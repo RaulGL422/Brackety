@@ -1,7 +1,6 @@
 # Pendientes
 
 ## Entorno de desarrollo (Raul)
-- [ ] Android: instalar *cmdline-tools* (SDK Manager de Android Studio) y aceptar licencias con `flutter doctor --android-licenses`.
 - [ ] Autorizar la depuración USB en el móvil conectado (aparece como "not authorized").
 - [ ] Docker Desktop: solo hará falta para probar `deploy/` en Windows; tests y ejecución local no lo necesitan.
 
@@ -30,4 +29,5 @@
 - [ ] Registro de tratamientos y plantilla de registro de brechas.
 
 ## Hecho
+- 2026-10-28 · Android cmdline-tools instaladas; `flutter doctor` sin errores para Android y web.
 - 2026-10-28 · Graphify configurado a partir de ClipHive (`CLAUDE.md`, `.gitignore`).
