@@ -18,4 +18,10 @@ Formato: fecha · decisión · motivo.
 - 2026-10-28 · Despliegue manual `deploy.sh` en la Pi; Claude Code solo en el PC · simplicidad.
 - 2026-10-28 · Empates en rankings comparten posición; sin desempate automático por ahora · pedido por Raul.
 - 2026-10-28 · Club y Entidad Externa no pueden ser Ayudante · pedido por Raul.
+- 2026-10-28 · PostgreSQL 18 embebido (zonky) en tests y ejecución local, en vez de Testcontainers · no hay Docker en el PC de desarrollo; sigue siendo Postgres real.
+- 2026-10-28 · Ejecutadores por escenario con BD temporal y fechas relativas al reloj (`08-ejecucion-local.md`) · pedido por Raul para probar casos concretos.
+- 2026-10-28 · Run configs de IntelliJ en `.run/` + scripts `run-server.ps1` / `run-app.ps1` · pedido por Raul.
+- 2026-10-28 · Spotless (palantir-java-format) en Java y `dart format` en Flutter · formato uniforme, lo aplica el hook global.
+- 2026-10-28 · Diseño responsive obligatorio con clases de ventana Material 3 · pedido por Raul: cualquier dispositivo.
+- 2026-10-28 · Graphify como en ClipHive: grafo local en `graphify-out/` (no se sube), `graphify update .` tras cada commit · ahorro de tokens.
 - 2026-10-28 · Peso de pesaje exacto configurable por evento; solo estatura como medida corporal fija (sin envergadura) · pedido por Raul.

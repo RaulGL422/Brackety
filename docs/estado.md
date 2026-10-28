@@ -1,10 +1,10 @@
 # Estado del proyecto
 
-Última actualización: 2026-10-28. Fase: **planificación cerrada, sin código**.
+Última actualización: 2026-10-28. Fase: **0 · infra-deploy**.
 
 | Módulo | Doc | Estado | Rama activa |
 |---|---|---|---|
-| infra-deploy | modulos/infra-deploy.md | pendiente | – |
+| infra-deploy | modulos/infra-deploy.md | en curso (tarea 1/6) | chore/infra-repo-setup |
 | auth | modulos/auth.md | pendiente | – |
 | perfiles-menores | modulos/perfiles-menores.md | pendiente | – |
 | legal-paginas | modulos/legal-paginas.md | pendiente | – |
@@ -35,4 +35,4 @@ Estados: pendiente · en curso · en pruebas · cerrado.
 8. Exploración de diseño (`07-diseno.md`) justo antes de la primera pantalla real de cada bloque.
 
 ## Bloqueos
-Ver `pendientes.md`. Antes de la primera fase: archivos de ClipHive/Graphify.
+Ver `pendientes.md`. Ninguno bloquea la fase 0.

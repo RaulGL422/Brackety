@@ -6,7 +6,7 @@ Objetivo: calidad sin horas de QA manual. Los tests se escriben con la tarea, en
 | Nivel | Herramienta | Qué cubre |
 |---|---|---|
 | Unitario backend | JUnit 5 | Motor de puntuación, sorteo, calendario, permisos |
-| Integración backend | Testcontainers + PostgreSQL 18 | Repos, Flyway, seguridad, endpoints |
+| Integración backend | PostgreSQL 18 embebido (zonky) | Repos, Flyway, seguridad, endpoints |
 | Unitario front | `flutter test` | Lógica de providers y repositorios |
 | Widget | `flutter test` | Pantallas críticas (marcador, inscripción) |
 | E2E | Solo flujos críticos | Login, inscripción por QR, marcador offline → sync |
@@ -18,6 +18,8 @@ Objetivo: calidad sin horas de QA manual. Los tests se escriben con la tarea, en
 - [ ] Menores y privacidad (fotos nunca públicas, datos mínimos) si el módulo los toca.
 - [ ] Offline: escenario sin red y sincronización, si el módulo lo exige.
 - [ ] Sin N+1 en listados principales.
+- [ ] Pantallas probadas en móvil, tablet y escritorio (widget tests a 3 tamaños).
+- [ ] Escenarios de datos del módulo en `08-ejecucion-local.md` con su run config.
 - [ ] CI verde y `estado.md` actualizado.
 
 ## Determinismo

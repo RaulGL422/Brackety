@@ -1,7 +1,9 @@
 # Pendientes
 
-## Bloquean el arranque de la primera fase
-- [ ] Raul pasará archivos de **ClipHive / Graphify** (CLAUDE.md, comandos, reglas) → Claude los adapta a `.claude/` y `CLAUDE.md`.
+## Entorno de desarrollo (Raul)
+- [ ] Android: instalar *cmdline-tools* (SDK Manager de Android Studio) y aceptar licencias con `flutter doctor --android-licenses`.
+- [ ] Autorizar la depuración USB en el móvil conectado (aparece como "not authorized").
+- [ ] Docker Desktop: solo hará falta para probar `deploy/` en Windows; tests y ejecución local no lo necesitan.
 
 ## Bloquean el lanzamiento público
 - [ ] Email de privacidad (`PRIVACY_CONTACT_EMAIL`, p. ej. `privacidad@rgal.dev`). Sin él, la API no deja publicar ni pasar de fase.
@@ -27,4 +29,4 @@
 - [ ] Registro de tratamientos y plantilla de registro de brechas.
 
 ## Hecho
-(nada todavía)
+- 2026-10-28 · Graphify configurado a partir de ClipHive (`CLAUDE.md`, `.gitignore`).

@@ -13,15 +13,15 @@ Repo, CI, esqueletos de `server/`, `app/`, `admin/` y despliegue reproducible en
 - Cloudflare Tunnel: rutas `web`, `api`, `admin`; Access solo en `admin`.
 
 ## Tareas
-1. Repo + `.gitignore` + CI vacío que compila.
-2. Esqueleto Spring Boot 4.1 (Java 25, Maven wrapper, Flyway, actuator, Testcontainers).
-3. Esqueleto Flutter `app` y `admin` (i18n es/en, tema, router, Riverpod).
+1. Repo, `.gitignore`, Graphify y reglas (`chore/infra-repo-setup`).
+2. Esqueleto Spring Boot 4.1 (Java 25, Maven wrapper, Flyway, actuator, Postgres embebido, Spotless), ejecutadores por escenario, reloj inyectable y CI backend (`feat/infra-server-skeleton`).
+3. Esqueleto Flutter `app` y `admin` (i18n es/en, tema, router, Riverpod, layout responsive), destinos web/emulador/móvil/URL y CI Flutter (`feat/infra-flutter-skeleton`).
 4. Dockerfiles y compose.
 5. Scripts de despliegue y guía de primer arranque en la Pi.
 6. Backup `pg_dump` cifrado (script + cron), prueba de restauración.
 
 ## Tests
-CI verde; `docker compose up` local con healthchecks OK; restauración de backup probada.
+CI verde; ejecutadores locales arrancan (`08-ejecucion-local.md`); `docker compose up` con healthchecks OK; restauración de backup probada.
 
 ## Estado
-Pendiente. Requiere configurar Graphify (`pendientes.md`).
+En curso: tarea 1 hecha.

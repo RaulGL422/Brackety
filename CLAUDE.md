@@ -22,8 +22,19 @@ Plataforma multideporte de ligas, ligas por fases y torneos (primer cliente: Lig
 - Sin `PRIVACY_CONTACT_EMAIL` definido, la API rechaza publicar eventos y pasar de fase.
 - Secretos solo en variables de entorno; `.env.example` siempre actualizado.
 
+## Workflow
+- Backend (desde `server/`): `./mvnw -q -B verify` (tests + Spotless). Un test: `./mvnw -q test -Dtest=<Clase>`. Formato: `./mvnw spotless:apply`.
+- Flutter (desde `app/` o `admin/`): `flutter analyze` y `flutter test`. Formato: `dart format .`.
+- Ejecutar en local (BD temporal, escenarios, reloj simulado, destinos Android/web): `docs/08-ejecucion-local.md`. Toda pantalla responsive (`docs/07-diseno.md`).
+- Post-commit: `graphify update .` (o `python -m graphify update .`); `graphify-out/` no se sube.
+- En Windows, texto con tildes por Bash heredoc se corrompe: usar Write/Edit.
+
 ## Graphify
-Pendiente de configurar: Raul pasará los archivos de ClipHive antes de la primera fase. Ver `docs/pendientes.md`. Hasta entonces, no inventes comandos de Graphify.
+Grafo de conocimiento local en `graphify-out/`.
+- Para preguntas sobre el código, si existe `graphify-out/graph.json`, primero `graphify query "<pregunta>"`; relaciones con `graphify path "<A>" "<B>"`, conceptos con `graphify explain "<concepto>"`.
+- `graphify-out/GRAPH_REPORT.md` solo para revisiones de arquitectura amplias.
+- Tras modificar código: `graphify update .` (solo AST, sin coste de API).
+- Si `graphify` no está en el PATH, usar `python -m graphify` (o el intérprete de `graphify-out/.graphify_python`).
 
 ## Entorno
-Claude Code corre en el PC de Raul (Windows/Linux). La Raspberry (SD, sin backups aún) solo despliega con `deploy/deploy.sh`.
+Claude Code corre en el PC de Raul (Windows/Linux). La Raspberry (SD, sin backups aún) solo despliega con `deploy/deploy.sh`. Flutter en `C:\dev\flutter`; JDK 25 en `~/.jdks/ms-25.*`; sin Docker en el PC.

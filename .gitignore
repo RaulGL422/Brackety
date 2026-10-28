@@ -1,9 +1,26 @@
+# Secrets
 .env
 *.env.local
+app/env/device.json
+admin/env/device.json
+
+# Build output
 target/
 build/
 .dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml
+*.log
+hs_err_pid*
+node_modules/
+
+# IDEs (shared run configs live in .run/)
 .idea/
 .vscode/
-*.log
-node_modules/
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# graphify — local knowledge graph, regenerated with `graphify update .`, never committed
+graphify-out/

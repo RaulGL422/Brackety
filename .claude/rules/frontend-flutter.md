@@ -18,6 +18,12 @@ paths: ["app/**", "admin/**"]
 - Medir antes de optimizar, pero prohibido: setState global, providers que reconstruyen pantallas enteras, listas sin builder.
 - Pantallas de marcador y tapiz: tamaño táctil grande, cero animaciones pesadas, funcionar sin red.
 
+## Responsive
+Toda pantalla funciona en móvil, tablet y escritorio con las clases de ventana de `docs/07-diseno.md` (helpers en `core/layout`). Decidir por ancho, nunca por `Platform`/`kIsWeb`.
+
+## Backend
+La URL de la API llega solo por `API_BASE_URL` (`--dart-define-from-file=env/<destino>.json`); nunca URLs fijas en código. Ver `docs/08-ejecucion-local.md`.
+
 ## Accesibilidad y diseño
 Seguir `docs/07-diseno.md`. Contraste suficiente, textos escalables, uso con una mano en el tapiz.
 
