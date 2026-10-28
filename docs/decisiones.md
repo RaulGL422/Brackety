@@ -24,4 +24,6 @@ Formato: fecha · decisión · motivo.
 - 2026-10-28 · Spotless (palantir-java-format) en Java y `dart format` en Flutter · formato uniforme, lo aplica el hook global.
 - 2026-10-28 · Diseño responsive obligatorio con clases de ventana Material 3 · pedido por Raul: cualquier dispositivo.
 - 2026-10-28 · Graphify como en ClipHive: grafo local en `graphify-out/` (no se sube), `graphify update .` tras cada commit · ahorro de tokens.
+- 2026-10-28 · Paquete local `packages/brackety_core` desde el inicio (config API, layout responsive, tema, red, pantalla Conexión) · app y admin ya comparten ese código; evita duplicarlo.
+- 2026-10-28 · Dependencias front: flutter_riverpod 3.4.3, go_router 18.1.1, dio 5.11.1, intl 0.20.3 · stack previsto en `02-stack-versiones.md`; últimas compatibles con Flutter 3.47.8.
 - 2026-10-28 · Peso de pesaje exacto configurable por evento; solo estatura como medida corporal fija (sin envergadura) · pedido por Raul.

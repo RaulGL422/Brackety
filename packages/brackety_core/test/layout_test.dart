@@ -1,0 +1,82 @@
+import 'package:brackety_core/brackety_core.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  test('window size thresholds follow Material 3', () {
+    expect(WindowSize.fromWidth(0), WindowSize.compact);
+    expect(WindowSize.fromWidth(599), WindowSize.compact);
+    expect(WindowSize.fromWidth(600), WindowSize.medium);
+    expect(WindowSize.fromWidth(839), WindowSize.medium);
+    expect(WindowSize.fromWidth(840), WindowSize.expanded);
+  });
+
+  Future<void> pumpAt(
+    WidgetTester tester,
+    Size size, {
+    ValueChanged<int>? onSelected,
+  }) async {
+    tester.view.physicalSize = size;
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: AdaptiveScaffold(
+          title: 'Brackety',
+          destinations: const [
+            AdaptiveDestination(icon: Icons.home, label: 'Home'),
+            AdaptiveDestination(icon: Icons.dns, label: 'Server'),
+          ],
+          selectedIndex: 0,
+          onSelected: onSelected ?? (_) {},
+          body: const Text('body'),
+        ),
+      ),
+    );
+  }
+
+  testWidgets('phone uses a bottom navigation bar', (tester) async {
+    await pumpAt(tester, const Size(360, 800));
+
+    expect(find.byType(NavigationBar), findsOneWidget);
+    expect(find.byType(NavigationRail), findsNothing);
+  });
+
+  testWidgets('tablet uses a navigation rail with labels', (tester) async {
+    await pumpAt(tester, const Size(800, 1280));
+
+    final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
+    expect(rail.extended, isFalse);
+    expect(rail.labelType, NavigationRailLabelType.all);
+    expect(find.byType(NavigationBar), findsNothing);
+  });
+
+  testWidgets('desktop uses an extended rail', (tester) async {
+    await pumpAt(tester, const Size(1440, 900));
+
+    expect(
+      tester.widget<NavigationRail>(find.byType(NavigationRail)).extended,
+      isTrue,
+    );
+  });
+
+  testWidgets('desktop content never grows past the reading width', (
+    tester,
+  ) async {
+    await pumpAt(tester, const Size(2560, 1440));
+
+    expect(
+      tester.getSize(find.text('body')).width,
+      lessThanOrEqualTo(AdaptiveScaffold.maxContentWidth),
+    );
+  });
+
+  testWidgets('selecting a destination reports its index', (tester) async {
+    int? selected;
+    await pumpAt(tester, const Size(360, 800), onSelected: (i) => selected = i);
+
+    await tester.tap(find.text('Server'));
+
+    expect(selected, 1);
+  });
+}

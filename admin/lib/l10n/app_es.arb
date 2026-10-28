@@ -1,0 +1,8 @@
+{
+  "@@locale": "es",
+  "appTitle": "Brackety Admin",
+  "navDashboard": "Panel",
+  "navConnection": "Conexión",
+  "dashboardTitle": "Panel de superadmin",
+  "dashboardSubtitle": "Gestión global de la plataforma."
+}

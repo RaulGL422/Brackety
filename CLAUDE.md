@@ -24,7 +24,7 @@ Plataforma multideporte de ligas, ligas por fases y torneos (primer cliente: Lig
 
 ## Workflow
 - Backend (desde `server/`): `./mvnw -q -B verify` (tests + Spotless). Un test: `./mvnw -q test -Dtest=<Clase>`. Formato: `./mvnw spotless:apply`.
-- Flutter (desde `app/` o `admin/`): `flutter analyze` y `flutter test`. Formato: `dart format .`.
+- Flutter (desde `app/`, `admin/` o `packages/brackety_core/`): `flutter analyze` y `flutter test`. Formato: `dart format lib test`.
 - Ejecutar en local (BD temporal, escenarios, reloj simulado, destinos Android/web): `docs/08-ejecucion-local.md`. Toda pantalla responsive (`docs/07-diseno.md`).
 - Post-commit: `graphify update .` (o `python -m graphify update .`); `graphify-out/` no se sube.
 - En Windows, texto con tildes por Bash heredoc se corrompe: usar Write/Edit.
@@ -37,4 +37,4 @@ Grafo de conocimiento local en `graphify-out/`.
 - Si `graphify` no está en el PATH, usar `python -m graphify` (o el intérprete de `graphify-out/.graphify_python`).
 
 ## Entorno
-Claude Code corre en el PC de Raul (Windows/Linux). La Raspberry (SD, sin backups aún) solo despliega con `deploy/deploy.sh`. Flutter en `C:\dev\flutter`; JDK 25 en `~/.jdks/ms-25.*`; sin Docker en el PC.
+Claude Code corre en el PC de Raul (Windows/Linux). La Raspberry (SD, sin backups aún) solo despliega con `deploy/deploy.sh`. Flutter en `C:\dev\flutter` (Gradle con JDK 21); JDK 25 en `~/.jdks/ms-25.*`; sin Docker en el PC.
