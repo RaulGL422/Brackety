@@ -39,8 +39,12 @@ public class EmbeddedPostgresConfig {
         if (!Files.exists(pidFile)) {
             return;
         }
-        var pid = Long.parseLong(Files.readAllLines(pidFile).getFirst().trim());
-        ProcessHandle.of(pid)
+        var lines = Files.readAllLines(pidFile);
+        // A hard kill can leave the file empty or half written: then there is nothing to kill.
+        if (lines.isEmpty() || !lines.getFirst().trim().matches("\\d+")) {
+            return;
+        }
+        ProcessHandle.of(Long.parseLong(lines.getFirst().trim()))
                 .filter(p -> p.info().command().orElse("").contains("postgres"))
                 .ifPresent(postmaster -> {
                     postmaster.descendants().forEach(ProcessHandle::destroyForcibly);

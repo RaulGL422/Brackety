@@ -4,6 +4,6 @@
   "connectionServer": "Server",
   "connectionStatusOk": "Connected",
   "connectionStatusError": "Cannot reach the server",
-  "connectionServerToday": "Server date",
+  "connectionServerToday": "Server date: {date}",
   "retry": "Retry"
 }

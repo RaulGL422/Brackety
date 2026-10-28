@@ -22,7 +22,12 @@ class CoreLocalizationsEs extends CoreLocalizations {
   String get connectionStatusError => 'Sin conexión con el servidor';
 
   @override
-  String get connectionServerToday => 'Fecha del servidor';
+  String connectionServerToday(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Fecha del servidor: $dateString';
+  }
 
   @override
   String get retry => 'Reintentar';

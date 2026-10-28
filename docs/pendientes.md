@@ -6,6 +6,7 @@
 - [ ] Docker Desktop: solo hará falta para probar `deploy/` en Windows; tests y ejecución local no lo necesitan.
 
 ## Bloquean el lanzamiento público
+- [ ] Firma release de Android (keystore propio en secretos de CI); ahora `app/android/app/build.gradle.kts` firma release con la clave debug de la plantilla.
 - [ ] Email de privacidad (`PRIVACY_CONTACT_EMAIL`, p. ej. `privacidad@rgal.dev`). Sin él, la API no deja publicar ni pasar de fase.
 - [ ] SSD USB/NVMe para la base de datos (la SD no es fiable).
 - [ ] Backups cifrados + prueba de restauración.

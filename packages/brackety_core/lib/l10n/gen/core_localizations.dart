@@ -125,8 +125,8 @@ abstract class CoreLocalizations {
   /// No description provided for @connectionServerToday.
   ///
   /// In es, this message translates to:
-  /// **'Fecha del servidor'**
-  String get connectionServerToday;
+  /// **'Fecha del servidor: {date}'**
+  String connectionServerToday(DateTime date);
 
   /// No description provided for @retry.
   ///

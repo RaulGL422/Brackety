@@ -22,7 +22,12 @@ class CoreLocalizationsEn extends CoreLocalizations {
   String get connectionStatusError => 'Cannot reach the server';
 
   @override
-  String get connectionServerToday => 'Server date';
+  String connectionServerToday(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Server date: $dateString';
+  }
 
   @override
   String get retry => 'Retry';

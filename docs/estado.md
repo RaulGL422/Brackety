@@ -4,7 +4,7 @@
 
 | Módulo | Doc | Estado | Rama activa |
 |---|---|---|---|
-| infra-deploy | modulos/infra-deploy.md | en curso (tarea 3/6) | feat/infra-flutter-skeleton |
+| infra-deploy | modulos/infra-deploy.md | en curso (3/6 hechas) | feat/infra-flutter-skeleton |
 | auth | modulos/auth.md | pendiente | – |
 | perfiles-menores | modulos/perfiles-menores.md | pendiente | – |
 | legal-paginas | modulos/legal-paginas.md | pendiente | – |

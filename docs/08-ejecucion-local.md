@@ -6,7 +6,7 @@ Objetivo: arrancar cualquier app en local en un clic, con la base de datos en el
 - Siempre con **PostgreSQL 18 embebido** (zonky): BD temporal, se crea al arrancar y se borra al parar. Sin Docker.
 - Puerto API `8080`. BD en `localhost:15432` (usuario y BD `postgres`, sin contraseña) para inspeccionarla con un cliente mientras corre.
 - Lanzador: clase `LocalBracketyApplication` (en `server/src/test`, nunca llega al jar de producción).
-- Perfil Spring `local`: CORS abierto a `localhost` y red local (192.168.x, 10.x).
+- Perfil Spring `local`: CORS abierto a `localhost` y red local (192.168.x, 10.x, 172.x).
 - Parada brusca (stop del IDE): el siguiente arranque mata el Postgres huérfano por su `postmaster.pid` y empieza de cero.
 - Comprobar conexión y reloj: `GET /api/v1/info` → `{"name":"brackety","today":"…"}`.
 - Primera vez en Windows: aceptar el aviso del firewall para Java (red privada) si se va a usar desde el móvil.

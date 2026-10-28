@@ -1,6 +1,5 @@
 import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -15,12 +14,7 @@ void main() {
         child: const MaterialApp(
           locale: Locale('es'),
           supportedLocales: CoreLocalizations.supportedLocales,
-          localizationsDelegates: [
-            CoreLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
+          localizationsDelegates: coreLocalizationsDelegates,
           home: Scaffold(body: ConnectionScreen()),
         ),
       ),

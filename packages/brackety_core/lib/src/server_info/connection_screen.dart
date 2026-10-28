@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 import '../../l10n/gen/core_localizations.dart';
 import '../config/api_config.dart';
@@ -32,8 +31,7 @@ class ConnectionScreen extends ConsumerWidget {
           AsyncData(:final value) => _StatusTile(
             ok: true,
             title: l10n.connectionStatusOk,
-            subtitle:
-                '${l10n.connectionServerToday}: ${DateFormat.yMMMMd(Localizations.localeOf(context).toLanguageTag()).format(value.today)}',
+            subtitle: l10n.connectionServerToday(value.today),
           ),
           AsyncError() => _StatusTile(
             ok: false,
