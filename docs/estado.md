@@ -4,7 +4,7 @@
 
 | Módulo | Doc | Estado | Rama activa |
 |---|---|---|---|
-| infra-deploy | modulos/infra-deploy.md | en curso (5/6 hechas) | feat/infra-deploy-scripts |
+| infra-deploy | modulos/infra-deploy.md | en pruebas (6/6, PRs #1–#6 abiertas) | feat/infra-backup |
 | auth | modulos/auth.md | pendiente | – |
 | perfiles-menores | modulos/perfiles-menores.md | pendiente | – |
 | legal-paginas | modulos/legal-paginas.md | pendiente | – |

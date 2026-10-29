@@ -6,6 +6,9 @@ docs/
 **/build/
 **/.dart_tool/
 **/.flutter-plugins*
-**/env/device.json
 **/android/
-deploy/.env
+**/env/
+**/.env
+**/*.env.local
+**/key.properties
+**/*.jks

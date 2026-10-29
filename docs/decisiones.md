@@ -32,5 +32,6 @@ Formato: fecha · decisión · motivo.
 - 2026-10-29 · Un solo `deploy/web.Dockerfile` para web y admin (`ARG APP`), Flutter clonado en la etiqueta 3.47.8 · no hay imagen Flutter 3.47.8 de terceros; misma versión que en local y sin duplicar Dockerfiles.
 - 2026-10-29 · Perfiles `pi`/`windows` del compose = activan el túnel; diferencias de host por `.env` (`DB_DATA`, `IMAGE_TAG`) · sin perfil se prueba el stack completo en local y CI sin token de Cloudflare.
 - 2026-10-29 · Rollback = reetiquetar como `rollback` las imágenes en ejecución antes del pull · no depende de saber qué versión había; el modo `local` permite probarlo en CI con una versión rota.
+- 2026-10-29 · Backups cifrados con age (clave pública en el servidor, privada fuera) en vez de gpg · más simple y quien acceda a la Pi no puede leer los backups.
 - 2026-10-29 · Web con `--no-web-resources-cdn` · CanvasKit servido desde nuestro nginx, sin peticiones a gstatic (privacidad).
 - 2026-10-29 · `CLAUDE.md` sin datos de la máquina de desarrollo; van en `docs/10-entorno-desarrollo.md` · el repo será público y visible para empresas; `docs/` es material de planificación temporal.
