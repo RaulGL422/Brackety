@@ -9,6 +9,9 @@
 - [ ] Paquetes GHCR: hacerlos públicos o `docker login ghcr.io` en la Pi con un token de solo lectura (decidir).
 - [ ] Cabecera Content-Security-Policy en nginx: probarla contra el despliegue real antes de activarla.
 
+## Repositorio público
+- [ ] `docs/` es planificación temporal y se eliminará en el futuro. Antes de hacerlo: pasar a `CLAUDE.md` (o un README) lo imprescindible que hoy solo vive en `docs/` y quitar sus enlaces.
+
 ## Bloquean el lanzamiento público
 - [ ] Firma release de Android (keystore propio en secretos de CI); ahora `app/android/app/build.gradle.kts` firma release con la clave debug de la plantilla.
 - [ ] Email de privacidad (`PRIVACY_CONTACT_EMAIL`, p. ej. `privacidad@rgal.dev`). Sin él, la API no deja publicar ni pasar de fase.
