@@ -5,7 +5,8 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-env_value() { grep -E "^$1=" .env | tail -1 | cut -d= -f2- || true; }
+# Same reading rules as compose: last occurrence wins, CRLF and surrounding quotes are ignored.
+env_value() { grep -E "^$1=" .env | tail -1 | cut -d= -f2- | tr -d '\r' | sed -E "s/^\"(.*)\"$/\1/; s/^'(.*)'$/\1/" || true; }
 dir="${BACKUP_DIR:-$(env_value BACKUP_DIR)}"
 recipient="${BACKUP_AGE_RECIPIENT:-$(env_value BACKUP_AGE_RECIPIENT)}"
 [[ -n "$dir" && -n "$recipient" ]] || { echo "Set BACKUP_DIR and BACKUP_AGE_RECIPIENT in deploy/.env" >&2; exit 1; }

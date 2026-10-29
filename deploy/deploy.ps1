@@ -15,26 +15,30 @@ function Invoke-Compose {
     return $LASTEXITCODE -eq 0
 }
 
-if (-not (Test-Path .env)) {
-    Write-Host 'Missing deploy/.env: copy .env.example and fill it in' -ForegroundColor Red
+function Stop-Deploy([string]$message) {
+    Write-Host $message -ForegroundColor Red
     exit 1
 }
 
-# Tag what is running now, so a failed deploy can go back to it.
+if (-not (Test-Path .env)) { Stop-Deploy 'Missing deploy/.env: copy .env.example and fill it in' }
+# An empty token makes the tunnel restart forever and would roll back a healthy release.
+if ($Mode -ne 'local' -and -not (Select-String -Path .env -Pattern '^CLOUDFLARE_TUNNEL_TOKEN=.+' -Quiet)) {
+    Stop-Deploy 'Set CLOUDFLARE_TUNNEL_TOKEN in deploy/.env'
+}
+
+# Tag what is running and healthy now, so a failed deploy can go back to it.
 $saved = 0
 foreach ($s in $services) {
     $id = docker compose @profileArgs ps -q $s
-    if ($id) {
+    if ($id -and (docker inspect --format '{{.State.Health.Status}}' $id) -eq 'healthy') {
         $image = docker inspect --format '{{.Image}}' $id
         docker tag $image "ghcr.io/raulgl422/brackety-${s}:rollback"
+        if (-not $image -or $LASTEXITCODE -ne 0) { Stop-Deploy "Could not tag the rollback image of $s" }
         $saved++
     }
 }
 
-if ($Mode -ne 'local' -and -not (Invoke-Compose pull --quiet)) {
-    Write-Host 'Pull failed; nothing was changed' -ForegroundColor Red
-    exit 1
-}
+if ($Mode -ne 'local' -and -not (Invoke-Compose pull --quiet)) { Stop-Deploy 'Pull failed; nothing was changed' }
 
 if (Invoke-Compose up -d --wait --wait-timeout 300) {
     docker image prune -f | Out-Null
@@ -46,13 +50,13 @@ Write-Host 'Deploy failed: healthchecks did not pass' -ForegroundColor Red
 Invoke-Compose ps | Out-Null
 
 # Database migrations are not undone: Flyway ignores newer ones, so the previous api still starts.
-if ($saved -eq $services.Count) {
-    Write-Host 'Rolling back to the previous images' -ForegroundColor Yellow
-    $env:IMAGE_TAG = 'rollback'
-    try { Invoke-Compose up -d --wait --wait-timeout 300 | Out-Null }
-    finally { Remove-Item Env:IMAGE_TAG }
-    Write-Host 'Rollback done; fix the release and deploy again' -ForegroundColor Yellow
-} else {
-    Write-Host 'Nothing to roll back to (first deploy)' -ForegroundColor Yellow
-}
+if ($saved -ne $services.Count) { Stop-Deploy 'Nothing to roll back to (first deploy)' }
+
+Write-Host 'Rolling back to the previous images' -ForegroundColor Yellow
+$previousTag = $env:IMAGE_TAG
+$env:IMAGE_TAG = 'rollback'
+try { $rolledBack = Invoke-Compose up -d --wait --wait-timeout 300 }
+finally { $env:IMAGE_TAG = $previousTag }
+if (-not $rolledBack) { Stop-Deploy 'Rollback failed: the service is down, check docker compose logs' }
+Write-Host 'Rollback done; fix the release and deploy again' -ForegroundColor Yellow
 exit 1
