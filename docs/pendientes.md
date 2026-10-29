@@ -5,6 +5,9 @@
 - [ ] Autorizar la depuración USB en el móvil conectado (aparece como "not authorized").
 - [ ] Docker Desktop: solo hará falta para probar `deploy/` en Windows; tests y ejecución local no lo necesitan.
 
+## Repositorio público
+- [ ] `docs/` es planificación temporal y se eliminará en el futuro. Antes de hacerlo: pasar a `CLAUDE.md` (o un README) lo imprescindible que hoy solo vive en `docs/` y quitar sus enlaces.
+
 ## Bloquean el lanzamiento público
 - [ ] Email de privacidad (`PRIVACY_CONTACT_EMAIL`, p. ej. `privacidad@rgal.dev`). Sin él, la API no deja publicar ni pasar de fase.
 - [ ] SSD USB/NVMe para la base de datos (la SD no es fiable).
