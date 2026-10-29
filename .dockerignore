@@ -1,0 +1,11 @@
+.git/
+.idea/
+graphify-out/
+server/
+docs/
+**/build/
+**/.dart_tool/
+**/.flutter-plugins*
+**/env/device.json
+**/android/
+deploy/.env

@@ -4,6 +4,11 @@
 - [ ] Autorizar la depuración USB en el móvil conectado (aparece como "not authorized").
 - [ ] Docker Desktop: solo hará falta para probar `deploy/` en Windows; tests y ejecución local no lo necesitan.
 
+## Despliegue (infra-deploy)
+- [ ] Variable de repositorio `API_BASE_URL` en GitHub (Settings → Variables) cuando haya dominio; sin ella fallan las imágenes web/admin al publicar.
+- [ ] Paquetes GHCR: hacerlos públicos o `docker login ghcr.io` en la Pi con un token de solo lectura (decidir).
+- [ ] Cabecera Content-Security-Policy en nginx: probarla contra el despliegue real antes de activarla.
+
 ## Repositorio público
 - [ ] `docs/` es planificación temporal y se eliminará en el futuro. Antes de hacerlo: pasar a `CLAUDE.md` (o un README) lo imprescindible que hoy solo vive en `docs/` y quitar sus enlaces.
 

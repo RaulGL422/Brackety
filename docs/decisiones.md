@@ -29,4 +29,7 @@ Formato: fecha · decisión · motivo.
 - 2026-10-28 · Peso de pesaje exacto configurable por evento; solo estatura como medida corporal fija (sin envergadura) · pedido por Raul.
 - 2026-10-29 · IntelliJ para el servidor y Android Studio para el front (`app/` y `admin/` abiertos por separado, cada uno con su `.run/`) · el selector de dispositivos Flutter no funcionaba en IntelliJ; pedido por Raul.
 - 2026-10-29 · Maven 3.9.16 en vez de 3.10.0 · IntelliJ 2026.1 falla al importar con 3.10 (`No implementation for ArtifactHandlerManager`); misma versión en IDE, terminal y CI.
+- 2026-10-29 · Un solo `deploy/web.Dockerfile` para web y admin (`ARG APP`), Flutter clonado en la etiqueta 3.47.8 · no hay imagen Flutter 3.47.8 de terceros; misma versión que en local y sin duplicar Dockerfiles.
+- 2026-10-29 · Perfiles `pi`/`windows` del compose = activan el túnel; diferencias de host por `.env` (`DB_DATA`, `IMAGE_TAG`) · sin perfil se prueba el stack completo en local y CI sin token de Cloudflare.
+- 2026-10-29 · Web con `--no-web-resources-cdn` · CanvasKit servido desde nuestro nginx, sin peticiones a gstatic (privacidad).
 - 2026-10-29 · `CLAUDE.md` sin datos de la máquina de desarrollo; van en `docs/10-entorno-desarrollo.md` · el repo será público y visible para empresas; `docs/` es material de planificación temporal.
