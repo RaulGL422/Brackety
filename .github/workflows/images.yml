@@ -36,6 +36,7 @@ jobs:
       - name: Broken release rolls back
         run: |
           # nginx never answers on :8080, so the api healthcheck fails like a bad release would.
+          docker pull --quiet nginx:1.30.6-alpine
           docker tag nginx:1.30.6-alpine ghcr.io/raulgl422/brackety-api:latest
           if ./deploy.sh local; then echo "deploy of a broken api should fail"; exit 1; fi
           docker compose ps api --format '{{.Image}}' | grep -q ':rollback'
