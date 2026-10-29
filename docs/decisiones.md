@@ -27,3 +27,4 @@ Formato: fecha · decisión · motivo.
 - 2026-10-28 · Paquete local `packages/brackety_core` desde el inicio (config API, layout responsive, tema, red, pantalla Conexión) · app y admin ya comparten ese código; evita duplicarlo.
 - 2026-10-28 · Dependencias front: flutter_riverpod 3.4.3, go_router 18.1.1, dio 5.11.1, intl 0.20.3 · stack previsto en `02-stack-versiones.md`; últimas compatibles con Flutter 3.47.8.
 - 2026-10-28 · Peso de pesaje exacto configurable por evento; solo estatura como medida corporal fija (sin envergadura) · pedido por Raul.
+- 2026-10-29 · IntelliJ para el servidor y Android Studio para el front (mismas run configs de `.run/`) · el selector de dispositivos Flutter no funcionaba en IntelliJ; pedido por Raul.

@@ -26,7 +26,8 @@ Cada escenario es una clase `Scenario` en `server/src/test/java/dev/rgal/bracket
 ## Cómo lanzar
 | Dónde | Cómo |
 |---|---|
-| IntelliJ | Run configs en `.run/`: `server · <escenario>`, `server · elegir escenario y fecha` (pregunta ambos; fecha vacía = hoy), `server · tests`, `app · <destino>`, `admin · <destino>` |
+| IntelliJ (servidor) | Run configs en `.run/`: `server · <escenario>`, `server · elegir escenario y fecha` (pregunta ambos; fecha vacía = hoy), `server · tests`. Requiere `server/pom.xml` cargado como proyecto Maven (módulo `brackety-server`) |
+| Android Studio (front) | Abrir la raíz del repo con el plugin Flutter y SDK `C:\dev\flutter`: `app · <destino>`, `admin · <destino>` |
 | Terminal | `./run-server.ps1 -Scenario <nombre> [-Today 2027-03-10]` · `-Scenario ?` lista los escenarios |
 | Terminal | `./run-app.ps1 -Target web\|emulator\|device\|url [-Url https://…] [-App app\|admin]` |
 
@@ -39,7 +40,7 @@ La URL de la API entra por `--dart-define-from-file=env/<destino>.json` (`API_BA
 | `device` | `http://<IP LAN del PC>:8080` | el script detecta la IP; móvil en la misma wifi |
 | `url` | la que se pase | Pi, túnel o cualquier servidor remoto |
 - HTTP sin TLS solo en builds debug (`android/app/src/debug/AndroidManifest.xml`).
-- En IntelliJ el dispositivo (Chrome, emulador, móvil) se elige en el desplegable de dispositivos; la run config fija el backend.
+- En Android Studio el dispositivo (Chrome, emulador, móvil) se elige en el desplegable de dispositivos; la run config fija el backend.
 - `env/device.json` no se sube (lleva tu IP): lo crea `./run-app.ps1 -Target device`, o copia `env/device.example.json`.
 - La pantalla **Conexión** de app y admin muestra la URL usada y la fecha del servidor: así se ve si el reloj simulado está activo.
 - Gradle (Android) usa JDK 21 (`flutter config --jdk-dir`); el servidor, JDK 25.
