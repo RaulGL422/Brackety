@@ -25,3 +25,4 @@ Formato: fecha · decisión · motivo.
 - 2026-10-28 · Diseño responsive obligatorio con clases de ventana Material 3 · pedido por Raul: cualquier dispositivo.
 - 2026-10-28 · Graphify como en ClipHive: grafo local en `graphify-out/` (no se sube), `graphify update .` tras cada commit · ahorro de tokens.
 - 2026-10-28 · Peso de pesaje exacto configurable por evento; solo estatura como medida corporal fija (sin envergadura) · pedido por Raul.
+- 2026-10-29 · `CLAUDE.md` sin datos de la máquina de desarrollo; van en `docs/10-entorno-desarrollo.md` · el repo será público y visible para empresas; `docs/` es material de planificación temporal.
