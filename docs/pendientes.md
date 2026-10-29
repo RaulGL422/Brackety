@@ -7,6 +7,9 @@
 ## Despliegue (infra-deploy)
 - [ ] Variable de repositorio `API_BASE_URL` en GitHub (Settings → Variables) cuando haya dominio; sin ella fallan las imágenes web/admin al publicar.
 - [ ] Paquetes GHCR: hacerlos públicos o `docker login ghcr.io` en la Pi con un token de solo lectura (decidir).
+- [ ] Copia de los backups en la nube (doc 05): elegir proveedor barato; se añadiría con `rclone` al final de `backup.sh`.
+- [ ] Generar la clave age de backups y guardar la privada fuera de la Pi (`09-despliegue.md`).
+- [ ] Backup en Windows si llega a ser el servidor (hoy `backup.sh` es solo Linux).
 - [ ] Cabecera Content-Security-Policy en nginx: probarla contra el despliegue real antes de activarla.
 
 ## Bloquean el lanzamiento público

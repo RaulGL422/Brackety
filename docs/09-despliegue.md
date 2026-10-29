@@ -38,6 +38,21 @@ Tras un reinicio todo vuelve solo: Docker arranca con el sistema y los servicios
 - El rollback **no deshace migraciones** de base de datos: hacer backup antes de desplegar una versión con migraciones (tarea 6).
 - `local` usa imágenes construidas en la máquina, sin pull ni túnel (`docker compose build && ./deploy.sh local`). Es lo que prueba el CI, rollback incluido.
 
+## Backups
+`deploy/backup.sh`: `pg_dump` cifrado con [age](https://github.com/FiloSottile/age), 14 diarios + 8 semanales (domingo).
+1. **Clave** (en tu PC, una vez): `winget install FiloSottile.age` y `age-keygen -o brackety-backup.key`.
+   - El archivo es la clave **privada**: guárdala en el gestor de contraseñas y en un USB. Nunca en la Pi ni en git.
+   - La línea `# public key: age1…` va a `BACKUP_AGE_RECIPIENT` en `.env`.
+2. **Disco de backups** distinto del SSD de la base de datos: montarlo como el SSD (fstab por UUID, `nofail`) en `/mnt/backup` y poner `BACKUP_DIR=/mnt/backup/brackety`.
+3. **En la Pi**: `sudo apt install -y age` y probar a mano: `~/brackety/deploy/backup.sh`.
+4. **Cron** (`crontab -e`): `30 3 * * * $HOME/brackety/deploy/backup.sh >> $HOME/brackety-backup.log 2>&1`.
+- Antes de desplegar una versión con migraciones: lanzar `backup.sh` a mano.
+
+## Restaurar (probar antes del lanzamiento y cada trimestre)
+- **Prueba** (no toca producción): `./restore.sh /mnt/backup/brackety/daily/<archivo>.dump.age /media/usb/brackety-backup.key` restaura en la base `restore_check`. Revisar datos y borrarla con el comando que muestra el script.
+- **Recuperación real**: añadir `brackety` como tercer argumento. Pide confirmación, para la api, sustituye la base y vuelve a arrancar la api.
+- Tras usar la clave privada en la Pi, retirar el USB.
+
 ## Windows (servidor alternativo)
 1. Docker Desktop con backend WSL 2, que arranque al iniciar sesión.
 2. Clonar el repo, `deploy\.env` desde `.env.example` (en `DB_DATA` dejar `pgdata` o una ruta tipo `D:/brackety/pgdata`).
