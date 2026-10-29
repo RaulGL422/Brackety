@@ -26,7 +26,7 @@ Plataforma multideporte de ligas, ligas por fases y torneos (primer cliente: Lig
 - Backend (desde `server/`): `./mvnw -q -B verify` (tests + Spotless). Un test: `./mvnw -q test -Dtest=<Clase>`. Formato: `./mvnw spotless:apply`.
 - Flutter (desde `app/`, `admin/` o `packages/brackety_core/`): `flutter analyze` y `flutter test`. Formato: `dart format lib test`.
 - Ejecutar en local (BD temporal, escenarios, reloj simulado, destinos Android/web): `docs/08-ejecucion-local.md`. Toda pantalla responsive (`docs/07-diseno.md`).
-- Post-commit: `graphify update .` (o `python -m graphify update .`); `graphify-out/` no se sube.
+- Post-commit: lo hace el hook `.githooks/post-commit` (activar una vez: `git config core.hooksPath .githooks`); si no está activo, `graphify update .`. `graphify-out/` no se sube.
 
 ## Graphify
 Grafo de conocimiento local en `graphify-out/`.

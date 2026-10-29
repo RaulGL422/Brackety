@@ -5,6 +5,9 @@ on:
   push:
     branches: [development, main]
 
+permissions:
+  contents: read
+
 jobs:
   server:
     runs-on: ubuntu-latest
@@ -12,8 +15,8 @@ jobs:
       run:
         working-directory: server
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-java@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           distribution: temurin
           java-version: '25'
@@ -31,8 +34,8 @@ jobs:
       run:
         working-directory: ${{ matrix.project }}
     steps:
-      - uses: actions/checkout@v7
-      - uses: subosito/flutter-action@v2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           flutter-version: '3.47.8'
           channel: stable
@@ -41,3 +44,12 @@ jobs:
       - run: dart format --output=none --set-exit-if-changed lib test
       - run: flutter analyze
       - run: flutter test
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Docs stay at 150 lines or less
+        run: |
+          long=$(find docs -name '*.md' -exec awk 'END { if (NR > 150) print FILENAME " (" NR " lines)" }' {} \;)
+          if [ -n "$long" ]; then echo "Split these docs (rule in .claude/rules/docs-upkeep.md):"; echo "$long"; exit 1; fi

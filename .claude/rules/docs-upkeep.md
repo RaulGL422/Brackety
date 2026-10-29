@@ -1,6 +1,6 @@
 # Reglas de documentación (ahorro de tokens)
 
-- Cada MD de `docs/` ≤ 150 líneas. Si crece, dividir en dos, no ampliar.
+- Cada MD de `docs/` ≤ 150 líneas (lo comprueba el CI). Si crece, dividir en dos, no ampliar.
 - `docs/estado.md` es la única fuente de "qué está hecho". Se actualiza al cerrar cada tarea (estado del módulo + fecha).
 - Decisión nueva o cambiada → una línea en `docs/decisiones.md` (fecha, decisión, motivo).
 - Duda sin respuesta → `docs/pendientes.md` con el módulo afectado. No bloquear lo demás.
