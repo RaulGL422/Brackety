@@ -33,3 +33,4 @@ Formato: fecha · decisión · motivo.
 - 2026-10-29 · Perfiles `pi`/`windows` del compose = activan el túnel; diferencias de host por `.env` (`DB_DATA`, `IMAGE_TAG`) · sin perfil se prueba el stack completo en local y CI sin token de Cloudflare.
 - 2026-10-29 · Rollback = reetiquetar como `rollback` las imágenes en ejecución antes del pull · no depende de saber qué versión había; el modo `local` permite probarlo en CI con una versión rota.
 - 2026-10-29 · Web con `--no-web-resources-cdn` · CanvasKit servido desde nuestro nginx, sin peticiones a gstatic (privacidad).
+- 2026-10-29 · `CLAUDE.md` sin datos de la máquina de desarrollo; van en `docs/10-entorno-desarrollo.md` · el repo será público y visible para empresas; `docs/` es material de planificación temporal.
