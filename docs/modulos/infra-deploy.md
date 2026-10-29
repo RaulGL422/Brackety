@@ -30,4 +30,4 @@ Repo, CI, esqueletos de `server/`, `app/`, `admin/` y despliegue reproducible en
 CI verde; ejecutadores locales arrancan (`08-ejecucion-local.md`); `docker compose up` con healthchecks OK; restauración de backup probada.
 
 ## Estado
-En pruebas: 6/6 tareas hechas y CI verde. Se cierra al fusionar las PRs. Lo que falta para producción (dominio, SSD, disco de backups, copia en la nube) está en `pendientes.md`.
+Cerrado (2026-10-30): 6/6 tareas fusionadas en `development` (PRs #1–#7) con CI verde. Lo que falta para producción (dominio, SSD, disco de backups, copia en la nube) está en `pendientes.md`.
