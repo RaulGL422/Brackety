@@ -23,14 +23,24 @@ jobs:
         run: |
           cp .env.example .env
           sed -i 's/^DB_USER=.*/DB_USER=brackety/; s/^DB_PASSWORD=.*/DB_PASSWORD=ci-only-password/; s#^API_BASE_URL=.*#API_BASE_URL=http://localhost:8080#' .env
-      - name: Build and start
-        run: docker compose up -d --build --wait --wait-timeout 300
+      - name: Build images
+        run: docker compose build
+      - name: Deploy
+        run: ./deploy.sh local
       - name: Check endpoints
         run: |
           curl -fsS http://127.0.0.1:8080/actuator/health | grep -q UP
           curl -fsS http://127.0.0.1:8081/ | grep -q flutter_bootstrap
           curl -fsS http://127.0.0.1:8082/healthz
           curl -fsSI http://127.0.0.1:8081/ | grep -qi "x-content-type-options: nosniff"
+      - name: Broken release rolls back
+        run: |
+          # nginx never answers on :8080, so the api healthcheck fails like a bad release would.
+          docker pull --quiet nginx:1.30.6-alpine
+          docker tag nginx:1.30.6-alpine ghcr.io/raulgl422/brackety-api:latest
+          if ./deploy.sh local; then echo "deploy of a broken api should fail"; exit 1; fi
+          docker compose ps api --format '{{.Image}}' | grep -q ':rollback'
+          curl -fsS http://127.0.0.1:8080/actuator/health | grep -q UP
       - name: Logs on failure
         if: failure()
         run: docker compose logs
