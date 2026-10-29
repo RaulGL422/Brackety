@@ -15,7 +15,8 @@ case "$target" in
   postgres | template0 | template1 | brackety_restore) echo "Reserved database name: $target" >&2; exit 2 ;;
 esac
 
-sql() { docker compose exec -T db sh -c 'psql -q -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d postgres -c "$1"' sh "$1"; }
+# </dev/null: exec -T would otherwise swallow the script's stdin, including the confirmation below.
+sql() { docker compose exec -T db sh -c 'psql -q -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d postgres -c "$1"' sh "$1" < /dev/null; }
 
 scratch="$target"
 [[ "$target" == brackety ]] && scratch=brackety_restore
