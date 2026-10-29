@@ -31,4 +31,5 @@ Formato: fecha · decisión · motivo.
 - 2026-10-29 · Maven 3.9.16 en vez de 3.10.0 · IntelliJ 2026.1 falla al importar con 3.10 (`No implementation for ArtifactHandlerManager`); misma versión en IDE, terminal y CI.
 - 2026-10-29 · Un solo `deploy/web.Dockerfile` para web y admin (`ARG APP`), Flutter clonado en la etiqueta 3.47.8 · no hay imagen Flutter 3.47.8 de terceros; misma versión que en local y sin duplicar Dockerfiles.
 - 2026-10-29 · Perfiles `pi`/`windows` del compose = activan el túnel; diferencias de host por `.env` (`DB_DATA`, `IMAGE_TAG`) · sin perfil se prueba el stack completo en local y CI sin token de Cloudflare.
+- 2026-10-29 · Rollback = reetiquetar como `rollback` las imágenes en ejecución antes del pull · no depende de saber qué versión había; el modo `local` permite probarlo en CI con una versión rota.
 - 2026-10-29 · Web con `--no-web-resources-cdn` · CanvasKit servido desde nuestro nginx, sin peticiones a gstatic (privacidad).
