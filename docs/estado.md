@@ -1,10 +1,10 @@
 # Estado del proyecto
 
-Última actualización: 2026-10-29. Fase: **0 · infra-deploy**.
+Última actualización: 2026-10-30. Fase 0 cerrada; siguiente: **auth**.
 
 | Módulo | Doc | Estado | Rama activa |
 |---|---|---|---|
-| infra-deploy | modulos/infra-deploy.md | en pruebas (6/6, PRs #1–#6 abiertas) | feat/infra-backup |
+| infra-deploy | modulos/infra-deploy.md | cerrado (2026-10-30) | – |
 | auth | modulos/auth.md | pendiente | – |
 | perfiles-menores | modulos/perfiles-menores.md | pendiente | – |
 | legal-paginas | modulos/legal-paginas.md | pendiente | – |
