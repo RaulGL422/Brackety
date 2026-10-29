@@ -6,7 +6,10 @@ Objetivo: arrancar cualquier app en local en un clic, con la base de datos en el
 - Siempre con **PostgreSQL 18 embebido** (zonky): BD temporal, se crea al arrancar y se borra al parar. Sin Docker.
 - Puerto API `8080`. BD en `localhost:15432` (usuario y BD `postgres`, sin contraseña) para inspeccionarla con un cliente mientras corre.
 - Lanzador: clase `LocalBracketyApplication` (en `server/src/test`, nunca llega al jar de producción).
-- Perfil Spring `local`: CORS abierto a `localhost`, logs legibles.
+- Perfil Spring `local`: CORS abierto a `localhost` y red local (192.168.x, 10.x).
+- Parada brusca (stop del IDE): el siguiente arranque mata el Postgres huérfano por su `postmaster.pid` y empieza de cero.
+- Comprobar conexión y reloj: `GET /api/v1/info` → `{"name":"brackety","today":"…"}`.
+- Primera vez en Windows: aceptar el aviso del firewall para Java (red privada) si se va a usar desde el móvil.
 
 ## Escenarios
 Cada escenario es una clase `Scenario` en `server/src/test/java/dev/rgal/brackety/devdata/scenarios/`.
@@ -23,8 +26,8 @@ Cada escenario es una clase `Scenario` en `server/src/test/java/dev/rgal/bracket
 ## Cómo lanzar
 | Dónde | Cómo |
 |---|---|
-| IntelliJ | Desplegable de run configs: `server · <escenario>`, `app · <destino>`, `admin · <destino>` (en `.run/`) |
-| Terminal | `./run-server.ps1 -Scenario <nombre> [-Today 2027-03-10]` · `./run-server.ps1 -List` |
+| IntelliJ | Run configs en `.run/`: `server · <escenario>`, `server · elegir escenario y fecha` (pregunta ambos; fecha vacía = hoy), `server · tests`, `app · <destino>`, `admin · <destino>` |
+| Terminal | `./run-server.ps1 -Scenario <nombre> [-Today 2027-03-10]` · `-Scenario ?` lista los escenarios |
 | Terminal | `./run-app.ps1 -Target web\|emulator\|device\|url [-Url https://…] [-App app\|admin]` |
 
 ## Front → backend
