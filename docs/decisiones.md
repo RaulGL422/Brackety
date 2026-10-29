@@ -1,0 +1,28 @@
+# Decisiones
+
+Formato: fecha · decisión · motivo.
+
+- 2026-10-28 · Nombre de trabajo **Brackety** · propuesto por Raul; marca y dominio sin verificar (`pendientes.md`).
+- 2026-10-28 · Front en **Flutter** (Android + web + superadmin), sin iOS nativo · Kotlin Multiplatform web aún en beta; sin Mac no se puede firmar iOS; la web/PWA cubre iOS.
+- 2026-10-28 · Backend **Java 25 + Spring Boot 4.1 + Maven + PostgreSQL 18** · versiones verificadas; Java por dominio de Raul.
+- 2026-10-28 · 5 contenedores (api, web, admin, db, tunnel), sin Redis · carga de 20 simultáneos; aislamiento de fallos.
+- 2026-10-28 · Login Google + Apple + email/contraseña; cuentas con varios perfiles · Apple exige su login si se ofrece Google en iOS.
+- 2026-10-28 · Email con Resend (rgal.dev), push con Firebase · ya usa Resend.
+- 2026-10-28 · Pagos fuera de la app: solo marca pagado/no pagado · evita riesgo legal y complejidad.
+- 2026-10-28 · Menores: tutor = Externo que crea el perfil; independización a los 14 · RGPD/LOPDGDD.
+- 2026-10-28 · Fotos nunca públicas; ayudante con permiso de marcador las ve en su tapiz.
+- 2026-10-28 · Sorteo siempre aleatorio con semilla guardada, ajustable a mano · pedido por Raul.
+- 2026-10-28 · Un único escritor por tapiz con traspaso explícito · evita fusionar conflictos offline.
+- 2026-10-28 · Permisos delegables a un solo nivel · pedido por Raul.
+- 2026-10-28 · Superadmin: usuario único por entorno + Cloudflare Access · pedido por Raul.
+- 2026-10-28 · Despliegue manual `deploy.sh` en la Pi; Claude Code solo en el PC · simplicidad.
+- 2026-10-28 · Empates en rankings comparten posición; sin desempate automático por ahora · pedido por Raul.
+- 2026-10-28 · Club y Entidad Externa no pueden ser Ayudante · pedido por Raul.
+- 2026-10-28 · PostgreSQL 18 embebido (zonky) en tests y ejecución local, en vez de Testcontainers · no hay Docker en el PC de desarrollo; sigue siendo Postgres real.
+- 2026-10-28 · Ejecutadores por escenario con BD temporal y fechas relativas al reloj (`08-ejecucion-local.md`) · pedido por Raul para probar casos concretos.
+- 2026-10-28 · Run configs de IntelliJ en `.run/` + scripts `run-server.ps1` / `run-app.ps1` · pedido por Raul.
+- 2026-10-28 · Spotless (palantir-java-format) en Java y `dart format` en Flutter · formato uniforme, lo aplica el hook global.
+- 2026-10-28 · Diseño responsive obligatorio con clases de ventana Material 3 · pedido por Raul: cualquier dispositivo.
+- 2026-10-28 · Graphify como en ClipHive: grafo local en `graphify-out/` (no se sube), `graphify update .` tras cada commit · ahorro de tokens.
+- 2026-10-28 · Peso de pesaje exacto configurable por evento; solo estatura como medida corporal fija (sin envergadura) · pedido por Raul.
+- 2026-10-29 · `CLAUDE.md` sin datos de la máquina de desarrollo; van en `docs/10-entorno-desarrollo.md` · el repo será público y visible para empresas; `docs/` es material de planificación temporal.
