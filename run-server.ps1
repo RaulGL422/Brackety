@@ -16,7 +16,9 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$jdk = Get-ChildItem "$env:USERPROFILE\.jdks" -Directory -Filter "*25*" -ErrorAction SilentlyContinue |
+# By the JDK's own release file, not the folder name: "jbr-21.0.25" would also match "*25*".
+$jdk = Get-ChildItem "$env:USERPROFILE\.jdks" -Directory -ErrorAction SilentlyContinue |
+    Where-Object { Select-String -Path "$($_.FullName)\release" -Pattern '^JAVA_VERSION="25[."]' -Quiet -ErrorAction SilentlyContinue } |
     Sort-Object Name -Descending | Select-Object -First 1
 if ($jdk) {
     $env:JAVA_HOME = $jdk.FullName

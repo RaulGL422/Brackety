@@ -29,7 +29,7 @@ public class ScenarioLoader implements ApplicationRunner {
                 scenarios.stream().sorted(Comparator.comparing(Scenario::name)).toList();
         this.clock = clock;
         this.transactions = transactions;
-        this.selected = selected;
+        this.selected = selected.isBlank() ? "empty" : selected.strip();
     }
 
     @Override

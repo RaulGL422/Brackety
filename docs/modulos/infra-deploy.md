@@ -24,4 +24,4 @@ Repo, CI, esqueletos de `server/`, `app/`, `admin/` y despliegue reproducible en
 CI verde; ejecutadores locales arrancan (`08-ejecucion-local.md`); `docker compose up` con healthchecks OK; restauración de backup probada.
 
 ## Estado
-En curso: tareas 1 y 2 hechas.
+En curso: tareas 1, 2 y 3 hechas. Siguen Dockerfiles y compose.

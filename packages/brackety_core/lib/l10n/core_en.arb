@@ -1,0 +1,9 @@
+{
+  "@@locale": "en",
+  "connectionTitle": "Connection",
+  "connectionServer": "Server",
+  "connectionStatusOk": "Connected",
+  "connectionStatusError": "Cannot reach the server",
+  "connectionServerToday": "Server date: {date}",
+  "retry": "Retry"
+}

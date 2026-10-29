@@ -1,0 +1,17 @@
+{
+  "@@locale": "es",
+  "connectionTitle": "Conexión",
+  "connectionServer": "Servidor",
+  "connectionStatusOk": "Conectado",
+  "connectionStatusError": "Sin conexión con el servidor",
+  "connectionServerToday": "Fecha del servidor: {date}",
+  "retry": "Reintentar",
+  "@connectionServerToday": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMMd"
+      }
+    }
+  }
+}

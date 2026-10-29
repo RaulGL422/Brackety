@@ -1,7 +1,6 @@
 # Pendientes
 
 ## Entorno de desarrollo (Raul)
-- [ ] Android: instalar *cmdline-tools* (SDK Manager de Android Studio) y aceptar licencias con `flutter doctor --android-licenses`.
 - [ ] Autorizar la depuración USB en el móvil conectado (aparece como "not authorized").
 - [ ] Docker Desktop: solo hará falta para probar `deploy/` en Windows; tests y ejecución local no lo necesitan.
 
@@ -9,6 +8,7 @@
 - [ ] `docs/` es planificación temporal y se eliminará en el futuro. Antes de hacerlo: pasar a `CLAUDE.md` (o un README) lo imprescindible que hoy solo vive en `docs/` y quitar sus enlaces.
 
 ## Bloquean el lanzamiento público
+- [ ] Firma release de Android (keystore propio en secretos de CI); ahora `app/android/app/build.gradle.kts` firma release con la clave debug de la plantilla.
 - [ ] Email de privacidad (`PRIVACY_CONTACT_EMAIL`, p. ej. `privacidad@rgal.dev`). Sin él, la API no deja publicar ni pasar de fase.
 - [ ] SSD USB/NVMe para la base de datos (la SD no es fiable).
 - [ ] Backups cifrados + prueba de restauración.
@@ -32,4 +32,5 @@
 - [ ] Registro de tratamientos y plantilla de registro de brechas.
 
 ## Hecho
+- 2026-10-28 · Android cmdline-tools instaladas; `flutter doctor` sin errores para Android y web.
 - 2026-10-28 · Graphify configurado a partir de ClipHive (`CLAUDE.md`, `.gitignore`).

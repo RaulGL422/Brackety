@@ -27,6 +27,15 @@ class ScenarioLoaderTest {
     }
 
     @Test
+    void blankSelectionFallsBackToTheEmptyScenario() {
+        var empty = new RecordingScenario("empty");
+        new ScenarioLoader(List.of(alpha, empty), clock, TransactionOperations.withoutTransaction(), " ").run(null);
+
+        assertThat(empty.seededOn).containsExactly(LocalDate.of(2026, 10, 28));
+        assertThat(alpha.seededOn).isEmpty();
+    }
+
+    @Test
     void unknownScenarioFailsListingTheAvailableOnes() {
         assertThatThrownBy(() -> loader("missing").run(null))
                 .isInstanceOf(IllegalArgumentException.class)

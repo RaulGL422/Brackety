@@ -6,7 +6,7 @@ Verificado el 2026-10-28 en fuentes oficiales o documentación vigente.
 |---|---|---|
 | Java | 25 (LTS) | Verificada; compatible con Spring Boot 4 |
 | Spring Boot | 4.1.2 | Última 4.1.x en Maven Central (2026-10-28) |
-| Maven | 3.10.0 (wrapper 3.3.4) | Última estable; Maven 4 aún en RC |
+| Maven | 3.9.16 (wrapper 3.3.4) | 3.10 rompe la importación de IntelliJ 2026.1; Maven 4 aún en RC |
 | PostgreSQL | 18.x (última menor) | PG 19 solo vista en beta; no usar hasta GA estable |
 | PostgreSQL embebido | zonky `embedded-postgres` 2.2.2 + binarios 18.6.0 | Solo local y tests (`08-ejecucion-local.md`) |
 | Spotless | 3.10.4 + palantir-java-format 2.103.0 | Formato Java; Dart con `dart format` |
