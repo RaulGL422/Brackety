@@ -4,6 +4,11 @@
 - [ ] Autorizar la depuración USB en el móvil conectado (aparece como "not authorized").
 - [ ] Docker Desktop: solo hará falta para probar `deploy/` en Windows; tests y ejecución local no lo necesitan.
 
+## Despliegue (infra-deploy)
+- [ ] Variable de repositorio `API_BASE_URL` en GitHub (Settings → Variables) cuando haya dominio; sin ella fallan las imágenes web/admin al publicar.
+- [ ] Paquetes GHCR: hacerlos públicos o `docker login ghcr.io` en la Pi con un token de solo lectura (decidir).
+- [ ] Cabecera Content-Security-Policy en nginx: probarla contra el despliegue real antes de activarla.
+
 ## Bloquean el lanzamiento público
 - [ ] Firma release de Android (keystore propio en secretos de CI); ahora `app/android/app/build.gradle.kts` firma release con la clave debug de la plantilla.
 - [ ] Email de privacidad (`PRIVACY_CONTACT_EMAIL`, p. ej. `privacidad@rgal.dev`). Sin él, la API no deja publicar ni pasar de fase.

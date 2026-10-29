@@ -3,6 +3,7 @@
 ## Variables de entorno
 - Se suben a una web de gestión de secretos; en local, `.env` (ignorado por Git). Siempre `deploy/.env.example` actualizado, sin valores reales.
 - Variables mínimas: `DB_URL, DB_USER, DB_PASSWORD, JWT_SECRET, GOOGLE_CLIENT_ID, APPLE_CLIENT_ID, RESEND_API_KEY, FCM_CREDENTIALS, SUPERADMIN_EMAIL, SUPERADMIN_PASSWORD_HASH, PRIVACY_CONTACT_EMAIL, PUBLIC_BASE_URL, CORS_ALLOWED_ORIGINS` (patrones de origen separados por comas; vacío = sin CORS).
+- Solo de despliegue (`deploy/.env`): `CLOUDFLARE_TUNNEL_TOKEN`, `API_BASE_URL` (URL pública de la API que se graba en web y admin al construir), `IMAGE_TAG`, `DB_DATA` (volumen o ruta del SSD), `API_PORT`, `WEB_PORT`, `ADMIN_PORT`.
 - Sin `PRIVACY_CONTACT_EMAIL` la API no permite publicar eventos ni pasar de fase.
 
 ## Superadmin

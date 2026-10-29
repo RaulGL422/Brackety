@@ -11,7 +11,8 @@ Verificado el 2026-10-28 en fuentes oficiales o documentación vigente.
 | PostgreSQL embebido | zonky `embedded-postgres` 2.2.2 + binarios 18.6.0 | Solo local y tests (`08-ejecucion-local.md`) |
 | Spotless | 3.10.4 + palantir-java-format 2.103.0 | Formato Java; Dart con `dart format` |
 | Flutter | 3.47.8 (Dart 3.13.7) | Último parche 3.47; instalado en `C:\dev\flutter` |
-| Docker / Compose | última estable | Fijar al montar `deploy/` |
+| Imágenes Docker | `postgres:18.6-alpine`, `eclipse-temurin:25.0.4.1_1` (jdk/jre), `nginx:1.30.6-alpine`, `cloudflare/cloudflared:2026.10.6`, `debian:trixie-slim` (build Flutter) | Verificadas en Docker Hub (2026-10-29) |
+| Acciones Docker | setup-qemu v4, setup-buildx v4, login v4, metadata v6, build-push v7 | Últimas mayores (2026-10-29) |
 | Kotlin Multiplatform web | descartado | Compose para web (Wasm) sigue en beta |
 
 ## Reglas de versionado
