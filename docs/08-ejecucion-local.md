@@ -27,7 +27,7 @@ Cada escenario es una clase `Scenario` en `server/src/test/java/dev/rgal/bracket
 | Dónde | Cómo |
 |---|---|
 | IntelliJ (servidor) | Run configs en `.run/`: `server · <escenario>`, `server · elegir escenario y fecha` (pregunta ambos; fecha vacía = hoy), `server · tests`. Requiere `server/pom.xml` cargado como proyecto Maven (módulo `brackety-server`) (*Maven home*: wrapper) |
-| Android Studio (front) | Abrir la raíz del repo con el plugin Flutter y SDK `C:\dev\flutter`: `app · <destino>`, `admin · <destino>` |
+| Android Studio (front) | Abrir `app/` (o `admin/`) como proyecto propio, nunca la raíz: el plugin Flutter necesita el `pubspec.yaml` en la raíz del proyecto. Plugin Flutter + SDK `C:\dev\flutter`. Run configs en `app/.run/` y `admin/.run/`: `app · <destino>`, `admin · <destino>` |
 | Terminal | `./run-server.ps1 -Scenario <nombre> [-Today 2027-03-10]` · `-Scenario ?` lista los escenarios |
 | Terminal | `./run-app.ps1 -Target web\|emulator\|device\|url [-Url https://…] [-App app\|admin]` |
 
