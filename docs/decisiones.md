@@ -34,4 +34,8 @@ Formato: fecha · decisión · motivo.
 - 2026-10-29 · Rollback = reetiquetar como `rollback` las imágenes en ejecución antes del pull · no depende de saber qué versión había; el modo `local` permite probarlo en CI con una versión rota.
 - 2026-10-29 · Backups cifrados con age (clave pública en el servidor, privada fuera) en vez de gpg · más simple y quien acceda a la Pi no puede leer los backups.
 - 2026-10-29 · Web con `--no-web-resources-cdn` · CanvasKit servido desde nuestro nginx, sin peticiones a gstatic (privacidad).
+- 2026-10-29 · Una PR abierta por línea de trabajo, sin PRs encadenadas (opción A) · con merge squash cada PR encadenada había que rehacerla; elegido por Raul.
+- 2026-10-29 · Migraciones Flyway con fecha (`V20261029_1200__…`) · dos ramas no chocan por número de versión.
+- 2026-10-29 · Reglas automatizadas: hook `post-commit` (Graphify), check de tamaño de docs en CI, Dependabot semanal a `development` · lo que depende de acordarse acaba olvidándose.
+- 2026-10-29 · Regla `.claude/rules/infra.md` y checklist de infraestructura en `reviewer` · los fallos de la fase 0 estaban en scripts y CI, que no tenían reglas.
 - 2026-10-29 · `CLAUDE.md` sin datos de la máquina de desarrollo; van en `docs/10-entorno-desarrollo.md` · el repo será público y visible para empresas; `docs/` es material de planificación temporal.

@@ -13,6 +13,9 @@ Guía para Claude sobre la máquina donde se trabaja. No son datos sensibles; es
 - Android SDK en `%LOCALAPPDATA%\Android\Sdk`.
 - IDEs: IntelliJ para el servidor; Android Studio para `app/` y `admin/` (cada uno abierto como proyecto propio). Detalle en `08-ejecucion-local.md`.
 
+## Git
+- Hooks del repo activos en este clon (`git config core.hooksPath .githooks`): Graphify se actualiza solo tras cada commit.
+
 ## Avisos conocidos
 - En Windows, texto con tildes por Bash heredoc se corrompe: usar Write/Edit.
 - El antivirus (Surfshark) pone en cuarentena ejecutables de desarrollo (`dart.exe`, `git.exe`, `java.exe`…) como `Drop.Win64.RoamingSelfRun`. Si desaparece un `.exe`, mirar su cuarentena; las carpetas de herramientas y del repo deben estar excluidas.
