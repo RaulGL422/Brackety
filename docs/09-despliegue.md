@@ -50,7 +50,7 @@ Tras un reinicio todo vuelve solo: Docker arranca con el sistema y los servicios
 
 ## Restaurar (probar antes del lanzamiento y cada trimestre)
 - **Prueba** (no toca producción): `./restore.sh /mnt/backup/brackety/daily/<archivo>.dump.age /media/usb/brackety-backup.key` restaura en la base `restore_check`. Revisar datos y borrarla con el comando que muestra el script.
-- **Recuperación real**: añadir `brackety` como tercer argumento. Pide confirmación, para la api, sustituye la base y vuelve a arrancar la api.
+- **Recuperación real**: añadir `brackety` como tercer argumento. Restaura primero en `brackety_restore`; solo si sale bien pide confirmación, para la api, cambia las bases y arranca la api. La anterior queda como `brackety_old_<fecha>`: borrarla cuando todo funcione.
 - Tras usar la clave privada en la Pi, retirar el USB.
 
 ## Windows (servidor alternativo)
