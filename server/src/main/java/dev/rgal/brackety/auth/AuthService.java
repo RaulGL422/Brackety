@@ -22,6 +22,8 @@ public class AuthService {
     private final ConsentRepository consents;
     private final LoginAttemptRepository loginAttempts;
     private final SessionService sessions;
+    private final EmailTokens emailTokens;
+    private final AuthEmails authEmails;
     private final PasswordEncoder passwordEncoder;
     private final Clock clock;
     private final String dummyHash;
@@ -32,6 +34,8 @@ public class AuthService {
             ConsentRepository consents,
             LoginAttemptRepository loginAttempts,
             SessionService sessions,
+            EmailTokens emailTokens,
+            AuthEmails authEmails,
             PasswordEncoder passwordEncoder,
             Clock clock) {
         this.accounts = accounts;
@@ -39,6 +43,8 @@ public class AuthService {
         this.consents = consents;
         this.loginAttempts = loginAttempts;
         this.sessions = sessions;
+        this.emailTokens = emailTokens;
+        this.authEmails = authEmails;
         this.passwordEncoder = passwordEncoder;
         this.clock = clock;
         // Checked against when the account does not exist, so the response time does not reveal it.
@@ -53,8 +59,11 @@ public class AuthService {
         var email = normalize(request.email());
         // Hashed before the duplicate check so both paths take the same time.
         var passwordHash = passwordEncoder.encode(request.password());
-        if (accounts.existsByEmail(email)) {
-            // feat/auth-email: send the "you already have an account" email here.
+        var existing = accounts.lockByEmail(email);
+        if (existing.isPresent()) {
+            if (existing.get().tryMarkAlreadyRegisteredSent(clock.instant(), EmailTokens.RESEND_INTERVAL)) {
+                authEmails.alreadyRegistered(existing.get());
+            }
             return;
         }
         var now = clock.instant();
@@ -63,7 +72,7 @@ public class AuthService {
         consents.saveAll(List.of(
                 new Consent(account.getId(), Consent.Document.TERMS, request.acceptedTermsVersion(), now),
                 new Consent(account.getId(), Consent.Document.PRIVACY, request.acceptedPrivacyVersion(), now)));
-        // feat/auth-email: send the verification link here.
+        authEmails.verifyEmail(account, emailTokens.issue(account.getId(), EmailToken.Purpose.VERIFY_EMAIL));
     }
 
     // No rollback on AuthException: the failure counters must be saved even though the login fails.
@@ -71,8 +80,7 @@ public class AuthService {
     public Session login(String email, String password, String clientIp) {
         var now = clock.instant();
         var normalizedEmail = normalize(email);
-        // Keyed by email, not account, so unknown emails lock the same way and do not reveal which exist.
-        var emailAttempt = lockAttempt("email:" + Sha256.hex(normalizedEmail));
+        var emailAttempt = lockAttempt(LoginAttempt.emailKey(normalizedEmail));
         var ipAttempt = lockAttempt("ip:" + Sha256.hex(clientIp));
         ipAttempt.setIp(clientIp);
         if (emailAttempt.isLocked(now)) {
@@ -84,16 +92,16 @@ public class AuthService {
         var account = accounts.findByEmail(normalizedEmail).filter(Account::isActive);
         account.ifPresent(a -> emailAttempt.setAccountId(a.getId()));
         if (!passwordMatches(account, password)) {
-            if (emailAttempt.recordFailure(now, LoginAttempt.MAX_EMAIL_FAILURES)
-                    && emailAttempt.getAccountId() != null) {
-                // feat/auth-email: tell the account owner it is locked, with the lock id.
+            // recordFailure is true only for the failure that locks, so each lock sends one email.
+            if (emailAttempt.recordFailure(now, LoginAttempt.MAX_EMAIL_FAILURES) && account.isPresent()) {
+                authEmails.accountLocked(account.get(), emailAttempt.getLockId());
             }
             ipAttempt.recordFailure(now, LoginAttempt.MAX_IP_FAILURES);
             throw AuthException.invalidCredentials();
         }
         // The IP counter is not reset: one valid account must not unlock guessing others from the same IP.
         emailAttempt.reset();
-        return sessions.start(account.get().getId());
+        return sessions.start(account.get());
     }
 
     private LoginAttempt lockAttempt(String key) {
@@ -110,7 +118,7 @@ public class AuthService {
         return passwordEncoder.matches(password, hash);
     }
 
-    private static String normalize(String email) {
+    static String normalize(String email) {
         return email.strip().toLowerCase(Locale.ROOT);
     }
 }

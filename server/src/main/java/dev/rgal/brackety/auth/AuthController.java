@@ -1,9 +1,12 @@
 package dev.rgal.brackety.auth;
 
 import dev.rgal.brackety.auth.SessionService.Session;
+import dev.rgal.brackety.auth.dto.EmailRequest;
 import dev.rgal.brackety.auth.dto.LoginRequest;
 import dev.rgal.brackety.auth.dto.RefreshRequest;
 import dev.rgal.brackety.auth.dto.RegisterRequest;
+import dev.rgal.brackety.auth.dto.ResetPasswordRequest;
+import dev.rgal.brackety.auth.dto.TokenRequest;
 import dev.rgal.brackety.auth.dto.TokenResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -31,10 +34,18 @@ class AuthController {
 
     private final AuthService auth;
     private final SessionService sessions;
+    private final EmailVerificationService verification;
+    private final PasswordResetService passwordReset;
 
-    AuthController(AuthService auth, SessionService sessions) {
+    AuthController(
+            AuthService auth,
+            SessionService sessions,
+            EmailVerificationService verification,
+            PasswordResetService passwordReset) {
         this.auth = auth;
         this.sessions = sessions;
+        this.verification = verification;
+        this.passwordReset = passwordReset;
     }
 
     @PostMapping("/register")
@@ -74,14 +85,39 @@ class AuthController {
                 .build();
     }
 
+    @PostMapping("/email/verify")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void verifyEmail(@Valid @RequestBody TokenRequest request) {
+        verification.verify(request.token());
+    }
+
+    @PostMapping("/email/resend")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    void resendVerification(@Valid @RequestBody EmailRequest request) {
+        verification.resend(request.email());
+    }
+
+    @PostMapping("/password/forgot")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    void forgotPassword(@Valid @RequestBody EmailRequest request) {
+        passwordReset.forgot(request.email());
+    }
+
+    @PostMapping("/password/reset")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        passwordReset.reset(request.token(), request.newPassword());
+    }
+
     // Web keeps the refresh token in an httpOnly cookie, out of reach of scripts; Android gets it in the body.
     private static ResponseEntity<TokenResponse> respond(Session session, boolean web) {
         if (web) {
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, refreshCookie(session.refreshToken(), SessionService.REFRESH_TTL))
-                    .body(new TokenResponse(session.accessToken(), session.expiresIn(), null));
+                    .body(new TokenResponse(session.accessToken(), session.expiresIn(), null, session.emailVerified()));
         }
-        return ResponseEntity.ok(new TokenResponse(session.accessToken(), session.expiresIn(), session.refreshToken()));
+        return ResponseEntity.ok(new TokenResponse(
+                session.accessToken(), session.expiresIn(), session.refreshToken(), session.emailVerified()));
     }
 
     private static boolean isWeb(String client) {

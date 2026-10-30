@@ -50,3 +50,4 @@ La URL de la API entra por `--dart-define-from-file=env/<destino>.json` (`API_BA
 |---|---|---|
 | `empty` | BD vacía solo con migraciones | Primer arranque, registro desde cero |
 | `accounts` | Una cuenta por perfil (`club@`, `entidad@`, `ayudante@`, `externo@`, `alumno@example.test`; contraseña `brackety-demo`; sin verificar) y `bloqueada@example.test` bloqueada 15 min desde el arranque | Login, refresh, logout, bloqueo por intentos |
+| `unverified` | Cuentas sin verificar (contraseña `brackety-demo`): `nueva@` recién creada, `recordatorio@` con 5 días y `purga@` con 7 (`@example.test`). La tarea diaria corre 1 min después de arrancar | Verificación pendiente, reenvío, recordatorio del día 5 y borrado del día 7 (enlaces en el log de la API) |

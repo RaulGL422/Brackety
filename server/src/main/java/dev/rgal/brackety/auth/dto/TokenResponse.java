@@ -6,4 +6,5 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public record TokenResponse(
         String accessToken,
         long expiresIn,
-        @JsonInclude(JsonInclude.Include.NON_NULL) String refreshToken) {}
+        @JsonInclude(JsonInclude.Include.NON_NULL) String refreshToken,
+        boolean emailVerified) {}

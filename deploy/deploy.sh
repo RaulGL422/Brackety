@@ -20,6 +20,12 @@ if [[ "$mode" != local ]] && ! grep -Eq '^CLOUDFLARE_TUNNEL_TOKEN=.+' .env; then
   exit 1
 fi
 
+# Without it the api never becomes healthy and every deploy would roll back.
+if ! grep -Eq '^JWT_SECRET=.{32,}' .env; then
+  echo "Set JWT_SECRET in deploy/.env (at least 32 characters: openssl rand -base64 48)" >&2
+  exit 1
+fi
+
 # Tag what is running and healthy now, so a failed deploy can go back to it.
 saved=0
 for s in "${services[@]}"; do

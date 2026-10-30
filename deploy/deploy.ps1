@@ -26,6 +26,11 @@ if ($Mode -ne 'local' -and -not (Select-String -Path .env -Pattern '^CLOUDFLARE_
     Stop-Deploy 'Set CLOUDFLARE_TUNNEL_TOKEN in deploy/.env'
 }
 
+# Without it the api never becomes healthy and every deploy would roll back.
+if (-not (Select-String -Path .env -Pattern '^JWT_SECRET=.{32,}' -Quiet)) {
+    Stop-Deploy 'Set JWT_SECRET in deploy/.env (at least 32 characters: openssl rand -base64 48)'
+}
+
 # Tag what is running and healthy now, so a failed deploy can go back to it.
 $saved = 0
 foreach ($s in $services) {

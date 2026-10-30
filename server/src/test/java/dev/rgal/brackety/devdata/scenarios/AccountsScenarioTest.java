@@ -15,7 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.transaction.support.TransactionOperations;
 import org.springframework.web.ErrorResponseException;
 
-@SpringBootTest
+// The daily purge would delete the 7-day account if it fired mid-test.
+@SpringBootTest(properties = "brackety.auth.unverified-purge-initial-delay=P3650D")
 @Import(EmbeddedPostgresConfig.class)
 class AccountsScenarioTest {
 

@@ -6,6 +6,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -33,6 +34,8 @@ class Account {
 
     private Instant createdAt;
     private Instant updatedAt;
+    private Instant verificationReminderSentAt;
+    private Instant alreadyRegisteredSentAt;
 
     protected Account() {}
 
@@ -62,7 +65,34 @@ class Account {
         return emailVerified;
     }
 
+    String getLocale() {
+        return locale;
+    }
+
     boolean isActive() {
         return status == Status.ACTIVE;
+    }
+
+    void markEmailVerified(Instant now) {
+        emailVerified = true;
+        updatedAt = now;
+    }
+
+    void changePassword(String passwordHash, Instant now) {
+        this.passwordHash = passwordHash;
+        updatedAt = now;
+    }
+
+    /** Records the notice and returns true, unless one went out less than {@code interval} ago. */
+    boolean tryMarkAlreadyRegisteredSent(Instant now, Duration interval) {
+        if (alreadyRegisteredSentAt != null && now.isBefore(alreadyRegisteredSentAt.plus(interval))) {
+            return false;
+        }
+        alreadyRegisteredSentAt = now;
+        return true;
+    }
+
+    void markReminderSent(Instant now) {
+        verificationReminderSentAt = now;
     }
 }
