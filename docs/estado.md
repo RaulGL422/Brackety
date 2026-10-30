@@ -38,7 +38,9 @@ Estados: pendiente · en curso · en pruebas · cerrado.
 | Tarea | Doc | Estado | Rama activa |
 |---|---|---|---|
 | sistema de diseño: tokens + página dev en admin | 07-diseno.md | cerrado (2026-10-30) | chore/design-system |
-- Motivo: fijar colores, tipografía, espaciado y componentes antes de la primera pantalla real (`auth`), para no repartir valores sueltos por el código.
+| prototipo Fase 1 Yoseikan (uso real ≈ 2026-11-14) | modulos/prototipo-f1.md | en curso: plan y paso 1/7 (back: evento, tapices, staff, inscripciones, cuentas demo) (2026-10-30) | feat/proto-f1-backend |
+- Motivo prototipo: Raul necesita usar la app en la Fase 1 real en 15 días; adelanta versiones mínimas de eventos, inscripciones, grupos, marcador y ranking.
+- Motivo sistema de diseño: fijar colores, tipografía, espaciado y componentes antes de la primera pantalla real (`auth`), para no repartir valores sueltos por el código.
 
 ## Bloqueos
 Ver `pendientes.md`. Ninguno bloquea la fase 0.

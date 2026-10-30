@@ -84,3 +84,9 @@ Formato: fecha · decisión · motivo.
 - 2026-10-30 · Cambio de email: el token se guarda aunque el email esté ocupado (no se envía) y la confirmación cierra todas las sesiones, también la actual · mismo trabajo en ambos casos (sin enumeración); lo más simple, como recuperar contraseña.
 - 2026-10-30 · Exportación sin el `sub` de Google · es un identificador interno de Google, no un dato que dio el usuario; pendiente de revisión legal.
 - 2026-10-30 · Purga de cuentas borradas: tarea diaria con `brackety.auth.deleted-purge-initial-delay` (1 min tras arrancar); marca `// eventos/ranking:` como punto de anonimizado · sin infraestructura hasta que existan resultados.
+- 2026-10-30 · Prototipo de uso real en la Fase 1 (≈ 2026-11-14) con versiones mínimas de los módulos reales (`modulos/prototipo-f1.md`) · fecha fija del primer cliente; pedido por Raul.
+- 2026-10-30 · Cuentas demo usuario = contraseña (`arbitro1`/`arbitro1`), solo con `DEMO_ACCOUNTS_ENABLED=true` · riesgo aceptado por Raul para tenerlas ya; bloqueo y limitador siguen activos.
+- 2026-10-30 · Fase 1 del prototipo = Tambo (2:00, máx. 15); cada competidor suma lo que marca, gane o no; descalificado 0 · elegido por Raul.
+- 2026-10-30 · Prototipo sin WebSocket ni offline: el front sondea cada pocos segundos y el reloj del combate se calcula con eventos con hora del servidor · menos piezas para llegar a tiempo; `tiempo-real` y `offline` lo sustituirán.
+- 2026-10-30 · Prototipo solo en la web (PWA en móvil/tablet) · una sola build que probar; Android nativo después.
+- 2026-10-30 · Prototipo desplegado en la Pi de Raul con el Postgres del compose; grupos solo de 4 o 3 + fantasma · elegido por Raul.
