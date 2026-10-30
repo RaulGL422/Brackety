@@ -71,6 +71,7 @@ class SessionServiceTest extends AuthIntegrationTest {
     @Test
     void reusingAUsedTokenRevokesTheWholeFamily() {
         var second = sessions.refresh(first.refreshToken());
+        clock.advance(SessionService.REUSE_GRACE.plusSeconds(1));
 
         assertUnauthorized(() -> sessions.refresh(first.refreshToken()));
 
@@ -79,9 +80,21 @@ class SessionServiceTest extends AuthIntegrationTest {
     }
 
     @Test
+    void aConcurrentRefreshWithinTheGraceIsRejectedWithoutRevokingTheSession() {
+        var second = sessions.refresh(first.refreshToken());
+        clock.advance(SessionService.REUSE_GRACE);
+
+        assertUnauthorized(() -> sessions.refresh(first.refreshToken()));
+
+        assertThat(count("refresh_token where revoked_at is not null")).isZero();
+        assertThat(sessions.refresh(second.refreshToken()).accessToken()).isNotBlank();
+    }
+
+    @Test
     void reuseDoesNotTouchOtherSessions() {
         var other = auth.login("ana@example.test", PASSWORD, "203.0.113.10");
         sessions.refresh(first.refreshToken());
+        clock.advance(SessionService.REUSE_GRACE.plusSeconds(1));
 
         assertUnauthorized(() -> sessions.refresh(first.refreshToken()));
 

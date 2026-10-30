@@ -25,6 +25,8 @@ import org.springframework.web.util.UrlPathHelper;
 class RateLimitFilter extends OncePerRequestFilter {
 
     static final String AUTH_PATH = "/api/v1/auth/";
+    // Refresh needs a valid token, so it gets its own, higher limit: many users share one IP at an event.
+    static final String REFRESH_PATH = "/api/v1/auth/refresh";
     static final String HEALTH_PATH = "/actuator/health";
     // Decoded path, as Spring MVC matches it: the raw URI would let /api/v1/%61uth skip the auth limit.
     private static final UrlPathHelper PATHS = UrlPathHelper.defaultInstance;
@@ -32,14 +34,17 @@ class RateLimitFilter extends OncePerRequestFilter {
     private final Clock clock;
     private final MinuteCounter all;
     private final MinuteCounter auth;
+    private final MinuteCounter refresh;
 
     RateLimitFilter(
             Clock clock,
-            @Value("${brackety.rate-limit.per-minute:300}") int perMinute,
-            @Value("${brackety.rate-limit.auth-per-minute:20}") int authPerMinute) {
+            @Value("${brackety.rate-limit.per-minute}") int perMinute,
+            @Value("${brackety.rate-limit.auth-per-minute}") int authPerMinute,
+            @Value("${brackety.rate-limit.refresh-per-minute}") int refreshPerMinute) {
         this.clock = clock;
         this.all = new MinuteCounter(perMinute);
         this.auth = new MinuteCounter(authPerMinute);
+        this.refresh = new MinuteCounter(refreshPerMinute);
     }
 
     @Override
@@ -53,14 +58,20 @@ class RateLimitFilter extends OncePerRequestFilter {
         var epochSecond = clock.instant().getEpochSecond();
         var minute = epochSecond / 60;
         var ip = request.getRemoteAddr();
-        var allowed = all.tryAcquire(ip, minute)
-                && (!PATHS.getPathWithinApplication(request).startsWith(AUTH_PATH) || auth.tryAcquire(ip, minute));
+        var allowed = all.tryAcquire(ip, minute) && limitFor(PATHS.getPathWithinApplication(request), ip, minute);
         if (allowed) {
             chain.doFilter(request, response);
             return;
         }
         response.setHeader(HttpHeaders.RETRY_AFTER, String.valueOf(60 - epochSecond % 60));
         ProblemResponses.write(response, HttpStatus.TOO_MANY_REQUESTS, "Too many requests. Try again later.");
+    }
+
+    private boolean limitFor(String path, String ip, long minute) {
+        if (path.startsWith(REFRESH_PATH)) {
+            return refresh.tryAcquire(ip, minute);
+        }
+        return !path.startsWith(AUTH_PATH) || auth.tryAcquire(ip, minute);
     }
 
     // A fresh map every minute: memory is bounded by the IPs seen in one minute.

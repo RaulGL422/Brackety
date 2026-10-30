@@ -18,7 +18,7 @@ class RateLimitFilterTest {
 
     // 40 s into the minute, so Retry-After is 20.
     private final MutableClock clock = new MutableClock(Instant.parse("2027-03-10T09:00:40Z"), ZoneId.of("UTC"));
-    private final RateLimitFilter filter = new RateLimitFilter(clock, 300, 20);
+    private final RateLimitFilter filter = new RateLimitFilter(clock, 300, 20, 30);
 
     @Test
     void allows300RequestsPerMinuteAcrossTheApi() throws Exception {
@@ -51,6 +51,18 @@ class RateLimitFilterTest {
         }
 
         assertThat(call("/api/v1/%61uth/login", IP).getStatus()).isEqualTo(429);
+    }
+
+    @Test
+    void refreshHasItsOwnLimit() throws Exception {
+        for (int i = 0; i < 20; i++) {
+            call("/api/v1/auth/login", IP);
+        }
+
+        for (int i = 0; i < 30; i++) {
+            assertThat(call("/api/v1/auth/refresh", IP).getStatus()).isEqualTo(200);
+        }
+        assertThat(call("/api/v1/auth/refresh", IP).getStatus()).isEqualTo(429);
     }
 
     @Test

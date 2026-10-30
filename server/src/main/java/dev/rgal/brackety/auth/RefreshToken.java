@@ -52,6 +52,10 @@ class RefreshToken {
         return !now.isBefore(expiresAt);
     }
 
+    boolean wasUsedSince(Instant since) {
+        return usedAt != null && !usedAt.isBefore(since);
+    }
+
     void markUsed(Instant now) {
         usedAt = now;
     }

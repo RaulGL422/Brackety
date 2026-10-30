@@ -21,6 +21,8 @@ public class SessionService {
 
     static final Duration ACCESS_TTL = Duration.ofMinutes(15);
     static final Duration REFRESH_TTL = Duration.ofDays(30);
+    // Two tabs or two app calls refreshing at once are not a theft: the late one gets 401 and retries.
+    static final Duration REUSE_GRACE = Duration.ofSeconds(10);
 
     private static final Logger log = LoggerFactory.getLogger(SessionService.class);
 
@@ -55,6 +57,9 @@ public class SessionService {
         var now = clock.instant();
         var token = find(rawToken);
         if (token.isRevoked()) {
+            throw AuthException.invalidSession();
+        }
+        if (token.isUsed() && token.wasUsedSince(now.minus(REUSE_GRACE))) {
             throw AuthException.invalidSession();
         }
         if (token.isUsed()) {
