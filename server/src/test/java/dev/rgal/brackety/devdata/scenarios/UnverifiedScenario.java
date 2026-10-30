@@ -1,7 +1,7 @@
 package dev.rgal.brackety.devdata.scenarios;
 
 import dev.rgal.brackety.auth.AuthService;
-import dev.rgal.brackety.auth.ProfileType;
+import dev.rgal.brackety.auth.account.ProfileType;
 import dev.rgal.brackety.auth.dto.RegisterRequest;
 import dev.rgal.brackety.devdata.DevScenario;
 import dev.rgal.brackety.devdata.Scenario;

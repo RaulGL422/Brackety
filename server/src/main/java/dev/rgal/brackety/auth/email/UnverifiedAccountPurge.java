@@ -1,5 +1,7 @@
-package dev.rgal.brackety.auth;
+package dev.rgal.brackety.auth.email;
 
+import dev.rgal.brackety.auth.account.AccountRepository;
+import dev.rgal.brackety.auth.account.AuthEmails;
 import java.time.Clock;
 import java.time.Duration;
 import org.slf4j.Logger;

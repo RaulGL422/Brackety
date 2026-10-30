@@ -1,4 +1,4 @@
-package dev.rgal.brackety.auth;
+package dev.rgal.brackety.auth.email;
 
 import jakarta.persistence.LockModeType;
 import java.time.Instant;

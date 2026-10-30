@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.groups.Tuple.tuple;
 
+import dev.rgal.brackety.auth.account.AccountRepository;
+import dev.rgal.brackety.auth.account.ProfileType;
 import dev.rgal.brackety.auth.dto.RegisterRequest;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
@@ -20,12 +22,6 @@ class AuthServiceTest extends AuthIntegrationTest {
     @Autowired
     AccountRepository accounts;
 
-    @Autowired
-    ProfileRepository profiles;
-
-    @Autowired
-    ConsentRepository consents;
-
     @Test
     void registersAnUnverifiedAccountWithItsProfileAndConsents() {
         auth.register(registration("  Ana@Example.TEST "));
@@ -33,15 +29,21 @@ class AuthServiceTest extends AuthIntegrationTest {
         var account = accounts.findByEmail("ana@example.test").orElseThrow();
         assertThat(account.isEmailVerified()).isFalse();
         assertThat(account.isActive()).isTrue();
-        assertThat(profiles.findByAccountId(account.getId())).singleElement().satisfies(p -> {
-            assertThat(p.getType()).isEqualTo(ProfileType.CLUB);
-            assertThat(p.isValidated()).isFalse();
-        });
-        assertThat(consents.findByAccountId(account.getId()))
-                .extracting(Consent::getDocument, Consent::getVersion, Consent::getAcceptedAt)
+        assertThat(jdbc.sql("select type, validated from profile where account_id = ?")
+                        .param(account.getId())
+                        .query((rs, n) -> tuple(rs.getString("type"), rs.getBoolean("validated")))
+                        .list())
+                .containsExactly(tuple(ProfileType.CLUB.name(), false));
+        assertThat(jdbc.sql("select document, version, accepted_at from consent where account_id = ?")
+                        .param(account.getId())
+                        .query((rs, n) -> tuple(
+                                rs.getString("document"),
+                                rs.getString("version"),
+                                rs.getTimestamp("accepted_at").toInstant()))
+                        .list())
                 .containsExactlyInAnyOrder(
-                        tuple(Consent.Document.TERMS, "2027-01", AuthTestConfig.START),
-                        tuple(Consent.Document.PRIVACY, "2027-02", AuthTestConfig.START));
+                        tuple("TERMS", "2027-01", AuthTestConfig.START),
+                        tuple("PRIVACY", "2027-02", AuthTestConfig.START));
     }
 
     @Test

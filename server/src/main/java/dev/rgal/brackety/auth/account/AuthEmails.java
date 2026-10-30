@@ -1,4 +1,4 @@
-package dev.rgal.brackety.auth;
+package dev.rgal.brackety.auth.account;
 
 import dev.rgal.brackety.notifications.Email;
 import dev.rgal.brackety.notifications.EmailService;
@@ -10,7 +10,7 @@ import org.springframework.web.util.HtmlUtils;
 
 // Every auth email: one paragraph, one link, in the account language.
 @Component
-class AuthEmails {
+public class AuthEmails {
 
     static final String VERIFY_PATH = "/verify-email?token=";
     static final String RESET_PATH = "/reset-password?token=";
@@ -26,31 +26,31 @@ class AuthEmails {
         this.baseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
     }
 
-    void verifyEmail(Account account, String token) {
+    public void verifyEmail(Account account, String token) {
         send(account, "verify", VERIFY_PATH + token);
     }
 
-    void verificationReminder(Account account, String token) {
+    public void verificationReminder(Account account, String token) {
         send(account, "reminder", VERIFY_PATH + token);
     }
 
-    void alreadyRegistered(Account account) {
+    public void alreadyRegistered(Account account) {
         send(account, "already-registered", FORGOT_PATH);
     }
 
-    void resetPassword(Account account, String token) {
+    public void resetPassword(Account account, String token) {
         send(account, "reset", RESET_PATH + token);
     }
 
-    void passwordChanged(Account account) {
+    public void passwordChanged(Account account) {
         send(account, "password-changed", FORGOT_PATH);
     }
 
-    void sessionReused(Account account) {
+    public void sessionReused(Account account) {
         send(account, "session-reused", FORGOT_PATH);
     }
 
-    void accountLocked(Account account, String lockId) {
+    public void accountLocked(Account account, String lockId) {
         send(account, "locked", FORGOT_PATH, lockId);
     }
 

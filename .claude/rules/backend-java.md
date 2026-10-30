@@ -5,6 +5,7 @@ paths: ["server/**"]
 
 ## Estructura
 `server/src/main/java/dev/rgal/brackety/<feature>/` con: `<Feature>Controller`, `<Feature>Service`, `<Feature>Repository`, `<Feature>` (entidad), `dto/` (records). Features: auth, profiles, events, registrations, staff, league, phasedleague, tournament, scoring, scoreboard, offline, ranking, notifications, admin, legal, common.
+- Un feature con más de ~15 archivos se divide en subpaquetes por tema dentro del feature (p. ej. `auth/account`, `auth/session`); lo usado entre subpaquetes es `public`, lo demás package-private.
 - Un controller delgado: valida, llama al service, devuelve DTO. Lógica solo en service.
 - DTOs como `record`. Nunca devolver entidades JPA.
 - Dependencias entre features solo por service público; prohibidos ciclos.

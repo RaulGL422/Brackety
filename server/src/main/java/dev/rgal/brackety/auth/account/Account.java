@@ -1,4 +1,4 @@
-package dev.rgal.brackety.auth;
+package dev.rgal.brackety.auth.account;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,10 +9,11 @@ import jakarta.persistence.Id;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Locale;
 import java.util.UUID;
 
 @Entity
-class Account {
+public class Account {
 
     enum Status {
         ACTIVE,
@@ -39,7 +40,7 @@ class Account {
 
     protected Account() {}
 
-    Account(String email, String passwordHash, LocalDate birthDate, String locale, Instant now) {
+    public Account(String email, String passwordHash, LocalDate birthDate, String locale, Instant now) {
         this.email = email;
         this.passwordHash = passwordHash;
         this.birthDate = birthDate;
@@ -49,19 +50,19 @@ class Account {
         this.updatedAt = now;
     }
 
-    UUID getId() {
+    public UUID getId() {
         return id;
     }
 
-    String getEmail() {
+    public String getEmail() {
         return email;
     }
 
-    String getPasswordHash() {
+    public String getPasswordHash() {
         return passwordHash;
     }
 
-    boolean isEmailVerified() {
+    public boolean isEmailVerified() {
         return emailVerified;
     }
 
@@ -69,22 +70,22 @@ class Account {
         return locale;
     }
 
-    boolean isActive() {
+    public boolean isActive() {
         return status == Status.ACTIVE;
     }
 
-    void markEmailVerified(Instant now) {
+    public void markEmailVerified(Instant now) {
         emailVerified = true;
         updatedAt = now;
     }
 
-    void changePassword(String passwordHash, Instant now) {
+    public void changePassword(String passwordHash, Instant now) {
         this.passwordHash = passwordHash;
         updatedAt = now;
     }
 
     /** Records the notice and returns true, unless one went out less than {@code interval} ago. */
-    boolean tryMarkAlreadyRegisteredSent(Instant now, Duration interval) {
+    public boolean tryMarkAlreadyRegisteredSent(Instant now, Duration interval) {
         if (alreadyRegisteredSentAt != null && now.isBefore(alreadyRegisteredSentAt.plus(interval))) {
             return false;
         }
@@ -92,7 +93,11 @@ class Account {
         return true;
     }
 
-    void markReminderSent(Instant now) {
+    public void markReminderSent(Instant now) {
         verificationReminderSentAt = now;
+    }
+
+    public static String normalizeEmail(String email) {
+        return email.strip().toLowerCase(Locale.ROOT);
     }
 }

@@ -1,4 +1,4 @@
-package dev.rgal.brackety.auth;
+package dev.rgal.brackety.auth.lockout;
 
 import jakarta.persistence.LockModeType;
 import java.time.Instant;
@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-interface LoginAttemptRepository extends JpaRepository<LoginAttempt, String> {
+public interface LoginAttemptRepository extends JpaRepository<LoginAttempt, String> {
 
     @Modifying
     @Query(value = "insert into login_attempt (attempt_key) values (:key) on conflict do nothing", nativeQuery = true)

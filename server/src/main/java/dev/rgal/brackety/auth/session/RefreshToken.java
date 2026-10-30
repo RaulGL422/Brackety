@@ -1,4 +1,4 @@
-package dev.rgal.brackety.auth;
+package dev.rgal.brackety.auth.session;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

@@ -1,6 +1,5 @@
 package dev.rgal.brackety.auth;
 
-import dev.rgal.brackety.auth.SessionService.Session;
 import dev.rgal.brackety.auth.dto.EmailRequest;
 import dev.rgal.brackety.auth.dto.LoginRequest;
 import dev.rgal.brackety.auth.dto.RefreshRequest;
@@ -8,6 +7,10 @@ import dev.rgal.brackety.auth.dto.RegisterRequest;
 import dev.rgal.brackety.auth.dto.ResetPasswordRequest;
 import dev.rgal.brackety.auth.dto.TokenRequest;
 import dev.rgal.brackety.auth.dto.TokenResponse;
+import dev.rgal.brackety.auth.email.EmailVerificationService;
+import dev.rgal.brackety.auth.email.PasswordResetService;
+import dev.rgal.brackety.auth.session.SessionService;
+import dev.rgal.brackety.auth.session.SessionService.Session;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.time.Duration;

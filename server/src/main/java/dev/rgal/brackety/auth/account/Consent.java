@@ -1,4 +1,4 @@
-package dev.rgal.brackety.auth;
+package dev.rgal.brackety.auth.account;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,9 +10,9 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-class Consent {
+public class Consent {
 
-    enum Document {
+    public enum Document {
         TERMS,
         PRIVACY
     }
@@ -31,7 +31,7 @@ class Consent {
 
     protected Consent() {}
 
-    Consent(UUID accountId, Document document, String version, Instant acceptedAt) {
+    public Consent(UUID accountId, Document document, String version, Instant acceptedAt) {
         this.accountId = accountId;
         this.document = document;
         this.version = version;

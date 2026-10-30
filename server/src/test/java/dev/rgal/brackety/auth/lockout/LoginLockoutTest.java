@@ -1,7 +1,11 @@
-package dev.rgal.brackety.auth;
+package dev.rgal.brackety.auth.lockout;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import dev.rgal.brackety.auth.AuthException;
+import dev.rgal.brackety.auth.AuthIntegrationTest;
+import dev.rgal.brackety.auth.AuthService;
+import dev.rgal.brackety.common.crypto.Sha256;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;

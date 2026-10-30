@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
+import dev.rgal.brackety.auth.account.AccountRepository;
 import jakarta.servlet.http.Cookie;
 import java.time.Duration;
 import java.util.Optional;

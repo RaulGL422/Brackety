@@ -1,5 +1,9 @@
-package dev.rgal.brackety.auth;
+package dev.rgal.brackety.auth.email;
 
+import dev.rgal.brackety.auth.AuthException;
+import dev.rgal.brackety.auth.account.Account;
+import dev.rgal.brackety.auth.account.AccountRepository;
+import dev.rgal.brackety.auth.account.AuthEmails;
 import java.time.Clock;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +33,7 @@ public class EmailVerificationService {
     // Says nothing back: whether the account exists, is verified or hit the limit stays hidden.
     @Transactional
     public void resend(String email) {
-        accounts.lockByEmail(AuthService.normalize(email))
+        accounts.lockByEmail(Account.normalizeEmail(email))
                 .filter(a -> a.isActive() && !a.isEmailVerified())
                 .ifPresent(account -> emailTokens
                         .issueThrottled(account.getId(), EmailToken.Purpose.VERIFY_EMAIL)
