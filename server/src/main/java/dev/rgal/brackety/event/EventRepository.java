@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface EventRepository extends JpaRepository<Event, UUID> {
 
+    boolean existsByOwnerAccountId(UUID ownerAccountId);
+
     // Serializes group creation in one event: mat choice and group numbers need a stable view.
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select e from Event e where e.id = :eventId")

@@ -19,6 +19,7 @@ import dev.rgal.brackety.auth.account.IdentityRepository;
 import dev.rgal.brackety.auth.email.PasswordResetService;
 import dev.rgal.brackety.auth.google.FakeGoogle;
 import dev.rgal.brackety.auth.google.GoogleSignInService;
+import dev.rgal.brackety.auth.reauth.ReauthService;
 import dev.rgal.brackety.auth.session.SessionService;
 import dev.rgal.brackety.auth.session.SessionService.Session;
 import java.time.Duration;
@@ -26,7 +27,6 @@ import java.time.LocalDate;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -234,8 +234,9 @@ class IdentityControllerTest extends AuthIntegrationTest {
     @Test
     void unlinkingTheOnlySignInMethodIsRefused() throws Exception {
         var session = googleAccount(ANA, "sub-ana");
+        var reauth = reauthWithGoogle(mvc, session, google.idToken("sub-ana", ANA));
 
-        mvc.perform(as(session, delete("/api/v1/me/identities/google")))
+        mvc.perform(as(session, delete("/api/v1/me/identities/google")).header(ReauthService.HEADER, reauth))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value("LAST_SIGN_IN_METHOD"));
         assertThat(count("identity")).isOne();
@@ -247,7 +248,9 @@ class IdentityControllerTest extends AuthIntegrationTest {
         link(session, google.idToken("sub-ana", ANA));
         emails.reset();
 
-        mvc.perform(as(session, delete("/api/v1/me/identities/google"))).andExpect(status().isNoContent());
+        mvc.perform(as(session, delete("/api/v1/me/identities/google"))
+                        .header(ReauthService.HEADER, reauthWithPassword(mvc, session)))
+                .andExpect(status().isNoContent());
 
         assertThat(count("identity")).isZero();
         assertThat(emails.sentTo(ANA))
@@ -260,7 +263,8 @@ class IdentityControllerTest extends AuthIntegrationTest {
     void removingThePasswordWithoutAnotherMethodIsRefused() throws Exception {
         var session = passwordAccount(ANA);
 
-        mvc.perform(as(session, delete("/api/v1/me/password")))
+        mvc.perform(as(session, delete("/api/v1/me/password"))
+                        .header(ReauthService.HEADER, reauthWithPassword(mvc, session)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value("LAST_SIGN_IN_METHOD"));
         assertThat(count("account where password_hash is not null")).isOne();
@@ -270,9 +274,11 @@ class IdentityControllerTest extends AuthIntegrationTest {
     void removingThePasswordClosesEverySessionAndSendsANotice() throws Exception {
         var session = passwordAccount(ANA);
         link(session, google.idToken("sub-ana", ANA));
+        var reauth = reauthWithPassword(mvc, session);
         emails.reset();
 
-        mvc.perform(as(session, delete("/api/v1/me/password"))).andExpect(status().isNoContent());
+        mvc.perform(as(session, delete("/api/v1/me/password")).header(ReauthService.HEADER, reauth))
+                .andExpect(status().isNoContent());
 
         assertThat(count("account where password_hash is null")).isOne();
         assertThatThrownBy(() -> sessions.refresh(session.refreshToken())).isInstanceOf(AuthException.class);
@@ -309,10 +315,12 @@ class IdentityControllerTest extends AuthIntegrationTest {
     @Test
     void aDeletedAccountCannotChangeItsMethods() throws Exception {
         var session = passwordAccount(ANA);
-        jdbc.sql("update account set status = 'DELETED'").update();
+        var reauth = reauthWithPassword(mvc, session);
+        jdbc.sql("update account set status = 'DELETED', deleted_at = now()").update();
 
         mvc.perform(as(session, get("/api/v1/me/identities"))).andExpect(status().isUnauthorized());
-        mvc.perform(as(session, delete("/api/v1/me/password"))).andExpect(status().isUnauthorized());
+        mvc.perform(as(session, delete("/api/v1/me/password")).header(ReauthService.HEADER, reauth))
+                .andExpect(status().isUnauthorized());
     }
 
     // The query the daily purge runs (its class is internal to auth.email).
@@ -347,9 +355,5 @@ class IdentityControllerTest extends AuthIntegrationTest {
                 post("/api/v1/me/identities/google")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"idToken\":\"%s\"}".formatted(idToken))));
-    }
-
-    private static MockHttpServletRequestBuilder as(Session session, MockHttpServletRequestBuilder request) {
-        return request.header(HttpHeaders.AUTHORIZATION, "Bearer " + session.accessToken());
     }
 }

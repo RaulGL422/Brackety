@@ -37,19 +37,25 @@ public class EmailToken {
 
     private Instant createdAt;
     private Instant expiresAt;
+    private String newEmail;
 
     protected EmailToken() {}
 
-    EmailToken(String tokenHash, UUID accountId, Purpose purpose, Instant now) {
+    EmailToken(String tokenHash, UUID accountId, Purpose purpose, String newEmail, Instant now) {
         this.tokenHash = tokenHash;
         this.accountId = accountId;
         this.purpose = purpose;
+        this.newEmail = newEmail;
         this.createdAt = now;
         this.expiresAt = now.plus(purpose.ttl);
     }
 
     UUID getAccountId() {
         return accountId;
+    }
+
+    String getNewEmail() {
+        return newEmail;
     }
 
     boolean isUsable(Purpose expected, Instant now) {

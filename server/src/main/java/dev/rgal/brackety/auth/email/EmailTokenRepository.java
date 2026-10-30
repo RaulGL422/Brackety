@@ -20,4 +20,8 @@ interface EmailTokenRepository extends JpaRepository<EmailToken, UUID> {
     @Modifying
     @Query("delete from EmailToken t where t.accountId = :accountId and t.purpose = :purpose")
     int deleteByAccountIdAndPurpose(UUID accountId, EmailToken.Purpose purpose);
+
+    @Modifying
+    @Query("delete from EmailToken t where t.accountId = :accountId")
+    int deleteByAccountId(UUID accountId);
 }

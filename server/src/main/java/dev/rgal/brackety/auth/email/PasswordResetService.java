@@ -6,7 +6,7 @@ import dev.rgal.brackety.auth.account.AccountRepository;
 import dev.rgal.brackety.auth.account.AuthEmails;
 import dev.rgal.brackety.auth.lockout.LoginAttempt;
 import dev.rgal.brackety.auth.lockout.LoginAttemptRepository;
-import dev.rgal.brackety.auth.session.RefreshTokenRepository;
+import dev.rgal.brackety.auth.session.SessionService;
 import java.time.Clock;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PasswordResetService {
 
     private final AccountRepository accounts;
-    private final RefreshTokenRepository refreshTokens;
+    private final SessionService sessions;
     private final LoginAttemptRepository loginAttempts;
     private final EmailTokens emailTokens;
     private final AuthEmails authEmails;
@@ -25,14 +25,14 @@ public class PasswordResetService {
 
     PasswordResetService(
             AccountRepository accounts,
-            RefreshTokenRepository refreshTokens,
+            SessionService sessions,
             LoginAttemptRepository loginAttempts,
             EmailTokens emailTokens,
             AuthEmails authEmails,
             PasswordEncoder passwordEncoder,
             Clock clock) {
         this.accounts = accounts;
-        this.refreshTokens = refreshTokens;
+        this.sessions = sessions;
         this.loginAttempts = loginAttempts;
         this.emailTokens = emailTokens;
         this.authEmails = authEmails;
@@ -51,7 +51,8 @@ public class PasswordResetService {
     }
 
     // Opening the link proves the inbox is theirs, so it also verifies the email.
-    // Every session is closed: whoever knew the old password may be logged in.
+    // Every session and pending link is closed: whoever knew the old password may be logged in, or may
+    // have asked for an email change.
     // The email lock goes too, so someone locking the account on purpose cannot keep the owner out.
     // The IP counter stays: it protects other accounts.
     @Transactional
@@ -61,7 +62,7 @@ public class PasswordResetService {
         var now = clock.instant();
         account.changePassword(passwordEncoder.encode(newPassword), now);
         account.markEmailVerified(now);
-        refreshTokens.revokeAccount(accountId, now);
+        sessions.closeAll(account);
         loginAttempts.deleteById(LoginAttempt.emailKey(account.getEmail()));
         authEmails.passwordChanged(account);
     }

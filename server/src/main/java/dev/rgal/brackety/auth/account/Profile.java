@@ -38,7 +38,11 @@ public class Profile {
         return type;
     }
 
-    boolean isValidated() {
+    public boolean isValidated() {
         return validated;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
     }
 }

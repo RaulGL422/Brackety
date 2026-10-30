@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 
 import dev.rgal.brackety.auth.SecurityConfig;
+import dev.rgal.brackety.auth.account.AccountRepository;
 import java.time.Clock;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -16,12 +17,17 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 // No CORS_ALLOWED_ORIGINS, as in a production .env left empty: no origin may be allowed.
 @WebMvcTest(InfoController.class)
 @Import({CorsConfigTest.SystemClock.class, SecurityConfig.class})
 class CorsConfigTest {
+
+    // The JWT decoder of SecurityConfig needs it; this slice has no JPA and no request carries a token.
+    @MockitoBean
+    AccountRepository accounts;
 
     @Autowired
     MockMvc mvc;
