@@ -47,6 +47,11 @@ public class EventService {
         return events.findById(eventId).orElseThrow(EventException::notFound);
     }
 
+    /** Locks the event row until the transaction ends; see {@link EventRepository#lockById}. */
+    public Event lock(UUID eventId) {
+        return events.lockById(eventId).orElseThrow(EventException::notFound);
+    }
+
     @Transactional(readOnly = true)
     public List<MyEventResponse> myEvents(UUID accountId) {
         var rolesByEvent = staff.findByAccountId(accountId).stream()
@@ -89,8 +94,19 @@ public class EventService {
         if (new HashSet<>(assigned).size() != assigned.size()) {
             throw EventException.invalid("A referee can only be on one mat.");
         }
-        event.update(request.name().strip(), request.date(), request.maxGroupsPerMat());
+        // The date sets every participant's age, and so the category their group was made for.
+        if (!request.date().equals(event.getEventDate()) && events.hasGroups(eventId)) {
+            throw EventException.conflict("The date cannot change once there are groups.");
+        }
         var current = mats.findByEventIdOrderByNumber(eventId);
+        var removed = current.size() > request.matReferees().size()
+                ? current.subList(request.matReferees().size(), current.size())
+                : List.<Mat>of();
+        if (!removed.isEmpty()
+                && events.hasGroupsOnMats(removed.stream().map(Mat::getId).toList())) {
+            throw EventException.conflict("A mat with groups cannot be removed.");
+        }
+        event.update(request.name().strip(), request.date(), request.maxGroupsPerMat());
         for (int i = 0; i < request.matReferees().size(); i++) {
             var referee = request.matReferees().get(i);
             if (i < current.size()) {
@@ -99,9 +115,7 @@ public class EventService {
                 mats.save(new Mat(eventId, i + 1, referee));
             }
         }
-        if (current.size() > request.matReferees().size()) {
-            mats.deleteAll(current.subList(request.matReferees().size(), current.size()));
-        }
+        mats.deleteAll(removed);
         return settings(event);
     }
 

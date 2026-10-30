@@ -29,6 +29,10 @@ public class Mat {
         return id;
     }
 
+    public UUID getEventId() {
+        return eventId;
+    }
+
     public int getNumber() {
         return number;
     }
