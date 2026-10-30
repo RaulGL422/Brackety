@@ -48,6 +48,17 @@ public class AuthException extends ErrorResponseException {
         return new AuthException(HttpStatus.CONFLICT, "Another sign-in for this account is in progress. Try again.");
     }
 
+    public static AuthException googleUnavailable() {
+        return new AuthException(HttpStatus.SERVICE_UNAVAILABLE, "Google sign-in is temporarily unavailable.");
+    }
+
+    public static AuthException emailNotVerified() {
+        return withCode(
+                HttpStatus.FORBIDDEN,
+                "EMAIL_NOT_VERIFIED",
+                "Verify the email of the account first, or link the Google account that uses that email.");
+    }
+
     public static AuthException googleSignInFailed() {
         return new AuthException(HttpStatus.UNAUTHORIZED, "Google sign-in failed.");
     }

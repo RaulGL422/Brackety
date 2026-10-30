@@ -5,7 +5,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.RemoteKeySourceException;
 import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.jwk.source.JWKSource;
+import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import dev.rgal.brackety.auth.AuthException;
@@ -110,6 +113,20 @@ class GoogleIdTokensTest {
     @Test
     void rejectsGarbage() {
         assertSignInFailed("not-a-jwt");
+    }
+
+    @Test
+    void unreachableGoogleKeysAreA503NotABadToken() {
+        JWKSource<SecurityContext> down = (selector, context) -> {
+            throw new RemoteKeySourceException("Google is down", null);
+        };
+        var unreachable = new GoogleIdTokens(down, FakeGoogle.CLIENT_ID, clock);
+
+        assertThatThrownBy(() -> unreachable.verify(google.idToken("sub-1", "ana@example.test")))
+                .isInstanceOfSatisfying(AuthException.class, e -> {
+                    assertThat(e.getStatusCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
+                    assertThat(e.getBody().getDetail()).isEqualTo("Google sign-in is temporarily unavailable.");
+                });
     }
 
     @Test

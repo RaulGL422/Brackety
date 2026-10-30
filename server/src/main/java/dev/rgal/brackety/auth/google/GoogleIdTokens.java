@@ -58,7 +58,7 @@ public class GoogleIdTokens {
         } catch (JwtException e) {
             // Not a bad token: most likely Google's keys could not be fetched.
             log.warn("Google ID token could not be checked: {}", e.getMessage());
-            throw AuthException.googleSignInFailed();
+            throw AuthException.googleUnavailable();
         }
     }
 
