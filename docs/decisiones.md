@@ -77,3 +77,9 @@ Formato: fecha · decisión · motivo.
 - 2026-10-30 · En local, Google simulado: clave generada al arrancar y `POST /api/v1/auth/dev/google-token` que emite idTokens; solo en `src/test` (nunca en el jar) · probar Google sin client IDs ni red.
 - 2026-10-30 · Vincular Google con el mismo email que la cuenta (normalizado) la marca como verificada; con otro email, no · Google ha probado que el buzón es suyo, como el enlace de recuperar contraseña.
 - 2026-10-30 · Una cuenta sin verificar no puede vincular un Google con otro email (403 `EMAIL_NOT_VERIFIED`) · cierra el pre-secuestro: el dueño real verificaría después la cuenta con el Google del atacante dentro.
+- 2026-10-30 · Prototipo de uso real en la Fase 1 (≈ 2026-11-14) con versiones mínimas de los módulos reales (`modulos/prototipo-f1.md`) · fecha fija del primer cliente; pedido por Raul.
+- 2026-10-30 · Cuentas demo usuario = contraseña (`arbitro1`/`arbitro1`), solo con `DEMO_ACCOUNTS_ENABLED=true` · riesgo aceptado por Raul para tenerlas ya; bloqueo y limitador siguen activos.
+- 2026-10-30 · Fase 1 del prototipo = Tambo (2:00, máx. 15); cada competidor suma lo que marca, gane o no; descalificado 0 · elegido por Raul.
+- 2026-10-30 · Prototipo sin WebSocket ni offline: el front sondea cada pocos segundos y el reloj del combate se calcula con eventos con hora del servidor · menos piezas para llegar a tiempo; `tiempo-real` y `offline` lo sustituirán.
+- 2026-10-30 · Prototipo solo en la web (PWA en móvil/tablet) · una sola build que probar; Android nativo después.
+- 2026-10-30 · Prototipo desplegado en la Pi de Raul con el Postgres del compose; grupos solo de 4 o 3 + fantasma · elegido por Raul.
