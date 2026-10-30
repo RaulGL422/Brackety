@@ -30,13 +30,18 @@ Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, f
 - Grupo = 4 reales, o 3 reales + 1 fantasma; ningún otro tamaño.
 
 ### Fin estimado de un tapiz
-- Restante = tiempo del combate en curso + combates pendientes × (2:00 + 30 s de cambio).
+- Restante = reloj del combate en curso + pendientes × (2:00 + 30 s); sin combate en curso, solo lo que quede de los 30 s tras el último.
 - Fin = ahora + restante: si el tapiz está parado, el fin se retrasa solo.
 
 ### Árbitro (tapiz)
 - Solo su tapiz. Ve sus grupos, los combates disponibles y el **recomendado**.
-- Recomendado: mayor suma del tiempo sin combatir de los dos alumnos (desde su último combate o desde la creación del grupo). Empate: primero alumnos que aún no han combatido y se intercala entre grupos (G1 1-2, G2 1-2, G1 3-4, G2 3-4…). Orden base del nórdico de 4: 1-2, 3-4, 1-3, 2-4, 1-4, 2-3. Nunca un alumno dos seguidos si hay alternativa. Algoritmo puro con tests.
-- Fantasma ocupado en otro tapiz: su combate se muestra pero no se recomienda.
+- Orden del grupo = orden en que el ayudante seleccionó (fantasma al final). Nórdico de 4: 1-2, 3-4, 1-3, 2-4, 1-4, 2-3 (rojo el primero).
+- Recomendado (`MatchRecommender`), por pasos:
+  1. Fuera los combates con alguien combatiendo ahora en cualquier tapiz (fantasma ocupado: se ve, no está disponible).
+  2. Si hay alternativa, fuera los que repiten alumno del combate recién acabado en el tapiz.
+  3. Primero los que tienen más alumnos sin combatir todavía.
+  4. Mayor suma de descanso de los dos (desde su último combate o desde que se creó el grupo); sumas a menos de un hueco (2:00 + 30 s) cuentan como iguales.
+  5. Empate: el grupo que lleva más sin combatir en el tapiz (así se intercalan: G1 1-2, G2 1-2, G1 3-4, G2 3-4…), luego nº de grupo y orden.
 
 ### Marcador Tambo
 - Rojo y azul fijos. Cronómetro 2:00 con iniciar/parar; tiempo restante visible. El reloj lo manda el servidor (eventos con hora).
@@ -50,14 +55,18 @@ Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, f
 - Alumno = 10 por asistir (estar en un grupo como real) + lo que marca en cada combate (gane o no, hasta 15). Descalificado: 0 en ese combate.
 - Fantasma: no suma en ese grupo; su rival sí.
 
+## Protecciones
+- Con grupos: no cambia la fecha del evento ni el nacimiento de un alumno agrupado (cambiarían categorías); no se quita un tapiz con grupos ni se borra un alumno agrupado (409).
+- Crear grupos bloquea la fila del evento: dos ayudantes a la vez no eligen tapiz con datos viejos. Un alumno solo es real en un grupo (índice único en BD).
+
 ## Datos
-`event` (tapices, multigrupo, duración, límite), `event_category`, `mat` (árbitro), `event_staff` (cuenta, rol `CLUB`/`GROUPER`/`REFEREE`), `participant`, `fight_group`, `group_member` (orden, fantasma), `match`, `match_event` (tipo, lado, motivo, autor, hora, reloj).
+`event` (tapices, multigrupo, duración, límite), `event_category`, `mat` (árbitro), `event_staff` (cuenta, rol `CLUB`/`GROUPER`/`REFEREE`), `participant`, `fight_group`, `group_member` (orden, fantasma), `fight_match`, `match_event` (tipo, lado, motivo, autor, hora, reloj).
 
 ## API
 - `GET /api/v1/me/events` · `GET|PUT /events/{id}/settings` · `GET|POST|PUT|DELETE /events/{id}/participants`.
 - `GET /events/{id}/categories` (con nº inscritos y agrupados) · `GET /events/{id}/categories/{cat}/participants`.
 - `POST /events/{id}/groups` (uno o varios grupos → tapiz asignado).
-- `GET /mats/{id}/board` (grupos, combates, recomendado) · `GET /matches/{id}` · `POST /matches/{id}/events` · `POST /matches/{id}/finish`.
+- `GET /events/{id}/mats` (club y ayudantes) · `GET /mats/{id}/board` (árbitro de ese tapiz y club: grupos, combates, disponible, recomendado) · `GET /matches/{id}` · `POST /matches/{id}/events` · `POST /matches/{id}/finish`.
 - `GET /events/{id}/standings` · `GET /events/{id}/mats` (fin estimado) · `GET /events/{id}/export/{standings|matches}.csv`.
 - Permisos por rol y evento en servidor; el árbitro solo escribe en su tapiz.
 

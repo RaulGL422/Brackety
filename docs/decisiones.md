@@ -82,4 +82,7 @@ Formato: fecha · decisión · motivo.
 - 2026-10-30 · Fase 1 del prototipo = Tambo (2:00, máx. 15); cada competidor suma lo que marca, gane o no; descalificado 0 · elegido por Raul.
 - 2026-10-30 · Prototipo sin WebSocket ni offline: el front sondea cada pocos segundos y el reloj del combate se calcula con eventos con hora del servidor · menos piezas para llegar a tiempo; `tiempo-real` y `offline` lo sustituirán.
 - 2026-10-30 · Prototipo solo en la web (PWA en móvil/tablet) · una sola build que probar; Android nativo después.
+- 2026-10-30 · Combate recomendado: sumas de descanso a menos de un hueco (combate + cambio) cuentan como iguales y entonces se intercalan grupos · con tiempos reales nunca hay empate exacto y el intercalado pedido por Raul no ocurriría.
+- 2026-10-30 · Orden dentro del grupo = orden de selección del ayudante, sin semilla aleatoria en el prototipo · el ayudante ya decide el grupo a mano; la semilla de `liga-fases` llegará con ese módulo.
+- 2026-10-30 · `event` y `participant` consultan `fight_group` con SQL nativo para sus protecciones · evita una dependencia circular entre paquetes (grouping ya depende de ellos).
 - 2026-10-30 · Prototipo desplegado en la Pi de Raul con el Postgres del compose; grupos solo de 4 o 3 + fantasma · elegido por Raul.

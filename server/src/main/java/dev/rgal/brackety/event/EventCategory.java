@@ -31,6 +31,10 @@ public class EventCategory {
         return id;
     }
 
+    public UUID getEventId() {
+        return eventId;
+    }
+
     public String getName() {
         return name;
     }
