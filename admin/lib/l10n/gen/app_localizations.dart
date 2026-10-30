@@ -143,32 +143,8 @@ abstract class AppLocalizations {
   /// No description provided for @dsIntro.
   ///
   /// In es, this message translates to:
-  /// **'Solo en builds debug. Todo lo de abajo usa el tema real con la paleta y el modo elegidos.'**
+  /// **'Solo en builds debug. Todo lo de abajo usa el tema real en el modo elegido.'**
   String get dsIntro;
-
-  /// No description provided for @dsPalette.
-  ///
-  /// In es, this message translates to:
-  /// **'Paleta'**
-  String get dsPalette;
-
-  /// No description provided for @dsPaletteElectric.
-  ///
-  /// In es, this message translates to:
-  /// **'Eléctrico'**
-  String get dsPaletteElectric;
-
-  /// No description provided for @dsPaletteFire.
-  ///
-  /// In es, this message translates to:
-  /// **'Fuego'**
-  String get dsPaletteFire;
-
-  /// No description provided for @dsPaletteNight.
-  ///
-  /// In es, this message translates to:
-  /// **'Noche'**
-  String get dsPaletteNight;
 
   /// No description provided for @dsMode.
   ///

@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-Última actualización: 2026-10-30. Fase 0 cerrada; siguiente: **auth**. Imprevisto en curso: sistema de diseño (ver abajo).
+Última actualización: 2026-10-30. Fase 0 cerrada; siguiente: **auth**.
 
 | Módulo | Doc | Estado | Rama activa |
 |---|---|---|---|
@@ -37,7 +37,7 @@ Estados: pendiente · en curso · en pruebas · cerrado.
 ## Imprevistos (fuera del orden)
 | Tarea | Doc | Estado | Rama activa |
 |---|---|---|---|
-| sistema de diseño: tokens + página dev en admin | 07-diseno.md | en pruebas (2026-10-30): falta validación visual | chore/design-system |
+| sistema de diseño: tokens + página dev en admin | 07-diseno.md | cerrado (2026-10-30), PR pendiente de fusionar | chore/design-system |
 - Motivo: fijar colores, tipografía, espaciado y componentes antes de la primera pantalla real (`auth`), para no repartir valores sueltos por el código.
 
 ## Bloqueos

@@ -3,29 +3,18 @@ import 'package:flutter/material.dart';
 import 'brackety_colors.dart';
 import 'tokens.dart';
 
-class BrandPalette {
-  const BrandPalette({required this.primary, required this.accent});
-
-  final Color primary;
-  final Color accent;
-}
-
-const brandPalette = BrandPalette(
-  primary: Color(0xFF2F5BFF),
-  accent: Color(0xFFFF6B00),
-);
+const _brandPrimary = Color(0xFF2F5BFF);
+const _brandAccent = Color(0xFFFF6B00);
 
 const _bodyFont = 'packages/brackety_core/Barlow';
 const _displayFont = 'packages/brackety_core/BarlowCondensed';
 
-ThemeData lightTheme([BrandPalette palette = brandPalette]) =>
-    buildTheme(Brightness.light, palette);
+ThemeData lightTheme() => buildTheme(Brightness.light);
 
-ThemeData darkTheme([BrandPalette palette = brandPalette]) =>
-    buildTheme(Brightness.dark, palette);
+ThemeData darkTheme() => buildTheme(Brightness.dark);
 
-ThemeData buildTheme(Brightness brightness, BrandPalette palette) {
-  final scheme = _colorScheme(brightness, palette);
+ThemeData buildTheme(Brightness brightness) {
+  final scheme = _colorScheme(brightness);
   final base = ThemeData(
     colorScheme: scheme,
     fontFamily: _bodyFont,
@@ -95,16 +84,16 @@ ThemeData buildTheme(Brightness brightness, BrandPalette palette) {
   );
 }
 
-ColorScheme _colorScheme(Brightness brightness, BrandPalette palette) {
+ColorScheme _colorScheme(Brightness brightness) {
   final main = ColorScheme.fromSeed(
-    seedColor: palette.primary,
+    seedColor: _brandPrimary,
     brightness: brightness,
     dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
   );
   // The accent goes in tertiary with its own tonal palette, so it keeps its
   // hue instead of being derived from the primary.
   final accent = ColorScheme.fromSeed(
-    seedColor: palette.accent,
+    seedColor: _brandAccent,
     brightness: brightness,
     dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
   );

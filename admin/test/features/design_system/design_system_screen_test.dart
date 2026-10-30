@@ -12,29 +12,26 @@ void main() {
   };
 
   for (final MapEntry(key: device, value: size) in sizes.entries) {
-    testWidgets(
-      'design system page renders every palette and mode on $device',
-      (tester) async {
-        tester.view.physicalSize = size;
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('design system page renders in light and dark on $device', (
+      tester,
+    ) async {
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(const ProviderScope(child: AdminApp()));
-        await tester.pumpAndSettle();
-        await tester.tap(find.text('Design').first);
-        await tester.pumpAndSettle();
+      await tester.pumpWidget(const ProviderScope(child: AdminApp()));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Design').first);
+      await tester.pumpAndSettle();
 
-        expect(find.text('Design system'), findsOneWidget);
-        for (final palette in ['Fire', 'Night', 'Electric']) {
-          await tester.tap(find.text(palette));
-          await tester.pumpAndSettle();
-        }
-        await tester.tap(find.text('Dark'));
+      expect(find.text('Design system'), findsOneWidget);
+      for (final mode in ['Dark', 'Light']) {
+        await tester.tap(find.text(mode));
         await tester.pumpAndSettle();
+      }
 
-        expect(tester.takeException(), isNull);
-      },
-    );
+      expect(tester.takeException(), isNull);
+    });
   }
 
   testWidgets('scoreboard buttons change the score', (tester) async {

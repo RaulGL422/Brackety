@@ -32,19 +32,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dsIntro =>
-      'Debug builds only. Everything below uses the real theme with the chosen palette and mode.';
-
-  @override
-  String get dsPalette => 'Palette';
-
-  @override
-  String get dsPaletteElectric => 'Electric';
-
-  @override
-  String get dsPaletteFire => 'Fire';
-
-  @override
-  String get dsPaletteNight => 'Night';
+      'Debug builds only. Everything below uses the real theme in the chosen mode.';
 
   @override
   String get dsMode => 'Mode';

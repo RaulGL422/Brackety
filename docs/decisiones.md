@@ -43,3 +43,4 @@ Formato: fecha · decisión · motivo.
 - 2026-10-30 · Marca Brackety neutra (no colores del cliente), estilo deportivo y enérgico, modo claro/oscuro según el sistema · plataforma multideporte; elegido por Raul.
 - 2026-10-30 · Colores de los competidores configurables por ubicación desde una paleta amplia común a todos los deportes · cada deporte usa colores distintos (rojo/blanco, rojo/azul…); elegido por Raul.
 - 2026-10-30 · Página "Sistema de diseño" en admin solo en builds debug (`kDebugMode`) · Raul valida visualmente paleta, tipografía y componentes; nunca llega a producción.
+- 2026-10-30 · Paleta Eléctrico (`#2F5BFF` + acento `#FF6B00`) y tipografía Barlow / Barlow Condensed · validadas por Raul en la página Diseño frente a Fuego y Noche (el rojo de Fuego chocaba con error y con el competidor rojo).

@@ -7,7 +7,7 @@ void main() {
 
   for (final brightness in Brightness.values) {
     group('$brightness theme', () {
-      final theme = buildTheme(brightness, brandPalette);
+      final theme = buildTheme(brightness);
       final c = theme.colorScheme;
       final b = theme.extension<BracketyColors>()!;
 

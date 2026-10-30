@@ -16,7 +16,6 @@ class DesignSystemScreen extends StatefulWidget {
 }
 
 class _DesignSystemScreenState extends State<DesignSystemScreen> {
-  var _palette = _Candidate.electric;
   Brightness? _brightness;
   var _textScale = 1.0;
 
@@ -24,7 +23,7 @@ class _DesignSystemScreenState extends State<DesignSystemScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final brightness = _brightness ?? MediaQuery.platformBrightnessOf(context);
-    final theme = buildTheme(brightness, _palette.palette);
+    final theme = buildTheme(brightness);
 
     return Theme(
       data: theme,
@@ -77,14 +76,6 @@ class _DesignSystemScreenState extends State<DesignSystemScreen> {
       runSpacing: AppSpacing.m,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
-        SegmentedButton<_Candidate>(
-          segments: [
-            for (final c in _Candidate.values)
-              ButtonSegment(value: c, label: Text(c.label(l10n))),
-          ],
-          selected: {_palette},
-          onSelectionChanged: (s) => setState(() => _palette = s.first),
-        ),
         SegmentedButton<Brightness>(
           segments: [
             ButtonSegment(
@@ -121,24 +112,6 @@ class _DesignSystemScreenState extends State<DesignSystemScreen> {
       ],
     );
   }
-}
-
-// Candidates to compare; once one is chosen it becomes `brandPalette` and
-// the others go away.
-enum _Candidate {
-  electric(BrandPalette(primary: Color(0xFF2F5BFF), accent: Color(0xFFFF6B00))),
-  fire(BrandPalette(primary: Color(0xFFE63B12), accent: Color(0xFF00A6A6))),
-  night(BrandPalette(primary: Color(0xFF6C2BD9), accent: Color(0xFFC6FF00)));
-
-  const _Candidate(this.palette);
-
-  final BrandPalette palette;
-
-  String label(AppLocalizations l10n) => switch (this) {
-    electric => l10n.dsPaletteElectric,
-    fire => l10n.dsPaletteFire,
-    night => l10n.dsPaletteNight,
-  };
 }
 
 class _Section extends StatelessWidget {
