@@ -15,6 +15,9 @@
 ## Auth
 - [ ] Google Cloud: crear OAuth client IDs (web + Android con SHA-1 de debug y release) antes de `feat/auth-google`.
 - [ ] Resend: API key y remitente verificado en `rgal.dev` antes de `feat/auth-email` (en local los emails van al log).
+- [ ] Cloudflare: regla de rate limiting sobre `/api/v1/auth/*` al desplegar.
+- [ ] Producción: leer la IP real de `CF-Connecting-IP` y confiar solo en el túnel; comprobar en el despliegue real.
+- [ ] Validar en servidor las versiones de términos y privacidad aceptadas (depende de `legal-paginas`).
 - [ ] Más adelante: 2FA (TOTP), lista de sesiones activas con "cerrar en todos", contraseñas contra filtraciones (HaveIBeenPwned).
 - [ ] Login con Apple cuando haya cuenta Apple Developer o app iOS.
 

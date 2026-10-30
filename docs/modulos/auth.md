@@ -29,9 +29,14 @@ Cuentas, login y sesión compartidos entre web y Android.
 
 ### Seguridad
 - Contraseñas con Argon2id, mínimo 10 caracteres, sin reglas de composición.
-- 5 fallos por cuenta o IP → bloqueo 15 min.
+- Fallos de login en ventana de 15 min: 5 por email o 30 por IP → bloqueo 15 min (respuesta 429). La IP es pública y compartida en eventos (NAT): su umbral solo frena ataques masivos.
+- Cada bloqueo tiene un id corto (`L-7K2F`) que va en el 429; el superadmin puede revocarlo desde admin (con auditoría).
+- Al bloquearse un email existente: un único aviso por email con enlace para cambiar la contraseña.
+- Filas de intentos (IP en claro, cuenta si existe) se purgan al pasar ventana y bloqueo.
+- Limitador general por IP en la app: 300 peticiones/min en la API y 20/min en `/api/v1/auth/**` → 429 con `Retry-After`. Segunda capa en Cloudflare.
+- Cliente web identificado por cabecera `X-Client: web` (refresh en cookie); sin ella, refresh en el cuerpo.
 - Registro, login y recuperación responden igual exista o no la cuenta (sin enumeración).
-- Avisos por email: identidad vinculada/desvinculada, cambio de contraseña o email, reutilización de refresh.
+- Avisos por email: bloqueo por fallos, identidad vinculada/desvinculada, cambio de contraseña o email, reutilización de refresh.
 
 ### Registro y perfiles
 - Registro: fecha de nacimiento, perfil inicial (Club, Entidad Externa, Ayudante, Externo, Alumno) y aceptación de términos y privacidad con fecha y versión.
@@ -50,28 +55,28 @@ Cuentas, login y sesión compartidos entre web y Android.
 - `consent`: cuenta, documento, versión, fecha.
 - `refresh_token`: hash, familia, cuenta, caducidad, usado/revocado.
 - `email_token`: hash, propósito (verificar, recuperar, cambio de email), caducidad, usado.
-- `login_attempt`: clave (cuenta o IP), fallos, bloqueado hasta.
+- `login_attempt`: clave (hash de email o IP), IP en claro o cuenta si existe, fallos, último fallo, id de bloqueo, bloqueado hasta.
 
 ## API (borrador)
-`POST /auth/register`, `/auth/login`, `/auth/google`, `/auth/refresh`, `/auth/logout`, `/auth/email/verify`, `/auth/email/resend`, `/auth/password/forgot`, `/auth/password/reset`, `/me`, `/me/profiles`, `/me/identities`, `/me/email`, `DELETE /me`, `GET /me/export`. Superadmin: `/admin/auth/login`, `/admin/organizers/{id}/validate`.
+Bajo `/api/v1`: `POST /auth/register`, `/auth/login`, `/auth/google`, `/auth/refresh`, `/auth/logout`, `/auth/email/verify`, `/auth/email/resend`, `/auth/password/forgot`, `/auth/password/reset`, `/me`, `/me/profiles`, `/me/identities`, `/me/email`, `DELETE /me`, `GET /me/export`. Superadmin: `/admin/auth/login`, `/admin/organizers/{id}/validate`, `GET /admin/auth/locks`, `DELETE /admin/auth/locks/{lockId}`.
 
 ## Pantallas
-Inicio de sesión, registro con selector de perfil, verificación pendiente, recuperar contraseña, ajustes de cuenta (identidades, perfiles, email, idioma, exportar/borrar). Admin: login de superadmin.
+Inicio de sesión, registro con selector de perfil, verificación pendiente, recuperar contraseña, ajustes de cuenta (identidades, perfiles, email, idioma, exportar/borrar). Admin: login de superadmin, bloqueos activos con revocación.
 
 ## Offline
 - La sesión sigue válida sin red mientras el refresh no caduque. El acceso caducado se renueva al volver la red.
 - Login, registro y ajustes de cuenta requieren conexión.
 
 ## Tests
-Login por cada método, refresh/reutilización, límites de tasa y bloqueo, sin enumeración, verificación y purga a 7 días, cuenta sin verificar sustituida por Google, vinculación y desvinculación, borrado y anonimizado.
+Login por cada método, refresh/reutilización, límites de tasa, bloqueo con ventana y umbrales, revocación desde admin, sin enumeración, verificación y purga a 7 días, cuenta sin verificar sustituida por Google, vinculación y desvinculación, borrado y anonimizado.
 
 ## Estado
 En curso. Tareas (una rama cada una, en este orden):
-1. `feat/auth-register-login` · migración, registro con perfil y consentimiento, login email, JWT + refresh rotatorio, cookie web, logout, bloqueo.
-2. `feat/auth-email` · verificación, recuperación, purga y recordatorio, avisos de seguridad (Resend).
+1. `feat/auth-register-login` · migración, registro con perfil y consentimiento, login email, JWT + refresh rotatorio, cookie web, logout, bloqueo con ventana e id, limitador general.
+2. `feat/auth-email` · verificación, recuperación, purga y recordatorio, avisos de seguridad incluido bloqueo (Resend).
 3. `feat/auth-google` · login Google, sustitución de cuenta sin verificar, vincular y desvincular.
 4. `feat/auth-me` · `/me`, perfiles adicionales, cambio de email, borrado y exportación.
-5. `feat/auth-superadmin` · superadmin por entorno y validación de organizadores.
+5. `feat/auth-superadmin` · superadmin por entorno, validación de organizadores, listar y revocar bloqueos con auditoría.
 6. `feat/auth-screens-login` · app: login, registro, verificación pendiente, recuperar; cliente HTTP con refresh.
 7. `feat/auth-screens-settings` · app: ajustes de cuenta.
-8. `feat/auth-admin-login` · admin: login de superadmin.
+8. `feat/auth-admin-login` · admin: login de superadmin y pantalla de bloqueos.

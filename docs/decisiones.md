@@ -49,4 +49,8 @@ Formato: fecha · decisión · motivo.
 - 2026-10-30 · Login con Apple pospuesto; `auth` arranca con email + Google · sin app iOS nativa no es obligatorio y exige Apple Developer (99 $/año).
 - 2026-10-30 · Club y Entidad Externa se registran libremente pero no publican eventos hasta validación del superadmin · evita organizadores falsos sin frenar el alta.
 - 2026-10-30 · Email obligatorio verificado; sin verificar no crea nada de valor y se borra a los 7 días; Google sustituye a una cuenta sin verificar con su email; vinculación de identidades solo manual · cierra el pre-secuestro de cuentas; propuesto por Raul.
-- 2026-10-30 · Refresh de 30 días rotatorio, bloqueo 5 fallos/15 min, Argon2id con mínimo 10 caracteres, respuestas sin enumeración · valores estándar (OWASP/NIST) aceptados por Raul.
+- 2026-10-30 · Refresh de 30 días rotatorio, Argon2id con mínimo 10 caracteres, respuestas sin enumeración · valores estándar (OWASP/NIST) aceptados por Raul.
+- 2026-10-30 · Bloqueo de login con ventana de 15 min: 5 fallos por email, 30 por IP · la IP pública se comparte en eventos (NAT); por IP solo se frenan ataques masivos.
+- 2026-10-30 · Doble capa de límite de tasa: limitador en la app (300/min API, 20/min auth) + regla en Cloudflare · pedido por Raul: más tranquilidad y errores 429 controlados por la app.
+- 2026-10-30 · Bloqueos con id corto en el 429, revocables por el superadmin desde admin con auditoría; aviso por email al bloquearse una cuenta · pedido por Raul.
+- 2026-10-30 · IP en claro en `login_attempt` solo mientras dura ventana o bloqueo; purga automática · interés legítimo de seguridad con conservación mínima (RGPD).
