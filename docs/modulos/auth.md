@@ -24,10 +24,9 @@ Cuentas, login y sesión compartidos entre web y Android.
 - Login con Google cuyo email coincide con una cuenta con contraseña **sin verificar**: esa cuenta se borra, se revocan sus sesiones, se crea la de Google y se muestra un aviso.
 - Mismo caso con cuenta **verificada**: no se crea cuenta; se indica entrar con el método original y vincular desde ajustes (409 `ACCOUNT_EXISTS`).
 - Primer login con Google: `REGISTRATION_REQUIRED` con el email (ya probado por Google); la app pide fecha, perfil y consentimientos y repite con el mismo token. La cuenta sin verificar solo se borra al completar.
-- Cuenta borrada (lógica): login con Google da el 401 genérico.
 - Registro con contraseña de un email que ya existe: misma respuesta que un registro nuevo; el email explica que ya hay cuenta.
 - Recuperar la contraseña también verifica el email.
-- Cambio de email: se verifica el nuevo antes de sustituir; se avisa al antiguo.
+- Cambio de email (+ reauth): enlace de 24 h al email nuevo, máx. 1 cada 60 s. Si ya es de otra cuenta, misma respuesta 202 y a ese email le llega "ya hay una cuenta". Al confirmar se recomprueba que esté libre (si no, enlace inválido), queda verificado, se cierran todas las sesiones y se avisa al antiguo (`n***@dominio`). Google no cambia.
 
 ### Sesión
 - JWT de acceso 15 min + refresh rotatorio de 30 días (se renueva en cada uso).
@@ -50,25 +49,31 @@ Cuentas, login y sesión compartidos entre web y Android.
 ### Registro y perfiles
 - Registro: fecha de nacimiento, perfil inicial (Club, Entidad Externa, Ayudante, Externo, Alumno) y aceptación de términos y privacidad con fecha y versión.
 - Menor de 14 no se registra solo: lo da de alta su tutor (`perfiles-menores.md`).
-- Perfiles adicionales desde ajustes según combinaciones de `roles/README.md`.
+- Perfiles adicionales desde ajustes (exige email verificado): un perfil cualquiera, o Alumno + Ayudante, o Externo + Ayudante; lo demás 409 `PROFILE_COMBINATION_NOT_ALLOWED`. El último no se quita (409 `LAST_PROFILE`). Organizador nuevo, sin validar.
 - Club y Entidad Externa: alta libre, pero no publican eventos hasta que el superadmin los valida.
 
 ### Superadmin y RGPD
 - Superadmin: usuario único por entorno, credenciales iniciales por variables de entorno, endpoint separado, solo tras Cloudflare Access.
-- Borrado de cuenta y exportación de datos (`06-legal-rgpd.md`): borrado lógico, definitivo a los 30 días, resultados anonimizados.
+- Acciones delicadas (borrar cuenta, cambiar email, exportar, quitar contraseña, desvincular Google) exigen reauth: `POST /me/reauth` con contraseña o Google → token de 5 min en la cabecera `X-Reauth`. Sin él: 403 `REAUTH_REQUIRED`; prueba incorrecta: 403 `REAUTH_FAILED`. La contraseña fallida cuenta para el bloqueo por email e IP.
+- Borrado de cuenta (`06-legal-rgpd.md`): lógico, cierra todas las sesiones y avisa por email con la fecha; definitivo a los 30 días (tarea diaria, cascade; ahí se anonimizarán resultados cuando existan).
+- En esos 30 días: login con contraseña correcta o Google → 403 `ACCOUNT_PENDING_DELETION` con `deletesOn` y `restoreToken` (5 min); `POST /auth/restore` la reactiva y da sesión. Credenciales malas: 401 genérico. Registro con ese email: 202 y aviso al dueño (1 cada 60 s). Google con ese email sin identidad: 409 `ACCOUNT_EXISTS`.
+- Exportación: JSON descargable con cuenta (sin hash), perfiles, identidades (sin `sub`) y consentimientos.
 
 ## Datos
-- `account`: email, hash de contraseña, email verificado, fecha de nacimiento, idioma, estado (activa, borrada lógica), fechas.
+- `account`: email, hash de contraseña, email verificado, fecha de nacimiento, idioma, estado (activa, borrada lógica) con `deleted_at`, fechas.
 - `identity`: cuenta, proveedor, `sub`, email del proveedor.
 - `profile`: cuenta, tipo, validado por superadmin (solo organizadores).
 - `consent`: cuenta, documento, versión, fecha.
 - `refresh_token`: hash, familia, cuenta, caducidad, usado/revocado.
-- `email_token`: hash, propósito (verificar, recuperar, cambio de email), caducidad, usado.
+- `email_token`: hash, propósito (verificar, recuperar, cambio de email), email nuevo (solo cambio), caducidad.
 - `login_attempt`: clave (hash de email o IP), IP en claro o cuenta si existe, fallos, último fallo, id de bloqueo, bloqueado hasta.
 
 ## API (borrador)
 - `POST /auth/google` `{idToken, registration?: {birthDate, profile, acceptedTermsVersion, acceptedPrivacyVersion, locale}}` → `{status: SIGNED_IN, accessToken, expiresIn, refreshToken?, emailVerified, replacedUnverifiedAccount}` (sesión como el login) o `{status: REGISTRATION_REQUIRED, email}`.
 - `GET /me/identities` → `[{method: PASSWORD}, {method: GOOGLE, email, linkedAt}]`. `POST /me/identities/google` `{idToken}`, `DELETE /me/identities/google`, `DELETE /me/password` → 204.
+- `GET /me` → `{email, emailVerified, birthDate, locale, profiles: [{type, validated}], signInMethods, deletesOn?}`. `PATCH /me` `{locale: es|en}`. `POST /me/profiles` `{type}`, `DELETE /me/profiles/{type}` → 204.
+- `POST /me/reauth` `{password}` o `{googleIdToken}` → `{reauthToken, expiresIn}`. Con `X-Reauth`: `POST /me/email` `{newEmail}` → 202; `DELETE /me` → `{deletesOn}`; `GET /me/export` → adjunto JSON.
+- `POST /auth/email/change/confirm` `{token}` → 204. `POST /auth/restore` `{restoreToken}` → sesión como el login.
 - Errores 409 con `code` en el problem+json. Solo en local: `POST /auth/dev/google-token` `{subject, email}` (doc 08).
 Todos bajo `/api/v1`: `POST /auth/register`, `/auth/login`, `/auth/google`, `/auth/refresh`, `/auth/logout`, `/auth/email/verify`, `/auth/email/resend`, `/auth/password/forgot`, `/auth/password/reset`, `/me`, `/me/profiles`, `/me/identities`, `/me/email`, `DELETE /me`, `GET /me/export`. Superadmin: `/admin/auth/login`, `/admin/organizers/{id}/validate`, `GET /admin/auth/locks`, `DELETE /admin/auth/locks/{lockId}`.
 

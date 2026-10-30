@@ -5,7 +5,7 @@
 | Módulo | Doc | Estado | Rama activa |
 |---|---|---|---|
 | infra-deploy | modulos/infra-deploy.md | cerrado (2026-10-30) | – |
-| auth | modulos/auth.md | en curso: tareas 1-3/8 hechas (registro, login, sesión, bloqueo, limitador; verificación, recuperación, purga, avisos por email; login Google, sustitución de cuenta sin verificar, vincular y desvincular) (2026-10-30) | feat/auth-google |
+| auth | modulos/auth.md | en curso: tareas 1-4/8 hechas (registro, login, sesión, bloqueo, limitador; verificación, recuperación, purga, avisos por email; login Google, sustitución de cuenta sin verificar, vincular y desvincular; `/me`, perfiles, reauth, cambio de email, borrado lógico con restaurar y purga, exportación) (2026-10-30) | feat/auth-me |
 | perfiles-menores | modulos/perfiles-menores.md | pendiente | – |
 | legal-paginas | modulos/legal-paginas.md | pendiente | – |
 | eventos | modulos/eventos.md | pendiente | – |

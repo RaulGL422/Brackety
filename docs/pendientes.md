@@ -21,7 +21,10 @@
 - [ ] Emails de auth: pasar el envío directo (tras commit, sin reintentos) a la cola con reintentos del módulo `notificaciones`.
 - [ ] Register/forgot: queda una pequeña diferencia de tiempo de BD según exista la cuenta (enumeración por temporización, medible con muchas muestras). Aceptado por ahora; si hiciera falta, mover esas escrituras al hilo asíncrono.
 - [ ] Más adelante: 2FA (TOTP), lista de sesiones activas con "cerrar en todos", contraseñas contra filtraciones (HaveIBeenPwned).
-- [ ] Una cuenta en borrado lógico bloquea registrarse con ese email (Google y contraseña) hasta el borrado definitivo a los 30 días. Decidir en `feat/auth-me` si se permite reactivarla.
+- [ ] Aviso "tu email ha cambiado" al email antiguo: sin canal de soporte no hay forma de recuperar la cuenta si el cambio lo hizo un atacante (salvo Google vinculado). Definir con `PRIVACY_CONTACT_EMAIL`/soporte.
+- [ ] Exportación sin el `sub` de Google (es dato personal, pero es un identificador interno de Google): confirmarlo en la revisión legal.
+- [ ] Quitar un perfil lo borra (no `deleted_at`): revisar cuando eventos o inscripciones referencien perfiles.
+- [ ] Tras borrar la cuenta o cambiar el email, el access token sigue vivo hasta 15 min: cada endpoint de módulos futuros debe comprobar que la cuenta está activa (como hacen los de `/me`).
 - [ ] Login con Apple cuando haya cuenta Apple Developer o app iOS.
 
 ## Repositorio público
@@ -52,6 +55,7 @@
 - [ ] Registro de tratamientos y plantilla de registro de brechas.
 
 ## Hecho
+- 2026-10-30 · Cuenta en borrado lógico: durante 30 días el dueño la reactiva al iniciar sesión (`ACCOUNT_PENDING_DELETION` + restaurar); registrarse con ese email avisa al dueño y no crea otra.
 - 2026-10-30 · Sistema de diseño validado: paleta Eléctrico y Barlow.
 - 2026-10-28 · Android cmdline-tools instaladas; `flutter doctor` sin errores para Android y web.
 - 2026-10-28 · Graphify configurado a partir de ClipHive (`CLAUDE.md`, `.gitignore`).
