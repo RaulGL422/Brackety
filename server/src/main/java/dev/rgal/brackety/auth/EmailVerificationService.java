@@ -29,7 +29,7 @@ public class EmailVerificationService {
     // Says nothing back: whether the account exists, is verified or hit the limit stays hidden.
     @Transactional
     public void resend(String email) {
-        accounts.findByEmail(AuthService.normalize(email))
+        accounts.lockByEmail(AuthService.normalize(email))
                 .filter(a -> a.isActive() && !a.isEmailVerified())
                 .ifPresent(account -> emailTokens
                         .issueThrottled(account.getId(), EmailToken.Purpose.VERIFY_EMAIL)

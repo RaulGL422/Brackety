@@ -78,6 +78,26 @@ class PasswordResetTest extends AuthIntegrationTest {
     }
 
     @Test
+    void resetLiftsTheEmailLockButKeepsTheIpCounter() {
+        for (int i = 0; i < 5; i++) {
+            assertThatThrownBy(() -> auth.login(ANA, "wrong-password", IP)).isInstanceOf(AuthException.class);
+        }
+        assertThatThrownBy(() -> auth.login(ANA, PASSWORD, "198.51.100.1")).isInstanceOf(AuthException.class);
+        passwordReset.forgot(ANA);
+
+        // The lock notice came first; the reset link is the last email.
+        passwordReset.reset(tokenIn(emails.sentTo(ANA).getLast()), NEW_PASSWORD);
+
+        assertThat(count("login_attempt where attempt_key like 'email:%'")).isZero();
+        assertThat(jdbc.sql("select failures from login_attempt where ip = ?")
+                        .param(IP)
+                        .query(Integer.class)
+                        .single())
+                .isEqualTo(5);
+        assertThat(auth.login(ANA, NEW_PASSWORD, "198.51.100.1").accessToken()).isNotBlank();
+    }
+
+    @Test
     void theResetLinkWorksOnlyOnce() {
         passwordReset.forgot(ANA);
         var token = tokenIn(emails.sentTo(ANA).getFirst());

@@ -36,6 +36,21 @@ class SecurityEmailsTest extends AuthIntegrationTest {
     }
 
     @Test
+    void repeatedDuplicateRegistrationsSendAtMostOneEmailPerMinute() {
+        auth.register(registration(ANA));
+        emails.reset();
+
+        auth.register(registration(ANA));
+        clock.advance(Duration.ofSeconds(59));
+        auth.register(registration(ANA));
+        assertThat(emails.sentTo(ANA)).hasSize(1);
+
+        clock.advance(Duration.ofSeconds(1));
+        auth.register(registration(ANA));
+        assertThat(emails.sentTo(ANA)).hasSize(2);
+    }
+
+    @Test
     void emailsUseTheAccountLanguage() {
         auth.register(registration(ANA));
         auth.register(new RegisterRequest(

@@ -51,7 +51,7 @@ class AuthControllerTest extends AuthIntegrationTest {
     void concurrentDuplicateRegistrationIsStillAccepted() throws Exception {
         var body = REGISTER_JSON.formatted("ana@example.test", PASSWORD, "1990-05-20");
         register(body).andExpect(status().isAccepted());
-        doReturn(Optional.empty()).when(accounts).findByEmail("ana@example.test");
+        doReturn(Optional.empty()).when(accounts).lockByEmail("ana@example.test");
 
         register(body).andExpect(status().isAccepted());
 

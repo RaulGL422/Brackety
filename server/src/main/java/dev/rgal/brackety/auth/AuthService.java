@@ -59,9 +59,11 @@ public class AuthService {
         var email = normalize(request.email());
         // Hashed before the duplicate check so both paths take the same time.
         var passwordHash = passwordEncoder.encode(request.password());
-        var existing = accounts.findByEmail(email);
+        var existing = accounts.lockByEmail(email);
         if (existing.isPresent()) {
-            authEmails.alreadyRegistered(existing.get());
+            if (existing.get().tryMarkAlreadyRegisteredSent(clock.instant(), EmailTokens.RESEND_INTERVAL)) {
+                authEmails.alreadyRegistered(existing.get());
+            }
             return;
         }
         var now = clock.instant();
@@ -78,8 +80,7 @@ public class AuthService {
     public Session login(String email, String password, String clientIp) {
         var now = clock.instant();
         var normalizedEmail = normalize(email);
-        // Keyed by email, not account, so unknown emails lock the same way and do not reveal which exist.
-        var emailAttempt = lockAttempt("email:" + Sha256.hex(normalizedEmail));
+        var emailAttempt = lockAttempt(LoginAttempt.emailKey(normalizedEmail));
         var ipAttempt = lockAttempt("ip:" + Sha256.hex(clientIp));
         ipAttempt.setIp(clientIp);
         if (emailAttempt.isLocked(now)) {

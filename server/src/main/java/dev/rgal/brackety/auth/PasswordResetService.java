@@ -10,6 +10,7 @@ public class PasswordResetService {
 
     private final AccountRepository accounts;
     private final RefreshTokenRepository refreshTokens;
+    private final LoginAttemptRepository loginAttempts;
     private final EmailTokens emailTokens;
     private final AuthEmails authEmails;
     private final PasswordEncoder passwordEncoder;
@@ -18,12 +19,14 @@ public class PasswordResetService {
     PasswordResetService(
             AccountRepository accounts,
             RefreshTokenRepository refreshTokens,
+            LoginAttemptRepository loginAttempts,
             EmailTokens emailTokens,
             AuthEmails authEmails,
             PasswordEncoder passwordEncoder,
             Clock clock) {
         this.accounts = accounts;
         this.refreshTokens = refreshTokens;
+        this.loginAttempts = loginAttempts;
         this.emailTokens = emailTokens;
         this.authEmails = authEmails;
         this.passwordEncoder = passwordEncoder;
@@ -33,7 +36,7 @@ public class PasswordResetService {
     // Says nothing back: whether the account exists or hit the limit stays hidden.
     @Transactional
     public void forgot(String email) {
-        accounts.findByEmail(AuthService.normalize(email))
+        accounts.lockByEmail(AuthService.normalize(email))
                 .filter(Account::isActive)
                 .ifPresent(account -> emailTokens
                         .issueThrottled(account.getId(), EmailToken.Purpose.RESET_PASSWORD)
@@ -42,6 +45,8 @@ public class PasswordResetService {
 
     // Opening the link proves the inbox is theirs, so it also verifies the email.
     // Every session is closed: whoever knew the old password may be logged in.
+    // The email lock goes too, so someone locking the account on purpose cannot keep the owner out.
+    // The IP counter stays: it protects other accounts.
     @Transactional
     public void reset(String token, String newPassword) {
         var accountId = emailTokens.consume(token, EmailToken.Purpose.RESET_PASSWORD);
@@ -50,6 +55,7 @@ public class PasswordResetService {
         account.changePassword(passwordEncoder.encode(newPassword), now);
         account.markEmailVerified(now);
         refreshTokens.revokeAccount(accountId, now);
+        loginAttempts.deleteById(LoginAttempt.emailKey(account.getEmail()));
         authEmails.passwordChanged(account);
     }
 }

@@ -75,6 +75,11 @@ class LoginAttempt {
         lockId = null;
     }
 
+    // Keyed by email, not account, so unknown emails lock the same way and do not reveal which exist.
+    static String emailKey(String normalizedEmail) {
+        return "email:" + Sha256.hex(normalizedEmail);
+    }
+
     static String newLockId() {
         var id = new StringBuilder("L-");
         for (int i = 0; i < 6; i++) {
