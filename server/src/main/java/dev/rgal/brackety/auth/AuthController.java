@@ -8,6 +8,7 @@ import dev.rgal.brackety.auth.dto.TokenResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.time.Duration;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -39,7 +40,11 @@ class AuthController {
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.ACCEPTED)
     void register(@Valid @RequestBody RegisterRequest request) {
-        auth.register(request);
+        try {
+            auth.register(request);
+        } catch (DataIntegrityViolationException e) {
+            // A concurrent registration took the email first: answer as for any duplicate, without revealing it.
+        }
     }
 
     @PostMapping("/login")

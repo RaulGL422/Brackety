@@ -2,6 +2,7 @@ package dev.rgal.brackety.auth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.endsWith;
+import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -28,6 +30,9 @@ class AuthControllerTest extends AuthIntegrationTest {
     @Autowired
     MockMvc mvc;
 
+    @MockitoSpyBean
+    AccountRepository accounts;
+
     @Test
     void registerAndDuplicateGetTheSameEmptyAccepted() throws Exception {
         var body = REGISTER_JSON.formatted("ana@example.test", PASSWORD, "1990-05-20");
@@ -37,6 +42,17 @@ class AuthControllerTest extends AuthIntegrationTest {
 
         assertThat(first.getContentAsString()).isEmpty();
         assertThat(second.getContentAsString()).isEqualTo(first.getContentAsString());
+        assertThat(count("account")).isOne();
+    }
+
+    @Test
+    void concurrentDuplicateRegistrationIsStillAccepted() throws Exception {
+        var body = REGISTER_JSON.formatted("ana@example.test", PASSWORD, "1990-05-20");
+        register(body).andExpect(status().isAccepted());
+        doReturn(false).when(accounts).existsByEmail("ana@example.test");
+
+        register(body).andExpect(status().isAccepted());
+
         assertThat(count("account")).isOne();
     }
 
