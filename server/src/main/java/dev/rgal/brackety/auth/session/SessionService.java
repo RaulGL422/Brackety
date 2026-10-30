@@ -5,6 +5,7 @@ import dev.rgal.brackety.auth.account.Account;
 import dev.rgal.brackety.auth.account.AccountRepository;
 import dev.rgal.brackety.auth.account.AuthEmails;
 import dev.rgal.brackety.auth.account.ProfileRepository;
+import dev.rgal.brackety.auth.email.EmailTokens;
 import dev.rgal.brackety.common.crypto.RandomTokens;
 import dev.rgal.brackety.common.crypto.Sha256;
 import java.time.Clock;
@@ -29,6 +30,9 @@ public class SessionService {
     // Two tabs or two app calls refreshing at once are not a theft: the late one gets 401 and retries.
     static final Duration REUSE_GRACE = Duration.ofSeconds(10);
     public static final String EMAIL_VERIFIED_CLAIM = "email_verified";
+    // Tells an access token from the other tokens signed with the same key (see ShortLivedTokens).
+    public static final String PURPOSE_CLAIM = "purpose";
+    public static final String ACCESS_PURPOSE = "ACCESS";
 
     private static final Logger log = LoggerFactory.getLogger(SessionService.class);
 
@@ -36,6 +40,7 @@ public class SessionService {
     private final AccountRepository accounts;
     private final ProfileRepository profiles;
     private final AuthEmails authEmails;
+    private final EmailTokens emailTokens;
     private final JwtEncoder jwtEncoder;
     private final Clock clock;
 
@@ -44,12 +49,14 @@ public class SessionService {
             AccountRepository accounts,
             ProfileRepository profiles,
             AuthEmails authEmails,
+            EmailTokens emailTokens,
             JwtEncoder jwtEncoder,
             Clock clock) {
         this.refreshTokens = refreshTokens;
         this.accounts = accounts;
         this.profiles = profiles;
         this.authEmails = authEmails;
+        this.emailTokens = emailTokens;
         this.jwtEncoder = jwtEncoder;
         this.clock = clock;
     }
@@ -94,6 +101,18 @@ public class SessionService {
                 .ifPresent(t -> refreshTokens.revokeFamily(t.getFamilyId(), clock.instant()));
     }
 
+    /**
+     * For a change of credentials or a deletion: every refresh, access and reauth token of the account stops
+     * working, and so do the links already emailed (an attacker's email change, a reset sent to the old address).
+     */
+    @Transactional
+    public void closeAll(Account account) {
+        var now = clock.instant();
+        refreshTokens.revokeAccount(account.getId(), now);
+        account.revokeSessions(now);
+        emailTokens.deleteAll(account.getId());
+    }
+
     private RefreshToken find(String rawToken) {
         if (rawToken == null || rawToken.isBlank()) {
             throw AuthException.invalidSession();
@@ -119,6 +138,7 @@ public class SessionService {
                 .expiresAt(now.plus(ACCESS_TTL))
                 .claim("profiles", profileTypes)
                 .claim(EMAIL_VERIFIED_CLAIM, account.isEmailVerified())
+                .claim(PURPOSE_CLAIM, ACCESS_PURPOSE)
                 .build();
         var header = JwsHeader.with(MacAlgorithm.HS256).build();
         return jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();

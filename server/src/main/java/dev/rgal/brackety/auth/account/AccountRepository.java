@@ -33,4 +33,12 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
     @Modifying
     @Query("delete from Account a where a.emailVerified = false and a.createdAt <= :createdBefore")
     int deleteUnverified(Instant createdBefore);
+
+    @Query("select a.id from Account a where a.deletedAt <= :deletedBefore order by a.deletedAt")
+    List<UUID> findIdsDeletedBefore(Instant deletedBefore);
+
+    // Same cascade as above. Checked again in case the owner restored it since it was listed.
+    @Modifying
+    @Query("delete from Account a where a.id = :id and a.deletedAt <= :deletedBefore")
+    int deleteIfDeletedBefore(UUID id, Instant deletedBefore);
 }

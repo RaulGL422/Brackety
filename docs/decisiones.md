@@ -77,6 +77,12 @@ Formato: fecha · decisión · motivo.
 - 2026-10-30 · En local, Google simulado: clave generada al arrancar y `POST /api/v1/auth/dev/google-token` que emite idTokens; solo en `src/test` (nunca en el jar) · probar Google sin client IDs ni red.
 - 2026-10-30 · Vincular Google con el mismo email que la cuenta (normalizado) la marca como verificada; con otro email, no · Google ha probado que el buzón es suyo, como el enlace de recuperar contraseña.
 - 2026-10-30 · Una cuenta sin verificar no puede vincular un Google con otro email (403 `EMAIL_NOT_VERIFIED`) · cierra el pre-secuestro: el dueño real verificaría después la cuenta con el Google del atacante dentro.
+- 2026-10-30 · Reauth con JWT HS256 (misma clave que el acceso, claim `purpose` `REAUTH` frente a `ACCESS`; el decoder de la API solo acepta `ACCESS`), 5 min, ligado a la cuenta por `sub`, en la cabecera `X-Reauth`; reutilizable dentro de esos 5 min · sin tabla ni purga; un token de acceso no vale como reauth ni al revés; decidido por Raul.
+- 2026-10-30 · Reauth fallida: 403 `REAUTH_FAILED` (no 401) · la sesión es válida y un 401 haría que la app refrescara y repitiera.
+- 2026-10-30 · Cuenta pendiente de borrado: `restoreToken` JWT de 5 min (claim `purpose` `RESTORE`), solo para una cuenta aún borrada · la contraseña o Google ya han probado que es el dueño; sin estado en servidor.
+- 2026-10-30 · Cambio de email: el token se guarda aunque el email esté ocupado (no se envía) y la confirmación cierra todas las sesiones, también la actual · mismo trabajo en ambos casos (sin enumeración); lo más simple, como recuperar contraseña.
+- 2026-10-30 · Exportación sin el `sub` de Google · es un identificador interno de Google, no un dato que dio el usuario; pendiente de revisión legal.
+- 2026-10-30 · Purga de cuentas borradas: tarea diaria con `brackety.auth.deleted-purge-initial-delay` (1 min tras arrancar); marca `// eventos/ranking:` como punto de anonimizado · sin infraestructura hasta que existan resultados.
 - 2026-10-30 · Prototipo de uso real en la Fase 1 (≈ 2026-11-14) con versiones mínimas de los módulos reales (`modulos/prototipo-f1.md`) · fecha fija del primer cliente; pedido por Raul.
 - 2026-10-30 · Cuentas demo usuario = contraseña (`arbitro1`/`arbitro1`), solo con `DEMO_ACCOUNTS_ENABLED=true` · riesgo aceptado por Raul para tenerlas ya; bloqueo y limitador siguen activos.
 - 2026-10-30 · Fase 1 del prototipo = Tambo (2:00, máx. 15); cada competidor suma lo que marca, gane o no; descalificado 0 · elegido por Raul.
@@ -89,3 +95,7 @@ Formato: fecha · decisión · motivo.
 - 2026-10-30 · Al llegar a 15 o descalificar, el servidor registra una parada automática; "Finalizar" solo con el combate acabado · deshacer el último punto no deja el reloj corriendo solo; evita cerrar un combate por error.
 - 2026-10-30 · CSV con `;`, BOM UTF-8 y celdas de fórmula neutralizadas con `'` · abre bien en Excel en español y evita inyección de fórmulas con nombres maliciosos.
 - 2026-10-30 · Prototipo desplegado en la Pi de Raul con el Postgres del compose; grupos solo de 4 o 3 + fantasma · elegido por Raul.
+- 2026-10-30 · Corte por fecha `sessions_revoked_at`: al cambiar credenciales o borrar la cuenta, los tokens de acceso y reauth emitidos antes se rechazan (una lectura de la cuenta por petición) y se borran los enlaces de email pendientes · un atacante expulsado no debe seguir 15 min con acceso a datos de menores; decidido por Raul.
+- 2026-10-30 · `GET /me` ya no responde a una cuenta borrada (sale `deletesOn` de su respuesta); la app usa el `deletesOn` de `DELETE /me` · consecuencia del corte por fecha; sustituye a la decisión anterior.
+- 2026-10-30 · Un dueño de eventos no puede borrar su cuenta (409 `OWNS_EVENTS`) hasta ceder o borrar el evento · no perder datos de otros ni dejar eventos huérfanos; decidido por Raul.
+- 2026-10-30 · Cuenta borrada pasados 30 días: no se restaura aunque la purga no haya corrido · el plazo prometido es de 30 días, no "hasta la purga".

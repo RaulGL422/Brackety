@@ -1,9 +1,11 @@
 package dev.rgal.brackety.auth;
 
+import com.jayway.jsonpath.JsonPath;
 import dev.rgal.brackety.auth.account.ProfileType;
 import dev.rgal.brackety.auth.dto.RegisterRequest;
 import dev.rgal.brackety.auth.dto.RegistrationDetails;
 import dev.rgal.brackety.auth.google.FakeGoogle;
+import dev.rgal.brackety.auth.session.SessionService.Session;
 import dev.rgal.brackety.common.MutableClock;
 import dev.rgal.brackety.notifications.CapturingEmailSender;
 import dev.rgal.brackety.notifications.Email;
@@ -22,14 +24,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-// The purge job never starts on its own here: tests run it with the clock where they want it.
+// The purge jobs never start on their own here: tests run it with the clock where they want it.
 @SpringBootTest(
         properties = {
             "brackety.rate-limit.per-minute=100000",
             "brackety.rate-limit.auth-per-minute=100000",
             "brackety.auth.unverified-purge-initial-delay=P3650D",
+            "brackety.auth.deleted-purge-initial-delay=P3650D",
             // A list, as in production (web and Android client ids).
             "brackety.auth.google-client-ids=other-client.apps.googleusercontent.com, " + FakeGoogle.CLIENT_ID
         })
@@ -104,6 +113,32 @@ public abstract class AuthIntegrationTest {
         var real = Mockito.mockingDetails(spy).getMockCreationSettings().getDefaultAnswer();
         var first = new AtomicBoolean(true);
         return invocation -> first.getAndSet(false) ? value : real.answer(invocation);
+    }
+
+    protected static MockHttpServletRequestBuilder as(Session session, MockHttpServletRequestBuilder request) {
+        return request.header(HttpHeaders.AUTHORIZATION, "Bearer " + session.accessToken());
+    }
+
+    /** Proves the password again through the API and returns the token for the X-Reauth header. */
+    protected static String reauthWithPassword(MockMvc mvc, Session session) throws Exception {
+        return reauth(mvc, session, "{\"password\":\"%s\"}".formatted(PASSWORD));
+    }
+
+    protected static String reauthWithGoogle(MockMvc mvc, Session session, String idToken) throws Exception {
+        return reauth(mvc, session, "{\"googleIdToken\":\"%s\"}".formatted(idToken));
+    }
+
+    private static String reauth(MockMvc mvc, Session session, String body) throws Exception {
+        var response = mvc.perform(as(
+                        session,
+                        MockMvcRequestBuilders.post("/api/v1/me/reauth")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(body)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        return JsonPath.read(response, "$.reauthToken");
     }
 
     protected int count(String table) {

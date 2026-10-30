@@ -2,6 +2,7 @@ package dev.rgal.brackety.auth.identity;
 
 import dev.rgal.brackety.auth.dto.IdTokenRequest;
 import dev.rgal.brackety.auth.dto.SignInMethodResponse;
+import dev.rgal.brackety.auth.reauth.ReauthService;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,9 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 class IdentityController {
 
     private final IdentityService identities;
+    private final ReauthService reauth;
 
-    IdentityController(IdentityService identities) {
+    IdentityController(IdentityService identities, ReauthService reauth) {
         this.identities = identities;
+        this.reauth = reauth;
     }
 
     @GetMapping("/identities")
@@ -40,13 +44,19 @@ class IdentityController {
 
     @DeleteMapping("/identities/google")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    void unlinkGoogle(@AuthenticationPrincipal Jwt jwt) {
+    void unlinkGoogle(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestHeader(name = ReauthService.HEADER, required = false) String reauthToken) {
+        reauth.require(accountId(jwt), reauthToken);
         identities.unlinkGoogle(accountId(jwt));
     }
 
     @DeleteMapping("/password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    void removePassword(@AuthenticationPrincipal Jwt jwt) {
+    void removePassword(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestHeader(name = ReauthService.HEADER, required = false) String reauthToken) {
+        reauth.require(accountId(jwt), reauthToken);
         identities.removePassword(accountId(jwt));
     }
 
