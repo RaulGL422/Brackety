@@ -19,6 +19,10 @@ Cada escenario es una clase `Scenario` en `server/src/test/java/dev/rgal/bracket
 - Datos ficticios, nunca personales reales.
 - Cada módulo que cierra añade sus escenarios y su run config. Catálogo abajo.
 
+## Google simulado
+- En local la API confía en una clave generada al arrancar, no en Google. `POST /api/v1/auth/dev/google-token` `{"subject":"…","email":"…"}` devuelve un `idToken` para `POST /api/v1/auth/google`.
+- Solo existe en el lanzador local (`server/src/test`); en producción ese endpoint no existe.
+
 ## Reloj simulado
 - Toda la lógica usa el `Clock` inyectado; prohibido `LocalDate.now()` sin reloj.
 - `--brackety.clock.today=2027-03-10` desplaza el reloj a ese día (la hora sigue corriendo). Sirve para viajar en el tiempo con cualquier escenario.
@@ -50,4 +54,5 @@ La URL de la API entra por `--dart-define-from-file=env/<destino>.json` (`API_BA
 |---|---|---|
 | `empty` | BD vacía solo con migraciones | Primer arranque, registro desde cero |
 | `accounts` | Una cuenta por perfil (`club@`, `entidad@`, `ayudante@`, `externo@`, `alumno@example.test`; contraseña `brackety-demo`; sin verificar) y `bloqueada@example.test` bloqueada 15 min desde el arranque | Login, refresh, logout, bloqueo por intentos |
+| `google` | `google@` solo Google (sub `google-solo`), `vinculada@` con contraseña `brackety-demo` y Google `vinculada.gmail@` (sub `google-vinculada`), `sustituible@` sin verificar (`@example.test`) | Login con Google, `REGISTRATION_REQUIRED`, sustitución de cuenta sin verificar, vincular y desvincular |
 | `unverified` | Cuentas sin verificar (contraseña `brackety-demo`): `nueva@` recién creada, `recordatorio@` con 5 días y `purga@` con 7 (`@example.test`). La tarea diaria corre 1 min después de arrancar | Verificación pendiente, reenvío, recordatorio del día 5 y borrado del día 7 (enlaces en el log de la API) |

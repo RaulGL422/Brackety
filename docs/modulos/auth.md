@@ -9,7 +9,10 @@ Cuentas, login y sesión compartidos entre web y Android.
 - Token de Google verificado en servidor. La identidad se guarda por `sub` del proveedor, nunca por email.
 - Email de la cuenta único. Una identidad vinculada a mano puede tener otro email.
 - Vincular identidades solo a mano desde ajustes, con sesión iniciada. Nunca fusión automática.
-- No se puede desvincular la última identidad. Quitar la contraseña exige otro método vinculado.
+- No se puede desvincular la última identidad. Quitar la contraseña exige otro método vinculado (409 `LAST_SIGN_IN_METHOD`).
+- Token de Google: RS256 con las claves de Google, `iss` `accounts.google.com` (con o sin `https://`), `aud` en `GOOGLE_CLIENT_ID` (lista: web y Android), `exp` con el reloj (60 s de margen), `email_verified` true. Sin `GOOGLE_CLIENT_ID`: 503 y el resto de la API funciona.
+- Una sola identidad de Google por cuenta (otra → 409 `PROVIDER_ALREADY_LINKED`; la de otra cuenta → 409 `IDENTITY_IN_USE`).
+- Quitar la contraseña cierra todas las sesiones, también la actual. Ponerla de nuevo: "recuperar contraseña".
 
 ### Verificación de email
 - Cuenta con contraseña: verificación obligatoria por enlace (Resend). Enlace válido 24 h, reenvío con límite de tasa.
@@ -17,7 +20,9 @@ Cuentas, login y sesión compartidos entre web y Android.
 - Sin verificar a los 7 días → borrado definitivo. Recordatorio por email el día 5.
 - Cuenta creada con Google: email ya verificado.
 - Login con Google cuyo email coincide con una cuenta con contraseña **sin verificar**: esa cuenta se borra, se revocan sus sesiones, se crea la de Google y se muestra un aviso.
-- Mismo caso con cuenta **verificada**: no se crea cuenta; se indica entrar con el método original y vincular desde ajustes.
+- Mismo caso con cuenta **verificada**: no se crea cuenta; se indica entrar con el método original y vincular desde ajustes (409 `ACCOUNT_EXISTS`).
+- Primer login con Google: `REGISTRATION_REQUIRED` con el email (ya probado por Google); la app pide fecha, perfil y consentimientos y repite con el mismo token. La cuenta sin verificar solo se borra al completar.
+- Cuenta borrada (lógica): login con Google da el 401 genérico.
 - Registro con contraseña de un email que ya existe: misma respuesta que un registro nuevo; el email explica que ya hay cuenta.
 - Recuperar la contraseña también verifica el email.
 - Cambio de email: se verifica el nuevo antes de sustituir; se avisa al antiguo.
@@ -60,7 +65,10 @@ Cuentas, login y sesión compartidos entre web y Android.
 - `login_attempt`: clave (hash de email o IP), IP en claro o cuenta si existe, fallos, último fallo, id de bloqueo, bloqueado hasta.
 
 ## API (borrador)
-Bajo `/api/v1`: `POST /auth/register`, `/auth/login`, `/auth/google`, `/auth/refresh`, `/auth/logout`, `/auth/email/verify`, `/auth/email/resend`, `/auth/password/forgot`, `/auth/password/reset`, `/me`, `/me/profiles`, `/me/identities`, `/me/email`, `DELETE /me`, `GET /me/export`. Superadmin: `/admin/auth/login`, `/admin/organizers/{id}/validate`, `GET /admin/auth/locks`, `DELETE /admin/auth/locks/{lockId}`.
+- `POST /auth/google` `{idToken, registration?: {birthDate, profile, acceptedTermsVersion, acceptedPrivacyVersion, locale}}` → `{status: SIGNED_IN, accessToken, expiresIn, refreshToken?, emailVerified, replacedUnverifiedAccount}` (sesión como el login) o `{status: REGISTRATION_REQUIRED, email}`.
+- `GET /me/identities` → `[{method: PASSWORD}, {method: GOOGLE, email, linkedAt}]`. `POST /me/identities/google` `{idToken}`, `DELETE /me/identities/google`, `DELETE /me/password` → 204.
+- Errores 409 con `code` en el problem+json. Solo en local: `POST /auth/dev/google-token` `{subject, email}` (doc 08).
+Todos bajo `/api/v1`: `POST /auth/register`, `/auth/login`, `/auth/google`, `/auth/refresh`, `/auth/logout`, `/auth/email/verify`, `/auth/email/resend`, `/auth/password/forgot`, `/auth/password/reset`, `/me`, `/me/profiles`, `/me/identities`, `/me/email`, `DELETE /me`, `GET /me/export`. Superadmin: `/admin/auth/login`, `/admin/organizers/{id}/validate`, `GET /admin/auth/locks`, `DELETE /admin/auth/locks/{lockId}`.
 
 ## Pantallas
 Inicio de sesión, registro con selector de perfil, verificación pendiente, recuperar contraseña, ajustes de cuenta (identidades, perfiles, email, idioma, exportar/borrar). Admin: login de superadmin, bloqueos activos con revocación.
