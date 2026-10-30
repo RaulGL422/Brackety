@@ -19,6 +19,7 @@
 - [ ] Producción: leer la IP real de `CF-Connecting-IP` y confiar solo en el túnel; comprobar en el despliegue real.
 - [ ] Validar en servidor las versiones de términos y privacidad aceptadas (depende de `legal-paginas`).
 - [ ] Emails de auth: pasar el envío directo (tras commit, sin reintentos) a la cola con reintentos del módulo `notificaciones`.
+- [ ] Register/forgot: queda una pequeña diferencia de tiempo de BD según exista la cuenta (enumeración por temporización, medible con muchas muestras). Aceptado por ahora; si hiciera falta, mover esas escrituras al hilo asíncrono.
 - [ ] Más adelante: 2FA (TOTP), lista de sesiones activas con "cerrar en todos", contraseñas contra filtraciones (HaveIBeenPwned).
 - [ ] Login con Apple cuando haya cuenta Apple Developer o app iOS.
 

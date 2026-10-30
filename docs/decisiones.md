@@ -66,4 +66,6 @@ Formato: fecha · decisión · motivo.
 - 2026-10-30 · Cuenta sin verificar: claim `email_verified` en el JWT, `emailVerified` en login/refresh y anotación `@RequiresVerifiedEmail` (autoridad `EMAIL_VERIFIED`) para los endpoints de valor · simple y reutilizable; el claim se recalcula en cada refresh.
 - 2026-10-30 · Recordatorio del día 5 con un enlace de verificación nuevo; tarea diaria que también corre 1 min tras arrancar · el enlace del registro caduca a las 24 h; permite probar en local con el reloj desplazado.
 - 2026-10-30 · Recuperar la contraseña con el enlace borra el bloqueo y el contador por email de la cuenta (no el de IP); el aviso "ya tienes cuenta" también tiene el límite de 1 cada 60 s; los límites de 60 s bloquean la fila de la cuenta · el enlace prueba que es el dueño y un atacante no puede dejarle fuera; sin inundar buzones ni con peticiones simultáneas.
+- 2026-10-30 · Enlace de recuperación de contraseña válido 1 h (verificación, 24 h) · ventana corta para un enlace que cambia la contraseña.
+- 2026-10-30 · `compose-smoke` obligatorio en la protección de `development` · la PR #11 se fusionó con él en rojo (faltaba JWT_SECRET en CI); activado por Raul.
 - 2026-10-30 · CORS rechaza comodines de host (`*`, `https://*…`) al arrancar · con credenciales permitiría a cualquier web actuar como el usuario.
