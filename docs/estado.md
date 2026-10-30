@@ -38,7 +38,7 @@ Estados: pendiente · en curso · en pruebas · cerrado.
 | Tarea | Doc | Estado | Rama activa |
 |---|---|---|---|
 | sistema de diseño: tokens + página dev en admin | 07-diseno.md | cerrado (2026-10-30) | chore/design-system |
-| prototipo Fase 1 Yoseikan (uso real ≈ 2026-11-14) | modulos/prototipo-f1.md | en curso: pasos 1-2/7 (back: evento, tapices, staff, inscripciones, cuentas demo; grupos, fantasma, tapiz por fin estimado, combates, recomendado) (2026-10-30) | feat/proto-f1-groups |
+| prototipo Fase 1 Yoseikan (uso real ≈ 2026-11-14) | modulos/prototipo-f1.md | en curso: pasos 1-3/7, backend completo (evento, inscripciones, cuentas demo; grupos, fantasma, tapiz por fin estimado, recomendado; marcador Tambo, línea de tiempo, puntuación global, CSV) (2026-10-30) | feat/proto-f1-scoreboard |
 - Motivo prototipo: Raul necesita usar la app en la Fase 1 real en 15 días; adelanta versiones mínimas de eventos, inscripciones, grupos, marcador y ranking.
 - Motivo sistema de diseño: fijar colores, tipografía, espaciado y componentes antes de la primera pantalla real (`auth`), para no repartir valores sueltos por el código.
 
