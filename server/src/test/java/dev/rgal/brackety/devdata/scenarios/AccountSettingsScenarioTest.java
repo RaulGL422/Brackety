@@ -48,9 +48,10 @@ class AccountSettingsScenarioTest extends AuthIntegrationTest {
                 .isInstanceOfSatisfying(
                         AuthException.class,
                         e -> assertThat(e.getBody().getProperties()).containsEntry("code", "ACCOUNT_PENDING_DELETION"));
-        // The purge query takes the day-30 account only.
-        transactions.executeWithoutResult(
-                status -> accounts.deleteDeletedBefore(clock.instant().minus(Duration.ofDays(30))));
+        // The purge takes the day-30 account only.
+        for (var id : accounts.findIdsDeletedBefore(clock.instant().minus(Duration.ofDays(30)))) {
+            transactions.executeWithoutResult(status -> accounts.deleteIfDeletedBefore(id, clock.instant()));
+        }
         assertThat(count("account where status = 'DELETED'")).isOne();
     }
 

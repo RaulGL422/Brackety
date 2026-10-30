@@ -2,6 +2,7 @@ package dev.rgal.brackety.auth.session;
 
 import java.time.Clock;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 import javax.crypto.SecretKey;
@@ -18,7 +19,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * Signed like the access token, but its purpose claim differs: neither is accepted where the other is expected.
- * Nothing is stored, so they cannot be revoked; hence the short life.
+ * Nothing is stored, so they cannot be revoked one by one; hence the short life. A reauth token also dies with
+ * the account's session cut (see ReauthService#require).
  */
 @Component
 public class ShortLivedTokens {
@@ -60,8 +62,8 @@ public class ShortLivedTokens {
         return encoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
     }
 
-    /** The account the token was issued to; empty if it is invalid, expired or for another purpose. */
-    public Optional<UUID> verify(String token, Purpose purpose) {
+    /** Empty if the token is invalid, expired or for another purpose. */
+    public Optional<Verified> verify(String token, Purpose purpose) {
         if (token == null || token.isBlank()) {
             return Optional.empty();
         }
@@ -70,9 +72,11 @@ public class ShortLivedTokens {
             if (!purpose.name().equals(jwt.getClaimAsString(SessionService.PURPOSE_CLAIM))) {
                 return Optional.empty();
             }
-            return Optional.of(UUID.fromString(jwt.getSubject()));
+            return Optional.of(new Verified(UUID.fromString(jwt.getSubject()), jwt.getIssuedAt()));
         } catch (JwtException | IllegalArgumentException e) {
             return Optional.empty();
         }
     }
+
+    public record Verified(UUID accountId, Instant issuedAt) {}
 }

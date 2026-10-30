@@ -5,6 +5,7 @@ import dev.rgal.brackety.auth.account.Account;
 import dev.rgal.brackety.auth.account.AccountRepository;
 import dev.rgal.brackety.auth.account.AuthEmails;
 import dev.rgal.brackety.auth.account.ProfileRepository;
+import dev.rgal.brackety.auth.email.EmailTokens;
 import dev.rgal.brackety.common.crypto.RandomTokens;
 import dev.rgal.brackety.common.crypto.Sha256;
 import java.time.Clock;
@@ -39,6 +40,7 @@ public class SessionService {
     private final AccountRepository accounts;
     private final ProfileRepository profiles;
     private final AuthEmails authEmails;
+    private final EmailTokens emailTokens;
     private final JwtEncoder jwtEncoder;
     private final Clock clock;
 
@@ -47,12 +49,14 @@ public class SessionService {
             AccountRepository accounts,
             ProfileRepository profiles,
             AuthEmails authEmails,
+            EmailTokens emailTokens,
             JwtEncoder jwtEncoder,
             Clock clock) {
         this.refreshTokens = refreshTokens;
         this.accounts = accounts;
         this.profiles = profiles;
         this.authEmails = authEmails;
+        this.emailTokens = emailTokens;
         this.jwtEncoder = jwtEncoder;
         this.clock = clock;
     }
@@ -95,6 +99,18 @@ public class SessionService {
         refreshTokens
                 .findByTokenHash(Sha256.hex(rawToken))
                 .ifPresent(t -> refreshTokens.revokeFamily(t.getFamilyId(), clock.instant()));
+    }
+
+    /**
+     * For a change of credentials or a deletion: every refresh, access and reauth token of the account stops
+     * working, and so do the links already emailed (an attacker's email change, a reset sent to the old address).
+     */
+    @Transactional
+    public void closeAll(Account account) {
+        var now = clock.instant();
+        refreshTokens.revokeAccount(account.getId(), now);
+        account.revokeSessions(now);
+        emailTokens.deleteAll(account.getId());
     }
 
     private RefreshToken find(String rawToken) {

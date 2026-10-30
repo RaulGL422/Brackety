@@ -4,7 +4,7 @@ import dev.rgal.brackety.auth.AuthException;
 import dev.rgal.brackety.auth.account.Account;
 import dev.rgal.brackety.auth.account.AccountRepository;
 import dev.rgal.brackety.auth.account.AuthEmails;
-import dev.rgal.brackety.auth.session.RefreshTokenRepository;
+import dev.rgal.brackety.auth.session.SessionService;
 import java.time.Clock;
 import java.util.UUID;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -16,19 +16,19 @@ import org.springframework.transaction.annotation.Transactional;
 public class EmailChangeService {
 
     private final AccountRepository accounts;
-    private final RefreshTokenRepository refreshTokens;
+    private final SessionService sessions;
     private final EmailTokens emailTokens;
     private final AuthEmails authEmails;
     private final Clock clock;
 
     EmailChangeService(
             AccountRepository accounts,
-            RefreshTokenRepository refreshTokens,
+            SessionService sessions,
             EmailTokens emailTokens,
             AuthEmails authEmails,
             Clock clock) {
         this.accounts = accounts;
-        this.refreshTokens = refreshTokens;
+        this.sessions = sessions;
         this.emailTokens = emailTokens;
         this.authEmails = authEmails;
         this.clock = clock;
@@ -40,6 +40,9 @@ public class EmailChangeService {
     public void request(UUID accountId, String newEmail) {
         var account = accounts.lockById(accountId).filter(Account::isActive).orElseThrow(AuthException::invalidSession);
         var email = Account.normalizeEmail(newEmail);
+        if (email.equals(account.getEmail())) {
+            return;
+        }
         emailTokens
                 .issueThrottled(accountId, EmailToken.Purpose.CHANGE_EMAIL, email)
                 .ifPresent(token -> accounts.findByEmail(email)
@@ -47,7 +50,8 @@ public class EmailChangeService {
                                 authEmails::emailInUse, () -> authEmails.confirmEmailChange(account, email, token)));
     }
 
-    // Every session is closed, as on a password reset: whoever asked for the change may not be the owner.
+    // Every session and pending link is closed, as on a password reset: whoever asked for the change may not
+    // be the owner, and links sent to the old address must not work any more.
     @Transactional
     public void confirm(String token) {
         var change = emailTokens.consumeEmailChange(token);
@@ -58,15 +62,14 @@ public class EmailChangeService {
             throw AuthException.invalidLink();
         }
         var oldEmail = account.getEmail();
-        var now = clock.instant();
-        account.changeEmail(change.newEmail(), now);
+        account.changeEmail(change.newEmail(), clock.instant());
         try {
             accounts.flush();
         } catch (DataIntegrityViolationException e) {
             // A sign-up with that address committed between the check and this update.
             throw AuthException.invalidLink();
         }
-        refreshTokens.revokeAccount(account.getId(), now);
+        sessions.closeAll(account);
         authEmails.emailChanged(oldEmail, account);
     }
 }

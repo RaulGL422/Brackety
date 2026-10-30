@@ -27,10 +27,10 @@ class MeService {
         this.clock = clock;
     }
 
-    // A deleted account still answers while its last access token lives, so the app can show the date.
     @Transactional(readOnly = true)
     MeResponse get(UUID accountId) {
-        return response(accounts.findById(accountId).orElseThrow(AuthException::invalidSession));
+        return response(
+                accounts.findById(accountId).filter(Account::isActive).orElseThrow(AuthException::invalidSession));
     }
 
     @Transactional
@@ -50,7 +50,6 @@ class MeService {
                 account.getBirthDate(),
                 account.getLocale(),
                 accountProfiles,
-                identities.methods(account),
-                account.deletesOn(clock.getZone()));
+                identities.methods(account));
     }
 }

@@ -107,6 +107,11 @@ public class AuthException extends ErrorResponseException {
         return exception;
     }
 
+    public static AuthException ownsEvents() {
+        return withCode(
+                HttpStatus.CONFLICT, "OWNS_EVENTS", "This account owns events. Hand them over or delete them first.");
+    }
+
     public static AuthException profileCombinationNotAllowed() {
         return withCode(
                 HttpStatus.CONFLICT,

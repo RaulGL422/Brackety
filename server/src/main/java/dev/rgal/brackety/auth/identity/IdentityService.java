@@ -8,7 +8,7 @@ import dev.rgal.brackety.auth.account.Identity;
 import dev.rgal.brackety.auth.account.IdentityRepository;
 import dev.rgal.brackety.auth.dto.SignInMethodResponse;
 import dev.rgal.brackety.auth.google.GoogleIdTokens;
-import dev.rgal.brackety.auth.session.RefreshTokenRepository;
+import dev.rgal.brackety.auth.session.SessionService;
 import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,7 @@ public class IdentityService {
     private final AccountRepository accounts;
     private final IdentityRepository identities;
     private final GoogleIdTokens googleTokens;
-    private final RefreshTokenRepository refreshTokens;
+    private final SessionService sessions;
     private final AuthEmails authEmails;
     private final Clock clock;
 
@@ -34,13 +34,13 @@ public class IdentityService {
             AccountRepository accounts,
             IdentityRepository identities,
             GoogleIdTokens googleTokens,
-            RefreshTokenRepository refreshTokens,
+            SessionService sessions,
             AuthEmails authEmails,
             Clock clock) {
         this.accounts = accounts;
         this.identities = identities;
         this.googleTokens = googleTokens;
-        this.refreshTokens = refreshTokens;
+        this.sessions = sessions;
         this.authEmails = authEmails;
         this.clock = clock;
     }
@@ -127,9 +127,8 @@ public class IdentityService {
         if (identities.findByAccountIdOrderByCreatedAt(accountId).isEmpty()) {
             throw AuthException.lastSignInMethod();
         }
-        var now = clock.instant();
-        account.removePassword(now);
-        refreshTokens.revokeAccount(accountId, now);
+        account.removePassword(clock.instant());
+        sessions.closeAll(account);
         authEmails.passwordRemoved(account);
     }
 

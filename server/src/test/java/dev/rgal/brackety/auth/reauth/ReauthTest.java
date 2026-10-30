@@ -9,13 +9,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.jayway.jsonpath.JsonPath;
 import dev.rgal.brackety.auth.AuthIntegrationTest;
 import dev.rgal.brackety.auth.AuthService;
+import dev.rgal.brackety.auth.email.PasswordResetService;
 import dev.rgal.brackety.auth.google.FakeGoogle;
 import dev.rgal.brackety.auth.google.GoogleSignInService;
 import dev.rgal.brackety.auth.session.SessionService.Session;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.Date;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -40,6 +43,9 @@ class ReauthTest extends AuthIntegrationTest {
 
     @Autowired
     FakeGoogle google;
+
+    @Autowired
+    PasswordResetService passwordReset;
 
     @Test
     void everyNewMeEndpointNeedsAnAccessToken() throws Exception {
@@ -127,6 +133,43 @@ class ReauthTest extends AuthIntegrationTest {
         reauth(session, "{\"googleIdToken\":\"%s\"}".formatted(google.idToken("sub-unknown", ANA)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("REAUTH_FAILED"));
+    }
+
+    @Test
+    void aBadGoogleTokenIsAFailedProofNotAClosedSession() throws Exception {
+        var session = googleSignIn
+                .signIn(google.idToken("sub-ana", ANA), details(LocalDate.of(1990, 5, 20)))
+                .session();
+        var expired = google.sign(google.claims("sub-ana", ANA)
+                .expirationTime(Date.from(clock.instant().minusSeconds(120)))
+                .build());
+
+        for (var idToken : new String[] {"not-a-google-token", expired}) {
+            reauth(session, "{\"googleIdToken\":\"%s\"}".formatted(idToken))
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.code").value("REAUTH_FAILED"));
+        }
+    }
+
+    @Test
+    void aTokenIssuedBeforeAPasswordResetIsRefused() throws Exception {
+        var session = account(ANA);
+        var token = reauthWithPassword(mvc, session);
+        clock.advance(Duration.ofSeconds(1));
+        passwordReset.forgot(ANA);
+        passwordReset.reset(tokenIn(emails.sentTo(ANA).getLast()), "a-brand-new-password");
+
+        var fresh = auth.login(ANA, "a-brand-new-password", "203.0.113.10");
+        mvc.perform(as(fresh, get("/api/v1/me/export")).header(ReauthService.HEADER, token))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("REAUTH_REQUIRED"));
+        var after = reauth(fresh, "{\"password\":\"a-brand-new-password\"}")
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        mvc.perform(as(fresh, get("/api/v1/me/export"))
+                        .header(ReauthService.HEADER, JsonPath.<String>read(after, "$.reauthToken")))
+                .andExpect(status().isOk());
     }
 
     @Test

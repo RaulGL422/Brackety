@@ -9,6 +9,7 @@ import dev.rgal.brackety.auth.account.IdentityRepository;
 import dev.rgal.brackety.auth.dto.ReauthRequest;
 import dev.rgal.brackety.auth.dto.ReauthResponse;
 import dev.rgal.brackety.auth.google.GoogleIdTokens;
+import dev.rgal.brackety.auth.google.GoogleIdTokens.GoogleUser;
 import dev.rgal.brackety.auth.session.ShortLivedTokens;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -55,16 +56,32 @@ public class ReauthService {
                 shortLivedTokens.issue(accountId, ShortLivedTokens.Purpose.REAUTH), ShortLivedTokens.TTL.toSeconds());
     }
 
-    /** Throws 403 {@code REAUTH_REQUIRED} unless {@code token} is a live reauth token of this account. */
+    /**
+     * Throws 403 {@code REAUTH_REQUIRED} unless {@code token} is a live reauth token of this account, issued
+     * after its sessions were last closed.
+     */
     public void require(UUID accountId, String token) {
-        shortLivedTokens
+        var issuedAt = shortLivedTokens
                 .verify(token, ShortLivedTokens.Purpose.REAUTH)
-                .filter(accountId::equals)
+                .filter(t -> t.accountId().equals(accountId))
+                .map(ShortLivedTokens.Verified::issuedAt)
+                .orElseThrow(AuthException::reauthRequired);
+        accounts.findById(accountId)
+                .filter(a -> a.acceptsTokenIssuedAt(issuedAt))
                 .orElseThrow(AuthException::reauthRequired);
     }
 
     private boolean ownsGoogleAccount(UUID accountId, String idToken) {
-        var google = googleTokens.verify(idToken);
+        GoogleUser google;
+        try {
+            google = googleTokens.verify(idToken);
+        } catch (AuthException e) {
+            // A bad or expired Google token is a failed proof, not a closed session; 503s go through.
+            if (e.getStatusCode().is5xxServerError()) {
+                throw e;
+            }
+            return false;
+        }
         return identities
                 .findByProviderAndSubject(Identity.Provider.GOOGLE, google.subject())
                 .filter(i -> i.getAccountId().equals(accountId))

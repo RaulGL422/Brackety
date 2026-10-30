@@ -115,7 +115,9 @@ public class AuthService {
     // No rollback on AuthException: the failure counters must be saved even though the login fails.
     @Transactional(noRollbackFor = AuthException.class)
     public Session login(String email, String password, String clientIp) {
-        var account = checkPassword(email, password, clientIp).orElseThrow(AuthException::invalidCredentials);
+        var account = checkPassword(email, password, clientIp)
+                .filter(a -> a.isActive() || a.isRestorable(clock.instant()))
+                .orElseThrow(AuthException::invalidCredentials);
         if (!account.isActive()) {
             throw pendingDeletion(account);
         }
@@ -129,14 +131,16 @@ public class AuthService {
                 shortLivedTokens.issue(account.getId(), ShortLivedTokens.Purpose.RESTORE));
     }
 
+    // Issued after the deletion, so the session cut does not apply; past the grace the account is as if gone.
     @Transactional
     public Session restore(String restoreToken) {
+        var now = clock.instant();
         var account = shortLivedTokens
                 .verify(restoreToken, ShortLivedTokens.Purpose.RESTORE)
-                .flatMap(accounts::lockById)
-                .filter(a -> !a.isActive())
+                .flatMap(token -> accounts.lockById(token.accountId()))
+                .filter(a -> a.isRestorable(now))
                 .orElseThrow(AuthException::invalidSession);
-        account.restore(clock.instant());
+        account.restore(now);
         return sessions.start(account);
     }
 

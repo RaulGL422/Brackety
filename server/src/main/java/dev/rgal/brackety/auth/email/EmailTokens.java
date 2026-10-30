@@ -49,6 +49,11 @@ public class EmailTokens {
         return Optional.of(issue(accountId, purpose, newEmail));
     }
 
+    /** Drops every pending link of the account, whatever its purpose. */
+    public void deleteAll(UUID accountId) {
+        tokens.deleteByAccountId(accountId);
+    }
+
     /** Deletes the token and returns its account; invalid, expired and used tokens fail alike. */
     UUID consume(String raw, EmailToken.Purpose purpose) {
         return take(raw, purpose).getAccountId();

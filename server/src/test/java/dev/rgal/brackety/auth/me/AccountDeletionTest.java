@@ -15,10 +15,14 @@ import dev.rgal.brackety.auth.AuthService;
 import dev.rgal.brackety.auth.email.EmailToken;
 import dev.rgal.brackety.auth.email.EmailTokens;
 import dev.rgal.brackety.auth.google.FakeGoogle;
+import dev.rgal.brackety.auth.google.GoogleSignInService;
 import dev.rgal.brackety.auth.reauth.ReauthService;
 import dev.rgal.brackety.auth.session.SessionService;
 import dev.rgal.brackety.auth.session.SessionService.Session;
+import dev.rgal.brackety.event.Event;
+import dev.rgal.brackety.event.EventRepository;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +53,12 @@ class AccountDeletionTest extends AuthIntegrationTest {
     EmailTokens emailTokens;
 
     @Autowired
+    GoogleSignInService googleSignIn;
+
+    @Autowired
+    EventRepository events;
+
+    @Autowired
     DeletedAccountPurge purge;
 
     @Autowired
@@ -72,8 +82,46 @@ class AccountDeletionTest extends AuthIntegrationTest {
             assertThat(email.subject()).isEqualTo("Tu cuenta de Brackety se va a borrar");
             assertThat(email.text()).contains("9 de abril de 2027");
         });
-        mvc.perform(as(session, get("/api/v1/me")))
-                .andExpect(jsonPath("$.deletesOn").value("2027-04-09"));
+        mvc.perform(as(session, get("/api/v1/me"))).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void anEventOwnerCannotDeleteTheAccount() throws Exception {
+        var session = account(ANA);
+        events.save(Event.tambo(idOf(ANA), "Liga", LocalDate.of(2027, 4, 1), clock.instant()));
+        emails.reset();
+
+        deleteAccount(session)
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("OWNS_EVENTS"));
+
+        assertThat(count("account where status = 'ACTIVE' and deleted_at is null"))
+                .isOne();
+        assertThat(emails.sentTo(ANA)).isEmpty();
+        mvc.perform(as(session, get("/api/v1/me"))).andExpect(status().isOk());
+    }
+
+    @Test
+    void pastTheGraceTheAccountIsAsIfGoneUntilThePurgeRuns() throws Exception {
+        linkGoogle(account(ANA), "sub-ana", ANA);
+        deleteAccountOf(ANA);
+        clock.advance(Duration.ofDays(30).minusMinutes(1));
+        var restoreToken = restoreTokenOf(ANA);
+
+        clock.advance(Duration.ofMinutes(1));
+
+        login(ANA, PASSWORD)
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.detail").value("Invalid email or password."))
+                .andExpect(jsonPath("$.restoreToken").doesNotExist());
+        assertThatThrownBy(() -> googleSignIn.signIn(google.idToken("sub-ana", ANA), null))
+                .isInstanceOfSatisfying(
+                        AuthException.class,
+                        e -> assertThat(e.getStatusCode().value()).isEqualTo(401));
+        restore(restoreToken)
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.detail").value("Session expired. Log in again."));
+        assertThat(count("account where status = 'DELETED'")).isOne();
     }
 
     @Test
@@ -148,12 +196,29 @@ class AccountDeletionTest extends AuthIntegrationTest {
         deleteAccountOf(ANA);
 
         clock.advance(Duration.ofDays(30).minusSeconds(1));
-        transactions.executeWithoutResult(status -> purge.run());
+        purge.run();
         assertThat(count("account")).isOne();
 
         clock.advance(Duration.ofSeconds(1));
-        transactions.executeWithoutResult(status -> purge.run());
+        purge.run();
         assertThat(count("account")).isZero();
+    }
+
+    @Test
+    void anAccountThatCannotBePurgedDoesNotKeepTheOthers() {
+        account(ANA);
+        account(BEA);
+        deleteAccountOf(ANA);
+        clock.advance(Duration.ofSeconds(1));
+        deleteAccountOf(BEA);
+        // Only possible by hand: DELETE /me refuses an event owner.
+        events.save(Event.tambo(idOf(ANA), "Liga", LocalDate.of(2027, 4, 1), clock.instant()));
+
+        clock.advance(Duration.ofDays(30));
+        purge.run();
+
+        assertThat(jdbc.sql("select email from account").query(String.class).list())
+                .containsExactly(ANA);
     }
 
     @Test
@@ -170,7 +235,7 @@ class AccountDeletionTest extends AuthIntegrationTest {
         deleteAccountOf(ANA);
 
         clock.advance(Duration.ofDays(30));
-        transactions.executeWithoutResult(status -> purge.run());
+        purge.run();
 
         assertThat(count("account")).isOne();
         for (var table :

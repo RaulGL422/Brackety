@@ -10,6 +10,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -42,6 +43,7 @@ public class Account {
     private Instant verificationReminderSentAt;
     private Instant alreadyRegisteredSentAt;
     private Instant deletedAt;
+    private Instant sessionsRevokedAt;
 
     protected Account() {}
 
@@ -98,6 +100,24 @@ public class Account {
     /** The day the account will be purged, or null if it is not deleted. */
     public LocalDate deletesOn(ZoneId zone) {
         return deletedAt == null ? null : LocalDate.ofInstant(deletedAt.plus(DELETION_GRACE), zone);
+    }
+
+    /** Until the purge removes it, a deleted account can be restored only within the grace. */
+    public boolean isRestorable(Instant now) {
+        return !isActive() && now.isBefore(deletedAt.plus(DELETION_GRACE));
+    }
+
+    /** Access and reauth tokens issued before this call stop working, as they cannot be revoked one by one. */
+    public void revokeSessions(Instant now) {
+        sessionsRevokedAt = now;
+        updatedAt = now;
+    }
+
+    // JWT times are whole seconds: a token issued in the same second as the revocation is a new one and is kept.
+    public boolean acceptsTokenIssuedAt(Instant issuedAt) {
+        return isActive()
+                && issuedAt != null
+                && (sessionsRevokedAt == null || !issuedAt.isBefore(sessionsRevokedAt.truncatedTo(ChronoUnit.SECONDS)));
     }
 
     public void markDeleted(Instant now) {

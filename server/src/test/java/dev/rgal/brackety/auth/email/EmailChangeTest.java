@@ -42,6 +42,9 @@ class EmailChangeTest extends AuthIntegrationTest {
     @Autowired
     FakeGoogle google;
 
+    @Autowired
+    PasswordResetService passwordReset;
+
     @Test
     void theNewAddressIsProvedByItsLinkThenReplacesTheOldOne() throws Exception {
         var session = account(ANA);
@@ -94,6 +97,48 @@ class EmailChangeTest extends AuthIntegrationTest {
 
         assertThat(count("account where email = 'ana@example.test'")).isOne();
         assertThat(count("account where email = 'nueva.ana@example.test'")).isOne();
+    }
+
+    @Test
+    void thePresentAddressIsAcceptedAndNothingIsSent() throws Exception {
+        var session = account(ANA);
+        emails.reset();
+
+        requestChange(session, "Ana@Example.test").andExpect(status().isAccepted());
+
+        assertThat(emails.sent()).isEmpty();
+        assertThat(count("email_token where purpose = 'CHANGE_EMAIL'")).isZero();
+    }
+
+    @Test
+    void aPasswordResetCancelsAPendingChange() throws Exception {
+        var session = account(ANA);
+        emails.reset();
+        requestChange(session, NEW);
+        var change = tokenIn(single(NEW));
+
+        passwordReset.forgot(ANA);
+        passwordReset.reset(tokenIn(single(ANA)), "a-brand-new-password");
+
+        confirm(change).andExpect(status().isBadRequest());
+        assertThat(count("account where email = 'ana@example.test'")).isOne();
+    }
+
+    @Test
+    void confirmingCancelsTheLinksSentToTheOldAddress() throws Exception {
+        var session = account(ANA);
+        emails.reset();
+        passwordReset.forgot(ANA);
+        var reset = tokenIn(single(ANA));
+        requestChange(session, NEW);
+
+        confirm(tokenIn(single(NEW))).andExpect(status().isNoContent());
+
+        assertThatThrownBy(() -> passwordReset.reset(reset, "a-brand-new-password"))
+                .isInstanceOfSatisfying(
+                        AuthException.class,
+                        e -> assertThat(e.getBody().getDetail()).isEqualTo("This link is invalid or has expired."));
+        assertThat(auth.login(NEW, PASSWORD, IP).accessToken()).isNotBlank();
     }
 
     @Test

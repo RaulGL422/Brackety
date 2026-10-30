@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import dev.rgal.brackety.auth.SecurityConfig;
+import dev.rgal.brackety.auth.account.AccountRepository;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -14,11 +15,16 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(InfoController.class)
 @Import({InfoControllerTest.FixedClock.class, SecurityConfig.class})
 class InfoControllerTest {
+
+    // The JWT decoder of SecurityConfig needs it; this slice has no JPA and no request carries a token.
+    @MockitoBean
+    AccountRepository accounts;
 
     @Autowired
     MockMvc mvc;

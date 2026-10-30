@@ -44,8 +44,10 @@ public class GoogleSignInService {
         var google = googleTokens.verify(idToken);
         var identity = identities.findByProviderAndSubject(Identity.Provider.GOOGLE, google.subject());
         if (identity.isPresent()) {
-            var account =
-                    accounts.findById(identity.get().getAccountId()).orElseThrow(AuthException::googleSignInFailed);
+            // Past the grace a deleted account is as if gone, until the purge removes it.
+            var account = accounts.findById(identity.get().getAccountId())
+                    .filter(a -> a.isActive() || a.isRestorable(clock.instant()))
+                    .orElseThrow(AuthException::googleSignInFailed);
             if (!account.isActive()) {
                 throw auth.pendingDeletion(account);
             }

@@ -1,12 +1,14 @@
 package dev.rgal.brackety.auth;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import dev.rgal.brackety.auth.account.AccountRepository;
 import dev.rgal.brackety.auth.session.SessionService;
 import dev.rgal.brackety.common.ProblemResponses;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.Duration;
 import java.util.List;
+import java.util.UUID;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +25,12 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimValidator;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -93,7 +100,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    JwtDecoder jwtDecoder(SecretKey jwtKey, Clock clock) {
+    JwtDecoder jwtDecoder(SecretKey jwtKey, Clock clock, AccountRepository accounts) {
         var decoder = NimbusJwtDecoder.withSecretKey(jwtKey)
                 .macAlgorithm(MacAlgorithm.HS256)
                 .build();
@@ -103,8 +110,21 @@ public class SecurityConfig {
         // Only access tokens: a reauth or restore token, signed with the same key, must not open the API.
         decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(
                 timestamps,
-                new JwtClaimValidator<String>(SessionService.PURPOSE_CLAIM, SessionService.ACCESS_PURPOSE::equals)));
+                new JwtClaimValidator<String>(SessionService.PURPOSE_CLAIM, SessionService.ACCESS_PURPOSE::equals),
+                liveSession(accounts)));
         return decoder;
+    }
+
+    // One read per request: a deleted account, or a token issued before a password reset, an email change
+    // or a deletion, must not keep its 15 minutes.
+    private static OAuth2TokenValidator<Jwt> liveSession(AccountRepository accounts) {
+        var closed = OAuth2TokenValidatorResult.failure(
+                new OAuth2Error(OAuth2ErrorCodes.INVALID_TOKEN, "The session has been closed.", null));
+        return jwt -> accounts.findById(UUID.fromString(jwt.getSubject()))
+                        .filter(a -> a.acceptsTokenIssuedAt(jwt.getIssuedAt()))
+                        .isPresent()
+                ? OAuth2TokenValidatorResult.success()
+                : closed;
     }
 
     @Bean
