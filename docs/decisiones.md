@@ -70,6 +70,13 @@ Formato: fecha · decisión · motivo.
 - 2026-10-30 · `compose-smoke` obligatorio en la protección de `development` · la PR #11 se fusionó con él en rojo (faltaba JWT_SECRET en CI); activado por Raul.
 - 2026-10-30 · CORS rechaza comodines de host (`*`, `https://*…`) al arrancar · con credenciales permitiría a cualquier web actuar como el usuario.
 - 2026-10-30 · `auth` dividido en subpaquetes por tema (account, session, lockout, email) y utilidades en `common/crypto`; regla de ~15 archivos por feature · 28 archivos sueltos en una carpeta y creciendo; pedido por Raul.
+- 2026-10-30 · ID token de Google verificado con Nimbus (ya incluido) contra el JWKS de Google; `GOOGLE_CLIENT_ID` admite varios ids separados por comas (web y Android); sin él, 503 solo en Google · sin dependencia nueva; la API funciona sin cuentas de Google Cloud.
+- 2026-10-30 · `/auth/google` responde `REGISTRATION_REQUIRED` con el email y la app repite con el mismo token y `registration` (objeto anidado con las validaciones del registro) · sin estado en servidor entre las dos llamadas.
+- 2026-10-30 · Quitar la contraseña cierra todas las sesiones, incluida la actual · lo más simple, igual que recuperar contraseña; el access token no lleva la sesión.
+- 2026-10-30 · Una identidad de Google por cuenta; vincular la misma otra vez no hace nada; desvincular sin Google vinculado o quitar una contraseña que no hay: 204 sin efecto · `DELETE /me/identities/google` no lleva id.
+- 2026-10-30 · En local, Google simulado: clave generada al arrancar y `POST /api/v1/auth/dev/google-token` que emite idTokens; solo en `src/test` (nunca en el jar) · probar Google sin client IDs ni red.
+- 2026-10-30 · Vincular Google con el mismo email que la cuenta (normalizado) la marca como verificada; con otro email, no · Google ha probado que el buzón es suyo, como el enlace de recuperar contraseña.
+- 2026-10-30 · Una cuenta sin verificar no puede vincular un Google con otro email (403 `EMAIL_NOT_VERIFIED`) · cierra el pre-secuestro: el dueño real verificaría después la cuenta con el Google del atacante dentro.
 - 2026-10-30 · Prototipo de uso real en la Fase 1 (≈ 2026-11-14) con versiones mínimas de los módulos reales (`modulos/prototipo-f1.md`) · fecha fija del primer cliente; pedido por Raul.
 - 2026-10-30 · Cuentas demo usuario = contraseña (`arbitro1`/`arbitro1`), solo con `DEMO_ACCOUNTS_ENABLED=true` · riesgo aceptado por Raul para tenerlas ya; bloqueo y limitador siguen activos.
 - 2026-10-30 · Fase 1 del prototipo = Tambo (2:00, máx. 15); cada competidor suma lo que marca, gane o no; descalificado 0 · elegido por Raul.

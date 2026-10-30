@@ -15,6 +15,7 @@ Imágenes y compose: `modulos/infra-deploy.md`. Variables: `05-seguridad-infra.m
    - Rellenar `DB_USER`, `DB_PASSWORD` (larga y aleatoria: `openssl rand -base64 32`), `CLOUDFLARE_TUNNEL_TOKEN`, `CORS_ALLOWED_ORIGINS`, `PRIVACY_CONTACT_EMAIL`…
    - `JWT_SECRET` obligatoria (≥32 bytes): `openssl rand -base64 48`. Sin ella la API no arranca y `deploy.sh` se niega a desplegar. Cambiarla cierra todas las sesiones.
    - Email: `RESEND_API_KEY` (Resend → API Keys), `EMAIL_FROM` (remitente de un dominio verificado en Resend, p. ej. `Brackety <no-reply@rgal.dev>`) y `PUBLIC_BASE_URL` (URL pública de la web, base de los enlaces). Sin API key los emails solo van al log de la API.
+   - Google: `GOOGLE_CLIENT_ID` con los client IDs de OAuth (Google Cloud → APIs y servicios → Credenciales) de web y Android separados por comas. Vacía: el login con Google responde 503 y lo demás funciona.
    - `DB_DATA=/mnt/ssd/brackety/pgdata`.
    - `chmod 600 .env`: solo tu usuario puede leerlo.
 7. **GHCR**: si los paquetes son privados, `docker login ghcr.io -u RaulGL422` con un token de solo lectura (`read:packages`).
