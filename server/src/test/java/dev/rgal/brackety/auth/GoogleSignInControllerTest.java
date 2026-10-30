@@ -1,17 +1,27 @@
 package dev.rgal.brackety.auth;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import dev.rgal.brackety.auth.account.AccountRepository;
+import dev.rgal.brackety.auth.account.IdentityRepository;
 import dev.rgal.brackety.auth.google.FakeGoogle;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -29,6 +39,12 @@ class GoogleSignInControllerTest extends AuthIntegrationTest {
 
     @Autowired
     AuthService auth;
+
+    @MockitoSpyBean
+    AccountRepository accounts;
+
+    @MockitoSpyBean
+    IdentityRepository identities;
 
     @Test
     void aNewUserGetsRegistrationRequiredWithTheGoogleEmail() throws Exception {
@@ -113,6 +129,54 @@ class GoogleSignInControllerTest extends AuthIntegrationTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("$.detail").value("Google sign-in failed."));
+    }
+
+    @Test
+    void aConcurrentSignUpWithTheSameGoogleAccountEndsSignedIn() throws Exception {
+        var token = google.idToken("sub-ana", "ana@example.test");
+        signIn(null, token, REGISTRATION.formatted("1990-05-20"));
+        // As if the other request had not committed yet when this one looked: it inserts again and clashes.
+        doAnswer(firstCallReturns(Optional.empty(), identities))
+                .when(identities)
+                .findByProviderAndSubject(any(), any());
+        doAnswer(firstCallReturns(Optional.empty(), accounts)).when(accounts).lockByEmail(any());
+
+        signIn(null, token, REGISTRATION.formatted("1990-05-20"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("SIGNED_IN"))
+                .andExpect(jsonPath("$.replacedUnverifiedAccount").value(false));
+        assertThat(count("account")).isOne();
+        assertThat(count("identity")).isOne();
+    }
+
+    @Test
+    void aConcurrentSignUpWithTheSameEmailGetsTheUsualAnswerOnRetry() throws Exception {
+        signIn(null, google.idToken("sub-ana", "ana@example.test"), REGISTRATION.formatted("1990-05-20"));
+        doAnswer(firstCallReturns(Optional.empty(), accounts)).when(accounts).lockByEmail(any());
+
+        signIn(null, google.idToken("sub-other", "ana@example.test"), REGISTRATION.formatted("1990-05-20"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("ACCOUNT_EXISTS"));
+    }
+
+    @Test
+    void aClashThatPersistsAfterTheRetryIsAGeneric409() throws Exception {
+        signIn(null, google.idToken("sub-ana", "ana@example.test"), REGISTRATION.formatted("1990-05-20"));
+        doReturn(Optional.empty()).when(accounts).lockByEmail(any());
+
+        signIn(null, google.idToken("sub-other", "ana@example.test"), REGISTRATION.formatted("1990-05-20"))
+                .andExpect(status().isConflict())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.code").doesNotExist())
+                .andExpect(jsonPath("$.detail").value("Another sign-in for this account is in progress. Try again."));
+        assertThat(count("account")).isOne();
+    }
+
+    // The spies delegate to the real repository through their default answer.
+    private static Answer<Object> firstCallReturns(Object value, Object spy) {
+        var real = Mockito.mockingDetails(spy).getMockCreationSettings().getDefaultAnswer();
+        var first = new AtomicBoolean(true);
+        return invocation -> first.getAndSet(false) ? value : real.answer(invocation);
     }
 
     // The dev token endpoint only exists in the local runner (test sources), never in this app.

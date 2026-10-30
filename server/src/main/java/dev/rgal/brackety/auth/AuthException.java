@@ -44,6 +44,10 @@ public class AuthException extends ErrorResponseException {
         return new AuthException(HttpStatus.SERVICE_UNAVAILABLE, "Google sign-in is not configured.");
     }
 
+    static AuthException signInConflict() {
+        return new AuthException(HttpStatus.CONFLICT, "Another sign-in for this account is in progress. Try again.");
+    }
+
     public static AuthException googleSignInFailed() {
         return new AuthException(HttpStatus.UNAUTHORIZED, "Google sign-in failed.");
     }

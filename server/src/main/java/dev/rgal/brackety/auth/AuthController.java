@@ -79,13 +79,27 @@ class AuthController {
     ResponseEntity<GoogleSignInResponse> google(
             @Valid @RequestBody GoogleSignInRequest request,
             @RequestHeader(name = CLIENT_HEADER, required = false) String client) {
-        var result = google.signIn(request.idToken(), request.registration());
+        var result = googleSignInRetryingOnce(request);
         if (result.session() == null) {
             return ResponseEntity.ok(GoogleSignInResponse.registrationRequired(result.registrationEmail()));
         }
         var web = isWeb(client);
         return withRefreshCookie(result.session(), web)
                 .body(GoogleSignInResponse.signedIn(tokens(result.session(), web), result.replacedUnverifiedAccount()));
+    }
+
+    // A concurrent sign-up with the same Google account or email committed first and this one rolled back.
+    // Run again: it now finds that account and signs in (or gets its usual answer).
+    private GoogleSignInService.Result googleSignInRetryingOnce(GoogleSignInRequest request) {
+        try {
+            return google.signIn(request.idToken(), request.registration());
+        } catch (DataIntegrityViolationException first) {
+            try {
+                return google.signIn(request.idToken(), request.registration());
+            } catch (DataIntegrityViolationException again) {
+                throw AuthException.signInConflict();
+            }
+        }
     }
 
     @PostMapping("/refresh")
