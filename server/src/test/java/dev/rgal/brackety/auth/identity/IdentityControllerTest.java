@@ -12,11 +12,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import dev.rgal.brackety.auth.AuthException;
 import dev.rgal.brackety.auth.AuthIntegrationTest;
 import dev.rgal.brackety.auth.AuthService;
+import dev.rgal.brackety.auth.account.AccountRepository;
 import dev.rgal.brackety.auth.email.PasswordResetService;
 import dev.rgal.brackety.auth.google.FakeGoogle;
 import dev.rgal.brackety.auth.google.GoogleSignInService;
 import dev.rgal.brackety.auth.session.SessionService;
 import dev.rgal.brackety.auth.session.SessionService.Session;
+import java.time.Duration;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.transaction.support.TransactionOperations;
 
 class IdentityControllerTest extends AuthIntegrationTest {
 
@@ -49,6 +52,12 @@ class IdentityControllerTest extends AuthIntegrationTest {
 
     @Autowired
     PasswordResetService passwordReset;
+
+    @Autowired
+    AccountRepository accounts;
+
+    @Autowired
+    TransactionOperations transactions;
 
     @Test
     void everyEndpointNeedsAnAccessToken() throws Exception {
@@ -104,6 +113,28 @@ class IdentityControllerTest extends AuthIntegrationTest {
                 .singleElement()
                 .satisfies(email ->
                         assertThat(email.subject()).isEqualTo("Has vinculado una cuenta de Google a Brackety"));
+    }
+
+    @Test
+    void linkingAGoogleAccountWithTheSameEmailVerifiesTheAccountSoItIsNotPurged() throws Exception {
+        var session = passwordAccount(ANA);
+
+        link(session, google.idToken("sub-ana", "ANA@example.test")).andExpect(status().isNoContent());
+
+        assertThat(count("account where email_verified")).isOne();
+        purgeUnverifiedAfterSevenDays();
+        assertThat(count("account")).isOne();
+    }
+
+    @Test
+    void linkingAGoogleAccountWithAnotherEmailDoesNotVerifyTheAccount() throws Exception {
+        var session = passwordAccount(ANA);
+
+        link(session, google.idToken("sub-ana", "ana.personal@example.test")).andExpect(status().isNoContent());
+
+        assertThat(count("account where email_verified")).isZero();
+        purgeUnverifiedAfterSevenDays();
+        assertThat(count("account")).isZero();
     }
 
     @Test
@@ -231,6 +262,13 @@ class IdentityControllerTest extends AuthIntegrationTest {
 
         mvc.perform(as(session, get("/api/v1/me/identities"))).andExpect(status().isUnauthorized());
         mvc.perform(as(session, delete("/api/v1/me/password"))).andExpect(status().isUnauthorized());
+    }
+
+    // The query the daily purge runs (its class is internal to auth.email).
+    private void purgeUnverifiedAfterSevenDays() {
+        clock.advance(Duration.ofDays(7));
+        transactions.executeWithoutResult(
+                status -> accounts.deleteUnverified(clock.instant().minus(Duration.ofDays(7))));
     }
 
     private Session passwordAccount(String email) {

@@ -76,6 +76,10 @@ class IdentityService {
         }
         identities.save(
                 new Identity(accountId, Identity.Provider.GOOGLE, google.subject(), google.email(), clock.instant()));
+        // Google has proved the inbox is theirs, as opening a reset link does.
+        if (google.email().equals(account.getEmail())) {
+            account.markEmailVerified(clock.instant());
+        }
         authEmails.identityLinked(account, Identity.Provider.GOOGLE);
     }
 
