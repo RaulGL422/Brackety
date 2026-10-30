@@ -5,7 +5,7 @@
 | Módulo | Doc | Estado | Rama activa |
 |---|---|---|---|
 | infra-deploy | modulos/infra-deploy.md | cerrado (2026-10-30) | – |
-| auth | modulos/auth.md | pendiente | – |
+| auth | modulos/auth.md | en curso: registro, login, JWT + refresh, logout y bloqueo hechos (2026-10-30) | feat/auth-register-login |
 | perfiles-menores | modulos/perfiles-menores.md | pendiente | – |
 | legal-paginas | modulos/legal-paginas.md | pendiente | – |
 | eventos | modulos/eventos.md | pendiente | – |
