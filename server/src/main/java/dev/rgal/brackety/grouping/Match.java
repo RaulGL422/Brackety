@@ -39,6 +39,9 @@ public class Match {
     private int blueScore;
     private Instant startedAt;
     private Instant finishedAt;
+    private long elapsedMs;
+    private Instant runningSince;
+    private String disqualifiedSide;
 
     protected Match() {}
 
@@ -54,6 +57,10 @@ public class Match {
 
     public UUID getId() {
         return id;
+    }
+
+    public UUID getEventId() {
+        return eventId;
     }
 
     public UUID getGroupId() {
@@ -88,17 +95,48 @@ public class Match {
         return blueScore;
     }
 
+    public Instant getStartedAt() {
+        return startedAt;
+    }
+
     public Instant getFinishedAt() {
         return finishedAt;
     }
 
-    public boolean involves(UUID participantId) {
-        return redParticipantId.equals(participantId) || blueParticipantId.equals(participantId);
+    /** "RED", "BLUE" or null. */
+    public String getDisqualifiedSide() {
+        return disqualifiedSide;
     }
 
-    // Without pauses yet: the scoreboard (next step) replaces this with its own match clock.
+    /** Copies the scoreboard's state after each event, so mats and rankings need not replay them. */
+    public void updateFromScoreboard(
+            int redScore,
+            int blueScore,
+            Duration elapsed,
+            Instant runningSince,
+            String disqualifiedSide,
+            boolean finished,
+            Instant now) {
+        this.redScore = redScore;
+        this.blueScore = blueScore;
+        this.elapsedMs = elapsed.toMillis();
+        this.runningSince = runningSince;
+        this.disqualifiedSide = disqualifiedSide;
+        if (startedAt == null) {
+            startedAt = now;
+        }
+        status = finished ? Status.FINISHED : Status.IN_PROGRESS;
+        if (finished) {
+            finishedAt = now;
+        }
+    }
+
     Duration clockLeft(Instant now, Duration length) {
-        var left = length.minus(Duration.between(startedAt, now));
+        var elapsed = Duration.ofMillis(elapsedMs);
+        if (runningSince != null) {
+            elapsed = elapsed.plus(Duration.between(runningSince, now));
+        }
+        var left = length.minus(elapsed);
         return left.isNegative() ? Duration.ZERO : left;
     }
 }
