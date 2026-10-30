@@ -80,7 +80,6 @@ Formato: fecha · decisión · motivo.
 - 2026-10-30 · Reauth con JWT HS256 (misma clave que el acceso, claim `purpose` `REAUTH` frente a `ACCESS`; el decoder de la API solo acepta `ACCESS`), 5 min, ligado a la cuenta por `sub`, en la cabecera `X-Reauth`; reutilizable dentro de esos 5 min · sin tabla ni purga; un token de acceso no vale como reauth ni al revés; decidido por Raul.
 - 2026-10-30 · Reauth fallida: 403 `REAUTH_FAILED` (no 401) · la sesión es válida y un 401 haría que la app refrescara y repitiera.
 - 2026-10-30 · Cuenta pendiente de borrado: `restoreToken` JWT de 5 min (claim `purpose` `RESTORE`), solo para una cuenta aún borrada · la contraseña o Google ya han probado que es el dueño; sin estado en servidor.
-- 2026-10-30 · `GET /me` responde también para una cuenta borrada mientras viva su access token (muestra `deletesOn`); el resto de `/me` da 401 · es la única forma de que el campo tenga sentido.
 - 2026-10-30 · Cambio de email: el token se guarda aunque el email esté ocupado (no se envía) y la confirmación cierra todas las sesiones, también la actual · mismo trabajo en ambos casos (sin enumeración); lo más simple, como recuperar contraseña.
 - 2026-10-30 · Exportación sin el `sub` de Google · es un identificador interno de Google, no un dato que dio el usuario; pendiente de revisión legal.
 - 2026-10-30 · Purga de cuentas borradas: tarea diaria con `brackety.auth.deleted-purge-initial-delay` (1 min tras arrancar); marca `// eventos/ranking:` como punto de anonimizado · sin infraestructura hasta que existan resultados.
@@ -90,3 +89,7 @@ Formato: fecha · decisión · motivo.
 - 2026-10-30 · Prototipo sin WebSocket ni offline: el front sondea cada pocos segundos y el reloj del combate se calcula con eventos con hora del servidor · menos piezas para llegar a tiempo; `tiempo-real` y `offline` lo sustituirán.
 - 2026-10-30 · Prototipo solo en la web (PWA en móvil/tablet) · una sola build que probar; Android nativo después.
 - 2026-10-30 · Prototipo desplegado en la Pi de Raul con el Postgres del compose; grupos solo de 4 o 3 + fantasma · elegido por Raul.
+- 2026-10-30 · Corte por fecha `sessions_revoked_at`: al cambiar credenciales o borrar la cuenta, los tokens de acceso y reauth emitidos antes se rechazan (una lectura de la cuenta por petición) y se borran los enlaces de email pendientes · un atacante expulsado no debe seguir 15 min con acceso a datos de menores; decidido por Raul.
+- 2026-10-30 · `GET /me` ya no responde a una cuenta borrada (sale `deletesOn` de su respuesta); la app usa el `deletesOn` de `DELETE /me` · consecuencia del corte por fecha; sustituye a la decisión anterior.
+- 2026-10-30 · Un dueño de eventos no puede borrar su cuenta (409 `OWNS_EVENTS`) hasta ceder o borrar el evento · no perder datos de otros ni dejar eventos huérfanos; decidido por Raul.
+- 2026-10-30 · Cuenta borrada pasados 30 días: no se restaura aunque la purga no haya corrido · el plazo prometido es de 30 días, no "hasta la purga".

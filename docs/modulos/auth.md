@@ -26,12 +26,14 @@ Cuentas, login y sesión compartidos entre web y Android.
 - Primer login con Google: `REGISTRATION_REQUIRED` con el email (ya probado por Google); la app pide fecha, perfil y consentimientos y repite con el mismo token. La cuenta sin verificar solo se borra al completar.
 - Registro con contraseña de un email que ya existe: misma respuesta que un registro nuevo; el email explica que ya hay cuenta.
 - Recuperar la contraseña también verifica el email.
-- Cambio de email (+ reauth): enlace de 24 h al email nuevo, máx. 1 cada 60 s. Si ya es de otra cuenta, misma respuesta 202 y a ese email le llega "ya hay una cuenta". Al confirmar se recomprueba que esté libre (si no, enlace inválido), queda verificado, se cierran todas las sesiones y se avisa al antiguo (`n***@dominio`). Google no cambia.
+- Cambio de email (+ reauth): enlace de 24 h al email nuevo, máx. 1 cada 60 s. Si ya es de otra cuenta, misma respuesta 202 y a ese email le llega "ya hay una cuenta". Al confirmar se recomprueba que esté libre (si no, enlace inválido), queda verificado, se cierran todas las sesiones y se avisa al antiguo (`n***@dominio`). Google no cambia. Pedir el email actual: 202 sin enviar nada.
 
 ### Sesión
 - JWT de acceso 15 min + refresh rotatorio de 30 días (se renueva en cada uso).
 - Reutilizar un refresh ya usado → se revoca toda su familia (sesión) y se avisa por email. Excepción: en los 10 s siguientes a usarlo solo da 401, sin revocar ni avisar (dos pestañas o peticiones a la vez).
 - El cliente hace un solo refresh a la vez.
+- Cambio de credenciales (recuperar contraseña, confirmar cambio de email, quitar contraseña) o borrado: se revocan los refresh, se borran los enlaces de email pendientes y se fija `sessions_revoked_at`. Los tokens de acceso y reauth emitidos antes (`iat` en segundos) dejan de valer: 401 y 403 `REAUTH_REQUIRED`.
+- Cada petición lee la cuenta una vez: inexistente o borrada → 401.
 - Web: refresh en cookie `httpOnly` + `Secure` + `SameSite`; acceso solo en memoria. Android: almacenamiento seguro.
 
 ### Seguridad
@@ -54,13 +56,14 @@ Cuentas, login y sesión compartidos entre web y Android.
 
 ### Superadmin y RGPD
 - Superadmin: usuario único por entorno, credenciales iniciales por variables de entorno, endpoint separado, solo tras Cloudflare Access.
-- Acciones delicadas (borrar cuenta, cambiar email, exportar, quitar contraseña, desvincular Google) exigen reauth: `POST /me/reauth` con contraseña o Google → token de 5 min en la cabecera `X-Reauth`. Sin él: 403 `REAUTH_REQUIRED`; prueba incorrecta: 403 `REAUTH_FAILED`. La contraseña fallida cuenta para el bloqueo por email e IP.
-- Borrado de cuenta (`06-legal-rgpd.md`): lógico, cierra todas las sesiones y avisa por email con la fecha; definitivo a los 30 días (tarea diaria, cascade; ahí se anonimizarán resultados cuando existan).
+- Acciones delicadas (borrar cuenta, cambiar email, exportar, quitar contraseña, desvincular Google) exigen reauth: `POST /me/reauth` con contraseña o Google → token de 5 min en la cabecera `X-Reauth`. Sin él: 403 `REAUTH_REQUIRED`; prueba incorrecta (también token de Google inválido o caducado): 403 `REAUTH_FAILED`; Google no disponible: 503. La contraseña fallida cuenta para el bloqueo por email e IP.
+- Borrado de cuenta (`06-legal-rgpd.md`): lógico, cierra todas las sesiones y avisa por email con la fecha; definitivo a los 30 días (tarea diaria, cascade, cuenta a cuenta: la que falla se registra por id y no frena a las demás; ahí se anonimizarán resultados cuando existan). Dueño de eventos: 409 `OWNS_EVENTS`; antes cede o borra el evento.
 - En esos 30 días: login con contraseña correcta o Google → 403 `ACCOUNT_PENDING_DELETION` con `deletesOn` y `restoreToken` (5 min); `POST /auth/restore` la reactiva y da sesión. Credenciales malas: 401 genérico. Registro con ese email: 202 y aviso al dueño (1 cada 60 s). Google con ese email sin identidad: 409 `ACCOUNT_EXISTS`.
+- Pasados los 30 días, aunque la purga no haya corrido, es como si no existiera: login 401 genérico, `POST /auth/restore` 401.
 - Exportación: JSON descargable con cuenta (sin hash), perfiles, identidades (sin `sub`) y consentimientos.
 
 ## Datos
-- `account`: email, hash de contraseña, email verificado, fecha de nacimiento, idioma, estado (activa, borrada lógica) con `deleted_at`, fechas.
+- `account`: email, hash de contraseña, email verificado, fecha de nacimiento, idioma, estado (activa, borrada lógica) con `deleted_at`, corte de sesiones `sessions_revoked_at`, fechas.
 - `identity`: cuenta, proveedor, `sub`, email del proveedor.
 - `profile`: cuenta, tipo, validado por superadmin (solo organizadores).
 - `consent`: cuenta, documento, versión, fecha.
@@ -71,7 +74,7 @@ Cuentas, login y sesión compartidos entre web y Android.
 ## API (borrador)
 - `POST /auth/google` `{idToken, registration?: {birthDate, profile, acceptedTermsVersion, acceptedPrivacyVersion, locale}}` → `{status: SIGNED_IN, accessToken, expiresIn, refreshToken?, emailVerified, replacedUnverifiedAccount}` (sesión como el login) o `{status: REGISTRATION_REQUIRED, email}`.
 - `GET /me/identities` → `[{method: PASSWORD}, {method: GOOGLE, email, linkedAt}]`. `POST /me/identities/google` `{idToken}`, `DELETE /me/identities/google`, `DELETE /me/password` → 204.
-- `GET /me` → `{email, emailVerified, birthDate, locale, profiles: [{type, validated}], signInMethods, deletesOn?}`. `PATCH /me` `{locale: es|en}`. `POST /me/profiles` `{type}`, `DELETE /me/profiles/{type}` → 204.
+- `GET /me` → `{email, emailVerified, birthDate, locale, profiles: [{type, validated}], signInMethods}`. `PATCH /me` `{locale: es|en}`. `POST /me/profiles` `{type}`, `DELETE /me/profiles/{type}` → 204.
 - `POST /me/reauth` `{password}` o `{googleIdToken}` → `{reauthToken, expiresIn}`. Con `X-Reauth`: `POST /me/email` `{newEmail}` → 202; `DELETE /me` → `{deletesOn}`; `GET /me/export` → adjunto JSON.
 - `POST /auth/email/change/confirm` `{token}` → 204. `POST /auth/restore` `{restoreToken}` → sesión como el login.
 - Errores 409 con `code` en el problem+json. Solo en local: `POST /auth/dev/google-token` `{subject, email}` (doc 08).

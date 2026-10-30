@@ -24,7 +24,9 @@
 - [ ] Aviso "tu email ha cambiado" al email antiguo: sin canal de soporte no hay forma de recuperar la cuenta si el cambio lo hizo un atacante (salvo Google vinculado). Definir con `PRIVACY_CONTACT_EMAIL`/soporte.
 - [ ] Exportación sin el `sub` de Google (es dato personal, pero es un identificador interno de Google): confirmarlo en la revisión legal.
 - [ ] Quitar un perfil lo borra (no `deleted_at`): revisar cuando eventos o inscripciones referencien perfiles.
-- [ ] Tras borrar la cuenta o cambiar el email, el access token sigue vivo hasta 15 min: cada endpoint de módulos futuros debe comprobar que la cuenta está activa (como hacen los de `/me`).
+- [ ] Dueño de eventos: `DELETE /me` da 409 `OWNS_EVENTS`, pero aún no hay forma de ceder ni borrar un evento (módulo `eventos`). Hasta entonces ese organizador no puede borrar su cuenta.
+- [ ] Registro con el email de una cuenta borrada hace más de 30 días y aún sin purgar (hasta 1 día): el aviso dice que puede cancelar el borrado, ya no es cierto. ¿Callar o mensaje distinto?
+- [ ] Errores de la API sin texto en `i18n/messages*.properties` (la app traduce por `code`); `OWNS_EVENTS` sigue ese patrón. Confirmar si se quieren textos en servidor.
 - [ ] Login con Apple cuando haya cuenta Apple Developer o app iOS.
 
 ## Prototipo Fase 1 (bloquean el uso real)
@@ -62,6 +64,7 @@
 - [ ] Registro de tratamientos y plantilla de registro de brechas.
 
 ## Hecho
+- 2026-10-30 · Tokens de acceso y reauth emitidos antes de un cambio de credenciales o borrado se rechazan (`sessions_revoked_at`).
 - 2026-10-30 · Cuenta en borrado lógico: durante 30 días el dueño la reactiva al iniciar sesión (`ACCOUNT_PENDING_DELETION` + restaurar); registrarse con ese email avisa al dueño y no crea otra.
 - 2026-10-30 · Sistema de diseño validado: paleta Eléctrico y Barlow.
 - 2026-10-28 · Android cmdline-tools instaladas; `flutter doctor` sin errores para Android y web.
