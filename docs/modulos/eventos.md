@@ -13,7 +13,7 @@ Crear y configurar eventos (Liga, Liga en fases, Torneo) con sus ajustes comunes
 - Estatura: opcional / recomendada / obligatoria.
 - Descansos mínimos entre combates de un participante.
 - Ubicaciones clave (Tapiz 1, Entrada alumnos…), roles de ayudante del evento y permisos.
-- Colores de los competidores por ubicación, elegidos de la paleta común `SideColor` (`07-diseno.md`).
+- Colores de los competidores por ubicación, elegidos de la paleta común `CompetitorColor` (`07-diseno.md`).
 - Visibilidad del evento y de resultados: todos, clubes, inscritos, nadie. Modificable en cualquier momento.
 - Estados: borrador → publicado → en curso → finalizado (+ bloqueado por superadmin).
 

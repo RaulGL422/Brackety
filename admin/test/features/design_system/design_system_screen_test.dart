@@ -1,0 +1,55 @@
+import 'package:brackety_admin/app.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  const sizes = {
+    'phone': Size(360, 800),
+    'tablet': Size(800, 1280),
+    'desktop': Size(1440, 900),
+  };
+
+  for (final MapEntry(key: device, value: size) in sizes.entries) {
+    testWidgets(
+      'design system page renders every palette and mode on $device',
+      (tester) async {
+        tester.view.physicalSize = size;
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(const ProviderScope(child: AdminApp()));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Design').first);
+        await tester.pumpAndSettle();
+
+        expect(find.text('Design system'), findsOneWidget);
+        for (final palette in ['Fire', 'Night', 'Electric']) {
+          await tester.tap(find.text(palette));
+          await tester.pumpAndSettle();
+        }
+        await tester.tap(find.text('Dark'));
+        await tester.pumpAndSettle();
+
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
+  testWidgets('scoreboard buttons change the score', (tester) async {
+    tester.view.physicalSize = const Size(1440, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const ProviderScope(child: AdminApp()));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Design').first);
+    await tester.pumpAndSettle();
+
+    final fours = find.text('4').evaluate().length;
+    await tester.tap(find.text('+1').first);
+    await tester.pump();
+
+    expect(find.text('4'), findsNWidgets(fours + 1));
+  });
+}

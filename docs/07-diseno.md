@@ -13,6 +13,16 @@ Salida: `docs/07-diseno.md` actualizado con tokens (colores, tipografía, espaci
 
 Validación visual: página **Sistema de diseño** del admin, solo en debug (`./run-app.ps1 -Target web -App admin`). Muestra colores con su contraste, tipografía, espaciados, radios, componentes y ejemplos (marcador, clasificación).
 
+## Tokens (en `brackety_core`, rama `chore/design-system`)
+- Color: `ColorScheme` Material 3 (variante *fidelity*) desde `brandPalette` (primario + acento en `tertiary`). Candidatas: Eléctrico `#2F5BFF`/`#FF6B00` (por defecto), Fuego `#E63B12`/`#00A6A6`, Noche `#6C2BD9`/`#C6FF00`.
+- Estados: `BracketyColors` (`ThemeExtension`): success, warning (+ containers). Error usa el de Material.
+- Competidores: `CompetitorColor` (12 colores fijos en claro y oscuro, cada uno con su color de texto AA).
+- Tipografía: Barlow (texto) y Barlow Condensed (display, headline, números del marcador), empaquetadas en assets (offline), licencia OFL.
+- Espaciado `AppSpacing` 4·8·12·16·24·32·48. Radios `AppRadius` 8·12·20·full. Táctil `AppSizes` 48 (general) y 72 (marcador).
+- Componentes: estilo vía `ThemeData` (botones, tarjetas, campos, chips, diálogos). Widgets propios solo al repetirse.
+- Regla: ningún widget usa colores, tamaños o espaciados fijos; todo sale del tema o de los tokens.
+- Test `theme_test.dart`: contraste AA de todos los pares de color en claro y oscuro.
+
 ## Público objetivo
 Familias, deportistas (niños y adultos), entrenadores, árbitros y mesa. Muchos usuarios no técnicos, uso en móvil, a veces al aire libre (luz fuerte, arena).
 
@@ -34,4 +44,4 @@ Cada pantalla se diseña y prueba en móvil, tablet y escritorio. Clases de vent
 - Marcador/tapiz: en horizontal aprovecha el ancho; en tablet, los botones siguen al alcance de una mano.
 
 ## Estado
-Paleta, tipografías y componentes: **en exploración** (rama `chore/design-system`). Decisiones de partida en `decisiones.md` (2026-10-30).
+Tokens implementados; **pendiente de validación visual de Raul** (elegir paleta candidata en la página Sistema de diseño). Decisiones de partida en `decisiones.md` (2026-10-30).

@@ -32,6 +32,9 @@
 - [ ] Recopilar el reglamento completo en PDF para consulta cerca del marcador.
 - [ ] Confirmar orden de fases: deducido del Registro general (F1 suelo, F2 armas, F3 expresión técnica, F4 derribos).
 
+## Diseño (sistema de diseño)
+- [ ] Validar en la página Sistema de diseño del admin: elegir paleta (Eléctrico/Fuego/Noche), revisar tipografía Barlow y componentes en claro/oscuro y móvil.
+
 ## Producto
 - [ ] Grupo con sobrante: opciones (promedio por combate / puntos brutos / decidir caso a caso) y respuesta final del organizador; será opción del evento.
 - [ ] Modelo exacto de equipos en torneos por equipos (plantilla, suplentes, entrenadores).
