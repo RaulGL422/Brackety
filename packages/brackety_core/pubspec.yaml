@@ -24,6 +24,8 @@ dev_dependencies:
 
 flutter:
   generate: true
+  assets:
+    - assets/fonts/OFL.txt
   fonts:
     - family: Barlow
       fonts:

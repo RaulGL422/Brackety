@@ -8,7 +8,6 @@
   "navDesignSystem": "Design",
   "dsTitle": "Design system",
   "dsIntro": "Debug builds only. Everything below uses the real theme in the chosen mode.",
-  "dsMode": "Mode",
   "dsModeLight": "Light",
   "dsModeDark": "Dark",
   "dsTextScale": "Text at {percent} %",

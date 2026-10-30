@@ -146,12 +146,6 @@ abstract class AppLocalizations {
   /// **'Solo en builds debug. Todo lo de abajo usa el tema real en el modo elegido.'**
   String get dsIntro;
 
-  /// No description provided for @dsMode.
-  ///
-  /// In es, this message translates to:
-  /// **'Modo'**
-  String get dsMode;
-
   /// No description provided for @dsModeLight.
   ///
   /// In es, this message translates to:

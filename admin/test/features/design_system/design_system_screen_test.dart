@@ -34,6 +34,22 @@ void main() {
     });
   }
 
+  testWidgets('page lays out with text at 200 % on a phone', (tester) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const ProviderScope(child: AdminApp()));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.palette_outlined));
+    await tester.pumpAndSettle();
+    await tester.drag(find.byType(Slider), const Offset(400, 0));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Text at 200 %'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('scoreboard buttons change the score', (tester) async {
     tester.view.physicalSize = const Size(1440, 900);
     tester.view.devicePixelRatio = 1;

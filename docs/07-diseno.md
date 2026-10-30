@@ -20,7 +20,7 @@ Validación visual: página **Diseño** del admin, solo en debug (`./run-app.ps1
 - Tipografía: Barlow (texto) y Barlow Condensed (display, headline, números del marcador), empaquetadas en assets (offline), licencia OFL.
 - Espaciado `AppSpacing` 4·8·12·16·24·32·48. Radios `AppRadius` 8·12·20·full. Táctil `AppSizes` 48 (general) y 72 (marcador).
 - Componentes: estilo vía `ThemeData` (botones, tarjetas, campos, chips, diálogos). Widgets propios solo al repetirse.
-- Regla: ningún widget usa colores, tamaños o espaciados fijos; todo sale del tema o de los tokens.
+- Regla: ningún widget de producto usa colores, tamaños o espaciados fijos; todo sale del tema o de los tokens (la página Diseño fija anchos solo para maquetar la muestra).
 - Test `theme_test.dart`: contraste AA de todos los pares de color en claro y oscuro.
 
 ## Público objetivo

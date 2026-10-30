@@ -223,11 +223,21 @@ class _Standings extends StatelessWidget {
                   ? WidgetStatePropertyAll(c.tertiaryContainer)
                   : null,
               cells: [
-                DataCell(Text('${i + 1}')),
-                DataCell(Text(name)),
-                DataCell(Text('$wins')),
-                DataCell(Text('$losses')),
-                DataCell(Text('$points')),
+                for (final value in [
+                  '${i + 1}',
+                  name,
+                  '$wins',
+                  '$losses',
+                  '$points',
+                ])
+                  DataCell(
+                    Text(
+                      value,
+                      style: TextStyle(
+                        color: i == 0 ? c.onTertiaryContainer : null,
+                      ),
+                    ),
+                  ),
               ],
             ),
         ],

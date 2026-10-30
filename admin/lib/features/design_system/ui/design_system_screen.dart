@@ -94,17 +94,16 @@ class _DesignSystemScreenState extends State<DesignSystemScreen> {
         ),
         SizedBox(
           width: 280,
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(l10n.dsTextScale((_textScale * 100).round())),
-              Expanded(
-                child: Slider(
-                  value: _textScale,
-                  min: 1,
-                  max: 2,
-                  divisions: 4,
-                  onChanged: (v) => setState(() => _textScale = v),
-                ),
+              Slider(
+                value: _textScale,
+                min: 1,
+                max: 2,
+                divisions: 4,
+                onChanged: (v) => setState(() => _textScale = v),
               ),
             ],
           ),

@@ -6,5 +6,6 @@ import 'app.dart';
 
 void main() {
   ensureApiConfigured();
+  registerFontLicenses();
   runApp(const ProviderScope(child: AdminApp()));
 }

@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'brackety_colors.dart';
 import 'tokens.dart';
@@ -8,6 +10,16 @@ const _brandAccent = Color(0xFFFF6B00);
 
 const _bodyFont = 'packages/brackety_core/Barlow';
 const _displayFont = 'packages/brackety_core/BarlowCondensed';
+
+/// The bundled fonts are OFL: their notice must appear in the licenses page.
+void registerFontLicenses() {
+  LicenseRegistry.addLicense(() async* {
+    final text = await rootBundle.loadString(
+      'packages/brackety_core/assets/fonts/OFL.txt',
+    );
+    yield LicenseEntryWithLineBreaks(['Barlow'], text);
+  });
+}
 
 ThemeData lightTheme() => buildTheme(Brightness.light);
 
