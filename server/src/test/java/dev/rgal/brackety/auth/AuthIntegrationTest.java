@@ -5,6 +5,12 @@ import dev.rgal.brackety.common.MutableClock;
 import dev.rgal.brackety.notifications.CapturingEmailSender;
 import dev.rgal.brackety.notifications.Email;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -52,6 +58,33 @@ abstract class AuthIntegrationTest {
     // The raw token is only in the emailed link, as a real user would get it.
     static String tokenIn(Email email) {
         return email.link().substring(email.link().indexOf("token=") + "token=".length());
+    }
+
+    /** Runs the call on two threads released together; returns "ok" or the HTTP status of each. */
+    static List<String> runTwiceAtOnce(Runnable call) throws Exception {
+        var start = new CountDownLatch(1);
+        try (var pool = Executors.newFixedThreadPool(2)) {
+            var results = new ArrayList<Future<String>>();
+            for (int i = 0; i < 2; i++) {
+                results.add(pool.submit(() -> {
+                    if (!start.await(30, TimeUnit.SECONDS)) {
+                        throw new IllegalStateException("Start signal never came");
+                    }
+                    try {
+                        call.run();
+                        return "ok";
+                    } catch (AuthException e) {
+                        return String.valueOf(e.getStatusCode().value());
+                    }
+                }));
+            }
+            start.countDown();
+            var outcomes = new ArrayList<String>();
+            for (var result : results) {
+                outcomes.add(result.get(30, TimeUnit.SECONDS));
+            }
+            return outcomes;
+        }
     }
 
     int count(String table) {

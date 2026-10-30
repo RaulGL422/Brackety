@@ -107,6 +107,17 @@ class PasswordResetTest extends AuthIntegrationTest {
     }
 
     @Test
+    void twoSimultaneousResetsWithOneLinkSucceedOnlyOnce() throws Exception {
+        passwordReset.forgot(ANA);
+        var token = tokenIn(emails.sentTo(ANA).getFirst());
+
+        assertThat(runTwiceAtOnce(() -> passwordReset.reset(token, NEW_PASSWORD)))
+                .containsExactlyInAnyOrder("ok", "400");
+        assertThat(emails.sentTo(ANA).getLast().subject()).isEqualTo("Tu contraseña de Brackety ha cambiado");
+        assertThat(emails.sentTo(ANA)).hasSize(2);
+    }
+
+    @Test
     void aVerificationTokenCannotResetThePassword() {
         auth.register(registration("bob@example.test"));
 

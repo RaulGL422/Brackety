@@ -65,6 +65,14 @@ class EmailVerificationTest extends AuthIntegrationTest {
     }
 
     @Test
+    void twoSimultaneousUsesOfTheLinkSucceedOnlyOnce() throws Exception {
+        var token = tokenIn(emails.sentTo(ANA).getFirst());
+
+        assertThat(runTwiceAtOnce(() -> verification.verify(token))).containsExactlyInAnyOrder("ok", "400");
+        assertThat(count("email_token")).isZero();
+    }
+
+    @Test
     void anUnknownTokenIsRejected() {
         assertInvalidLink(() -> verification.verify("not-a-token"));
         assertThat(verified()).isFalse();

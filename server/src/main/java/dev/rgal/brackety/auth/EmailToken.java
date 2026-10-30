@@ -37,7 +37,6 @@ class EmailToken {
 
     private Instant createdAt;
     private Instant expiresAt;
-    private Instant usedAt;
 
     protected EmailToken() {}
 
@@ -54,10 +53,6 @@ class EmailToken {
     }
 
     boolean isUsable(Purpose expected, Instant now) {
-        return purpose == expected && usedAt == null && now.isBefore(expiresAt);
-    }
-
-    void markUsed(Instant now) {
-        usedAt = now;
+        return purpose == expected && now.isBefore(expiresAt);
     }
 }

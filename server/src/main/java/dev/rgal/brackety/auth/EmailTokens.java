@@ -1,9 +1,7 @@
 package dev.rgal.brackety.auth;
 
-import java.security.SecureRandom;
 import java.time.Clock;
 import java.time.Duration;
-import java.util.Base64;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
@@ -16,7 +14,6 @@ class EmailTokens {
 
     private final EmailTokenRepository tokens;
     private final Clock clock;
-    private final SecureRandom random = new SecureRandom();
 
     EmailTokens(EmailTokenRepository tokens, Clock clock) {
         this.tokens = tokens;
@@ -26,9 +23,7 @@ class EmailTokens {
     /** Replaces any earlier token of the same purpose and returns the raw one, to send by email. */
     String issue(UUID accountId, EmailToken.Purpose purpose) {
         tokens.deleteByAccountIdAndPurpose(accountId, purpose);
-        var bytes = new byte[32];
-        random.nextBytes(bytes);
-        var raw = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+        var raw = RandomTokens.newToken();
         tokens.save(new EmailToken(Sha256.hex(raw), accountId, purpose, clock.instant()));
         return raw;
     }
@@ -42,13 +37,14 @@ class EmailTokens {
         return Optional.of(issue(accountId, purpose));
     }
 
-    /** Marks the token used and returns its account; invalid, expired and used tokens fail alike. */
+    /** Deletes the token and returns its account; invalid, expired and used tokens fail alike. */
     UUID consume(String raw, EmailToken.Purpose purpose) {
         var now = clock.instant();
         var token = tokens.findByTokenHash(Sha256.hex(raw))
                 .filter(t -> t.isUsable(purpose, now))
                 .orElseThrow(AuthException::invalidLink);
-        token.markUsed(now);
+        // Deleted under the row lock: a concurrent second use waits, then finds nothing.
+        tokens.delete(token);
         return token.getAccountId();
     }
 }
