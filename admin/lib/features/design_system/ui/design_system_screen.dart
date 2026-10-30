@@ -31,7 +31,7 @@ class _DesignSystemScreenState extends State<DesignSystemScreen> {
       child: MediaQuery(
         data: MediaQuery.of(context)
             .copyWith(textScaler: TextScaler.linear(_textScale)),
-        child: ColoredBox(
+        child: Material(
           color: theme.colorScheme.surface,
           child: Align(
             alignment: Alignment.topCenter,
