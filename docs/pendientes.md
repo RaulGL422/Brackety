@@ -18,6 +18,7 @@
 - [ ] Cloudflare: regla de rate limiting sobre `/api/v1/auth/*` al desplegar.
 - [ ] Producción: leer la IP real de `CF-Connecting-IP` y confiar solo en el túnel; comprobar en el despliegue real.
 - [ ] Validar en servidor las versiones de términos y privacidad aceptadas (depende de `legal-paginas`).
+- [ ] Emails de auth: pasar el envío directo (tras commit, sin reintentos) a la cola con reintentos del módulo `notificaciones`.
 - [ ] Más adelante: 2FA (TOTP), lista de sesiones activas con "cerrar en todos", contraseñas contra filtraciones (HaveIBeenPwned).
 - [ ] Login con Apple cuando haya cuenta Apple Developer o app iOS.
 
