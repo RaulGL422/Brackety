@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 class GoogleSignInTest extends AuthIntegrationTest {
 
     private static final String ANA = "ana@example.test";
+    private static final String BEA = "bea@example.test";
     private static final LocalDate ADULT = LocalDate.of(1990, 5, 20);
 
     @Autowired
@@ -84,22 +85,39 @@ class GoogleSignInTest extends AuthIntegrationTest {
     }
 
     @Test
-    void anUnverifiedPasswordAccountIsReplacedWithItsSessions() {
+    void anUnverifiedPasswordAccountIsReplacedWithEverythingItHad() {
+        auth.register(registration(BEA));
+        var bea = idOf(BEA);
+        var beaSession = auth.login(BEA, PASSWORD, "203.0.113.10");
         auth.register(registration(ANA));
-        var oldId = accountId();
+        var oldId = idOf(ANA);
         var oldSession = auth.login(ANA, PASSWORD, "203.0.113.10");
+        // Not possible through the API any more (EMAIL_NOT_VERIFIED), but older or seeded data may have it.
+        jdbc.sql("insert into identity (id, account_id, provider, subject, provider_email, created_at)"
+                        + " values (gen_random_uuid(), ?, 'GOOGLE', 'sub-old', 'old@example.test', now())")
+                .param(oldId)
+                .update();
 
         var result = googleSignIn.signIn(google.idToken("sub-ana", ANA), details(ADULT));
 
         assertThat(result.replacedUnverifiedAccount()).isTrue();
         assertThat(result.session().emailVerified()).isTrue();
-        assertThat(accountId()).isNotEqualTo(oldId);
-        assertThat(count("account where password_hash is null and email_verified"))
+        var newId = idOf(ANA);
+        assertThat(newId).isNotEqualTo(oldId);
+        assertThat(count("account where id = '" + newId + "' and password_hash is null and email_verified"))
                 .isOne();
-        assertThat(count("refresh_token where account_id = '" + oldId + "'")).isZero();
-        assertThat(count("profile")).isOne();
-        assertThat(count("email_token")).isZero();
+        for (var table : new String[] {"refresh_token", "profile", "consent", "email_token", "identity"}) {
+            assertThat(count(table + " where account_id = '" + oldId + "'"))
+                    .as(table)
+                    .isZero();
+        }
+        assertThat(count("identity where subject = 'sub-old'")).isZero();
         assertThatThrownBy(() -> sessions.refresh(oldSession.refreshToken())).isInstanceOf(AuthException.class);
+
+        assertThat(count("profile where account_id = '" + bea + "'")).isOne();
+        assertThat(count("consent where account_id = '" + bea + "'")).isEqualTo(2);
+        assertThat(count("email_token where account_id = '" + bea + "'")).isOne();
+        assertThat(sessions.refresh(beaSession.refreshToken()).accessToken()).isNotBlank();
     }
 
     @Test
@@ -144,6 +162,13 @@ class GoogleSignInTest extends AuthIntegrationTest {
         assertUnauthorized(() -> googleSignIn.signIn(google.idToken("sub-ana", ANA), null));
         // Also when found by email, with another Google user.
         assertUnauthorized(() -> googleSignIn.signIn(google.idToken("sub-other", ANA), details(ADULT)));
+    }
+
+    private UUID idOf(String email) {
+        return jdbc.sql("select id from account where email = ?")
+                .param(email)
+                .query(UUID.class)
+                .single();
     }
 
     private UUID accountId() {
