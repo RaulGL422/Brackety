@@ -14,8 +14,11 @@ class AuthException extends ErrorResponseException {
         return new AuthException(HttpStatus.UNAUTHORIZED, "Invalid email or password.");
     }
 
-    static AuthException locked() {
-        return new AuthException(HttpStatus.TOO_MANY_REQUESTS, "Too many failed attempts. Try again later.");
+    // The lock id lets the user ask the superadmin to lift the lock.
+    static AuthException locked(String lockId) {
+        var exception = new AuthException(HttpStatus.TOO_MANY_REQUESTS, "Too many failed attempts. Try again later.");
+        exception.getBody().setProperty("lockId", lockId);
+        return exception;
     }
 
     static AuthException invalidSession() {

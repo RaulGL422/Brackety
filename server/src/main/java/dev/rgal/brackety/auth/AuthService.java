@@ -74,13 +74,21 @@ public class AuthService {
         // Keyed by email, not account, so unknown emails lock the same way and do not reveal which exist.
         var emailAttempt = lockAttempt("email:" + Sha256.hex(normalizedEmail));
         var ipAttempt = lockAttempt("ip:" + Sha256.hex(clientIp));
-        if (emailAttempt.isLocked(now) || ipAttempt.isLocked(now)) {
-            throw AuthException.locked();
+        ipAttempt.setIp(clientIp);
+        if (emailAttempt.isLocked(now)) {
+            throw AuthException.locked(emailAttempt.getLockId());
+        }
+        if (ipAttempt.isLocked(now)) {
+            throw AuthException.locked(ipAttempt.getLockId());
         }
         var account = accounts.findByEmail(normalizedEmail).filter(Account::isActive);
+        account.ifPresent(a -> emailAttempt.setAccountId(a.getId()));
         if (!passwordMatches(account, password)) {
-            emailAttempt.recordFailure(now);
-            ipAttempt.recordFailure(now);
+            if (emailAttempt.recordFailure(now, LoginAttempt.MAX_EMAIL_FAILURES)
+                    && emailAttempt.getAccountId() != null) {
+                // feat/auth-email: tell the account owner it is locked, with the lock id.
+            }
+            ipAttempt.recordFailure(now, LoginAttempt.MAX_IP_FAILURES);
             throw AuthException.invalidCredentials();
         }
         // The IP counter is not reset: one valid account must not unlock guessing others from the same IP.

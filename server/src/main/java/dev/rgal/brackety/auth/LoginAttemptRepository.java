@@ -1,6 +1,7 @@
 package dev.rgal.brackety.auth;
 
 import jakarta.persistence.LockModeType;
+import java.time.Instant;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
@@ -16,4 +17,9 @@ interface LoginAttemptRepository extends JpaRepository<LoginAttempt, String> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select a from LoginAttempt a where a.attemptKey = :key")
     LoginAttempt lockByKey(String key);
+
+    @Modifying
+    @Query("delete from LoginAttempt a where (a.lastFailureAt is null or a.lastFailureAt < :windowStart)"
+            + " and (a.lockedUntil is null or a.lockedUntil <= :now)")
+    int deleteFinished(Instant windowStart, Instant now);
 }

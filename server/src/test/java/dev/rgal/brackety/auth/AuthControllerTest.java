@@ -2,6 +2,7 @@ package dev.rgal.brackety.auth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.matchesPattern;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -77,6 +78,18 @@ class AuthControllerTest extends AuthIntegrationTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("$.detail").value("Invalid email or password."));
+    }
+
+    @Test
+    void lockedLoginIsA429ProblemWithTheLockId() throws Exception {
+        for (int i = 0; i < 5; i++) {
+            login(null, "nobody@example.test").andExpect(status().isUnauthorized());
+        }
+
+        login(null, "nobody@example.test")
+                .andExpect(status().isTooManyRequests())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.lockId").value(matchesPattern("L-[2-9A-HJKMNP-Z]{6}")));
     }
 
     @Test

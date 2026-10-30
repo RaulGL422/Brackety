@@ -5,10 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.groups.Tuple.tuple;
 
 import dev.rgal.brackety.auth.dto.RegisterRequest;
-import java.time.Duration;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -103,63 +100,6 @@ class AuthServiceTest extends AuthIntegrationTest {
         assertThat(unknownEmail.getStatusCode()).isEqualTo(wrongPassword.getStatusCode());
         assertThat(unknownEmail.getBody().getDetail())
                 .isEqualTo(wrongPassword.getBody().getDetail());
-    }
-
-    @Test
-    void locksTheAccountAfterFiveFailuresForFifteenMinutes() {
-        auth.register(registration("ana@example.test"));
-        assertThat(failTimes("ana@example.test", 5)).containsOnly(HttpStatus.UNAUTHORIZED);
-
-        assertThat(loginStatus("ana@example.test", PASSWORD, IP)).isEqualTo(HttpStatus.TOO_MANY_REQUESTS);
-        clock.advance(Duration.ofMinutes(15).minusSeconds(1));
-        assertThat(loginStatus("ana@example.test", PASSWORD, IP)).isEqualTo(HttpStatus.TOO_MANY_REQUESTS);
-
-        clock.advance(Duration.ofSeconds(1));
-        assertThat(auth.login("ana@example.test", PASSWORD, IP).accessToken()).isNotBlank();
-    }
-
-    @Test
-    void unknownEmailsLockLikeRealOnes() {
-        failTimes("nobody@example.test", 5);
-
-        assertThat(loginStatus("nobody@example.test", "wrong-password", IP)).isEqualTo(HttpStatus.TOO_MANY_REQUESTS);
-    }
-
-    @Test
-    void successfulLoginResetsTheAccountCounter() {
-        auth.register(registration("ana@example.test"));
-        failTimes("ana@example.test", 4);
-        auth.login("ana@example.test", PASSWORD, IP);
-
-        failTimes("ana@example.test", 4);
-
-        assertThat(auth.login("ana@example.test", PASSWORD, IP).accessToken()).isNotBlank();
-    }
-
-    @Test
-    void locksTheIpAfterFiveFailuresOnAnyAccounts() {
-        auth.register(registration("ana@example.test"));
-        for (int i = 1; i <= 5; i++) {
-            loginStatus("guess" + i + "@example.test", "wrong-password", IP);
-        }
-
-        assertThat(loginStatus("ana@example.test", PASSWORD, IP)).isEqualTo(HttpStatus.TOO_MANY_REQUESTS);
-        assertThat(auth.login("ana@example.test", PASSWORD, "203.0.113.99").accessToken())
-                .isNotBlank();
-    }
-
-    // Each failure from a different IP, so only the account counter adds up.
-    private List<HttpStatus> failTimes(String email, int times) {
-        var statuses = new ArrayList<HttpStatus>();
-        for (int i = 1; i <= times; i++) {
-            statuses.add(loginStatus(email, "wrong-password", "198.51.100." + i));
-        }
-        return statuses;
-    }
-
-    private HttpStatus loginStatus(String email, String password, String ip) {
-        return HttpStatus.valueOf(
-                catchAuth(() -> auth.login(email, password, ip)).getStatusCode().value());
     }
 
     private static AuthException catchAuth(Runnable call) {

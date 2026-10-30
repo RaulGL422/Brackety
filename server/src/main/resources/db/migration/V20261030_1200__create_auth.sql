@@ -64,9 +64,15 @@ create table email_token (
 );
 create index email_token_account_idx on email_token (account_id);
 
--- Keys are hashes of the email or IP, never the raw value.
+-- The key is a hash of the email or IP. The IP is kept in clear (IP rows only) and the account id
+-- (email rows only, never the email) so the superadmin can find and lift a lock; rows are purged
+-- as soon as their window and lock are over.
 create table login_attempt (
-    attempt_key  varchar(80) primary key,
-    failures     integer not null default 0,
-    locked_until timestamptz
+    attempt_key     varchar(80) primary key,
+    failures        integer not null default 0,
+    last_failure_at timestamptz,
+    locked_until    timestamptz,
+    lock_id         varchar(16) unique,
+    ip              varchar(45),
+    account_id      uuid references account (id) on delete cascade
 );
