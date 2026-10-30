@@ -2,6 +2,8 @@ package dev.rgal.brackety.auth.identity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -13,6 +15,7 @@ import dev.rgal.brackety.auth.AuthException;
 import dev.rgal.brackety.auth.AuthIntegrationTest;
 import dev.rgal.brackety.auth.AuthService;
 import dev.rgal.brackety.auth.account.AccountRepository;
+import dev.rgal.brackety.auth.account.IdentityRepository;
 import dev.rgal.brackety.auth.email.PasswordResetService;
 import dev.rgal.brackety.auth.google.FakeGoogle;
 import dev.rgal.brackety.auth.google.GoogleSignInService;
@@ -20,10 +23,12 @@ import dev.rgal.brackety.auth.session.SessionService;
 import dev.rgal.brackety.auth.session.SessionService.Session;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -53,8 +58,12 @@ class IdentityControllerTest extends AuthIntegrationTest {
     @Autowired
     PasswordResetService passwordReset;
 
-    @Autowired
+    // Spies only for the race tests; the same pair as GoogleSignInControllerTest, so they share one context.
+    @MockitoSpyBean
     AccountRepository accounts;
+
+    @MockitoSpyBean
+    IdentityRepository identities;
 
     @Autowired
     TransactionOperations transactions;
@@ -117,7 +126,7 @@ class IdentityControllerTest extends AuthIntegrationTest {
 
     @Test
     void linkingAGoogleAccountWithTheSameEmailVerifiesTheAccountSoItIsNotPurged() throws Exception {
-        var session = passwordAccount(ANA);
+        var session = unverifiedAccount(ANA);
 
         link(session, google.idToken("sub-ana", "ANA@example.test")).andExpect(status().isNoContent());
 
@@ -127,14 +136,56 @@ class IdentityControllerTest extends AuthIntegrationTest {
     }
 
     @Test
-    void linkingAGoogleAccountWithAnotherEmailDoesNotVerifyTheAccount() throws Exception {
-        var session = passwordAccount(ANA);
+    void anUnverifiedAccountCannotLinkAGoogleAccountWithAnotherEmail() throws Exception {
+        var session = unverifiedAccount(ANA);
 
-        link(session, google.idToken("sub-ana", "ana.personal@example.test")).andExpect(status().isNoContent());
+        link(session, google.idToken("sub-ana", "ana.personal@example.test"))
+                .andExpect(status().isForbidden())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.code").value("EMAIL_NOT_VERIFIED"));
 
+        assertThat(count("identity")).isZero();
         assertThat(count("account where email_verified")).isZero();
         purgeUnverifiedAfterSevenDays();
         assertThat(count("account")).isZero();
+    }
+
+    // Pre-hijacking: someone signs up with Ana's email and tries to plant their own Google account before
+    // Ana takes the account back with a password reset.
+    @Test
+    void aForeignGoogleAccountCannotBePlantedBeforeTheOwnerVerifies() throws Exception {
+        var attacker = unverifiedAccount(ANA);
+        var attackerGoogle = google.idToken("sub-attacker", "attacker@example.test");
+        link(attacker, attackerGoogle).andExpect(status().isForbidden());
+
+        passwordReset.forgot(ANA);
+        passwordReset.reset(tokenIn(emails.sentTo(ANA).getLast()), "the-owner-password");
+
+        mvc.perform(post("/api/v1/auth/google")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"idToken\":\"%s\"}".formatted(attackerGoogle)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("REGISTRATION_REQUIRED"))
+                .andExpect(jsonPath("$.email").value("attacker@example.test"))
+                .andExpect(jsonPath("$.accessToken").doesNotExist());
+        assertThat(count("identity")).isZero();
+    }
+
+    @Test
+    void aConcurrentLinkOfTheSameGoogleAccountIsIdentityInUse() throws Exception {
+        googleAccount(BEA, "sub-bea");
+        var session = passwordAccount(ANA);
+        emails.reset();
+        // As if Bea's link had not committed yet when this one looked: the insert clashes.
+        doAnswer(firstCallReturns(Optional.empty(), identities))
+                .when(identities)
+                .findByProviderAndSubject(any(), any());
+
+        link(session, google.idToken("sub-bea", BEA))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("IDENTITY_IN_USE"));
+        assertThat(count("identity")).isOne();
+        assertThat(emails.sentTo(ANA)).isEmpty();
     }
 
     @Test
@@ -272,6 +323,14 @@ class IdentityControllerTest extends AuthIntegrationTest {
     }
 
     private Session passwordAccount(String email) {
+        auth.register(registration(email));
+        jdbc.sql("update account set email_verified = true where email = ?")
+                .param(email)
+                .update();
+        return auth.login(email, PASSWORD, IP);
+    }
+
+    private Session unverifiedAccount(String email) {
         auth.register(registration(email));
         return auth.login(email, PASSWORD, IP);
     }

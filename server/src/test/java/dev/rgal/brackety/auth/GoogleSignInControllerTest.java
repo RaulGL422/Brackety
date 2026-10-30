@@ -14,10 +14,7 @@ import dev.rgal.brackety.auth.account.AccountRepository;
 import dev.rgal.brackety.auth.account.IdentityRepository;
 import dev.rgal.brackety.auth.google.FakeGoogle;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -170,13 +167,6 @@ class GoogleSignInControllerTest extends AuthIntegrationTest {
                 .andExpect(jsonPath("$.code").doesNotExist())
                 .andExpect(jsonPath("$.detail").value("Another sign-in for this account is in progress. Try again."));
         assertThat(count("account")).isOne();
-    }
-
-    // The spies delegate to the real repository through their default answer.
-    private static Answer<Object> firstCallReturns(Object value, Object spy) {
-        var real = Mockito.mockingDetails(spy).getMockCreationSettings().getDefaultAnswer();
-        var first = new AtomicBoolean(true);
-        return invocation -> first.getAndSet(false) ? value : real.answer(invocation);
     }
 
     // The dev token endpoint only exists in the local runner (test sources), never in this app.

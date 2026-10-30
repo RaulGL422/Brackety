@@ -13,6 +13,7 @@ import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,10 +60,16 @@ class IdentityService {
     }
 
     // The Google email may differ from the account one: the identity is the sub, not the address.
+    // Except on an unverified account: whoever signed up may not own the email, and the owner would later
+    // verify it (reset or link) with this Google account still in it.
     @Transactional
     void linkGoogle(UUID accountId, String idToken) {
         var google = googleTokens.verify(idToken);
         var account = lockActive(accountId);
+        var sameEmail = google.email().equals(account.getEmail());
+        if (!account.isEmailVerified() && !sameEmail) {
+            throw AuthException.emailNotVerified();
+        }
         var owner = identities.findByProviderAndSubject(Identity.Provider.GOOGLE, google.subject());
         if (owner.isPresent()) {
             if (owner.get().getAccountId().equals(accountId)) {
@@ -74,10 +81,15 @@ class IdentityService {
                 .anyMatch(i -> i.getProvider() == Identity.Provider.GOOGLE)) {
             throw AuthException.providerAlreadyLinked();
         }
-        identities.save(
-                new Identity(accountId, Identity.Provider.GOOGLE, google.subject(), google.email(), clock.instant()));
-        // Google has proved the inbox is theirs, as opening a reset link does.
-        if (google.email().equals(account.getEmail())) {
+        try {
+            identities.saveAndFlush(new Identity(
+                    accountId, Identity.Provider.GOOGLE, google.subject(), google.email(), clock.instant()));
+        } catch (DataIntegrityViolationException e) {
+            // Another account linked the same Google account at the same time and committed first.
+            throw AuthException.identityInUse();
+        }
+        // Only reachable with the same email: Google has proved the inbox is theirs, as a reset link does.
+        if (!account.isEmailVerified()) {
             account.markEmailVerified(clock.instant());
         }
         authEmails.identityLinked(account, Identity.Provider.GOOGLE);

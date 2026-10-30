@@ -14,7 +14,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.Mockito;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -94,6 +97,13 @@ public abstract class AuthIntegrationTest {
             }
             return outcomes;
         }
+    }
+
+    /** For a {@code @MockitoSpyBean} repository: the first call returns {@code value}, the rest go to the real one. */
+    protected static Answer<Object> firstCallReturns(Object value, Object spy) {
+        var real = Mockito.mockingDetails(spy).getMockCreationSettings().getDefaultAnswer();
+        var first = new AtomicBoolean(true);
+        return invocation -> first.getAndSet(false) ? value : real.answer(invocation);
     }
 
     protected int count(String table) {
