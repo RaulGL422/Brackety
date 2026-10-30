@@ -23,8 +23,17 @@ jobs:
         run: |
           cp .env.example .env
           sed -i 's/^DB_USER=.*/DB_USER=brackety/; s/^DB_PASSWORD=.*/DB_PASSWORD=ci-only-password/; s#^API_BASE_URL=.*#API_BASE_URL=http://localhost:8080#' .env
-          sed -i "s#^JWT_SECRET=.*#JWT_SECRET=$(openssl rand -base64 48 | tr -d '
-')#" .env
+          sed -i "s#^JWT_SECRET=.*#JWT_SECRET=$(openssl rand -base64 48 | tr -d '\n')#" .env
+      - name: Deploy refuses a short JWT_SECRET
+        run: |
+          cp .env "$RUNNER_TEMP/env.ok"
+          sed -i 's/^JWT_SECRET=.*/JWT_SECRET=too-short/' .env
+          status=0
+          ./deploy.sh local 2> "$RUNNER_TEMP/deploy.err" || status=$?
+          # Restore the good .env before any check, so later steps never run with the broken one.
+          cp "$RUNNER_TEMP/env.ok" .env
+          if [ "$status" -eq 0 ]; then echo "deploy with a short JWT_SECRET should fail"; exit 1; fi
+          grep -q "Set JWT_SECRET" "$RUNNER_TEMP/deploy.err"
       - name: Build images
         run: docker compose build
       - name: Deploy
