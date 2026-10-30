@@ -1,0 +1,85 @@
+package dev.rgal.brackety.auth;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import java.security.SecureRandom;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.UUID;
+
+@Entity
+class LoginAttempt {
+
+    static final int MAX_EMAIL_FAILURES = 5;
+    // High on purpose: at an event many users share one public IP (NAT); this only stops mass attacks.
+    static final int MAX_IP_FAILURES = 30;
+    static final Duration WINDOW = Duration.ofMinutes(15);
+    static final Duration LOCK_DURATION = Duration.ofMinutes(15);
+
+    // No 0/O or 1/I/L: the user reads the id out to the superadmin.
+    private static final String LOCK_ID_ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
+    private static final SecureRandom RANDOM = new SecureRandom();
+
+    @Id
+    private String attemptKey;
+
+    private int failures;
+    private Instant lastFailureAt;
+    private Instant lockedUntil;
+    private String lockId;
+    private String ip;
+    private UUID accountId;
+
+    protected LoginAttempt() {}
+
+    boolean isLocked(Instant now) {
+        return lockedUntil != null && now.isBefore(lockedUntil);
+    }
+
+    String getLockId() {
+        return lockId;
+    }
+
+    void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    void setAccountId(UUID accountId) {
+        this.accountId = accountId;
+    }
+
+    UUID getAccountId() {
+        return accountId;
+    }
+
+    /** Returns true when this failure locks the key. */
+    boolean recordFailure(Instant now, int maxFailures) {
+        if (lastFailureAt != null && now.isAfter(lastFailureAt.plus(WINDOW))) {
+            failures = 0;
+        }
+        failures++;
+        lastFailureAt = now;
+        if (failures < maxFailures) {
+            return false;
+        }
+        failures = 0;
+        lockedUntil = now.plus(LOCK_DURATION);
+        lockId = newLockId();
+        return true;
+    }
+
+    void reset() {
+        failures = 0;
+        lastFailureAt = null;
+        lockedUntil = null;
+        lockId = null;
+    }
+
+    static String newLockId() {
+        var id = new StringBuilder("L-");
+        for (int i = 0; i < 6; i++) {
+            id.append(LOCK_ID_ALPHABET.charAt(RANDOM.nextInt(LOCK_ID_ALPHABET.length())));
+        }
+        return id.toString();
+    }
+}

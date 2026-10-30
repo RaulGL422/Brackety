@@ -54,3 +54,10 @@ Formato: fecha · decisión · motivo.
 - 2026-10-30 · Doble capa de límite de tasa: limitador en la app (300/min API, 20/min auth) + regla en Cloudflare · pedido por Raul: más tranquilidad y errores 429 controlados por la app.
 - 2026-10-30 · Bloqueos con id corto en el 429, revocables por el superadmin desde admin con auditoría; aviso por email al bloquearse una cuenta · pedido por Raul.
 - 2026-10-30 · IP en claro en `login_attempt` solo mientras dura ventana o bloqueo; purga automática · interés legítimo de seguridad con conservación mínima (RGPD).
+- 2026-10-30 · Dependencias de `auth`: `spring-boot-starter-security`, `spring-boot-starter-security-oauth2-resource-server` (Nimbus, JWT HS256 con `JWT_SECRET`) y `bcprov-jdk18on` 1.86 · validación JWT estándar de Spring sin librería propia; BouncyCastle lo exige `Argon2PasswordEncoder`.
+- 2026-10-30 · Cliente web detectado por la cabecera `X-Client: web`: el refresh va en cookie `brackety_refresh` (`Path=/api/v1/auth`) y no en el cuerpo; sin cabecera, en el cuerpo (Android) · lo más simple; la cookie solo la manda el navegador.
+- 2026-10-30 · Contadores de bloqueo indexados por hash del email (nunca el email) y de la IP; la fila de email guarda la cuenta si existe · un email inexistente se bloquea igual, sin enumeración.
+- 2026-10-30 · Límites por IP subidos y separados: 3000/min API, 20/min login/registro/recuperar, 600/min refresh, configurables por entorno (sustituye 300/20) · con NAT todo un evento comparte IP; refresh exige token válido.
+- 2026-10-30 · Refresh reutilizado en los 10 s siguientes: 401 sin revocar ni avisar; el cliente hace un solo refresh a la vez · dos pestañas no son un robo; un ladrón nunca obtiene token y solo tiene 10 s.
+- 2026-10-30 · Ventana de fallos de login contada desde el último fallo (5 seguidos con menos de 15 min entre cada uno) · algo más estricto que una ventana fija; aceptado por Raul.
+- 2026-10-30 · CORS rechaza comodines de host (`*`, `https://*…`) al arrancar · con credenciales permitiría a cualquier web actuar como el usuario.

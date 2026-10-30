@@ -49,3 +49,4 @@ La URL de la API entra por `--dart-define-from-file=env/<destino>.json` (`API_BA
 | Nombre | Contenido | Para probar |
 |---|---|---|
 | `empty` | BD vacía solo con migraciones | Primer arranque, registro desde cero |
+| `accounts` | Una cuenta por perfil (`club@`, `entidad@`, `ayudante@`, `externo@`, `alumno@example.test`; contraseña `brackety-demo`; sin verificar) y `bloqueada@example.test` bloqueada 15 min desde el arranque | Login, refresh, logout, bloqueo por intentos |
