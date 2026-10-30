@@ -45,6 +45,12 @@ class ConnectionScreen extends ConsumerWidget {
           ),
           _ => const Center(child: CircularProgressIndicator()),
         },
+        ListTile(
+          leading: const Icon(Icons.description_outlined),
+          title: Text(l10n.licenses),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => showLicensePage(context: context),
+        ),
       ],
     );
   }

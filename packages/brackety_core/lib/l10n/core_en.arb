@@ -5,5 +5,6 @@
   "connectionStatusOk": "Connected",
   "connectionStatusError": "Cannot reach the server",
   "connectionServerToday": "Server date: {date}",
-  "retry": "Retry"
+  "retry": "Retry",
+  "licenses": "Software licenses"
 }
