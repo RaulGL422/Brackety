@@ -8,6 +8,7 @@ import dev.rgal.brackety.auth.account.ConsentRepository;
 import dev.rgal.brackety.auth.account.Profile;
 import dev.rgal.brackety.auth.account.ProfileRepository;
 import dev.rgal.brackety.auth.dto.RegisterRequest;
+import dev.rgal.brackety.auth.dto.RegistrationDetails;
 import dev.rgal.brackety.auth.email.EmailToken;
 import dev.rgal.brackety.auth.email.EmailTokens;
 import dev.rgal.brackety.auth.lockout.LoginAttempt;
@@ -65,9 +66,7 @@ public class AuthService {
 
     @Transactional
     public void register(RegisterRequest request) {
-        if (Period.between(request.birthDate(), LocalDate.now(clock)).getYears() < MIN_AGE) {
-            throw AuthException.underage();
-        }
+        checkMinimumAge(request.birthDate());
         var email = Account.normalizeEmail(request.email());
         // Hashed before the duplicate check so both paths take the same time.
         var passwordHash = passwordEncoder.encode(request.password());
@@ -78,13 +77,26 @@ public class AuthService {
             }
             return;
         }
-        var now = clock.instant();
-        var account = accounts.save(new Account(email, passwordHash, request.birthDate(), request.locale(), now));
-        profiles.save(new Profile(account.getId(), request.profile(), now));
-        consents.saveAll(List.of(
-                new Consent(account.getId(), Consent.Document.TERMS, request.acceptedTermsVersion(), now),
-                new Consent(account.getId(), Consent.Document.PRIVACY, request.acceptedPrivacyVersion(), now)));
+        var account = createAccount(email, passwordHash, request.details());
         authEmails.verifyEmail(account, emailTokens.issue(account.getId(), EmailToken.Purpose.VERIFY_EMAIL));
+    }
+
+    public void checkMinimumAge(LocalDate birthDate) {
+        if (Period.between(birthDate, LocalDate.now(clock)).getYears() < MIN_AGE) {
+            throw AuthException.underage();
+        }
+    }
+
+    /** The account with its first profile and consents; {@code passwordHash} is null for a provider sign-up. */
+    @Transactional
+    public Account createAccount(String email, String passwordHash, RegistrationDetails details) {
+        var now = clock.instant();
+        var account = accounts.save(new Account(email, passwordHash, details.birthDate(), details.locale(), now));
+        profiles.save(new Profile(account.getId(), details.profile(), now));
+        consents.saveAll(List.of(
+                new Consent(account.getId(), Consent.Document.TERMS, details.acceptedTermsVersion(), now),
+                new Consent(account.getId(), Consent.Document.PRIVACY, details.acceptedPrivacyVersion(), now)));
+        return account;
     }
 
     // No rollback on AuthException: the failure counters must be saved even though the login fails.

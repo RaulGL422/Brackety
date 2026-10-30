@@ -62,6 +62,10 @@ public class Account {
         return passwordHash;
     }
 
+    public boolean hasPassword() {
+        return passwordHash != null;
+    }
+
     public boolean isEmailVerified() {
         return emailVerified;
     }
@@ -81,6 +85,11 @@ public class Account {
 
     public void changePassword(String passwordHash, Instant now) {
         this.passwordHash = passwordHash;
+        updatedAt = now;
+    }
+
+    public void removePassword(Instant now) {
+        passwordHash = null;
         updatedAt = now;
     }
 

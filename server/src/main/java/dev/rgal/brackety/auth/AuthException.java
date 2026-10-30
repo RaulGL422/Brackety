@@ -10,6 +10,13 @@ public class AuthException extends ErrorResponseException {
         setDetail(detail);
     }
 
+    // The code lets the app pick the message to show without parsing the detail.
+    private static AuthException withCode(HttpStatus status, String code, String detail) {
+        var exception = new AuthException(status, detail);
+        exception.getBody().setProperty("code", code);
+        return exception;
+    }
+
     static AuthException invalidCredentials() {
         return new AuthException(HttpStatus.UNAUTHORIZED, "Invalid email or password.");
     }
@@ -31,5 +38,53 @@ public class AuthException extends ErrorResponseException {
 
     static AuthException underage() {
         return new AuthException(HttpStatus.BAD_REQUEST, "Minimum age to register is 14.");
+    }
+
+    public static AuthException googleNotConfigured() {
+        return new AuthException(HttpStatus.SERVICE_UNAVAILABLE, "Google sign-in is not configured.");
+    }
+
+    static AuthException signInConflict() {
+        return new AuthException(HttpStatus.CONFLICT, "Another sign-in for this account is in progress. Try again.");
+    }
+
+    public static AuthException googleUnavailable() {
+        return new AuthException(HttpStatus.SERVICE_UNAVAILABLE, "Google sign-in is temporarily unavailable.");
+    }
+
+    public static AuthException emailNotVerified() {
+        return withCode(
+                HttpStatus.FORBIDDEN,
+                "EMAIL_NOT_VERIFIED",
+                "Verify the email of the account first, or link the Google account that uses that email.");
+    }
+
+    public static AuthException googleSignInFailed() {
+        return new AuthException(HttpStatus.UNAUTHORIZED, "Google sign-in failed.");
+    }
+
+    public static AuthException accountExists() {
+        return withCode(
+                HttpStatus.CONFLICT,
+                "ACCOUNT_EXISTS",
+                "An account with this email already exists. Sign in with your usual method and link Google from"
+                        + " settings.");
+    }
+
+    public static AuthException identityInUse() {
+        return withCode(
+                HttpStatus.CONFLICT, "IDENTITY_IN_USE", "This Google account is already linked to another account.");
+    }
+
+    public static AuthException providerAlreadyLinked() {
+        return withCode(
+                HttpStatus.CONFLICT, "PROVIDER_ALREADY_LINKED", "A Google account is already linked. Unlink it first.");
+    }
+
+    public static AuthException lastSignInMethod() {
+        return withCode(
+                HttpStatus.CONFLICT,
+                "LAST_SIGN_IN_METHOD",
+                "This is the only way to sign in to the account. Add another one first.");
     }
 }

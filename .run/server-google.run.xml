@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="server · google" type="Application" factoryName="Application" folderName="server">
+    <option name="MAIN_CLASS_NAME" value="dev.rgal.brackety.local.LocalBracketyApplication" />
+    <module name="brackety-server" />
+    <option name="PROGRAM_PARAMETERS" value="--brackety.scenario=google" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/server" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

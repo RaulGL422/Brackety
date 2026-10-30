@@ -18,6 +18,10 @@ public record RegisterRequest(
         @NotBlank @Size(max = 32) String acceptedPrivacyVersion,
         @NotNull @Pattern(regexp = "es|en") String locale) {
 
+    public RegistrationDetails details() {
+        return new RegistrationDetails(birthDate, profile, acceptedTermsVersion, acceptedPrivacyVersion, locale);
+    }
+
     @Override
     public String toString() {
         return "RegisterRequest[profile=" + profile + ", locale=" + locale + "]";

@@ -50,13 +50,25 @@ public class AuthEmails {
         send(account, "session-reused", FORGOT_PATH);
     }
 
+    public void identityLinked(Account account, Identity.Provider provider) {
+        send(account, "identity-linked", FORGOT_PATH, providerName(provider));
+    }
+
+    public void identityUnlinked(Account account, Identity.Provider provider) {
+        send(account, "identity-unlinked", FORGOT_PATH, providerName(provider));
+    }
+
+    public void passwordRemoved(Account account) {
+        send(account, "password-removed", FORGOT_PATH);
+    }
+
     public void accountLocked(Account account, String lockId) {
         send(account, "locked", FORGOT_PATH, lockId);
     }
 
     private void send(Account account, String kind, String path, Object... args) {
         var locale = Locale.forLanguageTag(account.getLocale());
-        var subject = text("email." + kind + ".subject", locale);
+        var subject = messages.getMessage("email." + kind + ".subject", args, locale);
         var body = messages.getMessage("email." + kind + ".body", args, locale);
         var action = text("email." + kind + ".action", locale);
         var footer = text("email.footer", locale);
@@ -69,6 +81,12 @@ public class AuthEmails {
                         HtmlUtils.htmlEscape(action),
                         HtmlUtils.htmlEscape(footer));
         emails.send(new Email(account.getEmail(), subject, plain, html, link));
+    }
+
+    private static String providerName(Identity.Provider provider) {
+        return switch (provider) {
+            case GOOGLE -> "Google";
+        };
     }
 
     private String text(String key, Locale locale) {

@@ -19,6 +19,12 @@ Cada escenario es una clase `Scenario` en `server/src/test/java/dev/rgal/bracket
 - Datos ficticios, nunca personales reales.
 - Cada módulo que cierra añade sus escenarios y su run config. Catálogo abajo.
 
+## Google simulado
+- El lanzador local **siempre** usa el Google simulado, aunque haya `GOOGLE_CLIENT_ID`: confía en una clave generada al arrancar, no en Google. Probar el Google real exige el despliegue (o la imagen Docker) con los client IDs.
+- idToken de prueba: `POST /api/v1/auth/dev/google-token` `{"subject":"google-solo","email":"google@example.test"}` → `{"idToken":"…"}`, válido 1 h. Se usa tal cual en `POST /api/v1/auth/google` o `POST /api/v1/me/identities/google`. Un `subject` nuevo = una persona de Google nueva.
+- PowerShell: `irm -Method Post http://localhost:8080/api/v1/auth/dev/google-token -ContentType application/json -Body '{"subject":"s1","email":"a@example.test"}'`.
+- Solo existe en el lanzador local (`server/src/test`); en producción ese endpoint no existe.
+
 ## Reloj simulado
 - Toda la lógica usa el `Clock` inyectado; prohibido `LocalDate.now()` sin reloj.
 - `--brackety.clock.today=2027-03-10` desplaza el reloj a ese día (la hora sigue corriendo). Sirve para viajar en el tiempo con cualquier escenario.
@@ -50,4 +56,5 @@ La URL de la API entra por `--dart-define-from-file=env/<destino>.json` (`API_BA
 |---|---|---|
 | `empty` | BD vacía solo con migraciones | Primer arranque, registro desde cero |
 | `accounts` | Una cuenta por perfil (`club@`, `entidad@`, `ayudante@`, `externo@`, `alumno@example.test`; contraseña `brackety-demo`; sin verificar) y `bloqueada@example.test` bloqueada 15 min desde el arranque | Login, refresh, logout, bloqueo por intentos |
+| `google` | `google@` solo Google (sub `google-solo`), `vinculada@` con contraseña `brackety-demo` y Google `vinculada.gmail@` (sub `google-vinculada`), `sustituible@` sin verificar (`@example.test`) | Login con Google, `REGISTRATION_REQUIRED`, sustitución de cuenta sin verificar, vincular y desvincular |
 | `unverified` | Cuentas sin verificar (contraseña `brackety-demo`): `nueva@` recién creada, `recordatorio@` con 5 días y `purga@` con 7 (`@example.test`). La tarea diaria corre 1 min después de arrancar | Verificación pendiente, reenvío, recordatorio del día 5 y borrado del día 7 (enlaces en el log de la API) |
