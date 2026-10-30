@@ -23,6 +23,8 @@ class CorsConfig implements WebMvcConfigurer {
         }
         registry.addMapping("/**")
                 .allowedOriginPatterns(allowedOriginPatterns.toArray(String[]::new))
-                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS");
+                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+                // The web app sends the refresh cookie to /api/v1/auth from its own origin.
+                .allowCredentials(true);
     }
 }

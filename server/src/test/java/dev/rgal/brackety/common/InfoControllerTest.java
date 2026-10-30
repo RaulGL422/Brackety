@@ -4,6 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import dev.rgal.brackety.auth.SecurityConfig;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -16,7 +17,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(InfoController.class)
-@Import(InfoControllerTest.FixedClock.class)
+@Import({InfoControllerTest.FixedClock.class, SecurityConfig.class})
 class InfoControllerTest {
 
     @Autowired

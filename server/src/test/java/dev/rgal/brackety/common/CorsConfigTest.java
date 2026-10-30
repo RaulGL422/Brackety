@@ -3,6 +3,7 @@ package dev.rgal.brackety.common;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 
+import dev.rgal.brackety.auth.SecurityConfig;
 import java.time.Clock;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 // No CORS_ALLOWED_ORIGINS, as in a production .env left empty: no origin may be allowed.
 @WebMvcTest(InfoController.class)
-@Import(CorsConfigTest.SystemClock.class)
+@Import({CorsConfigTest.SystemClock.class, SecurityConfig.class})
 class CorsConfigTest {
 
     @Autowired
