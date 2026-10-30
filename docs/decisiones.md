@@ -39,3 +39,7 @@ Formato: fecha · decisión · motivo.
 - 2026-10-29 · Reglas automatizadas: hook `post-commit` (Graphify), check de tamaño de docs en CI, Dependabot semanal a `development` · lo que depende de acordarse acaba olvidándose.
 - 2026-10-29 · Regla `.claude/rules/infra.md` y checklist de infraestructura en `reviewer` · los fallos de la fase 0 estaban en scripts y CI, que no tenían reglas.
 - 2026-10-29 · `CLAUDE.md` sin datos de la máquina de desarrollo; van en `docs/10-entorno-desarrollo.md` · el repo será público y visible para empresas; `docs/` es material de planificación temporal.
+- 2026-10-30 · Sistema de diseño mínimo antes de `auth`: tokens en `ThemeData` + `ThemeExtension` + constantes de espaciado/radio en `brackety_core`, sin widgets propios salvo repetición · sin tokens cada pantalla inventa valores; un sistema grande sería abstracción "por si acaso".
+- 2026-10-30 · Marca Brackety neutra (no colores del cliente), estilo deportivo y enérgico, modo claro/oscuro según el sistema · plataforma multideporte; elegido por Raul.
+- 2026-10-30 · Colores de los competidores configurables por ubicación desde una paleta amplia común a todos los deportes · cada deporte usa colores distintos (rojo/blanco, rojo/azul…); elegido por Raul.
+- 2026-10-30 · Página "Sistema de diseño" en admin solo en builds debug (`kDebugMode`) · Raul valida visualmente paleta, tipografía y componentes; nunca llega a producción.

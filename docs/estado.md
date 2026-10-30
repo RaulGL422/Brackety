@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-Última actualización: 2026-10-30. Fase 0 cerrada; siguiente: **auth**.
+Última actualización: 2026-10-30. Fase 0 cerrada; siguiente: **auth**. Imprevisto en curso: sistema de diseño (ver abajo).
 
 | Módulo | Doc | Estado | Rama activa |
 |---|---|---|---|
@@ -33,6 +33,12 @@ Estados: pendiente · en curso · en pruebas · cerrado.
 6. `marcador-tapiz` + `tiempo-real` + `offline`.
 7. `ranking`, `notificaciones`, `superadmin-reportes`.
 8. Exploración de diseño (`07-diseno.md`) justo antes de la primera pantalla real de cada bloque.
+
+## Imprevistos (fuera del orden)
+| Tarea | Doc | Estado | Rama activa |
+|---|---|---|---|
+| sistema de diseño: tokens + página dev en admin | 07-diseno.md | en curso (2026-10-30) | chore/design-system |
+- Motivo: fijar colores, tipografía, espaciado y componentes antes de la primera pantalla real (`auth`), para no repartir valores sueltos por el código.
 
 ## Bloqueos
 Ver `pendientes.md`. Ninguno bloquea la fase 0.

@@ -9,7 +9,9 @@ Elegir con Raul, con mockups rápidos:
 3. Estilo de componentes (tarjetas, tablas, botones, estados vacíos).
 4. Pantallas clave: inicio con QR, tapiz/marcador, tabla de clasificación, inscripción.
 
-Salida: `docs/07-diseno.md` actualizado con tokens (colores, tipografía, espaciados) y se implementa un tema único en `app/lib/core/theme`.
+Salida: `docs/07-diseno.md` actualizado con tokens (colores, tipografía, espaciados) y un tema único en `packages/brackety_core/lib/src/theme` (lo comparten app y admin).
+
+Validación visual: página **Sistema de diseño** del admin, solo en debug (`./run-app.ps1 -Target web -App admin`). Muestra colores con su contraste, tipografía, espaciados, radios, componentes y ejemplos (marcador, clasificación).
 
 ## Público objetivo
 Familias, deportistas (niños y adultos), entrenadores, árbitros y mesa. Muchos usuarios no técnicos, uso en móvil, a veces al aire libre (luz fuerte, arena).
@@ -32,4 +34,4 @@ Cada pantalla se diseña y prueba en móvil, tablet y escritorio. Clases de vent
 - Marcador/tapiz: en horizontal aprovecha el ancho; en tablet, los botones siguen al alcance de una mano.
 
 ## Estado
-Paleta, tipografías y componentes: **pendiente de explorar**.
+Paleta, tipografías y componentes: **en exploración** (rama `chore/design-system`). Decisiones de partida en `decisiones.md` (2026-10-30).
