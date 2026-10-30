@@ -100,3 +100,4 @@ Formato: fecha · decisión · motivo.
 - 2026-10-30 · `GET /me` ya no responde a una cuenta borrada (sale `deletesOn` de su respuesta); la app usa el `deletesOn` de `DELETE /me` · consecuencia del corte por fecha; sustituye a la decisión anterior.
 - 2026-10-30 · Un dueño de eventos no puede borrar su cuenta (409 `OWNS_EVENTS`) hasta ceder o borrar el evento · no perder datos de otros ni dejar eventos huérfanos; decidido por Raul.
 - 2026-10-30 · Cuenta borrada pasados 30 días: no se restaura aunque la purga no haya corrido · el plazo prometido es de 30 días, no "hasta la purga".
+- 2026-10-30 · Migración del marcador renombrada a `V20261030_2000` · chocaba en `development` con `V20261030_1900` de auth (cada PR pasaba sola). Antes de fechar una migración, mirar las de `origin/development` y las ramas abiertas.
