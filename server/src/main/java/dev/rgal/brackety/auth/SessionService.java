@@ -1,10 +1,8 @@
 package dev.rgal.brackety.auth;
 
-import java.security.SecureRandom;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Base64;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +31,6 @@ public class SessionService {
     private final AuthEmails authEmails;
     private final JwtEncoder jwtEncoder;
     private final Clock clock;
-    private final SecureRandom random = new SecureRandom();
 
     SessionService(
             RefreshTokenRepository refreshTokens,
@@ -98,9 +95,7 @@ public class SessionService {
     }
 
     private Session issue(Account account, UUID familyId, Instant now) {
-        var bytes = new byte[32];
-        random.nextBytes(bytes);
-        var rawRefresh = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+        var rawRefresh = RandomTokens.newToken();
         refreshTokens.save(
                 new RefreshToken(Sha256.hex(rawRefresh), familyId, account.getId(), now, now.plus(REFRESH_TTL)));
         return new Session(accessToken(account, now), ACCESS_TTL.toSeconds(), rawRefresh, account.isEmailVerified());
