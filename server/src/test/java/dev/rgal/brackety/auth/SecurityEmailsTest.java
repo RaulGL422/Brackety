@@ -3,7 +3,10 @@ package dev.rgal.brackety.auth;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import dev.rgal.brackety.auth.account.ProfileType;
 import dev.rgal.brackety.auth.dto.RegisterRequest;
+import dev.rgal.brackety.auth.lockout.LoginAttempt;
+import dev.rgal.brackety.auth.session.SessionService;
 import dev.rgal.brackety.notifications.Email;
 import java.time.Duration;
 import java.time.LocalDate;

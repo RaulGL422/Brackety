@@ -1,5 +1,6 @@
 package dev.rgal.brackety.auth;
 
+import dev.rgal.brackety.auth.account.ProfileType;
 import dev.rgal.brackety.auth.dto.RegisterRequest;
 import dev.rgal.brackety.common.MutableClock;
 import dev.rgal.brackety.notifications.CapturingEmailSender;
@@ -27,41 +28,41 @@ import org.springframework.jdbc.core.simple.JdbcClient;
         })
 @AutoConfigureMockMvc
 @Import(AuthTestConfig.class)
-abstract class AuthIntegrationTest {
+public abstract class AuthIntegrationTest {
 
-    static final String PASSWORD = "correct-horse-battery";
-
-    @Autowired
-    MutableClock clock;
+    protected static final String PASSWORD = "correct-horse-battery";
 
     @Autowired
-    JdbcClient jdbc;
+    protected MutableClock clock;
 
     @Autowired
-    CapturingEmailSender emails;
+    protected JdbcClient jdbc;
+
+    @Autowired
+    protected CapturingEmailSender emails;
 
     @BeforeEach
-    void resetDatabaseClockAndEmails() {
+    protected void resetDatabaseClockAndEmails() {
         jdbc.sql("truncate account, login_attempt cascade").update();
         clock.set(AuthTestConfig.START);
         emails.reset();
     }
 
-    static RegisterRequest registration(String email) {
+    protected static RegisterRequest registration(String email) {
         return registration(email, LocalDate.of(1990, 5, 20));
     }
 
-    static RegisterRequest registration(String email, LocalDate birthDate) {
+    protected static RegisterRequest registration(String email, LocalDate birthDate) {
         return new RegisterRequest(email, PASSWORD, birthDate, ProfileType.CLUB, "2027-01", "2027-02", "es");
     }
 
     // The raw token is only in the emailed link, as a real user would get it.
-    static String tokenIn(Email email) {
+    protected static String tokenIn(Email email) {
         return email.link().substring(email.link().indexOf("token=") + "token=".length());
     }
 
     /** Runs the call on two threads released together; returns "ok" or the HTTP status of each. */
-    static List<String> runTwiceAtOnce(Runnable call) throws Exception {
+    protected static List<String> runTwiceAtOnce(Runnable call) throws Exception {
         var start = new CountDownLatch(1);
         try (var pool = Executors.newFixedThreadPool(2)) {
             var results = new ArrayList<Future<String>>();
@@ -87,7 +88,7 @@ abstract class AuthIntegrationTest {
         }
     }
 
-    int count(String table) {
+    protected int count(String table) {
         return jdbc.sql("select count(*) from " + table).query(Integer.class).single();
     }
 }

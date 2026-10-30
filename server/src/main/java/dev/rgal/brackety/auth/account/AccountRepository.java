@@ -1,4 +1,4 @@
-package dev.rgal.brackety.auth;
+package dev.rgal.brackety.auth.account;
 
 import jakarta.persistence.LockModeType;
 import java.time.Instant;
@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-interface AccountRepository extends JpaRepository<Account, UUID> {
+public interface AccountRepository extends JpaRepository<Account, UUID> {
 
     Optional<Account> findByEmail(String email);
 

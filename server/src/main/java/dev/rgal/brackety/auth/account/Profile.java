@@ -1,4 +1,4 @@
-package dev.rgal.brackety.auth;
+package dev.rgal.brackety.auth.account;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,7 +10,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-class Profile {
+public class Profile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -28,17 +28,17 @@ class Profile {
 
     protected Profile() {}
 
-    Profile(UUID accountId, ProfileType type, Instant now) {
+    public Profile(UUID accountId, ProfileType type, Instant now) {
         this.accountId = accountId;
         this.type = type;
         this.createdAt = now;
     }
 
-    ProfileType getType() {
+    public ProfileType getType() {
         return type;
     }
 
-    boolean isValidated() {
+    public boolean isValidated() {
         return validated;
     }
 }

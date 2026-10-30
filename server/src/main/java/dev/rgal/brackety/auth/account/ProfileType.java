@@ -1,4 +1,4 @@
-package dev.rgal.brackety.auth;
+package dev.rgal.brackety.auth.account;
 
 public enum ProfileType {
     CLUB,

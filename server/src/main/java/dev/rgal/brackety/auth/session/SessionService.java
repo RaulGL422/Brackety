@@ -1,5 +1,12 @@
-package dev.rgal.brackety.auth;
+package dev.rgal.brackety.auth.session;
 
+import dev.rgal.brackety.auth.AuthException;
+import dev.rgal.brackety.auth.account.Account;
+import dev.rgal.brackety.auth.account.AccountRepository;
+import dev.rgal.brackety.auth.account.AuthEmails;
+import dev.rgal.brackety.auth.account.ProfileRepository;
+import dev.rgal.brackety.common.crypto.RandomTokens;
+import dev.rgal.brackety.common.crypto.Sha256;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -18,10 +25,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class SessionService {
 
     static final Duration ACCESS_TTL = Duration.ofMinutes(15);
-    static final Duration REFRESH_TTL = Duration.ofDays(30);
+    public static final Duration REFRESH_TTL = Duration.ofDays(30);
     // Two tabs or two app calls refreshing at once are not a theft: the late one gets 401 and retries.
-    static final Duration REUSE_GRACE = Duration.ofSeconds(10);
-    static final String EMAIL_VERIFIED_CLAIM = "email_verified";
+    public static final Duration REUSE_GRACE = Duration.ofSeconds(10);
+    public static final String EMAIL_VERIFIED_CLAIM = "email_verified";
 
     private static final Logger log = LoggerFactory.getLogger(SessionService.class);
 
@@ -48,7 +55,7 @@ public class SessionService {
     }
 
     @Transactional
-    Session start(Account account) {
+    public Session start(Account account) {
         return issue(account, UUID.randomUUID(), clock.instant());
     }
 

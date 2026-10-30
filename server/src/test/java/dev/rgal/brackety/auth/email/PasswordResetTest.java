@@ -1,9 +1,13 @@
-package dev.rgal.brackety.auth;
+package dev.rgal.brackety.auth.email;
 
-import static dev.rgal.brackety.auth.EmailVerificationTest.assertInvalidLink;
+import static dev.rgal.brackety.auth.email.EmailVerificationTest.assertInvalidLink;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import dev.rgal.brackety.auth.AuthException;
+import dev.rgal.brackety.auth.AuthIntegrationTest;
+import dev.rgal.brackety.auth.AuthService;
+import dev.rgal.brackety.auth.session.SessionService;
 import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

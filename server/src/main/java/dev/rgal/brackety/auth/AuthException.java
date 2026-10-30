@@ -3,7 +3,7 @@ package dev.rgal.brackety.auth;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.ErrorResponseException;
 
-class AuthException extends ErrorResponseException {
+public class AuthException extends ErrorResponseException {
 
     private AuthException(HttpStatus status, String detail) {
         super(status);
@@ -21,11 +21,11 @@ class AuthException extends ErrorResponseException {
         return exception;
     }
 
-    static AuthException invalidSession() {
+    public static AuthException invalidSession() {
         return new AuthException(HttpStatus.UNAUTHORIZED, "Session expired. Log in again.");
     }
 
-    static AuthException invalidLink() {
+    public static AuthException invalidLink() {
         return new AuthException(HttpStatus.BAD_REQUEST, "This link is invalid or has expired.");
     }
 

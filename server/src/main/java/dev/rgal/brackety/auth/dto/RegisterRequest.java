@@ -1,6 +1,6 @@
 package dev.rgal.brackety.auth.dto;
 
-import dev.rgal.brackety.auth.ProfileType;
+import dev.rgal.brackety.auth.account.ProfileType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

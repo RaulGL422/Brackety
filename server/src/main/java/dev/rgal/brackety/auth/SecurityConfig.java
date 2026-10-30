@@ -1,6 +1,7 @@
 package dev.rgal.brackety.auth;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import dev.rgal.brackety.auth.session.SessionService;
 import dev.rgal.brackety.common.ProblemResponses;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;

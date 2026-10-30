@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 // Shared by every auth test so they reuse one Spring context and one embedded database.
 @TestConfiguration(proxyBeanMethods = false)
 @Import({EmbeddedPostgresConfig.class, AuthTestConfig.ProtectedController.class})
-class AuthTestConfig {
+public class AuthTestConfig {
 
-    static final Instant START = Instant.parse("2027-03-10T09:00:00Z");
+    public static final Instant START = Instant.parse("2027-03-10T09:00:00Z");
 
     @Bean
     @Primary

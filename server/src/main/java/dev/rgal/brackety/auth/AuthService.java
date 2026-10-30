@@ -1,7 +1,20 @@
 package dev.rgal.brackety.auth;
 
-import dev.rgal.brackety.auth.SessionService.Session;
+import dev.rgal.brackety.auth.account.Account;
+import dev.rgal.brackety.auth.account.AccountRepository;
+import dev.rgal.brackety.auth.account.AuthEmails;
+import dev.rgal.brackety.auth.account.Consent;
+import dev.rgal.brackety.auth.account.ConsentRepository;
+import dev.rgal.brackety.auth.account.Profile;
+import dev.rgal.brackety.auth.account.ProfileRepository;
 import dev.rgal.brackety.auth.dto.RegisterRequest;
+import dev.rgal.brackety.auth.email.EmailToken;
+import dev.rgal.brackety.auth.email.EmailTokens;
+import dev.rgal.brackety.auth.lockout.LoginAttempt;
+import dev.rgal.brackety.auth.lockout.LoginAttemptRepository;
+import dev.rgal.brackety.auth.session.SessionService;
+import dev.rgal.brackety.auth.session.SessionService.Session;
+import dev.rgal.brackety.common.crypto.Sha256;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.Period;
@@ -118,7 +131,7 @@ public class AuthService {
         return passwordEncoder.matches(password, hash);
     }
 
-    static String normalize(String email) {
+    public static String normalize(String email) {
         return email.strip().toLowerCase(Locale.ROOT);
     }
 }

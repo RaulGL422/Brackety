@@ -1,4 +1,4 @@
-package dev.rgal.brackety.auth;
+package dev.rgal.brackety.auth.lockout;
 
 import java.time.Clock;
 import org.springframework.scheduling.annotation.Scheduled;

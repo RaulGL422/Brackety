@@ -1,4 +1,4 @@
-package dev.rgal.brackety.auth;
+package dev.rgal.brackety.auth.email;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,9 +11,9 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-class EmailToken {
+public class EmailToken {
 
-    enum Purpose {
+    public enum Purpose {
         VERIFY_EMAIL(Duration.ofHours(24)),
         RESET_PASSWORD(Duration.ofHours(1)),
         CHANGE_EMAIL(Duration.ofHours(24));

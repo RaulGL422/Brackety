@@ -4,6 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.groups.Tuple.tuple;
 
+import dev.rgal.brackety.auth.account.AccountRepository;
+import dev.rgal.brackety.auth.account.Consent;
+import dev.rgal.brackety.auth.account.ConsentRepository;
+import dev.rgal.brackety.auth.account.ProfileRepository;
+import dev.rgal.brackety.auth.account.ProfileType;
 import dev.rgal.brackety.auth.dto.RegisterRequest;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;

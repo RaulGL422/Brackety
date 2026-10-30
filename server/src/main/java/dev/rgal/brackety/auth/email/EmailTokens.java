@@ -1,5 +1,8 @@
-package dev.rgal.brackety.auth;
+package dev.rgal.brackety.auth.email;
 
+import dev.rgal.brackety.auth.AuthException;
+import dev.rgal.brackety.common.crypto.RandomTokens;
+import dev.rgal.brackety.common.crypto.Sha256;
 import java.time.Clock;
 import java.time.Duration;
 import java.util.Optional;
@@ -8,9 +11,9 @@ import org.springframework.stereotype.Component;
 
 // Single-use links sent by email. Only the hash is stored: a database leak gives no usable link.
 @Component
-class EmailTokens {
+public class EmailTokens {
 
-    static final Duration RESEND_INTERVAL = Duration.ofSeconds(60);
+    public static final Duration RESEND_INTERVAL = Duration.ofSeconds(60);
 
     private final EmailTokenRepository tokens;
     private final Clock clock;
@@ -21,7 +24,7 @@ class EmailTokens {
     }
 
     /** Replaces any earlier token of the same purpose and returns the raw one, to send by email. */
-    String issue(UUID accountId, EmailToken.Purpose purpose) {
+    public String issue(UUID accountId, EmailToken.Purpose purpose) {
         tokens.deleteByAccountIdAndPurpose(accountId, purpose);
         var raw = RandomTokens.newToken();
         tokens.save(new EmailToken(Sha256.hex(raw), accountId, purpose, clock.instant()));

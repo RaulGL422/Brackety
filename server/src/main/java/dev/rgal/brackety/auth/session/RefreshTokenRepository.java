@@ -1,4 +1,4 @@
-package dev.rgal.brackety.auth;
+package dev.rgal.brackety.auth.session;
 
 import jakarta.persistence.LockModeType;
 import java.time.Instant;
@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-interface RefreshTokenRepository extends JpaRepository<RefreshToken, UUID> {
+public interface RefreshTokenRepository extends JpaRepository<RefreshToken, UUID> {
 
     // Locked so two concurrent refreshes with the same token cannot both rotate it.
     @Lock(LockModeType.PESSIMISTIC_WRITE)

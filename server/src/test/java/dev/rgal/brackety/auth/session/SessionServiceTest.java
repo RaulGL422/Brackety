@@ -1,9 +1,16 @@
-package dev.rgal.brackety.auth;
+package dev.rgal.brackety.auth.session;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import dev.rgal.brackety.auth.SessionService.Session;
+import dev.rgal.brackety.auth.AuthException;
+import dev.rgal.brackety.auth.AuthIntegrationTest;
+import dev.rgal.brackety.auth.AuthService;
+import dev.rgal.brackety.auth.AuthTestConfig;
+import dev.rgal.brackety.auth.account.AccountRepository;
+import dev.rgal.brackety.auth.email.EmailVerificationService;
+import dev.rgal.brackety.auth.session.SessionService.Session;
+import dev.rgal.brackety.common.crypto.Sha256;
 import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

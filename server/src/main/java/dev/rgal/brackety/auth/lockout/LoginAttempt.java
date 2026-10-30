@@ -1,5 +1,6 @@
-package dev.rgal.brackety.auth;
+package dev.rgal.brackety.auth.lockout;
 
+import dev.rgal.brackety.common.crypto.Sha256;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import java.security.SecureRandom;
@@ -8,13 +9,13 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-class LoginAttempt {
+public class LoginAttempt {
 
-    static final int MAX_EMAIL_FAILURES = 5;
+    public static final int MAX_EMAIL_FAILURES = 5;
     // High on purpose: at an event many users share one public IP (NAT); this only stops mass attacks.
-    static final int MAX_IP_FAILURES = 30;
+    public static final int MAX_IP_FAILURES = 30;
     static final Duration WINDOW = Duration.ofMinutes(15);
-    static final Duration LOCK_DURATION = Duration.ofMinutes(15);
+    public static final Duration LOCK_DURATION = Duration.ofMinutes(15);
 
     // No 0/O or 1/I/L: the user reads the id out to the superadmin.
     private static final String LOCK_ID_ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
@@ -32,19 +33,19 @@ class LoginAttempt {
 
     protected LoginAttempt() {}
 
-    boolean isLocked(Instant now) {
+    public boolean isLocked(Instant now) {
         return lockedUntil != null && now.isBefore(lockedUntil);
     }
 
-    String getLockId() {
+    public String getLockId() {
         return lockId;
     }
 
-    void setIp(String ip) {
+    public void setIp(String ip) {
         this.ip = ip;
     }
 
-    void setAccountId(UUID accountId) {
+    public void setAccountId(UUID accountId) {
         this.accountId = accountId;
     }
 
@@ -53,7 +54,7 @@ class LoginAttempt {
     }
 
     /** Returns true when this failure locks the key. */
-    boolean recordFailure(Instant now, int maxFailures) {
+    public boolean recordFailure(Instant now, int maxFailures) {
         if (lastFailureAt != null && now.isAfter(lastFailureAt.plus(WINDOW))) {
             failures = 0;
         }
@@ -68,7 +69,7 @@ class LoginAttempt {
         return true;
     }
 
-    void reset() {
+    public void reset() {
         failures = 0;
         lastFailureAt = null;
         lockedUntil = null;
@@ -76,7 +77,7 @@ class LoginAttempt {
     }
 
     // Keyed by email, not account, so unknown emails lock the same way and do not reveal which exist.
-    static String emailKey(String normalizedEmail) {
+    public static String emailKey(String normalizedEmail) {
         return "email:" + Sha256.hex(normalizedEmail);
     }
 
