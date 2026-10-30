@@ -6,6 +6,7 @@
   "connectionStatusError": "Sin conexión con el servidor",
   "connectionServerToday": "Fecha del servidor: {date}",
   "retry": "Reintentar",
+  "licenses": "Licencias de software",
   "@connectionServerToday": {
     "placeholders": {
       "date": {

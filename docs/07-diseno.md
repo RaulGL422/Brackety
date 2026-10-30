@@ -9,7 +9,19 @@ Elegir con Raul, con mockups rápidos:
 3. Estilo de componentes (tarjetas, tablas, botones, estados vacíos).
 4. Pantallas clave: inicio con QR, tapiz/marcador, tabla de clasificación, inscripción.
 
-Salida: `docs/07-diseno.md` actualizado con tokens (colores, tipografía, espaciados) y se implementa un tema único en `app/lib/core/theme`.
+Salida: `docs/07-diseno.md` actualizado con tokens (colores, tipografía, espaciados) y un tema único en `packages/brackety_core/lib/src/theme` (lo comparten app y admin).
+
+Validación visual: página **Diseño** del admin, solo en debug (`./run-app.ps1 -Target web -App admin`). Muestra colores con su contraste, tipografía, espaciados, radios, componentes y ejemplos (marcador, clasificación), en claro/oscuro y con texto hasta 200 %. Revisarla al cambiar el tema.
+
+## Tokens (en `packages/brackety_core/lib/src/theme`)
+- Color: paleta **Eléctrico**. `ColorScheme` Material 3 (variante *fidelity*) desde el primario `#2F5BFF`; el acento `#FF6B00` va en `tertiary` con su propia gama.
+- Estados: `BracketyColors` (`ThemeExtension`): success, warning (+ containers). Error usa el de Material.
+- Competidores: `CompetitorColor` (12 colores fijos en claro y oscuro, cada uno con su color de texto AA).
+- Tipografía: Barlow (texto) y Barlow Condensed (display, headline, números del marcador), empaquetadas en assets (offline), licencia OFL.
+- Espaciado `AppSpacing` 4·8·12·16·24·32·48. Radios `AppRadius` 8·12·20·full. Táctil `AppSizes` 48 (general) y 72 (marcador).
+- Componentes: estilo vía `ThemeData` (botones, tarjetas, campos, chips, diálogos). Widgets propios solo al repetirse.
+- Regla: ningún widget de producto usa colores, tamaños o espaciados fijos; todo sale del tema o de los tokens (la página Diseño fija anchos solo para maquetar la muestra).
+- Test `theme_test.dart`: contraste AA de todos los pares de color en claro y oscuro.
 
 ## Público objetivo
 Familias, deportistas (niños y adultos), entrenadores, árbitros y mesa. Muchos usuarios no técnicos, uso en móvil, a veces al aire libre (luz fuerte, arena).
@@ -32,4 +44,4 @@ Cada pantalla se diseña y prueba en móvil, tablet y escritorio. Clases de vent
 - Marcador/tapiz: en horizontal aprovecha el ancho; en tablet, los botones siguen al alcance de una mano.
 
 ## Estado
-Paleta, tipografías y componentes: **pendiente de explorar**.
+Tokens cerrados (2026-10-30): paleta Eléctrico, Barlow / Barlow Condensed. Las pantallas de cada módulo se diseñan sobre estos tokens.

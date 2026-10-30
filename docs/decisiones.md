@@ -39,3 +39,9 @@ Formato: fecha · decisión · motivo.
 - 2026-10-29 · Reglas automatizadas: hook `post-commit` (Graphify), check de tamaño de docs en CI, Dependabot semanal a `development` · lo que depende de acordarse acaba olvidándose.
 - 2026-10-29 · Regla `.claude/rules/infra.md` y checklist de infraestructura en `reviewer` · los fallos de la fase 0 estaban en scripts y CI, que no tenían reglas.
 - 2026-10-29 · `CLAUDE.md` sin datos de la máquina de desarrollo; van en `docs/10-entorno-desarrollo.md` · el repo será público y visible para empresas; `docs/` es material de planificación temporal.
+- 2026-10-30 · Sistema de diseño mínimo antes de `auth`: tokens en `ThemeData` + `ThemeExtension` + constantes de espaciado/radio en `brackety_core`, sin widgets propios salvo repetición · sin tokens cada pantalla inventa valores; un sistema grande sería abstracción "por si acaso".
+- 2026-10-30 · Marca Brackety neutra (no colores del cliente), estilo deportivo y enérgico, modo claro/oscuro según el sistema · plataforma multideporte; elegido por Raul.
+- 2026-10-30 · Colores de los competidores configurables por ubicación desde una paleta amplia común a todos los deportes · cada deporte usa colores distintos (rojo/blanco, rojo/azul…); elegido por Raul.
+- 2026-10-30 · Página "Sistema de diseño" en admin solo en builds debug (`kDebugMode`) · Raul valida visualmente paleta, tipografía y componentes; nunca llega a producción.
+- 2026-10-30 · Paleta Eléctrico (`#2F5BFF` + acento `#FF6B00`) y tipografía Barlow / Barlow Condensed · validadas por Raul en la página Diseño frente a Fuego y Noche (el rojo de Fuego chocaba con error y con el competidor rojo).
+- 2026-10-30 · Acceso a licencias de software (Flutter, paquetes, OFL de Barlow) provisional en la pantalla Conexión; se moverá a las páginas legales en `legal-paginas` · hoy no hay otro sitio común a app y admin; pedido por Raul.

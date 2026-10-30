@@ -127,6 +127,270 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Gestión global de la plataforma.'**
   String get dashboardSubtitle;
+
+  /// No description provided for @navDesignSystem.
+  ///
+  /// In es, this message translates to:
+  /// **'Diseño'**
+  String get navDesignSystem;
+
+  /// No description provided for @dsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Sistema de diseño'**
+  String get dsTitle;
+
+  /// No description provided for @dsIntro.
+  ///
+  /// In es, this message translates to:
+  /// **'Solo en builds debug. Todo lo de abajo usa el tema real en el modo elegido.'**
+  String get dsIntro;
+
+  /// No description provided for @dsModeLight.
+  ///
+  /// In es, this message translates to:
+  /// **'Claro'**
+  String get dsModeLight;
+
+  /// No description provided for @dsModeDark.
+  ///
+  /// In es, this message translates to:
+  /// **'Oscuro'**
+  String get dsModeDark;
+
+  /// No description provided for @dsTextScale.
+  ///
+  /// In es, this message translates to:
+  /// **'Texto al {percent} %'**
+  String dsTextScale(int percent);
+
+  /// No description provided for @dsColors.
+  ///
+  /// In es, this message translates to:
+  /// **'Colores'**
+  String get dsColors;
+
+  /// No description provided for @dsStatusColors.
+  ///
+  /// In es, this message translates to:
+  /// **'Estados'**
+  String get dsStatusColors;
+
+  /// No description provided for @dsCompetitorColors.
+  ///
+  /// In es, this message translates to:
+  /// **'Colores de competidor'**
+  String get dsCompetitorColors;
+
+  /// No description provided for @dsContrastHint.
+  ///
+  /// In es, this message translates to:
+  /// **'AA: texto normal (≥ 4,5). AA grande: solo texto grande (≥ 3). ✗: no usar para texto.'**
+  String get dsContrastHint;
+
+  /// No description provided for @dsContrastLarge.
+  ///
+  /// In es, this message translates to:
+  /// **'AA grande'**
+  String get dsContrastLarge;
+
+  /// No description provided for @dsTypography.
+  ///
+  /// In es, this message translates to:
+  /// **'Tipografía'**
+  String get dsTypography;
+
+  /// No description provided for @dsTypeSample.
+  ///
+  /// In es, this message translates to:
+  /// **'Liga de ejemplo 2027 · 0123456789'**
+  String get dsTypeSample;
+
+  /// No description provided for @dsSpacing.
+  ///
+  /// In es, this message translates to:
+  /// **'Espaciado'**
+  String get dsSpacing;
+
+  /// No description provided for @dsRadius.
+  ///
+  /// In es, this message translates to:
+  /// **'Radios'**
+  String get dsRadius;
+
+  /// No description provided for @dsComponents.
+  ///
+  /// In es, this message translates to:
+  /// **'Componentes'**
+  String get dsComponents;
+
+  /// No description provided for @dsSave.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardar'**
+  String get dsSave;
+
+  /// No description provided for @dsTonal.
+  ///
+  /// In es, this message translates to:
+  /// **'Inscribirse'**
+  String get dsTonal;
+
+  /// No description provided for @dsCancel.
+  ///
+  /// In es, this message translates to:
+  /// **'Cancelar'**
+  String get dsCancel;
+
+  /// No description provided for @dsMore.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver más'**
+  String get dsMore;
+
+  /// No description provided for @dsDisabled.
+  ///
+  /// In es, this message translates to:
+  /// **'Desactivado'**
+  String get dsDisabled;
+
+  /// No description provided for @dsFieldLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre del club'**
+  String get dsFieldLabel;
+
+  /// No description provided for @dsFieldHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Club Deportivo Ejemplo'**
+  String get dsFieldHint;
+
+  /// No description provided for @dsFieldError.
+  ///
+  /// In es, this message translates to:
+  /// **'Campo obligatorio'**
+  String get dsFieldError;
+
+  /// No description provided for @dsNotifications.
+  ///
+  /// In es, this message translates to:
+  /// **'Notificaciones'**
+  String get dsNotifications;
+
+  /// No description provided for @dsCategoryKids.
+  ///
+  /// In es, this message translates to:
+  /// **'Infantil'**
+  String get dsCategoryKids;
+
+  /// No description provided for @dsCategoryCadet.
+  ///
+  /// In es, this message translates to:
+  /// **'Cadete'**
+  String get dsCategoryCadet;
+
+  /// No description provided for @dsCategorySenior.
+  ///
+  /// In es, this message translates to:
+  /// **'Sénior'**
+  String get dsCategorySenior;
+
+  /// No description provided for @dsCardTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Liga de ejemplo 2027'**
+  String get dsCardTitle;
+
+  /// No description provided for @dsCardSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'3 fases · 120 inscritos'**
+  String get dsCardSubtitle;
+
+  /// No description provided for @dsPaid.
+  ///
+  /// In es, this message translates to:
+  /// **'Pagado'**
+  String get dsPaid;
+
+  /// No description provided for @dsPending.
+  ///
+  /// In es, this message translates to:
+  /// **'Pendiente'**
+  String get dsPending;
+
+  /// No description provided for @dsRejected.
+  ///
+  /// In es, this message translates to:
+  /// **'Rechazado'**
+  String get dsRejected;
+
+  /// No description provided for @dsSamples.
+  ///
+  /// In es, this message translates to:
+  /// **'Ejemplos'**
+  String get dsSamples;
+
+  /// No description provided for @dsScoreboard.
+  ///
+  /// In es, this message translates to:
+  /// **'Marcador'**
+  String get dsScoreboard;
+
+  /// No description provided for @dsColorA.
+  ///
+  /// In es, this message translates to:
+  /// **'Color A'**
+  String get dsColorA;
+
+  /// No description provided for @dsColorB.
+  ///
+  /// In es, this message translates to:
+  /// **'Color B'**
+  String get dsColorB;
+
+  /// No description provided for @dsPenalties.
+  ///
+  /// In es, this message translates to:
+  /// **'Amonestaciones: {count}'**
+  String dsPenalties(int count);
+
+  /// No description provided for @dsStandings.
+  ///
+  /// In es, this message translates to:
+  /// **'Clasificación'**
+  String get dsStandings;
+
+  /// No description provided for @dsPosition.
+  ///
+  /// In es, this message translates to:
+  /// **'Pos.'**
+  String get dsPosition;
+
+  /// No description provided for @dsCompetitor.
+  ///
+  /// In es, this message translates to:
+  /// **'Competidor'**
+  String get dsCompetitor;
+
+  /// No description provided for @dsWins.
+  ///
+  /// In es, this message translates to:
+  /// **'V'**
+  String get dsWins;
+
+  /// No description provided for @dsLosses.
+  ///
+  /// In es, this message translates to:
+  /// **'D'**
+  String get dsLosses;
+
+  /// No description provided for @dsPoints.
+  ///
+  /// In es, this message translates to:
+  /// **'Pts'**
+  String get dsPoints;
 }
 
 class _AppLocalizationsDelegate

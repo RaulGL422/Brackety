@@ -34,5 +34,11 @@ Estados: pendiente · en curso · en pruebas · cerrado.
 7. `ranking`, `notificaciones`, `superadmin-reportes`.
 8. Exploración de diseño (`07-diseno.md`) justo antes de la primera pantalla real de cada bloque.
 
+## Imprevistos (fuera del orden)
+| Tarea | Doc | Estado | Rama activa |
+|---|---|---|---|
+| sistema de diseño: tokens + página dev en admin | 07-diseno.md | cerrado (2026-10-30), PR pendiente de fusionar | chore/design-system |
+- Motivo: fijar colores, tipografía, espaciado y componentes antes de la primera pantalla real (`auth`), para no repartir valores sueltos por el código.
+
 ## Bloqueos
 Ver `pendientes.md`. Ninguno bloquea la fase 0.

@@ -19,6 +19,7 @@ Política de privacidad, términos de uso, política de cookies, aviso legal, co
 
 ## Pantallas
 Páginas legales, pantalla de aceptación en registro, aviso de puerta legal para organizadores.
+- Licencias de software (`showLicensePage`): hoy en la pantalla Conexión de `brackety_core`; al hacer este módulo se mueve junto a los enlaces legales (ajustes / pie de la web).
 
 ## Tests
 Puerta legal activa/inactiva, versión de consentimiento, páginas servidas en ambos idiomas.

@@ -40,5 +40,6 @@
 - [ ] Registro de tratamientos y plantilla de registro de brechas.
 
 ## Hecho
+- 2026-10-30 · Sistema de diseño validado: paleta Eléctrico y Barlow.
 - 2026-10-28 · Android cmdline-tools instaladas; `flutter doctor` sin errores para Android y web.
 - 2026-10-28 · Graphify configurado a partir de ClipHive (`CLAUDE.md`, `.gitignore`).

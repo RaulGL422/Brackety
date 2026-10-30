@@ -31,4 +31,7 @@ class CoreLocalizationsEs extends CoreLocalizations {
 
   @override
   String get retry => 'Reintentar';
+
+  @override
+  String get licenses => 'Licencias de software';
 }

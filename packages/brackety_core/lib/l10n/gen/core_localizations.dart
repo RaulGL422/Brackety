@@ -133,6 +133,12 @@ abstract class CoreLocalizations {
   /// In es, this message translates to:
   /// **'Reintentar'**
   String get retry;
+
+  /// No description provided for @licenses.
+  ///
+  /// In es, this message translates to:
+  /// **'Licencias de software'**
+  String get licenses;
 }
 
 class _CoreLocalizationsDelegate

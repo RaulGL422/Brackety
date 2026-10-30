@@ -51,6 +51,18 @@ void main() {
     expect(calls, 2);
   });
 
+  testWidgets('opens the licenses page', (tester) async {
+    await pump(
+      tester,
+      () async => ServerInfo(name: 'brackety', today: DateTime(2027, 3, 10)),
+    );
+
+    await tester.tap(find.text('Licencias de software'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(LicensePage), findsOneWidget);
+  });
+
   test('parses the info response', () {
     final info = ServerInfo.fromJson({
       'name': 'brackety',

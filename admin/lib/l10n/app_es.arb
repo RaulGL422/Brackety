@@ -4,5 +4,63 @@
   "navDashboard": "Panel",
   "navConnection": "Conexión",
   "dashboardTitle": "Panel de superadmin",
-  "dashboardSubtitle": "Gestión global de la plataforma."
+  "dashboardSubtitle": "Gestión global de la plataforma.",
+  "navDesignSystem": "Diseño",
+  "dsTitle": "Sistema de diseño",
+  "dsIntro": "Solo en builds debug. Todo lo de abajo usa el tema real en el modo elegido.",
+  "dsModeLight": "Claro",
+  "dsModeDark": "Oscuro",
+  "dsTextScale": "Texto al {percent} %",
+  "dsColors": "Colores",
+  "dsStatusColors": "Estados",
+  "dsCompetitorColors": "Colores de competidor",
+  "dsContrastHint": "AA: texto normal (≥ 4,5). AA grande: solo texto grande (≥ 3). ✗: no usar para texto.",
+  "dsContrastLarge": "AA grande",
+  "dsTypography": "Tipografía",
+  "dsTypeSample": "Liga de ejemplo 2027 · 0123456789",
+  "dsSpacing": "Espaciado",
+  "dsRadius": "Radios",
+  "dsComponents": "Componentes",
+  "dsSave": "Guardar",
+  "dsTonal": "Inscribirse",
+  "dsCancel": "Cancelar",
+  "dsMore": "Ver más",
+  "dsDisabled": "Desactivado",
+  "dsFieldLabel": "Nombre del club",
+  "dsFieldHint": "Club Deportivo Ejemplo",
+  "dsFieldError": "Campo obligatorio",
+  "dsNotifications": "Notificaciones",
+  "dsCategoryKids": "Infantil",
+  "dsCategoryCadet": "Cadete",
+  "dsCategorySenior": "Sénior",
+  "dsCardTitle": "Liga de ejemplo 2027",
+  "dsCardSubtitle": "3 fases · 120 inscritos",
+  "dsPaid": "Pagado",
+  "dsPending": "Pendiente",
+  "dsRejected": "Rechazado",
+  "dsSamples": "Ejemplos",
+  "dsScoreboard": "Marcador",
+  "dsColorA": "Color A",
+  "dsColorB": "Color B",
+  "dsPenalties": "Amonestaciones: {count}",
+  "dsStandings": "Clasificación",
+  "dsPosition": "Pos.",
+  "dsCompetitor": "Competidor",
+  "dsWins": "V",
+  "dsLosses": "D",
+  "dsPoints": "Pts",
+  "@dsTextScale": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "@dsPenalties": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

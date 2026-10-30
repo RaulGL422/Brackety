@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../l10n/gen/core_localizations.dart';
 import '../config/api_config.dart';
+import '../theme/brackety_colors.dart';
+import '../theme/tokens.dart';
 import 'server_info.dart';
 
 /// Shows which backend this build talks to and the server's "today" (shifted in local scenario runs).
@@ -15,13 +17,13 @@ class ConnectionScreen extends ConsumerWidget {
     final info = ref.watch(serverInfoProvider);
 
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.l),
       children: [
         Text(
           l10n.connectionTitle,
           style: Theme.of(context).textTheme.headlineSmall,
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.l),
         ListTile(
           leading: const Icon(Icons.dns_outlined),
           title: Text(l10n.connectionServer),
@@ -43,6 +45,12 @@ class ConnectionScreen extends ConsumerWidget {
           ),
           _ => const Center(child: CircularProgressIndicator()),
         },
+        ListTile(
+          leading: const Icon(Icons.description_outlined),
+          title: Text(l10n.licenses),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => showLicensePage(context: context),
+        ),
       ],
     );
   }
@@ -67,7 +75,7 @@ class _StatusTile extends StatelessWidget {
     return ListTile(
       leading: Icon(
         ok ? Icons.check_circle_outline : Icons.error_outline,
-        color: ok ? colors.primary : colors.error,
+        color: ok ? BracketyColors.of(context).success : colors.error,
       ),
       title: Text(title),
       subtitle: subtitle == null ? null : Text(subtitle!),
