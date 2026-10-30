@@ -45,6 +45,15 @@ Formato: fecha · decisión · motivo.
 - 2026-10-30 · Página "Sistema de diseño" en admin solo en builds debug (`kDebugMode`) · Raul valida visualmente paleta, tipografía y componentes; nunca llega a producción.
 - 2026-10-30 · Paleta Eléctrico (`#2F5BFF` + acento `#FF6B00`) y tipografía Barlow / Barlow Condensed · validadas por Raul en la página Diseño frente a Fuego y Noche (el rojo de Fuego chocaba con error y con el competidor rojo).
 - 2026-10-30 · Acceso a licencias de software (Flutter, paquetes, OFL de Barlow) provisional en la pantalla Conexión; se moverá a las páginas legales en `legal-paginas` · hoy no hay otro sitio común a app y admin; pedido por Raul.
+- 2026-10-30 · Sesión web con refresh en cookie `httpOnly` y acceso en memoria; Android en almacenamiento seguro · un XSS no puede robar el refresh; elegido por Raul.
+- 2026-10-30 · Login con Apple pospuesto; `auth` arranca con email + Google · sin app iOS nativa no es obligatorio y exige Apple Developer (99 $/año).
+- 2026-10-30 · Club y Entidad Externa se registran libremente pero no publican eventos hasta validación del superadmin · evita organizadores falsos sin frenar el alta.
+- 2026-10-30 · Email obligatorio verificado; sin verificar no crea nada de valor y se borra a los 7 días; Google sustituye a una cuenta sin verificar con su email; vinculación de identidades solo manual · cierra el pre-secuestro de cuentas; propuesto por Raul.
+- 2026-10-30 · Refresh de 30 días rotatorio, Argon2id con mínimo 10 caracteres, respuestas sin enumeración · valores estándar (OWASP/NIST) aceptados por Raul.
+- 2026-10-30 · Bloqueo de login con ventana de 15 min: 5 fallos por email, 30 por IP · la IP pública se comparte en eventos (NAT); por IP solo se frenan ataques masivos.
+- 2026-10-30 · Doble capa de límite de tasa: limitador en la app (300/min API, 20/min auth) + regla en Cloudflare · pedido por Raul: más tranquilidad y errores 429 controlados por la app.
+- 2026-10-30 · Bloqueos con id corto en el 429, revocables por el superadmin desde admin con auditoría; aviso por email al bloquearse una cuenta · pedido por Raul.
+- 2026-10-30 · IP en claro en `login_attempt` solo mientras dura ventana o bloqueo; purga automática · interés legítimo de seguridad con conservación mínima (RGPD).
 - 2026-10-30 · Dependencias de `auth`: `spring-boot-starter-security`, `spring-boot-starter-security-oauth2-resource-server` (Nimbus, JWT HS256 con `JWT_SECRET`) y `bcprov-jdk18on` 1.86 · validación JWT estándar de Spring sin librería propia; BouncyCastle lo exige `Argon2PasswordEncoder`.
 - 2026-10-30 · Cliente web detectado por la cabecera `X-Client: web`: el refresh va en cookie `brackety_refresh` (`Path=/api/v1/auth`) y no en el cuerpo; sin cabecera, en el cuerpo (Android) · lo más simple; la cookie solo la manda el navegador.
-- 2026-10-30 · Bloqueo de login por hash del email (no por id de cuenta) y por hash de IP; responde 429 al estar bloqueado · un email inexistente se bloquea igual, sin enumeración, y no se guardan email ni IP en claro.
+- 2026-10-30 · Contadores de bloqueo indexados por hash del email (nunca el email) y de la IP; la fila de email guarda la cuenta si existe · un email inexistente se bloquea igual, sin enumeración.
