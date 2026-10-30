@@ -93,6 +93,11 @@ public class AuthEmails {
         send(account, "pending-deletion", LOGIN_PATH);
     }
 
+    public void organizerValidated(Account account, ProfileType type) {
+        var typeName = text("profile-type." + type.name(), Locale.forLanguageTag(account.getLocale()));
+        send(account, "organizer-validated", LOGIN_PATH, typeName);
+    }
+
     private void send(Account account, String kind, String path, Object... args) {
         send(account.getEmail(), account, kind, path, args);
     }

@@ -18,7 +18,7 @@ public class AuthException extends ErrorResponseException {
         return exception;
     }
 
-    static AuthException invalidCredentials() {
+    public static AuthException invalidCredentials() {
         return new AuthException(HttpStatus.UNAUTHORIZED, "Invalid email or password.");
     }
 
@@ -27,6 +27,14 @@ public class AuthException extends ErrorResponseException {
         var exception = new AuthException(HttpStatus.TOO_MANY_REQUESTS, "Too many failed attempts. Try again later.");
         exception.getBody().setProperty("lockId", lockId);
         return exception;
+    }
+
+    public static AuthException superadminNotConfigured() {
+        return new AuthException(HttpStatus.SERVICE_UNAVAILABLE, "The superadmin is not configured.");
+    }
+
+    public static AuthException notFound() {
+        return new AuthException(HttpStatus.NOT_FOUND, "Not found.");
     }
 
     public static AuthException invalidSession() {
