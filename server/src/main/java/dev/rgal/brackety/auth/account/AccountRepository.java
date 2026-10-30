@@ -20,6 +20,11 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
     @Query("select a from Account a where a.email = :email")
     Optional<Account> lockByEmail(String email);
 
+    // Row lock so two changes to the sign-in methods at once cannot leave the account with none.
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select a from Account a where a.id = :id")
+    Optional<Account> lockById(UUID id);
+
     @Query("select a from Account a where a.emailVerified = false"
             + " and a.verificationReminderSentAt is null and a.createdAt <= :createdBefore")
     List<Account> findUnverifiedNeedingReminder(Instant createdBefore);
