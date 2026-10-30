@@ -104,29 +104,275 @@ abstract class AppLocalizations {
   /// **'Brackety'**
   String get appTitle;
 
-  /// No description provided for @navHome.
-  ///
-  /// In es, this message translates to:
-  /// **'Inicio'**
-  String get navHome;
-
   /// No description provided for @navConnection.
   ///
   /// In es, this message translates to:
   /// **'Conexión'**
   String get navConnection;
 
-  /// No description provided for @homeWelcome.
+  /// No description provided for @loading.
   ///
   /// In es, this message translates to:
-  /// **'Bienvenido a Brackety'**
-  String get homeWelcome;
+  /// **'Cargando…'**
+  String get loading;
 
-  /// No description provided for @homeSubtitle.
+  /// No description provided for @retry.
   ///
   /// In es, this message translates to:
-  /// **'Ligas, ligas por fases y torneos.'**
-  String get homeSubtitle;
+  /// **'Reintentar'**
+  String get retry;
+
+  /// No description provided for @loadError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se ha podido cargar. Comprueba la conexión.'**
+  String get loadError;
+
+  /// No description provided for @loginTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Entrar'**
+  String get loginTitle;
+
+  /// No description provided for @loginUsername.
+  ///
+  /// In es, this message translates to:
+  /// **'Usuario'**
+  String get loginUsername;
+
+  /// No description provided for @loginPassword.
+  ///
+  /// In es, this message translates to:
+  /// **'Contraseña'**
+  String get loginPassword;
+
+  /// No description provided for @loginSubmit.
+  ///
+  /// In es, this message translates to:
+  /// **'Entrar'**
+  String get loginSubmit;
+
+  /// No description provided for @loginInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'Usuario o contraseña incorrectos.'**
+  String get loginInvalid;
+
+  /// No description provided for @loginLocked.
+  ///
+  /// In es, this message translates to:
+  /// **'Demasiados intentos. Espera unos minutos.'**
+  String get loginLocked;
+
+  /// No description provided for @loginNoServer.
+  ///
+  /// In es, this message translates to:
+  /// **'No hay conexión con el servidor.'**
+  String get loginNoServer;
+
+  /// No description provided for @loginDemoAccounts.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuentas de prueba (solo en desarrollo)'**
+  String get loginDemoAccounts;
+
+  /// No description provided for @logout.
+  ///
+  /// In es, this message translates to:
+  /// **'Salir'**
+  String get logout;
+
+  /// No description provided for @eventsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Mis eventos'**
+  String get eventsTitle;
+
+  /// No description provided for @eventsEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'No tienes eventos asignados.'**
+  String get eventsEmpty;
+
+  /// No description provided for @roleClub.
+  ///
+  /// In es, this message translates to:
+  /// **'Club'**
+  String get roleClub;
+
+  /// No description provided for @roleGrouper.
+  ///
+  /// In es, this message translates to:
+  /// **'Ayudante'**
+  String get roleGrouper;
+
+  /// No description provided for @roleReferee.
+  ///
+  /// In es, this message translates to:
+  /// **'Árbitro'**
+  String get roleReferee;
+
+  /// No description provided for @eventMakeGroups.
+  ///
+  /// In es, this message translates to:
+  /// **'Crear grupos'**
+  String get eventMakeGroups;
+
+  /// No description provided for @eventMyMat.
+  ///
+  /// In es, this message translates to:
+  /// **'Tapiz {number}'**
+  String eventMyMat(int number);
+
+  /// No description provided for @eventClubPanel.
+  ///
+  /// In es, this message translates to:
+  /// **'Panel del club'**
+  String get eventClubPanel;
+
+  /// No description provided for @comingSoon.
+  ///
+  /// In es, this message translates to:
+  /// **'Disponible pronto'**
+  String get comingSoon;
+
+  /// No description provided for @categoriesTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Categorías'**
+  String get categoriesTitle;
+
+  /// No description provided for @categoriesEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no hay inscritos.'**
+  String get categoriesEmpty;
+
+  /// No description provided for @categoryCounts.
+  ///
+  /// In es, this message translates to:
+  /// **'{participants} inscritos · {grouped} en grupos'**
+  String categoryCounts(int participants, int grouped);
+
+  /// No description provided for @categoryAges.
+  ///
+  /// In es, this message translates to:
+  /// **'{name} años'**
+  String categoryAges(String name);
+
+  /// No description provided for @sortByName.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre'**
+  String get sortByName;
+
+  /// No description provided for @sortByHeight.
+  ///
+  /// In es, this message translates to:
+  /// **'Estatura'**
+  String get sortByHeight;
+
+  /// No description provided for @participantDetails.
+  ///
+  /// In es, this message translates to:
+  /// **'{age} años · {height}'**
+  String participantDetails(int age, String height);
+
+  /// No description provided for @heightCm.
+  ///
+  /// In es, this message translates to:
+  /// **'{cm} cm'**
+  String heightCm(int cm);
+
+  /// No description provided for @heightUnknown.
+  ///
+  /// In es, this message translates to:
+  /// **'sin estatura'**
+  String get heightUnknown;
+
+  /// No description provided for @participantGrouped.
+  ///
+  /// In es, this message translates to:
+  /// **'Grupo {group} · Tapiz {mat}'**
+  String participantGrouped(int group, int mat);
+
+  /// No description provided for @draftGroup.
+  ///
+  /// In es, this message translates to:
+  /// **'Grupo {number}'**
+  String draftGroup(int number);
+
+  /// No description provided for @draftCount.
+  ///
+  /// In es, this message translates to:
+  /// **'{count}/4'**
+  String draftCount(int count);
+
+  /// No description provided for @draftGhost.
+  ///
+  /// In es, this message translates to:
+  /// **'Competidor fantasma'**
+  String get draftGhost;
+
+  /// No description provided for @draftGhostHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Elige al fantasma: combate pero no puntúa.'**
+  String get draftGhostHint;
+
+  /// No description provided for @draftAddGroup.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir grupo'**
+  String get draftAddGroup;
+
+  /// No description provided for @draftRemoveGroup.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar grupo'**
+  String get draftRemoveGroup;
+
+  /// No description provided for @createGroup.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{Crear grupo} other{Crear grupos}}'**
+  String createGroup(int count);
+
+  /// No description provided for @groupsCreatedTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{Grupo creado} other{Grupos creados}}'**
+  String groupsCreatedTitle(int count);
+
+  /// No description provided for @groupsCreatedBody.
+  ///
+  /// In es, this message translates to:
+  /// **'{groups} → Tapiz {mat}'**
+  String groupsCreatedBody(String groups, int mat);
+
+  /// No description provided for @groupsConflict.
+  ///
+  /// In es, this message translates to:
+  /// **'Algún alumno ya está en un grupo. La lista se ha actualizado.'**
+  String get groupsConflict;
+
+  /// No description provided for @groupsError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se han podido crear los grupos.'**
+  String get groupsError;
+
+  /// No description provided for @ok.
+  ///
+  /// In es, this message translates to:
+  /// **'Aceptar'**
+  String get ok;
+
+  /// No description provided for @ghostBadge.
+  ///
+  /// In es, this message translates to:
+  /// **'Fantasma'**
+  String get ghostBadge;
 }
 
 class _AppLocalizationsDelegate
