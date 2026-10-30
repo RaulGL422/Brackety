@@ -71,6 +71,9 @@ Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, f
 - Permisos por rol y evento en servidor; el árbitro solo escribe en su tapiz.
 
 ## Pantallas
+- Sesión provisional (`app/lib/features/session/`): login real contra `/auth/login`, acceso en memoria, refresh por la cookie web y un reintento automático tras un 401; recarga de página = sesión recuperada. En debug, botones de acceso rápido a las cuentas demo. Las pantallas de `auth` sustituirán la de acceso.
+- Ayudante: categorías (con inscritos/agrupados) → alumnos por nombre o estatura → grupos en borrador con color y número (nunca rojo/azul) y casilla de fantasma → popup con el tapiz.
+
 Login, inicio por rol, categorías → alumnos → crear grupos, tablero del tapiz, marcador, panel del club (config, inscripciones, puntuaciones, tapices, línea de tiempo, exportar). Responsive (`07-diseno.md`), textos i18n.
 
 ## Tests
