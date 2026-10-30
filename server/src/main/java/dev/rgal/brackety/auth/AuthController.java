@@ -7,8 +7,10 @@ import dev.rgal.brackety.auth.dto.LoginRequest;
 import dev.rgal.brackety.auth.dto.RefreshRequest;
 import dev.rgal.brackety.auth.dto.RegisterRequest;
 import dev.rgal.brackety.auth.dto.ResetPasswordRequest;
+import dev.rgal.brackety.auth.dto.RestoreRequest;
 import dev.rgal.brackety.auth.dto.TokenRequest;
 import dev.rgal.brackety.auth.dto.TokenResponse;
+import dev.rgal.brackety.auth.email.EmailChangeService;
 import dev.rgal.brackety.auth.email.EmailVerificationService;
 import dev.rgal.brackety.auth.email.PasswordResetService;
 import dev.rgal.brackety.auth.google.GoogleSignInService;
@@ -43,18 +45,21 @@ class AuthController {
     private final EmailVerificationService verification;
     private final PasswordResetService passwordReset;
     private final GoogleSignInService google;
+    private final EmailChangeService emailChange;
 
     AuthController(
             AuthService auth,
             SessionService sessions,
             EmailVerificationService verification,
             PasswordResetService passwordReset,
-            GoogleSignInService google) {
+            GoogleSignInService google,
+            EmailChangeService emailChange) {
         this.auth = auth;
         this.sessions = sessions;
         this.verification = verification;
         this.passwordReset = passwordReset;
         this.google = google;
+        this.emailChange = emailChange;
     }
 
     @PostMapping("/register")
@@ -102,6 +107,13 @@ class AuthController {
         }
     }
 
+    @PostMapping("/restore")
+    ResponseEntity<TokenResponse> restore(
+            @Valid @RequestBody RestoreRequest request,
+            @RequestHeader(name = CLIENT_HEADER, required = false) String client) {
+        return respond(auth.restore(request.restoreToken()), isWeb(client));
+    }
+
     @PostMapping("/refresh")
     ResponseEntity<TokenResponse> refresh(
             @CookieValue(name = REFRESH_COOKIE, required = false) String cookie,
@@ -131,6 +143,12 @@ class AuthController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     void resendVerification(@Valid @RequestBody EmailRequest request) {
         verification.resend(request.email());
+    }
+
+    @PostMapping("/email/change/confirm")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void confirmEmailChange(@Valid @RequestBody TokenRequest request) {
+        emailChange.confirm(request.token());
     }
 
     @PostMapping("/password/forgot")

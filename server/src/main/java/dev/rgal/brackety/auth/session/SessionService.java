@@ -29,6 +29,9 @@ public class SessionService {
     // Two tabs or two app calls refreshing at once are not a theft: the late one gets 401 and retries.
     static final Duration REUSE_GRACE = Duration.ofSeconds(10);
     public static final String EMAIL_VERIFIED_CLAIM = "email_verified";
+    // Tells an access token from the other tokens signed with the same key (see ShortLivedTokens).
+    public static final String PURPOSE_CLAIM = "purpose";
+    public static final String ACCESS_PURPOSE = "ACCESS";
 
     private static final Logger log = LoggerFactory.getLogger(SessionService.class);
 
@@ -119,6 +122,7 @@ public class SessionService {
                 .expiresAt(now.plus(ACCESS_TTL))
                 .claim("profiles", profileTypes)
                 .claim(EMAIL_VERIFIED_CLAIM, account.isEmailVerified())
+                .claim(PURPOSE_CLAIM, ACCESS_PURPOSE)
                 .build();
         var header = JwsHeader.with(MacAlgorithm.HS256).build();
         return jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();

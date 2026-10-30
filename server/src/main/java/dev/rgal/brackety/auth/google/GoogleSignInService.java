@@ -44,17 +44,18 @@ public class GoogleSignInService {
         var google = googleTokens.verify(idToken);
         var identity = identities.findByProviderAndSubject(Identity.Provider.GOOGLE, google.subject());
         if (identity.isPresent()) {
-            var account = accounts.findById(identity.get().getAccountId())
-                    .filter(Account::isActive)
-                    .orElseThrow(AuthException::googleSignInFailed);
+            var account =
+                    accounts.findById(identity.get().getAccountId()).orElseThrow(AuthException::googleSignInFailed);
+            if (!account.isActive()) {
+                throw auth.pendingDeletion(account);
+            }
             return Result.signedIn(sessions.start(account), false);
         }
         var existing = accounts.lockByEmail(google.email());
-        if (existing.isPresent() && !existing.get().isActive()) {
-            throw AuthException.googleSignInFailed();
-        }
         // Never merged on its own: the owner links Google from settings once signed in.
-        if (existing.isPresent() && existing.get().isEmailVerified()) {
+        // A deleted account keeps its email until purged, so its owner can still restore it.
+        if (existing.isPresent()
+                && (existing.get().isEmailVerified() || !existing.get().isActive())) {
             throw AuthException.accountExists();
         }
         // Google has proved the email is theirs, so it can be told back.

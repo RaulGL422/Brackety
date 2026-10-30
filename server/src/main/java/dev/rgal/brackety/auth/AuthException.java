@@ -1,5 +1,6 @@
 package dev.rgal.brackety.auth;
 
+import java.time.LocalDate;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.ErrorResponseException;
 
@@ -86,5 +87,34 @@ public class AuthException extends ErrorResponseException {
                 HttpStatus.CONFLICT,
                 "LAST_SIGN_IN_METHOD",
                 "This is the only way to sign in to the account. Add another one first.");
+    }
+
+    public static AuthException reauthRequired() {
+        return withCode(HttpStatus.FORBIDDEN, "REAUTH_REQUIRED", "Confirm your password or Google account to do this.");
+    }
+
+    // 403, not 401: the session is fine, and a 401 would make the app refresh and retry.
+    public static AuthException reauthFailed() {
+        return withCode(HttpStatus.FORBIDDEN, "REAUTH_FAILED", "The password or Google account does not match.");
+    }
+
+    // Only once the password or Google has proved the account is theirs, so it does not reveal anything.
+    static AuthException pendingDeletion(LocalDate deletesOn, String restoreToken) {
+        var exception = withCode(
+                HttpStatus.FORBIDDEN, "ACCOUNT_PENDING_DELETION", "This account is pending deletion. Restore it?");
+        exception.getBody().setProperty("deletesOn", deletesOn.toString());
+        exception.getBody().setProperty("restoreToken", restoreToken);
+        return exception;
+    }
+
+    public static AuthException profileCombinationNotAllowed() {
+        return withCode(
+                HttpStatus.CONFLICT,
+                "PROFILE_COMBINATION_NOT_ALLOWED",
+                "This profile cannot be combined with the ones the account has.");
+    }
+
+    public static AuthException lastProfile() {
+        return withCode(HttpStatus.CONFLICT, "LAST_PROFILE", "An account needs at least one profile.");
     }
 }

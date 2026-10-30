@@ -33,4 +33,9 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
     @Modifying
     @Query("delete from Account a where a.emailVerified = false and a.createdAt <= :createdBefore")
     int deleteUnverified(Instant createdBefore);
+
+    // Same cascade as above: everything the account owns goes with it.
+    @Modifying
+    @Query("delete from Account a where a.deletedAt <= :deletedBefore")
+    int deleteDeletedBefore(Instant deletedBefore);
 }

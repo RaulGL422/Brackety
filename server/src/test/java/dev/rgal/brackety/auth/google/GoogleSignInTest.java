@@ -7,6 +7,7 @@ import dev.rgal.brackety.auth.AuthException;
 import dev.rgal.brackety.auth.AuthIntegrationTest;
 import dev.rgal.brackety.auth.AuthService;
 import dev.rgal.brackety.auth.session.SessionService;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -155,13 +156,23 @@ class GoogleSignInTest extends AuthIntegrationTest {
     }
 
     @Test
-    void aDeletedAccountGetsTheGeneric401() {
+    void aDeletedAccountIsOfferedTheRestoreAndNeverASecondAccount() {
         googleSignIn.signIn(google.idToken("sub-ana", ANA), details(ADULT));
-        jdbc.sql("update account set status = 'DELETED'").update();
+        jdbc.sql("update account set status = 'DELETED', deleted_at = ?")
+                .param(Timestamp.from(clock.instant()))
+                .update();
 
-        assertUnauthorized(() -> googleSignIn.signIn(google.idToken("sub-ana", ANA), null));
-        // Also when found by email, with another Google user.
-        assertUnauthorized(() -> googleSignIn.signIn(google.idToken("sub-other", ANA), details(ADULT)));
+        assertThatThrownBy(() -> googleSignIn.signIn(google.idToken("sub-ana", ANA), null))
+                .isInstanceOfSatisfying(AuthException.class, e -> {
+                    assertThat(e.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+                    assertThat(e.getBody().getProperties())
+                            .containsEntry("code", "ACCOUNT_PENDING_DELETION")
+                            .containsEntry("deletesOn", "2027-04-09")
+                            .containsKey("restoreToken");
+                });
+        // Found by email, with another Google user: as for a verified account, no new account.
+        assertConflict(() -> googleSignIn.signIn(google.idToken("sub-other", ANA), details(ADULT)), "ACCOUNT_EXISTS");
+        assertThat(count("account")).isOne();
     }
 
     private UUID idOf(String email) {
@@ -180,11 +191,5 @@ class GoogleSignInTest extends AuthIntegrationTest {
             assertThat(e.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
             assertThat(e.getBody().getProperties()).containsEntry("code", code);
         });
-    }
-
-    private static void assertUnauthorized(Runnable call) {
-        assertThatThrownBy(call::run)
-                .isInstanceOfSatisfying(
-                        AuthException.class, e -> assertThat(e.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED));
     }
 }

@@ -15,6 +15,7 @@ import dev.rgal.brackety.auth.lockout.LoginAttempt;
 import dev.rgal.brackety.auth.lockout.LoginAttemptRepository;
 import dev.rgal.brackety.auth.session.SessionService;
 import dev.rgal.brackety.auth.session.SessionService.Session;
+import dev.rgal.brackety.auth.session.ShortLivedTokens;
 import dev.rgal.brackety.common.crypto.Sha256;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -35,6 +36,7 @@ public class AuthService {
     private final ConsentRepository consents;
     private final LoginAttemptRepository loginAttempts;
     private final SessionService sessions;
+    private final ShortLivedTokens shortLivedTokens;
     private final EmailTokens emailTokens;
     private final AuthEmails authEmails;
     private final PasswordEncoder passwordEncoder;
@@ -47,6 +49,7 @@ public class AuthService {
             ConsentRepository consents,
             LoginAttemptRepository loginAttempts,
             SessionService sessions,
+            ShortLivedTokens shortLivedTokens,
             EmailTokens emailTokens,
             AuthEmails authEmails,
             PasswordEncoder passwordEncoder,
@@ -56,6 +59,7 @@ public class AuthService {
         this.consents = consents;
         this.loginAttempts = loginAttempts;
         this.sessions = sessions;
+        this.shortLivedTokens = shortLivedTokens;
         this.emailTokens = emailTokens;
         this.authEmails = authEmails;
         this.passwordEncoder = passwordEncoder;
@@ -72,13 +76,22 @@ public class AuthService {
         var passwordHash = passwordEncoder.encode(request.password());
         var existing = accounts.lockByEmail(email);
         if (existing.isPresent()) {
-            if (existing.get().tryMarkAlreadyRegisteredSent(clock.instant(), EmailTokens.RESEND_INTERVAL)) {
-                authEmails.alreadyRegistered(existing.get());
-            }
+            notifyAlreadyRegistered(existing.get());
             return;
         }
         var account = createAccount(email, passwordHash, request.details());
         authEmails.verifyEmail(account, emailTokens.issue(account.getId(), EmailToken.Purpose.VERIFY_EMAIL));
+    }
+
+    private void notifyAlreadyRegistered(Account account) {
+        if (!account.tryMarkAlreadyRegisteredSent(clock.instant(), EmailTokens.RESEND_INTERVAL)) {
+            return;
+        }
+        if (account.isActive()) {
+            authEmails.alreadyRegistered(account);
+        } else {
+            authEmails.registeredWhilePendingDeletion(account);
+        }
     }
 
     public void checkMinimumAge(LocalDate birthDate) {
@@ -102,6 +115,38 @@ public class AuthService {
     // No rollback on AuthException: the failure counters must be saved even though the login fails.
     @Transactional(noRollbackFor = AuthException.class)
     public Session login(String email, String password, String clientIp) {
+        var account = checkPassword(email, password, clientIp).orElseThrow(AuthException::invalidCredentials);
+        if (!account.isActive()) {
+            throw pendingDeletion(account);
+        }
+        return sessions.start(account);
+    }
+
+    /** For a deleted account whose owner has just proved it is theirs: when it goes, and how to keep it. */
+    public AuthException pendingDeletion(Account account) {
+        return AuthException.pendingDeletion(
+                account.deletesOn(clock.getZone()),
+                shortLivedTokens.issue(account.getId(), ShortLivedTokens.Purpose.RESTORE));
+    }
+
+    @Transactional
+    public Session restore(String restoreToken) {
+        var account = shortLivedTokens
+                .verify(restoreToken, ShortLivedTokens.Purpose.RESTORE)
+                .flatMap(accounts::lockById)
+                .filter(a -> !a.isActive())
+                .orElseThrow(AuthException::invalidSession);
+        account.restore(clock.instant());
+        return sessions.start(account);
+    }
+
+    /**
+     * The account (deleted ones too) if the password is right; empty if not, after counting the failure.
+     * Throws 429 while the email or IP is locked. The caller's transaction must not roll back on
+     * AuthException, or the counters are lost.
+     */
+    @Transactional(noRollbackFor = AuthException.class)
+    public Optional<Account> checkPassword(String email, String password, String clientIp) {
         var now = clock.instant();
         var normalizedEmail = Account.normalizeEmail(email);
         var emailAttempt = lockAttempt(LoginAttempt.emailKey(normalizedEmail));
@@ -113,7 +158,7 @@ public class AuthService {
         if (ipAttempt.isLocked(now)) {
             throw AuthException.locked(ipAttempt.getLockId());
         }
-        var account = accounts.findByEmail(normalizedEmail).filter(Account::isActive);
+        var account = accounts.findByEmail(normalizedEmail);
         account.ifPresent(a -> emailAttempt.setAccountId(a.getId()));
         if (!passwordMatches(account, password)) {
             // recordFailure is true only for the failure that locks, so each lock sends one email.
@@ -121,11 +166,11 @@ public class AuthService {
                 authEmails.accountLocked(account.get(), emailAttempt.getLockId());
             }
             ipAttempt.recordFailure(now, LoginAttempt.MAX_IP_FAILURES);
-            throw AuthException.invalidCredentials();
+            return Optional.empty();
         }
         // The IP counter is not reset: one valid account must not unlock guessing others from the same IP.
         emailAttempt.reset();
-        return sessions.start(account.get());
+        return account;
     }
 
     private LoginAttempt lockAttempt(String key) {

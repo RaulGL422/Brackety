@@ -25,29 +25,49 @@ public class EmailTokens {
 
     /** Replaces any earlier token of the same purpose and returns the raw one, to send by email. */
     public String issue(UUID accountId, EmailToken.Purpose purpose) {
+        return issue(accountId, purpose, null);
+    }
+
+    private String issue(UUID accountId, EmailToken.Purpose purpose, String newEmail) {
         tokens.deleteByAccountIdAndPurpose(accountId, purpose);
         var raw = RandomTokens.newToken();
-        tokens.save(new EmailToken(Sha256.hex(raw), accountId, purpose, clock.instant()));
+        tokens.save(new EmailToken(Sha256.hex(raw), accountId, purpose, newEmail, clock.instant()));
         return raw;
     }
 
     /** Like {@link #issue} but empty if one was issued in the last minute, so nobody can flood an inbox. */
     Optional<String> issueThrottled(UUID accountId, EmailToken.Purpose purpose) {
+        return issueThrottled(accountId, purpose, null);
+    }
+
+    /** {@code newEmail} is only for {@code CHANGE_EMAIL}: the address the link confirms. */
+    Optional<String> issueThrottled(UUID accountId, EmailToken.Purpose purpose, String newEmail) {
         var since = clock.instant().minus(RESEND_INTERVAL);
         if (tokens.existsByAccountIdAndPurposeAndCreatedAtAfter(accountId, purpose, since)) {
             return Optional.empty();
         }
-        return Optional.of(issue(accountId, purpose));
+        return Optional.of(issue(accountId, purpose, newEmail));
     }
 
     /** Deletes the token and returns its account; invalid, expired and used tokens fail alike. */
     UUID consume(String raw, EmailToken.Purpose purpose) {
+        return take(raw, purpose).getAccountId();
+    }
+
+    EmailChange consumeEmailChange(String raw) {
+        var token = take(raw, EmailToken.Purpose.CHANGE_EMAIL);
+        return new EmailChange(token.getAccountId(), token.getNewEmail());
+    }
+
+    private EmailToken take(String raw, EmailToken.Purpose purpose) {
         var now = clock.instant();
         var token = tokens.findByTokenHash(Sha256.hex(raw))
                 .filter(t -> t.isUsable(purpose, now))
                 .orElseThrow(AuthException::invalidLink);
         // Deleted under the row lock: a concurrent second use waits, then finds nothing.
         tokens.delete(token);
-        return token.getAccountId();
+        return token;
     }
+
+    record EmailChange(UUID accountId, String newEmail) {}
 }

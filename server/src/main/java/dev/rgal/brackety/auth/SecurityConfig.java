@@ -22,7 +22,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.JwtClaimValidator;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
@@ -98,7 +100,10 @@ public class SecurityConfig {
         // No clock skew: this server both issues and checks the tokens with the same clock.
         var timestamps = new JwtTimestampValidator(Duration.ZERO);
         timestamps.setClock(clock);
-        decoder.setJwtValidator(timestamps);
+        // Only access tokens: a reauth or restore token, signed with the same key, must not open the API.
+        decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(
+                timestamps,
+                new JwtClaimValidator<String>(SessionService.PURPOSE_CLAIM, SessionService.ACCESS_PURPOSE::equals)));
         return decoder;
     }
 

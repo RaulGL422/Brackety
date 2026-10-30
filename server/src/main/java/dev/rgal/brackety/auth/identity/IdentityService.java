@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 // Every change takes the account row lock, so two at once cannot leave the account without a way in.
 @Service
-class IdentityService {
+public class IdentityService {
 
     static final String PASSWORD = "PASSWORD";
 
@@ -47,7 +47,12 @@ class IdentityService {
 
     @Transactional(readOnly = true)
     List<SignInMethodResponse> methods(UUID accountId) {
-        var account = accounts.findById(accountId).filter(Account::isActive).orElseThrow(AuthException::invalidSession);
+        return methods(
+                accounts.findById(accountId).filter(Account::isActive).orElseThrow(AuthException::invalidSession));
+    }
+
+    public List<SignInMethodResponse> methods(Account account) {
+        var accountId = account.getId();
         var methods = new ArrayList<SignInMethodResponse>();
         if (account.hasPassword()) {
             methods.add(new SignInMethodResponse(PASSWORD, null, null));

@@ -9,11 +9,15 @@ import jakarta.persistence.Id;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Locale;
 import java.util.UUID;
 
 @Entity
 public class Account {
+
+    /** A deleted account can still be restored for this long; then it is purged for good. */
+    public static final Duration DELETION_GRACE = Duration.ofDays(30);
 
     enum Status {
         ACTIVE,
@@ -37,6 +41,7 @@ public class Account {
     private Instant updatedAt;
     private Instant verificationReminderSentAt;
     private Instant alreadyRegisteredSentAt;
+    private Instant deletedAt;
 
     protected Account() {}
 
@@ -70,12 +75,53 @@ public class Account {
         return emailVerified;
     }
 
-    String getLocale() {
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
+
+    public String getLocale() {
         return locale;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
     }
 
     public boolean isActive() {
         return status == Status.ACTIVE;
+    }
+
+    /** The day the account will be purged, or null if it is not deleted. */
+    public LocalDate deletesOn(ZoneId zone) {
+        return deletedAt == null ? null : LocalDate.ofInstant(deletedAt.plus(DELETION_GRACE), zone);
+    }
+
+    public void markDeleted(Instant now) {
+        status = Status.DELETED;
+        deletedAt = now;
+        updatedAt = now;
+    }
+
+    public void restore(Instant now) {
+        status = Status.ACTIVE;
+        deletedAt = null;
+        updatedAt = now;
+    }
+
+    /** Only once the new address has been proved by its link, so it is verified too. */
+    public void changeEmail(String newEmail, Instant now) {
+        email = newEmail;
+        emailVerified = true;
+        updatedAt = now;
+    }
+
+    public void changeLocale(String locale, Instant now) {
+        this.locale = locale;
+        updatedAt = now;
     }
 
     public void markEmailVerified(Instant now) {
