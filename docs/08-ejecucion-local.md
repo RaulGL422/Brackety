@@ -20,7 +20,9 @@ Cada escenario es una clase `Scenario` en `server/src/test/java/dev/rgal/bracket
 - Cada módulo que cierra añade sus escenarios y su run config. Catálogo abajo.
 
 ## Google simulado
-- En local la API confía en una clave generada al arrancar, no en Google. `POST /api/v1/auth/dev/google-token` `{"subject":"…","email":"…"}` devuelve un `idToken` para `POST /api/v1/auth/google`.
+- El lanzador local **siempre** usa el Google simulado, aunque haya `GOOGLE_CLIENT_ID`: confía en una clave generada al arrancar, no en Google. Probar el Google real exige el despliegue (o la imagen Docker) con los client IDs.
+- idToken de prueba: `POST /api/v1/auth/dev/google-token` `{"subject":"google-solo","email":"google@example.test"}` → `{"idToken":"…"}`, válido 1 h. Se usa tal cual en `POST /api/v1/auth/google` o `POST /api/v1/me/identities/google`. Un `subject` nuevo = una persona de Google nueva.
+- PowerShell: `irm -Method Post http://localhost:8080/api/v1/auth/dev/google-token -ContentType application/json -Body '{"subject":"s1","email":"a@example.test"}'`.
 - Solo existe en el lanzador local (`server/src/test`); en producción ese endpoint no existe.
 
 ## Reloj simulado

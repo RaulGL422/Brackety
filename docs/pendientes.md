@@ -13,7 +13,7 @@
 - [ ] Cabecera Content-Security-Policy en nginx: probarla contra el despliegue real antes de activarla.
 
 ## Auth
-- [ ] Google Cloud: crear OAuth client IDs (web + Android con SHA-1 de debug y release) antes de `feat/auth-google`.
+- [ ] Google Cloud: crear OAuth client IDs (web + Android con SHA-1 de debug y release), ponerlos en `GOOGLE_CLIENT_ID` y probar el login real de Google en web y en Android (en local solo hay Google simulado).
 - [ ] Resend: API key y remitente verificado en `rgal.dev` antes de `feat/auth-email` (en local los emails van al log).
 - [ ] Cloudflare: regla de rate limiting sobre `/api/v1/auth/*` al desplegar.
 - [ ] Producción: leer la IP real de `CF-Connecting-IP` y confiar solo en el túnel; comprobar en el despliegue real.

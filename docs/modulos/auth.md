@@ -18,7 +18,7 @@ Cuentas, login y sesión compartidos entre web y Android.
 - Cuenta con contraseña: verificación obligatoria por enlace (Resend). Enlace válido 24 h, reenvío con límite de tasa.
 - Sin verificar puede entrar y verificar, pero no crear nada de valor (perfiles de menores, inscripciones, eventos).
 - Sin verificar a los 7 días → borrado definitivo. Recordatorio por email el día 5.
-- Cuenta creada con Google: email ya verificado.
+- Cuenta creada con Google: email ya verificado. Vincular Google con el mismo email también verifica la cuenta.
 - Login con Google cuyo email coincide con una cuenta con contraseña **sin verificar**: esa cuenta se borra, se revocan sus sesiones, se crea la de Google y se muestra un aviso.
 - Mismo caso con cuenta **verificada**: no se crea cuenta; se indica entrar con el método original y vincular desde ajustes (409 `ACCOUNT_EXISTS`).
 - Primer login con Google: `REGISTRATION_REQUIRED` con el email (ya probado por Google); la app pide fecha, perfil y consentimientos y repite con el mismo token. La cuenta sin verificar solo se borra al completar.
