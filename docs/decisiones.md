@@ -69,3 +69,4 @@ Formato: fecha · decisión · motivo.
 - 2026-10-30 · Enlace de recuperación de contraseña válido 1 h (verificación, 24 h) · ventana corta para un enlace que cambia la contraseña.
 - 2026-10-30 · `compose-smoke` obligatorio en la protección de `development` · la PR #11 se fusionó con él en rojo (faltaba JWT_SECRET en CI); activado por Raul.
 - 2026-10-30 · CORS rechaza comodines de host (`*`, `https://*…`) al arrancar · con credenciales permitiría a cualquier web actuar como el usuario.
+- 2026-10-30 · `auth` dividido en subpaquetes por tema (account, session, lockout, email) y utilidades en `common/crypto`; regla de ~15 archivos por feature · 28 archivos sueltos en una carpeta y creciendo; pedido por Raul.
