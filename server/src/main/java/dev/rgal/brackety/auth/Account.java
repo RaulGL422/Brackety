@@ -33,6 +33,7 @@ class Account {
 
     private Instant createdAt;
     private Instant updatedAt;
+    private Instant verificationReminderSentAt;
 
     protected Account() {}
 
@@ -62,7 +63,25 @@ class Account {
         return emailVerified;
     }
 
+    String getLocale() {
+        return locale;
+    }
+
     boolean isActive() {
         return status == Status.ACTIVE;
+    }
+
+    void markEmailVerified(Instant now) {
+        emailVerified = true;
+        updatedAt = now;
+    }
+
+    void changePassword(String passwordHash, Instant now) {
+        this.passwordHash = passwordHash;
+        updatedAt = now;
+    }
+
+    void markReminderSent(Instant now) {
+        verificationReminderSentAt = now;
     }
 }

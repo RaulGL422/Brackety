@@ -25,6 +25,9 @@ class SessionServiceTest extends AuthIntegrationTest {
     @Autowired
     JwtDecoder jwtDecoder;
 
+    @Autowired
+    EmailVerificationService verification;
+
     private Session first;
 
     @BeforeEach
@@ -41,6 +44,24 @@ class SessionServiceTest extends AuthIntegrationTest {
         assertThat(jwt.getSubject()).isEqualTo(accountId.toString());
         assertThat(jwt.getClaimAsStringList("profiles")).containsExactly("CLUB");
         assertThat(jwt.getExpiresAt()).isEqualTo(AuthTestConfig.START.plus(Duration.ofMinutes(15)));
+    }
+
+    @Test
+    void anUnverifiedAccountGetsEmailVerifiedFalse() {
+        assertThat(first.emailVerified()).isFalse();
+        assertThat(jwtDecoder.decode(first.accessToken()).getClaimAsBoolean("email_verified"))
+                .isFalse();
+    }
+
+    @Test
+    void theRefreshAfterVerifyingCarriesEmailVerifiedTrue() {
+        verification.verify(tokenIn(emails.sentTo("ana@example.test").getFirst()));
+
+        var second = sessions.refresh(first.refreshToken());
+
+        assertThat(second.emailVerified()).isTrue();
+        assertThat(jwtDecoder.decode(second.accessToken()).getClaimAsBoolean("email_verified"))
+                .isTrue();
     }
 
     @Test

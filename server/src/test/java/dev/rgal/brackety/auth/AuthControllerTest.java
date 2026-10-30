@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.jayway.jsonpath.JsonPath;
 import jakarta.servlet.http.Cookie;
 import java.time.Duration;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -50,7 +51,7 @@ class AuthControllerTest extends AuthIntegrationTest {
     void concurrentDuplicateRegistrationIsStillAccepted() throws Exception {
         var body = REGISTER_JSON.formatted("ana@example.test", PASSWORD, "1990-05-20");
         register(body).andExpect(status().isAccepted());
-        doReturn(false).when(accounts).existsByEmail("ana@example.test");
+        doReturn(Optional.empty()).when(accounts).findByEmail("ana@example.test");
 
         register(body).andExpect(status().isAccepted());
 
@@ -217,6 +218,85 @@ class AuthControllerTest extends AuthIntegrationTest {
     }
 
     @Test
+    void loginTellsWhetherTheEmailIsVerified() throws Exception {
+        registerAna();
+
+        login(null, "ana@example.test").andExpect(jsonPath("$.emailVerified").value(false));
+    }
+
+    @Test
+    void verifiedOnlyEndpointsNeedAVerifiedEmail() throws Exception {
+        registerAna();
+        var login = login(null, "ana@example.test").andReturn().getResponse().getContentAsString();
+
+        mvc.perform(get("/api/v1/test/verified-only")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + JsonPath.read(login, "$.accessToken")))
+                .andExpect(status().isForbidden())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON));
+
+        postJson(
+                        "/api/v1/auth/email/verify",
+                        "{\"token\":\"%s\"}".formatted(tokenIn(emails.sent().getFirst())))
+                .andExpect(status().isNoContent());
+        var refreshed = postJson(
+                        "/api/v1/auth/refresh",
+                        "{\"refreshToken\":\"%s\"}".formatted(JsonPath.<String>read(login, "$.refreshToken")))
+                .andExpect(jsonPath("$.emailVerified").value(true))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        mvc.perform(get("/api/v1/test/verified-only")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + JsonPath.read(refreshed, "$.accessToken")))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void anInvalidLinkIsABadRequestProblem() throws Exception {
+        postJson("/api/v1/auth/email/verify", "{\"token\":\"not-a-token\"}")
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.detail").value("This link is invalid or has expired."));
+    }
+
+    @Test
+    void resendAndForgotAnswerTheSameEmptyAcceptedForAnyEmail() throws Exception {
+        registerAna();
+
+        for (var path : new String[] {"/api/v1/auth/email/resend", "/api/v1/auth/password/forgot"}) {
+            for (var email : new String[] {"ana@example.test", "nobody@example.test"}) {
+                var body = postJson(path, "{\"email\":\"%s\"}".formatted(email))
+                        .andExpect(status().isAccepted())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+                assertThat(body).isEmpty();
+            }
+        }
+    }
+
+    @Test
+    void resetRejectsAShortPassword() throws Exception {
+        postJson("/api/v1/auth/password/reset", "{\"token\":\"x\",\"newPassword\":\"123456789\"}")
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON));
+    }
+
+    @Test
+    void resetWithTheEmailedLinkChangesThePassword() throws Exception {
+        registerAna();
+        postJson("/api/v1/auth/password/forgot", "{\"email\":\"ana@example.test\"}");
+        var token = tokenIn(emails.sent().getLast());
+
+        postJson(
+                        "/api/v1/auth/password/reset",
+                        "{\"token\":\"%s\",\"newPassword\":\"a-brand-new-password\"}".formatted(token))
+                .andExpect(status().isNoContent());
+
+        login(null, "ana@example.test").andExpect(status().isUnauthorized());
+    }
+
+    @Test
     void publicEndpointsStayOpen() throws Exception {
         mvc.perform(get("/api/v1/info")).andExpect(status().isOk());
         mvc.perform(get("/actuator/health")).andExpect(status().isOk());
@@ -225,6 +305,10 @@ class AuthControllerTest extends AuthIntegrationTest {
     private void registerAna() throws Exception {
         register(REGISTER_JSON.formatted("ana@example.test", PASSWORD, "1990-05-20"))
                 .andExpect(status().isAccepted());
+    }
+
+    private ResultActions postJson(String path, String body) throws Exception {
+        return mvc.perform(post(path).contentType(MediaType.APPLICATION_JSON).content(body));
     }
 
     private ResultActions register(String body) throws Exception {

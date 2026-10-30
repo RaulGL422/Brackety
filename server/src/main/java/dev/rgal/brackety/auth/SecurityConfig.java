@@ -5,6 +5,7 @@ import dev.rgal.brackety.common.ProblemResponses;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.Duration;
+import java.util.List;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,10 +13,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -24,13 +27,19 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 
 @Configuration(proxyBeanMethods = false)
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
+
+    /** Granted when the access token says the email is verified; see {@link RequiresVerifiedEmail}. */
+    public static final String EMAIL_VERIFIED = "EMAIL_VERIFIED";
 
     static final String[] PUBLIC_PATHS = {"/api/v1/auth/**", "/api/v1/info", "/actuator/health", "/error"};
 
@@ -42,15 +51,28 @@ public class SecurityConfig {
             bearer.commence(request, response, e);
             ProblemResponses.write(response, HttpStatus.UNAUTHORIZED, "Authentication required.");
         };
+        AccessDeniedHandler forbidden =
+                (request, response, e) -> ProblemResponses.write(response, HttpStatus.FORBIDDEN, "Not allowed.");
         // CSRF is off because the API is stateless; the only cookie (refresh) is SameSite=Strict.
         return http.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(a ->
                         a.requestMatchers(PUBLIC_PATHS).permitAll().anyRequest().authenticated())
-                .exceptionHandling(e -> e.authenticationEntryPoint(unauthorized))
-                .oauth2ResourceServer(o -> o.jwt(Customizer.withDefaults()).authenticationEntryPoint(unauthorized))
+                .exceptionHandling(e -> e.authenticationEntryPoint(unauthorized).accessDeniedHandler(forbidden))
+                .oauth2ResourceServer(o -> o.jwt(j -> j.jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                        .authenticationEntryPoint(unauthorized)
+                        .accessDeniedHandler(forbidden))
                 .build();
+    }
+
+    private static JwtAuthenticationConverter jwtAuthenticationConverter() {
+        var converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(
+                jwt -> Boolean.TRUE.equals(jwt.getClaimAsBoolean(SessionService.EMAIL_VERIFIED_CLAIM))
+                        ? List.of(new SimpleGrantedAuthority(EMAIL_VERIFIED))
+                        : List.of());
+        return converter;
     }
 
     @Bean

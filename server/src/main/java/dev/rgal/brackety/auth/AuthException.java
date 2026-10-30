@@ -25,6 +25,10 @@ class AuthException extends ErrorResponseException {
         return new AuthException(HttpStatus.UNAUTHORIZED, "Session expired. Log in again.");
     }
 
+    static AuthException invalidLink() {
+        return new AuthException(HttpStatus.BAD_REQUEST, "This link is invalid or has expired.");
+    }
+
     static AuthException underage() {
         return new AuthException(HttpStatus.BAD_REQUEST, "Minimum age to register is 14.");
     }

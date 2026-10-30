@@ -23,12 +23,14 @@ public class SessionService {
     static final Duration REFRESH_TTL = Duration.ofDays(30);
     // Two tabs or two app calls refreshing at once are not a theft: the late one gets 401 and retries.
     static final Duration REUSE_GRACE = Duration.ofSeconds(10);
+    static final String EMAIL_VERIFIED_CLAIM = "email_verified";
 
     private static final Logger log = LoggerFactory.getLogger(SessionService.class);
 
     private final RefreshTokenRepository refreshTokens;
     private final AccountRepository accounts;
     private final ProfileRepository profiles;
+    private final AuthEmails authEmails;
     private final JwtEncoder jwtEncoder;
     private final Clock clock;
     private final SecureRandom random = new SecureRandom();
@@ -37,18 +39,20 @@ public class SessionService {
             RefreshTokenRepository refreshTokens,
             AccountRepository accounts,
             ProfileRepository profiles,
+            AuthEmails authEmails,
             JwtEncoder jwtEncoder,
             Clock clock) {
         this.refreshTokens = refreshTokens;
         this.accounts = accounts;
         this.profiles = profiles;
+        this.authEmails = authEmails;
         this.jwtEncoder = jwtEncoder;
         this.clock = clock;
     }
 
     @Transactional
-    Session start(UUID accountId) {
-        return issue(accountId, UUID.randomUUID(), clock.instant());
+    Session start(Account account) {
+        return issue(account, UUID.randomUUID(), clock.instant());
     }
 
     // No rollback on AuthException: revoking a family on reuse must be committed even though the call fails.
@@ -65,17 +69,15 @@ public class SessionService {
         if (token.isUsed()) {
             refreshTokens.revokeFamily(token.getFamilyId(), now);
             log.warn("Refresh token reused: session family {} revoked", token.getFamilyId());
-            // feat/auth-email: warn the account owner by email here.
+            accounts.findById(token.getAccountId()).ifPresent(authEmails::sessionReused);
             throw AuthException.invalidSession();
         }
-        if (token.isExpired(now)
-                || !accounts.findById(token.getAccountId())
-                        .map(Account::isActive)
-                        .orElse(false)) {
+        var account = accounts.findById(token.getAccountId()).filter(Account::isActive);
+        if (token.isExpired(now) || account.isEmpty()) {
             throw AuthException.invalidSession();
         }
         token.markUsed(now);
-        return issue(token.getAccountId(), token.getFamilyId(), now);
+        return issue(account.get(), token.getFamilyId(), now);
     }
 
     @Transactional
@@ -95,27 +97,30 @@ public class SessionService {
         return refreshTokens.findByTokenHash(Sha256.hex(rawToken)).orElseThrow(AuthException::invalidSession);
     }
 
-    private Session issue(UUID accountId, UUID familyId, Instant now) {
+    private Session issue(Account account, UUID familyId, Instant now) {
         var bytes = new byte[32];
         random.nextBytes(bytes);
         var rawRefresh = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
-        refreshTokens.save(new RefreshToken(Sha256.hex(rawRefresh), familyId, accountId, now, now.plus(REFRESH_TTL)));
-        return new Session(accessToken(accountId, now), ACCESS_TTL.toSeconds(), rawRefresh);
+        refreshTokens.save(
+                new RefreshToken(Sha256.hex(rawRefresh), familyId, account.getId(), now, now.plus(REFRESH_TTL)));
+        return new Session(accessToken(account, now), ACCESS_TTL.toSeconds(), rawRefresh, account.isEmailVerified());
     }
 
-    private String accessToken(UUID accountId, Instant now) {
-        var profileTypes = profiles.findByAccountId(accountId).stream()
+    // email_verified is read again on every refresh, so verifying shows up in the next access token.
+    private String accessToken(Account account, Instant now) {
+        var profileTypes = profiles.findByAccountId(account.getId()).stream()
                 .map(p -> p.getType().name())
                 .toList();
         var claims = JwtClaimsSet.builder()
-                .subject(accountId.toString())
+                .subject(account.getId().toString())
                 .issuedAt(now)
                 .expiresAt(now.plus(ACCESS_TTL))
                 .claim("profiles", profileTypes)
+                .claim(EMAIL_VERIFIED_CLAIM, account.isEmailVerified())
                 .build();
         var header = JwsHeader.with(MacAlgorithm.HS256).build();
         return jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
     }
 
-    public record Session(String accessToken, long expiresIn, String refreshToken) {}
+    public record Session(String accessToken, long expiresIn, String refreshToken, boolean emailVerified) {}
 }
