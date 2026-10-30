@@ -50,6 +50,10 @@ Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, f
 - 15 puntos o fin del tiempo → desaparece el reloj y aparece "Finalizar combate". Descalificación también finaliza.
 - Campana al iniciar el tiempo y al acabar (límite, tiempo o descalificación).
 - Todo queda en la línea de tiempo (quién, qué, cuándo, tiempo de combate).
+- Estado = repetición de los eventos (`TamboMatch`); deshacer es un evento más que anula el último punto, aviso o descalificación.
+- 15 puntos o descalificación paran el reloj con una parada automática registrada: al deshacer, sigue parado.
+- "Finalizar" solo con el combate acabado; después no se acepta nada. Un combate en curso por tapiz y ningún alumno en dos a la vez.
+- Escribe solo el árbitro del tapiz; el club ve el combate y su línea de tiempo.
 
 ### Puntuación global
 - Alumno = 10 por asistir (estar en un grupo como real) + lo que marca en cada combate (gane o no, hasta 15). Descalificado: 0 en ese combate.
@@ -66,8 +70,9 @@ Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, f
 - `GET /api/v1/me/events` · `GET|PUT /events/{id}/settings` · `GET|POST|PUT|DELETE /events/{id}/participants`.
 - `GET /events/{id}/categories` (con nº inscritos y agrupados) · `GET /events/{id}/categories/{cat}/participants`.
 - `POST /events/{id}/groups` (uno o varios grupos → tapiz asignado).
-- `GET /events/{id}/mats` (club y ayudantes) · `GET /mats/{id}/board` (árbitro de ese tapiz y club: grupos, combates, disponible, recomendado) · `GET /matches/{id}` · `POST /matches/{id}/events` · `POST /matches/{id}/finish`.
-- `GET /events/{id}/standings` · `GET /events/{id}/mats` (fin estimado) · `GET /events/{id}/export/{standings|matches}.csv`.
+- `GET /events/{id}/mats` (club y ayudantes) · `GET /mats/{id}/board` (árbitro de ese tapiz y club: grupos, combates, disponible, recomendado).
+- `GET /matches/{id}` · `POST /matches/{id}/events` (`START`, `STOP`, `POINT`, `WARNING`, `ONE_HAND_WARNING`, `DISQUALIFICATION`, `UNDO`, `FINISH`).
+- `GET /events/{id}/standings` · `GET /events/{id}/export/{standings|matches|timeline}.csv` (club; `;` y BOM para Excel en español; celdas que empiezan por `= + - @` se neutralizan).
 - Permisos por rol y evento en servidor; el árbitro solo escribe en su tapiz.
 
 ## Pantallas

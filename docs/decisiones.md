@@ -85,4 +85,7 @@ Formato: fecha · decisión · motivo.
 - 2026-10-30 · Combate recomendado: sumas de descanso a menos de un hueco (combate + cambio) cuentan como iguales y entonces se intercalan grupos · con tiempos reales nunca hay empate exacto y el intercalado pedido por Raul no ocurriría.
 - 2026-10-30 · Orden dentro del grupo = orden de selección del ayudante, sin semilla aleatoria en el prototipo · el ayudante ya decide el grupo a mano; la semilla de `liga-fases` llegará con ese módulo.
 - 2026-10-30 · `event` y `participant` consultan `fight_group` con SQL nativo para sus protecciones · evita una dependencia circular entre paquetes (grouping ya depende de ellos).
+- 2026-10-30 · Marcador guardado como eventos con hora (`match_event`) y estado recalculado al repetirlos; instantánea en `fight_match` para tableros y ranking · todo queda registrado sin código extra y el reloj sobrevive a recargar el móvil.
+- 2026-10-30 · Al llegar a 15 o descalificar, el servidor registra una parada automática; "Finalizar" solo con el combate acabado · deshacer el último punto no deja el reloj corriendo solo; evita cerrar un combate por error.
+- 2026-10-30 · CSV con `;`, BOM UTF-8 y celdas de fórmula neutralizadas con `'` · abre bien en Excel en español y evita inyección de fórmulas con nombres maliciosos.
 - 2026-10-30 · Prototipo desplegado en la Pi de Raul con el Postgres del compose; grupos solo de 4 o 3 + fantasma · elegido por Raul.
