@@ -20,6 +20,7 @@ class EventControllerTest extends EventApiTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].roles", contains("CLUB")))
+                .andExpect(jsonPath("$[0].maxGroupsPerMat").value(1))
                 .andExpect(jsonPath("$[0].matId").doesNotExist());
         call(get("/api/v1/events"), "arbitro3")
                 .andExpect(jsonPath("$[0].roles", contains("REFEREE")))

@@ -70,6 +70,7 @@ public class EventService {
                             event.getName(),
                             event.getEventDate(),
                             rolesByEvent.get(event.getId()),
+                            event.getMaxGroupsPerMat(),
                             mat.map(Mat::getId).orElse(null),
                             mat.map(Mat::getNumber).orElse(null));
                 })
