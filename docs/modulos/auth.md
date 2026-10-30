@@ -59,7 +59,7 @@ Cuentas, login y sesión compartidos entre web y Android.
 - Acciones delicadas (borrar cuenta, cambiar email, exportar, quitar contraseña, desvincular Google) exigen reauth: `POST /me/reauth` con contraseña o Google → token de 5 min en la cabecera `X-Reauth`. Sin él: 403 `REAUTH_REQUIRED`; prueba incorrecta (también token de Google inválido o caducado): 403 `REAUTH_FAILED`; Google no disponible: 503. La contraseña fallida cuenta para el bloqueo por email e IP.
 - Borrado de cuenta (`06-legal-rgpd.md`): lógico, cierra todas las sesiones y avisa por email con la fecha; definitivo a los 30 días (tarea diaria, cascade, cuenta a cuenta: la que falla se registra por id y no frena a las demás; ahí se anonimizarán resultados cuando existan). Dueño de eventos: 409 `OWNS_EVENTS`; antes cede o borra el evento.
 - En esos 30 días: login con contraseña correcta o Google → 403 `ACCOUNT_PENDING_DELETION` con `deletesOn` y `restoreToken` (5 min); `POST /auth/restore` la reactiva y da sesión. Credenciales malas: 401 genérico. Registro con ese email: 202 y aviso al dueño (1 cada 60 s). Google con ese email sin identidad: 409 `ACCOUNT_EXISTS`.
-- Pasados los 30 días, aunque la purga no haya corrido, es como si no existiera: login 401 genérico, `POST /auth/restore` 401.
+- Pasados los 30 días, aunque la purga no haya corrido, es como si no existiera: login 401 genérico, `POST /auth/restore` 401, registro con ese email 202 sin aviso a nadie.
 - Exportación: JSON descargable con cuenta (sin hash), perfiles, identidades (sin `sub`) y consentimientos.
 
 ## Datos

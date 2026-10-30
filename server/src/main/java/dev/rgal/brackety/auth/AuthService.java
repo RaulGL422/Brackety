@@ -84,6 +84,10 @@ public class AuthService {
     }
 
     private void notifyAlreadyRegistered(Account account) {
+        // Past the grace a deleted account is as if gone, even before the purge removes it: nobody is told.
+        if (!account.isActive() && !account.isRestorable(clock.instant())) {
+            return;
+        }
         if (!account.tryMarkAlreadyRegisteredSent(clock.instant(), EmailTokens.RESEND_INTERVAL)) {
             return;
         }
