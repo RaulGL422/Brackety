@@ -1,6 +1,7 @@
 package dev.rgal.brackety.auth;
 
 import dev.rgal.brackety.auth.dto.RegisterRequest;
+import dev.rgal.brackety.common.MutableClock;
 import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +10,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.simple.JdbcClient;
 
-@SpringBootTest
+@SpringBootTest(properties = {"brackety.rate-limit.per-minute=100000", "brackety.rate-limit.auth-per-minute=100000"})
 @AutoConfigureMockMvc
 @Import(AuthTestConfig.class)
 abstract class AuthIntegrationTest {

@@ -1,25 +1,25 @@
-package dev.rgal.brackety.auth;
+package dev.rgal.brackety.common;
 
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 
-class MutableClock extends Clock {
+public class MutableClock extends Clock {
 
     private final ZoneId zone;
     private Instant instant;
 
-    MutableClock(Instant instant, ZoneId zone) {
+    public MutableClock(Instant instant, ZoneId zone) {
         this.instant = instant;
         this.zone = zone;
     }
 
-    void set(Instant instant) {
+    public void set(Instant instant) {
         this.instant = instant;
     }
 
-    void advance(Duration duration) {
+    public void advance(Duration duration) {
         instant = instant.plus(duration);
     }
 
