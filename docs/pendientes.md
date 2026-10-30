@@ -34,7 +34,7 @@
 - [ ] Categorías reales de la Fase 1 (ahora ficticias: tramos del ranking, mixtas).
 - [ ] Aviso de privacidad mínimo visible antes de la fase (datos reales de menores sin páginas legales ni `PRIVACY_CONTACT_EMAIL`); la casilla del tutor ya está en la inscripción. Aceptado por Raul.
 - [ ] Tras la fase: desactivar `DEMO_ACCOUNTS_ENABLED` y borrar las cuentas demo.
-- [ ] Login del front: lo hace la sesión de `auth` (`feat/auth-screens-login`); el prototipo lo espera y sigue con lo demás.
+- [ ] Login del front: lo hace la sesión de `auth` (`feat/auth-screens-login`). Mientras, el prototipo usa una pantalla y sesión provisionales en `app/lib/features/session/`; `auth` debe sustituir la pantalla y puede reutilizar o reemplazar la sesión.
 
 ## Repositorio público
 - [ ] `docs/` es planificación temporal y se eliminará en el futuro. Antes de hacerlo: pasar a `CLAUDE.md` (o un README) lo imprescindible que hoy solo vive en `docs/` y quitar sus enlaces.
