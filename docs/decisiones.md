@@ -44,3 +44,4 @@ Formato: fecha · decisión · motivo.
 - 2026-10-30 · Colores de los competidores configurables por ubicación desde una paleta amplia común a todos los deportes · cada deporte usa colores distintos (rojo/blanco, rojo/azul…); elegido por Raul.
 - 2026-10-30 · Página "Sistema de diseño" en admin solo en builds debug (`kDebugMode`) · Raul valida visualmente paleta, tipografía y componentes; nunca llega a producción.
 - 2026-10-30 · Paleta Eléctrico (`#2F5BFF` + acento `#FF6B00`) y tipografía Barlow / Barlow Condensed · validadas por Raul en la página Diseño frente a Fuego y Noche (el rojo de Fuego chocaba con error y con el competidor rojo).
+- 2026-10-30 · Acceso a licencias de software (Flutter, paquetes, OFL de Barlow) provisional en la pantalla Conexión; se moverá a las páginas legales en `legal-paginas` · hoy no hay otro sitio común a app y admin; pedido por Raul.
