@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Primary;
 
 // Scenarios are not @Component on purpose: the main app scan would load them into every test context.
 @TestConfiguration(proxyBeanMethods = false)
-@Import({EmbeddedPostgresConfig.class, ScenarioLoader.class})
+@Import({EmbeddedPostgresConfig.class, LocalGoogleConfig.class, ScenarioLoader.class})
 @ComponentScan(
         basePackages = "dev.rgal.brackety.devdata",
         useDefaultFilters = false,
