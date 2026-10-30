@@ -1,11 +1,11 @@
 # Estado del proyecto
 
-Última actualización: 2026-10-30. Fase 0 cerrada; siguiente: **auth**.
+Última actualización: 2026-10-30. Fase 0 cerrada; en curso: **auth**.
 
 | Módulo | Doc | Estado | Rama activa |
 |---|---|---|---|
 | infra-deploy | modulos/infra-deploy.md | cerrado (2026-10-30) | – |
-| auth | modulos/auth.md | pendiente | – |
+| auth | modulos/auth.md | en curso | feat/auth-register-login |
 | perfiles-menores | modulos/perfiles-menores.md | pendiente | – |
 | legal-paginas | modulos/legal-paginas.md | pendiente | – |
 | eventos | modulos/eventos.md | pendiente | – |
@@ -37,7 +37,7 @@ Estados: pendiente · en curso · en pruebas · cerrado.
 ## Imprevistos (fuera del orden)
 | Tarea | Doc | Estado | Rama activa |
 |---|---|---|---|
-| sistema de diseño: tokens + página dev en admin | 07-diseno.md | cerrado (2026-10-30), PR pendiente de fusionar | chore/design-system |
+| sistema de diseño: tokens + página dev en admin | 07-diseno.md | cerrado (2026-10-30) | chore/design-system |
 - Motivo: fijar colores, tipografía, espaciado y componentes antes de la primera pantalla real (`auth`), para no repartir valores sueltos por el código.
 
 ## Bloqueos

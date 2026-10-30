@@ -45,3 +45,8 @@ Formato: fecha · decisión · motivo.
 - 2026-10-30 · Página "Sistema de diseño" en admin solo en builds debug (`kDebugMode`) · Raul valida visualmente paleta, tipografía y componentes; nunca llega a producción.
 - 2026-10-30 · Paleta Eléctrico (`#2F5BFF` + acento `#FF6B00`) y tipografía Barlow / Barlow Condensed · validadas por Raul en la página Diseño frente a Fuego y Noche (el rojo de Fuego chocaba con error y con el competidor rojo).
 - 2026-10-30 · Acceso a licencias de software (Flutter, paquetes, OFL de Barlow) provisional en la pantalla Conexión; se moverá a las páginas legales en `legal-paginas` · hoy no hay otro sitio común a app y admin; pedido por Raul.
+- 2026-10-30 · Sesión web con refresh en cookie `httpOnly` y acceso en memoria; Android en almacenamiento seguro · un XSS no puede robar el refresh; elegido por Raul.
+- 2026-10-30 · Login con Apple pospuesto; `auth` arranca con email + Google · sin app iOS nativa no es obligatorio y exige Apple Developer (99 $/año).
+- 2026-10-30 · Club y Entidad Externa se registran libremente pero no publican eventos hasta validación del superadmin · evita organizadores falsos sin frenar el alta.
+- 2026-10-30 · Email obligatorio verificado; sin verificar no crea nada de valor y se borra a los 7 días; Google sustituye a una cuenta sin verificar con su email; vinculación de identidades solo manual · cierra el pre-secuestro de cuentas; propuesto por Raul.
+- 2026-10-30 · Refresh de 30 días rotatorio, bloqueo 5 fallos/15 min, Argon2id con mínimo 10 caracteres, respuestas sin enumeración · valores estándar (OWASP/NIST) aceptados por Raul.
