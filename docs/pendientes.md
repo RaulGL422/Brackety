@@ -21,6 +21,7 @@
 - [ ] Emails de auth: pasar el envío directo (tras commit, sin reintentos) a la cola con reintentos del módulo `notificaciones`.
 - [ ] Register/forgot: queda una pequeña diferencia de tiempo de BD según exista la cuenta (enumeración por temporización, medible con muchas muestras). Aceptado por ahora; si hiciera falta, mover esas escrituras al hilo asíncrono.
 - [ ] Más adelante: 2FA (TOTP), lista de sesiones activas con "cerrar en todos", contraseñas contra filtraciones (HaveIBeenPwned).
+- [ ] Una cuenta en borrado lógico bloquea registrarse con ese email (Google y contraseña) hasta el borrado definitivo a los 30 días. Decidir en `feat/auth-me` si se permite reactivarla.
 - [ ] Login con Apple cuando haya cuenta Apple Developer o app iOS.
 
 ## Repositorio público

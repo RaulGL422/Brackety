@@ -76,3 +76,4 @@ Formato: fecha · decisión · motivo.
 - 2026-10-30 · Una identidad de Google por cuenta; vincular la misma otra vez no hace nada; desvincular sin Google vinculado o quitar una contraseña que no hay: 204 sin efecto · `DELETE /me/identities/google` no lleva id.
 - 2026-10-30 · En local, Google simulado: clave generada al arrancar y `POST /api/v1/auth/dev/google-token` que emite idTokens; solo en `src/test` (nunca en el jar) · probar Google sin client IDs ni red.
 - 2026-10-30 · Vincular Google con el mismo email que la cuenta (normalizado) la marca como verificada; con otro email, no · Google ha probado que el buzón es suyo, como el enlace de recuperar contraseña.
+- 2026-10-30 · Una cuenta sin verificar no puede vincular un Google con otro email (403 `EMAIL_NOT_VERIFIED`) · cierra el pre-secuestro: el dueño real verificaría después la cuenta con el Google del atacante dentro.

@@ -11,6 +11,8 @@ Cuentas, login y sesión compartidos entre web y Android.
 - Vincular identidades solo a mano desde ajustes, con sesión iniciada. Nunca fusión automática.
 - No se puede desvincular la última identidad. Quitar la contraseña exige otro método vinculado (409 `LAST_SIGN_IN_METHOD`).
 - Token de Google: RS256 con las claves de Google, `iss` `accounts.google.com` (con o sin `https://`), `aud` en `GOOGLE_CLIENT_ID` (lista: web y Android), `exp` con el reloj (60 s de margen), `email_verified` true. Sin `GOOGLE_CLIENT_ID`: 503 y el resto de la API funciona.
+- Cuenta sin verificar: solo vincula un Google con su mismo email (y queda verificada); con otro email, 403 `EMAIL_NOT_VERIFIED` (evita que quien se registró con un email ajeno deje su Google dentro antes de que el dueño la recupere).
+- Claves de Google inaccesibles: 503 (no es un token inválido).
 - Una sola identidad de Google por cuenta (otra → 409 `PROVIDER_ALREADY_LINKED`; la de otra cuenta → 409 `IDENTITY_IN_USE`).
 - Quitar la contraseña cierra todas las sesiones, también la actual. Ponerla de nuevo: "recuperar contraseña".
 
