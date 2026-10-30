@@ -22,4 +22,8 @@ public class EventException extends ErrorResponseException {
     public static EventException invalid(String detail) {
         return new EventException(HttpStatus.BAD_REQUEST, detail);
     }
+
+    public static EventException conflict(String detail) {
+        return new EventException(HttpStatus.CONFLICT, detail);
+    }
 }
