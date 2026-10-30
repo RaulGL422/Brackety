@@ -2,6 +2,8 @@ package dev.rgal.brackety.auth;
 
 import dev.rgal.brackety.auth.account.ProfileType;
 import dev.rgal.brackety.auth.dto.RegisterRequest;
+import dev.rgal.brackety.auth.dto.RegistrationDetails;
+import dev.rgal.brackety.auth.google.FakeGoogle;
 import dev.rgal.brackety.common.MutableClock;
 import dev.rgal.brackety.notifications.CapturingEmailSender;
 import dev.rgal.brackety.notifications.Email;
@@ -24,7 +26,9 @@ import org.springframework.jdbc.core.simple.JdbcClient;
         properties = {
             "brackety.rate-limit.per-minute=100000",
             "brackety.rate-limit.auth-per-minute=100000",
-            "brackety.auth.unverified-purge-initial-delay=P3650D"
+            "brackety.auth.unverified-purge-initial-delay=P3650D",
+            // A list, as in production (web and Android client ids).
+            "brackety.auth.google-client-ids=other-client.apps.googleusercontent.com, " + FakeGoogle.CLIENT_ID
         })
 @AutoConfigureMockMvc
 @Import(AuthTestConfig.class)
@@ -54,6 +58,10 @@ public abstract class AuthIntegrationTest {
 
     protected static RegisterRequest registration(String email, LocalDate birthDate) {
         return new RegisterRequest(email, PASSWORD, birthDate, ProfileType.CLUB, "2027-01", "2027-02", "es");
+    }
+
+    protected static RegistrationDetails details(LocalDate birthDate) {
+        return new RegistrationDetails(birthDate, ProfileType.STUDENT, "2027-01", "2027-02", "en");
     }
 
     // The raw token is only in the emailed link, as a real user would get it.

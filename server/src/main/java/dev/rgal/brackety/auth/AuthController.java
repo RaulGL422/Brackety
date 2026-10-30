@@ -1,6 +1,8 @@
 package dev.rgal.brackety.auth;
 
 import dev.rgal.brackety.auth.dto.EmailRequest;
+import dev.rgal.brackety.auth.dto.GoogleSignInRequest;
+import dev.rgal.brackety.auth.dto.GoogleSignInResponse;
 import dev.rgal.brackety.auth.dto.LoginRequest;
 import dev.rgal.brackety.auth.dto.RefreshRequest;
 import dev.rgal.brackety.auth.dto.RegisterRequest;
@@ -9,6 +11,7 @@ import dev.rgal.brackety.auth.dto.TokenRequest;
 import dev.rgal.brackety.auth.dto.TokenResponse;
 import dev.rgal.brackety.auth.email.EmailVerificationService;
 import dev.rgal.brackety.auth.email.PasswordResetService;
+import dev.rgal.brackety.auth.google.GoogleSignInService;
 import dev.rgal.brackety.auth.session.SessionService;
 import dev.rgal.brackety.auth.session.SessionService.Session;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,16 +42,19 @@ class AuthController {
     private final SessionService sessions;
     private final EmailVerificationService verification;
     private final PasswordResetService passwordReset;
+    private final GoogleSignInService google;
 
     AuthController(
             AuthService auth,
             SessionService sessions,
             EmailVerificationService verification,
-            PasswordResetService passwordReset) {
+            PasswordResetService passwordReset,
+            GoogleSignInService google) {
         this.auth = auth;
         this.sessions = sessions;
         this.verification = verification;
         this.passwordReset = passwordReset;
+        this.google = google;
     }
 
     @PostMapping("/register")
@@ -67,6 +73,19 @@ class AuthController {
             @RequestHeader(name = CLIENT_HEADER, required = false) String client,
             HttpServletRequest http) {
         return respond(auth.login(request.email(), request.password(), http.getRemoteAddr()), isWeb(client));
+    }
+
+    @PostMapping("/google")
+    ResponseEntity<GoogleSignInResponse> google(
+            @Valid @RequestBody GoogleSignInRequest request,
+            @RequestHeader(name = CLIENT_HEADER, required = false) String client) {
+        var result = google.signIn(request.idToken(), request.registration());
+        if (result.session() == null) {
+            return ResponseEntity.ok(GoogleSignInResponse.registrationRequired(result.registrationEmail()));
+        }
+        var web = isWeb(client);
+        return withRefreshCookie(result.session(), web)
+                .body(GoogleSignInResponse.signedIn(tokens(result.session(), web), result.replacedUnverifiedAccount()));
     }
 
     @PostMapping("/refresh")
@@ -112,15 +131,25 @@ class AuthController {
         passwordReset.reset(request.token(), request.newPassword());
     }
 
-    // Web keeps the refresh token in an httpOnly cookie, out of reach of scripts; Android gets it in the body.
     private static ResponseEntity<TokenResponse> respond(Session session, boolean web) {
+        return withRefreshCookie(session, web).body(tokens(session, web));
+    }
+
+    // Web keeps the refresh token in an httpOnly cookie, out of reach of scripts; Android gets it in the body.
+    private static ResponseEntity.BodyBuilder withRefreshCookie(Session session, boolean web) {
+        var response = ResponseEntity.ok();
         if (web) {
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.SET_COOKIE, refreshCookie(session.refreshToken(), SessionService.REFRESH_TTL))
-                    .body(new TokenResponse(session.accessToken(), session.expiresIn(), null, session.emailVerified()));
+            response.header(HttpHeaders.SET_COOKIE, refreshCookie(session.refreshToken(), SessionService.REFRESH_TTL));
         }
-        return ResponseEntity.ok(new TokenResponse(
-                session.accessToken(), session.expiresIn(), session.refreshToken(), session.emailVerified()));
+        return response;
+    }
+
+    private static TokenResponse tokens(Session session, boolean web) {
+        return new TokenResponse(
+                session.accessToken(),
+                session.expiresIn(),
+                web ? null : session.refreshToken(),
+                session.emailVerified());
     }
 
     private static boolean isWeb(String client) {
