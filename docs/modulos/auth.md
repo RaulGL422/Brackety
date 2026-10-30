@@ -24,7 +24,8 @@ Cuentas, login y sesión compartidos entre web y Android.
 
 ### Sesión
 - JWT de acceso 15 min + refresh rotatorio de 30 días (se renueva en cada uso).
-- Reutilizar un refresh ya usado → se revoca toda su familia (sesión) y se avisa por email.
+- Reutilizar un refresh ya usado → se revoca toda su familia (sesión) y se avisa por email. Excepción: en los 10 s siguientes a usarlo solo da 401, sin revocar ni avisar (dos pestañas o peticiones a la vez).
+- El cliente hace un solo refresh a la vez.
 - Web: refresh en cookie `httpOnly` + `Secure` + `SameSite`; acceso solo en memoria. Android: almacenamiento seguro.
 
 ### Seguridad
@@ -33,7 +34,8 @@ Cuentas, login y sesión compartidos entre web y Android.
 - Cada bloqueo tiene un id corto (`L-7K2F`) que va en el 429; el superadmin puede revocarlo desde admin (con auditoría).
 - Al bloquearse un email existente: un único aviso por email con enlace para cambiar la contraseña.
 - Filas de intentos (IP en claro, cuenta si existe) se purgan al pasar ventana y bloqueo.
-- Limitador general por IP en la app: 300 peticiones/min en la API y 20/min en `/api/v1/auth/**` → 429 con `Retry-After`. Segunda capa en Cloudflare.
+- Limitador por IP en la app (configurable por entorno): 3000 peticiones/min en la API, 20/min en `/api/v1/auth/**` salvo refresh, 600/min en refresh → 429 `problem+json` con `Retry-After`. Primera barrera, más fina, en Cloudflare.
+- La cookie de refresh solo vuelve por cookie: si el token llegó en la cookie, nunca sale en el cuerpo.
 - Cliente web identificado por cabecera `X-Client: web` (refresh en cookie); sin ella, refresh en el cuerpo.
 - Registro, login y recuperación responden igual exista o no la cuenta (sin enumeración).
 - Avisos por email: bloqueo por fallos, identidad vinculada/desvinculada, cambio de contraseña o email, reutilización de refresh.
@@ -77,6 +79,6 @@ En curso. Tareas (una rama cada una, en este orden):
 3. `feat/auth-google` · login Google, sustitución de cuenta sin verificar, vincular y desvincular.
 4. `feat/auth-me` · `/me`, perfiles adicionales, cambio de email, borrado y exportación.
 5. `feat/auth-superadmin` · superadmin por entorno, validación de organizadores, listar y revocar bloqueos con auditoría.
-6. `feat/auth-screens-login` · app: login, registro, verificación pendiente, recuperar; cliente HTTP con refresh.
+6. `feat/auth-screens-login` · app: login, registro, verificación pendiente, recuperar; cliente HTTP con refresh (uno a la vez) y 429 con `lockId`.
 7. `feat/auth-screens-settings` · app: ajustes de cuenta.
 8. `feat/auth-admin-login` · admin: login de superadmin y pantalla de bloqueos.
