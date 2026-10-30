@@ -52,7 +52,7 @@ class AuthController {
             @Valid @RequestBody LoginRequest request,
             @RequestHeader(name = CLIENT_HEADER, required = false) String client,
             HttpServletRequest http) {
-        return respond(auth.login(request.email(), request.password(), http.getRemoteAddr()), client);
+        return respond(auth.login(request.email(), request.password(), http.getRemoteAddr()), isWeb(client));
     }
 
     @PostMapping("/refresh")
@@ -60,7 +60,8 @@ class AuthController {
             @CookieValue(name = REFRESH_COOKIE, required = false) String cookie,
             @RequestBody(required = false) RefreshRequest body,
             @RequestHeader(name = CLIENT_HEADER, required = false) String client) {
-        return respond(sessions.refresh(refreshToken(cookie, body)), client);
+        // A token that came in the cookie goes back in the cookie, so a script can never read it from the body.
+        return respond(sessions.refresh(refreshToken(cookie, body)), hasText(cookie) || isWeb(client));
     }
 
     @PostMapping("/logout")
@@ -74,8 +75,8 @@ class AuthController {
     }
 
     // Web keeps the refresh token in an httpOnly cookie, out of reach of scripts; Android gets it in the body.
-    private static ResponseEntity<TokenResponse> respond(Session session, String client) {
-        if ("web".equalsIgnoreCase(client)) {
+    private static ResponseEntity<TokenResponse> respond(Session session, boolean web) {
+        if (web) {
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, refreshCookie(session.refreshToken(), SessionService.REFRESH_TTL))
                     .body(new TokenResponse(session.accessToken(), session.expiresIn(), null));
@@ -83,8 +84,16 @@ class AuthController {
         return ResponseEntity.ok(new TokenResponse(session.accessToken(), session.expiresIn(), session.refreshToken()));
     }
 
+    private static boolean isWeb(String client) {
+        return "web".equalsIgnoreCase(client);
+    }
+
+    private static boolean hasText(String value) {
+        return value != null && !value.isBlank();
+    }
+
     private static String refreshToken(String cookie, RefreshRequest body) {
-        if (cookie != null && !cookie.isBlank()) {
+        if (hasText(cookie)) {
             return cookie;
         }
         return body == null ? null : body.refreshToken();

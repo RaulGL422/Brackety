@@ -14,9 +14,9 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.UrlPathHelper;
 
 // Requests per IP per clock minute, in memory: the API runs as a single instance.
 // Runs before Spring Security so a flood is cut before any token or password work.
@@ -26,6 +26,8 @@ class RateLimitFilter extends OncePerRequestFilter {
 
     static final String AUTH_PATH = "/api/v1/auth/";
     static final String HEALTH_PATH = "/actuator/health";
+    // Decoded path, as Spring MVC matches it: the raw URI would let /api/v1/%61uth skip the auth limit.
+    private static final UrlPathHelper PATHS = UrlPathHelper.defaultInstance;
 
     private final Clock clock;
     private final MinuteCounter all;
@@ -42,7 +44,7 @@ class RateLimitFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return request.getRequestURI().startsWith(HEALTH_PATH);
+        return PATHS.getPathWithinApplication(request).startsWith(HEALTH_PATH);
     }
 
     @Override
@@ -52,17 +54,13 @@ class RateLimitFilter extends OncePerRequestFilter {
         var minute = epochSecond / 60;
         var ip = request.getRemoteAddr();
         var allowed = all.tryAcquire(ip, minute)
-                && (!request.getRequestURI().startsWith(AUTH_PATH) || auth.tryAcquire(ip, minute));
+                && (!PATHS.getPathWithinApplication(request).startsWith(AUTH_PATH) || auth.tryAcquire(ip, minute));
         if (allowed) {
             chain.doFilter(request, response);
             return;
         }
-        response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
         response.setHeader(HttpHeaders.RETRY_AFTER, String.valueOf(60 - epochSecond % 60));
-        response.setContentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE);
-        response.getWriter()
-                .write("{\"type\":\"about:blank\",\"title\":\"Too Many Requests\",\"status\":429,"
-                        + "\"detail\":\"Too many requests. Try again later.\"}");
+        ProblemResponses.write(response, HttpStatus.TOO_MANY_REQUESTS, "Too many requests. Try again later.");
     }
 
     // A fresh map every minute: memory is bounded by the IPs seen in one minute.

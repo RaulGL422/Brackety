@@ -1,6 +1,7 @@
 package dev.rgal.brackety.auth;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import dev.rgal.brackety.common.ProblemResponses;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.Duration;
@@ -9,6 +10,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -22,6 +24,8 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration(proxyBeanMethods = false)
@@ -32,13 +36,20 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        var bearer = new BearerTokenAuthenticationEntryPoint();
+        // Keeps the WWW-Authenticate header from Spring and adds the problem+json body the API uses.
+        AuthenticationEntryPoint unauthorized = (request, response, e) -> {
+            bearer.commence(request, response, e);
+            ProblemResponses.write(response, HttpStatus.UNAUTHORIZED, "Authentication required.");
+        };
         // CSRF is off because the API is stateless; the only cookie (refresh) is SameSite=Strict.
         return http.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(a ->
                         a.requestMatchers(PUBLIC_PATHS).permitAll().anyRequest().authenticated())
-                .oauth2ResourceServer(o -> o.jwt(Customizer.withDefaults()))
+                .exceptionHandling(e -> e.authenticationEntryPoint(unauthorized))
+                .oauth2ResourceServer(o -> o.jwt(Customizer.withDefaults()).authenticationEntryPoint(unauthorized))
                 .build();
     }
 

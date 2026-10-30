@@ -45,6 +45,15 @@ class RateLimitFilterTest {
     }
 
     @Test
+    void anEncodedAuthPathCountsAsAuth() throws Exception {
+        for (int i = 0; i < 20; i++) {
+            call("/api/v1/auth/login", IP);
+        }
+
+        assertThat(call("/api/v1/%61uth/login", IP).getStatus()).isEqualTo(429);
+    }
+
+    @Test
     void countsEachIpApart() throws Exception {
         for (int i = 0; i < 20; i++) {
             call("/api/v1/auth/login", IP);

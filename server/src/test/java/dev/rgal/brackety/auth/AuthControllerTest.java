@@ -139,6 +139,18 @@ class AuthControllerTest extends AuthIntegrationTest {
     }
 
     @Test
+    void aCookieRefreshNeverReturnsTheTokenInTheBody() throws Exception {
+        registerAna();
+        var cookie =
+                login("web", "ana@example.test").andReturn().getResponse().getCookie(AuthController.REFRESH_COOKIE);
+
+        mvc.perform(post("/api/v1/auth/refresh").cookie(cookie))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.refreshToken").doesNotExist())
+                .andExpect(header().exists(HttpHeaders.SET_COOKIE));
+    }
+
+    @Test
     void androidRefreshesWithTheBody() throws Exception {
         registerAna();
         var refresh = refreshTokenOf(login(null, "ana@example.test"));
@@ -188,9 +200,13 @@ class AuthControllerTest extends AuthIntegrationTest {
         var accessToken = JsonPath.<String>read(
                 login(null, "ana@example.test").andReturn().getResponse().getContentAsString(), "$.accessToken");
 
-        mvc.perform(get("/api/v1/test/whoami")).andExpect(status().isUnauthorized());
+        mvc.perform(get("/api/v1/test/whoami"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(header().exists(HttpHeaders.WWW_AUTHENTICATE));
         mvc.perform(get("/api/v1/test/whoami").header(HttpHeaders.AUTHORIZATION, "Bearer not-a-jwt"))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON));
         mvc.perform(get("/api/v1/test/whoami").header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
                 .andExpect(status().isOk())
                 .andExpect(content().string(endsWith("[CLUB]")));
