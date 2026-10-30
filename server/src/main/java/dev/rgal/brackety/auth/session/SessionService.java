@@ -27,7 +27,7 @@ public class SessionService {
     static final Duration ACCESS_TTL = Duration.ofMinutes(15);
     public static final Duration REFRESH_TTL = Duration.ofDays(30);
     // Two tabs or two app calls refreshing at once are not a theft: the late one gets 401 and retries.
-    public static final Duration REUSE_GRACE = Duration.ofSeconds(10);
+    static final Duration REUSE_GRACE = Duration.ofSeconds(10);
     public static final String EMAIL_VERIFIED_CLAIM = "email_verified";
 
     private static final Logger log = LoggerFactory.getLogger(SessionService.class);

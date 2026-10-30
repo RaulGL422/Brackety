@@ -38,15 +38,15 @@ public class Consent {
         this.acceptedAt = acceptedAt;
     }
 
-    public Document getDocument() {
+    Document getDocument() {
         return document;
     }
 
-    public String getVersion() {
+    String getVersion() {
         return version;
     }
 
-    public Instant getAcceptedAt() {
+    Instant getAcceptedAt() {
         return acceptedAt;
     }
 }

@@ -19,7 +19,6 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -69,7 +68,7 @@ public class AuthService {
         if (Period.between(request.birthDate(), LocalDate.now(clock)).getYears() < MIN_AGE) {
             throw AuthException.underage();
         }
-        var email = normalize(request.email());
+        var email = Account.normalizeEmail(request.email());
         // Hashed before the duplicate check so both paths take the same time.
         var passwordHash = passwordEncoder.encode(request.password());
         var existing = accounts.lockByEmail(email);
@@ -92,7 +91,7 @@ public class AuthService {
     @Transactional(noRollbackFor = AuthException.class)
     public Session login(String email, String password, String clientIp) {
         var now = clock.instant();
-        var normalizedEmail = normalize(email);
+        var normalizedEmail = Account.normalizeEmail(email);
         var emailAttempt = lockAttempt(LoginAttempt.emailKey(normalizedEmail));
         var ipAttempt = lockAttempt("ip:" + Sha256.hex(clientIp));
         ipAttempt.setIp(clientIp);
@@ -129,9 +128,5 @@ public class AuthService {
             return false;
         }
         return passwordEncoder.matches(password, hash);
-    }
-
-    public static String normalize(String email) {
-        return email.strip().toLowerCase(Locale.ROOT);
     }
 }

@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import dev.rgal.brackety.auth.account.ProfileType;
 import dev.rgal.brackety.auth.dto.RegisterRequest;
-import dev.rgal.brackety.auth.lockout.LoginAttempt;
 import dev.rgal.brackety.auth.session.SessionService;
 import dev.rgal.brackety.notifications.Email;
 import java.time.Duration;
@@ -91,7 +90,7 @@ class SecurityEmailsTest extends AuthIntegrationTest {
         auth.register(registration(ANA));
         emails.reset();
         failLogin(5);
-        clock.advance(LoginAttempt.LOCK_DURATION);
+        clock.advance(Duration.ofMinutes(15));
 
         failLogin(5);
 
@@ -115,7 +114,7 @@ class SecurityEmailsTest extends AuthIntegrationTest {
         sessions.refresh(first.refreshToken());
         emails.reset();
 
-        clock.advance(SessionService.REUSE_GRACE);
+        clock.advance(Duration.ofSeconds(10));
         assertThatThrownBy(() -> sessions.refresh(first.refreshToken()));
         assertThat(emails.sent()).isEmpty();
 

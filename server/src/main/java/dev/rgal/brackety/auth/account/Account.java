@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Locale;
 import java.util.UUID;
 
 @Entity
@@ -94,5 +95,9 @@ public class Account {
 
     public void markReminderSent(Instant now) {
         verificationReminderSentAt = now;
+    }
+
+    public static String normalizeEmail(String email) {
+        return email.strip().toLowerCase(Locale.ROOT);
     }
 }

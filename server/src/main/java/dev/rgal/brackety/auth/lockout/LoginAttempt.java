@@ -15,7 +15,7 @@ public class LoginAttempt {
     // High on purpose: at an event many users share one public IP (NAT); this only stops mass attacks.
     public static final int MAX_IP_FAILURES = 30;
     static final Duration WINDOW = Duration.ofMinutes(15);
-    public static final Duration LOCK_DURATION = Duration.ofMinutes(15);
+    static final Duration LOCK_DURATION = Duration.ofMinutes(15);
 
     // No 0/O or 1/I/L: the user reads the id out to the superadmin.
     private static final String LOCK_ID_ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";

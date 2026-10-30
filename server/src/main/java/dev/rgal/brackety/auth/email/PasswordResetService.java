@@ -1,7 +1,6 @@
 package dev.rgal.brackety.auth.email;
 
 import dev.rgal.brackety.auth.AuthException;
-import dev.rgal.brackety.auth.AuthService;
 import dev.rgal.brackety.auth.account.Account;
 import dev.rgal.brackety.auth.account.AccountRepository;
 import dev.rgal.brackety.auth.account.AuthEmails;
@@ -44,7 +43,7 @@ public class PasswordResetService {
     // Says nothing back: whether the account exists or hit the limit stays hidden.
     @Transactional
     public void forgot(String email) {
-        accounts.lockByEmail(AuthService.normalize(email))
+        accounts.lockByEmail(Account.normalizeEmail(email))
                 .filter(Account::isActive)
                 .ifPresent(account -> emailTokens
                         .issueThrottled(account.getId(), EmailToken.Purpose.RESET_PASSWORD)

@@ -38,7 +38,7 @@ public class Profile {
         return type;
     }
 
-    public boolean isValidated() {
+    boolean isValidated() {
         return validated;
     }
 }
