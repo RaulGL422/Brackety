@@ -27,6 +27,8 @@ class RateLimitFilter extends OncePerRequestFilter {
     static final String AUTH_PATH = "/api/v1/auth/";
     // Refresh needs a valid token, so it gets its own, higher limit: many users share one IP at an event.
     static final String REFRESH_PATH = "/api/v1/auth/refresh";
+    // The superadmin login guesses passwords like any other: same limit as sign-in.
+    static final String ADMIN_LOGIN_PATH = "/api/v1/admin/auth/login";
     static final String HEALTH_PATH = "/actuator/health";
     // Decoded path, as Spring MVC matches it: the raw URI would let /api/v1/%61uth skip the auth limit.
     private static final UrlPathHelper PATHS = UrlPathHelper.defaultInstance;
@@ -71,7 +73,8 @@ class RateLimitFilter extends OncePerRequestFilter {
         if (path.startsWith(REFRESH_PATH)) {
             return refresh.tryAcquire(ip, minute);
         }
-        return !path.startsWith(AUTH_PATH) || auth.tryAcquire(ip, minute);
+        var signIn = path.startsWith(AUTH_PATH) || path.startsWith(ADMIN_LOGIN_PATH);
+        return !signIn || auth.tryAcquire(ip, minute);
     }
 
     // A fresh map every minute: memory is bounded by the IPs seen in one minute.

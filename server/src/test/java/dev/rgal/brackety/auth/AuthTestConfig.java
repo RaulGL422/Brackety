@@ -2,6 +2,8 @@ package dev.rgal.brackety.auth;
 
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import dev.rgal.brackety.auth.admin.CloudflareAccess;
+import dev.rgal.brackety.auth.admin.FakeCloudflareAccess;
 import dev.rgal.brackety.auth.google.FakeGoogle;
 import dev.rgal.brackety.common.MutableClock;
 import dev.rgal.brackety.local.EmbeddedPostgresConfig;
@@ -48,6 +50,18 @@ public class AuthTestConfig {
     @Primary
     JWKSource<SecurityContext> fakeGoogleJwks(FakeGoogle google) {
         return google.jwks();
+    }
+
+    @Bean
+    FakeCloudflareAccess fakeCloudflareAccess(MutableClock clock) {
+        return new FakeCloudflareAccess(clock);
+    }
+
+    // Cloudflare's keys are never fetched in tests: Access assertions are signed with the fake one.
+    @Bean
+    @Primary
+    CloudflareAccess fakeCloudflareAccessCheck(FakeCloudflareAccess cloudflare) {
+        return cloudflare.access();
     }
 
     // Emails go out on the calling thread, so a test sees them as soon as the service call returns.

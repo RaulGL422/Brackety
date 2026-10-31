@@ -34,6 +34,23 @@ public class Profile {
         this.createdAt = now;
     }
 
+    public UUID getAccountId() {
+        return accountId;
+    }
+
+    public boolean isOrganizer() {
+        return type == ProfileType.CLUB || type == ProfileType.EXTERNAL_ENTITY;
+    }
+
+    /** Returns false if it already was. */
+    public boolean validate() {
+        if (validated) {
+            return false;
+        }
+        validated = true;
+        return true;
+    }
+
     public ProfileType getType() {
         return type;
     }

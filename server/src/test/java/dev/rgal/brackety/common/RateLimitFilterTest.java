@@ -45,6 +45,17 @@ class RateLimitFilterTest {
     }
 
     @Test
+    void theSuperadminLoginSharesTheSignInLimit() throws Exception {
+        for (int i = 0; i < 10; i++) {
+            call("/api/v1/auth/login", IP);
+            call("/api/v1/admin/auth/login", IP);
+        }
+
+        assertThat(call("/api/v1/admin/auth/login", IP).getStatus()).isEqualTo(429);
+        assertThat(call("/api/v1/admin/auth/locks", IP).getStatus()).isEqualTo(200);
+    }
+
+    @Test
     void anEncodedAuthPathCountsAsAuth() throws Exception {
         for (int i = 0; i < 20; i++) {
             call("/api/v1/auth/login", IP);

@@ -20,4 +20,7 @@ FROM nginx:1.30.6-alpine
 ARG APP
 COPY deploy/nginx/security-headers.conf /etc/nginx/security-headers.conf
 COPY deploy/nginx/web.conf /etc/nginx/conf.d/default.conf
+COPY deploy/nginx/admin-api.conf /tmp/admin-api.conf
+RUN mkdir -p /etc/nginx/app.d \
+    && if [ "$APP" = "admin" ]; then mv /tmp/admin-api.conf /etc/nginx/app.d/; else rm /tmp/admin-api.conf; fi
 COPY --from=build /src/${APP}/build/web /usr/share/nginx/html

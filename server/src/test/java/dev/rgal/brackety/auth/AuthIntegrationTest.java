@@ -40,13 +40,19 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
             "brackety.auth.unverified-purge-initial-delay=P3650D",
             "brackety.auth.deleted-purge-initial-delay=P3650D",
             // A list, as in production (web and Android client ids).
-            "brackety.auth.google-client-ids=other-client.apps.googleusercontent.com, " + FakeGoogle.CLIENT_ID
+            "brackety.auth.google-client-ids=other-client.apps.googleusercontent.com, " + FakeGoogle.CLIENT_ID,
+            "brackety.superadmin.email=" + AuthIntegrationTest.SUPERADMIN_EMAIL,
+            "brackety.superadmin.password-hash=" + AuthIntegrationTest.SUPERADMIN_PASSWORD_HASH
         })
 @AutoConfigureMockMvc
 @Import(AuthTestConfig.class)
 public abstract class AuthIntegrationTest {
 
     protected static final String PASSWORD = "correct-horse-battery";
+    protected static final String SUPERADMIN_EMAIL = "superadmin@example.test";
+    // PASSWORD, hashed with SuperadminPasswordHash.
+    protected static final String SUPERADMIN_PASSWORD_HASH =
+            "$argon2id$v=19$m=19456,t=2,p=1$AcplTC/dLHhH1XfsBNB0pA$kByTPtLzWseDp3T+lGkrQ/yCNZ+rteO5cQBksgwWHMs";
 
     @Autowired
     protected MutableClock clock;
@@ -59,7 +65,7 @@ public abstract class AuthIntegrationTest {
 
     @BeforeEach
     protected void resetDatabaseClockAndEmails() {
-        jdbc.sql("truncate account, login_attempt cascade").update();
+        jdbc.sql("truncate account, login_attempt, admin_audit cascade").update();
         clock.set(AuthTestConfig.START);
         emails.reset();
     }
