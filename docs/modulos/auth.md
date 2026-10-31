@@ -50,7 +50,8 @@ Cuentas, login y sesión compartidos entre web y Android.
 
 ### Registro y perfiles
 - Registro: fecha de nacimiento, perfil inicial (Club, Entidad Externa, Ayudante, Externo, Alumno) y aceptación de términos y privacidad con fecha y versión.
-- Menor de 14 no se registra solo: lo da de alta su tutor (`perfiles-menores.md`).
+- Hasta `legal-paginas`, la app envía la versión provisional `2026-11-draft` en términos y privacidad, con una única casilla sin enlaces.
+- Menor de 14 no se registra solo: lo da de alta su tutor (`perfiles-menores.md`). La app lo bloquea también antes de enviar.
 - Perfiles adicionales desde ajustes (exige email verificado): un perfil cualquiera, o Alumno + Ayudante, o Externo + Ayudante; lo demás 409 `PROFILE_COMBINATION_NOT_ALLOWED`. El último no se quita (409 `LAST_PROFILE`). Organizador nuevo, sin validar.
 - Club y Entidad Externa: alta libre, pero no publican eventos hasta que el superadmin los valida.
 
@@ -91,6 +92,8 @@ Todos bajo `/api/v1`: `POST /auth/register`, `/auth/login`, `/auth/google`, `/au
 
 ## Pantallas
 Inicio de sesión, registro con selector de perfil, verificación pendiente, recuperar contraseña, ajustes de cuenta (identidades, perfiles, email, idioma, exportar/borrar). Admin: login de superadmin, bloqueos activos con revocación.
+- Código en `app/lib/features/auth/`. Verificación pendiente: aviso no bloqueante encima de toda la app (con reenvío).
+- Enlaces de email (`/verify-email`, `/reset-password`, `/forgot-password`) abren en cualquier estado de sesión; web con URLs sin `#`.
 
 ## Offline
 - La sesión sigue válida sin red mientras el refresh no caduque. El acceso caducado se renueva al volver la red.
@@ -106,6 +109,6 @@ En curso. Tareas (una rama cada una, en este orden):
 3. `feat/auth-google` · login Google, sustitución de cuenta sin verificar, vincular y desvincular.
 4. `feat/auth-me` · `/me`, perfiles adicionales, cambio de email, borrado y exportación.
 5. `feat/auth-superadmin` · superadmin por entorno, validación de organizadores, listar y revocar bloqueos con auditoría. Hecha (2026-10-31).
-6. `feat/auth-screens-login` · app: login, registro, verificación pendiente, recuperar; cliente HTTP con refresh (uno a la vez) y 429 con `lockId`.
+6. `feat/auth-screens-login` · app: login, registro, verificación pendiente, recuperar; cliente HTTP con refresh (uno a la vez) y 429 con `lockId`. Hecha (2026-10-31).
 7. `feat/auth-screens-settings` · app: ajustes de cuenta.
 8. `feat/auth-admin-login` · admin: login de superadmin y pantalla de bloqueos.

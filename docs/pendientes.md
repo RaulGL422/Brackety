@@ -29,13 +29,14 @@
 - [ ] Registro con el email de una cuenta borrada hace más de 30 días y aún sin purgar (hasta 1 día): el aviso dice que puede cancelar el borrado, ya no es cierto. ¿Callar o mensaje distinto?
 - [ ] Errores de la API sin texto en `i18n/messages*.properties` (la app traduce por `code`); `OWNS_EVENTS` sigue ese patrón. Confirmar si se quieren textos en servidor.
 - [ ] Login con Apple cuando haya cuenta Apple Developer o app iOS.
+- [ ] Versión legal provisional `2026-11-draft` (`app/lib/features/auth/data/registration.dart`): sustituirla en `legal-paginas` por las versiones reales y añadir los enlaces a la casilla.
+- [ ] Login con Google en la app (botón + `REGISTRATION_REQUIRED`) cuando existan los client IDs.
 
 ## Prototipo Fase 1 (bloquean el uso real)
 - [ ] Raul: URL pública de la Pi para web, API y superadmin (`API_BASE_URL`, `PUBLIC_BASE_URL`, `CORS_ALLOWED_ORIGINS`) y conexión a Internet en el pabellón: sin offline, sin red no funciona.
 - [ ] Categorías reales de la Fase 1 (ahora ficticias: tramos del ranking, mixtas).
 - [ ] Aviso de privacidad mínimo visible antes de la fase (datos reales de menores sin páginas legales ni `PRIVACY_CONTACT_EMAIL`); la casilla del tutor ya está en la inscripción. Aceptado por Raul.
 - [ ] Tras la fase: desactivar `DEMO_ACCOUNTS_ENABLED` y borrar las cuentas demo.
-- [ ] Login del front: lo hace la sesión de `auth` (`feat/auth-screens-login`). Mientras, el prototipo usa una pantalla y sesión provisionales en `app/lib/features/session/`; `auth` debe sustituir la pantalla y puede reutilizar o reemplazar la sesión.
 
 ## Repositorio público
 - [ ] `docs/` es planificación temporal y se eliminará en el futuro. Antes de hacerlo: pasar a `CLAUDE.md` (o un README) lo imprescindible que hoy solo vive en `docs/` y quitar sus enlaces.
