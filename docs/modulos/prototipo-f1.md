@@ -78,6 +78,7 @@ Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, f
 ## Pantallas
 - Sesión provisional (`app/lib/features/session/`): login real contra `/auth/login`, acceso en memoria, refresh por la cookie web y un reintento automático tras un 401; recarga de página = sesión recuperada. En debug, botones de acceso rápido a las cuentas demo. Las pantallas de `auth` sustituirán la de acceso.
 - Ayudante: categorías (con inscritos/agrupados) → alumnos por nombre o estatura → grupos en borrador con color y número (nunca rojo/azul) y casilla de fantasma → popup con el tapiz.
+- Árbitro: tablero del tapiz (sondeo 5 s; grupos con color y número, recomendado, en curso, pendientes con motivo si esperan, terminados) → marcador (sondeo 2 s, reloj contado en el dispositivo y resincronizado, +1, menú de avisos con motivo, deshacer, finalizar, línea de tiempo). Campana generada (`app/tool/make_bell.py`), una vez al iniciar y una al acabar.
 
 Login, inicio por rol, categorías → alumnos → crear grupos, tablero del tapiz, marcador, panel del club (config, inscripciones, puntuaciones, tapices, línea de tiempo, exportar). Responsive (`07-diseno.md`), textos i18n.
 

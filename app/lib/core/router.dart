@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import '../features/events/ui/events_screen.dart';
 import '../features/grouping/ui/categories_screen.dart';
 import '../features/grouping/ui/group_builder_screen.dart';
+import '../features/mat/ui/mat_board_screen.dart';
+import '../features/scoreboard/ui/scoreboard_screen.dart';
 import '../features/session/state/session_controller.dart';
 import '../features/session/ui/login_screen.dart';
 import '../l10n/gen/app_localizations.dart';
@@ -57,6 +59,16 @@ final routerProvider = Provider<GoRouter>((ref) {
           categoryId: state.pathParameters['categoryId']!,
           categoryName: state.extra as String?,
         ),
+      ),
+      GoRoute(
+        path: '/mats/:matId',
+        builder: (_, state) =>
+            MatBoardScreen(matId: state.pathParameters['matId']!),
+      ),
+      GoRoute(
+        path: '/matches/:matchId',
+        builder: (_, state) =>
+            ScoreboardScreen(matchId: state.pathParameters['matchId']!),
       ),
     ],
   );
