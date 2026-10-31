@@ -78,9 +78,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get eventClubPanel => 'Panel del club';
 
   @override
-  String get comingSoon => 'Disponible pronto';
-
-  @override
   String get categoriesTitle => 'Categorías';
 
   @override
@@ -330,4 +327,165 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get tlRivalPoint => 'punto al rival';
+
+  @override
+  String get clubStandings => 'Puntuaciones';
+
+  @override
+  String get clubMats => 'Tapices';
+
+  @override
+  String get clubParticipants => 'Inscripciones';
+
+  @override
+  String get clubSettings => 'Configuración';
+
+  @override
+  String get allCategories => 'Todas las categorías';
+
+  @override
+  String get noCategory => 'Sin categoría';
+
+  @override
+  String get sortByPoints => 'Puntos';
+
+  @override
+  String get standingsEmpty => 'Todavía no hay puntuaciones.';
+
+  @override
+  String standingsTotal(int total) {
+    return '$total pts';
+  }
+
+  @override
+  String standingsDetail(int attendance, int points, int matches) {
+    return 'Asistencia $attendance · Combates $points ($matches)';
+  }
+
+  @override
+  String get matsEmpty => 'No hay tapices.';
+
+  @override
+  String matSummary(int groups, int pending) {
+    return '$groups grupos · $pending combates pendientes';
+  }
+
+  @override
+  String get matNoReferee => 'Sin árbitro';
+
+  @override
+  String matEstimatedEnd(String time) {
+    return 'Fin estimado $time';
+  }
+
+  @override
+  String get matFighting => 'Combate en curso';
+
+  @override
+  String get matIdle => 'Parado';
+
+  @override
+  String get participantAdd => 'Inscribir alumno';
+
+  @override
+  String get participantEdit => 'Editar alumno';
+
+  @override
+  String get firstName => 'Nombre';
+
+  @override
+  String get lastName => 'Apellidos';
+
+  @override
+  String get birthDate => 'Fecha de nacimiento';
+
+  @override
+  String get heightOptional => 'Estatura en cm (opcional)';
+
+  @override
+  String get heightInvalid => 'Entre 50 y 250 cm';
+
+  @override
+  String get guardianConsent => 'El tutor legal está de acuerdo';
+
+  @override
+  String get guardianConsentRequired => 'Obligatorio para menores de 18 años.';
+
+  @override
+  String get fieldRequired => 'Obligatorio';
+
+  @override
+  String participantAgeCategory(int age, String category) {
+    return '$age años · $category';
+  }
+
+  @override
+  String deleteParticipantTitle(String name) {
+    return '¿Borrar a $name?';
+  }
+
+  @override
+  String get save => 'Guardar';
+
+  @override
+  String get delete => 'Borrar';
+
+  @override
+  String get saved => 'Guardado';
+
+  @override
+  String get saveConflict => 'No se puede: ya hay grupos que dependen de esto.';
+
+  @override
+  String get saveInvalid => 'Revisa los datos.';
+
+  @override
+  String get saveError => 'No se ha podido guardar.';
+
+  @override
+  String get settingsName => 'Nombre del evento';
+
+  @override
+  String get settingsDate => 'Fecha';
+
+  @override
+  String get settingsMaxGroups => 'Grupos por tapiz a la vez';
+
+  @override
+  String get settingsMaxGroupsHint => '1 = sin multigrupo';
+
+  @override
+  String get settingsAddMat => 'Añadir tapiz';
+
+  @override
+  String get settingsRemoveMat => 'Quitar el último tapiz';
+
+  @override
+  String get settingsReferee => 'Árbitro';
+
+  @override
+  String categoryRange(String name, int min, int max) {
+    return '$name · de $min a $max años';
+  }
+
+  @override
+  String get exportCsv => 'Exportar CSV';
+
+  @override
+  String get exportStandings => 'Clasificación';
+
+  @override
+  String get exportMatches => 'Combates';
+
+  @override
+  String get exportTimeline => 'Línea de tiempo';
+
+  @override
+  String get exportError => 'No se ha podido exportar.';
+
+  @override
+  String get matchLive => 'En curso';
+
+  @override
+  String get matchNotStarted => 'Sin empezar';
 }
