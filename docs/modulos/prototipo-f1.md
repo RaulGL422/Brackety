@@ -93,6 +93,7 @@ Recomendado (empates, intercalado, fantasma ocupado), fin estimado, asignación 
 5. Front: tapiz, marcador, campana.
 6. Front: panel del club.
 7. Despliegue en la Pi (Postgres persistente del compose, URL de Raul) y ensayo con varios dispositivos.
+8-11. Categorías por equipos: ver `prototipo-f1-equipos.md`.
 
 ## Estado
 En curso desde 2026-10-30.

@@ -111,3 +111,6 @@ Formato: fecha · decisión · motivo.
 - 2026-10-31 · El login de superadmin tiene su propio contador de fallos (no el del email) y comparte el de IP · con el del email, cualquiera podía bloquear al superadmin desde el login público, y él no puede revocar su propio bloqueo.
 - 2026-10-31 · Registro con email de cuenta pasada la gracia y aún sin purgar: 202 sin crear ni avisar hasta la purga diaria · como mucho un día de espera; no duplicar la purga en el registro; decidido por Raul.
 - 2026-10-31 · En local, Cloudflare Access se simula (clave generada al arrancar y filtro que añade la cabecera, en `server/src/test`) en lugar de desactivarse · el código de producción no tiene forma de saltarse la comprobación y en local se ejecuta la misma.
+- 2026-10-31 · Categorías por equipos en el prototipo: formato, tamaño de equipo y de grupo por categoría; grupo de 4 equipos de 3; un combate Tambo equipo contra equipo; cada miembro suma los puntos de su equipo · cambio de planes de Raul para la Fase 1.
+- 2026-10-31 · Equipo fantasma = 3 alumnos cualesquiera de la categoría (no un equipo ya hecho); botón "Grupo individual" en categorías por equipos para los sobrantes · decidido por Raul.
+- 2026-10-31 · Equipos con nombre "Equipo N" numerado por evento · el árbitro los llama por ese nombre y no se repite entre tapices.

@@ -60,6 +60,7 @@
 ## Producto
 - [ ] Grupo con sobrante: opciones (promedio por combate / puntos brutos / decidir caso a caso) y respuesta final del organizador; será opción del evento.
 - [ ] Modelo exacto de equipos en torneos por equipos (plantilla, suplentes, entrenadores).
+- [ ] Prototipo por equipos: categorías reales (cuáles van por equipos y edades), tamaños reales de equipo/grupo y si hay ranking de equipos además del de alumnos (`prototipo-f1-equipos.md`).
 - [ ] Plantillas de deporte adicionales (judo, karate, taekwondo, fútbol…): investigar al llegar a `puntuacion`.
 - [ ] Doble eliminación y repesca (judo, taekwondo, karate): investigar al llegar a `torneo`.
 - [ ] Registro de tratamientos y plantilla de registro de brechas.
