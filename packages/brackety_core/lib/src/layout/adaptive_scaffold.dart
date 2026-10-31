@@ -18,6 +18,7 @@ class AdaptiveScaffold extends StatelessWidget {
     required this.selectedIndex,
     required this.onSelected,
     required this.body,
+    this.actions,
   });
 
   static const maxContentWidth = 1200.0;
@@ -27,6 +28,7 @@ class AdaptiveScaffold extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onSelected;
   final Widget body;
+  final List<Widget>? actions;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +37,7 @@ class AdaptiveScaffold extends StatelessWidget {
 
     if (size == WindowSize.compact) {
       return Scaffold(
-        appBar: AppBar(title: Text(title)),
+        appBar: AppBar(title: Text(title), actions: actions),
         body: content,
         bottomNavigationBar: NavigationBar(
           selectedIndex: selectedIndex,
@@ -49,7 +51,7 @@ class AdaptiveScaffold extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(title: Text(title), actions: actions),
       body: Row(
         children: [
           NavigationRail(
