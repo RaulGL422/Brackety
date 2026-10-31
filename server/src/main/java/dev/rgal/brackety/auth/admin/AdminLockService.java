@@ -43,7 +43,7 @@ class AdminLockService {
         return locks.stream()
                 .map(lock -> new LockResponse(
                         lock.getLockId(),
-                        lock.isEmailKey() ? LockResponse.Type.EMAIL : LockResponse.Type.IP,
+                        lock.getKind(),
                         lock.getLockedUntil(),
                         lock.getAccountId() == null ? null : emails.get(lock.getAccountId()),
                         lock.getIp()))
@@ -60,12 +60,9 @@ class AdminLockService {
         audit.save(new AdminAudit(AdminAudit.Action.LOCK_REVOKED, lockId, now));
     }
 
-    /** {@code email} is the account one, if the email has an account; {@code ip} only for an IP lock. */
-    record LockResponse(String lockId, Type type, Instant lockedUntil, String email, String ip) {
-
-        enum Type {
-            EMAIL,
-            IP
-        }
-    }
+    /**
+     * {@code type} ADMIN is the superadmin login itself. {@code email} is the account one, if the email has an
+     * account; {@code ip} only for an IP lock.
+     */
+    record LockResponse(String lockId, LoginAttempt.Kind type, Instant lockedUntil, String email, String ip) {}
 }

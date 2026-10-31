@@ -17,12 +17,16 @@ import dev.rgal.brackety.auth.AuthIntegrationTest;
 import dev.rgal.brackety.auth.AuthService;
 import dev.rgal.brackety.auth.account.ProfileType;
 import dev.rgal.brackety.auth.dto.RegisterRequest;
+import dev.rgal.brackety.auth.lockout.LoginAttempt;
+import java.net.URI;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -47,6 +51,9 @@ class AdminApiTest extends AuthIntegrationTest {
     @Autowired
     FakeCloudflareAccess cloudflare;
 
+    @Autowired
+    AdminLockService locks;
+
     // --- Cloudflare Access
 
     @Test
@@ -69,6 +76,29 @@ class AdminApiTest extends AuthIntegrationTest {
                         .header(CloudflareAccess.HEADER, forged)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken()))
                 .andExpect(status().isForbidden());
+    }
+
+    // Spellings of an admin path that must never get past Access: 403 there, or rejected (4xx) before.
+    @ParameterizedTest
+    @ValueSource(
+            strings = {
+                "/api/v1/admin/auth/locks/",
+                "/api/v1/%61dmin/auth/locks",
+                "/api/v1/admin",
+                "/api/v1/admin//auth/locks",
+                "/api/v1/admin;x=1/auth/locks"
+            })
+    void noSpellingOfAnAdminPathSkipsAccess(String path) throws Exception {
+        auth.register(registration(ANA));
+        var userToken = auth.login(ANA, PASSWORD, IP).accessToken();
+
+        for (var token : List.of(adminToken(), userToken)) {
+            var status = mvc.perform(get(URI.create(path)).header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                    .andReturn()
+                    .getResponse()
+                    .getStatus();
+            assertThat(status).as(path).isBetween(400, 499);
+        }
     }
 
     @Test
@@ -109,22 +139,58 @@ class AdminApiTest extends AuthIntegrationTest {
     }
 
     @Test
-    void fiveFailuresLockTheSuperadminEmailWithALockId() throws Exception {
+    void fiveFailuresLockTheSuperadminLoginWithALockId() throws Exception {
+        failAdminLogin(5);
+
+        var body = adminLogin(SUPERADMIN_EMAIL, PASSWORD)
+                .andExpect(status().isTooManyRequests())
+                .andExpect(jsonPath("$.lockId").value(matchesPattern("L-[2-9A-HJKMNP-Z]{6}")))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        assertThat(emails.sent()).isEmpty();
+        assertThat(locks.activeLocks()).singleElement().satisfies(lock -> {
+            assertThat(lock.lockId()).isEqualTo(JsonPath.read(body, "$.lockId"));
+            assertThat(lock.type()).isEqualTo(LoginAttempt.Kind.ADMIN);
+            assertThat(lock.email()).isNull();
+        });
+    }
+
+    @Test
+    void failuresOnThePublicLoginWithTheSuperadminEmailDoNotLockTheSuperadmin() throws Exception {
         for (int i = 0; i < 5; i++) {
+            loginFails(SUPERADMIN_EMAIL, "198.51.100." + i);
+        }
+        assertThatThrownBy(() -> auth.login(SUPERADMIN_EMAIL, PASSWORD, IP))
+                .isInstanceOfSatisfying(
+                        AuthException.class,
+                        e -> assertThat(e.getStatusCode().value()).isEqualTo(429));
+
+        assertThat(adminToken()).isNotBlank();
+    }
+
+    @Test
+    void failuresOnTheSuperadminLoginDoNotLockThePublicLoginOfThatEmail() throws Exception {
+        auth.register(registration(SUPERADMIN_EMAIL));
+
+        failAdminLogin(5);
+
+        assertThat(auth.login(SUPERADMIN_EMAIL, PASSWORD, IP).accessToken()).isNotBlank();
+    }
+
+    private void failAdminLogin(int times) throws Exception {
+        for (int i = 0; i < times; i++) {
             adminLogin(SUPERADMIN_EMAIL, "wrong-password", "198.51.100." + i).andExpect(status().isUnauthorized());
         }
-
-        adminLogin(SUPERADMIN_EMAIL, PASSWORD)
-                .andExpect(status().isTooManyRequests())
-                .andExpect(jsonPath("$.lockId").value(matchesPattern("L-[2-9A-HJKMNP-Z]{6}")));
-        assertThat(emails.sent()).isEmpty();
     }
 
     @Test
     void theAdminLoginCountsTowardsTheIpLockOfTheUserLogin() throws Exception {
-        for (int i = 0; i < 30; i++) {
-            adminLogin("guess" + i + "@example.test", "wrong-password").andExpect(status().isUnauthorized());
+        for (int i = 0; i < 29; i++) {
+            loginFails("guess" + i + "@example.test", ADMIN_IP);
         }
+
+        adminLogin(SUPERADMIN_EMAIL, "wrong-password").andExpect(status().isUnauthorized());
 
         assertThatThrownBy(() -> auth.login(ANA, PASSWORD, ADMIN_IP))
                 .isInstanceOfSatisfying(

@@ -106,3 +106,5 @@ Formato: fecha · decisión · motivo.
 - 2026-10-30 · Contraseña del superadmin como hash Argon2id en `SUPERADMIN_PASSWORD_HASH`; se genera con la run config `server · superadmin password hash` (clase en `server/src/test`) · sin dependencias nuevas, misma configuración que el login y la contraseña no queda en el historial del shell.
 - 2026-10-30 · Auditoría de superadmin (`admin_audit`) sin IP ni emails y sin FK a `account` · minimización de datos y que la purga de cuentas borradas no falle por una FK.
 - 2026-10-30 · Al validar un organizador se le avisa por email en su idioma (solo la primera vez) · sabe cuándo puede publicar eventos.
+
+- 2026-10-31 · El login de superadmin tiene su propio contador de fallos (no el del email) y comparte el de IP · con el del email, cualquiera podía bloquear al superadmin desde el login público, y él no puede revocar su propio bloqueo.

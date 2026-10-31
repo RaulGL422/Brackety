@@ -16,7 +16,6 @@ import dev.rgal.brackety.auth.lockout.LoginAttemptRepository;
 import dev.rgal.brackety.auth.session.SessionService;
 import dev.rgal.brackety.auth.session.SessionService.Session;
 import dev.rgal.brackety.auth.session.ShortLivedTokens;
-import dev.rgal.brackety.common.crypto.Sha256;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.Period;
@@ -158,42 +157,43 @@ public class AuthService {
     public Optional<Account> checkPassword(String email, String password, String clientIp) {
         var normalizedEmail = Account.normalizeEmail(email);
         var account = accounts.findByEmail(normalizedEmail);
-        var matches = underLockout(normalizedEmail, account, clientIp, () -> passwordMatches(account, password));
+        var matches = underLockout(
+                LoginAttempt.emailKey(normalizedEmail), account, clientIp, () -> passwordMatches(account, password));
         return matches ? account : Optional.empty();
     }
 
     /**
-     * Runs {@code check} under the same email and IP lockout as the user login (the superadmin login uses it):
-     * 429 while locked, and a false result counts as a failure. Same transaction rule as {@link #checkPassword}.
+     * For the superadmin login: runs {@code check} with the user login rules (5 failures in 15 min lock 15 min)
+     * on the superadmin own counter, plus the IP counter it shares with the user login. 429 while locked; a false
+     * result counts as a failure. Same transaction rule as {@link #checkPassword}.
      */
     @Transactional(noRollbackFor = AuthException.class)
-    public boolean checkUnderLockout(String email, String clientIp, BooleanSupplier check) {
-        return underLockout(Account.normalizeEmail(email), Optional.empty(), clientIp, check);
+    public boolean checkSuperadminUnderLockout(String clientIp, BooleanSupplier check) {
+        return underLockout(LoginAttempt.ADMIN_KEY, Optional.empty(), clientIp, check);
     }
 
-    private boolean underLockout(
-            String normalizedEmail, Optional<Account> account, String clientIp, BooleanSupplier check) {
+    private boolean underLockout(String key, Optional<Account> account, String clientIp, BooleanSupplier check) {
         var now = clock.instant();
-        var emailAttempt = lockAttempt(LoginAttempt.emailKey(normalizedEmail));
-        var ipAttempt = lockAttempt("ip:" + Sha256.hex(clientIp));
+        var keyAttempt = lockAttempt(key);
+        var ipAttempt = lockAttempt(LoginAttempt.ipKey(clientIp));
         ipAttempt.setIp(clientIp);
-        if (emailAttempt.isLocked(now)) {
-            throw AuthException.locked(emailAttempt.getLockId());
+        if (keyAttempt.isLocked(now)) {
+            throw AuthException.locked(keyAttempt.getLockId());
         }
         if (ipAttempt.isLocked(now)) {
             throw AuthException.locked(ipAttempt.getLockId());
         }
-        account.ifPresent(a -> emailAttempt.setAccountId(a.getId()));
+        account.ifPresent(a -> keyAttempt.setAccountId(a.getId()));
         if (!check.getAsBoolean()) {
             // recordFailure is true only for the failure that locks, so each lock sends one email.
-            if (emailAttempt.recordFailure(now, LoginAttempt.MAX_EMAIL_FAILURES) && account.isPresent()) {
-                authEmails.accountLocked(account.get(), emailAttempt.getLockId());
+            if (keyAttempt.recordFailure(now, LoginAttempt.MAX_EMAIL_FAILURES) && account.isPresent()) {
+                authEmails.accountLocked(account.get(), keyAttempt.getLockId());
             }
             ipAttempt.recordFailure(now, LoginAttempt.MAX_IP_FAILURES);
             return false;
         }
         // The IP counter is not reset: one valid account must not unlock guessing others from the same IP.
-        emailAttempt.reset();
+        keyAttempt.reset();
         return true;
     }
 

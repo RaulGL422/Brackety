@@ -60,7 +60,7 @@ public class AdminAuthService {
         if (emailHash == null || passwordHash == null) {
             throw AuthException.superadminNotConfigured();
         }
-        if (!auth.checkUnderLockout(email, clientIp, () -> matches(email, password))) {
+        if (!auth.checkSuperadminUnderLockout(clientIp, () -> matches(email, password))) {
             throw AuthException.invalidCredentials();
         }
         var now = clock.instant();

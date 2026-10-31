@@ -58,7 +58,7 @@ Cuentas, login y sesión compartidos entre web y Android.
 - Superadmin: usuario único por entorno (`SUPERADMIN_EMAIL` + `SUPERADMIN_PASSWORD_HASH` Argon2id); sin ellas, login 503. Cambiar la contraseña = cambiar la variable y reiniciar.
 - Todo `/api/v1/admin/**` (login incluido) exige la cabecera `Cf-Access-Jwt-Assertion`: RS256 con las claves del equipo, `iss` `https://<CF_ACCESS_TEAM_DOMAIN>`, `aud` con `CF_ACCESS_AUD`, `exp` con el reloj (60 s de margen). Falta o inválida: 403; claves inaccesibles o variables vacías: 503. Solo el lanzador local la desactiva. La app admin llama a la API por su propio host (proxy nginx, `09-despliegue.md`).
 - Sesión de superadmin: JWT de 1 h con `purpose` `ADMIN`, sin refresh. La API de usuarios no lo acepta (401) y la de superadmin solo acepta ese (401).
-- Login de superadmin: 401 genérico; mismo bloqueo por email e IP y mismo limitador que el login normal; siempre se comprueba el hash.
+- Login de superadmin: 401 genérico; contador propio (5 fallos en 15 min → 15 min, tipo `ADMIN` en el listado) más el de IP compartido con el login normal, y el mismo limitador; siempre se comprueba el hash. Los fallos del login público con su email no le afectan, ni al revés.
 - Bloqueos activos: se listan (email de la cuenta si existe, IP si es de IP) y se revocan; revocar borra los fallos y el usuario puede reintentar. Caducado o desconocido: 404.
 - Validar organizador (Club, Entidad Externa de cuenta activa): idempotente; la primera vez avisa por email en su idioma. Sin perfil organizador, inexistente o borrada: 404.
 - Auditoría (`admin_audit`): login, bloqueo revocado y organizador validado, en la misma transacción. Sin IP ni emails; objetivo en texto, sin FK.
@@ -86,7 +86,7 @@ Cuentas, login y sesión compartidos entre web y Android.
 - `POST /auth/email/change/confirm` `{token}` → 204. `POST /auth/restore` `{restoreToken}` → sesión como el login.
 - Errores 409 con `code` en el problem+json. Solo en local: `POST /auth/dev/google-token` `{subject, email}` (doc 08).
 Todos bajo `/api/v1`: `POST /auth/register`, `/auth/login`, `/auth/google`, `/auth/refresh`, `/auth/logout`, `/auth/email/verify`, `/auth/email/resend`, `/auth/password/forgot`, `/auth/password/reset`, `/me`, `/me/profiles`, `/me/identities`, `/me/email`, `DELETE /me`, `GET /me/export`. Superadmin: `/admin/auth/login`, `/admin/organizers/{id}/validate`, `GET /admin/auth/locks`, `DELETE /admin/auth/locks/{lockId}`.
-- `POST /admin/auth/login` `{email, password}` → `{accessToken, expiresIn}`. `GET /admin/auth/locks` → `[{lockId, type: EMAIL|IP, lockedUntil, email, ip}]`; `DELETE /admin/auth/locks/{lockId}` → 204.
+- `POST /admin/auth/login` `{email, password}` → `{accessToken, expiresIn}`. `GET /admin/auth/locks` → `[{lockId, type: EMAIL|IP|ADMIN, lockedUntil, email, ip}]`; `DELETE /admin/auth/locks/{lockId}` → 204.
 - `GET /admin/organizers?validated=true|false` (sin filtro: todos) → `[{accountId, email, profileType, validated, createdAt}]` (`createdAt` del perfil); `POST /admin/organizers/{accountId}/validate` → 204.
 
 ## Pantallas
