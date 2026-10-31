@@ -96,6 +96,8 @@ class SessionController extends Notifier<SessionState> {
       _signIn(await _api.restore(restoreToken));
 
   Future<void> logout() async {
+    // A refresh finishing after this would sign the user back in with a token never revoked.
+    await _refreshing;
     final stored = await _store.read();
     await _signOutLocally();
     try {

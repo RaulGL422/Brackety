@@ -184,6 +184,27 @@ void main() {
     },
   );
 
+  test(
+    'logout during a refresh waits for it and revokes the rotated token',
+    () async {
+      final api = FakeAuthApi(signedIn: true, issueRefreshTokens: true);
+      final store = FakeRefreshTokenStore(token: 'stored');
+      final container = containerFor(api, store);
+      await restore(container);
+      final gate = api.refreshGate = Completer<void>();
+      final notifier = container.read(sessionProvider.notifier);
+
+      final refreshing = notifier.refresh();
+      final loggingOut = notifier.logout();
+      gate.complete();
+      await Future.wait([refreshing, loggingOut]);
+
+      expect(container.read(sessionProvider).status, SessionStatus.signedOut);
+      expect(store.token, isNull);
+      expect(api.logouts, ['refresh-2']);
+    },
+  );
+
   test('a password reset signs this device out too', () async {
     final api = FakeAuthApi(signedIn: true, issueRefreshTokens: true);
     final store = FakeRefreshTokenStore(token: 'stored');
