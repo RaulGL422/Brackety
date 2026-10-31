@@ -1,11 +1,11 @@
 # Estado del proyecto
 
-Última actualización: 2026-10-30. Fase 0 cerrada; en curso: **auth**.
+Última actualización: 2026-10-31. Fase 0 cerrada; en curso: **auth**.
 
 | Módulo | Doc | Estado | Rama activa |
 |---|---|---|---|
 | infra-deploy | modulos/infra-deploy.md | cerrado (2026-10-30) | – |
-| auth | modulos/auth.md | en curso: tareas 1-4/8 hechas (registro, login, sesión, bloqueo, limitador; verificación, recuperación, purga, avisos por email; login Google, sustitución de cuenta sin verificar, vincular y desvincular; `/me`, perfiles, reauth, cambio de email, borrado lógico con restaurar y purga, exportación; corte de tokens al cerrar sesiones, bloqueo de borrado a dueños de eventos) (2026-10-30) | feat/auth-me |
+| auth | modulos/auth.md | en curso: tareas 1-5/8 hechas (registro, login, sesión, bloqueo, limitador; verificación, recuperación, purga, avisos por email; login Google, sustitución de cuenta sin verificar, vincular y desvincular; `/me`, perfiles, reauth, cambio de email, borrado lógico con restaurar y purga, exportación; corte de tokens al cerrar sesiones, bloqueo de borrado a dueños de eventos; superadmin por entorno tras Cloudflare Access verificado en la API, bloqueos y validación de organizadores con auditoría) (2026-10-31) | feat/auth-superadmin |
 | perfiles-menores | modulos/perfiles-menores.md | pendiente | – |
 | legal-paginas | modulos/legal-paginas.md | pendiente | – |
 | eventos | modulos/eventos.md | pendiente | – |
