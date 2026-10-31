@@ -55,11 +55,17 @@ Cuentas, login y sesión compartidos entre web y Android.
 - Club y Entidad Externa: alta libre, pero no publican eventos hasta que el superadmin los valida.
 
 ### Superadmin y RGPD
-- Superadmin: usuario único por entorno, credenciales iniciales por variables de entorno, endpoint separado, solo tras Cloudflare Access.
+- Superadmin: usuario único por entorno (`SUPERADMIN_EMAIL` + `SUPERADMIN_PASSWORD_HASH` Argon2id); sin ellas, login 503. Cambiar la contraseña = cambiar la variable y reiniciar.
+- Todo `/api/v1/admin/**` (login incluido) exige la cabecera `Cf-Access-Jwt-Assertion`: RS256 con las claves del equipo, `iss` `https://<CF_ACCESS_TEAM_DOMAIN>`, `aud` con `CF_ACCESS_AUD`, `exp` con el reloj (60 s de margen). Falta o inválida: 403; claves inaccesibles o variables vacías: 503. En local la pone un Cloudflare simulado (`08-ejecucion-local.md`). La app admin llama a la API por su propio host (proxy nginx, `09-despliegue.md`).
+- Sesión de superadmin: JWT de 1 h con `purpose` `ADMIN`, sin refresh. La API de usuarios no lo acepta (401) y la de superadmin solo acepta ese (401).
+- Login de superadmin: 401 genérico; contador propio (5 fallos en 15 min → 15 min, tipo `ADMIN` en el listado) más el de IP compartido con el login normal, y el mismo limitador; siempre se comprueba el hash. Los fallos del login público con su email no le afectan, ni al revés.
+- Bloqueos activos: se listan (email de la cuenta si existe, IP si es de IP) y se revocan; revocar borra los fallos y el usuario puede reintentar. Caducado o desconocido: 404.
+- Validar organizador (Club, Entidad Externa de cuenta activa): idempotente; la primera vez avisa por email en su idioma. Sin perfil organizador, inexistente o borrada: 404.
+- Auditoría (`admin_audit`): login, bloqueo revocado y organizador validado, en la misma transacción. Sin IP ni emails; objetivo en texto, sin FK.
 - Acciones delicadas (borrar cuenta, cambiar email, exportar, quitar contraseña, desvincular Google) exigen reauth: `POST /me/reauth` con contraseña o Google → token de 5 min en la cabecera `X-Reauth`. Sin él: 403 `REAUTH_REQUIRED`; prueba incorrecta (también token de Google inválido o caducado): 403 `REAUTH_FAILED`; Google no disponible: 503. La contraseña fallida cuenta para el bloqueo por email e IP.
 - Borrado de cuenta (`06-legal-rgpd.md`): lógico, cierra todas las sesiones y avisa por email con la fecha; definitivo a los 30 días (tarea diaria, cascade, cuenta a cuenta: la que falla se registra por id y no frena a las demás; ahí se anonimizarán resultados cuando existan). Dueño de eventos: 409 `OWNS_EVENTS`; antes cede o borra el evento.
 - En esos 30 días: login con contraseña correcta o Google → 403 `ACCOUNT_PENDING_DELETION` con `deletesOn` y `restoreToken` (5 min); `POST /auth/restore` la reactiva y da sesión. Credenciales malas: 401 genérico. Registro con ese email: 202 y aviso al dueño (1 cada 60 s). Google con ese email sin identidad: 409 `ACCOUNT_EXISTS`.
-- Pasados los 30 días, aunque la purga no haya corrido, es como si no existiera: login 401 genérico, `POST /auth/restore` 401.
+- Pasados los 30 días, aunque la purga no haya corrido, es como si no existiera: login 401 genérico, `POST /auth/restore` 401, registro con ese email 202 sin aviso a nadie.
 - Exportación: JSON descargable con cuenta (sin hash), perfiles, identidades (sin `sub`) y consentimientos.
 
 ## Datos
@@ -69,6 +75,7 @@ Cuentas, login y sesión compartidos entre web y Android.
 - `consent`: cuenta, documento, versión, fecha.
 - `refresh_token`: hash, familia, cuenta, caducidad, usado/revocado.
 - `email_token`: hash, propósito (verificar, recuperar, cambio de email), email nuevo (solo cambio), caducidad.
+- `admin_audit`: fecha, acción, objetivo (lockId o accountId).
 - `login_attempt`: clave (hash de email o IP), IP en claro o cuenta si existe, fallos, último fallo, id de bloqueo, bloqueado hasta.
 
 ## API (borrador)
@@ -79,6 +86,8 @@ Cuentas, login y sesión compartidos entre web y Android.
 - `POST /auth/email/change/confirm` `{token}` → 204. `POST /auth/restore` `{restoreToken}` → sesión como el login.
 - Errores 409 con `code` en el problem+json. Solo en local: `POST /auth/dev/google-token` `{subject, email}` (doc 08).
 Todos bajo `/api/v1`: `POST /auth/register`, `/auth/login`, `/auth/google`, `/auth/refresh`, `/auth/logout`, `/auth/email/verify`, `/auth/email/resend`, `/auth/password/forgot`, `/auth/password/reset`, `/me`, `/me/profiles`, `/me/identities`, `/me/email`, `DELETE /me`, `GET /me/export`. Superadmin: `/admin/auth/login`, `/admin/organizers/{id}/validate`, `GET /admin/auth/locks`, `DELETE /admin/auth/locks/{lockId}`.
+- `POST /admin/auth/login` `{email, password}` → `{accessToken, expiresIn}`. `GET /admin/auth/locks` → `[{lockId, type: EMAIL|IP|ADMIN, lockedUntil, email, ip}]`; `DELETE /admin/auth/locks/{lockId}` → 204.
+- `GET /admin/organizers?validated=true|false` (sin filtro: todos) → `[{accountId, email, profileType, validated, createdAt}]` (`createdAt` del perfil); `POST /admin/organizers/{accountId}/validate` → 204.
 
 ## Pantallas
 Inicio de sesión, registro con selector de perfil, verificación pendiente, recuperar contraseña, ajustes de cuenta (identidades, perfiles, email, idioma, exportar/borrar). Admin: login de superadmin, bloqueos activos con revocación.
@@ -96,7 +105,7 @@ En curso. Tareas (una rama cada una, en este orden):
 2. `feat/auth-email` · verificación, recuperación, purga y recordatorio, avisos de seguridad incluido bloqueo (Resend).
 3. `feat/auth-google` · login Google, sustitución de cuenta sin verificar, vincular y desvincular.
 4. `feat/auth-me` · `/me`, perfiles adicionales, cambio de email, borrado y exportación.
-5. `feat/auth-superadmin` · superadmin por entorno, validación de organizadores, listar y revocar bloqueos con auditoría.
+5. `feat/auth-superadmin` · superadmin por entorno, validación de organizadores, listar y revocar bloqueos con auditoría. Hecha (2026-10-31).
 6. `feat/auth-screens-login` · app: login, registro, verificación pendiente, recuperar; cliente HTTP con refresh (uno a la vez) y 429 con `lockId`.
 7. `feat/auth-screens-settings` · app: ajustes de cuenta.
 8. `feat/auth-admin-login` · admin: login de superadmin y pantalla de bloqueos.

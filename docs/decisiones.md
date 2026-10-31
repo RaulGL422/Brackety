@@ -102,3 +102,12 @@ Formato: fecha · decisión · motivo.
 - 2026-10-30 · Cuenta borrada pasados 30 días: no se restaura aunque la purga no haya corrido · el plazo prometido es de 30 días, no "hasta la purga".
 - 2026-10-31 · Campana del marcador generada por script (`app/tool/make_bell.py`) y reproducida con `audioplayers` 6.8.1 · sin licencias de terceros; el paquete funciona en web y Android.
 - 2026-10-30 · Migración del marcador renombrada a `V20261030_2000` · chocaba en `development` con `V20261030_1900` de auth (cada PR pasaba sola). Antes de fechar una migración, mirar las de `origin/development` y las ramas abiertas.
+- 2026-10-30 · Cloudflare Access verificado también en la API: todo `/api/v1/admin/**` exige `Cf-Access-Jwt-Assertion` válido, y el nginx de admin reenvía `/api/` a la API para que la app admin pase por Access · el hostname `api` no está tras Access; sin esto, la API de superadmin quedaría expuesta solo con la contraseña. Decidido por Raul.
+- 2026-10-30 · Sesión de superadmin: JWT de 1 h (`purpose` `ADMIN`), sin refresh ni revocación; tokens de usuario y de superadmin no se aceptan en la otra API · uso esporádico; un reinicio basta para cambiar la contraseña. Decidido por Raul.
+- 2026-10-30 · Contraseña del superadmin como hash Argon2id en `SUPERADMIN_PASSWORD_HASH`; se genera con la run config `server · superadmin password hash` (clase en `server/src/test`) · sin dependencias nuevas, misma configuración que el login y la contraseña no queda en el historial del shell.
+- 2026-10-30 · Auditoría de superadmin (`admin_audit`) sin IP ni emails y sin FK a `account` · minimización de datos y que la purga de cuentas borradas no falle por una FK.
+- 2026-10-30 · Al validar un organizador se le avisa por email en su idioma (solo la primera vez) · sabe cuándo puede publicar eventos.
+
+- 2026-10-31 · El login de superadmin tiene su propio contador de fallos (no el del email) y comparte el de IP · con el del email, cualquiera podía bloquear al superadmin desde el login público, y él no puede revocar su propio bloqueo.
+- 2026-10-31 · Registro con email de cuenta pasada la gracia y aún sin purgar: 202 sin crear ni avisar hasta la purga diaria · como mucho un día de espera; no duplicar la purga en el registro; decidido por Raul.
+- 2026-10-31 · En local, Cloudflare Access se simula (clave generada al arrancar y filtro que añade la cabecera, en `server/src/test`) en lugar de desactivarse · el código de producción no tiene forma de saltarse la comprobación y en local se ejecuta la misma.

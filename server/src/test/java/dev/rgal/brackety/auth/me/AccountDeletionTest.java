@@ -191,6 +191,18 @@ class AccountDeletionTest extends AuthIntegrationTest {
     }
 
     @Test
+    void pastTheGraceSigningUpWithTheEmailTellsNobody() throws Exception {
+        deleteAccount(account(ANA));
+        clock.advance(Duration.ofDays(30));
+        emails.reset();
+
+        auth.register(registration(ANA));
+
+        assertThat(emails.sentTo(ANA)).isEmpty();
+        assertThat(count("account")).isOne();
+    }
+
+    @Test
     void thePurgeWaitsThirtyDays() {
         account(ANA);
         deleteAccountOf(ANA);

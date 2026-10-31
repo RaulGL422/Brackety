@@ -5,6 +5,7 @@
 - [ ] Docker Desktop: solo hará falta para probar `deploy/` en Windows; tests y ejecución local no lo necesitan.
 
 ## Despliegue (infra-deploy)
+- [ ] Raul: crear la variable de repositorio `ADMIN_API_BASE_URL` en GitHub (URL del host admin); sin ella el superadmin recibe 403.
 - [ ] Variable de repositorio `API_BASE_URL` en GitHub (Settings → Variables) cuando haya dominio; sin ella fallan las imágenes web/admin al publicar.
 - [ ] Paquetes GHCR: hacerlos públicos o `docker login ghcr.io` en la Pi con un token de solo lectura (decidir).
 - [ ] Copia de los backups en la nube (doc 05): elegir proveedor barato; se añadiría con `rclone` al final de `backup.sh`.

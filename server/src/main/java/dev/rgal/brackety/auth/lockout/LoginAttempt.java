@@ -19,6 +19,19 @@ public class LoginAttempt {
 
     // No 0/O or 1/I/L: the user reads the id out to the superadmin.
     private static final String LOCK_ID_ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
+    private static final String EMAIL_KEY_PREFIX = "email:";
+    private static final String IP_KEY_PREFIX = "ip:";
+    // The superadmin has its own counter: failures on the public login with the superadmin email must not
+    // lock the superadmin out, and the superadmin cannot lift a lock on itself.
+    public static final String ADMIN_KEY = "admin:superadmin";
+
+    /** What a row counts failures of. */
+    public enum Kind {
+        EMAIL,
+        IP,
+        ADMIN
+    }
+
     private static final SecureRandom RANDOM = new SecureRandom();
 
     @Id
@@ -41,6 +54,22 @@ public class LoginAttempt {
         return lockId;
     }
 
+    public Instant getLockedUntil() {
+        return lockedUntil;
+    }
+
+    /** Null for an email row. */
+    public String getIp() {
+        return ip;
+    }
+
+    public Kind getKind() {
+        if (attemptKey.startsWith(EMAIL_KEY_PREFIX)) {
+            return Kind.EMAIL;
+        }
+        return attemptKey.equals(ADMIN_KEY) ? Kind.ADMIN : Kind.IP;
+    }
+
     public void setIp(String ip) {
         this.ip = ip;
     }
@@ -49,7 +78,8 @@ public class LoginAttempt {
         this.accountId = accountId;
     }
 
-    UUID getAccountId() {
+    /** Null for an IP row, or for an email without an account. */
+    public UUID getAccountId() {
         return accountId;
     }
 
@@ -78,7 +108,11 @@ public class LoginAttempt {
 
     // Keyed by email, not account, so unknown emails lock the same way and do not reveal which exist.
     public static String emailKey(String normalizedEmail) {
-        return "email:" + Sha256.hex(normalizedEmail);
+        return EMAIL_KEY_PREFIX + Sha256.hex(normalizedEmail);
+    }
+
+    public static String ipKey(String ip) {
+        return IP_KEY_PREFIX + Sha256.hex(ip);
     }
 
     static String newLockId() {

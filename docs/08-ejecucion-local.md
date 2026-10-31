@@ -25,6 +25,10 @@ Cada escenario es una clase `Scenario` en `server/src/test/java/dev/rgal/bracket
 - PowerShell: `irm -Method Post http://localhost:8080/api/v1/auth/dev/google-token -ContentType application/json -Body '{"subject":"s1","email":"a@example.test"}'`.
 - Solo existe en el lanzador local (`server/src/test`); en producción ese endpoint no existe.
 
+## Superadmin local
+- Cloudflare Access simulado, como Google: la API local hace la comprobación real con una clave generada al arrancar y un filtro (`LocalAdminConfig`, solo en `server/src/test`) añade la cabecera que pondría Cloudflare si falta. La app admin funciona sin pasos extra.
+- Superadmin: `superadmin@example.test` / `brackety-demo` en `POST /api/v1/admin/auth/login`.
+
 ## Reloj simulado
 - Toda la lógica usa el `Clock` inyectado; prohibido `LocalDate.now()` sin reloj.
 - `--brackety.clock.today=2027-03-10` desplaza el reloj a ese día (la hora sigue corriendo). Sirve para viajar en el tiempo con cualquier escenario.
@@ -59,4 +63,5 @@ La URL de la API entra por `--dart-define-from-file=env/<destino>.json` (`API_BA
 | `google` | `google@` solo Google (sub `google-solo`), `vinculada@` con contraseña `brackety-demo` y Google `vinculada.gmail@` (sub `google-vinculada`), `sustituible@` sin verificar (`@example.test`) | Login con Google, `REGISTRATION_REQUIRED`, sustitución de cuenta sin verificar, vincular y desvincular |
 | `unverified` | Cuentas sin verificar (contraseña `brackety-demo`): `nueva@` recién creada, `recordatorio@` con 5 días y `purga@` con 7 (`@example.test`). La tarea diaria corre 1 min después de arrancar | Verificación pendiente, reenvío, recordatorio del día 5 y borrado del día 7 (enlaces en el log de la API) |
 | `account-settings` | Cuentas verificadas (contraseña `brackety-demo`): `alumno.ayudante@` con Alumno y Ayudante, `borrada.dia1@` borrada ayer y `borrada.dia30@` borrada hace 30 días (`@example.test`). La purga diaria corre 1 min después de arrancar | Ajustes de cuenta (`/me`, perfiles, reauth, cambio de email, exportar), login de cuenta pendiente de borrado y restaurar, borrado definitivo |
+| `superadmin` | Organizadores por validar (`club@`, `entidad@` en inglés) y uno validado (`club.validado@`); `bloqueada@` bloqueada por email y la IP `198.51.100.66` bloqueada, 15 min desde el arranque (`@example.test`, contraseña `brackety-demo`) | API de superadmin: login, bloqueos, validar organizadores (email en el log) |
 | `yoseikan-f1` | Evento del prototipo hoy con 5 tapices, 9 categorías ficticias y 60 alumnos ficticios; cuentas `club1`, `ayudante1-2`, `arbitro1-5` (contraseña = usuario) | Prototipo Fase 1: configuración, inscripciones, grupos y marcador |
