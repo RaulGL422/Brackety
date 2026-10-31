@@ -35,31 +35,21 @@ public class CloudflareAccess {
 
     // Null when the team domain or the audience is missing: the superadmin API answers 503.
     private final JwtDecoder decoder;
-    private final boolean enforced;
 
-    private CloudflareAccess(JwtDecoder decoder, boolean enforced) {
+    private CloudflareAccess(JwtDecoder decoder) {
         this.decoder = decoder;
-        this.enforced = enforced;
     }
 
     /** {@code teamDomain} as in the Zero Trust dashboard, e.g. {@code myteam.cloudflareaccess.com}. */
     public static CloudflareAccess of(
             JWKSource<SecurityContext> keys, String teamDomain, String audience, Clock clock) {
         if (keys == null || teamDomain.isBlank() || audience.isBlank()) {
-            return new CloudflareAccess(null, true);
+            return new CloudflareAccess(null);
         }
-        return new CloudflareAccess(decoder(keys, issuer(teamDomain), audience.strip(), clock), true);
-    }
-
-    /** Lets everything through. Only the local runner uses it (test sources); no setting reaches it. */
-    public static CloudflareAccess notEnforced() {
-        return new CloudflareAccess(null, false);
+        return new CloudflareAccess(decoder(keys, issuer(teamDomain), audience.strip(), clock));
     }
 
     public Outcome check(String assertion) {
-        if (!enforced) {
-            return Outcome.ALLOWED;
-        }
         if (decoder == null) {
             return Outcome.UNAVAILABLE;
         }

@@ -56,7 +56,7 @@ Cuentas, login y sesión compartidos entre web y Android.
 
 ### Superadmin y RGPD
 - Superadmin: usuario único por entorno (`SUPERADMIN_EMAIL` + `SUPERADMIN_PASSWORD_HASH` Argon2id); sin ellas, login 503. Cambiar la contraseña = cambiar la variable y reiniciar.
-- Todo `/api/v1/admin/**` (login incluido) exige la cabecera `Cf-Access-Jwt-Assertion`: RS256 con las claves del equipo, `iss` `https://<CF_ACCESS_TEAM_DOMAIN>`, `aud` con `CF_ACCESS_AUD`, `exp` con el reloj (60 s de margen). Falta o inválida: 403; claves inaccesibles o variables vacías: 503. Solo el lanzador local la desactiva. La app admin llama a la API por su propio host (proxy nginx, `09-despliegue.md`).
+- Todo `/api/v1/admin/**` (login incluido) exige la cabecera `Cf-Access-Jwt-Assertion`: RS256 con las claves del equipo, `iss` `https://<CF_ACCESS_TEAM_DOMAIN>`, `aud` con `CF_ACCESS_AUD`, `exp` con el reloj (60 s de margen). Falta o inválida: 403; claves inaccesibles o variables vacías: 503. En local la pone un Cloudflare simulado (`08-ejecucion-local.md`). La app admin llama a la API por su propio host (proxy nginx, `09-despliegue.md`).
 - Sesión de superadmin: JWT de 1 h con `purpose` `ADMIN`, sin refresh. La API de usuarios no lo acepta (401) y la de superadmin solo acepta ese (401).
 - Login de superadmin: 401 genérico; contador propio (5 fallos en 15 min → 15 min, tipo `ADMIN` en el listado) más el de IP compartido con el login normal, y el mismo limitador; siempre se comprueba el hash. Los fallos del login público con su email no le afectan, ni al revés.
 - Bloqueos activos: se listan (email de la cuenta si existe, IP si es de IP) y se revocan; revocar borra los fallos y el usuario puede reintentar. Caducado o desconocido: 404.

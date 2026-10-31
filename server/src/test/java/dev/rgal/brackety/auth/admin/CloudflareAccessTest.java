@@ -9,6 +9,7 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.PlainJWT;
 import com.nimbusds.jwt.SignedJWT;
 import dev.rgal.brackety.auth.admin.CloudflareAccess.Outcome;
 import dev.rgal.brackety.common.MutableClock;
@@ -133,8 +134,9 @@ class CloudflareAccessTest {
     }
 
     @Test
-    void notEnforcedLetsEverythingThrough() {
-        assertThat(CloudflareAccess.notEnforced().check(null)).isEqualTo(Outcome.ALLOWED);
+    void deniesAnUnsignedAssertion() {
+        assertThat(access.check(new PlainJWT(cloudflare.claims().build()).serialize()))
+                .isEqualTo(Outcome.DENIED);
     }
 
     @Test

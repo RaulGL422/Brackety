@@ -26,7 +26,7 @@ Cada escenario es una clase `Scenario` en `server/src/test/java/dev/rgal/bracket
 - Solo existe en el lanzador local (`server/src/test`); en producción ese endpoint no existe.
 
 ## Superadmin local
-- El lanzador local no exige Cloudflare Access (`brackety.local.skip-cloudflare-access` en `application-local.properties`, solo en `server/src/test`).
+- Cloudflare Access simulado, como Google: la API local hace la comprobación real con una clave generada al arrancar y un filtro (`LocalAdminConfig`, solo en `server/src/test`) añade la cabecera que pondría Cloudflare si falta. La app admin funciona sin pasos extra.
 - Superadmin: `superadmin@example.test` / `brackety-demo` en `POST /api/v1/admin/auth/login`.
 
 ## Reloj simulado

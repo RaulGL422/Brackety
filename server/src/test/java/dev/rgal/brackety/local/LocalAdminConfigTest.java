@@ -4,6 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import dev.rgal.brackety.auth.admin.CloudflareAccess;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,7 +16,6 @@ import org.springframework.test.web.servlet.MockMvc;
 // Same superadmin as application-local.properties (password brackety-demo).
 @SpringBootTest(
         properties = {
-            LocalAdminConfig.SKIP_ACCESS + "=true",
             "brackety.superadmin.email=superadmin@example.test",
             "brackety.superadmin.password-hash="
                     + "$argon2id$v=19$m=19456,t=2,p=1$qty4Hpx8trIozbxqxr56OQ$0NiOranNveRkXNK0Vqguif+/ertv6ImRz9eUqDI2QHM",
@@ -30,11 +30,20 @@ class LocalAdminConfigTest {
     MockMvc mvc;
 
     @Test
-    void theLocalSuperadminLogsInWithoutCloudflareAccess() throws Exception {
+    void theLocalSuperadminLogsInWithoutAddingTheAccessHeader() throws Exception {
         mvc.perform(post("/api/v1/admin/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"email\":\"superadmin@example.test\",\"password\":\"brackety-demo\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken").isNotEmpty());
+    }
+
+    @Test
+    void theRealAccessCheckStillRuns() throws Exception {
+        mvc.perform(post("/api/v1/admin/auth/login")
+                        .header(CloudflareAccess.HEADER, "not-a-jwt")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"superadmin@example.test\",\"password\":\"brackety-demo\"}"))
+                .andExpect(status().isForbidden());
     }
 }

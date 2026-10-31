@@ -108,3 +108,5 @@ Formato: fecha · decisión · motivo.
 - 2026-10-30 · Al validar un organizador se le avisa por email en su idioma (solo la primera vez) · sabe cuándo puede publicar eventos.
 
 - 2026-10-31 · El login de superadmin tiene su propio contador de fallos (no el del email) y comparte el de IP · con el del email, cualquiera podía bloquear al superadmin desde el login público, y él no puede revocar su propio bloqueo.
+- 2026-10-31 · Registro con email de cuenta pasada la gracia y aún sin purgar: 202 sin crear ni avisar hasta la purga diaria · como mucho un día de espera; no duplicar la purga en el registro; decidido por Raul.
+- 2026-10-31 · En local, Cloudflare Access se simula (clave generada al arrancar y filtro que añade la cabecera, en `server/src/test`) en lugar de desactivarse · el código de producción no tiene forma de saltarse la comprobación y en local se ejecuta la misma.
