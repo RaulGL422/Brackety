@@ -44,6 +44,11 @@ jobs:
           curl -fsS http://127.0.0.1:8081/ | grep -q flutter_bootstrap
           curl -fsS http://127.0.0.1:8082/healthz
           curl -fsSI http://127.0.0.1:8081/ | grep -qi "x-content-type-options: nosniff"
+          # Admin proxies /api/ to the api; web does not.
+          curl -fsS http://127.0.0.1:8082/api/v1/info | grep -q brackety
+          if curl -fsS http://127.0.0.1:8081/api/v1/info | grep -q '"today"'; then echo "web must not proxy the api"; exit 1; fi
+          # No Cloudflare Access settings in CI: the superadmin API is closed.
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8082/api/v1/admin/auth/locks)" = 503
       - name: Backup and restore
         run: |
           sudo apt-get install -y -qq age > /dev/null
@@ -130,6 +135,6 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             APP=${{ matrix.app }}
-            API_BASE_URL=${{ vars.API_BASE_URL }}
+            API_BASE_URL=${{ matrix.app == 'admin' && vars.ADMIN_API_BASE_URL || vars.API_BASE_URL }}
           cache-from: type=gha,scope=${{ matrix.image }}
           cache-to: type=gha,mode=max,scope=${{ matrix.image }}
