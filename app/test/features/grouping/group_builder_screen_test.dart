@@ -4,7 +4,6 @@ import 'package:brackety/features/events/state/events_providers.dart';
 import 'package:brackety/features/grouping/data/grouping_models.dart';
 import 'package:brackety/features/grouping/data/grouping_repository.dart';
 import 'package:brackety/features/grouping/state/group_draft.dart';
-import 'package:brackety/features/session/state/session_controller.dart';
 import 'package:brackety/core/router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -51,9 +50,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            sessionApiProvider.overrideWithValue(
-              FakeSessionApi(signedIn: true),
-            ),
+            ...sessionOverrides(FakeAuthApi(signedIn: true)),
             groupingRepositoryProvider.overrideWithValue(repository),
             myEventsProvider.overrideWith(
               (ref) async => [
@@ -116,7 +113,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          sessionApiProvider.overrideWithValue(FakeSessionApi(signedIn: true)),
+          ...sessionOverrides(FakeAuthApi(signedIn: true)),
           groupingRepositoryProvider.overrideWithValue(repository),
           myEventsProvider.overrideWith((ref) async => []),
         ],

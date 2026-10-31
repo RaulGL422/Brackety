@@ -25,28 +25,217 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loadError => 'Could not load. Check the connection.';
 
   @override
+  String get noServer => 'Cannot reach the server.';
+
+  @override
+  String get unexpectedError => 'Something went wrong. Try again.';
+
+  @override
+  String tooManyRequests(int seconds) {
+    return 'Too many requests. Wait $seconds s and try again.';
+  }
+
+  @override
+  String get tooManyRequestsWait =>
+      'Too many requests. Wait a moment and try again.';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get continueAction => 'Continue';
+
+  @override
+  String get fieldRequired => 'Required.';
+
+  @override
+  String get emailLabel => 'Email';
+
+  @override
+  String get emailInvalid => 'Enter a valid email.';
+
+  @override
+  String get passwordLabel => 'Password';
+
+  @override
+  String get passwordHint => 'At least 10 characters.';
+
+  @override
+  String get passwordTooShort => 'The password needs at least 10 characters.';
+
+  @override
+  String get passwordTooLong => 'The password can have at most 128 characters.';
+
+  @override
+  String get showPassword => 'Show password';
+
+  @override
+  String get hidePassword => 'Hide password';
+
+  @override
+  String get goToLogin => 'Go to sign in';
+
+  @override
   String get loginTitle => 'Sign in';
-
-  @override
-  String get loginUsername => 'Username';
-
-  @override
-  String get loginPassword => 'Password';
 
   @override
   String get loginSubmit => 'Sign in';
 
   @override
-  String get loginInvalid => 'Wrong username or password.';
+  String get loginInvalid => 'Wrong email or password.';
 
   @override
-  String get loginLocked => 'Too many attempts. Wait a few minutes.';
+  String loginLocked(String lockId) {
+    return 'Account locked for 15 minutes after too many failed attempts. If you need help, quote the code $lockId.';
+  }
 
   @override
-  String get loginNoServer => 'Cannot reach the server.';
+  String get loginForgot => 'Forgot your password?';
+
+  @override
+  String get loginNoAccount => 'No account? Sign up';
+
+  @override
+  String get loginPasswordChanged =>
+      'Password changed. You can sign in with the new one.';
 
   @override
   String get loginDemoAccounts => 'Test accounts (development only)';
+
+  @override
+  String get restoreTitle => 'Account pending deletion';
+
+  @override
+  String restoreBody(String date) {
+    return 'Your account will be deleted on $date. Do you want to restore it?';
+  }
+
+  @override
+  String get restoreConfirm => 'Restore account';
+
+  @override
+  String get restoreExpired =>
+      'Too much time has passed. Sign in again to restore the account.';
+
+  @override
+  String get registerTitle => 'Create account';
+
+  @override
+  String get registerSubmit => 'Create account';
+
+  @override
+  String get registerBirthDate => 'Date of birth';
+
+  @override
+  String get registerUnderage =>
+      'Children under 14 cannot sign up on their own: a parent or guardian adds them from their own account.';
+
+  @override
+  String get registerProfile => 'How will you use Brackety?';
+
+  @override
+  String get registerProfileRequired => 'Choose a profile.';
+
+  @override
+  String get profileClub => 'Club';
+
+  @override
+  String get profileClubHint => 'Organises events and registers its athletes.';
+
+  @override
+  String get profileExternalEntity => 'External entity';
+
+  @override
+  String get profileExternalEntityHint =>
+      'Federation, city council or another body that organises events.';
+
+  @override
+  String get profileHelper => 'Helper';
+
+  @override
+  String get profileHelperHint =>
+      'Helps at events: groups, table or refereeing.';
+
+  @override
+  String get profileExternal => 'External';
+
+  @override
+  String get profileExternalHint =>
+      'Follows events and results without belonging to a club.';
+
+  @override
+  String get profileStudent => 'Student';
+
+  @override
+  String get profileStudentHint => 'Athlete who competes with their club.';
+
+  @override
+  String get registerAccept =>
+      'I accept the terms of use and the privacy policy.';
+
+  @override
+  String get registerAcceptRequired =>
+      'You must accept them to create the account.';
+
+  @override
+  String get registerHaveAccount => 'Already have an account? Sign in';
+
+  @override
+  String get checkEmailTitle => 'Check your email';
+
+  @override
+  String get checkEmailBody =>
+      'We have sent you an email. Open its link to verify the account; it expires in 24 hours.';
+
+  @override
+  String get resendEmail => 'Resend email';
+
+  @override
+  String get resendSent => 'Email sent.';
+
+  @override
+  String get verifyBanner => 'Verify your email: some actions need it.';
+
+  @override
+  String get verifyTitle => 'Verify email';
+
+  @override
+  String get verifySuccess => 'Email verified. Thank you!';
+
+  @override
+  String get linkInvalid => 'The link is invalid or has expired.';
+
+  @override
+  String get forgotTitle => 'Recover password';
+
+  @override
+  String get forgotIntro =>
+      'Enter your email and we will send you a link to choose a new password.';
+
+  @override
+  String get forgotSubmit => 'Send link';
+
+  @override
+  String get forgotSent =>
+      'If there is an account with that email, we have sent you a link to change the password.';
+
+  @override
+  String get resetTitle => 'New password';
+
+  @override
+  String get resetNewPassword => 'New password';
+
+  @override
+  String get resetConfirmPassword => 'Repeat the password';
+
+  @override
+  String get resetMismatch => 'The passwords do not match.';
+
+  @override
+  String get resetSubmit => 'Change password';
+
+  @override
+  String get resetRequestNew => 'Request another link';
 
   @override
   String get logout => 'Sign out';
