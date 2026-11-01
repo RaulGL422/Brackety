@@ -112,4 +112,8 @@ Formato: fecha · decisión · motivo.
 - 2026-10-31 · En local, Cloudflare Access se simula (clave generada al arrancar y filtro que añade la cabecera, en `server/src/test`) en lugar de desactivarse · el código de producción no tiene forma de saltarse la comprobación y en local se ejecuta la misma.
 - 2026-10-31 · Registro en la app con versión legal provisional `2026-11-draft` y una casilla sin enlaces hasta `legal-paginas` · no hay textos legales todavía; decidido por Raul.
 - 2026-10-31 · Login con Google en la app pospuesto hasta tener sus client IDs · sin ellos no se puede probar; decidido por Raul.
+- 2026-11-02 · Tras registrarse, la app inicia sesión con los mismos datos · el 202 neutro parecía un registro roto; no filtra nada nuevo (ya se podía probar el login tras registrarse).
+- 2026-11-02 · El registro de la app solo ofrece Club y Ayudante; Alumno, Externo y Entidad Externa solo con `APP_ENV=dev` · el resto de perfiles aún no tiene módulos; decidido por Raul.
+- 2026-11-02 · `POST /auth/password/reset/check` comprueba el enlace sin gastarlo · la pantalla dice "enlace inválido" al abrirlo, no tras escribir la contraseña; decidido por Raul.
+- 2026-11-02 · Organizadores (Club, Entidad Externa) se registran sin fecha de nacimiento: casilla de mayor de edad y representante, nombre y CIF obligatorio validado por formato y dígito, repetible · la fecha no aporta en una organización y el CIF ayuda al superadmin a validar; tarea propia; decidido por Raul.
 - 2026-10-31 · Web con URLs sin `#` (path strategy) · los enlaces de email (`/verify-email?token=…`) deben abrir la pantalla correcta; nginx ya devuelve `index.html`.
