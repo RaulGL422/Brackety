@@ -64,6 +64,9 @@ class AuthApi {
   Future<void> forgotPassword(String email) =>
       _post('/password/forgot', {'email': email});
 
+  Future<void> checkResetToken(String token) =>
+      _post('/password/reset/check', {'token': token});
+
   Future<void> resetPassword(String token, String newPassword) =>
       _post('/password/reset', {'token': token, 'newPassword': newPassword});
 

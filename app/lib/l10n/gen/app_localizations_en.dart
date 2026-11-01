@@ -128,7 +128,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get registerUnderage =>
-      'Children under 14 cannot sign up on their own: a parent or guardian adds them from their own account.';
+      'Children under 14 cannot create their own account. A parent or guardian adds them from their own account by adding a minor profile (coming soon).';
 
   @override
   String get registerProfile => 'How will you use Brackety?';

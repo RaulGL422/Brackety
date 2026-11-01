@@ -57,7 +57,7 @@ switch ($Target) {
     "device" {
         $apiUrl = "http://$(Get-LanIp):8080"
         Set-Content -Path (Join-Path $project "env\device.json") -Encoding ascii `
-            -Value "{`n  `"API_BASE_URL`": `"$apiUrl`"`n}"
+            -Value "{`n  `"API_BASE_URL`": `"$apiUrl`",`n  `"APP_ENV`": `"dev`"`n}"
         Write-Host "Móvil -> $apiUrl (el móvil debe estar en la misma wifi)"
         $runArgs += "--dart-define-from-file=env/device.json"
     }

@@ -38,8 +38,8 @@ List<Override> sessionOverrides(
   refreshTokenStoreProvider.overrideWithValue(store),
 ];
 
-/// Server auth without a server. Sign-in works when the password equals the email (like the
-/// demo accounts); each `...Error` makes that call fail instead.
+/// Server auth without a server. Sign-in works for [accounts] and when the password equals the
+/// email (like the demo accounts); each `...Error` makes that call fail instead.
 class FakeAuthApi implements AuthApi {
   FakeAuthApi({this.signedIn = false, this.issueRefreshTokens = false});
 
@@ -56,6 +56,10 @@ class FakeAuthApi implements AuthApi {
   DioException? verifyError;
   DioException? forgotError;
   DioException? resetError;
+  DioException? resetCheckError;
+
+  /// Email → password; registering adds to it unless the email is already there.
+  final accounts = <String, String>{};
 
   /// While set and not completed, refreshes wait for it.
   Completer<void>? refreshGate;
@@ -69,6 +73,7 @@ class FakeAuthApi implements AuthApi {
   final resends = <String>[];
   final forgotten = <String>[];
   final resets = <String>[];
+  final resetChecks = <String>[];
   int _sessions = 0;
 
   SessionTokens _session() {
@@ -88,7 +93,9 @@ class FakeAuthApi implements AuthApi {
   @override
   Future<SessionTokens> login(String email, String password) async {
     _failWith(loginError);
-    if (email != password) throw httpError(401);
+    if (email != password && accounts[email] != password) {
+      throw httpError(401);
+    }
     logins.add(email);
     return _session();
   }
@@ -119,6 +126,7 @@ class FakeAuthApi implements AuthApi {
   Future<void> register(Registration registration) async {
     _failWith(registerError);
     registrations.add(registration);
+    accounts.putIfAbsent(registration.email, () => registration.password);
   }
 
   @override
@@ -135,6 +143,12 @@ class FakeAuthApi implements AuthApi {
   Future<void> forgotPassword(String email) async {
     _failWith(forgotError);
     forgotten.add(email);
+  }
+
+  @override
+  Future<void> checkResetToken(String token) async {
+    resetChecks.add(token);
+    _failWith(resetCheckError);
   }
 
   @override

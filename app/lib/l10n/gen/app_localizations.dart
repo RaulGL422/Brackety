@@ -317,7 +317,7 @@ abstract class AppLocalizations {
   /// No description provided for @registerUnderage.
   ///
   /// In es, this message translates to:
-  /// **'Los menores de 14 años no se registran solos: los da de alta su padre, madre o tutor desde su propia cuenta.'**
+  /// **'Los menores de 14 años no pueden crear su propia cuenta. Su padre, madre o tutor lo da de alta desde su cuenta añadiendo un perfil de menor (disponible próximamente).'**
   String get registerUnderage;
 
   /// No description provided for @registerProfile.

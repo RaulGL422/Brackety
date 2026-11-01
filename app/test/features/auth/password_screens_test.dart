@@ -96,6 +96,32 @@ void main() {
       expect(find.text('Send link'), findsOneWidget);
     });
 
+    testWidgets('a valid link is checked on open and shows the form', (
+      tester,
+    ) async {
+      final api = FakeAuthApi();
+      await pumpAuthApp(tester, api, location: '/reset-password?token=t1');
+
+      expect(api.resetChecks, ['t1']);
+      expect(find.text('Repeat the password'), findsOneWidget);
+    });
+
+    testWidgets('an invalid link is told on open', (tester) async {
+      final api = FakeAuthApi()..resetCheckError = httpError(400);
+      await pumpAuthApp(tester, api, location: '/reset-password?token=old');
+
+      expect(find.text('The link is invalid or has expired.'), findsOneWidget);
+      expect(find.text('Repeat the password'), findsNothing);
+      expect(find.text('Request another link'), findsOneWidget);
+    });
+
+    testWidgets('without network the form shows anyway', (tester) async {
+      final api = FakeAuthApi()..resetCheckError = networkError();
+      await pumpAuthApp(tester, api, location: '/reset-password?token=t1');
+
+      expect(find.text('Repeat the password'), findsOneWidget);
+    });
+
     testWidgets('a link without token is invalid at once', (tester) async {
       await pumpAuthApp(tester, FakeAuthApi(), location: '/reset-password');
 

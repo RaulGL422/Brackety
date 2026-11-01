@@ -15,3 +15,9 @@ void ensureApiConfigured() {
     );
   }
 }
+
+/// Deployment environment, injected like [apiBaseUrl]; `dev` only in the local env files.
+/// Unlike kDebugMode, a release build pointed at a local server can still be `dev`.
+const appEnv = String.fromEnvironment('APP_ENV');
+
+bool get isDevEnvironment => appEnv == 'dev';

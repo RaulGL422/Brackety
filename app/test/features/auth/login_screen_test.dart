@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/fakes.dart';
@@ -147,5 +148,28 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(api.logins, ['club1']);
+  });
+
+  testWidgets('Tab goes from field to field and skips the eye button', (
+    tester,
+  ) async {
+    await pumpAuthApp(tester, FakeAuthApi());
+    bool focusedIn(Finder finder) => tester
+        .widget<EditableText>(
+          find.descendant(of: finder, matching: find.byType(EditableText)),
+        )
+        .focusNode
+        .hasFocus;
+
+    await tester.tap(find.byType(TextField).at(0));
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pump();
+    expect(focusedIn(find.byType(TextField).at(1)), isTrue);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pump();
+    final focused = FocusManager.instance.primaryFocus!.context!;
+    expect(focused.findAncestorWidgetOfExactType<IconButton>(), isNull);
+    expect(focused.findAncestorWidgetOfExactType<FilledButton>(), isNotNull);
   });
 }

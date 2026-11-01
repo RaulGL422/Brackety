@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/auth_api.dart';
 import '../data/refresh_token_store.dart';
+import '../data/registration.dart';
 
 enum SessionStatus { restoring, signedOut, signedIn }
 
@@ -90,6 +91,20 @@ class SessionController extends Notifier<SessionState> {
 
   Future<void> login(String email, String password) async =>
       _signIn(await _api.login(email.trim(), password));
+
+  /// Registers and signs straight in; returns whether it did. A failed registration throws.
+  /// A failed sign-in (the email already had an account with another password, a lock, no
+  /// network) returns false and the app shows the same neutral "check your email" as always,
+  /// so nothing reveals whether the email was taken.
+  Future<bool> register(Registration registration) async {
+    await _api.register(registration);
+    try {
+      await login(registration.email, registration.password);
+      return true;
+    } on DioException {
+      return false;
+    }
+  }
 
   /// Cancels a pending account deletion with the token from the 403 of the login.
   Future<void> restoreAccount(String restoreToken) async =>

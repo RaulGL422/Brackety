@@ -1,5 +1,8 @@
 import 'package:brackety/features/auth/data/api_error.dart';
 import 'package:brackety/features/auth/data/registration.dart';
+import 'package:brackety/features/auth/ui/auth_texts.dart';
+import 'package:brackety/l10n/gen/app_localizations.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/fakes.dart';
@@ -90,6 +93,38 @@ void main() {
         'acceptedPrivacyVersion': '2026-11-draft',
         'locale': 'es',
       });
+    });
+  });
+
+  group('rate limiter message', () {
+    final limited = ApiError.from(
+      httpError(
+        429,
+        headers: {
+          'Retry-After': ['17'],
+        },
+      ),
+    );
+
+    test('uses the seconds from Retry-After', () {
+      expect(
+        apiErrorMessage(lookupAppLocalizations(const Locale('es')), limited),
+        'Demasiadas peticiones. Espera 17 s y vuelve a intentarlo.',
+      );
+      expect(
+        apiErrorMessage(lookupAppLocalizations(const Locale('en')), limited),
+        'Too many requests. Wait 17 s and try again.',
+      );
+    });
+
+    test('without Retry-After asks to wait a moment', () {
+      expect(
+        apiErrorMessage(
+          lookupAppLocalizations(const Locale('en')),
+          ApiError.from(httpError(429)),
+        ),
+        'Too many requests. Wait a moment and try again.',
+      );
     });
   });
 }

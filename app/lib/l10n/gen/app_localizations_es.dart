@@ -130,7 +130,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get registerUnderage =>
-      'Los menores de 14 años no se registran solos: los da de alta su padre, madre o tutor desde su propia cuenta.';
+      'Los menores de 14 años no pueden crear su propia cuenta. Su padre, madre o tutor lo da de alta desde su cuenta añadiendo un perfil de menor (disponible próximamente).';
 
   @override
   String get registerProfile => '¿Cómo vas a usar Brackety?';

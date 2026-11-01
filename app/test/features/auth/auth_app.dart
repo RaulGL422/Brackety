@@ -21,17 +21,20 @@ void useSize(WidgetTester tester, Size size) {
   addTearDown(tester.view.reset);
 }
 
-/// The whole app on [api], opened at [location]; "today" is 2026-10-31.
+/// The whole app on [api], opened at [location]; "today" is 2026-10-31 and `APP_ENV` is not dev
+/// unless [devEnvironment].
 Future<GoRouter> pumpAuthApp(
   WidgetTester tester,
   FakeAuthApi api, {
   String? location,
+  bool devEnvironment = false,
 }) async {
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
         ...sessionOverrides(api),
         todayProvider.overrideWithValue(DateTime(2026, 10, 31)),
+        devEnvironmentProvider.overrideWithValue(devEnvironment),
         myEventsProvider.overrideWith((ref) async => []),
       ],
       child: const BracketyApp(),

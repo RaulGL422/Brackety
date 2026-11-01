@@ -44,10 +44,13 @@ class _PasswordFieldState extends State<PasswordField> {
       decoration: InputDecoration(
         labelText: widget.label,
         helperText: widget.helperText,
-        suffixIcon: IconButton(
-          tooltip: _hidden ? l10n.showPassword : l10n.hidePassword,
-          icon: Icon(_hidden ? Icons.visibility : Icons.visibility_off),
-          onPressed: () => setState(() => _hidden = !_hidden),
+        // Out of the Tab order (field to field, then the buttons); still tappable.
+        suffixIcon: ExcludeFocus(
+          child: IconButton(
+            tooltip: _hidden ? l10n.showPassword : l10n.hidePassword,
+            icon: Icon(_hidden ? Icons.visibility : Icons.visibility_off),
+            onPressed: () => setState(() => _hidden = !_hidden),
+          ),
         ),
       ),
     );

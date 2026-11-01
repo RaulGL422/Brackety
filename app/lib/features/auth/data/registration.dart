@@ -19,6 +19,12 @@ extension on ProfileType {
   };
 }
 
+/// Profiles offered at sign-up. The others are only tried out in dev until their modules exist.
+List<ProfileType> registrationProfiles({required bool devEnvironment}) =>
+    devEnvironment
+    ? ProfileType.values
+    : const [ProfileType.club, ProfileType.helper];
+
 /// Whole years between [birthDate] and [today], as the server counts them.
 bool isOldEnoughToRegister(DateTime birthDate, DateTime today) {
   var age = today.year - birthDate.year;

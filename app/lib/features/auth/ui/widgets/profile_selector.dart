@@ -7,14 +7,21 @@ import '../auth_texts.dart';
 
 /// The first profile of the account, each with a one-line description.
 class ProfileSelector extends FormField<ProfileType> {
-  ProfileSelector({super.key, super.validator, super.onSaved})
-    : super(builder: (field) => _ProfileOptions(field: field));
+  ProfileSelector({
+    super.key,
+    required List<ProfileType> profiles,
+    super.validator,
+    super.onSaved,
+  }) : super(
+         builder: (field) => _ProfileOptions(field: field, profiles: profiles),
+       );
 }
 
 class _ProfileOptions extends StatelessWidget {
-  const _ProfileOptions({required this.field});
+  const _ProfileOptions({required this.field, required this.profiles});
 
   final FormFieldState<ProfileType> field;
+  final List<ProfileType> profiles;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +38,7 @@ class _ProfileOptions extends StatelessWidget {
           onChanged: field.didChange,
           child: Column(
             children: [
-              for (final profile in ProfileType.values)
+              for (final profile in profiles)
                 RadioListTile<ProfileType>(
                   value: profile,
                   contentPadding: EdgeInsets.zero,

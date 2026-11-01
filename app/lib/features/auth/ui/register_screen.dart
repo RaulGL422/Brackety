@@ -57,8 +57,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       _error = null;
     });
     try {
-      await ref.read(authApiProvider).register(registration);
-      if (mounted) context.go('/register/sent', extra: email);
+      final signedIn = await ref
+          .read(sessionProvider.notifier)
+          .register(registration);
+      // Signed in, the router takes the user home.
+      if (!signedIn && mounted) context.go('/register/sent', extra: email);
     } on DioException catch (e) {
       if (mounted) {
         setState(
@@ -121,6 +124,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: AppSpacing.l),
                 ProfileSelector(
+                  profiles: registrationProfiles(
+                    devEnvironment: ref.watch(devEnvironmentProvider),
+                  ),
                   validator: (value) =>
                       value == null ? l10n.registerProfileRequired : null,
                   onSaved: (value) => _profile = value,

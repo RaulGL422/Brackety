@@ -39,7 +39,7 @@
   "registerTitle": "Crear cuenta",
   "registerSubmit": "Crear cuenta",
   "registerBirthDate": "Fecha de nacimiento",
-  "registerUnderage": "Los menores de 14 años no se registran solos: los da de alta su padre, madre o tutor desde su propia cuenta.",
+  "registerUnderage": "Los menores de 14 años no pueden crear su propia cuenta. Su padre, madre o tutor lo da de alta desde su cuenta añadiendo un perfil de menor (disponible próximamente).",
   "registerProfile": "¿Cómo vas a usar Brackety?",
   "registerProfileRequired": "Elige un perfil.",
   "profileClub": "Club",

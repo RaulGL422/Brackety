@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
 import '../data/api_error.dart';
+import '../state/auth_providers.dart';
 import '../state/session_controller.dart';
 import 'auth_texts.dart';
 import 'widgets/auth_form_page.dart';
@@ -68,7 +69,10 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final error = _error;
-    if (_invalidLink) {
+    final linkValid = _invalidLink
+        ? const AsyncData(false)
+        : ref.watch(resetLinkValidProvider(widget.token!));
+    if (linkValid case AsyncData(value: false)) {
       return AuthFormPage(
         title: l10n.resetTitle,
         children: [
@@ -79,6 +83,12 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
             child: Text(l10n.resetRequestNew),
           ),
         ],
+      );
+    }
+    if (linkValid.isLoading) {
+      return AuthFormPage(
+        title: l10n.resetTitle,
+        children: const [Center(child: CircularProgressIndicator())],
       );
     }
     return AuthFormPage(
