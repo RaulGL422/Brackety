@@ -18,6 +18,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest(
@@ -95,5 +96,48 @@ class BracketyApplicationTests {
         }
 
         assertThat(statuses).contains(429);
+    }
+
+    @Test
+    void theRateLimiter429IsReadableByAnAllowedOrigin() throws Exception {
+        var rejected = loginUntil429("192.0.2.51", "http://localhost:5000");
+
+        assertThat(rejected.getHeader("Access-Control-Allow-Origin")).isEqualTo("http://localhost:5000");
+        assertThat(rejected.getHeader("Access-Control-Expose-Headers")).isEqualTo("Retry-After");
+        assertThat(rejected.getHeader("Retry-After")).isNotBlank();
+    }
+
+    @Test
+    void theRateLimiter429OfAnotherOriginHasNoAllowOrigin() throws Exception {
+        var rejected = loginUntil429("192.0.2.52", "https://evil.example");
+
+        assertThat(rejected.getHeader("Access-Control-Allow-Origin")).isNull();
+    }
+
+    @Test
+    void preflightStillWorksForAnAuthPath() throws Exception {
+        mvc.perform(options("/api/v1/auth/login")
+                        .header("Origin", "http://localhost:5000")
+                        .header("Access-Control-Request-Method", "POST")
+                        .header("Access-Control-Request-Headers", "content-type"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Access-Control-Allow-Origin", "http://localhost:5000"));
+    }
+
+    // Five calls against a limit of 2: even across a minute boundary one minute goes over.
+    private MockHttpServletResponse loginUntil429(String ip, String origin) throws Exception {
+        for (int i = 0; i < 5; i++) {
+            var response = mvc.perform(
+                            post("/api/v1/auth/login").header("Origin", origin).with(request -> {
+                                request.setRemoteAddr(ip);
+                                return request;
+                            }))
+                    .andReturn()
+                    .getResponse();
+            if (response.getStatus() == 429) {
+                return response;
+            }
+        }
+        throw new AssertionError("No 429 after 5 sign-in calls");
     }
 }
