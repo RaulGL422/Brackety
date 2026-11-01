@@ -163,6 +163,12 @@ class AuthController {
         passwordReset.reset(request.token(), request.newPassword());
     }
 
+    @PostMapping("/password/reset/check")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void checkResetLink(@Valid @RequestBody TokenRequest request) {
+        passwordReset.check(request.token());
+    }
+
     private static ResponseEntity<TokenResponse> respond(Session session, boolean web) {
         return withRefreshCookie(session, web).body(tokens(session, web));
     }
