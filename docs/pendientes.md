@@ -5,8 +5,6 @@
 - [ ] Docker Desktop: solo hará falta para probar `deploy/` en Windows; tests y ejecución local no lo necesitan.
 
 ## Despliegue (infra-deploy)
-- [ ] Raul: crear la variable de repositorio `ADMIN_API_BASE_URL` en GitHub (URL del host admin); sin ella el superadmin recibe 403.
-- [ ] Variable de repositorio `API_BASE_URL` en GitHub (Settings → Variables) cuando haya dominio; sin ella fallan las imágenes web/admin al publicar.
 - [ ] Paquetes GHCR: hacerlos públicos o `docker login ghcr.io` en la Pi con un token de solo lectura (decidir).
 - [ ] Copia de los backups en la nube (doc 05): elegir proveedor barato; se añadiría con `rclone` al final de `backup.sh`.
 - [ ] Generar la clave age de backups y guardar la privada fuera de la Pi (`09-despliegue.md`).
@@ -33,9 +31,10 @@
 - [ ] Login con Google en la app (botón + `REGISTRATION_REQUIRED`) cuando existan los client IDs.
 
 ## Prototipo Fase 1 (bloquean el uso real)
-- [ ] Raul: URL pública de la Pi para web, API y superadmin (`API_BASE_URL`, `PUBLIC_BASE_URL`, `CORS_ALLOWED_ORIGINS`) y conexión a Internet en el pabellón: sin offline, sin red no funciona.
+- [ ] Raul: túnel de Cloudflare con `brackety.rgal.dev` y `brackety-api.rgal.dev` (`prototipo-f1.md`, Despliegue) y conexión a Internet en el pabellón: sin offline, sin red no funciona.
 - [ ] Categorías reales de la Fase 1 (ahora ficticias: tramos del ranking, mixtas).
 - [ ] Aviso de privacidad mínimo visible antes de la fase (datos reales de menores sin páginas legales ni `PRIVACY_CONTACT_EMAIL`); la casilla del tutor ya está en la inscripción. Aceptado por Raul.
+- [ ] Base de datos de la fase en la SD (sin SSD) con copia diaria: ¿se acepta el riesgo o se compra antes el SSD?
 - [ ] Tras la fase: desactivar `DEMO_ACCOUNTS_ENABLED` y borrar las cuentas demo.
 
 ## Repositorio público
