@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:web/web.dart' as web;
 
 /// Hands [bytes] to the browser as a download called [name].
-void saveFile(String name, List<int> bytes, String mimeType) {
+Future<void> saveFile(String name, List<int> bytes, String mimeType) async {
   final blob = web.Blob(
     [Uint8List.fromList(bytes).toJS].toJS,
     web.BlobPropertyBag(type: mimeType),

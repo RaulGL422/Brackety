@@ -19,6 +19,14 @@ final verifyEmailProvider = FutureProvider.autoDispose.family<void, String>(
   },
 );
 
+/// The link sent to the new address. Confirming closes every session on the server, so this one
+/// ends too, if there is one here.
+final confirmEmailChangeProvider = FutureProvider.autoDispose
+    .family<void, String>(retry: (_, _) => null, (ref, token) async {
+      await ref.read(authApiProvider).confirmEmailChange(token);
+      await ref.read(sessionProvider.notifier).sessionsClosed();
+    });
+
 /// Whether a reset link still works, checked on open. Only the server's 400 says no: without an
 /// answer the form shows anyway and the submit tells.
 final resetLinkValidProvider = FutureProvider.autoDispose.family<bool, String>(

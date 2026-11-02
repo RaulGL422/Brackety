@@ -3,17 +3,34 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../data/account_api.dart';
 import '../data/auth_api.dart';
 import '../data/refresh_token_store.dart';
 import '../data/registration.dart';
 
 enum SessionStatus { restoring, signedOut, signedIn }
 
+/// Why the server ended the session, for the sign-in screen to explain.
+sealed class SignedOutNotice {
+  const SignedOutNotice();
+}
+
+class AccountDeletionScheduled extends SignedOutNotice {
+  const AccountDeletionScheduled(this.deletesOn);
+
+  final DateTime deletesOn;
+}
+
+class PasswordRemoved extends SignedOutNotice {
+  const PasswordRemoved();
+}
+
 class SessionState {
   const SessionState(
     this.status, {
     this.accessToken,
     this.emailVerified = true,
+    this.notice,
   });
 
   static const signedOut = SessionState(SessionStatus.signedOut);
@@ -25,10 +42,17 @@ class SessionState {
 
   /// Unknown while offline; assumed true so the banner only shows on the server's word.
   final bool emailVerified;
+
+  /// Only while signed out by [SessionController.sessionsClosed].
+  final SignedOutNotice? notice;
 }
 
 final authApiProvider = Provider<AuthApi>(
   (ref) => AuthApi(ref.watch(dioProvider)),
+);
+
+final accountApiProvider = Provider<AccountApi>(
+  (ref) => AccountApi(ref.watch(apiProvider)),
 );
 
 final refreshTokenStoreProvider = Provider<RefreshTokenStore>(
@@ -128,6 +152,14 @@ class SessionController extends Notifier<SessionState> {
     await _signOutLocally();
   }
 
+  /// The server has just closed every session, this one included (account deleted, password
+  /// removed, email changed): its refresh token is dead, so there is no logout to send.
+  Future<void> sessionsClosed([SignedOutNotice? notice]) async {
+    await _refreshing;
+    await _store.clear();
+    state = SessionState(SessionStatus.signedOut, notice: notice);
+  }
+
   /// After the email link. The access token still says unverified, so it asks for a new one.
   Future<void> emailVerified() async {
     if (state.status != SessionStatus.signedIn) return;
@@ -140,10 +172,8 @@ class SessionController extends Notifier<SessionState> {
 
   /// The session response has no email; `/me` does.
   Future<void> resendVerification() async {
-    final me = await ref
-        .read(apiProvider)
-        .get<Map<String, dynamic>>('/api/v1/me');
-    await _api.resendVerification(me.data!['email'] as String);
+    final me = await ref.read(accountApiProvider).me();
+    await _api.resendVerification(me.email);
   }
 
   Future<void> _signIn(SessionTokens tokens) async {

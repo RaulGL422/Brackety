@@ -61,6 +61,9 @@ class AuthApi {
   Future<void> resendVerification(String email) =>
       _post('/email/resend', {'email': email});
 
+  Future<void> confirmEmailChange(String token) =>
+      _post('/email/change/confirm', {'token': token});
+
   Future<void> forgotPassword(String email) =>
       _post('/password/forgot', {'email': email});
 

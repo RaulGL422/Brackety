@@ -4,6 +4,7 @@ import 'package:brackety/features/auth/state/auth_providers.dart';
 import 'package:brackety/features/events/state/events_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
@@ -21,18 +22,21 @@ void useSize(WidgetTester tester, Size size) {
   addTearDown(tester.view.reset);
 }
 
-/// The whole app on [api], opened at [location]; "today" is 2026-10-31 and `APP_ENV` is not dev
-/// unless [devEnvironment].
+/// The whole app on [api] (and [account] for `/me`), opened at [location]; "today" is 2026-10-31
+/// and `APP_ENV` is not dev unless [devEnvironment].
 Future<GoRouter> pumpAuthApp(
   WidgetTester tester,
   FakeAuthApi api, {
   String? location,
   bool devEnvironment = false,
+  FakeAccountApi? account,
+  List<Override> overrides = const [],
 }) async {
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        ...sessionOverrides(api),
+        ...sessionOverrides(api, account: account),
+        ...overrides,
         todayProvider.overrideWithValue(DateTime(2026, 10, 31)),
         devEnvironmentProvider.overrideWithValue(devEnvironment),
         myEventsProvider.overrideWith((ref) async => []),
@@ -61,6 +65,8 @@ Future<void> tapText(WidgetTester tester, String text) async {
       ? button.last
       : find.text(text).last;
   await tester.ensureVisible(target);
+  // A ListView lays the jump out on the next frame.
+  await tester.pump();
   await tester.tap(target);
   await tester.pumpAndSettle();
 }

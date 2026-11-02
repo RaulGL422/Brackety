@@ -26,6 +26,11 @@ class EventsScreen extends ConsumerWidget {
             onPressed: () => context.push('/connection'),
           ),
           IconButton(
+            tooltip: l10n.settingsTitle,
+            icon: const Icon(Icons.account_circle_outlined),
+            onPressed: () => context.push('/settings'),
+          ),
+          IconButton(
             tooltip: l10n.logout,
             icon: const Icon(Icons.logout),
             onPressed: () => ref.read(sessionProvider.notifier).logout(),

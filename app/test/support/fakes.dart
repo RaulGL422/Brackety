@@ -1,5 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:brackety/features/auth/data/account.dart';
+import 'package:brackety/features/auth/data/account_api.dart';
 import 'package:brackety/features/auth/data/auth_api.dart';
 import 'package:brackety/features/auth/data/refresh_token_store.dart';
 import 'package:brackety/features/auth/data/registration.dart';
@@ -29,13 +32,16 @@ DioException networkError() => DioException.connectionError(
 );
 
 /// The provider overrides every app test needs: [api] instead of the server and a web-like
-/// cookie store, so the session restores itself when [FakeAuthApi.signedIn] is true.
+/// cookie store, so the session restores itself when [FakeAuthApi.signedIn] is true. `/me`
+/// answers from [account] (a default one when not given).
 List<Override> sessionOverrides(
   FakeAuthApi api, {
   RefreshTokenStore store = const CookieRefreshTokenStore(),
+  FakeAccountApi? account,
 }) => [
   authApiProvider.overrideWithValue(api),
   refreshTokenStoreProvider.overrideWithValue(store),
+  accountApiProvider.overrideWithValue(account ?? FakeAccountApi()),
 ];
 
 /// Server auth without a server. Sign-in works for [accounts] and when the password equals the
@@ -57,6 +63,7 @@ class FakeAuthApi implements AuthApi {
   DioException? forgotError;
   DioException? resetError;
   DioException? resetCheckError;
+  DioException? confirmEmailChangeError;
 
   /// Email → password; registering adds to it unless the email is already there.
   final accounts = <String, String>{};
@@ -74,6 +81,7 @@ class FakeAuthApi implements AuthApi {
   final forgotten = <String>[];
   final resets = <String>[];
   final resetChecks = <String>[];
+  final emailChanges = <String>[];
   int _sessions = 0;
 
   SessionTokens _session() {
@@ -140,6 +148,13 @@ class FakeAuthApi implements AuthApi {
   Future<void> resendVerification(String email) async => resends.add(email);
 
   @override
+  Future<void> confirmEmailChange(String token) async {
+    _failWith(confirmEmailChangeError);
+    emailChanges.add(token);
+    signedIn = false;
+  }
+
+  @override
   Future<void> forgotPassword(String email) async {
     _failWith(forgotError);
     forgotten.add(email);
@@ -177,3 +192,140 @@ class FakeRefreshTokenStore implements RefreshTokenStore {
   @override
   Future<void> clear() async => token = null;
 }
+
+/// `/api/v1/me` without a server, starting from [account]. The password is [password]; each
+/// `...Error` makes that call fail instead (a list fails one call per element, then works).
+class FakeAccountApi implements AccountApi {
+  FakeAccountApi({Account? account, this.password = 'secret-password'})
+    : account = account ?? testAccount();
+
+  Account account;
+  final String password;
+
+  DioException? meError;
+  DioException? localeError;
+  final addProfileErrors = <DioException>[];
+  DioException? removeProfileError;
+  final actionErrors = <DioException>[];
+  DioException? reauthError;
+  DateTime deletesOn = DateTime(2026, 12, 2);
+
+  int meCalls = 0;
+  final locales = <String>[];
+  final addedProfiles = <ProfileType>[];
+  final removedProfiles = <ProfileType>[];
+  final reauths = <String>[];
+
+  /// Sensitive call name → the reauth token it carried.
+  final actions = <(String, String)>[];
+  int _tokens = 0;
+
+  @override
+  Future<Account> me() async {
+    meCalls++;
+    if (meError case final error?) throw error;
+    return account;
+  }
+
+  @override
+  Future<Account> updateLocale(String locale) async {
+    if (localeError case final error?) throw error;
+    locales.add(locale);
+    return account = account.withLocale(locale);
+  }
+
+  @override
+  Future<void> addProfile(ProfileType type) async {
+    if (addProfileErrors.isNotEmpty) throw addProfileErrors.removeAt(0);
+    addedProfiles.add(type);
+    account = _withProfiles([...account.profiles, AccountProfile(type: type)]);
+  }
+
+  @override
+  Future<void> removeProfile(ProfileType type) async {
+    if (removeProfileError case final error?) throw error;
+    removedProfiles.add(type);
+    account = _withProfiles([
+      for (final profile in account.profiles)
+        if (profile.type != type) profile,
+    ]);
+  }
+
+  @override
+  Future<ReauthToken> reauth(String password) async {
+    reauths.add(password);
+    if (reauthError case final error?) throw error;
+    if (password != this.password) {
+      throw httpError(403, body: {'code': 'REAUTH_FAILED'});
+    }
+    _tokens++;
+    return ReauthToken('reauth-$_tokens', const Duration(minutes: 5));
+  }
+
+  Future<void> _sensitive(String name, String token) async {
+    actions.add((name, token));
+    if (actionErrors.isNotEmpty) throw actionErrors.removeAt(0);
+  }
+
+  @override
+  Future<void> changeEmail(String newEmail, String reauthToken) =>
+      _sensitive('email:$newEmail', reauthToken);
+
+  @override
+  Future<DateTime> deleteAccount(String reauthToken) async {
+    await _sensitive('delete', reauthToken);
+    return deletesOn;
+  }
+
+  @override
+  Future<List<int>> export(String reauthToken) async {
+    await _sensitive('export', reauthToken);
+    return utf8.encode('{"email":"${account.email}"}');
+  }
+
+  @override
+  Future<void> unlinkGoogle(String reauthToken) async {
+    await _sensitive('unlinkGoogle', reauthToken);
+    account = Account(
+      email: account.email,
+      emailVerified: account.emailVerified,
+      locale: account.locale,
+      profiles: account.profiles,
+      signInMethods: [
+        for (final method in account.signInMethods)
+          if (method.method != SignInMethod.google) method,
+      ],
+    );
+  }
+
+  @override
+  Future<void> removePassword(String reauthToken) =>
+      _sensitive('removePassword', reauthToken);
+
+  Account _withProfiles(List<AccountProfile> profiles) => Account(
+    email: account.email,
+    emailVerified: account.emailVerified,
+    locale: account.locale,
+    profiles: profiles,
+    signInMethods: account.signInMethods,
+  );
+}
+
+/// A helper with a password, in English unless [locale] says otherwise.
+Account testAccount({
+  String email = 'ana@example.com',
+  bool emailVerified = true,
+  String locale = 'en',
+  List<AccountProfile> profiles = const [
+    AccountProfile(type: ProfileType.helper),
+  ],
+  List<SignInMethod> signInMethods = const [
+    SignInMethod(method: SignInMethod.password),
+  ],
+}) => Account(
+  email: email,
+  emailVerified: emailVerified,
+  locale: locale,
+  profiles: profiles,
+  signInMethods: signInMethods,
+);

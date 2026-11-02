@@ -773,6 +773,188 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get settingsTitle => 'Account settings';
+
+  @override
+  String get settingsAccount => 'Account';
+
+  @override
+  String get settingsEmailVerified => 'Verified';
+
+  @override
+  String get settingsEmailUnverified => 'Not verified';
+
+  @override
+  String get settingsChangeEmail => 'Change email';
+
+  @override
+  String get changeEmailNew => 'New email';
+
+  @override
+  String get changeEmailSubmit => 'Send link';
+
+  @override
+  String changeEmailSent(String email) {
+    return 'We have sent an email to $email. Open its link to finish the change (it expires in 24 hours).';
+  }
+
+  @override
+  String get settingsLanguage => 'Language';
+
+  @override
+  String get settingsLanguageHint =>
+      'It is also the language of the emails we send you.';
+
+  @override
+  String get languageSpanish => 'Español';
+
+  @override
+  String get languageEnglish => 'English';
+
+  @override
+  String get settingsLanguageError => 'The language could not be changed.';
+
+  @override
+  String get settingsProfiles => 'Profiles';
+
+  @override
+  String get profileValidated => 'Validated';
+
+  @override
+  String get profilePendingValidation => 'Pending validation';
+
+  @override
+  String profileTaxId(String taxId) {
+    return 'Tax ID (CIF): $taxId';
+  }
+
+  @override
+  String get profileAdd => 'Add profile';
+
+  @override
+  String get profileAdded => 'Profile added.';
+
+  @override
+  String get profileRemove => 'Remove profile';
+
+  @override
+  String profileRemoveConfirm(String profile) {
+    return 'Remove the $profile profile?';
+  }
+
+  @override
+  String get profileRemoved => 'Profile removed.';
+
+  @override
+  String get removeAction => 'Remove';
+
+  @override
+  String get profileLast => 'Your account needs at least one profile.';
+
+  @override
+  String get profileCombination =>
+      'That profile cannot be combined with the ones you have.';
+
+  @override
+  String get profileNeedsVerifiedEmail =>
+      'Verify your email before adding profiles.';
+
+  @override
+  String get settingsSignInMethods => 'Sign-in methods';
+
+  @override
+  String get signInPassword => 'Email and password';
+
+  @override
+  String get signInGoogle => 'Google';
+
+  @override
+  String get googleUnlink => 'Unlink';
+
+  @override
+  String get googleUnlinkConfirm =>
+      'Unlink your Google account? You will only be able to sign in with email and password.';
+
+  @override
+  String get googleUnlinked => 'Google unlinked.';
+
+  @override
+  String get passwordRemove => 'Remove password';
+
+  @override
+  String get passwordRemoveConfirm =>
+      'You will only be able to sign in with Google, and all your sessions will be closed, this one too. To have a password again, use \"Forgot your password?\".';
+
+  @override
+  String get lastSignInMethod =>
+      'This is your only way to sign in. Add another one first.';
+
+  @override
+  String get needsGoogle =>
+      'This action needs you to confirm with Google, coming soon to the app.';
+
+  @override
+  String get settingsData => 'Your data';
+
+  @override
+  String get settingsDataHint => 'Download a copy of your account data (JSON).';
+
+  @override
+  String get settingsExport => 'Export my data';
+
+  @override
+  String get settingsDanger => 'Danger zone';
+
+  @override
+  String get deleteAccount => 'Delete account';
+
+  @override
+  String get deleteAccountHint =>
+      'It is deleted for good after 30 days. Until then you can restore it by signing in.';
+
+  @override
+  String get deleteAccountTitle => 'Delete your account?';
+
+  @override
+  String get deleteAccountBody =>
+      'All your sessions will be closed. The account, with its profiles and data, will be deleted for good after 30 days. Until then you can restore it by signing in.';
+
+  @override
+  String get deleteOwnsEvents =>
+      'You are in charge of events. Hand them over to someone else or delete them before deleting your account.';
+
+  @override
+  String loginAccountDeleted(String date) {
+    return 'Your account will be deleted on $date. Sign in before then to restore it.';
+  }
+
+  @override
+  String get loginPasswordRemoved =>
+      'Password removed and sessions closed. You can now only sign in with Google.';
+
+  @override
+  String get reauthTitle => 'Confirm it\'s you';
+
+  @override
+  String get reauthBody => 'Enter your password to continue.';
+
+  @override
+  String get reauthSubmit => 'Confirm';
+
+  @override
+  String get reauthFailed => 'Wrong password.';
+
+  @override
+  String get settingsLogout => 'Sign out';
+
+  @override
+  String get confirmEmailChangeTitle => 'Email change';
+
+  @override
+  String get confirmEmailChangeDone =>
+      'Email changed. All sessions have been closed: sign in with the new email.';
+
+  @override
   String get categoryIndividual => 'Individual';
 
   @override

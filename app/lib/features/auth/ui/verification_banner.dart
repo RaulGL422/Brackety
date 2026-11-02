@@ -22,6 +22,8 @@ class VerificationBanner extends ConsumerWidget {
     );
     if (!pending) return child;
     return Column(
+      // Edge to edge: centred, the banner would shrink to its content.
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const _Banner(),
         Expanded(
@@ -51,16 +53,24 @@ class _Banner extends ConsumerWidget {
           padding: const EdgeInsets.all(AppSpacing.m),
           child: DefaultTextStyle.merge(
             style: TextStyle(color: colors.onWarningContainer),
-            child: Wrap(
-              spacing: AppSpacing.m,
-              runSpacing: AppSpacing.s,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                Text(l10n.verifyBanner),
-                ResendButton(
-                  send: ref.read(sessionProvider.notifier).resendVerification,
+            child: OutlinedButtonTheme(
+              data: OutlinedButtonThemeData(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: colors.onWarningContainer,
+                  side: BorderSide(color: colors.onWarningContainer),
                 ),
-              ],
+              ),
+              child: Wrap(
+                spacing: AppSpacing.m,
+                runSpacing: AppSpacing.s,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Text(l10n.verifyBanner),
+                  ResendButton(
+                    send: ref.read(sessionProvider.notifier).resendVerification,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
