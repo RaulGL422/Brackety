@@ -15,14 +15,12 @@ import dev.rgal.brackety.grouping.dto.CreateGroupsRequest;
 import dev.rgal.brackety.grouping.dto.CreateGroupsRequest.GroupRequest;
 import dev.rgal.brackety.grouping.dto.CreateGroupsResponse;
 import dev.rgal.brackety.participant.Participant;
-import dev.rgal.brackety.participant.ParticipantRepository;
 import java.time.Clock;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,9 +31,13 @@ class GroupService {
     private final FightGroupRepository groups;
     private final GroupMemberRepository members;
     private final MatchRepository matches;
-    private final ParticipantRepository participants;
+    private final TeamRepository teams;
+    private final TeamMemberRepository teamMembers;
+    private final TeamService teamService;
     private final EventCategoryRepository categories;
     private final MatRepository mats;
+    private final CategoryRoster roster;
+    private final CompetitorDirectory directory;
     private final EventService events;
     private final EventAccess access;
     private final MatSchedule schedule;
@@ -45,9 +47,13 @@ class GroupService {
             FightGroupRepository groups,
             GroupMemberRepository members,
             MatchRepository matches,
-            ParticipantRepository participants,
+            TeamRepository teams,
+            TeamMemberRepository teamMembers,
+            TeamService teamService,
             EventCategoryRepository categories,
             MatRepository mats,
+            CategoryRoster roster,
+            CompetitorDirectory directory,
             EventService events,
             EventAccess access,
             MatSchedule schedule,
@@ -55,9 +61,13 @@ class GroupService {
         this.groups = groups;
         this.members = members;
         this.matches = matches;
-        this.participants = participants;
+        this.teams = teams;
+        this.teamMembers = teamMembers;
+        this.teamService = teamService;
         this.categories = categories;
         this.mats = mats;
+        this.roster = roster;
+        this.directory = directory;
         this.events = events;
         this.access = access;
         this.schedule = schedule;
@@ -69,33 +79,43 @@ class GroupService {
     List<CategorySummary> categories(UUID eventId, UUID accountId) {
         access.require(eventId, accountId, EventRole.CLUB, EventRole.GROUPER);
         var event = events.get(eventId);
-        var grouped = groupedIds(eventId);
-        var all = participants.findByEventIdOrderByFirstNameAscLastNameAsc(eventId);
+        var grouped = roster.groupedIds(eventId);
+        var teamNumbers = directory.teamNumbers(eventId);
+        var realTeams = teams.findByEventId(eventId).stream()
+                .filter(t -> !t.isGhost())
+                .collect(Collectors.groupingBy(Team::getCategoryId, Collectors.counting()));
         return categories.findByEventIdOrderByMinAge(eventId).stream()
                 .map(c -> {
-                    var inCategory =
-                            all.stream().filter(p -> inCategory(event, c, p)).toList();
+                    var ids = roster.inCategory(event, c).stream()
+                            .map(Participant::getId)
+                            .toList();
                     return new CategorySummary(
-                            c.getId(), c.getName(), c.getMinAge(), c.getMaxAge(), inCategory.size(), (int)
-                                    inCategory.stream()
-                                            .filter(p -> grouped.containsKey(p.getId()))
-                                            .count());
+                            c.getId(),
+                            c.getName(),
+                            c.getMinAge(),
+                            c.getMaxAge(),
+                            ids.size(),
+                            (int) ids.stream().filter(grouped::containsKey).count(),
+                            c.getFormat(),
+                            c.getTeamSize(),
+                            (int) ids.stream().filter(teamNumbers::containsKey).count(),
+                            realTeams.getOrDefault(c.getId(), 0L).intValue());
                 })
                 .filter(c -> c.participants() > 0)
                 .toList();
     }
 
-    /** A category's participants by name; those already in a group say which one and where. */
+    /** A category's participants by name; those already in a group or team say which one and where. */
     @Transactional(readOnly = true)
     List<CategoryParticipant> categoryParticipants(UUID eventId, UUID categoryId, UUID accountId) {
         access.require(eventId, accountId, EventRole.CLUB, EventRole.GROUPER);
         var event = events.get(eventId);
-        var category = category(eventId, categoryId);
-        var grouped = groupedIds(eventId);
+        var category = roster.category(eventId, categoryId);
+        var grouped = roster.groupedIds(eventId);
+        var teamNumbers = directory.teamNumbers(eventId);
         var matNumbers =
                 mats.findByEventIdOrderByNumber(eventId).stream().collect(Collectors.toMap(Mat::getId, Mat::getNumber));
-        return participants.findByEventIdOrderByFirstNameAscLastNameAsc(eventId).stream()
-                .filter(p -> inCategory(event, category, p))
+        return roster.inCategory(event, category).stream()
                 .map(p -> {
                     var group = grouped.get(p.getId());
                     return new CategoryParticipant(
@@ -105,7 +125,8 @@ class GroupService {
                             p.getHeightCm(),
                             event.ageOf(p.getBirthDate()),
                             group == null ? null : group.getNumber(),
-                            group == null ? null : matNumbers.get(group.getMatId()));
+                            group == null ? null : matNumbers.get(group.getMatId()),
+                            teamNumbers.get(p.getId()));
                 })
                 .toList();
     }
@@ -117,28 +138,9 @@ class GroupService {
         if (request.groups().size() > event.getMaxGroupsPerMat()) {
             throw EventException.invalid("At most " + event.getMaxGroupsPerMat() + " groups go to a mat at once.");
         }
-        var category = category(eventId, request.categoryId());
-        var real = new ArrayList<UUID>();
-        var involved = new HashSet<UUID>();
-        for (var group : request.groups()) {
-            checkShape(group);
-            real.addAll(group.participantIds());
-            involved.addAll(group.participantIds());
-            if (group.ghostId() != null) {
-                involved.add(group.ghostId());
-            }
-        }
-        if (new HashSet<>(real).size() != real.size()) {
-            throw EventException.invalid("A participant can only be in one of the new groups.");
-        }
-        var found = participants.findAllById(involved);
-        if (found.size() != involved.size()
-                || !found.stream().allMatch(p -> p.getEventId().equals(eventId) && inCategory(event, category, p))) {
-            throw EventException.invalid("Every participant must be from this event and category.");
-        }
-        if (!members.findByParticipantIdInAndGhostFalse(real).isEmpty()) {
-            throw EventException.conflict("A participant is already in a group.");
-        }
+        var category = roster.category(eventId, request.categoryId());
+        checkParticipantGroups(event, category, request.groups());
+        checkTeamGroups(event, category, request.groups());
         var mat = schedule.soonestFree(event, clock.instant())
                 .orElseThrow(() -> EventException.conflict("No mat has a referee yet."));
         var number = groups.maxNumber(eventId);
@@ -151,53 +153,118 @@ class GroupService {
         return new CreateGroupsResponse(mat.getId(), mat.getNumber(), numbers);
     }
 
+    // Also in a team category: the "individual group" for those left without a team.
+    private void checkParticipantGroups(Event event, EventCategory category, List<GroupRequest> requested) {
+        var real = new ArrayList<UUID>();
+        var involved = new HashSet<UUID>();
+        for (var group : requested.stream().filter(g -> !g.isOfTeams()).toList()) {
+            var ids = group.participantIds() == null ? List.<UUID>of() : group.participantIds();
+            checkShape(ids, group.ghostId() != null, "A group is 4 participants, or 3 and a ghost.");
+            if (ids.contains(group.ghostId())) {
+                throw EventException.invalid("A participant appears twice in a group.");
+            }
+            real.addAll(ids);
+            involved.addAll(ids);
+            if (group.ghostId() != null) {
+                involved.add(group.ghostId());
+            }
+        }
+        if (real.isEmpty()) {
+            return;
+        }
+        if (new HashSet<>(real).size() != real.size()) {
+            throw EventException.invalid("A participant can only be in one of the new groups.");
+        }
+        roster.requireAllIn(event, category, involved);
+        roster.requireFree(real);
+    }
+
+    private void checkTeamGroups(Event event, EventCategory category, List<GroupRequest> requested) {
+        var teamRequests = requested.stream().filter(GroupRequest::isOfTeams).toList();
+        if (teamRequests.isEmpty()) {
+            return;
+        }
+        if (!category.isTeam()) {
+            throw EventException.invalid("This category is not by teams.");
+        }
+        var allTeams = new ArrayList<UUID>();
+        var membersByTeam = teamMembers.findByEventId(event.getId()).stream()
+                .collect(Collectors.groupingBy(
+                        TeamMember::getTeamId, Collectors.mapping(TeamMember::getParticipantId, Collectors.toSet())));
+        for (var group : teamRequests) {
+            var ghostTeam = group.ghostTeam() == null ? List.<UUID>of() : group.ghostTeam();
+            checkShape(group.teamIds(), !ghostTeam.isEmpty(), "A group is 4 teams, or 3 and a ghost team.");
+            allTeams.addAll(group.teamIds());
+            if (ghostTeam.isEmpty()) {
+                continue;
+            }
+            if (ghostTeam.size() != category.getTeamSize() || new HashSet<>(ghostTeam).size() != ghostTeam.size()) {
+                throw EventException.invalid("A ghost team is " + category.getTeamSize() + " different participants.");
+            }
+            roster.requireAllIn(event, category, ghostTeam);
+            var ownMembers = group.teamIds().stream()
+                    .flatMap(t -> membersByTeam.getOrDefault(t, Set.of()).stream())
+                    .collect(Collectors.toSet());
+            if (ghostTeam.stream().anyMatch(ownMembers::contains)) {
+                throw EventException.invalid("A ghost team cannot use the group's own fighters.");
+            }
+        }
+        if (new HashSet<>(allTeams).size() != allTeams.size()) {
+            throw EventException.invalid("A team can only be in one of the new groups.");
+        }
+        var found = teams.findAllById(allTeams);
+        if (found.size() != allTeams.size()
+                || !found.stream().allMatch(t -> t.getCategoryId().equals(category.getId()) && !t.isGhost())) {
+            throw EventException.invalid("Every team must be from this category.");
+        }
+        if (!members.findByTeamIdIn(allTeams).isEmpty()) {
+            throw EventException.conflict("A team is already in a group.");
+        }
+    }
+
+    private static void checkShape(List<UUID> ids, boolean withGhost, String message) {
+        var expected = withGhost ? RoundRobin.GROUP_SIZE - 1 : RoundRobin.GROUP_SIZE;
+        if (ids.size() != expected) {
+            throw EventException.invalid(message);
+        }
+        if (new HashSet<>(ids).size() != ids.size()) {
+            throw EventException.invalid("A competitor appears twice in a group.");
+        }
+    }
+
     private void save(Event event, EventCategory category, Mat mat, int number, UUID accountId, GroupRequest request) {
         var group = groups.save(
                 new FightGroup(event.getId(), category.getId(), mat.getId(), number, accountId, clock.instant()));
-        var order = new ArrayList<>(request.participantIds());
+        var ofTeams = request.isOfTeams();
+        var order = new ArrayList<>(ofTeams ? request.teamIds() : request.participantIds());
         for (int i = 0; i < order.size(); i++) {
-            members.save(new GroupMember(group.getId(), order.get(i), i, false));
+            members.save(new GroupMember(group.getId(), order.get(i), ofTeams, i, false));
         }
-        if (request.ghostId() != null) {
-            members.save(new GroupMember(group.getId(), request.ghostId(), order.size(), true));
-            order.add(request.ghostId());
+        var ghost = ofTeams ? ghostTeam(event, category, accountId, request) : request.ghostId();
+        if (ghost != null) {
+            members.save(new GroupMember(group.getId(), ghost, ofTeams, order.size(), true));
+            order.add(ghost);
         }
         var pairs = RoundRobin.pairs();
         for (int i = 0; i < pairs.size(); i++) {
             var pair = pairs.get(i);
             matches.save(new Match(
-                    event.getId(), group.getId(), mat.getId(), i, order.get(pair.red()), order.get(pair.blue())));
+                    event.getId(),
+                    group.getId(),
+                    mat.getId(),
+                    i,
+                    order.get(pair.red()),
+                    order.get(pair.blue()),
+                    ofTeams));
         }
     }
 
-    private static void checkShape(GroupRequest group) {
-        var ids = group.participantIds();
-        var expected = group.ghostId() == null ? RoundRobin.GROUP_SIZE : RoundRobin.GROUP_SIZE - 1;
-        if (ids.size() != expected) {
-            throw EventException.invalid("A group is 4 participants, or 3 and a ghost.");
+    private UUID ghostTeam(Event event, EventCategory category, UUID accountId, GroupRequest request) {
+        if (request.ghostTeam() == null || request.ghostTeam().isEmpty()) {
+            return null;
         }
-        if (new HashSet<>(ids).size() != ids.size() || ids.contains(group.ghostId())) {
-            throw EventException.invalid("A participant appears twice in a group.");
-        }
-    }
-
-    private EventCategory category(UUID eventId, UUID categoryId) {
-        return categories
-                .findById(categoryId)
-                .filter(c -> c.getEventId().equals(eventId))
-                .orElseThrow(EventException::notFound);
-    }
-
-    /** Participants competing for real in a group (not as ghosts), with that group. */
-    private Map<UUID, FightGroup> groupedIds(UUID eventId) {
-        var byId = groups.findByEventId(eventId).stream()
-                .collect(Collectors.toMap(FightGroup::getId, Function.identity()));
-        return members.findByEventId(eventId).stream()
-                .filter(m -> !m.isGhost())
-                .collect(Collectors.toMap(GroupMember::getParticipantId, m -> byId.get(m.getGroupId())));
-    }
-
-    private static boolean inCategory(Event event, EventCategory category, Participant participant) {
-        return category.contains(event.ageOf(participant.getBirthDate()));
+        return teamService
+                .save(event.getId(), category.getId(), true, accountId, request.ghostTeam())
+                .getId();
     }
 }

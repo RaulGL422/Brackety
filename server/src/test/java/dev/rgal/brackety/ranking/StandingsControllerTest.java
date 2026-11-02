@@ -112,7 +112,7 @@ class StandingsControllerTest extends EventApiTest {
                 .getResponse()
                 .getContentAsString(StandardCharsets.UTF_8);
         assertThat(standings).startsWith(Csv.BOM + "Posición;Nombre;Apellidos;Edad;Categoría");
-        assertThat(standings).contains("1;Bea;Prueba;9;9-10;10;15;25;1");
+        assertThat(standings).contains("1;Bea;Prueba;9;9-10;;10;15;25;1");
         assertThat(standings).contains("\"'=HYPERLINK(\"\"x\"\")\"");
 
         var matches = call(get("/api/v1/events/" + eventId + "/export/matches.csv"), "club1")

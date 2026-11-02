@@ -26,7 +26,11 @@ public record MatchView(
         Corner blue,
         List<TimelineEntry> timeline) {
 
-    /** {@code oneHandRule}: the fighter is 4 to 7, so the one-hand warning applies. */
+    /**
+     * A participant ({@code participantId}) or a team ({@code teamId}, {@code teamNumber}); {@code members}
+     * are the team's names, or the participant's own. {@code oneHandRule}: the fighter (or someone in
+     * the team) is 4 to 7, so the one-hand warning applies.
+     */
     public record Corner(
             UUID participantId,
             String name,
@@ -35,7 +39,10 @@ public record MatchView(
             int points,
             int warnings,
             int oneHandWarnings,
-            boolean disqualified) {}
+            boolean disqualified,
+            UUID teamId,
+            Integer teamNumber,
+            List<String> members) {}
 
     /** {@code gaveRivalPoint}: a second one-hand warning that gave the rival a point. */
     public record TimelineEntry(

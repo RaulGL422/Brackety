@@ -21,7 +21,7 @@ class YoseikanPhase1ScenarioTest extends AuthIntegrationTest {
     void seedsTheDemoEventWithParticipantsInEveryChildCategory() {
         new YoseikanPhase1Scenario(demo, participants).seed(new ScenarioContext(clock));
 
-        assertThat(count("participant")).isEqualTo(YoseikanPhase1Scenario.PARTICIPANTS);
+        assertThat(count("participant")).isEqualTo(YoseikanPhase1Scenario.PARTICIPANTS + YoseikanPhase1Scenario.TEENS);
         var categories = jdbc.sql("""
                         select count(distinct c.id) from participant p
                         join event e on e.id = p.event_id

@@ -121,3 +121,4 @@ Formato: fecha · decisión · motivo.
 - 2026-10-31 · Categorías por equipos en el prototipo: formato, tamaño de equipo y de grupo por categoría; grupo de 4 equipos de 3; un combate Tambo equipo contra equipo; cada miembro suma los puntos de su equipo · cambio de planes de Raul para la Fase 1.
 - 2026-10-31 · Equipo fantasma = 3 alumnos cualesquiera de la categoría (no un equipo ya hecho); botón "Grupo individual" en categorías por equipos para los sobrantes · decidido por Raul.
 - 2026-10-31 · Equipos con nombre "Equipo N" numerado por evento · el árbitro los llama por ese nombre y no se repite entre tapices.
+- 2026-11-02 · Prototipo en la Pi: web `brackety.rgal.dev`, API `brackety-api.rgal.dev`, admin `brackety-admin.rgal.dev`; imágenes de la release `v0.1.0` publicadas por el CI; equipos después del despliegue · un nivel de subdominio para el SSL gratuito de Cloudflare; compilar en la Pi es muy lento; decidido por Raul.

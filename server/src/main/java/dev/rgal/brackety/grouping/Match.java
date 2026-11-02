@@ -31,6 +31,8 @@ public class Match {
     private int orderIndex;
     private UUID redParticipantId;
     private UUID blueParticipantId;
+    private UUID redTeamId;
+    private UUID blueTeamId;
 
     @Enumerated(EnumType.STRING)
     private Status status;
@@ -45,13 +47,19 @@ public class Match {
 
     protected Match() {}
 
-    Match(UUID eventId, UUID groupId, UUID matId, int orderIndex, UUID red, UUID blue) {
+    /** {@code red} and {@code blue} are participants, or teams when {@code teams}. */
+    Match(UUID eventId, UUID groupId, UUID matId, int orderIndex, UUID red, UUID blue, boolean teams) {
         this.eventId = eventId;
         this.groupId = groupId;
         this.matId = matId;
         this.orderIndex = orderIndex;
-        this.redParticipantId = red;
-        this.blueParticipantId = blue;
+        if (teams) {
+            this.redTeamId = red;
+            this.blueTeamId = blue;
+        } else {
+            this.redParticipantId = red;
+            this.blueParticipantId = blue;
+        }
         this.status = Status.PENDING;
     }
 
@@ -75,12 +83,13 @@ public class Match {
         return orderIndex;
     }
 
-    public UUID getRedParticipantId() {
-        return redParticipantId;
+    /** The red participant's or team's id. */
+    public UUID getRedId() {
+        return redTeamId != null ? redTeamId : redParticipantId;
     }
 
-    public UUID getBlueParticipantId() {
-        return blueParticipantId;
+    public UUID getBlueId() {
+        return blueTeamId != null ? blueTeamId : blueParticipantId;
     }
 
     public Status getStatus() {
