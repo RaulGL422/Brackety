@@ -42,7 +42,7 @@ Cuentas, login y sesión compartidos entre web y Android.
 - Cada bloqueo tiene un id corto (`L-7K2F`) que va en el 429; el superadmin puede revocarlo desde admin (con auditoría).
 - Al bloquearse un email existente: un único aviso por email con enlace para cambiar la contraseña.
 - Filas de intentos (IP en claro, cuenta si existe) se purgan al pasar ventana y bloqueo.
-- Limitador por IP en la app (configurable por entorno): 3000 peticiones/min en la API, 20/min en `/api/v1/auth/**` salvo refresh, 600/min en refresh → 429 `problem+json` con `Retry-After`. Primera barrera, más fina, en Cloudflare.
+- Limitador por IP en la app (configurable por entorno): 3000 peticiones/min en la API, 20/min en `/api/v1/auth/**` salvo refresh, 600/min en refresh → 429 `problem+json` con `Retry-After` (expuesta por CORS para la web). El 429 lleva las cabeceras CORS si el origen está permitido. Los preflight `OPTIONS` solo cuentan en el límite general. Primera barrera, más fina, en Cloudflare.
 - La cookie de refresh solo vuelve por cookie: si el token llegó en la cookie, nunca sale en el cuerpo.
 - Cliente web identificado por cabecera `X-Client: web` (refresh en cookie); sin ella, refresh en el cuerpo.
 - Registro, login y recuperación responden igual exista o no la cuenta (sin enumeración).
@@ -50,7 +50,10 @@ Cuentas, login y sesión compartidos entre web y Android.
 
 ### Registro y perfiles
 - Registro: fecha de nacimiento, perfil inicial (Club, Entidad Externa, Ayudante, Externo, Alumno) y aceptación de términos y privacidad con fecha y versión.
-- Menor de 14 no se registra solo: lo da de alta su tutor (`perfiles-menores.md`).
+- App: solo ofrece Club y Ayudante; el resto solo con `APP_ENV=dev` (entorno local) hasta que sus módulos existan.
+- App: tras el 202 del registro inicia sesión con los mismos datos. Cuenta nueva → dentro con el aviso de verificar; si no → "revisa tu email" (no revela más que el propio login).
+- Hasta `legal-paginas`, la app envía la versión provisional `2026-11-draft` en términos y privacidad, con una única casilla sin enlaces.
+- Menor de 14 no se registra solo: lo da de alta su tutor (`perfiles-menores.md`). La app lo bloquea también antes de enviar.
 - Perfiles adicionales desde ajustes (exige email verificado): un perfil cualquiera, o Alumno + Ayudante, o Externo + Ayudante; lo demás 409 `PROFILE_COMBINATION_NOT_ALLOWED`. El último no se quita (409 `LAST_PROFILE`). Organizador nuevo, sin validar.
 - Club y Entidad Externa: alta libre, pero no publican eventos hasta que el superadmin los valida.
 
@@ -85,12 +88,14 @@ Cuentas, login y sesión compartidos entre web y Android.
 - `POST /me/reauth` `{password}` o `{googleIdToken}` → `{reauthToken, expiresIn}`. Con `X-Reauth`: `POST /me/email` `{newEmail}` → 202; `DELETE /me` → `{deletesOn}`; `GET /me/export` → adjunto JSON.
 - `POST /auth/email/change/confirm` `{token}` → 204. `POST /auth/restore` `{restoreToken}` → sesión como el login.
 - Errores 409 con `code` en el problem+json. Solo en local: `POST /auth/dev/google-token` `{subject, email}` (doc 08).
-Todos bajo `/api/v1`: `POST /auth/register`, `/auth/login`, `/auth/google`, `/auth/refresh`, `/auth/logout`, `/auth/email/verify`, `/auth/email/resend`, `/auth/password/forgot`, `/auth/password/reset`, `/me`, `/me/profiles`, `/me/identities`, `/me/email`, `DELETE /me`, `GET /me/export`. Superadmin: `/admin/auth/login`, `/admin/organizers/{id}/validate`, `GET /admin/auth/locks`, `DELETE /admin/auth/locks/{lockId}`.
+Todos bajo `/api/v1`: `POST /auth/register`, `/auth/login`, `/auth/google`, `/auth/refresh`, `/auth/logout`, `/auth/email/verify`, `/auth/email/resend`, `/auth/password/forgot`, `/auth/password/reset`, `/auth/password/reset/check` (`{token}` → 204 válido, 400 inválido; no lo gasta), `/me`, `/me/profiles`, `/me/identities`, `/me/email`, `DELETE /me`, `GET /me/export`. Superadmin: `/admin/auth/login`, `/admin/organizers/{id}/validate`, `GET /admin/auth/locks`, `DELETE /admin/auth/locks/{lockId}`.
 - `POST /admin/auth/login` `{email, password}` → `{accessToken, expiresIn}`. `GET /admin/auth/locks` → `[{lockId, type: EMAIL|IP|ADMIN, lockedUntil, email, ip}]`; `DELETE /admin/auth/locks/{lockId}` → 204.
 - `GET /admin/organizers?validated=true|false` (sin filtro: todos) → `[{accountId, email, profileType, validated, createdAt}]` (`createdAt` del perfil); `POST /admin/organizers/{accountId}/validate` → 204.
 
 ## Pantallas
 Inicio de sesión, registro con selector de perfil, verificación pendiente, recuperar contraseña, ajustes de cuenta (identidades, perfiles, email, idioma, exportar/borrar). Admin: login de superadmin, bloqueos activos con revocación.
+- Código en `app/lib/features/auth/`. Verificación pendiente: aviso no bloqueante encima de toda la app (con reenvío).
+- Enlaces de email (`/verify-email`, `/reset-password`, `/forgot-password`) abren en cualquier estado de sesión; web con URLs sin `#`.
 
 ## Offline
 - La sesión sigue válida sin red mientras el refresh no caduque. El acceso caducado se renueva al volver la red.
@@ -106,6 +111,7 @@ En curso. Tareas (una rama cada una, en este orden):
 3. `feat/auth-google` · login Google, sustitución de cuenta sin verificar, vincular y desvincular.
 4. `feat/auth-me` · `/me`, perfiles adicionales, cambio de email, borrado y exportación.
 5. `feat/auth-superadmin` · superadmin por entorno, validación de organizadores, listar y revocar bloqueos con auditoría. Hecha (2026-10-31).
-6. `feat/auth-screens-login` · app: login, registro, verificación pendiente, recuperar; cliente HTTP con refresh (uno a la vez) y 429 con `lockId`.
-7. `feat/auth-screens-settings` · app: ajustes de cuenta.
-8. `feat/auth-admin-login` · admin: login de superadmin y pantalla de bloqueos.
+6. `feat/auth-screens-login` · app: login, registro, verificación pendiente, recuperar; cliente HTTP con refresh (uno a la vez) y 429 con `lockId`. Hecha (2026-10-31).
+7. `feat/auth-organizer-signup` · registro de Club y Entidad Externa sin fecha de nacimiento: casilla "soy mayor de edad y represento a la organización", nombre y CIF obligatorios (formato y dígito de control, repetible entre cuentas); el superadmin los ve al validar.
+8. `feat/auth-screens-settings` · app: ajustes de cuenta.
+9. `feat/auth-admin-login` · admin: login de superadmin y pantalla de bloqueos.

@@ -128,23 +128,107 @@ abstract class AppLocalizations {
   /// **'No se ha podido cargar. Comprueba la conexión.'**
   String get loadError;
 
+  /// No description provided for @noServer.
+  ///
+  /// In es, this message translates to:
+  /// **'No hay conexión con el servidor.'**
+  String get noServer;
+
+  /// No description provided for @unexpectedError.
+  ///
+  /// In es, this message translates to:
+  /// **'Algo ha ido mal. Inténtalo de nuevo.'**
+  String get unexpectedError;
+
+  /// No description provided for @tooManyRequests.
+  ///
+  /// In es, this message translates to:
+  /// **'Demasiadas peticiones. Espera {seconds} s y vuelve a intentarlo.'**
+  String tooManyRequests(int seconds);
+
+  /// No description provided for @tooManyRequestsWait.
+  ///
+  /// In es, this message translates to:
+  /// **'Demasiadas peticiones. Espera un momento y vuelve a intentarlo.'**
+  String get tooManyRequestsWait;
+
+  /// No description provided for @cancel.
+  ///
+  /// In es, this message translates to:
+  /// **'Cancelar'**
+  String get cancel;
+
+  /// No description provided for @continueAction.
+  ///
+  /// In es, this message translates to:
+  /// **'Continuar'**
+  String get continueAction;
+
+  /// No description provided for @fieldRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'Campo obligatorio.'**
+  String get fieldRequired;
+
+  /// No description provided for @emailLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Email'**
+  String get emailLabel;
+
+  /// No description provided for @emailInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe un email válido.'**
+  String get emailInvalid;
+
+  /// No description provided for @passwordLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Contraseña'**
+  String get passwordLabel;
+
+  /// No description provided for @passwordHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Mínimo 10 caracteres.'**
+  String get passwordHint;
+
+  /// No description provided for @passwordTooShort.
+  ///
+  /// In es, this message translates to:
+  /// **'La contraseña necesita al menos 10 caracteres.'**
+  String get passwordTooShort;
+
+  /// No description provided for @passwordTooLong.
+  ///
+  /// In es, this message translates to:
+  /// **'La contraseña admite como máximo 128 caracteres.'**
+  String get passwordTooLong;
+
+  /// No description provided for @showPassword.
+  ///
+  /// In es, this message translates to:
+  /// **'Mostrar contraseña'**
+  String get showPassword;
+
+  /// No description provided for @hidePassword.
+  ///
+  /// In es, this message translates to:
+  /// **'Ocultar contraseña'**
+  String get hidePassword;
+
+  /// No description provided for @goToLogin.
+  ///
+  /// In es, this message translates to:
+  /// **'Ir a iniciar sesión'**
+  String get goToLogin;
+
   /// No description provided for @loginTitle.
   ///
   /// In es, this message translates to:
   /// **'Entrar'**
   String get loginTitle;
-
-  /// No description provided for @loginUsername.
-  ///
-  /// In es, this message translates to:
-  /// **'Usuario'**
-  String get loginUsername;
-
-  /// No description provided for @loginPassword.
-  ///
-  /// In es, this message translates to:
-  /// **'Contraseña'**
-  String get loginPassword;
 
   /// No description provided for @loginSubmit.
   ///
@@ -155,26 +239,284 @@ abstract class AppLocalizations {
   /// No description provided for @loginInvalid.
   ///
   /// In es, this message translates to:
-  /// **'Usuario o contraseña incorrectos.'**
+  /// **'Email o contraseña incorrectos.'**
   String get loginInvalid;
 
   /// No description provided for @loginLocked.
   ///
   /// In es, this message translates to:
-  /// **'Demasiados intentos. Espera unos minutos.'**
-  String get loginLocked;
+  /// **'Cuenta bloqueada 15 minutos por demasiados intentos fallidos. Si necesitas ayuda, indica el código {lockId}.'**
+  String loginLocked(String lockId);
 
-  /// No description provided for @loginNoServer.
+  /// No description provided for @loginForgot.
   ///
   /// In es, this message translates to:
-  /// **'No hay conexión con el servidor.'**
-  String get loginNoServer;
+  /// **'¿Has olvidado la contraseña?'**
+  String get loginForgot;
+
+  /// No description provided for @loginNoAccount.
+  ///
+  /// In es, this message translates to:
+  /// **'¿No tienes cuenta? Regístrate'**
+  String get loginNoAccount;
+
+  /// No description provided for @loginPasswordChanged.
+  ///
+  /// In es, this message translates to:
+  /// **'Contraseña cambiada. Ya puedes entrar con la nueva.'**
+  String get loginPasswordChanged;
 
   /// No description provided for @loginDemoAccounts.
   ///
   /// In es, this message translates to:
   /// **'Cuentas de prueba (solo en desarrollo)'**
   String get loginDemoAccounts;
+
+  /// No description provided for @restoreTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuenta pendiente de borrado'**
+  String get restoreTitle;
+
+  /// No description provided for @restoreBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu cuenta se borrará el {date}. ¿Quieres recuperarla?'**
+  String restoreBody(String date);
+
+  /// No description provided for @restoreConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'Recuperar cuenta'**
+  String get restoreConfirm;
+
+  /// No description provided for @restoreExpired.
+  ///
+  /// In es, this message translates to:
+  /// **'Ha pasado demasiado tiempo. Vuelve a entrar para recuperar la cuenta.'**
+  String get restoreExpired;
+
+  /// No description provided for @registerTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Crear cuenta'**
+  String get registerTitle;
+
+  /// No description provided for @registerSubmit.
+  ///
+  /// In es, this message translates to:
+  /// **'Crear cuenta'**
+  String get registerSubmit;
+
+  /// No description provided for @registerBirthDate.
+  ///
+  /// In es, this message translates to:
+  /// **'Fecha de nacimiento'**
+  String get registerBirthDate;
+
+  /// No description provided for @registerUnderage.
+  ///
+  /// In es, this message translates to:
+  /// **'Los menores de 14 años no pueden crear su propia cuenta. Su padre, madre o tutor lo da de alta desde su cuenta añadiendo un perfil de menor (disponible próximamente).'**
+  String get registerUnderage;
+
+  /// No description provided for @registerProfile.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Cómo vas a usar Brackety?'**
+  String get registerProfile;
+
+  /// No description provided for @registerProfileRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'Elige un perfil.'**
+  String get registerProfileRequired;
+
+  /// No description provided for @profileClub.
+  ///
+  /// In es, this message translates to:
+  /// **'Club'**
+  String get profileClub;
+
+  /// No description provided for @profileClubHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Organiza eventos e inscribe a sus deportistas.'**
+  String get profileClubHint;
+
+  /// No description provided for @profileExternalEntity.
+  ///
+  /// In es, this message translates to:
+  /// **'Entidad externa'**
+  String get profileExternalEntity;
+
+  /// No description provided for @profileExternalEntityHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Federación, ayuntamiento u otra entidad que organiza eventos.'**
+  String get profileExternalEntityHint;
+
+  /// No description provided for @profileHelper.
+  ///
+  /// In es, this message translates to:
+  /// **'Ayudante'**
+  String get profileHelper;
+
+  /// No description provided for @profileHelperHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Colabora en los eventos: grupos, mesa o arbitraje.'**
+  String get profileHelperHint;
+
+  /// No description provided for @profileExternal.
+  ///
+  /// In es, this message translates to:
+  /// **'Externo'**
+  String get profileExternal;
+
+  /// No description provided for @profileExternalHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Sigue eventos y resultados sin pertenecer a un club.'**
+  String get profileExternalHint;
+
+  /// No description provided for @profileStudent.
+  ///
+  /// In es, this message translates to:
+  /// **'Alumno'**
+  String get profileStudent;
+
+  /// No description provided for @profileStudentHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Deportista que compite con su club.'**
+  String get profileStudentHint;
+
+  /// No description provided for @registerAccept.
+  ///
+  /// In es, this message translates to:
+  /// **'Acepto los términos de uso y la política de privacidad.'**
+  String get registerAccept;
+
+  /// No description provided for @registerAcceptRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'Debes aceptarlos para crear la cuenta.'**
+  String get registerAcceptRequired;
+
+  /// No description provided for @registerHaveAccount.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Ya tienes cuenta? Entra'**
+  String get registerHaveAccount;
+
+  /// No description provided for @checkEmailTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Revisa tu email'**
+  String get checkEmailTitle;
+
+  /// No description provided for @checkEmailBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Te hemos enviado un email. Abre su enlace para verificar la cuenta; caduca en 24 horas.'**
+  String get checkEmailBody;
+
+  /// No description provided for @resendEmail.
+  ///
+  /// In es, this message translates to:
+  /// **'Reenviar email'**
+  String get resendEmail;
+
+  /// No description provided for @resendSent.
+  ///
+  /// In es, this message translates to:
+  /// **'Email enviado.'**
+  String get resendSent;
+
+  /// No description provided for @verifyBanner.
+  ///
+  /// In es, this message translates to:
+  /// **'Verifica tu email: algunas acciones lo necesitan.'**
+  String get verifyBanner;
+
+  /// No description provided for @verifyTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Verificar email'**
+  String get verifyTitle;
+
+  /// No description provided for @verifySuccess.
+  ///
+  /// In es, this message translates to:
+  /// **'Email verificado. ¡Gracias!'**
+  String get verifySuccess;
+
+  /// No description provided for @linkInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'El enlace no es válido o ha caducado.'**
+  String get linkInvalid;
+
+  /// No description provided for @forgotTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Recuperar contraseña'**
+  String get forgotTitle;
+
+  /// No description provided for @forgotIntro.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe tu email y te enviaremos un enlace para elegir una contraseña nueva.'**
+  String get forgotIntro;
+
+  /// No description provided for @forgotSubmit.
+  ///
+  /// In es, this message translates to:
+  /// **'Enviar enlace'**
+  String get forgotSubmit;
+
+  /// No description provided for @forgotSent.
+  ///
+  /// In es, this message translates to:
+  /// **'Si hay una cuenta con ese email, te hemos enviado un enlace para cambiar la contraseña.'**
+  String get forgotSent;
+
+  /// No description provided for @resetTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Nueva contraseña'**
+  String get resetTitle;
+
+  /// No description provided for @resetNewPassword.
+  ///
+  /// In es, this message translates to:
+  /// **'Nueva contraseña'**
+  String get resetNewPassword;
+
+  /// No description provided for @resetConfirmPassword.
+  ///
+  /// In es, this message translates to:
+  /// **'Repite la contraseña'**
+  String get resetConfirmPassword;
+
+  /// No description provided for @resetMismatch.
+  ///
+  /// In es, this message translates to:
+  /// **'Las contraseñas no coinciden.'**
+  String get resetMismatch;
+
+  /// No description provided for @resetSubmit.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar contraseña'**
+  String get resetSubmit;
+
+  /// No description provided for @resetRequestNew.
+  ///
+  /// In es, this message translates to:
+  /// **'Pedir otro enlace'**
+  String get resetRequestNew;
 
   /// No description provided for @logout.
   ///
@@ -554,12 +896,6 @@ abstract class AppLocalizations {
   /// **'¿Seguro? Queda registrado.'**
   String get reasonConfirm;
 
-  /// No description provided for @cancel.
-  ///
-  /// In es, this message translates to:
-  /// **'Cancelar'**
-  String get cancel;
-
   /// No description provided for @confirm.
   ///
   /// In es, this message translates to:
@@ -787,12 +1123,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Obligatorio para menores de 18 años.'**
   String get guardianConsentRequired;
-
-  /// No description provided for @fieldRequired.
-  ///
-  /// In es, this message translates to:
-  /// **'Obligatorio'**
-  String get fieldRequired;
 
   /// No description provided for @participantAgeCategory.
   ///

@@ -64,11 +64,20 @@ public class EmailTokens {
         return new EmailChange(token.getAccountId(), token.getNewEmail());
     }
 
-    private EmailToken take(String raw, EmailToken.Purpose purpose) {
+    /** Like {@link #consume} but leaves the token as it is. */
+    UUID check(String raw, EmailToken.Purpose purpose) {
+        return find(raw, purpose).getAccountId();
+    }
+
+    private EmailToken find(String raw, EmailToken.Purpose purpose) {
         var now = clock.instant();
-        var token = tokens.findByTokenHash(Sha256.hex(raw))
+        return tokens.findByTokenHash(Sha256.hex(raw))
                 .filter(t -> t.isUsable(purpose, now))
                 .orElseThrow(AuthException::invalidLink);
+    }
+
+    private EmailToken take(String raw, EmailToken.Purpose purpose) {
+        var token = find(raw, purpose);
         // Deleted under the row lock: a concurrent second use waits, then finds nothing.
         tokens.delete(token);
         return token;

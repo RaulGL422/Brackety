@@ -298,6 +298,47 @@ class AuthControllerTest extends AuthIntegrationTest {
     }
 
     @Test
+    void checkingAResetLinkDoesNotUseIt() throws Exception {
+        var token = emailedResetToken();
+
+        checkResetLink(token).andExpect(status().isNoContent());
+        checkResetLink(token).andExpect(status().isNoContent());
+
+        postJson(
+                        "/api/v1/auth/password/reset",
+                        "{\"token\":\"%s\",\"newPassword\":\"a-brand-new-password\"}".formatted(token))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void checkRejectsAUsedResetLink() throws Exception {
+        var token = emailedResetToken();
+        postJson(
+                        "/api/v1/auth/password/reset",
+                        "{\"token\":\"%s\",\"newPassword\":\"a-brand-new-password\"}".formatted(token))
+                .andExpect(status().isNoContent());
+
+        expectInvalidLink(checkResetLink(token));
+    }
+
+    @Test
+    void checkRejectsAnExpiredResetLink() throws Exception {
+        var token = emailedResetToken();
+        clock.advance(Duration.ofHours(1));
+
+        expectInvalidLink(checkResetLink(token));
+    }
+
+    @Test
+    void checkRejectsAVerificationLinkAndAnUnknownOne() throws Exception {
+        registerAna();
+        var verifyToken = tokenIn(emails.sentTo("ana@example.test").getFirst());
+
+        expectInvalidLink(checkResetLink(verifyToken));
+        expectInvalidLink(checkResetLink("not-a-real-token"));
+    }
+
+    @Test
     void publicEndpointsStayOpen() throws Exception {
         mvc.perform(get("/api/v1/info")).andExpect(status().isOk());
         mvc.perform(get("/actuator/health")).andExpect(status().isOk());
@@ -306,6 +347,22 @@ class AuthControllerTest extends AuthIntegrationTest {
     private void registerAna() throws Exception {
         register(REGISTER_JSON.formatted("ana@example.test", PASSWORD, "1990-05-20"))
                 .andExpect(status().isAccepted());
+    }
+
+    private String emailedResetToken() throws Exception {
+        registerAna();
+        postJson("/api/v1/auth/password/forgot", "{\"email\":\"ana@example.test\"}");
+        return tokenIn(emails.sent().getLast());
+    }
+
+    private ResultActions checkResetLink(String token) throws Exception {
+        return postJson("/api/v1/auth/password/reset/check", "{\"token\":\"%s\"}".formatted(token));
+    }
+
+    private static void expectInvalidLink(ResultActions result) throws Exception {
+        result.andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.detail").value("This link is invalid or has expired."));
     }
 
     private ResultActions postJson(String path, String body) throws Exception {

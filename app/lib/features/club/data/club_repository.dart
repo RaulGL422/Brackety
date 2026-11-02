@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../session/state/session_controller.dart';
+import '../../auth/state/session_controller.dart';
 import 'club_models.dart';
 
 final clubRepositoryProvider = Provider<ClubRepository>(

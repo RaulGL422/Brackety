@@ -19,4 +19,6 @@ abstract final class AppSizes {
   static const double touchTarget = 48;
   // Scoreboard buttons are pressed in a hurry, one-handed, at arm's length.
   static const double scoreTouchTarget = 72;
+  // Short forms (sign-in, sign-up) stay readable on wide windows instead of stretching.
+  static const double formMaxWidth = 480;
 }

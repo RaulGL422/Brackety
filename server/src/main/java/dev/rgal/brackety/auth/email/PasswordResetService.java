@@ -8,6 +8,7 @@ import dev.rgal.brackety.auth.lockout.LoginAttempt;
 import dev.rgal.brackety.auth.lockout.LoginAttemptRepository;
 import dev.rgal.brackety.auth.session.SessionService;
 import java.time.Clock;
+import java.util.UUID;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,6 +51,13 @@ public class PasswordResetService {
                         .ifPresent(token -> authEmails.resetPassword(account, token)));
     }
 
+    // Lets the reset page say the link is dead before the user types a new password. The token is untouched.
+    // Not read-only: the shared lookup locks the token row, which a read-only transaction refuses.
+    @Transactional
+    public void check(String token) {
+        activeAccount(emailTokens.check(token, EmailToken.Purpose.RESET_PASSWORD));
+    }
+
     // Opening the link proves the inbox is theirs, so it also verifies the email.
     // Every session and pending link is closed: whoever knew the old password may be logged in, or may
     // have asked for an email change.
@@ -57,13 +65,16 @@ public class PasswordResetService {
     // The IP counter stays: it protects other accounts.
     @Transactional
     public void reset(String token, String newPassword) {
-        var accountId = emailTokens.consume(token, EmailToken.Purpose.RESET_PASSWORD);
-        var account = accounts.findById(accountId).filter(Account::isActive).orElseThrow(AuthException::invalidLink);
+        var account = activeAccount(emailTokens.consume(token, EmailToken.Purpose.RESET_PASSWORD));
         var now = clock.instant();
         account.changePassword(passwordEncoder.encode(newPassword), now);
         account.markEmailVerified(now);
         sessions.closeAll(account);
         loginAttempts.deleteById(LoginAttempt.emailKey(account.getEmail()));
         authEmails.passwordChanged(account);
+    }
+
+    private Account activeAccount(UUID accountId) {
+        return accounts.findById(accountId).filter(Account::isActive).orElseThrow(AuthException::invalidLink);
     }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../session/state/session_controller.dart';
+import '../../auth/state/session_controller.dart';
 import '../data/my_event.dart';
 
 final myEventsProvider = FutureProvider.autoDispose<List<MyEvent>>((ref) async {

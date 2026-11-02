@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/async_view.dart';
 import '../../../l10n/gen/app_localizations.dart';
-import '../../session/state/session_controller.dart';
+import '../../auth/state/session_controller.dart';
 import '../data/my_event.dart';
 import '../state/events_providers.dart';
 

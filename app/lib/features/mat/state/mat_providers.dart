@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../session/state/session_controller.dart';
+import '../../auth/state/session_controller.dart';
 import '../data/mat_board.dart';
 
 /// The board refreshes on its own: other mats finish matches that change what is available here.
