@@ -39,6 +39,8 @@
 - [ ] Base de datos de la fase en la SD (sin SSD) con copia diaria: ¿se acepta el riesgo o se compra antes el SSD?
 - [ ] Tras la fase: desactivar `DEMO_ACCOUNTS_ENABLED` y borrar las cuentas demo.
 
+- [ ] Importación de alumnos: aceptar el DPA de Anthropic en su consola y confirmar el plazo de conservación de datos de la API (`modulos/importacion-alumnos.md`).
+
 ## Repositorio público
 - [ ] `docs/` es planificación temporal y se eliminará en el futuro. Antes de hacerlo: pasar a `CLAUDE.md` (o un README) lo imprescindible que hoy solo vive en `docs/` y quitar sus enlaces.
 
