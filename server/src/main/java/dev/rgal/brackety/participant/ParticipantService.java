@@ -60,9 +60,9 @@ public class ParticipantService {
     public ParticipantResponse update(UUID eventId, UUID participantId, UUID accountId, ParticipantRequest request) {
         access.require(eventId, accountId, EventRole.CLUB);
         var participant = find(eventId, participantId);
-        // The birth date sets the category the participant's group was made for.
-        if (!request.birthDate().equals(participant.getBirthDate()) && participants.isInAGroup(participantId)) {
-            throw EventException.conflict("The birth date cannot change once the participant is in a group.");
+        // The birth date sets the category the participant's group or team was made for.
+        if (!request.birthDate().equals(participant.getBirthDate()) && participants.isInAGroupOrTeam(participantId)) {
+            throw EventException.conflict("The birth date cannot change once the participant is in a group or team.");
         }
         return save(participant, request);
     }
@@ -71,8 +71,8 @@ public class ParticipantService {
     public void delete(UUID eventId, UUID participantId, UUID accountId) {
         access.require(eventId, accountId, EventRole.CLUB);
         var participant = find(eventId, participantId);
-        if (participants.isInAGroup(participantId)) {
-            throw EventException.conflict("A participant in a group cannot be removed.");
+        if (participants.isInAGroupOrTeam(participantId)) {
+            throw EventException.conflict("A participant in a group or team cannot be removed.");
         }
         participants.delete(participant);
     }

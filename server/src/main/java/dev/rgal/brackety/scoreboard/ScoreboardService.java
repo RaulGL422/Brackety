@@ -9,12 +9,13 @@ import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.event.Mat;
 import dev.rgal.brackety.event.MatRepository;
+import dev.rgal.brackety.grouping.Competitor;
+import dev.rgal.brackety.grouping.CompetitorDirectory;
 import dev.rgal.brackety.grouping.FightGroupRepository;
 import dev.rgal.brackety.grouping.GroupMember;
 import dev.rgal.brackety.grouping.GroupMemberRepository;
 import dev.rgal.brackety.grouping.Match;
 import dev.rgal.brackety.grouping.MatchRepository;
-import dev.rgal.brackety.participant.Participant;
 import dev.rgal.brackety.participant.ParticipantRepository;
 import dev.rgal.brackety.scoreboard.TamboMatch.Rules;
 import dev.rgal.brackety.scoreboard.dto.MatchEventRequest;
@@ -55,6 +56,7 @@ class ScoreboardService {
     private final FightGroupRepository groups;
     private final GroupMemberRepository members;
     private final ParticipantRepository participants;
+    private final CompetitorDirectory directory;
     private final AccountRepository accounts;
     private final EventService events;
     private final EventAccess access;
@@ -67,6 +69,7 @@ class ScoreboardService {
             FightGroupRepository groups,
             GroupMemberRepository members,
             ParticipantRepository participants,
+            CompetitorDirectory directory,
             AccountRepository accounts,
             EventService events,
             EventAccess access,
@@ -77,6 +80,7 @@ class ScoreboardService {
         this.groups = groups;
         this.members = members;
         this.participants = participants;
+        this.directory = directory;
         this.accounts = accounts;
         this.events = events;
         this.access = access;
@@ -185,10 +189,11 @@ class ScoreboardService {
         if (inProgress.stream().anyMatch(m -> m.getMatId().equals(match.getMatId()))) {
             throw EventException.conflict("Another match is in progress on this mat.");
         }
-        var fighters = Set.of(match.getRedParticipantId(), match.getBlueParticipantId());
+        var competitors = directory.of(match.getEventId());
+        var fighters = competitors.participants(match.getRedId(), match.getBlueId());
         if (inProgress.stream()
-                .anyMatch(m ->
-                        fighters.contains(m.getRedParticipantId()) || fighters.contains(m.getBlueParticipantId()))) {
+                .flatMap(m -> competitors.participants(m.getRedId(), m.getBlueId()).stream())
+                .anyMatch(fighters::contains)) {
             throw EventException.conflict("A fighter is in a match on another mat.");
         }
     }
@@ -197,9 +202,10 @@ class ScoreboardService {
         var history = matchEvents.findByMatchIdOrderByPosition(match.getId());
         var state = replay(event, history);
         var group = groups.findById(match.getGroupId()).orElseThrow();
+        var competitors = directory.of(match.getEventId());
         var ghost = members.findByGroupIdInOrderByPosition(List.of(group.getId())).stream()
                 .filter(GroupMember::isGhost)
-                .map(GroupMember::getParticipantId)
+                .map(GroupMember::getCompetitorId)
                 .findFirst()
                 .orElse(null);
         var actors = accounts
@@ -224,8 +230,8 @@ class ScoreboardService {
                 state.remainingAt(now).toMillis(),
                 state.isRunning(now),
                 state.endReason(now).map(Enum::name).orElse(null),
-                corner(event, state, Side.RED, fighter(match, Side.RED), ghost),
-                corner(event, state, Side.BLUE, fighter(match, Side.BLUE), ghost),
+                corner(event, state, Side.RED, competitors.get(match.getRedId()), ghost),
+                corner(event, state, Side.BLUE, competitors.get(match.getBlueId()), ghost),
                 history.stream()
                         .map(e -> new TimelineEntry(
                                 e.getId(),
@@ -241,27 +247,31 @@ class ScoreboardService {
                         .toList());
     }
 
-    private Corner corner(Event event, TamboMatch state, Side side, Participant fighter, UUID ghost) {
+    private Corner corner(Event event, TamboMatch state, Side side, Competitor fighter, UUID ghost) {
         var tally = state.corner(side);
         return new Corner(
-                fighter.getId(),
-                fighter.getFirstName() + " " + fighter.getLastName(),
-                fighter.getId().equals(ghost),
+                fighter.isTeam() ? null : fighter.id(),
+                fighter.isTeam() ? String.join(", ", fighter.memberNames()) : fighter.name(),
+                fighter.id().equals(ghost),
                 oneHandRule(event, fighter),
                 tally.points(),
                 tally.warnings(),
                 tally.oneHandWarnings(),
-                state.disqualified() == side);
+                state.disqualified() == side,
+                fighter.isTeam() ? fighter.id() : null,
+                fighter.teamNumber(),
+                fighter.memberNames());
     }
 
-    private Participant fighter(Match match, Side side) {
-        var id = side == Side.RED ? match.getRedParticipantId() : match.getBlueParticipantId();
-        return participants.findById(id).orElseThrow();
+    private Competitor fighter(Match match, Side side) {
+        return directory.of(match.getEventId()).get(side == Side.RED ? match.getRedId() : match.getBlueId());
     }
 
-    private static boolean oneHandRule(Event event, Participant fighter) {
-        var age = event.ageOf(fighter.getBirthDate());
-        return age >= ONE_HAND_MIN_AGE && age <= ONE_HAND_MAX_AGE;
+    // A team follows the rule if any of its members is young enough.
+    private boolean oneHandRule(Event event, Competitor fighter) {
+        return participants.findAllById(fighter.participantIds()).stream()
+                .map(p -> event.ageOf(p.getBirthDate()))
+                .anyMatch(age -> age >= ONE_HAND_MIN_AGE && age <= ONE_HAND_MAX_AGE);
     }
 
     private static TamboMatch replay(Event event, List<MatchEvent> history) {

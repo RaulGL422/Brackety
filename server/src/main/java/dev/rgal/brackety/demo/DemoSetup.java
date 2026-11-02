@@ -39,17 +39,18 @@ public class DemoSetup {
     private static final List<String> GROUPERS = List.of("ayudante1", "ayudante2");
     private static final List<String> REFEREES = List.of("arbitro1", "arbitro2", "arbitro3", "arbitro4", "arbitro5");
 
-    // Placeholder categories (ranking age bands, mixed) until the real ones are confirmed.
+    // Placeholder categories (ranking age bands, mixed) until the real ones are confirmed; the four
+    // oldest are by teams of 3 as an example of team categories (docs/modulos/prototipo-f1-equipos.md).
     private static final List<AgeBand> CATEGORIES = List.of(
-            new AgeBand("4-6", 4, 6),
-            new AgeBand("7-8", 7, 8),
-            new AgeBand("9-10", 9, 10),
-            new AgeBand("11-12", 11, 12),
-            new AgeBand("13-14", 13, 14),
-            new AgeBand("15-16", 15, 16),
-            new AgeBand("17-19", 17, 19),
-            new AgeBand("20-25", 20, 25),
-            new AgeBand("26+", 26, 120));
+            new AgeBand("4-6", 4, 6, null),
+            new AgeBand("7-8", 7, 8, null),
+            new AgeBand("9-10", 9, 10, null),
+            new AgeBand("11-12", 11, 12, null),
+            new AgeBand("13-14", 13, 14, null),
+            new AgeBand("15-16", 15, 16, 3),
+            new AgeBand("17-19", 17, 19, 3),
+            new AgeBand("20-25", 20, 25, 3),
+            new AgeBand("26+", 26, 120, 3));
 
     private static final Logger log = LoggerFactory.getLogger(DemoSetup.class);
 
@@ -118,7 +119,7 @@ public class DemoSetup {
                 mats.save(new Mat(event.getId(), i + 1, referee));
             }
             for (var c : CATEGORIES) {
-                categories.save(new EventCategory(event.getId(), c.name(), c.minAge(), c.maxAge()));
+                categories.save(new EventCategory(event.getId(), c.name(), c.minAge(), c.maxAge(), c.teamSize()));
             }
             return event.getId();
         });
@@ -134,5 +135,6 @@ public class DemoSetup {
         return account.getId();
     }
 
-    private record AgeBand(String name, int minAge, int maxAge) {}
+    /** {@code teamSize}: null for an individual category. */
+    private record AgeBand(String name, int minAge, int maxAge, Integer teamSize) {}
 }

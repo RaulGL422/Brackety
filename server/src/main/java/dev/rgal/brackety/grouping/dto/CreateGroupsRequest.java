@@ -11,7 +11,19 @@ import java.util.UUID;
 public record CreateGroupsRequest(
         @NotNull UUID categoryId, @NotEmpty @Size(max = 4) List<@Valid @NotNull GroupRequest> groups) {
 
-    /** 4 participants, or 3 plus a ghost; the order given is the order in the group. */
+    /**
+     * A group of participants (4, or 3 plus {@code ghostId}) or, in a team category, of teams (4, or
+     * 3 plus a ghost team made of the {@code ghostTeam} participants). The order given is the order
+     * in the group.
+     */
     public record GroupRequest(
-            @NotNull @Size(min = 3, max = 4) List<@NotNull UUID> participantIds, UUID ghostId) {}
+            @Size(max = 4) List<@NotNull UUID> participantIds,
+            UUID ghostId,
+            @Size(max = 4) List<@NotNull UUID> teamIds,
+            @Size(max = 5) List<@NotNull UUID> ghostTeam) {
+
+        public boolean isOfTeams() {
+            return teamIds != null && !teamIds.isEmpty();
+        }
+    }
 }
