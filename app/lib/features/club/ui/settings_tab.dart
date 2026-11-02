@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:brackety_core/brackety_core.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +18,7 @@ const maxMats = 20;
 const maxGroupsPerMatLimit = 4;
 
 /// Event name and date, mats with their referee, and multigroup. Categories are shown, not edited.
+/// Every change saves on its own; a refused one goes back to what the server has.
 class SettingsTab extends ConsumerWidget {
   const SettingsTab({super.key, required this.eventId});
 
@@ -43,17 +46,25 @@ class _SettingsForm extends ConsumerStatefulWidget {
 }
 
 class _SettingsFormState extends ConsumerState<_SettingsForm> {
-  final _form = GlobalKey<FormState>();
-  late final _name = TextEditingController(text: widget.initial.name);
-  late var _date = widget.initial.date;
-  late var _maxGroups = widget.initial.maxGroupsPerMat;
-  late var _matReferees = [...widget.initial.matReferees];
+  late var _saved = widget.initial;
+  late final _name = TextEditingController(text: _saved.name);
+  late var _date = _saved.date;
+  late var _maxGroups = _saved.maxGroupsPerMat;
+  late var _matReferees = [..._saved.matReferees];
+  Timer? _nameTyping;
   var _saving = false;
+  var _changedWhileSaving = false;
 
   @override
   void dispose() {
+    _nameTyping?.cancel();
     _name.dispose();
     super.dispose();
+  }
+
+  void _change(VoidCallback update) {
+    setState(update);
+    _save();
   }
 
   @override
@@ -63,7 +74,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
     final text = Theme.of(context).textTheme;
     final settings = widget.initial;
     return Form(
-      key: _form,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       child: ListView(
         padding: const EdgeInsets.all(AppSpacing.l),
         children: [
@@ -73,6 +84,12 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
             maxLength: 120,
             validator: (v) =>
                 v == null || v.trim().isEmpty ? l10n.fieldRequired : null,
+            // Saves once the club stops typing, not on every key.
+            onChanged: (_) {
+              _nameTyping?.cancel();
+              _nameTyping = Timer(const Duration(milliseconds: 800), _save);
+            },
+            onFieldSubmitted: (_) => _save(),
           ),
           InkWell(
             onTap: _pickDate,
@@ -94,7 +111,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
                 ButtonSegment(value: n, label: Text('$n')),
             ],
             selected: {_maxGroups},
-            onSelectionChanged: (s) => setState(() => _maxGroups = s.single),
+            onSelectionChanged: (s) => _change(() => _maxGroups = s.single),
           ),
           const SizedBox(height: AppSpacing.xl),
           Text(l10n.clubMats, style: text.titleMedium),
@@ -102,6 +119,8 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
             Padding(
               padding: const EdgeInsets.only(top: AppSpacing.s),
               child: DropdownButtonFormField<String?>(
+                // A new key when the value changes, so a refused change shows the saved referee again.
+                key: ValueKey('$i:$refereeId'),
                 initialValue: refereeId,
                 decoration: InputDecoration(
                   labelText:
@@ -112,7 +131,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
                   for (final r in settings.referees)
                     DropdownMenuItem(value: r.id, child: Text(r.username)),
                 ],
-                onChanged: (id) => setState(() => _matReferees[i] = id),
+                onChanged: (id) => _change(() => _matReferees[i] = id),
               ),
             ),
           const SizedBox(height: AppSpacing.s),
@@ -124,14 +143,14 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
                 label: Text(l10n.settingsAddMat),
                 onPressed: _matReferees.length >= maxMats
                     ? null
-                    : () => setState(() => _matReferees.add(null)),
+                    : () => _change(() => _matReferees.add(null)),
               ),
               TextButton.icon(
                 icon: const Icon(Icons.remove),
                 label: Text(l10n.settingsRemoveMat),
                 onPressed: _matReferees.length <= 1
                     ? null
-                    : () => setState(() => _matReferees.removeLast()),
+                    : () => _change(() => _matReferees.removeLast()),
               ),
             ],
           ),
@@ -142,14 +161,6 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
               contentPadding: EdgeInsets.zero,
               title: Text(l10n.categoryRange(c.name, c.minAge, c.maxAge)),
             ),
-          const SizedBox(height: AppSpacing.l),
-          Align(
-            alignment: Alignment.centerRight,
-            child: FilledButton(
-              onPressed: _saving ? null : _save,
-              child: Text(l10n.save),
-            ),
-          ),
         ],
       ),
     );
@@ -162,38 +173,58 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
       firstDate: DateTime(_date.year - 1),
       lastDate: DateTime(_date.year + 2),
     );
-    if (picked != null) setState(() => _date = picked);
+    if (picked != null && picked != _date) _change(() => _date = picked);
   }
 
+  /// One save at a time; changes made meanwhile go in the next one.
   Future<void> _save() async {
-    if (!_form.currentState!.validate()) return;
+    _nameTyping?.cancel();
+    if (_name.text.trim().isEmpty) return;
+    if (_saving) {
+      _changedWhileSaving = true;
+      return;
+    }
+    _saving = true;
     final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
-    setState(() => _saving = true);
     try {
-      final saved = await ref
-          .read(clubRepositoryProvider)
-          .saveSettings(
-            widget.eventId,
-            name: _name.text.trim(),
-            date: _date,
-            maxGroupsPerMat: _maxGroups,
-            matReferees: _matReferees,
-          );
-      if (!mounted) return;
-      setState(() => _matReferees = [...saved.matReferees]);
+      do {
+        _changedWhileSaving = false;
+        _saved = await ref
+            .read(clubRepositoryProvider)
+            .saveSettings(
+              widget.eventId,
+              name: _name.text.trim(),
+              date: _date,
+              maxGroupsPerMat: _maxGroups,
+              matReferees: [..._matReferees],
+            );
+      } while (_changedWhileSaving && mounted);
       ref
         ..invalidate(eventSettingsProvider(widget.eventId))
         ..invalidate(myEventsProvider)
         ..invalidate(matsOverviewProvider(widget.eventId))
         ..invalidate(participantsProvider(widget.eventId));
-      messenger.showSnackBar(SnackBar(content: Text(l10n.saved)));
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(l10n.saved),
+          duration: const Duration(seconds: 1),
+        ),
+      );
     } on DioException catch (e) {
       messenger.showSnackBar(
         SnackBar(content: Text(saveErrorMessage(l10n, e))),
       );
+      if (mounted) _showSaved();
     } finally {
-      if (mounted) setState(() => _saving = false);
+      _saving = false;
     }
   }
+
+  void _showSaved() => setState(() {
+    _name.text = _saved.name;
+    _date = _saved.date;
+    _maxGroups = _saved.maxGroupsPerMat;
+    _matReferees = [..._saved.matReferees];
+  });
 }

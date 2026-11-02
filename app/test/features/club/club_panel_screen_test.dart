@@ -1,4 +1,5 @@
 import 'package:brackety/features/club/data/club_models.dart';
+import 'package:brackety/features/club/data/club_repository.dart';
 import 'package:brackety/features/club/state/club_providers.dart';
 import 'package:brackety/features/club/ui/club_panel_screen.dart';
 import 'package:brackety/features/club/ui/participant_form.dart';
@@ -6,9 +7,47 @@ import 'package:brackety/features/events/data/my_event.dart';
 import 'package:brackety/features/events/state/events_providers.dart';
 import 'package:brackety/l10n/gen/app_localizations.dart';
 import 'package:brackety_core/brackety_core.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+/// Saves settings like the server would, or refuses them with [refuseWith].
+class FakeClubRepository extends Fake implements ClubRepository {
+  FakeClubRepository(this.current);
+
+  EventSettings current;
+  int? refuseWith;
+  final savedMaxGroups = <int>[];
+
+  @override
+  Future<EventSettings> saveSettings(
+    String eventId, {
+    required String name,
+    required DateTime date,
+    required int maxGroupsPerMat,
+    required List<String?> matReferees,
+  }) async {
+    if (refuseWith != null) {
+      throw DioException(
+        requestOptions: RequestOptions(),
+        response: Response(
+          requestOptions: RequestOptions(),
+          statusCode: refuseWith,
+        ),
+      );
+    }
+    savedMaxGroups.add(maxGroupsPerMat);
+    return current = EventSettings(
+      name: name,
+      date: date,
+      maxGroupsPerMat: maxGroupsPerMat,
+      matReferees: matReferees,
+      referees: current.referees,
+      categories: current.categories,
+    );
+  }
+}
 
 void main() {
   const sizes = {
@@ -68,13 +107,19 @@ void main() {
     categoryName: '4-7',
   );
 
-  Future<void> pumpPanel(WidgetTester tester, Size size) async {
+  Future<void> pumpPanel(
+    WidgetTester tester,
+    Size size, {
+    ClubRepository? repository,
+  }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          if (repository != null)
+            clubRepositoryProvider.overrideWithValue(repository),
           myEventsProvider.overrideWith((ref) async => [event]),
           eventSettingsProvider.overrideWith((ref, _) async => settings),
           standingsProvider.overrideWith((ref, _) async => standings),
@@ -171,6 +216,43 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  testWidgets('a settings change saves on its own, without a button', (
+    tester,
+  ) async {
+    final repository = FakeClubRepository(settings);
+    await pumpPanel(tester, const Size(800, 1280), repository: repository);
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+
+    expect(find.widgetWithText(FilledButton, 'Save'), findsNothing);
+    await tester.tap(find.text('2'));
+    await tester.pumpAndSettle();
+
+    expect(repository.savedMaxGroups, [2]);
+    expect(find.text('Saved'), findsOneWidget);
+  });
+
+  testWidgets('a refused change explains why and shows the saved value', (
+    tester,
+  ) async {
+    final repository = FakeClubRepository(settings)..refuseWith = 409;
+    await pumpPanel(tester, const Size(800, 1280), repository: repository);
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('2'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Not possible: there are groups that depend on it.'),
+      findsOneWidget,
+    );
+    final segments = tester.widget<SegmentedButton<int>>(
+      find.byType(SegmentedButton<int>),
+    );
+    expect(segments.selected, {1});
+  });
 
   test('age counts whole years up to the day before the birthday', () {
     final birth = DateTime(2019, 11, 14);
