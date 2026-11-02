@@ -39,7 +39,6 @@ class CategoriesScreen extends ConsumerWidget {
                         c.isTeam
                             ? l10n.categoryTeamCounts(
                                 c.participants,
-                                c.inTeams,
                                 c.teams,
                                 c.grouped,
                               )

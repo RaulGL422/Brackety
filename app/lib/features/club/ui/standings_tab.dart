@@ -106,11 +106,15 @@ class _StandingTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final ageCategory = l10n.participantAgeCategory(
+      row.age,
+      row.categoryName ?? l10n.noCategory,
+    );
     return ListTile(
       leading: CircleAvatar(child: Text('${row.position}')),
       title: Text('${row.firstName} ${row.lastName}'),
       subtitle: Text(
-        '${l10n.participantAgeCategory(row.age, row.categoryName ?? l10n.noCategory)}\n'
+        '${row.teamNumber == null ? ageCategory : l10n.standingTeam(l10n.teamName(row.teamNumber!), ageCategory)}\n'
         '${l10n.standingsDetail(row.attendancePoints, row.matchPoints, row.matches)}',
       ),
       isThreeLine: true,

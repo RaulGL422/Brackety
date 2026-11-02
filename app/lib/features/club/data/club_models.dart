@@ -10,12 +10,15 @@ class StaffMember {
   final String username;
 }
 
+/// An age band of the event; [teamSize] is null when it competes individually.
 class EventCategory {
   const EventCategory({
-    required this.id,
+    this.id,
     required this.name,
     required this.minAge,
     required this.maxAge,
+    this.teamSize,
+    this.groupSize = 4,
   });
 
   factory EventCategory.fromJson(Map<String, dynamic> json) => EventCategory(
@@ -23,12 +26,31 @@ class EventCategory {
     name: json['name'] as String,
     minAge: json['minAge'] as int,
     maxAge: json['maxAge'] as int,
+    teamSize: json['format'] == 'TEAM' ? json['teamSize'] as int? : null,
+    groupSize: json['groupSize'] as int? ?? 4,
   );
 
-  final String id;
+  /// Null for a category not saved yet.
+  final String? id;
   final String name;
   final int minAge;
   final int maxAge;
+  final int? teamSize;
+
+  /// Participants or teams per group; only 4 for now.
+  final int groupSize;
+
+  bool get isTeam => teamSize != null;
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'minAge': minAge,
+    'maxAge': maxAge,
+    'format': isTeam ? 'TEAM' : 'INDIVIDUAL',
+    'teamSize': teamSize,
+    'groupSize': groupSize,
+  };
 }
 
 class EventSettings {
@@ -123,6 +145,7 @@ class StandingRow {
     required this.matches,
     this.categoryId,
     this.categoryName,
+    this.teamNumber,
   });
 
   factory StandingRow.fromJson(Map<String, dynamic> json) => StandingRow(
@@ -137,6 +160,7 @@ class StandingRow {
     matchPoints: json['matchPoints'] as int,
     total: json['total'] as int,
     matches: json['matches'] as int,
+    teamNumber: json['teamNumber'] as int?,
   );
 
   /// Equal totals share the position.
@@ -148,6 +172,9 @@ class StandingRow {
   final String? categoryId;
   final String? categoryName;
   final int attendancePoints;
+
+  /// The participant's real team, or null.
+  final int? teamNumber;
   final int matchPoints;
   final int total;
   final int matches;
