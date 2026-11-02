@@ -12,6 +12,8 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, UUID> 
 
     List<GroupMember> findByParticipantIdInAndGhostFalse(Collection<UUID> participantIds);
 
+    List<GroupMember> findByTeamIdIn(Collection<UUID> teamIds);
+
     @Query("select m from GroupMember m where m.groupId in (select g.id from FightGroup g where g.eventId = :eventId)")
     List<GroupMember> findByEventId(UUID eventId);
 }

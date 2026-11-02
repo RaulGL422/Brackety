@@ -139,7 +139,14 @@ class MatchRecommenderTest {
             return MatchRecommender.recommend(
                     pending,
                     new Context(
-                            now, MATCH.plus(CHANGEOVER), lastFought, groupCreated, groupLastPlayed, busy, justFought));
+                            now,
+                            MATCH.plus(CHANGEOVER),
+                            lastFought,
+                            groupCreated,
+                            groupLastPlayed,
+                            busy,
+                            justFought,
+                            Map.of()));
         }
 
         void play(UUID matchId) {

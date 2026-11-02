@@ -11,7 +11,8 @@ public interface ParticipantRepository extends JpaRepository<Participant, UUID> 
 
     // Native so this package does not depend on grouping, which depends on it.
     @Query(
-            value = "select exists(select 1 from group_member where participant_id = :participantId)",
+            value = "select exists(select 1 from group_member where participant_id = :participantId)"
+                    + " or exists(select 1 from team_member where participant_id = :participantId)",
             nativeQuery = true)
-    boolean isInAGroup(UUID participantId);
+    boolean isInAGroupOrTeam(UUID participantId);
 }

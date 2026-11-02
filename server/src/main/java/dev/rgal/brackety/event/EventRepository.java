@@ -18,8 +18,11 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
     Optional<Event> lockById(UUID eventId);
 
     // Native so this package does not depend on grouping, which depends on it.
-    @Query(value = "select exists(select 1 from fight_group where event_id = :eventId)", nativeQuery = true)
-    boolean hasGroups(UUID eventId);
+    @Query(
+            value = "select exists(select 1 from fight_group where event_id = :eventId)"
+                    + " or exists(select 1 from team where event_id = :eventId)",
+            nativeQuery = true)
+    boolean hasGroupsOrTeams(UUID eventId);
 
     @Query(value = "select exists(select 1 from fight_group where mat_id in (:matIds))", nativeQuery = true)
     boolean hasGroupsOnMats(Collection<UUID> matIds);

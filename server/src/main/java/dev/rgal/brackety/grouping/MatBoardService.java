@@ -16,8 +16,6 @@ import dev.rgal.brackety.grouping.dto.MatBoardResponse.BoardGroup;
 import dev.rgal.brackety.grouping.dto.MatBoardResponse.BoardMatch;
 import dev.rgal.brackety.grouping.dto.MatBoardResponse.Fighter;
 import dev.rgal.brackety.grouping.dto.MatOverview;
-import dev.rgal.brackety.participant.Participant;
-import dev.rgal.brackety.participant.ParticipantRepository;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -41,7 +39,7 @@ class MatBoardService {
     private final FightGroupRepository groups;
     private final GroupMemberRepository members;
     private final MatchRepository matches;
-    private final ParticipantRepository participants;
+    private final CompetitorDirectory directory;
     private final EventCategoryRepository categories;
     private final AccountRepository accounts;
     private final EventService events;
@@ -54,7 +52,7 @@ class MatBoardService {
             FightGroupRepository groups,
             GroupMemberRepository members,
             MatchRepository matches,
-            ParticipantRepository participants,
+            CompetitorDirectory directory,
             EventCategoryRepository categories,
             AccountRepository accounts,
             EventService events,
@@ -65,7 +63,7 @@ class MatBoardService {
         this.groups = groups;
         this.members = members;
         this.matches = matches;
-        this.participants = participants;
+        this.directory = directory;
         this.categories = categories;
         this.accounts = accounts;
         this.events = events;
@@ -113,12 +111,8 @@ class MatBoardService {
         var groupMembers = members.findByGroupIdInOrderByPosition(groupById.keySet());
         var ghosts = groupMembers.stream()
                 .filter(GroupMember::isGhost)
-                .collect(Collectors.toMap(GroupMember::getGroupId, GroupMember::getParticipantId));
-        var names = participants
-                .findAllById(
-                        groupMembers.stream().map(GroupMember::getParticipantId).collect(Collectors.toSet()))
-                .stream()
-                .collect(Collectors.toMap(Participant::getId, p -> p.getFirstName() + " " + p.getLastName()));
+                .collect(Collectors.toMap(GroupMember::getGroupId, GroupMember::getCompetitorId));
+        var competitors = directory.of(event.getId());
         var categoryNames = categories.findByEventIdOrderByMinAge(event.getId()).stream()
                 .collect(Collectors.toMap(EventCategory::getId, EventCategory::getName));
 
@@ -126,13 +120,12 @@ class MatBoardService {
         var busy = new HashSet<UUID>();
         var lastFought = new HashMap<UUID, Instant>();
         for (var m : eventMatches) {
+            var fighters = competitors.participants(m.getRedId(), m.getBlueId());
             if (m.getStatus() == Match.Status.IN_PROGRESS) {
-                busy.add(m.getRedParticipantId());
-                busy.add(m.getBlueParticipantId());
+                busy.addAll(fighters);
             }
             if (m.getFinishedAt() != null) {
-                lastFought.merge(m.getRedParticipantId(), m.getFinishedAt(), this::later);
-                lastFought.merge(m.getBlueParticipantId(), m.getFinishedAt(), this::later);
+                fighters.forEach(p -> lastFought.merge(p, m.getFinishedAt(), this::later));
             }
         }
         var onMat = eventMatches.stream()
@@ -148,7 +141,7 @@ class MatBoardService {
         Set<UUID> justFought = onMat.stream()
                 .filter(m -> m.getFinishedAt() != null)
                 .max(Comparator.comparing(Match::getFinishedAt))
-                .map(m -> Set.of(m.getRedParticipantId(), m.getBlueParticipantId()))
+                .map(m -> competitors.participants(m.getRedId(), m.getBlueId()))
                 .orElse(Set.of());
 
         var candidates = onMat.stream()
@@ -158,8 +151,8 @@ class MatBoardService {
                         m.getGroupId(),
                         groupById.get(m.getGroupId()).getNumber(),
                         m.getOrderIndex(),
-                        m.getRedParticipantId(),
-                        m.getBlueParticipantId()))
+                        m.getRedId(),
+                        m.getBlueId()))
                 .toList();
         var context = new MatchRecommender.Context(
                 now,
@@ -168,11 +161,12 @@ class MatBoardService {
                 matGroups.stream().collect(Collectors.toMap(FightGroup::getId, FightGroup::getCreatedAt)),
                 groupLastPlayed,
                 busy,
-                justFought);
+                justFought,
+                competitors.teamMembers());
         var recommended = MatchRecommender.recommend(candidates, context).orElse(null);
 
-        BiFunction<UUID, UUID, Fighter> fighter = (groupId, participantId) ->
-                new Fighter(participantId, names.get(participantId), participantId.equals(ghosts.get(groupId)));
+        BiFunction<UUID, UUID, Fighter> fighter =
+                (groupId, id) -> fighter(competitors.get(id), id.equals(ghosts.get(groupId)));
         return new MatBoardResponse(
                 matId,
                 mat.getNumber(),
@@ -183,7 +177,7 @@ class MatBoardService {
                                 categoryNames.get(g.getCategoryId()),
                                 groupMembers.stream()
                                         .filter(m -> m.getGroupId().equals(g.getId()))
-                                        .map(m -> fighter.apply(g.getId(), m.getParticipantId()))
+                                        .map(m -> fighter.apply(g.getId(), m.getCompetitorId()))
                                         .toList()))
                         .toList(),
                 onMat.stream()
@@ -192,16 +186,26 @@ class MatBoardService {
                                 m.getGroupId(),
                                 groupById.get(m.getGroupId()).getNumber(),
                                 m.getOrderIndex(),
-                                fighter.apply(m.getGroupId(), m.getRedParticipantId()),
-                                fighter.apply(m.getGroupId(), m.getBlueParticipantId()),
+                                fighter.apply(m.getGroupId(), m.getRedId()),
+                                fighter.apply(m.getGroupId(), m.getBlueId()),
                                 m.getStatus(),
                                 m.getRedScore(),
                                 m.getBlueScore(),
                                 m.getStatus() == Match.Status.PENDING
-                                        && !busy.contains(m.getRedParticipantId())
-                                        && !busy.contains(m.getBlueParticipantId())))
+                                        && competitors.participants(m.getRedId(), m.getBlueId()).stream()
+                                                .noneMatch(busy::contains)))
                         .toList(),
                 recommended);
+    }
+
+    private static Fighter fighter(Competitor c, boolean ghost) {
+        return new Fighter(
+                c.isTeam() ? null : c.id(),
+                c.isTeam() ? String.join(", ", c.memberNames()) : c.name(),
+                ghost,
+                c.isTeam() ? c.id() : null,
+                c.teamNumber(),
+                c.memberNames());
     }
 
     private void requireBoardAccess(Mat mat, UUID accountId) {

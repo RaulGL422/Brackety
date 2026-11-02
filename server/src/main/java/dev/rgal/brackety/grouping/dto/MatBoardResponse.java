@@ -8,7 +8,12 @@ import java.util.UUID;
 public record MatBoardResponse(
         UUID matId, int matNumber, List<BoardGroup> groups, List<BoardMatch> matches, UUID recommendedMatchId) {
 
-    public record Fighter(UUID participantId, String name, boolean ghost) {}
+    /**
+     * A participant ({@code participantId}) or a team ({@code teamId}, {@code teamNumber}); {@code members}
+     * are the team's names, or the participant's own.
+     */
+    public record Fighter(
+            UUID participantId, String name, boolean ghost, UUID teamId, Integer teamNumber, List<String> members) {}
 
     public record BoardGroup(UUID id, int number, String categoryName, List<Fighter> members) {}
 

@@ -13,6 +13,8 @@ import java.util.Random;
 class YoseikanPhase1Scenario implements Scenario {
 
     static final int PARTICIPANTS = 60;
+    // Enough 15-16 year olds for groups of 4 teams of 3 in that team category, plus some left over.
+    static final int TEENS = 15;
 
     private static final List<String> FIRST_NAMES = List.of(
             "Lucía", "Hugo", "Martina", "Mateo", "Sofía", "Leo", "Julia", "Daniel", "Paula", "Pablo", "Valeria",
@@ -57,15 +59,15 @@ class YoseikanPhase1Scenario implements Scenario {
     @Override
     public String description() {
         return "Phase 1 prototype: club1, ayudante1-2, arbitro1-5 (password = username), event today with 5 mats and "
-                + PARTICIPANTS + " fictitious participants";
+                + (PARTICIPANTS + TEENS) + " fictitious participants (" + TEENS + " in the 15-16 team category)";
     }
 
     @Override
     public void seed(ScenarioContext ctx) {
         var eventId = demo.seed();
         var random = new Random(2027);
-        for (int i = 0; i < PARTICIPANTS; i++) {
-            var age = AGES[i % AGES.length];
+        for (int i = 0; i < PARTICIPANTS + TEENS; i++) {
+            var age = i < PARTICIPANTS ? AGES[i % AGES.length] : 15;
             var participant = new Participant(eventId, ctx.now().toInstant());
             participant.update(
                     FIRST_NAMES.get(random.nextInt(FIRST_NAMES.size())),

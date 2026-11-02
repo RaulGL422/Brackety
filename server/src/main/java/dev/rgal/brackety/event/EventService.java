@@ -96,8 +96,8 @@ public class EventService {
             throw EventException.invalid("A referee can only be on one mat.");
         }
         // The date sets every participant's age, and so the category their group was made for.
-        if (!request.date().equals(event.getEventDate()) && events.hasGroups(eventId)) {
-            throw EventException.conflict("The date cannot change once there are groups.");
+        if (!request.date().equals(event.getEventDate()) && events.hasGroupsOrTeams(eventId)) {
+            throw EventException.conflict("The date cannot change once there are groups or teams.");
         }
         var current = mats.findByEventIdOrderByNumber(eventId);
         var removed = current.size() > request.matReferees().size()
@@ -136,7 +136,7 @@ public class EventService {
                         .toList(),
                 referees,
                 categories.findByEventIdOrderByMinAge(event.getId()).stream()
-                        .map(c -> new CategoryResponse(c.getId(), c.getName(), c.getMinAge(), c.getMaxAge()))
+                        .map(CategoryResponse::of)
                         .toList());
     }
 

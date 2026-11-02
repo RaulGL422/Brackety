@@ -30,7 +30,7 @@ A partir de cierta edad, la categoría compite **por equipos de 3** en lugar de 
 - Solo con alumnos que no estén en un equipo real. Un alumno es real en un único sitio: un equipo o un grupo individual.
 
 ### Árbitro y marcador
-- Combate = **un marcador Tambo equipo contra equipo**: rojo = equipo A, azul = equipo B. Mismas reglas (2:00, 15, avisos, una mano 4-7 según edad de la categoría, deshacer, finalizar, campana).
+- Combate = **un marcador Tambo equipo contra equipo**: rojo = equipo A, azul = equipo B. Mismas reglas (2:00, 15, avisos, deshacer, finalizar, campana); aviso de una mano si algún miembro tiene 4-7.
 - Tablero y marcador muestran "Equipo N"; los nombres de los miembros, en pequeño debajo.
 - Nórdico de 4 sobre equipos (1-2, 3-4, 1-3, 2-4, 1-4, 2-3), equipo fantasma al final.
 - Recomendado: mismos pasos. Un equipo está ocupado si **cualquiera** de sus alumnos combate ahora en cualquier tapiz (también como fantasma). Descanso del equipo = el de su miembro con menos descanso.
@@ -52,10 +52,11 @@ A partir de cierta edad, la categoría compite **por equipos de 3** en lugar de 
 - La puntuación se calcula de los combates, no se guarda por alumno.
 
 ## API
-- `GET|PUT /events/{id}/categories` (club; formato y tamaños) · el `GET` para ayudante añade formato y nº de equipos.
+- `PUT /events/{id}/categories` (club; lista completa, las que faltan se borran; sin solapes de edad; la config la devuelve `GET /settings`) · `GET /events/{id}/categories` (ayudante) añade formato, tamaño de equipo, alumnos en equipo y nº de equipos.
 - `GET|POST /events/{id}/categories/{cat}/teams` · `DELETE /teams/{id}` (sin grupo).
-- `POST /events/{id}/groups` admite `teamIds` + `ghostTeam` (3 alumnos) además de `participantIds` + `ghostId`.
-- Tablero, combate, clasificación y CSV: campos nuevos (equipo) añadidos sin quitar ni renombrar los actuales (la app vieja sigue funcionando).
+- `POST /events/{id}/groups`: cada grupo lleva `participantIds` + `ghostId`, o `teamIds` + `ghostTeam` (ids de los alumnos del equipo fantasma).
+- Tablero y combate: cada lado añade `teamId`, `teamNumber` y `members`; en equipos `participantId` es null y `name` son los miembros. Clasificación: `teamNumber`. CSV: columna Equipo y "Equipo N (miembros)".
+- Código: `grouping/Team*`, `CategoryRoster` (quién está libre o agrupado), `CompetitorDirectory` (alumno o equipo → nombre y alumnos; lo usan tablero, recomendado, marcador y clasificación).
 
 ## Pantallas
 - Ayudante, categoría por equipos: dos pestañas **Alumnos** (crear equipo) y **Equipos** (crear grupo, casilla de equipo fantasma); botón "Grupo individual".
@@ -75,4 +76,4 @@ A partir de cierta edad, la categoría compite **por equipos de 3** en lugar de 
 El paso 7 (Pi) puede ir antes o después de estos; si la Fase 1 llega antes, se despliega sin equipos.
 
 ## Estado
-Diseñado 2026-10-31; sin empezar.
+Diseñado 2026-10-31. Paso 8 (back) hecho 2026-11-02: `TeamControllerTest`; escenario `yoseikan-f1` con 15 alumnos de 15-16. Siguiente: paso 9.
