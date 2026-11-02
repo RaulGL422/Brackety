@@ -122,3 +122,6 @@ Formato: fecha · decisión · motivo.
 - 2026-10-31 · Equipo fantasma = 3 alumnos cualesquiera de la categoría (no un equipo ya hecho); botón "Grupo individual" en categorías por equipos para los sobrantes · decidido por Raul.
 - 2026-10-31 · Equipos con nombre "Equipo N" numerado por evento · el árbitro los llama por ese nombre y no se repite entre tapices.
 - 2026-11-02 · Prototipo en la Pi: web `brackety.rgal.dev`, API `brackety-api.rgal.dev`, admin `brackety-admin.rgal.dev`; imágenes de la release `v0.1.0` publicadas por el CI; equipos después del despliegue · un nivel de subdominio para el SSL gratuito de Cloudflare; compilar en la Pi es muy lento; decidido por Raul.
+- 2026-11-02 · Idioma: el selector de ajustes cambia el de la app y el de la cuenta (emails); con sesión manda el de la cuenta, sin sesión el del dispositivo · una sola elección para todo; decidido por Raul.
+- 2026-11-02 · Exportar datos: en Android, hoja de compartir con el JSON (`share_plus`); en web, descarga del navegador (`package:web`) · Android no tiene carpeta de descargas accesible sin permisos; decidido por Raul.
+- 2026-11-02 · Ajustes de la app sin Google (ni vincular ni reauth con Google) hasta tener los client IDs: se muestra el Google ya vinculado, con desvincular y quitar contraseña · decidido por Raul.

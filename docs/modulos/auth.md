@@ -58,6 +58,8 @@ Cuentas, login y sesión compartidos entre web y Android.
 - Menor de 14 no se registra solo: lo da de alta su tutor (`perfiles-menores.md`). La app lo bloquea también antes de enviar.
 - Perfiles adicionales desde ajustes (exige email verificado): un perfil cualquiera, o Alumno + Ayudante, o Externo + Ayudante; lo demás 409 `PROFILE_COMBINATION_NOT_ALLOWED`. El último no se quita (409 `LAST_PROFILE`). Organizador nuevo, sin validar.
 - Club y Entidad Externa: alta libre, pero no publican eventos hasta que el superadmin los valida.
+- App, ajustes: ofrecen añadir los perfiles del registro salvo organizadores (piden nombre y CIF); con un organizador, ninguno.
+- Idioma: con sesión, la app usa el de la cuenta (`/me`), que también es el de los emails; el selector de ajustes cambia los dos (`PATCH /me`). Sin sesión, el del dispositivo. es y en.
 
 ### Superadmin y RGPD
 - Superadmin: usuario único por entorno (`SUPERADMIN_EMAIL` + `SUPERADMIN_PASSWORD_HASH` Argon2id); sin ellas, login 503. Cambiar la contraseña = cambiar la variable y reiniciar.
@@ -97,7 +99,8 @@ Todos bajo `/api/v1`: `POST /auth/register`, `/auth/login`, `/auth/google`, `/au
 ## Pantallas
 Inicio de sesión, registro con selector de perfil, verificación pendiente, recuperar contraseña, ajustes de cuenta (identidades, perfiles, email, idioma, exportar/borrar). Admin: login de superadmin, bloqueos activos con revocación.
 - Código en `app/lib/features/auth/`. Verificación pendiente: aviso no bloqueante encima de toda la app (con reenvío).
-- Enlaces de email (`/verify-email`, `/reset-password`, `/forgot-password`) abren en cualquier estado de sesión; web con URLs sin `#`.
+- Enlaces de email (`/verify-email`, `/reset-password`, `/forgot-password`, `/confirm-email-change`) abren en cualquier estado de sesión; web con URLs sin `#`.
+- Ajustes (`/settings`, icono de cuenta en Mis eventos): cuenta, idioma, perfiles, métodos de acceso, exportar (Android: compartir; web: descarga), borrar y cerrar sesión. Acciones delicadas: diálogo de contraseña, token de reauth en memoria hasta caducar. Sin Google hasta tener los client IDs.
 
 ## Offline
 - La sesión sigue válida sin red mientras el refresh no caduque. El acceso caducado se renueva al volver la red.
@@ -115,5 +118,5 @@ En curso. Tareas (una rama cada una, en este orden):
 5. `feat/auth-superadmin` · superadmin por entorno, validación de organizadores, listar y revocar bloqueos con auditoría. Hecha (2026-10-31).
 6. `feat/auth-screens-login` · app: login, registro, verificación pendiente, recuperar; cliente HTTP con refresh (uno a la vez) y 429 con `lockId`. Hecha (2026-10-31).
 7. `feat/auth-organizer-signup` · registro de Club y Entidad Externa sin fecha de nacimiento: casilla "soy mayor de edad y represento a la organización", nombre y CIF obligatorios (formato y dígito de control, repetible entre cuentas); el superadmin los ve al validar.
-8. `feat/auth-screens-settings` · app: ajustes de cuenta.
+8. `feat/auth-screens-settings` · app: ajustes de cuenta. Hecha (2026-11-02).
 9. `feat/auth-admin-login` · admin: login de superadmin y pantalla de bloqueos.
