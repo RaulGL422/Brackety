@@ -797,7 +797,7 @@ abstract class AppLocalizations {
   /// No description provided for @matWaiting.
   ///
   /// In es, this message translates to:
-  /// **'Un luchador está combatiendo en otro tapiz'**
+  /// **'Un luchador está combatiendo ahora'**
   String get matWaiting;
 
   /// No description provided for @matNoneAvailable.
@@ -1343,13 +1343,8 @@ abstract class AppLocalizations {
   /// No description provided for @categoryTeamCounts.
   ///
   /// In es, this message translates to:
-  /// **'{participants} inscritos · {inTeams} en {teams} equipos · {grouped} en grupos'**
-  String categoryTeamCounts(
-    int participants,
-    int inTeams,
-    int teams,
-    int grouped,
-  );
+  /// **'{participants} inscritos · {teams} equipos · {grouped} en grupos'**
+  String categoryTeamCounts(int participants, int teams, int grouped);
 
   /// No description provided for @newTeamCount.
   ///
@@ -1746,6 +1741,102 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Email cambiado. Se han cerrado todas las sesiones: inicia sesión con el email nuevo.'**
   String get confirmEmailChangeDone;
+
+  /// No description provided for @categoryIndividual.
+  ///
+  /// In es, this message translates to:
+  /// **'Individual'**
+  String get categoryIndividual;
+
+  /// No description provided for @categoryTeams.
+  ///
+  /// In es, this message translates to:
+  /// **'Equipos de {size}'**
+  String categoryTeams(int size);
+
+  /// No description provided for @categoryAdd.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir categoría'**
+  String get categoryAdd;
+
+  /// No description provided for @categoryEdit.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar categoría'**
+  String get categoryEdit;
+
+  /// No description provided for @categoryRemove.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar categoría'**
+  String get categoryRemove;
+
+  /// No description provided for @categoryNameLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre'**
+  String get categoryNameLabel;
+
+  /// No description provided for @categoryMinAge.
+  ///
+  /// In es, this message translates to:
+  /// **'Desde'**
+  String get categoryMinAge;
+
+  /// No description provided for @categoryMaxAge.
+  ///
+  /// In es, this message translates to:
+  /// **'Hasta'**
+  String get categoryMaxAge;
+
+  /// No description provided for @categoryByTeams.
+  ///
+  /// In es, this message translates to:
+  /// **'Por equipos'**
+  String get categoryByTeams;
+
+  /// No description provided for @categoryTeamSize.
+  ///
+  /// In es, this message translates to:
+  /// **'Alumnos por equipo'**
+  String get categoryTeamSize;
+
+  /// No description provided for @categoryGroupSize.
+  ///
+  /// In es, this message translates to:
+  /// **'Grupos de {size}'**
+  String categoryGroupSize(int size);
+
+  /// No description provided for @categoryAgesInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'La edad mínima no puede ser mayor que la máxima.'**
+  String get categoryAgesInvalid;
+
+  /// No description provided for @categoriesInUse.
+  ///
+  /// In es, this message translates to:
+  /// **'Una categoría con grupos o equipos solo puede cambiar de nombre.'**
+  String get categoriesInUse;
+
+  /// No description provided for @categoriesInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'Revisa las categorías: las edades no pueden solaparse.'**
+  String get categoriesInvalid;
+
+  /// No description provided for @standingTeam.
+  ///
+  /// In es, this message translates to:
+  /// **'{team} · {detail}'**
+  String standingTeam(String team, String detail);
+
+  /// No description provided for @categoryAgeSuffix.
+  ///
+  /// In es, this message translates to:
+  /// **'años'**
+  String get categoryAgeSuffix;
 }
 
 class _AppLocalizationsDelegate

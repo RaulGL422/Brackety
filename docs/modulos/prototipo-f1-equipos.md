@@ -61,7 +61,7 @@ A partir de cierta edad, la categoría compite **por equipos de 3** en lugar de 
 ## Pantallas
 - Ayudante, categoría por equipos (`grouping/ui/team_category_screen.dart`, ruta `…/categories/{cat}/teams?name=&size=`): pestañas **Alumnos** (elegir 3 libres → crear equipo) y **Equipos** (deshacer equipo sin grupo; elegir 4, o 3 + casilla de equipo fantasma que abre una hoja con los alumnos de la categoría salvo los del propio grupo); botón "Grupo individual" abre la pantalla de siempre, donde quien tiene equipo solo puede ser fantasma. Mismo borrador (`GroupDraft`) y multigrupo que en individual.
 - Árbitro y club (tablero, marcador, vista del combate, línea de tiempo): "Equipo N" como nombre y miembros en pequeño debajo (`mat/ui/fighter_text.dart`, común a alumnos y equipos).
-- Club: configuración de categorías editable; puntuaciones con columna de equipo; tapices en solo lectura con equipos.
+- Club (`club/ui/categories_editor.dart`): en Configuración, categorías editables (añadir, editar nombre/edades/por equipos/alumnos por equipo, quitar), cada cambio se guarda solo; 409 y 400 se explican. Grupos de 4 fijo (solo lectura). Puntuaciones con "Equipo N"; tapices en solo lectura con equipos (paso 10).
 
 ## Tests
 - Back: crear y deshacer equipo, número por evento, alumno en dos equipos (409), equipo fantasma con alumnos ya en equipos, grupo de equipos 4 y 3 + fantasma, grupo individual en categoría por equipos, recomendado con equipo ocupado por un miembro, puntuación por miembro, formato bloqueado con equipos, migración sin romper los eventos actuales.
@@ -76,4 +76,4 @@ A partir de cierta edad, la categoría compite **por equipos de 3** en lugar de 
 El paso 7 (Pi) puede ir antes o después de estos; si la Fase 1 llega antes, se despliega sin equipos.
 
 ## Estado
-Diseñado 2026-10-31. Paso 8 (back) hecho 2026-11-02 (PR #26): `TeamControllerTest`; escenario `yoseikan-f1` con 15 alumnos de 15-16. Paso 9 (front ayudante) hecho 2026-11-02: tests de borrador y widget en 3 tamaños; probado contra la API local (Chrome no disponible). Paso 10 (árbitro) hecho 2026-11-02: tests de tablero y marcador con equipos en 3 tamaños. Siguiente: paso 11.
+Diseñado 2026-10-31. Paso 8 (back) hecho 2026-11-02 (PR #26): `TeamControllerTest`; escenario `yoseikan-f1` con 15 alumnos de 15-16. Paso 9 (front ayudante) hecho 2026-11-02: tests de borrador y widget en 3 tamaños; probado contra la API local. Paso 10 (árbitro) hecho 2026-11-02: tests de tablero y marcador con equipos en 3 tamaños. Paso 11 (club) hecho 2026-11-02. Los 4 pasos probados por Claude en Chrome sin interfaz; falta la prueba manual de Raul del módulo completo.

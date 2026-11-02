@@ -418,7 +418,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matFinished => 'Finished';
 
   @override
-  String get matWaiting => 'A fighter is in a match on another mat';
+  String get matWaiting => 'A fighter is in a match right now';
 
   @override
   String get matNoneAvailable => 'No match can start right now.';
@@ -721,13 +721,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'For those left without a team: groups of 4 participants.';
 
   @override
-  String categoryTeamCounts(
-    int participants,
-    int inTeams,
-    int teams,
-    int grouped,
-  ) {
-    return '$participants registered · $inTeams in $teams teams · $grouped in groups';
+  String categoryTeamCounts(int participants, int teams, int grouped) {
+    return '$participants registered · $teams teams · $grouped in groups';
   }
 
   @override
@@ -958,4 +953,61 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get confirmEmailChangeDone =>
       'Email changed. All sessions have been closed: sign in with the new email.';
+
+  @override
+  String get categoryIndividual => 'Individual';
+
+  @override
+  String categoryTeams(int size) {
+    return 'Teams of $size';
+  }
+
+  @override
+  String get categoryAdd => 'Add category';
+
+  @override
+  String get categoryEdit => 'Edit category';
+
+  @override
+  String get categoryRemove => 'Remove category';
+
+  @override
+  String get categoryNameLabel => 'Name';
+
+  @override
+  String get categoryMinAge => 'From';
+
+  @override
+  String get categoryMaxAge => 'To';
+
+  @override
+  String get categoryByTeams => 'By teams';
+
+  @override
+  String get categoryTeamSize => 'Participants per team';
+
+  @override
+  String categoryGroupSize(int size) {
+    return 'Groups of $size';
+  }
+
+  @override
+  String get categoryAgesInvalid =>
+      'The minimum age cannot be above the maximum.';
+
+  @override
+  String get categoriesInUse =>
+      'A category with groups or teams can only change its name.';
+
+  @override
+  String get categoriesInvalid =>
+      'Check the categories: their ages cannot overlap.';
+
+  @override
+  String standingTeam(String team, String detail) {
+    return '$team · $detail';
+  }
+
+  @override
+  String get categoryAgeSuffix => 'years';
 }

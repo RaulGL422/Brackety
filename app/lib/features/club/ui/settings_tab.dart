@@ -12,6 +12,7 @@ import '../../events/state/events_providers.dart';
 import '../data/club_models.dart';
 import '../data/club_repository.dart';
 import '../state/club_providers.dart';
+import 'categories_editor.dart';
 import 'club_panel_screen.dart';
 
 const maxMats = 20;
@@ -156,11 +157,10 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
           ),
           const SizedBox(height: AppSpacing.xl),
           Text(l10n.categoriesTitle, style: text.titleMedium),
-          for (final c in settings.categories)
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(l10n.categoryRange(c.name, c.minAge, c.maxAge)),
-            ),
+          CategoriesEditor(
+            eventId: widget.eventId,
+            categories: settings.categories,
+          ),
         ],
       ),
     );

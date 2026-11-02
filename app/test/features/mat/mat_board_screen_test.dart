@@ -87,10 +87,7 @@ void main() {
         expect(find.text('Group 3 · ages 7-8'), findsOneWidget);
         expect(find.text('Recommended next'), findsOneWidget);
         expect(find.text('Ana  vs  Carla'), findsOneWidget);
-        expect(
-          find.text('A fighter is in a match on another mat'),
-          findsOneWidget,
-        );
+        expect(find.text('A fighter is in a match right now'), findsOneWidget);
         expect(find.text('4 - 15'), findsOneWidget);
         expect(tester.takeException(), isNull);
       },

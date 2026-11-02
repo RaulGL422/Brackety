@@ -421,7 +421,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get matFinished => 'Terminados';
 
   @override
-  String get matWaiting => 'Un luchador está combatiendo en otro tapiz';
+  String get matWaiting => 'Un luchador está combatiendo ahora';
 
   @override
   String get matNoneAvailable => 'Ningún combate puede empezar ahora.';
@@ -723,13 +723,8 @@ class AppLocalizationsEs extends AppLocalizations {
       'Para quien se quede sin equipo: grupos de 4 alumnos.';
 
   @override
-  String categoryTeamCounts(
-    int participants,
-    int inTeams,
-    int teams,
-    int grouped,
-  ) {
-    return '$participants inscritos · $inTeams en $teams equipos · $grouped en grupos';
+  String categoryTeamCounts(int participants, int teams, int grouped) {
+    return '$participants inscritos · $teams equipos · $grouped en grupos';
   }
 
   @override
@@ -961,4 +956,61 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get confirmEmailChangeDone =>
       'Email cambiado. Se han cerrado todas las sesiones: inicia sesión con el email nuevo.';
+
+  @override
+  String get categoryIndividual => 'Individual';
+
+  @override
+  String categoryTeams(int size) {
+    return 'Equipos de $size';
+  }
+
+  @override
+  String get categoryAdd => 'Añadir categoría';
+
+  @override
+  String get categoryEdit => 'Editar categoría';
+
+  @override
+  String get categoryRemove => 'Quitar categoría';
+
+  @override
+  String get categoryNameLabel => 'Nombre';
+
+  @override
+  String get categoryMinAge => 'Desde';
+
+  @override
+  String get categoryMaxAge => 'Hasta';
+
+  @override
+  String get categoryByTeams => 'Por equipos';
+
+  @override
+  String get categoryTeamSize => 'Alumnos por equipo';
+
+  @override
+  String categoryGroupSize(int size) {
+    return 'Grupos de $size';
+  }
+
+  @override
+  String get categoryAgesInvalid =>
+      'La edad mínima no puede ser mayor que la máxima.';
+
+  @override
+  String get categoriesInUse =>
+      'Una categoría con grupos o equipos solo puede cambiar de nombre.';
+
+  @override
+  String get categoriesInvalid =>
+      'Revisa las categorías: las edades no pueden solaparse.';
+
+  @override
+  String standingTeam(String team, String detail) {
+    return '$team · $detail';
+  }
+
+  @override
+  String get categoryAgeSuffix => 'años';
 }
