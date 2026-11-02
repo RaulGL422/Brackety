@@ -18,7 +18,7 @@ extension ProfileTypeOrganizer on ProfileType {
       this == ProfileType.club || this == ProfileType.externalEntity;
 }
 
-extension on ProfileType {
+extension ProfileTypeWire on ProfileType {
   String get wireName => switch (this) {
     ProfileType.club => 'CLUB',
     ProfileType.externalEntity => 'EXTERNAL_ENTITY',
@@ -26,6 +26,14 @@ extension on ProfileType {
     ProfileType.external => 'EXTERNAL',
     ProfileType.student => 'STUDENT',
   };
+}
+
+/// Null for a type this version of the app does not know yet.
+ProfileType? profileTypeFromWire(String wire) {
+  for (final type in ProfileType.values) {
+    if (type.wireName == wire) return type;
+  }
+  return null;
 }
 
 /// Profiles offered at sign-up. The others are only tried out in dev until their modules exist.
