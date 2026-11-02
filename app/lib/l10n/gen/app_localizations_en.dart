@@ -370,4 +370,150 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ghostBadge => 'Ghost';
+
+  @override
+  String matTitle(int number) {
+    return 'Mat $number';
+  }
+
+  @override
+  String get matEmpty => 'No groups on this mat yet.';
+
+  @override
+  String matGroupHeader(int number, String category) {
+    return 'Group $number · ages $category';
+  }
+
+  @override
+  String get matRecommended => 'Recommended next';
+
+  @override
+  String get matInProgress => 'In progress';
+
+  @override
+  String get matPending => 'Pending';
+
+  @override
+  String get matFinished => 'Finished';
+
+  @override
+  String get matWaiting => 'A fighter is in a match on another mat';
+
+  @override
+  String get matNoneAvailable => 'No match can start right now.';
+
+  @override
+  String get versus => 'vs';
+
+  @override
+  String scoreboardTitle(int mat, int group) {
+    return 'Mat $mat · Group $group';
+  }
+
+  @override
+  String get cornerRed => 'Red';
+
+  @override
+  String get cornerBlue => 'Blue';
+
+  @override
+  String get clockStart => 'Start';
+
+  @override
+  String get clockStop => 'Stop';
+
+  @override
+  String get clockResume => 'Resume';
+
+  @override
+  String get finishMatch => 'Finish match';
+
+  @override
+  String get matchFinished => 'Match finished';
+
+  @override
+  String get backToMat => 'Back to the mat';
+
+  @override
+  String get undo => 'Undo';
+
+  @override
+  String get timeline => 'Timeline';
+
+  @override
+  String get addPoint => '+1';
+
+  @override
+  String warningsCount(int count) {
+    return 'Warnings: $count';
+  }
+
+  @override
+  String oneHandCount(int count) {
+    return 'One hand: $count';
+  }
+
+  @override
+  String get disqualified => 'Disqualified';
+
+  @override
+  String get actionWarning => 'Warning';
+
+  @override
+  String get actionOneHand => 'Warning for hitting with one hand';
+
+  @override
+  String get actionDisqualify => 'Disqualification';
+
+  @override
+  String reasonTitle(String action, String fighter) {
+    return '$action · $fighter';
+  }
+
+  @override
+  String get reasonLabel => 'Reason (required)';
+
+  @override
+  String get reasonConfirm => 'Sure? It is recorded.';
+
+  @override
+  String get confirm => 'Confirm';
+
+  @override
+  String get endPoints => 'Ended on points';
+
+  @override
+  String get endTime => 'Time is up';
+
+  @override
+  String get endDisqualification => 'Ended by disqualification';
+
+  @override
+  String actionRefused(String detail) {
+    return 'Could not record it. $detail';
+  }
+
+  @override
+  String get tlStart => 'Clock started';
+
+  @override
+  String get tlStop => 'Stop';
+
+  @override
+  String get tlPoint => 'Point';
+
+  @override
+  String get tlUndo => 'Undo';
+
+  @override
+  String get tlFinish => 'Match finished';
+
+  @override
+  String get tlAutomatic => 'automatic';
+
+  @override
+  String get tlUndone => 'undone';
+
+  @override
+  String get tlRivalPoint => 'point to the rival';
 }

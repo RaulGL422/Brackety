@@ -80,12 +80,10 @@ class _EventCard extends StatelessWidget {
                   ),
                 if (event.roles.contains(EventRole.referee) &&
                     event.matNumber != null)
-                  OutlinedButton.icon(
+                  FilledButton.icon(
                     icon: const Icon(Icons.sports_martial_arts),
-                    label: Text(
-                      '${l10n.eventMyMat(event.matNumber!)} · ${l10n.comingSoon}',
-                    ),
-                    onPressed: null,
+                    label: Text(l10n.eventMyMat(event.matNumber!)),
+                    onPressed: () => context.push('/mats/${event.matId}'),
                   ),
                 if (event.roles.contains(EventRole.club))
                   OutlinedButton.icon(

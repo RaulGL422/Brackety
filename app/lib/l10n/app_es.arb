@@ -81,40 +81,221 @@
   "roleReferee": "Árbitro",
   "eventMakeGroups": "Crear grupos",
   "eventMyMat": "Tapiz {number}",
-  "@eventMyMat": {"placeholders": {"number": {"type": "int"}}},
+  "@eventMyMat": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
   "eventClubPanel": "Panel del club",
   "comingSoon": "Disponible pronto",
   "categoriesTitle": "Categorías",
   "categoriesEmpty": "Todavía no hay inscritos.",
   "categoryCounts": "{participants} inscritos · {grouped} en grupos",
-  "@categoryCounts": {"placeholders": {"participants": {"type": "int"}, "grouped": {"type": "int"}}},
+  "@categoryCounts": {
+    "placeholders": {
+      "participants": {
+        "type": "int"
+      },
+      "grouped": {
+        "type": "int"
+      }
+    }
+  },
   "categoryAges": "{name} años",
-  "@categoryAges": {"placeholders": {"name": {"type": "String"}}},
+  "@categoryAges": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "sortByName": "Nombre",
   "sortByHeight": "Estatura",
   "participantDetails": "{age} años · {height}",
-  "@participantDetails": {"placeholders": {"age": {"type": "int"}, "height": {"type": "String"}}},
+  "@participantDetails": {
+    "placeholders": {
+      "age": {
+        "type": "int"
+      },
+      "height": {
+        "type": "String"
+      }
+    }
+  },
   "heightCm": "{cm} cm",
-  "@heightCm": {"placeholders": {"cm": {"type": "int"}}},
+  "@heightCm": {
+    "placeholders": {
+      "cm": {
+        "type": "int"
+      }
+    }
+  },
   "heightUnknown": "sin estatura",
   "participantGrouped": "Grupo {group} · Tapiz {mat}",
-  "@participantGrouped": {"placeholders": {"group": {"type": "int"}, "mat": {"type": "int"}}},
+  "@participantGrouped": {
+    "placeholders": {
+      "group": {
+        "type": "int"
+      },
+      "mat": {
+        "type": "int"
+      }
+    }
+  },
   "draftGroup": "Grupo {number}",
-  "@draftGroup": {"placeholders": {"number": {"type": "int"}}},
+  "@draftGroup": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
   "draftCount": "{count}/4",
-  "@draftCount": {"placeholders": {"count": {"type": "int"}}},
+  "@draftCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "draftGhost": "Competidor fantasma",
   "draftGhostHint": "Elige al fantasma: combate pero no puntúa.",
   "draftAddGroup": "Añadir grupo",
   "draftRemoveGroup": "Quitar grupo",
   "createGroup": "{count, plural, =1{Crear grupo} other{Crear grupos}}",
-  "@createGroup": {"placeholders": {"count": {"type": "int"}}},
+  "@createGroup": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "groupsCreatedTitle": "{count, plural, =1{Grupo creado} other{Grupos creados}}",
-  "@groupsCreatedTitle": {"placeholders": {"count": {"type": "int"}}},
+  "@groupsCreatedTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "groupsCreatedBody": "{groups} → Tapiz {mat}",
-  "@groupsCreatedBody": {"placeholders": {"groups": {"type": "String"}, "mat": {"type": "int"}}},
+  "@groupsCreatedBody": {
+    "placeholders": {
+      "groups": {
+        "type": "String"
+      },
+      "mat": {
+        "type": "int"
+      }
+    }
+  },
   "groupsConflict": "Algún alumno ya está en un grupo. La lista se ha actualizado.",
   "groupsError": "No se han podido crear los grupos.",
   "ok": "Aceptar",
-  "ghostBadge": "Fantasma"
+  "ghostBadge": "Fantasma",
+  "matTitle": "Tapiz {number}",
+  "@matTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "matEmpty": "Todavía no hay grupos en este tapiz.",
+  "matGroupHeader": "Grupo {number} · {category} años",
+  "@matGroupHeader": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "matRecommended": "Siguiente recomendado",
+  "matInProgress": "En curso",
+  "matPending": "Pendientes",
+  "matFinished": "Terminados",
+  "matWaiting": "Un luchador está combatiendo en otro tapiz",
+  "matNoneAvailable": "Ningún combate puede empezar ahora.",
+  "versus": "vs",
+  "scoreboardTitle": "Tapiz {mat} · Grupo {group}",
+  "@scoreboardTitle": {
+    "placeholders": {
+      "mat": {
+        "type": "int"
+      },
+      "group": {
+        "type": "int"
+      }
+    }
+  },
+  "cornerRed": "Rojo",
+  "cornerBlue": "Azul",
+  "clockStart": "Iniciar",
+  "clockStop": "Parar",
+  "clockResume": "Reanudar",
+  "finishMatch": "Finalizar combate",
+  "matchFinished": "Combate finalizado",
+  "backToMat": "Volver al tapiz",
+  "undo": "Deshacer",
+  "timeline": "Línea de tiempo",
+  "addPoint": "+1",
+  "warningsCount": "Advertencias: {count}",
+  "@warningsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "oneHandCount": "Una mano: {count}",
+  "@oneHandCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "disqualified": "Descalificado",
+  "actionWarning": "Advertencia",
+  "actionOneHand": "Advertencia por golpear con una mano",
+  "actionDisqualify": "Descalificación",
+  "reasonTitle": "{action} · {fighter}",
+  "@reasonTitle": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      },
+      "fighter": {
+        "type": "String"
+      }
+    }
+  },
+  "reasonLabel": "Motivo (obligatorio)",
+  "reasonConfirm": "¿Seguro? Queda registrado.",
+  "cancel": "Cancelar",
+  "confirm": "Confirmar",
+  "endPoints": "Fin por puntos",
+  "endTime": "Fin del tiempo",
+  "endDisqualification": "Fin por descalificación",
+  "actionRefused": "No se ha podido registrar. {detail}",
+  "@actionRefused": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "tlStart": "Inicio del tiempo",
+  "tlStop": "Parada",
+  "tlPoint": "Punto",
+  "tlUndo": "Deshacer",
+  "tlFinish": "Fin del combate",
+  "tlAutomatic": "automático",
+  "tlUndone": "deshecho",
+  "tlRivalPoint": "punto al rival"
 }

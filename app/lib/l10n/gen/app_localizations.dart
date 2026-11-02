@@ -715,6 +715,270 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Fantasma'**
   String get ghostBadge;
+
+  /// No description provided for @matTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Tapiz {number}'**
+  String matTitle(int number);
+
+  /// No description provided for @matEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no hay grupos en este tapiz.'**
+  String get matEmpty;
+
+  /// No description provided for @matGroupHeader.
+  ///
+  /// In es, this message translates to:
+  /// **'Grupo {number} · {category} años'**
+  String matGroupHeader(int number, String category);
+
+  /// No description provided for @matRecommended.
+  ///
+  /// In es, this message translates to:
+  /// **'Siguiente recomendado'**
+  String get matRecommended;
+
+  /// No description provided for @matInProgress.
+  ///
+  /// In es, this message translates to:
+  /// **'En curso'**
+  String get matInProgress;
+
+  /// No description provided for @matPending.
+  ///
+  /// In es, this message translates to:
+  /// **'Pendientes'**
+  String get matPending;
+
+  /// No description provided for @matFinished.
+  ///
+  /// In es, this message translates to:
+  /// **'Terminados'**
+  String get matFinished;
+
+  /// No description provided for @matWaiting.
+  ///
+  /// In es, this message translates to:
+  /// **'Un luchador está combatiendo en otro tapiz'**
+  String get matWaiting;
+
+  /// No description provided for @matNoneAvailable.
+  ///
+  /// In es, this message translates to:
+  /// **'Ningún combate puede empezar ahora.'**
+  String get matNoneAvailable;
+
+  /// No description provided for @versus.
+  ///
+  /// In es, this message translates to:
+  /// **'vs'**
+  String get versus;
+
+  /// No description provided for @scoreboardTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Tapiz {mat} · Grupo {group}'**
+  String scoreboardTitle(int mat, int group);
+
+  /// No description provided for @cornerRed.
+  ///
+  /// In es, this message translates to:
+  /// **'Rojo'**
+  String get cornerRed;
+
+  /// No description provided for @cornerBlue.
+  ///
+  /// In es, this message translates to:
+  /// **'Azul'**
+  String get cornerBlue;
+
+  /// No description provided for @clockStart.
+  ///
+  /// In es, this message translates to:
+  /// **'Iniciar'**
+  String get clockStart;
+
+  /// No description provided for @clockStop.
+  ///
+  /// In es, this message translates to:
+  /// **'Parar'**
+  String get clockStop;
+
+  /// No description provided for @clockResume.
+  ///
+  /// In es, this message translates to:
+  /// **'Reanudar'**
+  String get clockResume;
+
+  /// No description provided for @finishMatch.
+  ///
+  /// In es, this message translates to:
+  /// **'Finalizar combate'**
+  String get finishMatch;
+
+  /// No description provided for @matchFinished.
+  ///
+  /// In es, this message translates to:
+  /// **'Combate finalizado'**
+  String get matchFinished;
+
+  /// No description provided for @backToMat.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver al tapiz'**
+  String get backToMat;
+
+  /// No description provided for @undo.
+  ///
+  /// In es, this message translates to:
+  /// **'Deshacer'**
+  String get undo;
+
+  /// No description provided for @timeline.
+  ///
+  /// In es, this message translates to:
+  /// **'Línea de tiempo'**
+  String get timeline;
+
+  /// No description provided for @addPoint.
+  ///
+  /// In es, this message translates to:
+  /// **'+1'**
+  String get addPoint;
+
+  /// No description provided for @warningsCount.
+  ///
+  /// In es, this message translates to:
+  /// **'Advertencias: {count}'**
+  String warningsCount(int count);
+
+  /// No description provided for @oneHandCount.
+  ///
+  /// In es, this message translates to:
+  /// **'Una mano: {count}'**
+  String oneHandCount(int count);
+
+  /// No description provided for @disqualified.
+  ///
+  /// In es, this message translates to:
+  /// **'Descalificado'**
+  String get disqualified;
+
+  /// No description provided for @actionWarning.
+  ///
+  /// In es, this message translates to:
+  /// **'Advertencia'**
+  String get actionWarning;
+
+  /// No description provided for @actionOneHand.
+  ///
+  /// In es, this message translates to:
+  /// **'Advertencia por golpear con una mano'**
+  String get actionOneHand;
+
+  /// No description provided for @actionDisqualify.
+  ///
+  /// In es, this message translates to:
+  /// **'Descalificación'**
+  String get actionDisqualify;
+
+  /// No description provided for @reasonTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'{action} · {fighter}'**
+  String reasonTitle(String action, String fighter);
+
+  /// No description provided for @reasonLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Motivo (obligatorio)'**
+  String get reasonLabel;
+
+  /// No description provided for @reasonConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Seguro? Queda registrado.'**
+  String get reasonConfirm;
+
+  /// No description provided for @confirm.
+  ///
+  /// In es, this message translates to:
+  /// **'Confirmar'**
+  String get confirm;
+
+  /// No description provided for @endPoints.
+  ///
+  /// In es, this message translates to:
+  /// **'Fin por puntos'**
+  String get endPoints;
+
+  /// No description provided for @endTime.
+  ///
+  /// In es, this message translates to:
+  /// **'Fin del tiempo'**
+  String get endTime;
+
+  /// No description provided for @endDisqualification.
+  ///
+  /// In es, this message translates to:
+  /// **'Fin por descalificación'**
+  String get endDisqualification;
+
+  /// No description provided for @actionRefused.
+  ///
+  /// In es, this message translates to:
+  /// **'No se ha podido registrar. {detail}'**
+  String actionRefused(String detail);
+
+  /// No description provided for @tlStart.
+  ///
+  /// In es, this message translates to:
+  /// **'Inicio del tiempo'**
+  String get tlStart;
+
+  /// No description provided for @tlStop.
+  ///
+  /// In es, this message translates to:
+  /// **'Parada'**
+  String get tlStop;
+
+  /// No description provided for @tlPoint.
+  ///
+  /// In es, this message translates to:
+  /// **'Punto'**
+  String get tlPoint;
+
+  /// No description provided for @tlUndo.
+  ///
+  /// In es, this message translates to:
+  /// **'Deshacer'**
+  String get tlUndo;
+
+  /// No description provided for @tlFinish.
+  ///
+  /// In es, this message translates to:
+  /// **'Fin del combate'**
+  String get tlFinish;
+
+  /// No description provided for @tlAutomatic.
+  ///
+  /// In es, this message translates to:
+  /// **'automático'**
+  String get tlAutomatic;
+
+  /// No description provided for @tlUndone.
+  ///
+  /// In es, this message translates to:
+  /// **'deshecho'**
+  String get tlUndone;
+
+  /// No description provided for @tlRivalPoint.
+  ///
+  /// In es, this message translates to:
+  /// **'punto al rival'**
+  String get tlRivalPoint;
 }
 
 class _AppLocalizationsDelegate

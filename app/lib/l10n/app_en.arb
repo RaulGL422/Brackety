@@ -81,40 +81,163 @@
   "roleReferee": "Referee",
   "eventMakeGroups": "Make groups",
   "eventMyMat": "Mat {number}",
-  "@eventMyMat": {"placeholders": {"number": {"type": "int"}}},
+  "@eventMyMat": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
   "eventClubPanel": "Club panel",
   "comingSoon": "Coming soon",
   "categoriesTitle": "Categories",
   "categoriesEmpty": "No registrations yet.",
   "categoryCounts": "{participants} registered · {grouped} in groups",
-  "@categoryCounts": {"placeholders": {"participants": {"type": "int"}, "grouped": {"type": "int"}}},
+  "@categoryCounts": {
+    "placeholders": {
+      "participants": {
+        "type": "int"
+      },
+      "grouped": {
+        "type": "int"
+      }
+    }
+  },
   "categoryAges": "Ages {name}",
-  "@categoryAges": {"placeholders": {"name": {"type": "String"}}},
+  "@categoryAges": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "sortByName": "Name",
   "sortByHeight": "Height",
   "participantDetails": "{age} years · {height}",
-  "@participantDetails": {"placeholders": {"age": {"type": "int"}, "height": {"type": "String"}}},
+  "@participantDetails": {
+    "placeholders": {
+      "age": {
+        "type": "int"
+      },
+      "height": {
+        "type": "String"
+      }
+    }
+  },
   "heightCm": "{cm} cm",
-  "@heightCm": {"placeholders": {"cm": {"type": "int"}}},
+  "@heightCm": {
+    "placeholders": {
+      "cm": {
+        "type": "int"
+      }
+    }
+  },
   "heightUnknown": "no height",
   "participantGrouped": "Group {group} · Mat {mat}",
-  "@participantGrouped": {"placeholders": {"group": {"type": "int"}, "mat": {"type": "int"}}},
+  "@participantGrouped": {
+    "placeholders": {
+      "group": {
+        "type": "int"
+      },
+      "mat": {
+        "type": "int"
+      }
+    }
+  },
   "draftGroup": "Group {number}",
-  "@draftGroup": {"placeholders": {"number": {"type": "int"}}},
+  "@draftGroup": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
   "draftCount": "{count}/4",
-  "@draftCount": {"placeholders": {"count": {"type": "int"}}},
+  "@draftCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "draftGhost": "Ghost competitor",
   "draftGhostHint": "Pick the ghost: fights but does not score.",
   "draftAddGroup": "Add group",
   "draftRemoveGroup": "Remove group",
   "createGroup": "{count, plural, =1{Create group} other{Create groups}}",
-  "@createGroup": {"placeholders": {"count": {"type": "int"}}},
+  "@createGroup": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "groupsCreatedTitle": "{count, plural, =1{Group created} other{Groups created}}",
-  "@groupsCreatedTitle": {"placeholders": {"count": {"type": "int"}}},
+  "@groupsCreatedTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "groupsCreatedBody": "{groups} → Mat {mat}",
-  "@groupsCreatedBody": {"placeholders": {"groups": {"type": "String"}, "mat": {"type": "int"}}},
+  "@groupsCreatedBody": {
+    "placeholders": {
+      "groups": {
+        "type": "String"
+      },
+      "mat": {
+        "type": "int"
+      }
+    }
+  },
   "groupsConflict": "A participant is already in a group. The list has been refreshed.",
   "groupsError": "The groups could not be created.",
   "ok": "OK",
-  "ghostBadge": "Ghost"
+  "ghostBadge": "Ghost",
+  "matTitle": "Mat {number}",
+  "matEmpty": "No groups on this mat yet.",
+  "matGroupHeader": "Group {number} · ages {category}",
+  "matRecommended": "Recommended next",
+  "matInProgress": "In progress",
+  "matPending": "Pending",
+  "matFinished": "Finished",
+  "matWaiting": "A fighter is in a match on another mat",
+  "matNoneAvailable": "No match can start right now.",
+  "versus": "vs",
+  "scoreboardTitle": "Mat {mat} · Group {group}",
+  "cornerRed": "Red",
+  "cornerBlue": "Blue",
+  "clockStart": "Start",
+  "clockStop": "Stop",
+  "clockResume": "Resume",
+  "finishMatch": "Finish match",
+  "matchFinished": "Match finished",
+  "backToMat": "Back to the mat",
+  "undo": "Undo",
+  "timeline": "Timeline",
+  "addPoint": "+1",
+  "warningsCount": "Warnings: {count}",
+  "oneHandCount": "One hand: {count}",
+  "disqualified": "Disqualified",
+  "actionWarning": "Warning",
+  "actionOneHand": "Warning for hitting with one hand",
+  "actionDisqualify": "Disqualification",
+  "reasonTitle": "{action} · {fighter}",
+  "reasonLabel": "Reason (required)",
+  "reasonConfirm": "Sure? It is recorded.",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "endPoints": "Ended on points",
+  "endTime": "Time is up",
+  "endDisqualification": "Ended by disqualification",
+  "actionRefused": "Could not record it. {detail}",
+  "tlStart": "Clock started",
+  "tlStop": "Stop",
+  "tlPoint": "Point",
+  "tlUndo": "Undo",
+  "tlFinish": "Match finished",
+  "tlAutomatic": "automatic",
+  "tlUndone": "undone",
+  "tlRivalPoint": "point to the rival"
 }

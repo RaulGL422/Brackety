@@ -373,4 +373,150 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get ghostBadge => 'Fantasma';
+
+  @override
+  String matTitle(int number) {
+    return 'Tapiz $number';
+  }
+
+  @override
+  String get matEmpty => 'Todavía no hay grupos en este tapiz.';
+
+  @override
+  String matGroupHeader(int number, String category) {
+    return 'Grupo $number · $category años';
+  }
+
+  @override
+  String get matRecommended => 'Siguiente recomendado';
+
+  @override
+  String get matInProgress => 'En curso';
+
+  @override
+  String get matPending => 'Pendientes';
+
+  @override
+  String get matFinished => 'Terminados';
+
+  @override
+  String get matWaiting => 'Un luchador está combatiendo en otro tapiz';
+
+  @override
+  String get matNoneAvailable => 'Ningún combate puede empezar ahora.';
+
+  @override
+  String get versus => 'vs';
+
+  @override
+  String scoreboardTitle(int mat, int group) {
+    return 'Tapiz $mat · Grupo $group';
+  }
+
+  @override
+  String get cornerRed => 'Rojo';
+
+  @override
+  String get cornerBlue => 'Azul';
+
+  @override
+  String get clockStart => 'Iniciar';
+
+  @override
+  String get clockStop => 'Parar';
+
+  @override
+  String get clockResume => 'Reanudar';
+
+  @override
+  String get finishMatch => 'Finalizar combate';
+
+  @override
+  String get matchFinished => 'Combate finalizado';
+
+  @override
+  String get backToMat => 'Volver al tapiz';
+
+  @override
+  String get undo => 'Deshacer';
+
+  @override
+  String get timeline => 'Línea de tiempo';
+
+  @override
+  String get addPoint => '+1';
+
+  @override
+  String warningsCount(int count) {
+    return 'Advertencias: $count';
+  }
+
+  @override
+  String oneHandCount(int count) {
+    return 'Una mano: $count';
+  }
+
+  @override
+  String get disqualified => 'Descalificado';
+
+  @override
+  String get actionWarning => 'Advertencia';
+
+  @override
+  String get actionOneHand => 'Advertencia por golpear con una mano';
+
+  @override
+  String get actionDisqualify => 'Descalificación';
+
+  @override
+  String reasonTitle(String action, String fighter) {
+    return '$action · $fighter';
+  }
+
+  @override
+  String get reasonLabel => 'Motivo (obligatorio)';
+
+  @override
+  String get reasonConfirm => '¿Seguro? Queda registrado.';
+
+  @override
+  String get confirm => 'Confirmar';
+
+  @override
+  String get endPoints => 'Fin por puntos';
+
+  @override
+  String get endTime => 'Fin del tiempo';
+
+  @override
+  String get endDisqualification => 'Fin por descalificación';
+
+  @override
+  String actionRefused(String detail) {
+    return 'No se ha podido registrar. $detail';
+  }
+
+  @override
+  String get tlStart => 'Inicio del tiempo';
+
+  @override
+  String get tlStop => 'Parada';
+
+  @override
+  String get tlPoint => 'Punto';
+
+  @override
+  String get tlUndo => 'Deshacer';
+
+  @override
+  String get tlFinish => 'Fin del combate';
+
+  @override
+  String get tlAutomatic => 'automático';
+
+  @override
+  String get tlUndone => 'deshecho';
+
+  @override
+  String get tlRivalPoint => 'punto al rival';
 }
