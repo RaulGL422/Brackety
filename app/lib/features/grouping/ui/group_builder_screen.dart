@@ -1,5 +1,4 @@
 import 'package:brackety_core/brackety_core.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,9 +7,9 @@ import '../../../core/group_colors.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../events/state/events_providers.dart';
 import '../data/grouping_models.dart';
-import '../data/grouping_repository.dart';
 import '../state/group_draft.dart';
 import '../state/grouping_providers.dart';
+import 'create_groups.dart';
 import 'draft_panel.dart';
 
 /// A category's participants: pick 4 (or 3 and a ghost) per group and send them to a mat.
@@ -39,46 +38,20 @@ class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
       (eventId: widget.eventId, categoryId: widget.categoryId);
 
   Future<void> _create(GroupDraft draft) async {
-    final l10n = AppLocalizations.of(context);
-    final messenger = ScaffoldMessenger.of(context);
     setState(() => _busy = true);
-    try {
-      final created = await ref
-          .read(groupingRepositoryProvider)
-          .create(widget.eventId, widget.categoryId, draft.groups);
-      setState(() => _draft = GroupDraft(maxGroups: draft.maxGroups));
-      _refresh();
-      if (!mounted) return;
-      await showDialog<void>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(l10n.groupsCreatedTitle(created.groupNumbers.length)),
-          content: Text(
-            l10n.groupsCreatedBody(
-              created.groupNumbers.map(l10n.draftGroup).join(', '),
-              created.matNumber,
-            ),
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
-          actions: [
-            FilledButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(l10n.ok),
-            ),
-          ],
-        ),
-      );
-    } on DioException catch (e) {
-      final conflict = e.response?.statusCode == 409;
-      if (conflict) _refresh();
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(conflict ? l10n.groupsConflict : l10n.groupsError),
-        ),
-      );
-    } finally {
-      if (mounted) setState(() => _busy = false);
-    }
+    final created = await createGroups(
+      context,
+      ref,
+      eventId: widget.eventId,
+      categoryId: widget.categoryId,
+      draft: draft,
+      refresh: _refresh,
+    );
+    if (!mounted) return;
+    setState(() {
+      _busy = false;
+      if (created) _draft = GroupDraft(maxGroups: draft.maxGroups);
+    });
   }
 
   void _change(GroupDraft Function(GroupDraft) change, int maxGroups) =>
@@ -118,7 +91,7 @@ class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
               participant: sorted[i],
               draft: draft,
               onTap: () => _change(
-                (d) => d.toggle(sorted[i].id, grouped: sorted[i].isGrouped),
+                (d) => d.toggle(sorted[i].id, grouped: sorted[i].isTaken),
                 maxGroups,
               ),
             ),
@@ -194,7 +167,7 @@ class _ParticipantTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final p = participant;
-    final state = draft.stateOf(p.id, grouped: p.isGrouped);
+    final state = draft.stateOf(p.id, grouped: p.isTaken);
     final draftIndex = draft.groupOf(p.id);
     final height = p.heightCm == null
         ? l10n.heightUnknown
@@ -206,9 +179,12 @@ class _ParticipantTile extends StatelessWidget {
       leading: _PickMark(state: state, draftIndex: draftIndex),
       title: Text(p.fullName),
       subtitle: Text(
-        p.isGrouped
-            ? '$details · ${l10n.participantGrouped(p.groupNumber!, p.matNumber!)}'
-            : details,
+        [
+          details,
+          if (p.teamNumber != null) l10n.teamName(p.teamNumber!),
+          if (p.isGrouped)
+            l10n.participantGrouped(p.groupNumber!, p.matNumber!),
+        ].join(' · '),
       ),
       trailing: state == PickState.ghost
           ? Chip(label: Text(l10n.ghostBadge))

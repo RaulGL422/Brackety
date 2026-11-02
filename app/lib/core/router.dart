@@ -14,6 +14,7 @@ import '../features/club/ui/club_panel_screen.dart';
 import '../features/events/ui/events_screen.dart';
 import '../features/grouping/ui/categories_screen.dart';
 import '../features/grouping/ui/group_builder_screen.dart';
+import '../features/grouping/ui/team_category_screen.dart';
 import '../features/mat/ui/mat_board_screen.dart';
 import '../features/scoreboard/ui/match_watch_screen.dart';
 import '../features/scoreboard/ui/scoreboard_screen.dart';
@@ -108,6 +109,15 @@ final routerProvider = Provider<GoRouter>((ref) {
           eventId: state.pathParameters['eventId']!,
           categoryId: state.pathParameters['categoryId']!,
           categoryName: state.extra as String?,
+        ),
+      ),
+      GoRoute(
+        path: '/events/:eventId/categories/:categoryId/teams',
+        builder: (_, state) => TeamCategoryScreen(
+          eventId: state.pathParameters['eventId']!,
+          categoryId: state.pathParameters['categoryId']!,
+          categoryName: state.uri.queryParameters['name'] ?? '',
+          teamSize: int.tryParse(state.uri.queryParameters['size'] ?? '') ?? 3,
         ),
       ),
       GoRoute(

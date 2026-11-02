@@ -36,17 +36,39 @@ class CategoriesScreen extends ConsumerWidget {
                     return ListTile(
                       title: Text(l10n.categoryAges(c.name)),
                       subtitle: Text(
-                        l10n.categoryCounts(c.participants, c.grouped),
+                        c.isTeam
+                            ? l10n.categoryTeamCounts(
+                                c.participants,
+                                c.inTeams,
+                                c.teams,
+                                c.grouped,
+                              )
+                            : l10n.categoryCounts(c.participants, c.grouped),
                       ),
                       leading: Icon(
-                        done ? Icons.check_circle : Icons.groups_outlined,
+                        done
+                            ? Icons.check_circle
+                            : c.isTeam
+                            ? Icons.diversity_3_outlined
+                            : Icons.groups_outlined,
                         color: done ? BracketyColors.of(context).success : null,
                       ),
                       trailing: const Icon(Icons.chevron_right),
-                      onTap: () => context.push(
-                        '/events/$eventId/categories/${c.id}',
-                        extra: c.name,
-                      ),
+                      onTap: () => c.isTeam
+                          ? context.push(
+                              Uri(
+                                path:
+                                    '/events/$eventId/categories/${c.id}/teams',
+                                queryParameters: {
+                                  'name': c.name,
+                                  'size': '${c.teamSize}',
+                                },
+                              ).toString(),
+                            )
+                          : context.push(
+                              '/events/$eventId/categories/${c.id}',
+                              extra: c.name,
+                            ),
                     );
                   },
                 ),

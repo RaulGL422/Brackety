@@ -48,10 +48,40 @@ class GroupingRepository {
         'categoryId': categoryId,
         'groups': [
           for (final g in groups)
-            {'participantIds': g.members, 'ghostId': g.ghost},
+            g.ofTeams
+                ? {
+                    'teamIds': g.members,
+                    if (g.ghostMode) 'ghostTeam': g.ghostTeam,
+                  }
+                : {'participantIds': g.members, 'ghostId': g.ghost},
         ],
       },
     );
     return CreatedGroups.fromJson(response.data!);
   }
+
+  Future<List<Team>> teams(String eventId, String categoryId) async {
+    final response = await _dio.get<List<dynamic>>(
+      '/api/v1/events/$eventId/categories/$categoryId/teams',
+    );
+    return [
+      for (final json in response.data!)
+        Team.fromJson(json as Map<String, dynamic>),
+    ];
+  }
+
+  Future<Team> createTeam(
+    String eventId,
+    String categoryId,
+    List<String> participantIds,
+  ) async {
+    final response = await _dio.post<Map<String, dynamic>>(
+      '/api/v1/events/$eventId/categories/$categoryId/teams',
+      data: {'participantIds': participantIds},
+    );
+    return Team.fromJson(response.data!);
+  }
+
+  Future<void> deleteTeam(String eventId, String teamId) =>
+      _dio.delete<void>('/api/v1/events/$eventId/teams/$teamId');
 }

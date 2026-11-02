@@ -674,4 +674,84 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get matchNotStarted => 'Sin empezar';
+
+  @override
+  String teamName(int number) {
+    return 'Equipo $number';
+  }
+
+  @override
+  String teamGhostName(int number) {
+    return 'Equipo $number (fantasma)';
+  }
+
+  @override
+  String get tabParticipants => 'Alumnos';
+
+  @override
+  String get tabTeams => 'Equipos';
+
+  @override
+  String get individualGroup => 'Grupo individual';
+
+  @override
+  String get individualGroupHint =>
+      'Para quien se quede sin equipo: grupos de 4 alumnos.';
+
+  @override
+  String categoryTeamCounts(
+    int participants,
+    int inTeams,
+    int teams,
+    int grouped,
+  ) {
+    return '$participants inscritos · $inTeams en $teams equipos · $grouped en grupos';
+  }
+
+  @override
+  String newTeamCount(int count, int size) {
+    return 'Equipo nuevo · $count/$size';
+  }
+
+  @override
+  String get createTeam => 'Crear equipo';
+
+  @override
+  String teamCreated(String team) {
+    return 'Creado el $team';
+  }
+
+  @override
+  String get teamConflict =>
+      'Algún alumno ya está en un equipo o grupo. La lista se ha actualizado.';
+
+  @override
+  String get teamError => 'No se ha podido crear el equipo.';
+
+  @override
+  String get teamsEmpty => 'Todavía no hay equipos: créalos en Alumnos.';
+
+  @override
+  String get deleteTeam => 'Deshacer equipo';
+
+  @override
+  String deleteTeamConfirm(String team) {
+    return '¿Deshacer el $team? Sus alumnos quedan libres.';
+  }
+
+  @override
+  String get deleteTeamError => 'No se ha podido deshacer el equipo.';
+
+  @override
+  String get draftGhostTeam => 'Equipo fantasma';
+
+  @override
+  String draftGhostTeamHint(int size) {
+    return 'Elige $size alumnos cualesquiera de la categoría: combaten pero no puntúan.';
+  }
+
+  @override
+  String pickGhostTeam(int count, int size) {
+    return 'Elegir alumnos · $count/$size';
+  }
 }
