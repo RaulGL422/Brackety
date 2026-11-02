@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/club/ui/club_panel_screen.dart';
 import '../features/events/ui/events_screen.dart';
 import '../features/grouping/ui/categories_screen.dart';
 import '../features/grouping/ui/group_builder_screen.dart';
 import '../features/mat/ui/mat_board_screen.dart';
+import '../features/scoreboard/ui/match_watch_screen.dart';
 import '../features/scoreboard/ui/scoreboard_screen.dart';
 import '../features/session/state/session_controller.dart';
 import '../features/session/ui/login_screen.dart';
@@ -59,6 +61,23 @@ final routerProvider = Provider<GoRouter>((ref) {
           categoryId: state.pathParameters['categoryId']!,
           categoryName: state.extra as String?,
         ),
+      ),
+      GoRoute(
+        path: '/events/:eventId/club',
+        builder: (_, state) =>
+            ClubPanelScreen(eventId: state.pathParameters['eventId']!),
+      ),
+      GoRoute(
+        path: '/club/mats/:matId',
+        builder: (_, state) => MatBoardScreen(
+          matId: state.pathParameters['matId']!,
+          readOnly: true,
+        ),
+      ),
+      GoRoute(
+        path: '/club/matches/:matchId',
+        builder: (_, state) =>
+            MatchWatchScreen(matchId: state.pathParameters['matchId']!),
       ),
       GoRoute(
         path: '/mats/:matId',

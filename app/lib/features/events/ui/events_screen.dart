@@ -86,10 +86,10 @@ class _EventCard extends StatelessWidget {
                     onPressed: () => context.push('/mats/${event.matId}'),
                   ),
                 if (event.roles.contains(EventRole.club))
-                  OutlinedButton.icon(
+                  FilledButton.icon(
                     icon: const Icon(Icons.dashboard_outlined),
-                    label: Text('${l10n.eventClubPanel} · ${l10n.comingSoon}'),
-                    onPressed: null,
+                    label: Text(l10n.eventClubPanel),
+                    onPressed: () => context.push('/events/${event.id}/club'),
                   ),
               ],
             ),

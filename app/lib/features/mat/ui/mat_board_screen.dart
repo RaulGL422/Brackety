@@ -10,10 +10,12 @@ import '../data/mat_board.dart';
 import '../state/mat_providers.dart';
 
 /// The referee's mat: its groups, the recommended match and every match by status.
+/// With [readOnly] (the club) every match opens its timeline instead of the scoreboard.
 class MatBoardScreen extends ConsumerWidget {
-  const MatBoardScreen({super.key, required this.matId});
+  const MatBoardScreen({super.key, required this.matId, this.readOnly = false});
 
   final String matId;
+  final bool readOnly;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -33,7 +35,7 @@ class MatBoardScreen extends ConsumerWidget {
             ? Center(child: Text(l10n.matEmpty))
             : RefreshIndicator(
                 onRefresh: () => ref.refresh(provider.future),
-                child: _BoardList(board: board),
+                child: _BoardList(board: board, readOnly: readOnly),
               ),
       ),
     );
@@ -41,9 +43,10 @@ class MatBoardScreen extends ConsumerWidget {
 }
 
 class _BoardList extends StatelessWidget {
-  const _BoardList({required this.board});
+  const _BoardList({required this.board, required this.readOnly});
 
   final MatBoard board;
+  final bool readOnly;
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +85,12 @@ class _BoardList extends StatelessWidget {
         if (byStatus[MatchStatus.inProgress]!.isNotEmpty) ...[
           section(l10n.matInProgress),
           for (final m in byStatus[MatchStatus.inProgress]!)
-            _MatchTile(board: board, match: m, highlight: true),
+            _MatchTile(
+              board: board,
+              readOnly: readOnly,
+              match: m,
+              highlight: true,
+            ),
         ],
         section(l10n.matRecommended),
         if (recommended == null)
@@ -91,17 +99,22 @@ class _BoardList extends StatelessWidget {
             child: Text(l10n.matNoneAvailable),
           )
         else
-          _MatchTile(board: board, match: recommended, highlight: true),
+          _MatchTile(
+            board: board,
+            readOnly: readOnly,
+            match: recommended,
+            highlight: true,
+          ),
         if (byStatus[MatchStatus.pending]!.isNotEmpty) ...[
           section(l10n.matPending),
           for (final m in byStatus[MatchStatus.pending]!)
             if (m.id != board.recommendedMatchId)
-              _MatchTile(board: board, match: m),
+              _MatchTile(board: board, readOnly: readOnly, match: m),
         ],
         if (byStatus[MatchStatus.finished]!.isNotEmpty) ...[
           section(l10n.matFinished),
           for (final m in byStatus[MatchStatus.finished]!)
-            _MatchTile(board: board, match: m),
+            _MatchTile(board: board, readOnly: readOnly, match: m),
         ],
       ],
     );
@@ -150,11 +163,13 @@ class _MatchTile extends StatelessWidget {
   const _MatchTile({
     required this.board,
     required this.match,
+    required this.readOnly,
     this.highlight = false,
   });
 
   final MatBoard board;
   final BoardMatch match;
+  final bool readOnly;
   final bool highlight;
 
   @override
@@ -185,8 +200,10 @@ class _MatchTile extends StatelessWidget {
                 style: Theme.of(context).textTheme.titleLarge,
               )
             : const Icon(Icons.chevron_right),
-        enabled: !waiting,
-        onTap: () => context.push('/matches/${match.id}'),
+        enabled: readOnly || !waiting,
+        onTap: () => context.push(
+          readOnly ? '/club/matches/${match.id}' : '/matches/${match.id}',
+        ),
       ),
     );
   }

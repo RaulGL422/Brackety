@@ -38,7 +38,7 @@ Estados: pendiente · en curso · en pruebas · cerrado.
 | Tarea | Doc | Estado | Rama activa |
 |---|---|---|---|
 | sistema de diseño: tokens + página dev en admin | 07-diseno.md | cerrado (2026-10-30) | chore/design-system |
-| prototipo Fase 1 Yoseikan (uso real ≈ 2026-11-14) | modulos/prototipo-f1.md | en curso: back completo (pasos 1-3/7); front pasos 4-5/7 (sesión provisional, mis eventos, crear grupos; tablero del tapiz y marcador con campana). Falta: paso 6 panel del club, paso 7 Pi; prueba manual del árbitro en Chrome a medias (2026-10-31) | feat/proto-f1-referee |
+| prototipo Fase 1 Yoseikan (uso real ≈ 2026-11-14) | modulos/prototipo-f1.md | en curso: back completo (pasos 1-3/7); front pasos 4-6/7 (sesión provisional, mis eventos, crear grupos; tablero del tapiz y marcador con campana; panel del club con puntuaciones, tapices, inscripciones, configuración y CSV). Probado a mano en Chrome (ayudante, árbitro y club). Falta: paso 7 Pi (2026-11-02) | feat/proto-f1-club |
 - Motivo prototipo: Raul necesita usar la app en la Fase 1 real en 15 días; adelanta versiones mínimas de eventos, inscripciones, grupos, marcador y ranking.
 - Motivo sistema de diseño: fijar colores, tipografía, espaciado y componentes antes de la primera pantalla real (`auth`), para no repartir valores sueltos por el código.
 

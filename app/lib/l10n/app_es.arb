@@ -29,7 +29,6 @@
     }
   },
   "eventClubPanel": "Panel del club",
-  "comingSoon": "Disponible pronto",
   "categoriesTitle": "Categorías",
   "categoriesEmpty": "Todavía no hay inscritos.",
   "categoryCounts": "{participants} inscritos · {grouped} en grupos",
@@ -237,5 +236,121 @@
   "tlFinish": "Fin del combate",
   "tlAutomatic": "automático",
   "tlUndone": "deshecho",
-  "tlRivalPoint": "punto al rival"
+  "tlRivalPoint": "punto al rival",
+  "clubStandings": "Puntuaciones",
+  "clubMats": "Tapices",
+  "clubParticipants": "Inscripciones",
+  "clubSettings": "Configuración",
+  "allCategories": "Todas las categorías",
+  "noCategory": "Sin categoría",
+  "sortByPoints": "Puntos",
+  "standingsEmpty": "Todavía no hay puntuaciones.",
+  "standingsTotal": "{total} pts",
+  "@standingsTotal": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "standingsDetail": "Asistencia {attendance} · Combates {points} ({matches})",
+  "@standingsDetail": {
+    "placeholders": {
+      "attendance": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      },
+      "matches": {
+        "type": "int"
+      }
+    }
+  },
+  "matsEmpty": "No hay tapices.",
+  "matSummary": "{groups} grupos · {pending} combates pendientes",
+  "@matSummary": {
+    "placeholders": {
+      "groups": {
+        "type": "int"
+      },
+      "pending": {
+        "type": "int"
+      }
+    }
+  },
+  "matNoReferee": "Sin árbitro",
+  "matEstimatedEnd": "Fin estimado {time}",
+  "@matEstimatedEnd": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "matFighting": "Combate en curso",
+  "matIdle": "Parado",
+  "participantAdd": "Inscribir alumno",
+  "participantEdit": "Editar alumno",
+  "firstName": "Nombre",
+  "lastName": "Apellidos",
+  "birthDate": "Fecha de nacimiento",
+  "heightOptional": "Estatura en cm (opcional)",
+  "heightInvalid": "Entre 50 y 250 cm",
+  "guardianConsent": "El tutor legal está de acuerdo",
+  "guardianConsentRequired": "Obligatorio para menores de 18 años.",
+  "fieldRequired": "Obligatorio",
+  "participantAgeCategory": "{age} años · {category}",
+  "@participantAgeCategory": {
+    "placeholders": {
+      "age": {
+        "type": "int"
+      },
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteParticipantTitle": "¿Borrar a {name}?",
+  "@deleteParticipantTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "save": "Guardar",
+  "delete": "Borrar",
+  "saved": "Guardado",
+  "saveConflict": "No se puede: ya hay grupos que dependen de esto.",
+  "saveInvalid": "Revisa los datos.",
+  "saveError": "No se ha podido guardar.",
+  "settingsName": "Nombre del evento",
+  "settingsDate": "Fecha",
+  "settingsMaxGroups": "Grupos por tapiz a la vez",
+  "settingsMaxGroupsHint": "1 = sin multigrupo",
+  "settingsAddMat": "Añadir tapiz",
+  "settingsRemoveMat": "Quitar el último tapiz",
+  "settingsReferee": "Árbitro",
+  "categoryRange": "{name} · de {min} a {max} años",
+  "@categoryRange": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "exportCsv": "Exportar CSV",
+  "exportStandings": "Clasificación",
+  "exportMatches": "Combates",
+  "exportTimeline": "Línea de tiempo",
+  "exportError": "No se ha podido exportar.",
+  "matchLive": "En curso",
+  "matchNotStarted": "Sin empezar"
 }

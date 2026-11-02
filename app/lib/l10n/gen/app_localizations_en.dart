@@ -78,9 +78,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get eventClubPanel => 'Club panel';
 
   @override
-  String get comingSoon => 'Coming soon';
-
-  @override
   String get categoriesTitle => 'Categories';
 
   @override
@@ -330,4 +327,166 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tlRivalPoint => 'point to the rival';
+
+  @override
+  String get clubStandings => 'Scores';
+
+  @override
+  String get clubMats => 'Mats';
+
+  @override
+  String get clubParticipants => 'Entries';
+
+  @override
+  String get clubSettings => 'Settings';
+
+  @override
+  String get allCategories => 'All categories';
+
+  @override
+  String get noCategory => 'No category';
+
+  @override
+  String get sortByPoints => 'Points';
+
+  @override
+  String get standingsEmpty => 'No scores yet.';
+
+  @override
+  String standingsTotal(int total) {
+    return '$total pts';
+  }
+
+  @override
+  String standingsDetail(int attendance, int points, int matches) {
+    return 'Attendance $attendance · Matches $points ($matches)';
+  }
+
+  @override
+  String get matsEmpty => 'No mats.';
+
+  @override
+  String matSummary(int groups, int pending) {
+    return '$groups groups · $pending pending matches';
+  }
+
+  @override
+  String get matNoReferee => 'No referee';
+
+  @override
+  String matEstimatedEnd(String time) {
+    return 'Estimated end $time';
+  }
+
+  @override
+  String get matFighting => 'Match in progress';
+
+  @override
+  String get matIdle => 'Idle';
+
+  @override
+  String get participantAdd => 'Add student';
+
+  @override
+  String get participantEdit => 'Edit student';
+
+  @override
+  String get firstName => 'First name';
+
+  @override
+  String get lastName => 'Last name';
+
+  @override
+  String get birthDate => 'Date of birth';
+
+  @override
+  String get heightOptional => 'Height in cm (optional)';
+
+  @override
+  String get heightInvalid => 'Between 50 and 250 cm';
+
+  @override
+  String get guardianConsent => 'The legal guardian agrees';
+
+  @override
+  String get guardianConsentRequired => 'Required for under-18s.';
+
+  @override
+  String get fieldRequired => 'Required';
+
+  @override
+  String participantAgeCategory(int age, String category) {
+    return '$age years · $category';
+  }
+
+  @override
+  String deleteParticipantTitle(String name) {
+    return 'Delete $name?';
+  }
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get delete => 'Delete';
+
+  @override
+  String get saved => 'Saved';
+
+  @override
+  String get saveConflict =>
+      'Not possible: there are groups that depend on it.';
+
+  @override
+  String get saveInvalid => 'Check the data.';
+
+  @override
+  String get saveError => 'Could not save.';
+
+  @override
+  String get settingsName => 'Event name';
+
+  @override
+  String get settingsDate => 'Date';
+
+  @override
+  String get settingsMaxGroups => 'Groups per mat at once';
+
+  @override
+  String get settingsMaxGroupsHint => '1 = no multigroup';
+
+  @override
+  String get settingsAddMat => 'Add mat';
+
+  @override
+  String get settingsRemoveMat => 'Remove the last mat';
+
+  @override
+  String get settingsReferee => 'Referee';
+
+  @override
+  String categoryRange(String name, int min, int max) {
+    return '$name · $min to $max years';
+  }
+
+  @override
+  String get exportCsv => 'Export CSV';
+
+  @override
+  String get exportStandings => 'Standings';
+
+  @override
+  String get exportMatches => 'Matches';
+
+  @override
+  String get exportTimeline => 'Timeline';
+
+  @override
+  String get exportError => 'Could not export.';
+
+  @override
+  String get matchLive => 'In progress';
+
+  @override
+  String get matchNotStarted => 'Not started';
 }
