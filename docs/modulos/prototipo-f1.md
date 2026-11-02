@@ -96,5 +96,17 @@ Recomendado (empates, intercalado, fantasma ocupado), fin estimado, asignación 
 7. Despliegue en la Pi (Postgres persistente del compose, URL de Raul) y ensayo con varios dispositivos.
 8-11. Categorías por equipos: ver `prototipo-f1-equipos.md`.
 
+## Despliegue en la Pi (paso 7)
+Pasos generales: `09-despliegue.md`. Aquí solo lo propio del prototipo.
+- Hostnames del túnel: `brackety.rgal.dev` → `http://web:80` y `brackety-api.rgal.dev` → `http://api:8080`. `brackety-admin.rgal.dev` → `http://admin:80` solo cuando haya Cloudflare Access (el prototipo no usa superadmin). Un solo nivel de subdominio: el SSL gratuito de Cloudflare no cubre `api.brackety.rgal.dev`.
+- Imágenes: release `v0.1.0` (PR `development` → `main` con merge commit y tag); el CI publica `ghcr.io/raulgl422/brackety-*` arm64. Las variables de repo `API_BASE_URL` y `ADMIN_API_BASE_URL` ya están puestas.
+- `.env` (además de lo obligatorio: `DB_USER`, `DB_PASSWORD`, `JWT_SECRET`, `CLOUDFLARE_TUNNEL_TOKEN`):
+  - `IMAGE_TAG=0.1.0`, `CORS_ALLOWED_ORIGINS=https://brackety.rgal.dev`, `PUBLIC_BASE_URL=https://brackety.rgal.dev`.
+  - `API_BASE_URL=https://brackety-api.rgal.dev`, `ADMIN_API_BASE_URL=https://brackety-admin.rgal.dev`.
+  - `DEMO_ACCOUNTS_ENABLED=true`, `DEMO_EVENT_DATE=2026-11-14`: crea las cuentas y el evento sin alumnos (los inscribe el club).
+  - Vacías: Resend (emails al log), Google, superadmin y Cloudflare Access.
+- Sin SSD: `DB_DATA=pgdata` (volumen en la SD). Riesgo aceptado para la fase; copia con `backup.sh` al acabar cada jornada.
+- Ensayo: móvil y tablet con datos móviles (fuera de la wifi de casa), una cuenta por rol, un combate completo con campana y el CSV.
+
 ## Estado
 En curso desde 2026-10-30.
