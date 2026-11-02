@@ -79,11 +79,12 @@ Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, f
 - Sesión y acceso: los de `auth` (`app/lib/features/auth/`, tarea 6); en debug, botones de acceso rápido a las cuentas demo.
 - Ayudante: categorías (con inscritos/agrupados) → alumnos por nombre o estatura → grupos en borrador con color y número (nunca rojo/azul) y casilla de fantasma → popup con el tapiz.
 - Árbitro: tablero del tapiz (sondeo 5 s; grupos con color y número, recomendado, en curso, pendientes con motivo si esperan, terminados) → marcador (sondeo 2 s, reloj contado en el dispositivo y resincronizado, +1, menú de avisos con motivo, deshacer, finalizar, línea de tiempo). Campana generada (`app/tool/make_bell.py`), una vez al iniciar y una al acabar.
+- Club (`app/lib/features/club/`): panel con 4 secciones (barra inferior en móvil, raíl en tablet/escritorio). Puntuaciones (sondeo 5 s, filtro por categoría, orden por puntos o nombre). Tapices (árbitro, en curso/parado, grupos, pendientes, fin estimado) → tablero en solo lectura → combate con marcador y línea de tiempo, sin controles. Inscripciones: alta, edición y borrado; casilla del tutor obligatoria si es menor el día del evento. Configuración: nombre, fecha, multigrupo 1-4, tapices con su árbitro (añadir/quitar el último), categorías solo lectura; cada cambio se guarda solo, sin botón (el nombre al dejar de escribir) y si el servidor lo rechaza vuelve el valor guardado. Exportar los 3 CSV desde la barra (solo web). Si hay grupos, el 409 se explica con un aviso.
 
 Login, inicio por rol, categorías → alumnos → crear grupos, tablero del tapiz, marcador, panel del club (config, inscripciones, puntuaciones, tapices, línea de tiempo, exportar). Responsive (`07-diseno.md`), textos i18n.
 
 ## Tests
-Recomendado (empates, intercalado, fantasma ocupado), fin estimado, asignación de tapiz, fantasma, puntuación global, reglas del marcador (15, tiempo, una mano 4-7, descalificación, deshacer), permisos por rol. Widget tests de marcador y crear grupos en 3 tamaños.
+Recomendado (empates, intercalado, fantasma ocupado), fin estimado, asignación de tapiz, fantasma, puntuación global, reglas del marcador (15, tiempo, una mano 4-7, descalificación, deshacer), permisos por rol. Widget tests de marcador, crear grupos y panel del club en 3 tamaños.
 
 ## Plan (PRs en serie hacia `development`)
 1. Back: evento, categorías, tapices, staff, inscripciones, cuentas demo.
@@ -93,6 +94,7 @@ Recomendado (empates, intercalado, fantasma ocupado), fin estimado, asignación 
 5. Front: tapiz, marcador, campana.
 6. Front: panel del club.
 7. Despliegue en la Pi (Postgres persistente del compose, URL de Raul) y ensayo con varios dispositivos.
+8-11. Categorías por equipos: ver `prototipo-f1-equipos.md`.
 
 ## Estado
 En curso desde 2026-10-30.

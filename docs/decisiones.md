@@ -118,3 +118,6 @@ Formato: fecha · decisión · motivo.
 - 2026-11-02 · `POST /auth/password/reset/check` comprueba el enlace sin gastarlo · la pantalla dice "enlace inválido" al abrirlo, no tras escribir la contraseña; decidido por Raul.
 - 2026-11-02 · Organizadores (Club, Entidad Externa) se registran sin fecha de nacimiento: casilla de mayor de edad y representante, nombre y CIF obligatorio validado por formato y dígito, repetible · la fecha no aporta en una organización y el CIF ayuda al superadmin a validar; tarea propia; decidido por Raul.
 - 2026-10-31 · Web con URLs sin `#` (path strategy) · los enlaces de email (`/verify-email?token=…`) deben abrir la pantalla correcta; nginx ya devuelve `index.html`.
+- 2026-10-31 · Categorías por equipos en el prototipo: formato, tamaño de equipo y de grupo por categoría; grupo de 4 equipos de 3; un combate Tambo equipo contra equipo; cada miembro suma los puntos de su equipo · cambio de planes de Raul para la Fase 1.
+- 2026-10-31 · Equipo fantasma = 3 alumnos cualesquiera de la categoría (no un equipo ya hecho); botón "Grupo individual" en categorías por equipos para los sobrantes · decidido por Raul.
+- 2026-10-31 · Equipos con nombre "Equipo N" numerado por evento · el árbitro los llama por ese nombre y no se repite entre tapices.

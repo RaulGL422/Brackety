@@ -96,4 +96,31 @@ void main() {
       },
     );
   }
+  testWidgets('the club can open a match that waits for a fighter', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [matBoardProvider.overrideWith((ref, matId) async => board)],
+        child: MaterialApp(
+          theme: lightTheme(),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            ...coreLocalizationsDelegates,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const MatBoardScreen(matId: 'mat2', readOnly: true),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final waiting = tester.widget<ListTile>(
+      find.ancestor(
+        of: find.text('Carla  vs  Diego (Ghost)'),
+        matching: find.byType(ListTile),
+      ),
+    );
+    expect(waiting.enabled, isTrue);
+  });
 }

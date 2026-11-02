@@ -572,12 +572,6 @@ abstract class AppLocalizations {
   /// **'Panel del club'**
   String get eventClubPanel;
 
-  /// No description provided for @comingSoon.
-  ///
-  /// In es, this message translates to:
-  /// **'Disponible pronto'**
-  String get comingSoon;
-
   /// No description provided for @categoriesTitle.
   ///
   /// In es, this message translates to:
@@ -979,6 +973,294 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'punto al rival'**
   String get tlRivalPoint;
+
+  /// No description provided for @clubStandings.
+  ///
+  /// In es, this message translates to:
+  /// **'Puntuaciones'**
+  String get clubStandings;
+
+  /// No description provided for @clubMats.
+  ///
+  /// In es, this message translates to:
+  /// **'Tapices'**
+  String get clubMats;
+
+  /// No description provided for @clubParticipants.
+  ///
+  /// In es, this message translates to:
+  /// **'Inscripciones'**
+  String get clubParticipants;
+
+  /// No description provided for @clubSettings.
+  ///
+  /// In es, this message translates to:
+  /// **'Configuración'**
+  String get clubSettings;
+
+  /// No description provided for @allCategories.
+  ///
+  /// In es, this message translates to:
+  /// **'Todas las categorías'**
+  String get allCategories;
+
+  /// No description provided for @noCategory.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin categoría'**
+  String get noCategory;
+
+  /// No description provided for @sortByPoints.
+  ///
+  /// In es, this message translates to:
+  /// **'Puntos'**
+  String get sortByPoints;
+
+  /// No description provided for @standingsEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no hay puntuaciones.'**
+  String get standingsEmpty;
+
+  /// No description provided for @standingsTotal.
+  ///
+  /// In es, this message translates to:
+  /// **'{total} pts'**
+  String standingsTotal(int total);
+
+  /// No description provided for @standingsDetail.
+  ///
+  /// In es, this message translates to:
+  /// **'Asistencia {attendance} · Combates {points} ({matches})'**
+  String standingsDetail(int attendance, int points, int matches);
+
+  /// No description provided for @matsEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'No hay tapices.'**
+  String get matsEmpty;
+
+  /// No description provided for @matSummary.
+  ///
+  /// In es, this message translates to:
+  /// **'{groups} grupos · {pending} combates pendientes'**
+  String matSummary(int groups, int pending);
+
+  /// No description provided for @matNoReferee.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin árbitro'**
+  String get matNoReferee;
+
+  /// No description provided for @matEstimatedEnd.
+  ///
+  /// In es, this message translates to:
+  /// **'Fin estimado {time}'**
+  String matEstimatedEnd(String time);
+
+  /// No description provided for @matFighting.
+  ///
+  /// In es, this message translates to:
+  /// **'Combate en curso'**
+  String get matFighting;
+
+  /// No description provided for @matIdle.
+  ///
+  /// In es, this message translates to:
+  /// **'Parado'**
+  String get matIdle;
+
+  /// No description provided for @participantAdd.
+  ///
+  /// In es, this message translates to:
+  /// **'Inscribir alumno'**
+  String get participantAdd;
+
+  /// No description provided for @participantEdit.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar alumno'**
+  String get participantEdit;
+
+  /// No description provided for @firstName.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre'**
+  String get firstName;
+
+  /// No description provided for @lastName.
+  ///
+  /// In es, this message translates to:
+  /// **'Apellidos'**
+  String get lastName;
+
+  /// No description provided for @birthDate.
+  ///
+  /// In es, this message translates to:
+  /// **'Fecha de nacimiento'**
+  String get birthDate;
+
+  /// No description provided for @heightOptional.
+  ///
+  /// In es, this message translates to:
+  /// **'Estatura en cm (opcional)'**
+  String get heightOptional;
+
+  /// No description provided for @heightInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'Entre 50 y 250 cm'**
+  String get heightInvalid;
+
+  /// No description provided for @guardianConsent.
+  ///
+  /// In es, this message translates to:
+  /// **'El tutor legal está de acuerdo'**
+  String get guardianConsent;
+
+  /// No description provided for @guardianConsentRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'Obligatorio para menores de 18 años.'**
+  String get guardianConsentRequired;
+
+  /// No description provided for @participantAgeCategory.
+  ///
+  /// In es, this message translates to:
+  /// **'{age} años · {category}'**
+  String participantAgeCategory(int age, String category);
+
+  /// No description provided for @deleteParticipantTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Borrar a {name}?'**
+  String deleteParticipantTitle(String name);
+
+  /// No description provided for @save.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardar'**
+  String get save;
+
+  /// No description provided for @delete.
+  ///
+  /// In es, this message translates to:
+  /// **'Borrar'**
+  String get delete;
+
+  /// No description provided for @saved.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardado'**
+  String get saved;
+
+  /// No description provided for @saveConflict.
+  ///
+  /// In es, this message translates to:
+  /// **'No se puede: ya hay grupos que dependen de esto.'**
+  String get saveConflict;
+
+  /// No description provided for @saveInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'Revisa los datos.'**
+  String get saveInvalid;
+
+  /// No description provided for @saveError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se ha podido guardar.'**
+  String get saveError;
+
+  /// No description provided for @settingsName.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre del evento'**
+  String get settingsName;
+
+  /// No description provided for @settingsDate.
+  ///
+  /// In es, this message translates to:
+  /// **'Fecha'**
+  String get settingsDate;
+
+  /// No description provided for @settingsMaxGroups.
+  ///
+  /// In es, this message translates to:
+  /// **'Grupos por tapiz a la vez'**
+  String get settingsMaxGroups;
+
+  /// No description provided for @settingsMaxGroupsHint.
+  ///
+  /// In es, this message translates to:
+  /// **'1 = sin multigrupo'**
+  String get settingsMaxGroupsHint;
+
+  /// No description provided for @settingsAddMat.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir tapiz'**
+  String get settingsAddMat;
+
+  /// No description provided for @settingsRemoveMat.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar el último tapiz'**
+  String get settingsRemoveMat;
+
+  /// No description provided for @settingsReferee.
+  ///
+  /// In es, this message translates to:
+  /// **'Árbitro'**
+  String get settingsReferee;
+
+  /// No description provided for @categoryRange.
+  ///
+  /// In es, this message translates to:
+  /// **'{name} · de {min} a {max} años'**
+  String categoryRange(String name, int min, int max);
+
+  /// No description provided for @exportCsv.
+  ///
+  /// In es, this message translates to:
+  /// **'Exportar CSV'**
+  String get exportCsv;
+
+  /// No description provided for @exportStandings.
+  ///
+  /// In es, this message translates to:
+  /// **'Clasificación'**
+  String get exportStandings;
+
+  /// No description provided for @exportMatches.
+  ///
+  /// In es, this message translates to:
+  /// **'Combates'**
+  String get exportMatches;
+
+  /// No description provided for @exportTimeline.
+  ///
+  /// In es, this message translates to:
+  /// **'Línea de tiempo'**
+  String get exportTimeline;
+
+  /// No description provided for @exportError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se ha podido exportar.'**
+  String get exportError;
+
+  /// No description provided for @matchLive.
+  ///
+  /// In es, this message translates to:
+  /// **'En curso'**
+  String get matchLive;
+
+  /// No description provided for @matchNotStarted.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin empezar'**
+  String get matchNotStarted;
 }
 
 class _AppLocalizationsDelegate
