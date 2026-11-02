@@ -65,25 +65,28 @@ class _ReauthDialogState extends ConsumerState<ReauthDialog> {
     final error = _error;
     return AlertDialog(
       title: Text(l10n.reauthTitle),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(l10n.reauthBody),
-            const SizedBox(height: AppSpacing.l),
-            PasswordField(
-              controller: _password,
-              label: l10n.passwordLabel,
-              autofillHints: const [AutofillHints.password],
-              textInputAction: TextInputAction.done,
-              onSubmitted: (_) => _submit(),
-            ),
-            if (error != null) ...[
-              const SizedBox(height: AppSpacing.m),
-              FormMessage.error(error),
+      content: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: AppSizes.formMaxWidth),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(l10n.reauthBody),
+              const SizedBox(height: AppSpacing.l),
+              PasswordField(
+                controller: _password,
+                label: l10n.passwordLabel,
+                autofillHints: const [AutofillHints.password],
+                textInputAction: TextInputAction.done,
+                onSubmitted: (_) => _submit(),
+              ),
+              if (error != null) ...[
+                const SizedBox(height: AppSpacing.m),
+                FormMessage.error(error),
+              ],
             ],
-          ],
+          ),
         ),
       ),
       actions: [

@@ -104,17 +104,27 @@ String exportFileName(DateTime now) {
       '${day.day.toString().padLeft(2, '0')}.json';
 }
 
-/// What settings offer to add: the sign-up choices minus organizers (they need the organization's
-/// name and CIF, only given at sign-up) and minus what the account has. Organizers combine with
-/// nothing, so they get nothing. The server checks the combination either way.
+/// Profile sets an account may hold (docs/modulos/auth.md): any single one, or Helper with
+/// Student or with External. The server checks it too.
+bool isAllowedProfileSet(Set<ProfileType> types) =>
+    types.length == 1 ||
+    (types.length == 2 &&
+        types.contains(ProfileType.helper) &&
+        (types.contains(ProfileType.student) ||
+            types.contains(ProfileType.external)));
+
+/// What settings offer to add: the sign-up choices (dev-only ones only in dev) that keep the set
+/// allowed. Never an organizer: it needs the organization's name and CIF, only given at sign-up.
 List<ProfileType> addableProfiles(
   Account account, {
   required bool devEnvironment,
 }) {
-  if (account.profiles.any((p) => p.type.isOrganizer)) return const [];
   final owned = {for (final profile in account.profiles) profile.type};
   return [
     for (final type in registrationProfiles(devEnvironment: devEnvironment))
-      if (!type.isOrganizer && !owned.contains(type)) type,
+      if (!type.isOrganizer &&
+          !owned.contains(type) &&
+          isAllowedProfileSet({...owned, type}))
+        type,
   ];
 }

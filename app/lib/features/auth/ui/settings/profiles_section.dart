@@ -57,7 +57,10 @@ class ProfilesSection extends ConsumerWidget {
         for (final profile in account.profiles)
           _ProfileTile(
             profile: profile,
-            onRemove: () => _remove(context, ref, profile.type),
+            // The last one cannot go (409 LAST_PROFILE): no button to invite it.
+            onRemove: account.profiles.length > 1
+                ? () => _remove(context, ref, profile.type)
+                : null,
           ),
         if (addable.isNotEmpty) ...[
           const SizedBox(height: AppSpacing.m),
@@ -85,7 +88,7 @@ class _ProfileTile extends StatelessWidget {
   const _ProfileTile({required this.profile, required this.onRemove});
 
   final AccountProfile profile;
-  final VoidCallback onRemove;
+  final VoidCallback? onRemove;
 
   @override
   Widget build(BuildContext context) {
@@ -95,11 +98,13 @@ class _ProfileTile extends StatelessWidget {
       contentPadding: EdgeInsets.zero,
       title: Text(profileName(l10n, profile.type)),
       subtitle: organizer ? _OrganizerDetails(profile: profile) : null,
-      trailing: IconButton(
-        tooltip: l10n.profileRemove,
-        icon: const Icon(Icons.remove_circle_outline),
-        onPressed: onRemove,
-      ),
+      trailing: onRemove == null
+          ? null
+          : IconButton(
+              tooltip: l10n.profileRemove,
+              icon: const Icon(Icons.remove_circle_outline),
+              onPressed: onRemove,
+            ),
     );
   }
 }

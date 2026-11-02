@@ -1,3 +1,4 @@
+import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/gen/app_localizations.dart';
@@ -42,7 +43,11 @@ class ConfirmDialog extends StatelessWidget {
     final title = this.title;
     return AlertDialog(
       title: title == null ? null : Text(title),
-      content: Text(body),
+      // Long bodies would stretch the dialog across wide windows.
+      content: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: AppSizes.formMaxWidth),
+        child: Text(body),
+      ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context, false),

@@ -3,6 +3,7 @@ import 'package:brackety/features/auth/data/account.dart';
 import 'package:brackety/features/auth/data/registration.dart';
 import 'package:brackety/features/auth/state/session_controller.dart';
 import 'package:brackety/features/auth/ui/settings_screen.dart';
+import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -168,6 +169,22 @@ void main() {
       expect(find.text('Profile added.'), findsOneWidget);
     });
 
+    testWidgets('with Student and Helper nothing is offered', (tester) async {
+      await openSettings(
+        tester,
+        devEnvironment: true,
+        account: testAccount(
+          profiles: const [
+            AccountProfile(type: ProfileType.student),
+            AccountProfile(type: ProfileType.helper),
+          ],
+        ),
+      );
+
+      expect(find.text('Add profile'), findsNothing);
+      expect(find.widgetWithText(OutlinedButton, 'External'), findsNothing);
+    });
+
     testWidgets('outside dev only Helper is offered', (tester) async {
       await openSettings(
         tester,
@@ -224,11 +241,26 @@ void main() {
       expect(api.addedProfiles, [ProfileType.student]);
     });
 
-    testWidgets('the last one cannot be removed', (tester) async {
-      final api = await openSettings(tester);
+    testWidgets('the last one has no remove button', (tester) async {
+      await openSettings(tester);
+
+      expect(find.text('Helper'), findsOneWidget);
+      expect(find.byTooltip('Remove profile'), findsNothing);
+    });
+
+    testWidgets('a LAST_PROFILE from the server is explained', (tester) async {
+      final api = await openSettings(
+        tester,
+        account: testAccount(
+          profiles: const [
+            AccountProfile(type: ProfileType.helper),
+            AccountProfile(type: ProfileType.student),
+          ],
+        ),
+      );
       api.removeProfileError = httpError(409, body: {'code': 'LAST_PROFILE'});
 
-      await tester.tap(find.byTooltip('Remove profile'));
+      await tester.tap(find.byTooltip('Remove profile').first);
       await tester.pumpAndSettle();
       expect(find.text('Remove the Helper profile?'), findsOneWidget);
       await tapText(tester, 'Remove');
@@ -256,7 +288,7 @@ void main() {
 
       expect(api.removedProfiles, [ProfileType.student]);
       expect(find.text('Profile removed.'), findsOneWidget);
-      expect(find.byTooltip('Remove profile'), findsOneWidget);
+      expect(find.byTooltip('Remove profile'), findsNothing);
     });
   });
 
@@ -530,5 +562,29 @@ void main() {
       expect(find.text('The link is invalid or has expired.'), findsOneWidget);
       expect(auth.emailChanges, isEmpty);
     });
+  });
+
+  testWidgets('the delete confirmation keeps a readable width on desktop', (
+    tester,
+  ) async {
+    useSize(tester, const Size(1280, 900));
+    await openSettings(tester);
+
+    await scrollTo(tester, 'Delete account');
+    await tapText(tester, 'Delete account');
+
+    expect(
+      tester
+          .getSize(
+            find
+                .descendant(
+                  of: find.byType(AlertDialog),
+                  matching: find.byType(Material),
+                )
+                .first,
+          )
+          .width,
+      lessThanOrEqualTo(AppSizes.formMaxWidth + 2 * AppSpacing.xl * 2),
+    );
   });
 }

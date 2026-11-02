@@ -228,6 +228,23 @@ void main() {
       );
     });
 
+    test('only what keeps an allowed combination', () {
+      expect(
+        addableProfiles(
+          withProfiles([ProfileType.student, ProfileType.helper]),
+          devEnvironment: true,
+        ),
+        isEmpty,
+      );
+      expect(
+        addableProfiles(
+          withProfiles([ProfileType.external]),
+          devEnvironment: true,
+        ),
+        [ProfileType.helper],
+      );
+    });
+
     test('an organizer gets nothing to add', () {
       expect(
         addableProfiles(withProfiles([ProfileType.club]), devEnvironment: true),
