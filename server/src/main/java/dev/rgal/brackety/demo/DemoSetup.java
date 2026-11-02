@@ -36,6 +36,9 @@ import org.springframework.transaction.support.TransactionOperations;
 public class DemoSetup {
 
     private static final String CLUB = "club1";
+    // Fictional organization, with a CIF that only passes the check digit.
+    private static final String DEMO_CLUB_NAME = "Club Demo Yoseikan";
+    private static final String DEMO_CLUB_CIF = "G12345674";
     private static final List<String> GROUPERS = List.of("ayudante1", "ayudante2");
     private static final List<String> REFEREES = List.of("arbitro1", "arbitro2", "arbitro3", "arbitro4", "arbitro5");
 
@@ -127,11 +130,14 @@ public class DemoSetup {
 
     private UUID account(String username, ProfileType profile) {
         var now = clock.instant();
-        var account = new Account(
-                username, passwordEncoder.encode(username), LocalDate.now(clock).minusYears(30), "es", now);
+        var birthDate = profile.isOrganizer() ? null : LocalDate.now(clock).minusYears(30);
+        var account = new Account(username, passwordEncoder.encode(username), birthDate, "es", now);
         account.markEmailVerified(now);
         accounts.save(account);
-        profiles.save(new Profile(account.getId(), profile, now));
+        profiles.save(
+                profile.isOrganizer()
+                        ? new Profile(account.getId(), profile, DEMO_CLUB_NAME, DEMO_CLUB_CIF, now)
+                        : new Profile(account.getId(), profile, now));
         return account.getId();
     }
 

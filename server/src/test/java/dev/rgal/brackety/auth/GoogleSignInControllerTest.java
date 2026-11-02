@@ -28,6 +28,11 @@ class GoogleSignInControllerTest extends AuthIntegrationTest {
             ,"registration":{"birthDate":"%s","profile":"HELPER",
              "acceptedTermsVersion":"2027-01","acceptedPrivacyVersion":"2027-02","locale":"es"}""";
 
+    private static final String ORGANIZER_REGISTRATION = """
+            ,"registration":{"profile":"EXTERNAL_ENTITY",
+             "organization":{"name":"Entidad Ficticia","taxId":"%s"},"representativeDeclaration":true,
+             "acceptedTermsVersion":"2027-01","acceptedPrivacyVersion":"2027-02","locale":"es"}""";
+
     @Autowired
     MockMvc mvc;
 
@@ -110,6 +115,30 @@ class GoogleSignInControllerTest extends AuthIntegrationTest {
         signIn(null, google.idToken("sub-kid", "kid@example.test"), REGISTRATION.formatted("2013-03-11"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.detail").value("Minimum age to register is 14."));
+    }
+
+    @Test
+    void anOrganizerCompletesTheRegistrationWithItsOrganization() throws Exception {
+        var token = google.idToken("sub-club", "club@example.test");
+        signIn(null, token, "").andExpect(jsonPath("$.status").value("REGISTRATION_REQUIRED"));
+
+        signIn(null, token, ORGANIZER_REGISTRATION.formatted("G12345674"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("SIGNED_IN"));
+
+        assertThat(count("account where birth_date is null and email_verified")).isOne();
+        assertThat(count("profile where type = 'EXTERNAL_ENTITY' and organization_name = 'Entidad Ficticia'"
+                        + " and tax_id = 'G12345674'"))
+                .isOne();
+        assertThat(count("consent where document = 'ORGANIZER_DECLARATION'")).isOne();
+    }
+
+    @Test
+    void anOrganizerWithAnInvalidCifIsABadRequestWithItsCode() throws Exception {
+        signIn(null, google.idToken("sub-club", "club@example.test"), ORGANIZER_REGISTRATION.formatted("P12345674"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_TAX_ID"));
+        assertThat(count("account")).isZero();
     }
 
     @Test

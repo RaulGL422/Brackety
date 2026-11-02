@@ -24,6 +24,10 @@ public class Profile {
     // Only meaningful for organizers (CLUB, EXTERNAL_ENTITY): the superadmin validates them.
     private boolean validated;
 
+    // Only for organizers, who must give them (DB check).
+    private String organizationName;
+    private String taxId;
+
     private Instant createdAt;
 
     protected Profile() {}
@@ -34,12 +38,18 @@ public class Profile {
         this.createdAt = now;
     }
 
+    public Profile(UUID accountId, ProfileType type, String organizationName, String taxId, Instant now) {
+        this(accountId, type, now);
+        this.organizationName = organizationName;
+        this.taxId = taxId;
+    }
+
     public UUID getAccountId() {
         return accountId;
     }
 
     public boolean isOrganizer() {
-        return type == ProfileType.CLUB || type == ProfileType.EXTERNAL_ENTITY;
+        return type.isOrganizer();
     }
 
     /** Returns false if it already was. */
@@ -57,6 +67,14 @@ public class Profile {
 
     public boolean isValidated() {
         return validated;
+    }
+
+    public String getOrganizationName() {
+        return organizationName;
+    }
+
+    public String getTaxId() {
+        return taxId;
     }
 
     public Instant getCreatedAt() {

@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../data/api_error.dart';
 import '../data/registration.dart';
+import '../data/tax_id.dart';
 import '../state/auth_providers.dart';
 import '../state/session_controller.dart';
 import 'auth_texts.dart';
@@ -14,6 +15,7 @@ import 'widgets/acceptance_checkbox.dart';
 import 'widgets/auth_form_page.dart';
 import 'widgets/birth_date_field.dart';
 import 'widgets/form_message.dart';
+import 'widgets/organization_fields.dart';
 import 'widgets/password_field.dart';
 import 'widgets/profile_selector.dart';
 
@@ -28,8 +30,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _email = TextEditingController();
   final _password = TextEditingController();
-  DateTime? _birthDate;
+  final _organizationName = TextEditingController();
+  final _taxId = TextEditingController();
+  // Kept here, not in the fields, so switching profile and back loses nothing.
   ProfileType? _profile;
+  DateTime? _birthDate;
+  bool _declared = false;
+  String? _taxIdError;
   bool _busy = false;
   String? _error;
 
@@ -37,21 +44,33 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   void dispose() {
     _email.dispose();
     _password.dispose();
+    _organizationName.dispose();
+    _taxId.dispose();
     super.dispose();
+  }
+
+  Registration _registration(ProfileType profile) {
+    final organizer = profile.isOrganizer;
+    return Registration(
+      email: _email.text.trim(),
+      password: _password.text,
+      profile: profile,
+      locale: Localizations.localeOf(context).languageCode,
+      birthDate: organizer ? null : _birthDate,
+      organization: organizer
+          ? Organization(
+              name: _organizationName.text.trim(),
+              taxId: normalizeTaxId(_taxId.text),
+            )
+          : null,
+      representativeDeclaration: organizer,
+    );
   }
 
   Future<void> _submit() async {
     final form = _formKey.currentState!;
     if (_busy || !form.validate()) return;
-    form.save();
-    final email = _email.text.trim();
-    final registration = Registration(
-      email: email,
-      password: _password.text,
-      birthDate: _birthDate!,
-      profile: _profile!,
-      locale: Localizations.localeOf(context).languageCode,
-    );
+    final registration = _registration(_profile!);
     setState(() {
       _busy = true;
       _error = null;
@@ -61,19 +80,25 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           .read(sessionProvider.notifier)
           .register(registration);
       // Signed in, the router takes the user home.
-      if (!signedIn && mounted) context.go('/register/sent', extra: email);
-    } on DioException catch (e) {
-      if (mounted) {
-        setState(
-          () => _error = apiErrorMessage(
-            AppLocalizations.of(context),
-            ApiError.from(e),
-          ),
-        );
+      if (!signedIn && mounted) {
+        context.go('/register/sent', extra: registration.email);
       }
+    } on DioException catch (e) {
+      if (mounted) _showError(ApiError.from(e));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+  }
+
+  void _showError(ApiError error) {
+    final l10n = AppLocalizations.of(context);
+    setState(() {
+      if (error.status == 400 && error.code == 'INVALID_TAX_ID') {
+        _taxIdError = l10n.registerTaxIdInvalid;
+      } else {
+        _error = apiErrorMessage(l10n, error);
+      }
+    });
   }
 
   String? _validateBirthDate(AppLocalizations l10n, DateTime? birthDate) {
@@ -84,10 +109,34 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         : l10n.registerUnderage;
   }
 
+  Widget _profileFields(AppLocalizations l10n, ProfileType profile) {
+    if (profile.isOrganizer) {
+      return OrganizationFields(
+        key: const ValueKey('organization'),
+        name: _organizationName,
+        taxId: _taxId,
+        taxIdError: _taxIdError,
+        onTaxIdChanged: (_) {
+          if (_taxIdError != null) setState(() => _taxIdError = null);
+        },
+        declared: _declared,
+        onDeclaredChanged: (value) => _declared = value,
+      );
+    }
+    return BirthDateField(
+      key: const ValueKey('birthDate'),
+      today: ref.watch(todayProvider),
+      initialValue: _birthDate,
+      onChanged: (value) => _birthDate = value,
+      validator: (value) => _validateBirthDate(l10n, value),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final error = _error;
+    final profile = _profile;
     return AuthFormPage(
       title: l10n.registerTitle,
       children: [
@@ -97,6 +146,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                ProfileSelector(
+                  profiles: registrationProfiles(
+                    devEnvironment: ref.watch(devEnvironmentProvider),
+                  ),
+                  initialValue: profile,
+                  onChanged: (value) => setState(() => _profile = value),
+                  validator: (value) =>
+                      value == null ? l10n.registerProfileRequired : null,
+                ),
+                if (profile != null) ...[
+                  const SizedBox(height: AppSpacing.m),
+                  _profileFields(l10n, profile),
+                ],
+                const SizedBox(height: AppSpacing.l),
                 TextFormField(
                   controller: _email,
                   keyboardType: TextInputType.emailAddress,
@@ -116,23 +179,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   onSubmitted: (_) => _submit(),
                   validator: (value) => validateNewPassword(l10n, value),
                 ),
-                const SizedBox(height: AppSpacing.m),
-                BirthDateField(
-                  today: ref.watch(todayProvider),
-                  validator: (value) => _validateBirthDate(l10n, value),
-                  onSaved: (value) => _birthDate = value,
-                ),
-                const SizedBox(height: AppSpacing.l),
-                ProfileSelector(
-                  profiles: registrationProfiles(
-                    devEnvironment: ref.watch(devEnvironmentProvider),
-                  ),
-                  validator: (value) =>
-                      value == null ? l10n.registerProfileRequired : null,
-                  onSaved: (value) => _profile = value,
-                ),
                 const SizedBox(height: AppSpacing.s),
-                AcceptanceCheckbox(),
+                AcceptanceCheckbox(
+                  title: l10n.registerAccept,
+                  requiredText: l10n.registerAcceptRequired,
+                ),
               ],
             ),
           ),

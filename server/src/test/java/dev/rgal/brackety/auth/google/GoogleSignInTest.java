@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import dev.rgal.brackety.auth.AuthException;
 import dev.rgal.brackety.auth.AuthIntegrationTest;
 import dev.rgal.brackety.auth.AuthService;
+import dev.rgal.brackety.auth.account.ProfileType;
 import dev.rgal.brackety.auth.session.SessionService;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -18,7 +19,6 @@ class GoogleSignInTest extends AuthIntegrationTest {
 
     private static final String ANA = "ana@example.test";
     private static final String BEA = "bea@example.test";
-    private static final LocalDate ADULT = LocalDate.of(1990, 5, 20);
 
     @Autowired
     GoogleSignInService googleSignIn;
@@ -76,6 +76,15 @@ class GoogleSignInTest extends AuthIntegrationTest {
     }
 
     @Test
+    void anOrganizerRegistersWithGoogleWithoutABirthDate() {
+        googleSignIn.signIn(google.idToken("sub-ana", ANA), organizerDetails(ProfileType.CLUB, ORGANIZATION));
+
+        assertThat(count("account where birth_date is null and email_verified")).isOne();
+        assertThat(count("profile where type = 'CLUB' and tax_id = 'G12345674'"))
+                .isOne();
+    }
+
+    @Test
     void under14CannotRegisterWithGoogle() {
         var underage = LocalDate.of(2013, 3, 11);
 
@@ -116,7 +125,7 @@ class GoogleSignInTest extends AuthIntegrationTest {
         assertThatThrownBy(() -> sessions.refresh(oldSession.refreshToken())).isInstanceOf(AuthException.class);
 
         assertThat(count("profile where account_id = '" + bea + "'")).isOne();
-        assertThat(count("consent where account_id = '" + bea + "'")).isEqualTo(2);
+        assertThat(count("consent where account_id = '" + bea + "'")).isEqualTo(3);
         assertThat(count("email_token where account_id = '" + bea + "'")).isOne();
         assertThat(sessions.refresh(beaSession.refreshToken()).accessToken()).isNotBlank();
     }

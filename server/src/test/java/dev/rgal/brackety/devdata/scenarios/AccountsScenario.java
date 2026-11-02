@@ -2,7 +2,6 @@ package dev.rgal.brackety.devdata.scenarios;
 
 import dev.rgal.brackety.auth.AuthService;
 import dev.rgal.brackety.auth.account.ProfileType;
-import dev.rgal.brackety.auth.dto.RegisterRequest;
 import dev.rgal.brackety.devdata.DevScenario;
 import dev.rgal.brackety.devdata.Scenario;
 import dev.rgal.brackety.devdata.ScenarioContext;
@@ -48,8 +47,7 @@ class AccountsScenario implements Scenario {
 
     @Override
     public void seed(ScenarioContext ctx) {
-        ACCOUNTS.forEach((email, profile) -> auth.register(new RegisterRequest(
-                email, PASSWORD, ctx.daysFromToday(-30 * 365), profile, "2027-01", "2027-01", "es")));
+        ACCOUNTS.forEach((email, profile) -> auth.register(SignUps.of(email, PASSWORD, profile, "es", ctx)));
         for (int i = 0; i < 5; i++) {
             try {
                 auth.login(LOCKED_EMAIL, "wrong-password", "scenario-" + i);

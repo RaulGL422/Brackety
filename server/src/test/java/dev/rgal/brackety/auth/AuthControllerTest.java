@@ -27,8 +27,10 @@ import org.springframework.test.web.servlet.ResultActions;
 class AuthControllerTest extends AuthIntegrationTest {
 
     private static final String REGISTER_JSON = """
-            {"email":"%s","password":"%s","birthDate":"%s","profile":"CLUB",
+            {"email":"%s","password":"%s","birthDate":"%s","profile":"HELPER",
              "acceptedTermsVersion":"2027-01","acceptedPrivacyVersion":"2027-02","locale":"es"}""";
+    private static final String ORGANIZER = """
+            "organization":{"name":"Club Ficticio","taxId":"G12345674"},"representativeDeclaration":true""";
 
     @Autowired
     MockMvc mvc;
@@ -72,6 +74,62 @@ class AuthControllerTest extends AuthIntegrationTest {
         register(REGISTER_JSON.formatted("kid@example.test", PASSWORD, "2013-03-11"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON));
+    }
+
+    @Test
+    void registersAnOrganizerWithItsOrganizationAndDeclarationInsteadOfABirthDate() throws Exception {
+        register(json(
+                        "CLUB",
+                        "\"organization\":{\"name\":\"  Club Ficticio  \",\"taxId\":\"g-1234.567 4\"},"
+                                + "\"representativeDeclaration\":true"))
+                .andExpect(status().isAccepted());
+
+        assertThat(count("account where birth_date is null")).isOne();
+        assertThat(count("profile where type = 'CLUB' and organization_name = 'Club Ficticio'"
+                        + " and tax_id = 'G12345674' and not validated"))
+                .isOne();
+        assertThat(count("consent where document = 'ORGANIZER_DECLARATION' and version = '2027-01'"))
+                .isOne();
+    }
+
+    @Test
+    void anOrganizerGivesNoBirthDateButTheOrganizationAndTheDeclaration() throws Exception {
+        var organization = "\"organization\":{\"name\":\"Club Ficticio\",\"taxId\":\"G12345674\"}";
+        for (var fields : new String[] {
+            ORGANIZER + ",\"birthDate\":\"1990-05-20\"",
+            "\"representativeDeclaration\":true",
+            organization,
+            organization + ",\"representativeDeclaration\":false",
+            "\"organization\":{\"name\":\" C \",\"taxId\":\"G12345674\"},\"representativeDeclaration\":true",
+            "\"organization\":{\"name\":\"Club Ficticio\"},\"representativeDeclaration\":true"
+        }) {
+            register(json("EXTERNAL_ENTITY", fields))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                    .andExpect(jsonPath("$.code").doesNotExist());
+        }
+        assertThat(count("account")).isZero();
+    }
+
+    @Test
+    void anyoneElseGivesTheBirthDateAndNoOrganization() throws Exception {
+        for (var fields : new String[] {
+            "\"birthDate\":\"1990-05-20\"," + ORGANIZER,
+            "\"birthDate\":\"1990-05-20\",\"representativeDeclaration\":true",
+            "\"representativeDeclaration\":true"
+        }) {
+            register(json("HELPER", fields)).andExpect(status().isBadRequest());
+        }
+        assertThat(count("account")).isZero();
+    }
+
+    @Test
+    void anInvalidCifIsABadRequestWithItsCode() throws Exception {
+        register(json("CLUB", ORGANIZER.replace("G12345674", "G12345675")))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.code").value("INVALID_TAX_ID"));
+        assertThat(count("account")).isZero();
     }
 
     @Test
@@ -211,7 +269,7 @@ class AuthControllerTest extends AuthIntegrationTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON));
         mvc.perform(get("/api/v1/test/whoami").header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
                 .andExpect(status().isOk())
-                .andExpect(content().string(endsWith("[CLUB]")));
+                .andExpect(content().string(endsWith("[HELPER]")));
 
         clock.advance(Duration.ofMinutes(15).plusSeconds(1));
         mvc.perform(get("/api/v1/test/whoami").header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
@@ -367,6 +425,12 @@ class AuthControllerTest extends AuthIntegrationTest {
 
     private ResultActions postJson(String path, String body) throws Exception {
         return mvc.perform(post(path).contentType(MediaType.APPLICATION_JSON).content(body));
+    }
+
+    private static String json(String profile, String fields) {
+        return """
+                {"email":"org@example.test","password":"%s","profile":"%s",%s,
+                 "acceptedTermsVersion":"2027-01","acceptedPrivacyVersion":"2027-02","locale":"es"}""".formatted(PASSWORD, profile, fields);
     }
 
     private ResultActions register(String body) throws Exception {

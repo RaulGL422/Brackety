@@ -1,5 +1,6 @@
 import 'package:brackety/features/auth/data/api_error.dart';
 import 'package:brackety/features/auth/data/registration.dart';
+import 'package:brackety/features/auth/data/tax_id.dart';
 import 'package:brackety/features/auth/ui/auth_texts.dart';
 import 'package:brackety/l10n/gen/app_localizations.dart';
 import 'package:flutter/widgets.dart';
@@ -80,7 +81,7 @@ void main() {
         email: 'ana@example.com',
         password: 'long enough',
         birthDate: DateTime(1990, 5, 7),
-        profile: ProfileType.externalEntity,
+        profile: ProfileType.helper,
         locale: 'es',
       ).toJson();
 
@@ -88,11 +89,119 @@ void main() {
         'email': 'ana@example.com',
         'password': 'long enough',
         'birthDate': '1990-05-07',
-        'profile': 'EXTERNAL_ENTITY',
+        'profile': 'HELPER',
         'acceptedTermsVersion': '2026-11-draft',
         'acceptedPrivacyVersion': '2026-11-draft',
         'locale': 'es',
       });
+    });
+
+    test('an organizer sends the organization and the declaration, and no '
+        'birth date key', () {
+      final json = const Registration(
+        email: 'club@example.com',
+        password: 'long enough',
+        profile: ProfileType.externalEntity,
+        locale: 'es',
+        organization: Organization(name: 'Federación', taxId: 'G12345674'),
+        representativeDeclaration: true,
+      ).toJson();
+
+      expect(json, {
+        'email': 'club@example.com',
+        'password': 'long enough',
+        'profile': 'EXTERNAL_ENTITY',
+        'organization': {'name': 'Federación', 'taxId': 'G12345674'},
+        'representativeDeclaration': true,
+        'acceptedTermsVersion': '2026-11-draft',
+        'acceptedPrivacyVersion': '2026-11-draft',
+        'locale': 'es',
+      });
+    });
+
+    test('only clubs and external entities are organizers', () {
+      expect(ProfileType.values.where((profile) => profile.isOrganizer), [
+        ProfileType.club,
+        ProfileType.externalEntity,
+      ]);
+    });
+  });
+
+  group('CIF', () {
+    test('accepts the known valid ones', () {
+      expect(isValidCif('B12345674'), isTrue);
+      expect(isValidCif('G12345674'), isTrue);
+      expect(isValidCif('G1234567D'), isTrue);
+    });
+
+    test('normalizes case, spaces, hyphens and dots first', () {
+      expect(normalizeTaxId('b-1234567 4'), 'B12345674');
+      expect(normalizeTaxId('g.123.456.7d'), 'G1234567D');
+      expect(isValidCif('b-1234567 4'), isTrue);
+    });
+
+    test('rejects a wrong length or shape', () {
+      expect(isValidCif(''), isFalse);
+      expect(isValidCif('B1234567'), isFalse);
+      expect(isValidCif('B123456745'), isFalse);
+      expect(isValidCif('1B2345674'), isFalse);
+      expect(isValidCif('B12A45674'), isFalse);
+    });
+
+    test('rejects a first letter that is not a CIF type', () {
+      for (final letter in ['I', 'K', 'L', 'M', 'O', 'T', 'X', 'Y', 'Z']) {
+        expect(isValidCif('${letter}12345674'), isFalse, reason: letter);
+      }
+    });
+
+    test('rejects a wrong control', () {
+      expect(isValidCif('B12345675'), isFalse);
+      expect(isValidCif('G1234567E'), isFalse);
+    });
+
+    test('P, Q, R, S, N and W need the control letter', () {
+      for (final letter in ['P', 'Q', 'R', 'S', 'N', 'W']) {
+        expect(isValidCif('${letter}1234567D'), isTrue, reason: letter);
+        expect(isValidCif('${letter}12345674'), isFalse, reason: letter);
+      }
+    });
+
+    test('A, B, E and H need the control digit', () {
+      for (final letter in ['A', 'B', 'E', 'H']) {
+        expect(isValidCif('${letter}12345674'), isTrue, reason: letter);
+        expect(isValidCif('${letter}1234567D'), isFalse, reason: letter);
+      }
+    });
+
+    test('the other letters take either', () {
+      for (final letter in ['C', 'D', 'F', 'G', 'J', 'U', 'V']) {
+        expect(isValidCif('${letter}12345674'), isTrue, reason: letter);
+        expect(isValidCif('${letter}1234567D'), isTrue, reason: letter);
+      }
+    });
+  });
+
+  group('organizer field validation', () {
+    final l10n = lookupAppLocalizations(const Locale('en'));
+
+    test('the organization name is trimmed and 2 to 200 long', () {
+      expect(validateOrganizationName(l10n, '   '), l10n.fieldRequired);
+      expect(
+        validateOrganizationName(l10n, ' A '),
+        l10n.registerOrganizationNameLength,
+      );
+      expect(validateOrganizationName(l10n, ' AB '), isNull);
+      expect(validateOrganizationName(l10n, 'A' * 200), isNull);
+      expect(
+        validateOrganizationName(l10n, 'A' * 201),
+        l10n.registerOrganizationNameLength,
+      );
+    });
+
+    test('the CIF is required and checked', () {
+      expect(validateTaxId(l10n, ' - '), l10n.fieldRequired);
+      expect(validateTaxId(l10n, 'B12345675'), l10n.registerTaxIdInvalid);
+      expect(validateTaxId(l10n, 'b-1234567 4'), isNull);
     });
   });
 

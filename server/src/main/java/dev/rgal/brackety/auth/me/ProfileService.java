@@ -46,7 +46,8 @@ class ProfileService {
         if (!types.add(type)) {
             return;
         }
-        if (!isAllowed(types)) {
+        // An organizer gives the organization's name and CIF at sign-up; there is no way to give them here.
+        if (type.isOrganizer() || !isAllowed(types)) {
             throw AuthException.profileCombinationNotAllowed();
         }
         profiles.save(new Profile(accountId, type, clock.instant()));

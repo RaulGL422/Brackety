@@ -178,6 +178,30 @@ class AppLocalizationsEn extends AppLocalizations {
       'You must accept them to create the account.';
 
   @override
+  String get registerOrganizationName => 'Organization name';
+
+  @override
+  String get registerOrganizationNameLength => 'Between 2 and 200 characters.';
+
+  @override
+  String get registerTaxId => 'CIF (Spanish tax ID)';
+
+  @override
+  String get registerTaxIdHelper =>
+      'The platform uses it to verify the organization before it can publish events.';
+
+  @override
+  String get registerTaxIdInvalid => 'Invalid CIF.';
+
+  @override
+  String get registerRepresentative =>
+      'I am of legal age and represent this organization.';
+
+  @override
+  String get registerRepresentativeRequired =>
+      'You must confirm it to register the organization.';
+
+  @override
   String get registerHaveAccount => 'Already have an account? Sign in';
 
   @override

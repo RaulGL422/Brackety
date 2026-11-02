@@ -3,6 +3,7 @@ package dev.rgal.brackety.auth;
 import dev.rgal.brackety.auth.account.Account;
 import dev.rgal.brackety.auth.account.AccountRepository;
 import dev.rgal.brackety.auth.account.AuthEmails;
+import dev.rgal.brackety.auth.account.Cif;
 import dev.rgal.brackety.auth.account.Consent;
 import dev.rgal.brackety.auth.account.ConsentRepository;
 import dev.rgal.brackety.auth.account.Profile;
@@ -19,6 +20,7 @@ import dev.rgal.brackety.auth.session.ShortLivedTokens;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
@@ -70,7 +72,7 @@ public class AuthService {
 
     @Transactional
     public void register(RegisterRequest request) {
-        checkMinimumAge(request.birthDate());
+        checkRegistration(request.details());
         var email = Account.normalizeEmail(request.email());
         // Hashed before the duplicate check so both paths take the same time.
         var passwordHash = passwordEncoder.encode(request.password());
@@ -98,21 +100,39 @@ public class AuthService {
         }
     }
 
-    public void checkMinimumAge(LocalDate birthDate) {
-        if (Period.between(birthDate, LocalDate.now(clock)).getYears() < MIN_AGE) {
+    /** The rules Bean Validation cannot check: the organizer's CIF, or the minimum age of everyone else. */
+    public void checkRegistration(RegistrationDetails details) {
+        if (details.isOrganizer()) {
+            if (!Cif.isValid(details.organization().taxId())) {
+                throw AuthException.invalidTaxId();
+            }
+        } else if (Period.between(details.birthDate(), LocalDate.now(clock)).getYears() < MIN_AGE) {
             throw AuthException.underage();
         }
     }
 
-    /** The account with its first profile and consents; {@code passwordHash} is null for a provider sign-up. */
+    /**
+     * The account with its first profile and consents, after {@link #checkRegistration}; {@code passwordHash} is null
+     * for a provider sign-up.
+     */
     @Transactional
     public Account createAccount(String email, String passwordHash, RegistrationDetails details) {
         var now = clock.instant();
         var account = accounts.save(new Account(email, passwordHash, details.birthDate(), details.locale(), now));
-        profiles.save(new Profile(account.getId(), details.profile(), now));
-        consents.saveAll(List.of(
+        var organization = details.organization();
+        profiles.save(
+                organization == null
+                        ? new Profile(account.getId(), details.profile(), now)
+                        : new Profile(
+                                account.getId(), details.profile(), organization.name(), organization.taxId(), now));
+        var accepted = new ArrayList<>(List.of(
                 new Consent(account.getId(), Consent.Document.TERMS, details.acceptedTermsVersion(), now),
                 new Consent(account.getId(), Consent.Document.PRIVACY, details.acceptedPrivacyVersion(), now)));
+        if (details.isOrganizer()) {
+            accepted.add(new Consent(
+                    account.getId(), Consent.Document.ORGANIZER_DECLARATION, details.acceptedTermsVersion(), now));
+        }
+        consents.saveAll(accepted);
         return account;
     }
 

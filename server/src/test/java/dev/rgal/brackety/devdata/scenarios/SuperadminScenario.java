@@ -2,7 +2,6 @@ package dev.rgal.brackety.devdata.scenarios;
 
 import dev.rgal.brackety.auth.AuthService;
 import dev.rgal.brackety.auth.account.ProfileType;
-import dev.rgal.brackety.auth.dto.RegisterRequest;
 import dev.rgal.brackety.devdata.DevScenario;
 import dev.rgal.brackety.devdata.Scenario;
 import dev.rgal.brackety.devdata.ScenarioContext;
@@ -53,8 +52,7 @@ class SuperadminScenario implements Scenario {
     }
 
     private void register(ScenarioContext ctx, String email, ProfileType profile, String locale) {
-        auth.register(new RegisterRequest(
-                email, PASSWORD, ctx.daysFromToday(-30 * 365), profile, "2027-01", "2027-01", locale));
+        auth.register(SignUps.of(email, PASSWORD, profile, locale, ctx));
     }
 
     private void failLogin(String email, String ip) {

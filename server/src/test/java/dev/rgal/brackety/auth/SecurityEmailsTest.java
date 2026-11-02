@@ -30,7 +30,15 @@ class SecurityEmailsTest extends AuthIntegrationTest {
         emails.reset();
 
         auth.register(new RegisterRequest(
-                "ANA@example.test", "another-password", LocalDate.of(1980, 1, 1), ProfileType.STUDENT, "v", "v", "en"));
+                "ANA@example.test",
+                "another-password",
+                ProfileType.STUDENT,
+                LocalDate.of(1980, 1, 1),
+                null,
+                null,
+                "v",
+                "v",
+                "en"));
 
         var email = emails.sentTo(ANA).getFirst();
         assertThat(email.subject()).isEqualTo("Ya tienes una cuenta en Brackety");
@@ -55,8 +63,7 @@ class SecurityEmailsTest extends AuthIntegrationTest {
     @Test
     void emailsUseTheAccountLanguage() {
         auth.register(registration(ANA));
-        auth.register(new RegisterRequest(
-                "bob@example.test", PASSWORD, LocalDate.of(1990, 1, 1), ProfileType.CLUB, "v", "v", "en"));
+        auth.register(registration("bob@example.test", ProfileType.CLUB, "en"));
 
         var spanish = emails.sentTo(ANA).getFirst();
         var english = emails.sentTo("bob@example.test").getFirst();

@@ -53,7 +53,8 @@ class DataExportService {
                         account.getCreatedAt(),
                         account.getUpdatedAt()),
                 profiles.findByAccountId(accountId).stream()
-                        .map(p -> new ProfileData(p.getType(), p.isValidated(), p.getCreatedAt()))
+                        .map(p -> new ProfileData(
+                                p.getType(), p.isValidated(), p.getOrganizationName(), p.getTaxId(), p.getCreatedAt()))
                         .toList(),
                 identities.findByAccountIdOrderByCreatedAt(accountId).stream()
                         .map(i -> new IdentityData(i.getProvider().name(), i.getProviderEmail(), i.getLinkedAt()))

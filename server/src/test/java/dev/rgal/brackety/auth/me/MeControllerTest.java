@@ -6,6 +6,7 @@ import static dev.rgal.brackety.auth.account.ProfileType.EXTERNAL_ENTITY;
 import static dev.rgal.brackety.auth.account.ProfileType.HELPER;
 import static dev.rgal.brackety.auth.account.ProfileType.STUDENT;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -17,11 +18,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import dev.rgal.brackety.auth.AuthIntegrationTest;
 import dev.rgal.brackety.auth.AuthService;
 import dev.rgal.brackety.auth.account.ProfileType;
-import dev.rgal.brackety.auth.dto.RegisterRequest;
 import dev.rgal.brackety.auth.google.FakeGoogle;
 import dev.rgal.brackety.auth.reauth.ReauthService;
 import dev.rgal.brackety.auth.session.SessionService.Session;
-import java.time.LocalDate;
 import java.util.EnumSet;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -56,6 +55,8 @@ class MeControllerTest extends AuthIntegrationTest {
                 .andExpect(jsonPath("$.profiles.length()").value(1))
                 .andExpect(jsonPath("$.profiles[0].type").value("STUDENT"))
                 .andExpect(jsonPath("$.profiles[0].validated").value(false))
+                .andExpect(jsonPath("$.profiles[0].organizationName").doesNotExist())
+                .andExpect(jsonPath("$.profiles[0].taxId").doesNotExist())
                 .andExpect(jsonPath("$.signInMethods[0].method").value("PASSWORD"))
                 .andExpect(jsonPath("$.deletesOn").doesNotExist());
     }
@@ -125,15 +126,37 @@ class MeControllerTest extends AuthIntegrationTest {
     }
 
     @Test
-    void aNewOrganizerProfileStartsUnvalidatedAndAddingItAgainChangesNothing() throws Exception {
+    void anOrganizerProfileIsNeverAddedFromSettingsAsItNeedsTheOrganization() throws Exception {
         var session = account(ANA, CLUB, true);
+
+        addProfile(session, CLUB).andExpect(status().isNoContent());
+        // Only reachable with seeded data: an account without profiles.
         jdbc.sql("delete from profile").update();
+        addProfile(session, EXTERNAL_ENTITY)
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("PROFILE_COMBINATION_NOT_ALLOWED"));
 
-        addProfile(session, EXTERNAL_ENTITY).andExpect(status().isNoContent());
-        addProfile(session, EXTERNAL_ENTITY).andExpect(status().isNoContent());
+        assertThat(count("profile")).isZero();
+    }
 
-        assertThat(count("profile where type = 'EXTERNAL_ENTITY' and not validated"))
-                .isOne();
+    @Test
+    void anOrganizerShowsItsOrganizationAndNoBirthDate() throws Exception {
+        var session = account(ANA, CLUB, true);
+
+        mvc.perform(as(session, get("/api/v1/me")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.birthDate").value(nullValue()))
+                .andExpect(jsonPath("$.profiles[0].type").value("CLUB"))
+                .andExpect(jsonPath("$.profiles[0].validated").value(false))
+                .andExpect(jsonPath("$.profiles[0].organizationName").value("Club Ficticio"))
+                .andExpect(jsonPath("$.profiles[0].taxId").value("G12345674"));
+        mvc.perform(as(session, get("/api/v1/me/export"))
+                        .header(ReauthService.HEADER, reauthWithPassword(mvc, session)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.account.birthDate").value(nullValue()))
+                .andExpect(jsonPath("$.profiles[0].organizationName").value("Club Ficticio"))
+                .andExpect(jsonPath("$.profiles[0].taxId").value("G12345674"))
+                .andExpect(jsonPath("$.consents.length()").value(3));
     }
 
     @Test
@@ -169,6 +192,7 @@ class MeControllerTest extends AuthIntegrationTest {
                 .andExpect(jsonPath("$.account.hasPassword").value(true))
                 .andExpect(jsonPath("$.account.birthDate").value("1990-05-20"))
                 .andExpect(jsonPath("$.profiles[0].type").value("STUDENT"))
+                .andExpect(jsonPath("$.profiles[0].organizationName").doesNotExist())
                 .andExpect(jsonPath("$.identities[0].provider").value("GOOGLE"))
                 .andExpect(jsonPath("$.identities[0].email").value("ana.g@example.test"))
                 .andExpect(jsonPath("$.identities[0].linkedAt").value("2027-03-10T09:00:00Z"))
@@ -198,8 +222,7 @@ class MeControllerTest extends AuthIntegrationTest {
 
     // Verified before logging in, so the access token already carries the email_verified claim.
     private Session account(String email, ProfileType profile, boolean verified) {
-        auth.register(
-                new RegisterRequest(email, PASSWORD, LocalDate.of(1990, 5, 20), profile, "2027-01", "2027-02", "es"));
+        auth.register(registration(email, profile, "es"));
         jdbc.sql("update account set email_verified = ? where email = ?")
                 .param(verified)
                 .param(email)

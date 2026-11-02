@@ -9,17 +9,24 @@ class BirthDateField extends FormField<DateTime> {
     super.key,
     required DateTime today,
     super.validator,
-    super.onSaved,
+    super.initialValue,
+    ValueChanged<DateTime>? onChanged,
   }) : super(
-         builder: (field) => _BirthDateInput(field: field, today: today),
+         builder: (field) =>
+             _BirthDateInput(field: field, today: today, onChanged: onChanged),
        );
 }
 
 class _BirthDateInput extends StatelessWidget {
-  const _BirthDateInput({required this.field, required this.today});
+  const _BirthDateInput({
+    required this.field,
+    required this.today,
+    this.onChanged,
+  });
 
   final FormFieldState<DateTime> field;
   final DateTime today;
+  final ValueChanged<DateTime>? onChanged;
 
   Future<void> _pick(BuildContext context) async {
     final picked = await showDatePicker(
@@ -29,7 +36,9 @@ class _BirthDateInput extends StatelessWidget {
       firstDate: DateTime(1900),
       lastDate: today,
     );
-    if (picked != null) field.didChange(picked);
+    if (picked == null) return;
+    field.didChange(picked);
+    onChanged?.call(picked);
   }
 
   @override

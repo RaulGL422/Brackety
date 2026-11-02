@@ -404,6 +404,48 @@ abstract class AppLocalizations {
   /// **'Debes aceptarlos para crear la cuenta.'**
   String get registerAcceptRequired;
 
+  /// No description provided for @registerOrganizationName.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre de la organización'**
+  String get registerOrganizationName;
+
+  /// No description provided for @registerOrganizationNameLength.
+  ///
+  /// In es, this message translates to:
+  /// **'Entre 2 y 200 caracteres.'**
+  String get registerOrganizationNameLength;
+
+  /// No description provided for @registerTaxId.
+  ///
+  /// In es, this message translates to:
+  /// **'CIF'**
+  String get registerTaxId;
+
+  /// No description provided for @registerTaxIdHelper.
+  ///
+  /// In es, this message translates to:
+  /// **'La plataforma lo usa para verificar la organización antes de que pueda publicar eventos.'**
+  String get registerTaxIdHelper;
+
+  /// No description provided for @registerTaxIdInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'CIF no válido.'**
+  String get registerTaxIdInvalid;
+
+  /// No description provided for @registerRepresentative.
+  ///
+  /// In es, this message translates to:
+  /// **'Soy mayor de edad y represento a esta organización.'**
+  String get registerRepresentative;
+
+  /// No description provided for @registerRepresentativeRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'Debes confirmarlo para registrar la organización.'**
+  String get registerRepresentativeRequired;
+
   /// No description provided for @registerHaveAccount.
   ///
   /// In es, this message translates to:

@@ -12,6 +12,8 @@
 - [ ] Cabecera Content-Security-Policy en nginx: probarla contra el despliegue real antes de activarla.
 
 ## Auth
+- [ ] Organizadores creados antes del registro con CIF (p. ej. `club1` demo de un despliegue anterior) quedan sin nombre ni CIF: el superadmin los ve vacíos. Pedírselos a mano o completar desde ajustes cuando exista.
+- [ ] Organizadores sin CIF español (entidades extranjeras, autónomos con NIF): hoy no pueden registrarse como organizador. Decidir si se admite NIF/NIE o un identificador extranjero.
 - [ ] Google Cloud: crear OAuth client IDs (web + Android con SHA-1 de debug y release), ponerlos en `GOOGLE_CLIENT_ID` y probar el login real de Google en web y en Android (en local solo hay Google simulado).
 - [ ] Resend: API key y remitente verificado en `rgal.dev` antes de `feat/auth-email` (en local los emails van al log).
 - [ ] Cloudflare: regla de rate limiting sobre `/api/v1/auth/*` al desplegar.

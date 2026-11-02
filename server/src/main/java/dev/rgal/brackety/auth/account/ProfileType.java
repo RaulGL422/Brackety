@@ -5,5 +5,10 @@ public enum ProfileType {
     EXTERNAL_ENTITY,
     HELPER,
     EXTERNAL,
-    STUDENT
+    STUDENT;
+
+    /** Organizers hold events and the superadmin validates them. */
+    public boolean isOrganizer() {
+        return this == CLUB || this == EXTERNAL_ENTITY;
+    }
 }

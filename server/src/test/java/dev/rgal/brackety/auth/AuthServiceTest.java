@@ -29,11 +29,16 @@ class AuthServiceTest extends AuthIntegrationTest {
         var account = accounts.findByEmail("ana@example.test").orElseThrow();
         assertThat(account.isEmailVerified()).isFalse();
         assertThat(account.isActive()).isTrue();
-        assertThat(jdbc.sql("select type, validated from profile where account_id = ?")
+        assertThat(account.getBirthDate()).isNull();
+        assertThat(jdbc.sql("select type, validated, organization_name, tax_id from profile where account_id = ?")
                         .param(account.getId())
-                        .query((rs, n) -> tuple(rs.getString("type"), rs.getBoolean("validated")))
+                        .query((rs, n) -> tuple(
+                                rs.getString("type"),
+                                rs.getBoolean("validated"),
+                                rs.getString("organization_name"),
+                                rs.getString("tax_id")))
                         .list())
-                .containsExactly(tuple(ProfileType.CLUB.name(), false));
+                .containsExactly(tuple(ProfileType.CLUB.name(), false, "Club Ficticio", "G12345674"));
         assertThat(jdbc.sql("select document, version, accepted_at from consent where account_id = ?")
                         .param(account.getId())
                         .query((rs, n) -> tuple(
@@ -43,7 +48,27 @@ class AuthServiceTest extends AuthIntegrationTest {
                         .list())
                 .containsExactlyInAnyOrder(
                         tuple("TERMS", "2027-01", AuthTestConfig.START),
-                        tuple("PRIVACY", "2027-02", AuthTestConfig.START));
+                        tuple("PRIVACY", "2027-02", AuthTestConfig.START),
+                        tuple("ORGANIZER_DECLARATION", "2027-01", AuthTestConfig.START));
+    }
+
+    @Test
+    void aStudentHasABirthDateAndNoOrganization() {
+        auth.register(registration("ana@example.test", ADULT));
+
+        assertThat(accounts.findByEmail("ana@example.test").orElseThrow().getBirthDate())
+                .isEqualTo(ADULT);
+        assertThat(count("profile where organization_name is null and tax_id is null"))
+                .isOne();
+        assertThat(count("consent")).isEqualTo(2);
+    }
+
+    @Test
+    void severalAccountsCanManageTheSameOrganization() {
+        auth.register(registration("ana@example.test"));
+        auth.register(registration("bea@example.test", ProfileType.EXTERNAL_ENTITY, "en"));
+
+        assertThat(count("profile where tax_id = 'G12345674'")).isEqualTo(2);
     }
 
     @Test
@@ -70,13 +95,21 @@ class AuthServiceTest extends AuthIntegrationTest {
     void duplicateEmailIsAcceptedSilentlyAndChangesNothing() {
         auth.register(registration("ana@example.test"));
         var duplicate = new RegisterRequest(
-                "ANA@example.test", "another-password", LocalDate.of(1980, 1, 1), ProfileType.STUDENT, "v", "v", "en");
+                "ANA@example.test",
+                "another-password",
+                ProfileType.STUDENT,
+                LocalDate.of(1980, 1, 1),
+                null,
+                null,
+                "v",
+                "v",
+                "en");
 
         auth.register(duplicate);
 
         assertThat(count("account")).isOne();
         assertThat(count("profile")).isOne();
-        assertThat(count("consent")).isEqualTo(2);
+        assertThat(count("consent")).isEqualTo(3);
         assertThat(auth.login("ana@example.test", PASSWORD, IP).accessToken()).isNotBlank();
     }
 

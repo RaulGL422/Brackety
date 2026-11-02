@@ -16,11 +16,9 @@ import dev.rgal.brackety.auth.AuthException;
 import dev.rgal.brackety.auth.AuthIntegrationTest;
 import dev.rgal.brackety.auth.AuthService;
 import dev.rgal.brackety.auth.account.ProfileType;
-import dev.rgal.brackety.auth.dto.RegisterRequest;
 import dev.rgal.brackety.auth.lockout.LoginAttempt;
 import java.net.URI;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -314,14 +312,23 @@ class AdminApiTest extends AuthIntegrationTest {
                 .update();
 
         assertThat(organizers("?validated=false"))
-                .extracting("accountId", "email", "profileType", "validated", "createdAt")
+                .extracting("accountId", "email", "profileType", "validated", "organizationName", "taxId", "createdAt")
                 .containsExactly(
-                        tuple(club.toString(), "club@example.test", "CLUB", false, "2027-03-10T09:00:00Z"),
+                        tuple(
+                                club.toString(),
+                                "club@example.test",
+                                "CLUB",
+                                false,
+                                "Club Ficticio",
+                                "G12345674",
+                                "2027-03-10T09:00:00Z"),
                         tuple(
                                 entity.toString(),
                                 "entidad@example.test",
                                 "EXTERNAL_ENTITY",
                                 false,
+                                "Club Ficticio",
+                                "G12345674",
                                 "2027-03-10T09:01:00Z"));
         assertThat(organizers("?validated=true")).isEmpty();
 
@@ -424,8 +431,7 @@ class AdminApiTest extends AuthIntegrationTest {
     }
 
     private UUID register(String email, ProfileType profile, String locale) {
-        auth.register(
-                new RegisterRequest(email, PASSWORD, LocalDate.of(1990, 5, 20), profile, "2027-01", "2027-02", locale));
+        auth.register(registration(email, profile, locale));
         return jdbc.sql("select id from account where email = ?")
                 .param(email)
                 .query(UUID.class)
