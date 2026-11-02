@@ -105,6 +105,7 @@ class Participant {
     required this.age,
     this.heightCm,
     this.categoryName,
+    this.chosenCategoryId,
   });
 
   factory Participant.fromJson(Map<String, dynamic> json) => Participant(
@@ -116,6 +117,7 @@ class Participant {
     age: json['age'] as int,
     heightCm: json['heightCm'] as int?,
     categoryName: json['categoryName'] as String?,
+    chosenCategoryId: json['chosenCategoryId'] as String?,
   );
 
   final String id;
@@ -130,6 +132,9 @@ class Participant {
 
   /// Null when no category of the event covers the age.
   final String? categoryName;
+
+  /// Set when a category was chosen for them instead of following their age.
+  final String? chosenCategoryId;
 }
 
 class StandingRow {

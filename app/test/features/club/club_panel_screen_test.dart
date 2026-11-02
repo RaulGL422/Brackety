@@ -20,6 +20,19 @@ class FakeClubRepository extends Fake implements ClubRepository {
   int? refuseWith;
   final savedMaxGroups = <int>[];
   final savedCategories = <List<EventCategory>>[];
+  final savedParticipantCategories = <String?>[];
+
+  @override
+  Future<void> saveParticipant(
+    String eventId, {
+    String? participantId,
+    required String firstName,
+    required String lastName,
+    required DateTime birthDate,
+    required int? heightCm,
+    required bool guardianConsent,
+    String? categoryId,
+  }) async => savedParticipantCategories.add(categoryId);
 
   @override
   Future<List<EventCategory>> saveCategories(
@@ -248,6 +261,29 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  testWidgets('a participant can be put in another category than their age', (
+    tester,
+  ) async {
+    final repository = FakeClubRepository(settings);
+    await pumpPanel(tester, const Size(800, 1280), repository: repository);
+    await tester.tap(find.text('Entries'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Lucia Test'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('By age'), findsOneWidget);
+    await tester.tap(find.text('By age'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('8-11').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('The legal guardian agrees'));
+    await tester.pump();
+    await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+    await tester.pumpAndSettle();
+
+    expect(repository.savedParticipantCategories, ['c2']);
+  });
 
   testWidgets('a settings change saves on its own, without a button', (
     tester,

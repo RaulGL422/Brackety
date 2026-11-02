@@ -1013,4 +1013,176 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get categoryAgeSuffix => 'años';
+
+  @override
+  String get categoryLabel => 'Categoría';
+
+  @override
+  String get categoryByAge => 'Automática por edad';
+
+  @override
+  String get importButton => 'Importar alumnos';
+
+  @override
+  String get importFormatTitle => 'Cómo debe ser la lista';
+
+  @override
+  String get importFormatBody =>
+      'Una fila por alumno: nombre, apellidos, fecha de nacimiento (dd/mm/aaaa), estatura en cm (opcional) y categoría (opcional). Vale una o varias fotos, un CSV, un Excel, un TXT o el texto pegado.';
+
+  @override
+  String get importTemplate => 'Descargar plantilla';
+
+  @override
+  String get importPickPhotos => 'Elegir fotos';
+
+  @override
+  String get importPickFile => 'Elegir archivo';
+
+  @override
+  String get importPasteHint => 'O pega aquí la lista';
+
+  @override
+  String get importConsent =>
+      'Confirmo que todos los alumnos de esta lista, y sus tutores si son menores, han aceptado inscribirse en este evento sin excepción, y que la lista se procesará con un servicio de IA externo (Anthropic) solo para leerla. Las imágenes y archivos no se guardan.';
+
+  @override
+  String get importRead => 'Leer lista';
+
+  @override
+  String get importReading => 'Leyendo la lista… puede tardar hasta un minuto.';
+
+  @override
+  String get importReadError =>
+      'No se ha podido leer la lista. Prueba con una foto más nítida o con un archivo.';
+
+  @override
+  String get importTooMany =>
+      'Has leído muchas listas en la última hora. Prueba más tarde.';
+
+  @override
+  String importInvalidFiles(int max) {
+    return 'Solo fotos (JPG, PNG, WebP), CSV, TXT o Excel: hasta $max archivos de 10 MB.';
+  }
+
+  @override
+  String importSummary(int total, int errors, int warnings) {
+    return '$total alumnos · $errors con errores · $warnings para revisar';
+  }
+
+  @override
+  String importRegister(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Inscribir $count alumnos',
+      one: 'Inscribir 1 alumno',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String importRegistered(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count alumnos inscritos',
+      one: '1 alumno inscrito',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importRegisterRefused =>
+      'No se ha inscrito nadie: revisa las filas marcadas.';
+
+  @override
+  String get importAddRow => 'Añadir alumno';
+
+  @override
+  String get importEditRow => 'Editar alumno';
+
+  @override
+  String get importRemoveRow => 'Quitar de la lista';
+
+  @override
+  String get importStartOver => 'Volver a subir';
+
+  @override
+  String get importEmpty => 'La lista no tiene alumnos.';
+
+  @override
+  String importUseCategory(String name) {
+    return 'Usar $name';
+  }
+
+  @override
+  String get fieldFirstName => 'el nombre';
+
+  @override
+  String get fieldLastName => 'los apellidos';
+
+  @override
+  String get fieldBirthDate => 'la fecha de nacimiento';
+
+  @override
+  String get fieldHeight => 'la estatura';
+
+  @override
+  String get fieldCategory => 'la categoría';
+
+  @override
+  String issueMissing(String field) {
+    return 'Falta $field';
+  }
+
+  @override
+  String issueTooLong(String field) {
+    return 'Demasiado largo: $field';
+  }
+
+  @override
+  String issueInvalidDate(String text) {
+    return 'Fecha no válida: $text';
+  }
+
+  @override
+  String get issueFutureDate =>
+      'La fecha de nacimiento tiene que ser anterior a hoy';
+
+  @override
+  String issueHeight(String cm) {
+    return 'Estatura $cm: tiene que estar entre 50 y 250 cm';
+  }
+
+  @override
+  String issueNoCategory(String age) {
+    return 'Ninguna categoría del evento es para $age años';
+  }
+
+  @override
+  String issueUnknownCategory(String name) {
+    return 'La categoría «$name» no existe en el evento';
+  }
+
+  @override
+  String get issueChosenCategoryGone => 'La categoría elegida ya no existe';
+
+  @override
+  String issueCategoryMismatch(String written, String byAge) {
+    return 'Indica $written, pero por su edad le corresponde $byAge';
+  }
+
+  @override
+  String issueDuplicate(String row) {
+    return 'Repetido en la lista (fila $row)';
+  }
+
+  @override
+  String get issueAlreadyRegistered => 'Ya está inscrito en el evento';
+
+  @override
+  String issueUnsure(String field) {
+    return 'Revisa $field: no se leyó con seguridad';
+  }
 }
