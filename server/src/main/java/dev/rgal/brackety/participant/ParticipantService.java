@@ -11,6 +11,7 @@ import dev.rgal.brackety.participant.dto.ParticipantRequest;
 import dev.rgal.brackety.participant.dto.ParticipantResponse;
 import java.time.Clock;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,9 +61,12 @@ public class ParticipantService {
     public ParticipantResponse update(UUID eventId, UUID participantId, UUID accountId, ParticipantRequest request) {
         access.require(eventId, accountId, EventRole.CLUB);
         var participant = find(eventId, participantId);
-        // The birth date sets the category the participant's group or team was made for.
-        if (!request.birthDate().equals(participant.getBirthDate()) && participants.isInAGroupOrTeam(participantId)) {
-            throw EventException.conflict("The birth date cannot change once the participant is in a group or team.");
+        // The birth date and the chosen category set the category their group or team was made for.
+        var changesCategory = !request.birthDate().equals(participant.getBirthDate())
+                || !Objects.equals(request.categoryId(), participant.getCategoryId());
+        if (changesCategory && participants.isInAGroupOrTeam(participantId)) {
+            throw EventException.conflict(
+                    "The birth date and category cannot change once the participant is in a group or team.");
         }
         return save(participant, request);
     }
@@ -89,19 +93,25 @@ public class ParticipantService {
         if (event.ageOf(request.birthDate()) < ADULT_AGE && !request.guardianConsent()) {
             throw EventException.invalid("A minor needs the guardian's consent.");
         }
+        var eventCategories = categories.findByEventIdOrderByMinAge(event.getId());
+        if (request.categoryId() != null
+                && eventCategories.stream().noneMatch(c -> c.getId().equals(request.categoryId()))) {
+            throw EventException.invalid("The category is not from this event.");
+        }
         participant.update(
                 request.firstName().strip(),
                 request.lastName().strip(),
                 request.birthDate(),
                 request.heightCm(),
-                request.guardianConsent());
+                request.guardianConsent(),
+                request.categoryId());
         participants.save(participant);
-        return toResponse(participant, event, categories.findByEventIdOrderByMinAge(event.getId()));
+        return toResponse(participant, event, eventCategories);
     }
 
     static ParticipantResponse toResponse(Participant p, Event event, List<EventCategory> eventCategories) {
         var age = event.ageOf(p.getBirthDate());
-        var category = eventCategories.stream().filter(c -> c.contains(age)).findFirst();
+        var category = p.categoryIn(event, eventCategories);
         return new ParticipantResponse(
                 p.getId(),
                 p.getFirstName(),
@@ -111,6 +121,7 @@ public class ParticipantService {
                 p.hasGuardianConsent(),
                 age,
                 category.map(EventCategory::getId).orElse(null),
-                category.map(EventCategory::getName).orElse(null));
+                category.map(EventCategory::getName).orElse(null),
+                p.getCategoryId());
     }
 }

@@ -25,6 +25,10 @@ Cada escenario es una clase `Scenario` en `server/src/test/java/dev/rgal/bracket
 - PowerShell: `irm -Method Post http://localhost:8080/api/v1/auth/dev/google-token -ContentType application/json -Body '{"subject":"s1","email":"a@example.test"}'`.
 - Solo existe en el lanzador local (`server/src/test`); en producción ese endpoint no existe.
 
+## Importación de alumnos local
+- Sin `ANTHROPIC_API_KEY` el botón de importar no aparece. `--brackety.import.local-cli=true` lo activa con el `claude` y la sesión de quien desarrolla: **solo con listas ficticias** (las condiciones de la suscripción no cubren datos de terceros).
+- Modelo: `--brackety.import.model=…` (por defecto `claude-sonnet-5-5`).
+
 ## Superadmin local
 - Cloudflare Access simulado, como Google: la API local hace la comprobación real con una clave generada al arrancar y un filtro (`LocalAdminConfig`, solo en `server/src/test`) añade la cabecera que pondría Cloudflare si falta. La app admin funciona sin pasos extra.
 - Superadmin: `superadmin@example.test` / `brackety-demo` en `POST /api/v1/admin/auth/login`.

@@ -125,3 +125,6 @@ Formato: fecha · decisión · motivo.
 - 2026-11-02 · Idioma: el selector de ajustes cambia el de la app y el de la cuenta (emails); con sesión manda el de la cuenta, sin sesión el del dispositivo · una sola elección para todo; decidido por Raul.
 - 2026-11-02 · Exportar datos: en Android, hoja de compartir con el JSON (`share_plus`); en web, descarga del navegador (`package:web`) · Android no tiene carpeta de descargas accesible sin permisos; decidido por Raul.
 - 2026-11-02 · Ajustes de la app sin Google (ni vincular ni reauth con Google) hasta tener los client IDs: se muestra el Google ya vinculado, con desvincular y quitar contraseña · decidido por Raul.
+- 2026-11-02 · Importación masiva de alumnos (fotos, CSV, Excel, TXT) leída con `claude -p` y revisada por el club antes de inscribir; todo o nada · pruebas in situ con muchas inscripciones; decidido por Raul.
+- 2026-11-02 · Claude con `ANTHROPIC_API_KEY` (condiciones comerciales y DPA), no con el token de suscripción · trata datos de menores de terceros.
+- 2026-11-02 · Una inscripción puede llevar categoría elegida; si no, la de su edad · al importar, quien inscribe decide si la categoría escrita no cuadra con la edad; decidido por Raul.
