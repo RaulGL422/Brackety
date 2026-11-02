@@ -117,10 +117,77 @@ void main() {
 
     final waiting = tester.widget<ListTile>(
       find.ancestor(
-        of: find.text('Carla  vs  Diego (Ghost)'),
+        of: find.text('Carla  vs  Diego · Ghost'),
         matching: find.byType(ListTile),
       ),
     );
     expect(waiting.enabled, isTrue);
   });
+
+  test('a team fighter has no participant id and keeps its members', () {
+    final f = Fighter.fromJson({
+      'participantId': null,
+      'name': 'Ana P, Bea P, Carla P',
+      'ghost': false,
+      'teamId': 't1',
+      'teamNumber': 1,
+      'members': ['Ana P', 'Bea P', 'Carla P'],
+    });
+
+    expect(f.participantId, isNull);
+    expect(f.teamNumber, 1);
+    expect(f.members, hasLength(3));
+  });
+
+  for (final MapEntry(key: device, value: size) in sizes.entries) {
+    testWidgets('teams are called by number on $device', (tester) async {
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      Fighter team(int n, {bool ghost = false}) => Fighter(
+        participantId: null,
+        name: 'x',
+        ghost: ghost,
+        teamNumber: n,
+        members: ['A$n', 'B$n', 'C$n'],
+      );
+      final teams = [team(1), team(2), team(3), team(4, ghost: true)];
+      final teamBoard = MatBoard(
+        matNumber: 1,
+        groups: [
+          BoardGroup(
+            id: 'g1',
+            number: 1,
+            categoryName: '15-16',
+            members: teams,
+          ),
+        ],
+        matches: [match('m1', teams[0], teams[1], MatchStatus.pending)],
+        recommendedMatchId: 'm1',
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            matBoardProvider.overrideWith((ref, matId) async => teamBoard),
+          ],
+          child: MaterialApp(
+            theme: lightTheme(),
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              ...coreLocalizationsDelegates,
+            ],
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: const MatBoardScreen(matId: 'mat1'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Team 1  vs  Team 2'), findsOneWidget);
+      expect(find.text('Team 4 · Ghost'), findsOneWidget);
+      expect(find.text('A1, B1, C1'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  }
 }

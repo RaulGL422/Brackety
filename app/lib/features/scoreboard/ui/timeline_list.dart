@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
+import '../../mat/ui/fighter_text.dart';
 import '../data/match_view.dart';
 
 /// Every action of a match, oldest first: who, what, when and at which match time.
@@ -25,8 +26,8 @@ class TimelineList extends StatelessWidget {
       itemBuilder: (context, i) {
         final e = view.timeline[i];
         final who = switch (e.side) {
-          Side.red => '${l10n.cornerRed} · ${view.red.name}',
-          Side.blue => '${l10n.cornerBlue} · ${view.blue.name}',
+          Side.red => '${l10n.cornerRed} · ${view.red.title(l10n)}',
+          Side.blue => '${l10n.cornerBlue} · ${view.blue.title(l10n)}',
           null => null,
         };
         final notes = [

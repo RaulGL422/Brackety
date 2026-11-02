@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/async_view.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../mat/state/mat_providers.dart';
+import '../../mat/ui/fighter_text.dart';
 import '../data/match_view.dart';
 import '../state/match_controller.dart';
 import 'clock_bar.dart';
@@ -80,7 +81,7 @@ class ScoreboardScreen extends ConsumerWidget {
       };
       reason = await askReason(
         context,
-        title: l10n.reasonTitle(label, view.corner(side).name),
+        title: l10n.reasonTitle(label, view.corner(side).title(l10n)),
       );
       if (reason == null || !context.mounted) return;
     }
@@ -173,7 +174,8 @@ class _Finished extends StatelessWidget {
               Text(l10n.matchFinished, style: text.headlineSmall),
               const SizedBox(height: AppSpacing.s),
               Text(
-                '${view.red.name}  ${view.red.points} - ${view.blue.points}  ${view.blue.name}',
+                '${view.red.title(l10n)}  ${view.red.points} - '
+                '${view.blue.points}  ${view.blue.title(l10n)}',
                 style: text.titleLarge,
                 textAlign: TextAlign.center,
               ),

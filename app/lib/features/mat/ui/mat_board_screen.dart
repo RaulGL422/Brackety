@@ -8,6 +8,7 @@ import '../../../core/group_colors.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../data/mat_board.dart';
 import '../state/mat_providers.dart';
+import 'fighter_text.dart';
 
 /// The referee's mat: its groups, the recommended match and every match by status.
 /// With [readOnly] (the club) every match opens its timeline instead of the scoreboard.
@@ -143,15 +144,29 @@ class _GroupCard extends StatelessWidget {
               children: [
                 _GroupBadge(number: group.number, color: color),
                 const SizedBox(width: AppSpacing.s),
-                Text(
-                  l10n.matGroupHeader(group.number, group.categoryName),
-                  style: Theme.of(context).textTheme.titleSmall,
+                Flexible(
+                  child: Text(
+                    l10n.matGroupHeader(group.number, group.categoryName),
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: AppSpacing.s),
-            for (final m in group.members)
-              Text(m.ghost ? '${m.name} · ${l10n.ghostBadge}' : m.name),
+            for (final m in group.members) ...[
+              Text(m.label(l10n)),
+              if (m.membersLine != null)
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: AppSpacing.m,
+                    bottom: AppSpacing.xs,
+                  ),
+                  child: Text(
+                    m.membersLine!,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ),
+            ],
           ],
         ),
       ),
@@ -176,8 +191,6 @@ class _MatchTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
-    String name(Fighter f) =>
-        f.ghost ? '${f.name} (${l10n.ghostBadge})' : f.name;
     final finished = match.status == MatchStatus.finished;
     final waiting = match.status == MatchStatus.pending && !match.available;
     return Card(
@@ -192,7 +205,9 @@ class _MatchTile extends StatelessWidget {
           number: match.groupNumber,
           color: groupColor(board.groupIndex(match.groupId)),
         ),
-        title: Text('${name(match.red)}  ${l10n.versus}  ${name(match.blue)}'),
+        title: Text(
+          '${match.red.label(l10n)}  ${l10n.versus}  ${match.blue.label(l10n)}',
+        ),
         subtitle: waiting ? Text(l10n.matWaiting) : null,
         trailing: finished
             ? Text(

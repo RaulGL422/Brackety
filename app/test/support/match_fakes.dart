@@ -23,6 +23,21 @@ Corner corner(String name, {int points = 0, bool oneHandRule = false}) =>
       disqualified: false,
     );
 
+/// A team corner: [number] is "Team N", with three members.
+Corner teamCorner(int number, List<String> members, {bool ghost = false}) =>
+    Corner(
+      participantId: null,
+      name: members.join(', '),
+      ghost: ghost,
+      oneHandRule: false,
+      points: 0,
+      warnings: 0,
+      oneHandWarnings: 0,
+      disqualified: false,
+      teamNumber: number,
+      members: members,
+    );
+
 MatchView matchView({
   MatchStatus status = MatchStatus.pending,
   bool running = false,
@@ -30,6 +45,8 @@ MatchView matchView({
   EndReason? endReason,
   int redPoints = 0,
   bool canUndo = false,
+  Corner? red,
+  Corner? blue,
 }) => MatchView(
   id: 'm1',
   matId: 'mat1',
@@ -41,8 +58,8 @@ MatchView matchView({
   remaining: remaining,
   running: running,
   endReason: endReason,
-  red: corner('Ana Prueba', points: redPoints, oneHandRule: true),
-  blue: corner('Bea Prueba'),
+  red: red ?? corner('Ana Prueba', points: redPoints, oneHandRule: true),
+  blue: blue ?? corner('Bea Prueba'),
   timeline: [
     if (canUndo)
       TimelineEntry(
