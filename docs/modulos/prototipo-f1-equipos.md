@@ -59,7 +59,7 @@ A partir de cierta edad, la categoría compite **por equipos de 3** en lugar de 
 - Código: `grouping/Team*`, `CategoryRoster` (quién está libre o agrupado), `CompetitorDirectory` (alumno o equipo → nombre y alumnos; lo usan tablero, recomendado, marcador y clasificación).
 
 ## Pantallas
-- Ayudante, categoría por equipos: dos pestañas **Alumnos** (crear equipo) y **Equipos** (crear grupo, casilla de equipo fantasma); botón "Grupo individual".
+- Ayudante, categoría por equipos (`grouping/ui/team_category_screen.dart`, ruta `…/categories/{cat}/teams?name=&size=`): pestañas **Alumnos** (elegir 3 libres → crear equipo) y **Equipos** (deshacer equipo sin grupo; elegir 4, o 3 + casilla de equipo fantasma que abre una hoja con los alumnos de la categoría salvo los del propio grupo); botón "Grupo individual" abre la pantalla de siempre, donde quien tiene equipo solo puede ser fantasma. Mismo borrador (`GroupDraft`) y multigrupo que en individual.
 - Árbitro: tarjetas de grupo y marcador con "Equipo N" grande y miembros debajo.
 - Club: configuración de categorías editable; puntuaciones con columna de equipo; tapices en solo lectura con equipos.
 
@@ -76,4 +76,4 @@ A partir de cierta edad, la categoría compite **por equipos de 3** en lugar de 
 El paso 7 (Pi) puede ir antes o después de estos; si la Fase 1 llega antes, se despliega sin equipos.
 
 ## Estado
-Diseñado 2026-10-31. Paso 8 (back) hecho 2026-11-02: `TeamControllerTest`; escenario `yoseikan-f1` con 15 alumnos de 15-16. Siguiente: paso 9.
+Diseñado 2026-10-31. Paso 8 (back) hecho 2026-11-02 (PR #26): `TeamControllerTest`; escenario `yoseikan-f1` con 15 alumnos de 15-16. Paso 9 (front ayudante) hecho 2026-11-02: tests de borrador y widget en 3 tamaños; probado contra la API local (Chrome no disponible). Siguiente: paso 10.
