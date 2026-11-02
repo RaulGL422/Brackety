@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/fakes.dart';
+import '../../support/grouping_fakes.dart';
 
 void main() {
   const sizes = {
@@ -138,33 +139,4 @@ void main() {
     expect(group.members, ['p0', 'p1', 'p2']);
     expect(group.ghost, 'grouped');
   });
-}
-
-class FakeGroupingRepository implements GroupingRepository {
-  FakeGroupingRepository(this.list);
-
-  final List<CategoryParticipant> list;
-  final created = <List<DraftGroup>>[];
-
-  @override
-  Future<List<CategoryParticipant>> participants(
-    String eventId,
-    String categoryId,
-  ) async => list;
-
-  @override
-  Future<List<CategorySummary>> categories(String eventId) async => [];
-
-  @override
-  Future<CreatedGroups> create(
-    String eventId,
-    String categoryId,
-    List<DraftGroup> groups,
-  ) async {
-    created.add(groups);
-    return CreatedGroups(
-      matNumber: 2,
-      groupNumbers: [for (var i = 0; i < groups.length; i++) i + 1],
-    );
-  }
 }

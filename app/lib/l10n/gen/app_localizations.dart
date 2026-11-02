@@ -1261,6 +1261,125 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Sin empezar'**
   String get matchNotStarted;
+
+  /// No description provided for @teamName.
+  ///
+  /// In es, this message translates to:
+  /// **'Equipo {number}'**
+  String teamName(int number);
+
+  /// No description provided for @teamGhostName.
+  ///
+  /// In es, this message translates to:
+  /// **'Equipo {number} (fantasma)'**
+  String teamGhostName(int number);
+
+  /// No description provided for @tabParticipants.
+  ///
+  /// In es, this message translates to:
+  /// **'Alumnos'**
+  String get tabParticipants;
+
+  /// No description provided for @tabTeams.
+  ///
+  /// In es, this message translates to:
+  /// **'Equipos'**
+  String get tabTeams;
+
+  /// No description provided for @individualGroup.
+  ///
+  /// In es, this message translates to:
+  /// **'Grupo individual'**
+  String get individualGroup;
+
+  /// No description provided for @individualGroupHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Para quien se quede sin equipo: grupos de 4 alumnos.'**
+  String get individualGroupHint;
+
+  /// No description provided for @categoryTeamCounts.
+  ///
+  /// In es, this message translates to:
+  /// **'{participants} inscritos · {inTeams} en {teams} equipos · {grouped} en grupos'**
+  String categoryTeamCounts(
+    int participants,
+    int inTeams,
+    int teams,
+    int grouped,
+  );
+
+  /// No description provided for @newTeamCount.
+  ///
+  /// In es, this message translates to:
+  /// **'Equipo nuevo · {count}/{size}'**
+  String newTeamCount(int count, int size);
+
+  /// No description provided for @createTeam.
+  ///
+  /// In es, this message translates to:
+  /// **'Crear equipo'**
+  String get createTeam;
+
+  /// No description provided for @teamCreated.
+  ///
+  /// In es, this message translates to:
+  /// **'Creado el {team}'**
+  String teamCreated(String team);
+
+  /// No description provided for @teamConflict.
+  ///
+  /// In es, this message translates to:
+  /// **'Algún alumno ya está en un equipo o grupo. La lista se ha actualizado.'**
+  String get teamConflict;
+
+  /// No description provided for @teamError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se ha podido crear el equipo.'**
+  String get teamError;
+
+  /// No description provided for @teamsEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no hay equipos: créalos en Alumnos.'**
+  String get teamsEmpty;
+
+  /// No description provided for @deleteTeam.
+  ///
+  /// In es, this message translates to:
+  /// **'Deshacer equipo'**
+  String get deleteTeam;
+
+  /// No description provided for @deleteTeamConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Deshacer el {team}? Sus alumnos quedan libres.'**
+  String deleteTeamConfirm(String team);
+
+  /// No description provided for @deleteTeamError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se ha podido deshacer el equipo.'**
+  String get deleteTeamError;
+
+  /// No description provided for @draftGhostTeam.
+  ///
+  /// In es, this message translates to:
+  /// **'Equipo fantasma'**
+  String get draftGhostTeam;
+
+  /// No description provided for @draftGhostTeamHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Elige {size} alumnos cualesquiera de la categoría: combaten pero no puntúan.'**
+  String draftGhostTeamHint(int size);
+
+  /// No description provided for @pickGhostTeam.
+  ///
+  /// In es, this message translates to:
+  /// **'Elegir alumnos · {count}/{size}'**
+  String pickGhostTeam(int count, int size);
 }
 
 class _AppLocalizationsDelegate

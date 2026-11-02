@@ -13,6 +13,7 @@ class DraftPanel extends StatelessWidget {
     required this.busy,
     required this.onChanged,
     required this.onCreate,
+    this.onPickGhostTeam,
   });
 
   final GroupDraft draft;
@@ -21,6 +22,9 @@ class DraftPanel extends StatelessWidget {
   /// Applies a change to the draft as it is when the tap lands, not as it was when built.
   final void Function(GroupDraft Function(GroupDraft draft) change) onChanged;
   final VoidCallback onCreate;
+
+  /// Opens the ghost team picker; only for groups of teams.
+  final VoidCallback? onPickGhostTeam;
 
   @override
   Widget build(BuildContext context) {
@@ -66,13 +70,35 @@ class DraftPanel extends StatelessWidget {
               CheckboxListTile(
                 contentPadding: EdgeInsets.zero,
                 value: group.ghostMode,
-                title: Text(l10n.draftGhost),
+                title: Text(
+                  group.ofTeams ? l10n.draftGhostTeam : l10n.draftGhost,
+                ),
                 subtitle: group.choosingGhost
                     ? Text(l10n.draftGhostHint)
+                    : group.ofTeams && group.ghostMode
+                    ? Text(l10n.draftGhostTeamHint(draft.ghostTeamSize!))
                     : null,
                 onChanged: (on) =>
                     onChanged((d) => d.setGhostMode(on ?? false)),
               ),
+              if (group.ofTeams &&
+                  group.ghostMode &&
+                  group.members.length == DraftGroup.size - 1) ...[
+                OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(AppSizes.touchTarget),
+                  ),
+                  icon: const Icon(Icons.visibility_off_outlined),
+                  label: Text(
+                    l10n.pickGhostTeam(
+                      group.ghostTeam.length,
+                      draft.ghostTeamSize!,
+                    ),
+                  ),
+                  onPressed: onPickGhostTeam,
+                ),
+                const SizedBox(height: AppSpacing.s),
+              ],
               FilledButton(
                 style: FilledButton.styleFrom(
                   minimumSize: const Size.fromHeight(AppSizes.touchTarget),
@@ -105,7 +131,8 @@ class _GroupChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final color = groupColor(index);
-    final count = group.members.length + (group.ghost == null ? 0 : 1);
+    final count =
+        group.members.length + (group.ghostMode && group.isComplete ? 1 : 0);
     return ChoiceChip(
       selected: selected,
       onSelected: (_) => onTap(),

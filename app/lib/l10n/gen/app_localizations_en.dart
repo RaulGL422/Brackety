@@ -672,4 +672,84 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get matchNotStarted => 'Not started';
+
+  @override
+  String teamName(int number) {
+    return 'Team $number';
+  }
+
+  @override
+  String teamGhostName(int number) {
+    return 'Team $number (ghost)';
+  }
+
+  @override
+  String get tabParticipants => 'Participants';
+
+  @override
+  String get tabTeams => 'Teams';
+
+  @override
+  String get individualGroup => 'Individual group';
+
+  @override
+  String get individualGroupHint =>
+      'For those left without a team: groups of 4 participants.';
+
+  @override
+  String categoryTeamCounts(
+    int participants,
+    int inTeams,
+    int teams,
+    int grouped,
+  ) {
+    return '$participants registered · $inTeams in $teams teams · $grouped in groups';
+  }
+
+  @override
+  String newTeamCount(int count, int size) {
+    return 'New team · $count/$size';
+  }
+
+  @override
+  String get createTeam => 'Create team';
+
+  @override
+  String teamCreated(String team) {
+    return '$team created';
+  }
+
+  @override
+  String get teamConflict =>
+      'A participant is already in a team or group. The list has been refreshed.';
+
+  @override
+  String get teamError => 'The team could not be created.';
+
+  @override
+  String get teamsEmpty => 'No teams yet: make them in Participants.';
+
+  @override
+  String get deleteTeam => 'Undo team';
+
+  @override
+  String deleteTeamConfirm(String team) {
+    return 'Undo $team? Its participants become free.';
+  }
+
+  @override
+  String get deleteTeamError => 'The team could not be undone.';
+
+  @override
+  String get draftGhostTeam => 'Ghost team';
+
+  @override
+  String draftGhostTeamHint(int size) {
+    return 'Pick any $size participants of the category: they fight but do not score.';
+  }
+
+  @override
+  String pickGhostTeam(int count, int size) {
+    return 'Pick participants · $count/$size';
+  }
 }

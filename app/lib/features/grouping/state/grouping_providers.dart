@@ -18,6 +18,13 @@ final categoryParticipantsProvider = FutureProvider.autoDispose
           .participants(key.eventId, key.categoryId),
     );
 
+final categoryTeamsProvider = FutureProvider.autoDispose
+    .family<List<Team>, CategoryKey>(
+      (ref, key) => ref
+          .watch(groupingRepositoryProvider)
+          .teams(key.eventId, key.categoryId),
+    );
+
 enum ParticipantSort { name, height }
 
 /// By name as the server sends them, or shortest first (then by name) with unknown heights last.
