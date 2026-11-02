@@ -76,4 +76,4 @@ A partir de cierta edad, la categoría compite **por equipos de 3** en lugar de 
 El paso 7 (Pi) puede ir antes o después de estos; si la Fase 1 llega antes, se despliega sin equipos.
 
 ## Estado
-Diseñado 2026-10-31. Paso 8 (back) hecho 2026-11-02 (PR #26): `TeamControllerTest`; escenario `yoseikan-f1` con 15 alumnos de 15-16. Paso 9 (front ayudante) hecho 2026-11-02: tests de borrador y widget en 3 tamaños; probado contra la API local (Chrome no disponible). Siguiente: paso 10.
+Diseñado 2026-10-31. Paso 8 (back) hecho 2026-11-02 (PR #26): `TeamControllerTest`; escenario `yoseikan-f1` con 15 alumnos de 15-16. Paso 9 (front ayudante) hecho 2026-11-02: tests de borrador y widget en 3 tamaños; probado contra la API local (Chrome no disponible). Paso 10 (árbitro) hecho 2026-11-02: tests de tablero y marcador con equipos en 3 tamaños. Siguiente: paso 11.
