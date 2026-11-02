@@ -119,7 +119,13 @@ class _OrganizerList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final table = WindowSize.of(context) == WindowSize.expanded;
+    return LayoutBuilder(
+      builder: (context, constraints) =>
+          _layout(context, ref, constraints.maxWidth >= tableMinWidth),
+    );
+  }
+
+  Widget _layout(BuildContext context, WidgetRef ref, bool table) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -138,6 +144,7 @@ class _OrganizerList extends ConsumerWidget {
                 : const SizedBox(height: AppSpacing.s),
             itemBuilder: (context, i) => OrganizerTile(
               organizer: organizers[i],
+              table: table,
               onValidate: () => _validate(context, ref, organizers[i]),
             ),
           ),

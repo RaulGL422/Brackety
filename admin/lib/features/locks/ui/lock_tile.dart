@@ -17,17 +17,19 @@ List<String> lockColumnLabels(AppLocalizations l10n) => [
   '',
 ];
 
-/// A table row on wide windows, a card on phones and tablets.
+/// A table row when [table], else a card.
 class LockTile extends StatelessWidget {
   const LockTile({
     super.key,
     required this.lock,
     required this.now,
+    required this.table,
     required this.onRevoke,
   });
 
   final Lock lock;
   final DateTime now;
+  final bool table;
   final VoidCallback onRevoke;
 
   @override
@@ -40,13 +42,13 @@ class LockTile extends StatelessWidget {
     );
     final timeLeft = lockTimeLeft(l10n, lock, now);
 
-    if (WindowSize.of(context) == WindowSize.expanded) {
+    if (table) {
       return TableLine(
         flexes: lockColumns,
         cells: [
-          SelectableText(lock.lockId),
+          OneLineText(lock.lockId),
           typeChip,
-          Text(lockTarget(l10n, lock)),
+          OneLineText(lockTarget(l10n, lock)),
           Text(timeLeft),
           revoke,
         ],

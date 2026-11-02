@@ -77,7 +77,18 @@ class _LockList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final now = ref.watch(clockProvider)();
-    final table = WindowSize.of(context) == WindowSize.expanded;
+    return LayoutBuilder(
+      builder: (context, constraints) =>
+          _layout(context, ref, now, constraints.maxWidth >= tableMinWidth),
+    );
+  }
+
+  Widget _layout(
+    BuildContext context,
+    WidgetRef ref,
+    DateTime now,
+    bool table,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -97,6 +108,7 @@ class _LockList extends ConsumerWidget {
             itemBuilder: (context, i) => LockTile(
               lock: locks[i],
               now: now,
+              table: table,
               onRevoke: () => _revoke(context, ref, locks[i]),
             ),
           ),
