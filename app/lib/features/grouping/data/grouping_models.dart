@@ -5,7 +5,6 @@ class CategorySummary {
     required this.participants,
     required this.grouped,
     this.teamSize,
-    this.inTeams = 0,
     this.teams = 0,
   });
 
@@ -16,7 +15,6 @@ class CategorySummary {
         participants: json['participants'] as int,
         grouped: json['grouped'] as int,
         teamSize: json['format'] == 'TEAM' ? json['teamSize'] as int : null,
-        inTeams: json['inTeams'] as int? ?? 0,
         teams: json['teams'] as int? ?? 0,
       );
 
@@ -29,7 +27,6 @@ class CategorySummary {
 
   /// Null in an individual category.
   final int? teamSize;
-  final int inTeams;
   final int teams;
 
   bool get isTeam => teamSize != null;

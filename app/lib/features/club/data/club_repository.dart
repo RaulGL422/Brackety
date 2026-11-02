@@ -44,6 +44,23 @@ class ClubRepository {
     return EventSettings.fromJson(response.data!);
   }
 
+  /// The event's whole category list: those left out are removed.
+  Future<List<EventCategory>> saveCategories(
+    String eventId,
+    List<EventCategory> categories,
+  ) async {
+    final response = await _dio.put<List<dynamic>>(
+      '/api/v1/events/$eventId/categories',
+      data: {
+        'categories': [for (final c in categories) c.toJson()],
+      },
+    );
+    return [
+      for (final c in response.data!)
+        EventCategory.fromJson(c as Map<String, dynamic>),
+    ];
+  }
+
   Future<List<Participant>> participants(String eventId) async {
     final response = await _dio.get<List<dynamic>>(
       '/api/v1/events/$eventId/participants',

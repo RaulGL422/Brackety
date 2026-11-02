@@ -19,15 +19,28 @@ class FakeClubRepository extends Fake implements ClubRepository {
   EventSettings current;
   int? refuseWith;
   final savedMaxGroups = <int>[];
+  final savedCategories = <List<EventCategory>>[];
 
   @override
-  Future<EventSettings> saveSettings(
-    String eventId, {
-    required String name,
-    required DateTime date,
-    required int maxGroupsPerMat,
-    required List<String?> matReferees,
-  }) async {
+  Future<List<EventCategory>> saveCategories(
+    String eventId,
+    List<EventCategory> categories,
+  ) async {
+    _refuse();
+    savedCategories.add(categories);
+    return [
+      for (final (i, c) in categories.indexed)
+        EventCategory(
+          id: c.id ?? 'new$i',
+          name: c.name,
+          minAge: c.minAge,
+          maxAge: c.maxAge,
+          teamSize: c.teamSize,
+        ),
+    ];
+  }
+
+  void _refuse() {
     if (refuseWith != null) {
       throw DioException(
         requestOptions: RequestOptions(),
@@ -37,6 +50,17 @@ class FakeClubRepository extends Fake implements ClubRepository {
         ),
       );
     }
+  }
+
+  @override
+  Future<EventSettings> saveSettings(
+    String eventId, {
+    required String name,
+    required DateTime date,
+    required int maxGroupsPerMat,
+    required List<String?> matReferees,
+  }) async {
+    _refuse();
     savedMaxGroups.add(maxGroupsPerMat);
     return current = EventSettings(
       name: name,
@@ -73,6 +97,13 @@ void main() {
     categories: const [
       EventCategory(id: 'c1', name: '4-7', minAge: 4, maxAge: 7),
       EventCategory(id: 'c2', name: '8-11', minAge: 8, maxAge: 11),
+      EventCategory(
+        id: 'c3',
+        name: '15-16',
+        minAge: 15,
+        maxAge: 16,
+        teamSize: 3,
+      ),
     ],
   );
 
@@ -111,6 +142,7 @@ void main() {
     WidgetTester tester,
     Size size, {
     ClubRepository? repository,
+    List<StandingRow>? scores,
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
@@ -122,7 +154,7 @@ void main() {
             clubRepositoryProvider.overrideWithValue(repository),
           myEventsProvider.overrideWith((ref) async => [event]),
           eventSettingsProvider.overrideWith((ref, _) async => settings),
-          standingsProvider.overrideWith((ref, _) async => standings),
+          standingsProvider.overrideWith((ref, _) async => scores ?? standings),
           participantsProvider.overrideWith((ref, _) async => [minor]),
           matsOverviewProvider.overrideWith(
             (ref, _) async => [
@@ -252,6 +284,108 @@ void main() {
       find.byType(SegmentedButton<int>),
     );
     expect(segments.selected, {1});
+  });
+
+  Future<void> openCategories(WidgetTester tester) async {
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Add category'),
+      200,
+      scrollable: find.byType(Scrollable).last,
+    );
+    await tester.pumpAndSettle();
+  }
+
+  for (final MapEntry(key: device, value: size) in sizes.entries) {
+    testWidgets('the club adds a team category on $device', (tester) async {
+      final repository = FakeClubRepository(settings);
+      await pumpPanel(tester, size, repository: repository);
+      await openCategories(tester);
+
+      expect(find.text('Teams of 3 · Groups of 4'), findsOneWidget);
+      expect(find.text('Individual · Groups of 4'), findsNWidgets(2));
+      await tester.tap(find.text('Add category'));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Name'),
+        '17-19',
+      );
+      await tester.enterText(find.widgetWithText(TextFormField, 'From'), '17');
+      await tester.enterText(find.widgetWithText(TextFormField, 'To'), '19');
+      await tester.tap(find.text('By teams'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
+
+      final saved = repository.savedCategories.single;
+      expect(saved, hasLength(4));
+      expect(saved.last.name, '17-19');
+      expect(saved.last.teamSize, 3);
+      expect(find.text('Saved'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets('a category with ages the wrong way round is not saved', (
+    tester,
+  ) async {
+    final repository = FakeClubRepository(settings);
+    await pumpPanel(tester, const Size(800, 1280), repository: repository);
+    await openCategories(tester);
+    await tester.tap(find.text('Add category'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.widgetWithText(TextFormField, 'Name'), 'X');
+    await tester.enterText(find.widgetWithText(TextFormField, 'From'), '12');
+    await tester.enterText(find.widgetWithText(TextFormField, 'To'), '10');
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('The minimum age cannot be above the maximum.'),
+      findsOneWidget,
+    );
+    expect(repository.savedCategories, isEmpty);
+  });
+
+  testWidgets('removing a category in use explains why', (tester) async {
+    final repository = FakeClubRepository(settings)..refuseWith = 409;
+    await pumpPanel(tester, const Size(800, 1280), repository: repository);
+    await openCategories(tester);
+
+    await tester.tap(find.byTooltip('Remove category').last);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('A category with groups or teams can only change its name.'),
+      findsOneWidget,
+    );
+    expect(find.text('Teams of 3 · Groups of 4'), findsOneWidget);
+  });
+
+  testWidgets('a team member shows their team in the scores', (tester) async {
+    await pumpPanel(
+      tester,
+      const Size(800, 1280),
+      scores: [
+        StandingRow(
+          position: 4,
+          participantId: 'teen',
+          firstName: 'Teo',
+          lastName: 'Test',
+          age: 15,
+          categoryId: 'c3',
+          categoryName: '15-16',
+          attendancePoints: 10,
+          matchPoints: 0,
+          total: 10,
+          matches: 3,
+          teamNumber: 2,
+        ),
+      ],
+    );
+
+    expect(find.textContaining('Team 2 · 15 years · 15-16'), findsOneWidget);
   });
 
   test('age counts whole years up to the day before the birthday', () {
