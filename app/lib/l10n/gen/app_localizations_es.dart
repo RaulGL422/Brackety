@@ -775,6 +775,189 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get settingsTitle => 'Ajustes de la cuenta';
+
+  @override
+  String get settingsAccount => 'Cuenta';
+
+  @override
+  String get settingsEmailVerified => 'Verificado';
+
+  @override
+  String get settingsEmailUnverified => 'Sin verificar';
+
+  @override
+  String get settingsChangeEmail => 'Cambiar email';
+
+  @override
+  String get changeEmailNew => 'Email nuevo';
+
+  @override
+  String get changeEmailSubmit => 'Enviar enlace';
+
+  @override
+  String changeEmailSent(String email) {
+    return 'Hemos enviado un email a $email. Abre su enlace para terminar el cambio (caduca en 24 horas).';
+  }
+
+  @override
+  String get settingsLanguage => 'Idioma';
+
+  @override
+  String get settingsLanguageHint =>
+      'También es el de los emails que te enviamos.';
+
+  @override
+  String get languageSpanish => 'Español';
+
+  @override
+  String get languageEnglish => 'English';
+
+  @override
+  String get settingsLanguageError => 'No se ha podido cambiar el idioma.';
+
+  @override
+  String get settingsProfiles => 'Perfiles';
+
+  @override
+  String get profileValidated => 'Validado';
+
+  @override
+  String get profilePendingValidation => 'Pendiente de validación';
+
+  @override
+  String profileTaxId(String taxId) {
+    return 'CIF: $taxId';
+  }
+
+  @override
+  String get profileAdd => 'Añadir perfil';
+
+  @override
+  String get profileAdded => 'Perfil añadido.';
+
+  @override
+  String get profileRemove => 'Quitar perfil';
+
+  @override
+  String profileRemoveConfirm(String profile) {
+    return '¿Quitar el perfil $profile?';
+  }
+
+  @override
+  String get profileRemoved => 'Perfil quitado.';
+
+  @override
+  String get removeAction => 'Quitar';
+
+  @override
+  String get profileLast => 'Tu cuenta necesita al menos un perfil.';
+
+  @override
+  String get profileCombination =>
+      'Ese perfil no se puede combinar con los que ya tienes.';
+
+  @override
+  String get profileNeedsVerifiedEmail =>
+      'Verifica tu email antes de añadir perfiles.';
+
+  @override
+  String get settingsSignInMethods => 'Métodos de acceso';
+
+  @override
+  String get signInPassword => 'Email y contraseña';
+
+  @override
+  String get signInGoogle => 'Google';
+
+  @override
+  String get googleUnlink => 'Desvincular';
+
+  @override
+  String get googleUnlinkConfirm =>
+      '¿Desvincular tu cuenta de Google? Solo podrás entrar con email y contraseña.';
+
+  @override
+  String get googleUnlinked => 'Google desvinculado.';
+
+  @override
+  String get passwordRemove => 'Quitar contraseña';
+
+  @override
+  String get passwordRemoveConfirm =>
+      'Solo podrás entrar con Google y se cerrarán todas tus sesiones, también esta. Para volver a tener contraseña, usa «¿Has olvidado la contraseña?».';
+
+  @override
+  String get lastSignInMethod =>
+      'Es tu único método de acceso. Añade otro antes.';
+
+  @override
+  String get needsGoogle =>
+      'Esta acción pide confirmar con Google, que llegará pronto a la app.';
+
+  @override
+  String get settingsData => 'Tus datos';
+
+  @override
+  String get settingsDataHint =>
+      'Descarga una copia de los datos de tu cuenta (JSON).';
+
+  @override
+  String get settingsExport => 'Exportar mis datos';
+
+  @override
+  String get settingsDanger => 'Zona peligrosa';
+
+  @override
+  String get deleteAccount => 'Borrar cuenta';
+
+  @override
+  String get deleteAccountHint =>
+      'Se borra definitivamente a los 30 días. Hasta entonces puedes recuperarla iniciando sesión.';
+
+  @override
+  String get deleteAccountTitle => '¿Borrar tu cuenta?';
+
+  @override
+  String get deleteAccountBody =>
+      'Se cerrarán todas tus sesiones. La cuenta, con sus perfiles y datos, se borrará definitivamente a los 30 días. Hasta entonces puedes recuperarla iniciando sesión.';
+
+  @override
+  String get deleteOwnsEvents =>
+      'Eres responsable de eventos. Cédelos a otra persona o bórralos antes de borrar tu cuenta.';
+
+  @override
+  String loginAccountDeleted(String date) {
+    return 'Tu cuenta se borrará el $date. Inicia sesión antes para recuperarla.';
+  }
+
+  @override
+  String get loginPasswordRemoved =>
+      'Contraseña quitada y sesiones cerradas. Ya solo puedes entrar con Google.';
+
+  @override
+  String get reauthTitle => 'Confirma que eres tú';
+
+  @override
+  String get reauthBody => 'Escribe tu contraseña para continuar.';
+
+  @override
+  String get reauthSubmit => 'Confirmar';
+
+  @override
+  String get reauthFailed => 'Contraseña incorrecta.';
+
+  @override
+  String get settingsLogout => 'Cerrar sesión';
+
+  @override
+  String get confirmEmailChangeTitle => 'Cambio de email';
+
+  @override
+  String get confirmEmailChangeDone =>
+      'Email cambiado. Se han cerrado todas las sesiones: inicia sesión con el email nuevo.';
+
+  @override
   String get categoryIndividual => 'Individual';
 
   @override

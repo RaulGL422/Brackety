@@ -5,10 +5,12 @@ import 'package:go_router/go_router.dart';
 
 import '../features/auth/state/session_controller.dart';
 import '../features/auth/ui/check_email_screen.dart';
+import '../features/auth/ui/confirm_email_change_screen.dart';
 import '../features/auth/ui/forgot_password_screen.dart';
 import '../features/auth/ui/login_screen.dart';
 import '../features/auth/ui/register_screen.dart';
 import '../features/auth/ui/reset_password_screen.dart';
+import '../features/auth/ui/settings_screen.dart';
 import '../features/auth/ui/verify_email_screen.dart';
 import '../features/club/ui/club_panel_screen.dart';
 import '../features/events/ui/events_screen.dart';
@@ -26,6 +28,7 @@ const _anySession = {
   '/verify-email',
   '/reset-password',
   '/forgot-password',
+  '/confirm-email-change',
 };
 const _signedOutOnly = {'/login', '/register', '/register/sent'};
 
@@ -88,6 +91,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, state) =>
             ResetPasswordScreen(token: state.uri.queryParameters['token']),
       ),
+      GoRoute(
+        path: '/confirm-email-change',
+        builder: (_, state) =>
+            ConfirmEmailChangeScreen(token: state.uri.queryParameters['token']),
+      ),
+      GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
       GoRoute(
         path: '/connection',
         builder: (context, _) => Scaffold(
