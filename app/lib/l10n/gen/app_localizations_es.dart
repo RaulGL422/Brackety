@@ -180,6 +180,30 @@ class AppLocalizationsEs extends AppLocalizations {
   String get registerAcceptRequired => 'Debes aceptarlos para crear la cuenta.';
 
   @override
+  String get registerOrganizationName => 'Nombre de la organización';
+
+  @override
+  String get registerOrganizationNameLength => 'Entre 2 y 200 caracteres.';
+
+  @override
+  String get registerTaxId => 'CIF';
+
+  @override
+  String get registerTaxIdHelper =>
+      'La plataforma lo usa para verificar la organización antes de que pueda publicar eventos.';
+
+  @override
+  String get registerTaxIdInvalid => 'CIF no válido.';
+
+  @override
+  String get registerRepresentative =>
+      'Soy mayor de edad y represento a esta organización.';
+
+  @override
+  String get registerRepresentativeRequired =>
+      'Debes confirmarlo para registrar la organización.';
+
+  @override
   String get registerHaveAccount => '¿Ya tienes cuenta? Entra';
 
   @override

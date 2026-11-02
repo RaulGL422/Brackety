@@ -11,17 +11,27 @@ class ProfileSelector extends FormField<ProfileType> {
     super.key,
     required List<ProfileType> profiles,
     super.validator,
-    super.onSaved,
+    super.initialValue,
+    ValueChanged<ProfileType>? onChanged,
   }) : super(
-         builder: (field) => _ProfileOptions(field: field, profiles: profiles),
+         builder: (field) => _ProfileOptions(
+           field: field,
+           profiles: profiles,
+           onChanged: onChanged,
+         ),
        );
 }
 
 class _ProfileOptions extends StatelessWidget {
-  const _ProfileOptions({required this.field, required this.profiles});
+  const _ProfileOptions({
+    required this.field,
+    required this.profiles,
+    this.onChanged,
+  });
 
   final FormFieldState<ProfileType> field;
   final List<ProfileType> profiles;
+  final ValueChanged<ProfileType>? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +45,10 @@ class _ProfileOptions extends StatelessWidget {
         const SizedBox(height: AppSpacing.xs),
         RadioGroup<ProfileType>(
           groupValue: field.value,
-          onChanged: field.didChange,
+          onChanged: (profile) {
+            field.didChange(profile);
+            if (profile != null) onChanged?.call(profile);
+          },
           child: Column(
             children: [
               for (final profile in profiles)

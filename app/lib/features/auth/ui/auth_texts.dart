@@ -1,6 +1,7 @@
 import '../../../l10n/gen/app_localizations.dart';
 import '../data/api_error.dart';
 import '../data/registration.dart';
+import '../data/tax_id.dart';
 
 /// The message for the failures every auth screen can get; screens handle their own cases first.
 String apiErrorMessage(AppLocalizations l10n, ApiError error) {
@@ -27,6 +28,22 @@ String? validateNewPassword(AppLocalizations l10n, String? value) {
   if (length < passwordMinLength) return l10n.passwordTooShort;
   if (length > passwordMaxLength) return l10n.passwordTooLong;
   return null;
+}
+
+String? validateOrganizationName(AppLocalizations l10n, String? value) {
+  final length = value?.trim().length ?? 0;
+  if (length == 0) return l10n.fieldRequired;
+  if (length < organizationNameMinLength ||
+      length > organizationNameMaxLength) {
+    return l10n.registerOrganizationNameLength;
+  }
+  return null;
+}
+
+String? validateTaxId(AppLocalizations l10n, String? value) {
+  final taxId = normalizeTaxId(value ?? '');
+  if (taxId.isEmpty) return l10n.fieldRequired;
+  return isValidCif(taxId) ? null : l10n.registerTaxIdInvalid;
 }
 
 String profileName(AppLocalizations l10n, ProfileType profile) =>

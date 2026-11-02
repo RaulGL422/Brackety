@@ -7,7 +7,16 @@ const minimumRegistrationAge = 14;
 const passwordMinLength = 10;
 const passwordMaxLength = 128;
 
+const organizationNameMinLength = 2;
+const organizationNameMaxLength = 200;
+
 enum ProfileType { club, externalEntity, helper, external, student }
+
+extension ProfileTypeOrganizer on ProfileType {
+  /// Organizers sign up for an organization: no birth date, but its name, CIF and a declaration.
+  bool get isOrganizer =>
+      this == ProfileType.club || this == ProfileType.externalEntity;
+}
 
 extension on ProfileType {
   String get wireName => switch (this) {
@@ -35,30 +44,50 @@ bool isOldEnoughToRegister(DateTime birthDate, DateTime today) {
   return age >= minimumRegistrationAge;
 }
 
+class Organization {
+  const Organization({required this.name, required this.taxId});
+
+  final String name;
+  final String taxId;
+
+  Map<String, Object> toJson() => {'name': name, 'taxId': taxId};
+}
+
+/// Organizers send [organization] and [representativeDeclaration]; everyone else, [birthDate].
 class Registration {
   const Registration({
     required this.email,
     required this.password,
-    required this.birthDate,
     required this.profile,
     required this.locale,
+    this.birthDate,
+    this.organization,
+    this.representativeDeclaration = false,
   });
 
   final String email;
   final String password;
-  final DateTime birthDate;
   final ProfileType profile;
   final String locale;
+  final DateTime? birthDate;
+  final Organization? organization;
+  final bool representativeDeclaration;
 
-  Map<String, Object> toJson() => {
-    'email': email,
-    'password': password,
-    'birthDate': _isoDate(birthDate),
-    'profile': profile.wireName,
-    'acceptedTermsVersion': legalDocumentsVersion,
-    'acceptedPrivacyVersion': legalDocumentsVersion,
-    'locale': locale,
-  };
+  Map<String, Object> toJson() {
+    final birthDate = this.birthDate;
+    final organization = this.organization;
+    return {
+      'email': email,
+      'password': password,
+      'profile': profile.wireName,
+      if (birthDate != null) 'birthDate': _isoDate(birthDate),
+      if (organization != null) 'organization': organization.toJson(),
+      if (representativeDeclaration) 'representativeDeclaration': true,
+      'acceptedTermsVersion': legalDocumentsVersion,
+      'acceptedPrivacyVersion': legalDocumentsVersion,
+      'locale': locale,
+    };
+  }
 
   static String _isoDate(DateTime date) =>
       '${date.year.toString().padLeft(4, '0')}-'
