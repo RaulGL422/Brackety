@@ -2,6 +2,7 @@ import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
+import '../../mat/ui/fighter_text.dart';
 import '../data/match_view.dart';
 
 /// One fighter: big score, +1 and the warnings menu. Red and blue are fixed for this event.
@@ -39,13 +40,18 @@ class CornerPanel extends StatelessWidget {
               style: text.labelLarge?.merge(onColor),
             ),
             Text(
-              corner.ghost
-                  ? '${corner.name} · ${l10n.ghostBadge}'
-                  : corner.name,
+              corner.label(l10n),
               style: text.titleLarge?.merge(onColor),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
+            if (corner.membersLine != null)
+              Text(
+                corner.membersLine!,
+                style: text.bodySmall?.merge(onColor),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
             Expanded(
               child: FittedBox(
                 child: Text(

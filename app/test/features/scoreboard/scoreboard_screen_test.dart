@@ -90,6 +90,30 @@ void main() {
     });
   }
 
+  for (final MapEntry(key: device, value: size) in sizes.entries) {
+    testWidgets('a team match shows the team numbers and members on $device', (
+      tester,
+    ) async {
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await open(
+        tester,
+        matchView(
+          red: teamCorner(1, ['Ana P', 'Bea P', 'Carla P']),
+          blue: teamCorner(4, ['Diego P', 'Eva P', 'Fran P'], ghost: true),
+        ),
+      );
+
+      expect(find.text('Team 1'), findsOneWidget);
+      expect(find.text('Ana P, Bea P, Carla P'), findsOneWidget);
+      expect(find.text('Team 4 · Ghost'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+
+      await tester.pumpWidget(const SizedBox());
+    });
+  }
+
   testWidgets('a warning needs a confirmed reason', (tester) async {
     tester.view.physicalSize = sizes['tablet']!;
     tester.view.devicePixelRatio = 1;

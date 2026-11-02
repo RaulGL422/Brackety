@@ -6,24 +6,45 @@ MatchStatus matchStatusFromJson(String value) => switch (value) {
   _ => MatchStatus.finished,
 };
 
-class Fighter {
+/// What every screen shows of a fighter: a participant, or a team called by its number.
+abstract interface class FighterInfo {
+  String get name;
+
+  /// Set for a team ("Equipo N"); [members] are then its participants.
+  int? get teamNumber;
+  List<String> get members;
+
+  /// Fights but scores nothing.
+  bool get ghost;
+}
+
+class Fighter implements FighterInfo {
   const Fighter({
     required this.participantId,
     required this.name,
     required this.ghost,
+    this.teamNumber,
+    this.members = const [],
   });
 
   factory Fighter.fromJson(Map<String, dynamic> json) => Fighter(
-    participantId: json['participantId'] as String,
+    participantId: json['participantId'] as String?,
     name: json['name'] as String,
     ghost: json['ghost'] as bool,
+    teamNumber: json['teamNumber'] as int?,
+    members: [for (final m in json['members'] as List? ?? []) m as String],
   );
 
-  final String participantId;
+  /// Null for a team.
+  final String? participantId;
+  @override
   final String name;
-
-  /// Fights in this group but scores nothing in it.
+  @override
   final bool ghost;
+  @override
+  final int? teamNumber;
+  @override
+  final List<String> members;
 }
 
 class BoardGroup {

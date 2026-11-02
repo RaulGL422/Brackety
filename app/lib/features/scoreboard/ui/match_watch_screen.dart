@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/async_view.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../mat/data/mat_board.dart';
+import '../../mat/ui/fighter_text.dart';
 import '../data/match_view.dart';
 import '../data/scoreboard_repository.dart';
 import 'timeline_list.dart';
@@ -48,8 +49,8 @@ class MatchWatchScreen extends ConsumerWidget {
                   }, style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: AppSpacing.s),
                   Text(
-                    '${view.red.name}  ${view.red.points} - '
-                    '${view.blue.points}  ${view.blue.name}',
+                    '${view.red.title(l10n)}  ${view.red.points} - '
+                    '${view.blue.points}  ${view.blue.title(l10n)}',
                     style: Theme.of(context).textTheme.titleLarge,
                     textAlign: TextAlign.center,
                   ),

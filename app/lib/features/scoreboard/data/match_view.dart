@@ -23,7 +23,7 @@ enum MatchAction {
       values.firstWhere((a) => a.wire == value);
 }
 
-class Corner {
+class Corner implements FighterInfo {
   const Corner({
     required this.participantId,
     required this.name,
@@ -33,10 +33,12 @@ class Corner {
     required this.warnings,
     required this.oneHandWarnings,
     required this.disqualified,
+    this.teamNumber,
+    this.members = const [],
   });
 
   factory Corner.fromJson(Map<String, dynamic> json) => Corner(
-    participantId: json['participantId'] as String,
+    participantId: json['participantId'] as String?,
     name: json['name'] as String,
     ghost: json['ghost'] as bool,
     oneHandRule: json['oneHandRule'] as bool,
@@ -44,13 +46,22 @@ class Corner {
     warnings: json['warnings'] as int,
     oneHandWarnings: json['oneHandWarnings'] as int,
     disqualified: json['disqualified'] as bool,
+    teamNumber: json['teamNumber'] as int?,
+    members: [for (final m in json['members'] as List? ?? []) m as String],
   );
 
-  final String participantId;
+  /// Null for a team.
+  final String? participantId;
+  @override
   final String name;
+  @override
   final bool ghost;
+  @override
+  final int? teamNumber;
+  @override
+  final List<String> members;
 
-  /// Aged 4 to 7: the one-hand warning applies.
+  /// Aged 4 to 7 (for a team, someone in it): the one-hand warning applies.
   final bool oneHandRule;
   final int points;
   final int warnings;
