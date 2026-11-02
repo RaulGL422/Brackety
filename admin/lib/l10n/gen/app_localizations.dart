@@ -391,6 +391,408 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Pts'**
   String get dsPoints;
+
+  /// No description provided for @navLocks.
+  ///
+  /// In es, this message translates to:
+  /// **'Bloqueos'**
+  String get navLocks;
+
+  /// No description provided for @navOrganizers.
+  ///
+  /// In es, this message translates to:
+  /// **'Organizadores'**
+  String get navOrganizers;
+
+  /// No description provided for @logout.
+  ///
+  /// In es, this message translates to:
+  /// **'Cerrar sesión'**
+  String get logout;
+
+  /// No description provided for @cancel.
+  ///
+  /// In es, this message translates to:
+  /// **'Cancelar'**
+  String get cancel;
+
+  /// No description provided for @retry.
+  ///
+  /// In es, this message translates to:
+  /// **'Reintentar'**
+  String get retry;
+
+  /// No description provided for @refresh.
+  ///
+  /// In es, this message translates to:
+  /// **'Actualizar'**
+  String get refresh;
+
+  /// No description provided for @loadError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se han podido cargar los datos.'**
+  String get loadError;
+
+  /// No description provided for @noServer.
+  ///
+  /// In es, this message translates to:
+  /// **'No se puede conectar con el servidor.'**
+  String get noServer;
+
+  /// No description provided for @unexpectedError.
+  ///
+  /// In es, this message translates to:
+  /// **'Algo ha fallado. Inténtalo de nuevo.'**
+  String get unexpectedError;
+
+  /// No description provided for @adminNotConfigured.
+  ///
+  /// In es, this message translates to:
+  /// **'El acceso de superadmin no está configurado en este servidor.'**
+  String get adminNotConfigured;
+
+  /// No description provided for @adminAccessDenied.
+  ///
+  /// In es, this message translates to:
+  /// **'Acceso denegado: la administración solo funciona desde su dominio protegido (Cloudflare Access).'**
+  String get adminAccessDenied;
+
+  /// No description provided for @tooManyRequests.
+  ///
+  /// In es, this message translates to:
+  /// **'Demasiadas peticiones. Espera {seconds} s y vuelve a intentarlo.'**
+  String tooManyRequests(int seconds);
+
+  /// No description provided for @tooManyRequestsWait.
+  ///
+  /// In es, this message translates to:
+  /// **'Demasiadas peticiones. Espera un momento y vuelve a intentarlo.'**
+  String get tooManyRequestsWait;
+
+  /// No description provided for @loginTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Acceso de superadmin'**
+  String get loginTitle;
+
+  /// No description provided for @emailLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Email'**
+  String get emailLabel;
+
+  /// No description provided for @passwordLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Contraseña'**
+  String get passwordLabel;
+
+  /// No description provided for @showPassword.
+  ///
+  /// In es, this message translates to:
+  /// **'Mostrar contraseña'**
+  String get showPassword;
+
+  /// No description provided for @hidePassword.
+  ///
+  /// In es, this message translates to:
+  /// **'Ocultar contraseña'**
+  String get hidePassword;
+
+  /// No description provided for @fieldRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'Campo obligatorio'**
+  String get fieldRequired;
+
+  /// No description provided for @loginSubmit.
+  ///
+  /// In es, this message translates to:
+  /// **'Entrar'**
+  String get loginSubmit;
+
+  /// No description provided for @loginInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'Email o contraseña incorrectos.'**
+  String get loginInvalid;
+
+  /// No description provided for @loginLocked.
+  ///
+  /// In es, this message translates to:
+  /// **'Demasiados intentos fallidos: acceso bloqueado 15 minutos (bloqueo {lockId}).'**
+  String loginLocked(String lockId);
+
+  /// No description provided for @sessionExpired.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu sesión ha caducado. Vuelve a entrar.'**
+  String get sessionExpired;
+
+  /// No description provided for @locksTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Bloqueos activos'**
+  String get locksTitle;
+
+  /// No description provided for @locksEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'No hay bloqueos activos.'**
+  String get locksEmpty;
+
+  /// No description provided for @lockColumnId.
+  ///
+  /// In es, this message translates to:
+  /// **'Bloqueo'**
+  String get lockColumnId;
+
+  /// No description provided for @lockColumnType.
+  ///
+  /// In es, this message translates to:
+  /// **'Tipo'**
+  String get lockColumnType;
+
+  /// No description provided for @lockColumnWho.
+  ///
+  /// In es, this message translates to:
+  /// **'Quién'**
+  String get lockColumnWho;
+
+  /// No description provided for @lockColumnTimeLeft.
+  ///
+  /// In es, this message translates to:
+  /// **'Tiempo restante'**
+  String get lockColumnTimeLeft;
+
+  /// No description provided for @lockTypeEmail.
+  ///
+  /// In es, this message translates to:
+  /// **'Email'**
+  String get lockTypeEmail;
+
+  /// No description provided for @lockTypeIp.
+  ///
+  /// In es, this message translates to:
+  /// **'IP'**
+  String get lockTypeIp;
+
+  /// No description provided for @lockTypeAdmin.
+  ///
+  /// In es, this message translates to:
+  /// **'Superadmin'**
+  String get lockTypeAdmin;
+
+  /// No description provided for @lockUnknownEmail.
+  ///
+  /// In es, this message translates to:
+  /// **'Email sin cuenta'**
+  String get lockUnknownEmail;
+
+  /// No description provided for @lockMinutesLeft.
+  ///
+  /// In es, this message translates to:
+  /// **'{minutes, plural, =1{Queda 1 min} other{Quedan {minutes} min}}'**
+  String lockMinutesLeft(int minutes);
+
+  /// No description provided for @lockUntil.
+  ///
+  /// In es, this message translates to:
+  /// **'hasta las {time}'**
+  String lockUntil(DateTime time);
+
+  /// No description provided for @lockExpired.
+  ///
+  /// In es, this message translates to:
+  /// **'Caducado'**
+  String get lockExpired;
+
+  /// No description provided for @lockRevoke.
+  ///
+  /// In es, this message translates to:
+  /// **'Revocar'**
+  String get lockRevoke;
+
+  /// No description provided for @lockRevokeTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Revocar el bloqueo {lockId}?'**
+  String lockRevokeTitle(String lockId);
+
+  /// No description provided for @lockRevokeBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Se borran sus intentos fallidos y se podrá volver a entrar al momento.'**
+  String get lockRevokeBody;
+
+  /// No description provided for @lockRevoked.
+  ///
+  /// In es, this message translates to:
+  /// **'Bloqueo {lockId} revocado.'**
+  String lockRevoked(String lockId);
+
+  /// No description provided for @lockAlreadyExpired.
+  ///
+  /// In es, this message translates to:
+  /// **'Ese bloqueo ya había caducado. Lista actualizada.'**
+  String get lockAlreadyExpired;
+
+  /// No description provided for @organizersTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Organizadores'**
+  String get organizersTitle;
+
+  /// No description provided for @organizerFilterPending.
+  ///
+  /// In es, this message translates to:
+  /// **'Pendientes'**
+  String get organizerFilterPending;
+
+  /// No description provided for @organizerFilterValidated.
+  ///
+  /// In es, this message translates to:
+  /// **'Validados'**
+  String get organizerFilterValidated;
+
+  /// No description provided for @organizerFilterAll.
+  ///
+  /// In es, this message translates to:
+  /// **'Todos'**
+  String get organizerFilterAll;
+
+  /// No description provided for @organizersEmptyPending.
+  ///
+  /// In es, this message translates to:
+  /// **'No hay organizadores pendientes de validar.'**
+  String get organizersEmptyPending;
+
+  /// No description provided for @organizersEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'No hay organizadores.'**
+  String get organizersEmpty;
+
+  /// No description provided for @organizerColumnName.
+  ///
+  /// In es, this message translates to:
+  /// **'Organización'**
+  String get organizerColumnName;
+
+  /// No description provided for @organizerColumnTaxId.
+  ///
+  /// In es, this message translates to:
+  /// **'CIF'**
+  String get organizerColumnTaxId;
+
+  /// No description provided for @organizerColumnType.
+  ///
+  /// In es, this message translates to:
+  /// **'Tipo'**
+  String get organizerColumnType;
+
+  /// No description provided for @organizerColumnEmail.
+  ///
+  /// In es, this message translates to:
+  /// **'Email'**
+  String get organizerColumnEmail;
+
+  /// No description provided for @organizerColumnCreated.
+  ///
+  /// In es, this message translates to:
+  /// **'Alta'**
+  String get organizerColumnCreated;
+
+  /// No description provided for @organizerColumnState.
+  ///
+  /// In es, this message translates to:
+  /// **'Estado'**
+  String get organizerColumnState;
+
+  /// No description provided for @organizerNoData.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin datos'**
+  String get organizerNoData;
+
+  /// No description provided for @organizerNoTaxId.
+  ///
+  /// In es, this message translates to:
+  /// **'—'**
+  String get organizerNoTaxId;
+
+  /// No description provided for @organizerTaxId.
+  ///
+  /// In es, this message translates to:
+  /// **'CIF: {taxId}'**
+  String organizerTaxId(String taxId);
+
+  /// No description provided for @organizerDate.
+  ///
+  /// In es, this message translates to:
+  /// **'{date}'**
+  String organizerDate(DateTime date);
+
+  /// No description provided for @organizerCreated.
+  ///
+  /// In es, this message translates to:
+  /// **'Alta: {date}'**
+  String organizerCreated(DateTime date);
+
+  /// No description provided for @organizerClub.
+  ///
+  /// In es, this message translates to:
+  /// **'Club'**
+  String get organizerClub;
+
+  /// No description provided for @organizerExternalEntity.
+  ///
+  /// In es, this message translates to:
+  /// **'Entidad externa'**
+  String get organizerExternalEntity;
+
+  /// No description provided for @organizerPending.
+  ///
+  /// In es, this message translates to:
+  /// **'Pendiente'**
+  String get organizerPending;
+
+  /// No description provided for @organizerValidated.
+  ///
+  /// In es, this message translates to:
+  /// **'Validado'**
+  String get organizerValidated;
+
+  /// No description provided for @organizerValidate.
+  ///
+  /// In es, this message translates to:
+  /// **'Validar'**
+  String get organizerValidate;
+
+  /// No description provided for @organizerValidateTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Validar {name}?'**
+  String organizerValidateTitle(String name);
+
+  /// No description provided for @organizerValidateBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Podrá publicar eventos. Si es la primera vez que se valida, recibirá un email avisándole.'**
+  String get organizerValidateBody;
+
+  /// No description provided for @organizerValidatedDone.
+  ///
+  /// In es, this message translates to:
+  /// **'{name} validado.'**
+  String organizerValidatedDone(String name);
+
+  /// No description provided for @organizerNotFound.
+  ///
+  /// In es, this message translates to:
+  /// **'Ese organizador ya no existe o ya no es organizador. Lista actualizada.'**
+  String get organizerNotFound;
 }
 
 class _AppLocalizationsDelegate

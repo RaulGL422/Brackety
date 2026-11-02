@@ -97,7 +97,8 @@ Todos bajo `/api/v1`: `POST /auth/register`, `/auth/login`, `/auth/google`, `/au
 - `GET /admin/organizers?validated=true|false` (sin filtro: todos) → `[{accountId, email, profileType, organizationName, taxId, validated, createdAt}]` (`createdAt` del perfil); `POST /admin/organizers/{accountId}/validate` → 204.
 
 ## Pantallas
-Inicio de sesión, registro con selector de perfil, verificación pendiente, recuperar contraseña, ajustes de cuenta (identidades, perfiles, email, idioma, exportar/borrar). Admin: login de superadmin, bloqueos activos con revocación.
+Inicio de sesión, registro con selector de perfil, verificación pendiente, recuperar contraseña, ajustes de cuenta (identidades, perfiles, email, idioma, exportar/borrar). Admin: login de superadmin, bloqueos activos con revocación, organizadores con validación.
+- Admin (`admin/lib/features/auth|locks|organizers/`): token solo en memoria (recargar = entrar otra vez); cualquier 401 → login con "sesión caducada". Sin sesión solo abren Conexión y Diseño (debug). Bloqueos: tipo, quién, tiempo restante, revocar con confirmación. Organizadores: filtro Pendientes/Validados/Todos, nombre y CIF ("Sin datos" si faltan), validar con confirmación. Tabla en escritorio, tarjetas en móvil y tablet.
 - Código en `app/lib/features/auth/`. Verificación pendiente: aviso no bloqueante encima de toda la app (con reenvío).
 - Enlaces de email (`/verify-email`, `/reset-password`, `/forgot-password`, `/confirm-email-change`) abren en cualquier estado de sesión; web con URLs sin `#`.
 - Ajustes (`/settings`, icono de cuenta en Mis eventos): cuenta, idioma, perfiles, métodos de acceso, exportar (Android: compartir; web: descarga), borrar y cerrar sesión. Acciones delicadas: diálogo de contraseña, token de reauth en memoria hasta caducar. Sin Google hasta tener los client IDs.
@@ -110,7 +111,7 @@ Inicio de sesión, registro con selector de perfil, verificación pendiente, rec
 Login por cada método, refresh/reutilización, límites de tasa, bloqueo con ventana y umbrales, revocación desde admin, sin enumeración, verificación y purga a 7 días, cuenta sin verificar sustituida por Google, vinculación y desvinculación, borrado y anonimizado.
 
 ## Estado
-En curso. Tareas (una rama cada una, en este orden):
+Tareas 1-9 hechas; en pruebas: falta la prueba manual del módulo completo de Raul. Tareas (una rama cada una, en este orden):
 1. `feat/auth-register-login` · migración, registro con perfil y consentimiento, login email, JWT + refresh rotatorio, cookie web, logout, bloqueo con ventana e id, limitador general.
 2. `feat/auth-email` · verificación, recuperación, purga y recordatorio, avisos de seguridad incluido bloqueo (Resend).
 3. `feat/auth-google` · login Google, sustitución de cuenta sin verificar, vincular y desvincular.
@@ -119,4 +120,4 @@ En curso. Tareas (una rama cada una, en este orden):
 6. `feat/auth-screens-login` · app: login, registro, verificación pendiente, recuperar; cliente HTTP con refresh (uno a la vez) y 429 con `lockId`. Hecha (2026-10-31).
 7. `feat/auth-organizer-signup` · registro de Club y Entidad Externa sin fecha de nacimiento: casilla "soy mayor de edad y represento a la organización", nombre y CIF obligatorios (formato y dígito de control, repetible entre cuentas); el superadmin los ve al validar. Hecha (2026-11-02).
 8. `feat/auth-screens-settings` · app: ajustes de cuenta. Hecha (2026-11-02).
-9. `feat/auth-admin-login` · admin: login de superadmin y pantalla de bloqueos.
+9. `feat/auth-admin-login` · admin: login de superadmin y pantalla de bloqueos y organizadores. Hecha (2026-11-02).

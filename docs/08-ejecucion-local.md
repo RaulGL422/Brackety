@@ -32,6 +32,7 @@ Cada escenario es una clase `Scenario` en `server/src/test/java/dev/rgal/bracket
 ## Superadmin local
 - Cloudflare Access simulado, como Google: la API local hace la comprobación real con una clave generada al arrancar y un filtro (`LocalAdminConfig`, solo en `server/src/test`) añade la cabecera que pondría Cloudflare si falta. La app admin funciona sin pasos extra.
 - Superadmin: `superadmin@example.test` / `brackety-demo` en `POST /api/v1/admin/auth/login`.
+- Probar la app admin: API con el escenario `superadmin` y `./run-app.ps1 -Target web -App admin`; entrar con el superadmin y ver Bloqueos y Organizadores.
 
 ## Reloj simulado
 - Toda la lógica usa el `Clock` inyectado; prohibido `LocalDate.now()` sin reloj.
