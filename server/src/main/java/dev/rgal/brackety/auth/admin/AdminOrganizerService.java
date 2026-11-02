@@ -60,6 +60,8 @@ class AdminOrganizerService {
                         active.get(p.getAccountId()).getEmail(),
                         p.getType(),
                         p.isValidated(),
+                        p.getOrganizationName(),
+                        p.getTaxId(),
                         p.getCreatedAt()))
                 .toList();
     }
@@ -86,5 +88,11 @@ class AdminOrganizerService {
 
     /** {@code createdAt} is when the account took the organizer profile. */
     record OrganizerResponse(
-            UUID accountId, String email, ProfileType profileType, boolean validated, Instant createdAt) {}
+            UUID accountId,
+            String email,
+            ProfileType profileType,
+            boolean validated,
+            String organizationName,
+            String taxId,
+            Instant createdAt) {}
 }

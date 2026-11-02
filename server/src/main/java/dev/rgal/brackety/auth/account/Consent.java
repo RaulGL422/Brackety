@@ -14,7 +14,9 @@ public class Consent {
 
     public enum Document {
         TERMS,
-        PRIVACY
+        PRIVACY,
+        // An organizer is of legal age and represents the organization; versioned as the terms it was accepted with.
+        ORGANIZER_DECLARATION
     }
 
     @Id

@@ -6,7 +6,6 @@ import dev.rgal.brackety.auth.account.AccountRepository;
 import dev.rgal.brackety.auth.account.Profile;
 import dev.rgal.brackety.auth.account.ProfileRepository;
 import dev.rgal.brackety.auth.account.ProfileType;
-import dev.rgal.brackety.auth.dto.RegisterRequest;
 import dev.rgal.brackety.devdata.DevScenario;
 import dev.rgal.brackety.devdata.Scenario;
 import dev.rgal.brackety.devdata.ScenarioContext;
@@ -53,8 +52,7 @@ class AccountSettingsScenario implements Scenario {
     }
 
     private Account verified(String email, ScenarioContext ctx) {
-        auth.register(new RegisterRequest(
-                email, PASSWORD, ctx.daysFromToday(-30 * 365), ProfileType.STUDENT, "2027-01", "2027-01", "es"));
+        auth.register(SignUps.of(email, PASSWORD, ProfileType.STUDENT, "es", ctx));
         var account = accounts.findByEmail(email).orElseThrow();
         account.markEmailVerified(ctx.now().toInstant());
         return account;

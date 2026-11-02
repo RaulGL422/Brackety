@@ -42,7 +42,7 @@ class MeService {
 
     private MeResponse response(Account account) {
         var accountProfiles = profiles.findByAccountId(account.getId()).stream()
-                .map(p -> new ProfileResponse(p.getType(), p.isValidated()))
+                .map(ProfileResponse::of)
                 .toList();
         return new MeResponse(
                 account.getEmail(),

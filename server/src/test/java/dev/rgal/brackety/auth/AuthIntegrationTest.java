@@ -2,6 +2,7 @@ package dev.rgal.brackety.auth;
 
 import com.jayway.jsonpath.JsonPath;
 import dev.rgal.brackety.auth.account.ProfileType;
+import dev.rgal.brackety.auth.dto.OrganizationRequest;
 import dev.rgal.brackety.auth.dto.RegisterRequest;
 import dev.rgal.brackety.auth.dto.RegistrationDetails;
 import dev.rgal.brackety.auth.google.FakeGoogle;
@@ -70,16 +71,43 @@ public abstract class AuthIntegrationTest {
         emails.reset();
     }
 
+    protected static final LocalDate ADULT = LocalDate.of(1990, 5, 20);
+    // Fictional; the CIF only passes the check digit.
+    protected static final OrganizationRequest ORGANIZATION = new OrganizationRequest("Club Ficticio", "G12345674");
+
+    /** A club. */
     protected static RegisterRequest registration(String email) {
-        return registration(email, LocalDate.of(1990, 5, 20));
+        return registration(email, ProfileType.CLUB, "es");
     }
 
+    /** A student born on {@code birthDate}. */
     protected static RegisterRequest registration(String email, LocalDate birthDate) {
-        return new RegisterRequest(email, PASSWORD, birthDate, ProfileType.CLUB, "2027-01", "2027-02", "es");
+        return new RegisterRequest(
+                email, PASSWORD, ProfileType.STUDENT, birthDate, null, null, "2027-01", "2027-02", "es");
     }
 
+    /** An organizer gives {@link #ORGANIZATION}; anyone else is an adult. */
+    protected static RegisterRequest registration(String email, ProfileType profile, String locale) {
+        var organizer = profile.isOrganizer();
+        return new RegisterRequest(
+                email,
+                PASSWORD,
+                profile,
+                organizer ? null : ADULT,
+                organizer ? ORGANIZATION : null,
+                organizer ? true : null,
+                "2027-01",
+                "2027-02",
+                locale);
+    }
+
+    /** A student born on {@code birthDate}. */
     protected static RegistrationDetails details(LocalDate birthDate) {
-        return new RegistrationDetails(birthDate, ProfileType.STUDENT, "2027-01", "2027-02", "en");
+        return new RegistrationDetails(ProfileType.STUDENT, birthDate, null, null, "2027-01", "2027-02", "en");
+    }
+
+    protected static RegistrationDetails organizerDetails(ProfileType profile, OrganizationRequest organization) {
+        return new RegistrationDetails(profile, null, organization, true, "2027-01", "2027-02", "en");
     }
 
     // The raw token is only in the emailed link, as a real user would get it.

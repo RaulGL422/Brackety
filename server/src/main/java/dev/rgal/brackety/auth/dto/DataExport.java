@@ -1,5 +1,6 @@
 package dev.rgal.brackety.auth.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import dev.rgal.brackety.auth.account.ProfileType;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -25,7 +26,10 @@ public record DataExport(
             Instant createdAt,
             Instant updatedAt) {}
 
-    public record ProfileData(ProfileType type, boolean validated, Instant createdAt) {}
+    /** The organization only on organizer profiles. */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public record ProfileData(
+            ProfileType type, boolean validated, String organizationName, String taxId, Instant createdAt) {}
 
     public record IdentityData(String provider, String email, Instant linkedAt) {}
 

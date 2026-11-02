@@ -2,7 +2,6 @@ package dev.rgal.brackety.devdata.scenarios;
 
 import dev.rgal.brackety.auth.AuthService;
 import dev.rgal.brackety.auth.account.ProfileType;
-import dev.rgal.brackety.auth.dto.RegisterRequest;
 import dev.rgal.brackety.devdata.DevScenario;
 import dev.rgal.brackety.devdata.Scenario;
 import dev.rgal.brackety.devdata.ScenarioContext;
@@ -47,8 +46,7 @@ class UnverifiedScenario implements Scenario {
     @Override
     public void seed(ScenarioContext ctx) {
         AGE_IN_DAYS.forEach((email, days) -> {
-            auth.register(new RegisterRequest(
-                    email, PASSWORD, ctx.daysFromToday(-30 * 365), ProfileType.STUDENT, "2027-01", "2027-01", "es"));
+            auth.register(SignUps.of(email, PASSWORD, ProfileType.STUDENT, "es", ctx));
             // The account is still a pending JPA insert; the plain SQL update below must see it.
             entityManager.flush();
             jdbc.sql("update account set created_at = ? where email = ?")

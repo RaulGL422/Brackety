@@ -49,6 +49,10 @@ public class AuthException extends ErrorResponseException {
         return new AuthException(HttpStatus.BAD_REQUEST, "Minimum age to register is 14.");
     }
 
+    static AuthException invalidTaxId() {
+        return withCode(HttpStatus.BAD_REQUEST, "INVALID_TAX_ID", "The CIF is not valid.");
+    }
+
     public static AuthException googleNotConfigured() {
         return new AuthException(HttpStatus.SERVICE_UNAVAILABLE, "Google sign-in is not configured.");
     }

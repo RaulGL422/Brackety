@@ -64,7 +64,7 @@ public class GoogleSignInService {
         if (registration == null) {
             return Result.registrationRequired(google.email());
         }
-        auth.checkMinimumAge(registration.birthDate());
+        auth.checkRegistration(registration);
         existing.ifPresent(this::deleteUnverified);
         var account = register(google, registration);
         return Result.signedIn(sessions.start(account), existing.isPresent());

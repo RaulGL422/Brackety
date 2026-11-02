@@ -5,8 +5,6 @@ import dev.rgal.brackety.auth.account.AccountRepository;
 import dev.rgal.brackety.auth.account.Identity;
 import dev.rgal.brackety.auth.account.IdentityRepository;
 import dev.rgal.brackety.auth.account.ProfileType;
-import dev.rgal.brackety.auth.dto.RegisterRequest;
-import dev.rgal.brackety.auth.dto.RegistrationDetails;
 import dev.rgal.brackety.devdata.DevScenario;
 import dev.rgal.brackety.devdata.Scenario;
 import dev.rgal.brackety.devdata.ScenarioContext;
@@ -48,24 +46,20 @@ class GoogleScenario implements Scenario {
     @Override
     public void seed(ScenarioContext ctx) {
         var now = ctx.now().toInstant();
-        var birthDate = ctx.daysFromToday(-30 * 365);
         var googleOnly = auth.createAccount(
-                GOOGLE_ONLY, null, new RegistrationDetails(birthDate, ProfileType.STUDENT, "2027-01", "2027-01", "es"));
+                GOOGLE_ONLY,
+                null,
+                SignUps.of(GOOGLE_ONLY, null, ProfileType.STUDENT, "es", ctx).details());
         googleOnly.markEmailVerified(now);
         identities.save(
                 new Identity(googleOnly.getId(), Identity.Provider.GOOGLE, GOOGLE_ONLY_SUBJECT, GOOGLE_ONLY, now));
 
-        auth.register(passwordSignUp(LINKED, ctx));
+        auth.register(SignUps.of(LINKED, PASSWORD, ProfileType.CLUB, "es", ctx));
         var linked = accounts.findByEmail(LINKED).orElseThrow();
         linked.markEmailVerified(now);
         identities.save(
                 new Identity(linked.getId(), Identity.Provider.GOOGLE, LINKED_SUBJECT, LINKED_GOOGLE_EMAIL, now));
 
-        auth.register(passwordSignUp(UNVERIFIED, ctx));
-    }
-
-    private static RegisterRequest passwordSignUp(String email, ScenarioContext ctx) {
-        return new RegisterRequest(
-                email, PASSWORD, ctx.daysFromToday(-30 * 365), ProfileType.CLUB, "2027-01", "2027-01", "es");
+        auth.register(SignUps.of(UNVERIFIED, PASSWORD, ProfileType.CLUB, "es", ctx));
     }
 }
