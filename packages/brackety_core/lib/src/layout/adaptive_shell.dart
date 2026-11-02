@@ -17,18 +17,28 @@ class AdaptiveTab {
   final WidgetBuilder builder;
 }
 
-/// Router whose top-level tabs share one [AdaptiveScaffold].
+/// Router whose top-level tabs share one [AdaptiveScaffold]. [routes] live outside the shell
+/// (a sign-in page, for example); [redirect], [refreshListenable] and [actions] go to the
+/// router and the app bar as they are.
 GoRouter adaptiveShellRouter({
   required String Function(BuildContext context) title,
   required List<AdaptiveTab> tabs,
+  List<RouteBase> routes = const [],
+  GoRouterRedirect? redirect,
+  Listenable? refreshListenable,
+  List<Widget> Function(BuildContext context)? actions,
 }) {
   return GoRouter(
+    redirect: redirect,
+    refreshListenable: refreshListenable,
     routes: [
+      ...routes,
       ShellRoute(
         builder: (context, state, child) {
           final index = tabs.indexWhere((t) => t.path == state.uri.path);
           return AdaptiveScaffold(
             title: title(context),
+            actions: actions?.call(context),
             destinations: [
               for (final t in tabs)
                 AdaptiveDestination(icon: t.icon, label: t.label(context)),

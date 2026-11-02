@@ -1,6 +1,7 @@
 import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 
 void main() {
   test('window size thresholds follow Material 3', () {
@@ -78,5 +79,41 @@ void main() {
     await tester.tap(find.text('Server'));
 
     expect(selected, 1);
+  });
+
+  testWidgets('shell router redirects to routes outside the shell', (
+    tester,
+  ) async {
+    final signedIn = ValueNotifier(false);
+    addTearDown(signedIn.dispose);
+    final router = adaptiveShellRouter(
+      title: (_) => 'Brackety',
+      tabs: [
+        AdaptiveTab(
+          path: '/',
+          icon: Icons.home,
+          label: (_) => 'Home',
+          builder: (_) => const Text('home body'),
+        ),
+      ],
+      routes: [GoRoute(path: '/login', builder: (_, _) => const Text('login'))],
+      refreshListenable: signedIn,
+      redirect: (_, state) => signedIn.value
+          ? (state.matchedLocation == '/login' ? '/' : null)
+          : (state.matchedLocation == '/login' ? null : '/login'),
+      actions: (_) => [const Icon(Icons.logout)],
+    );
+    addTearDown(router.dispose);
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+    await tester.pumpAndSettle();
+
+    expect(find.text('login'), findsOneWidget);
+    expect(find.byType(NavigationBar), findsNothing);
+
+    signedIn.value = true;
+    await tester.pumpAndSettle();
+
+    expect(find.text('home body'), findsOneWidget);
+    expect(find.byIcon(Icons.logout), findsOneWidget);
   });
 }
