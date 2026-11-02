@@ -2,8 +2,10 @@ package dev.rgal.brackety.event;
 
 import dev.rgal.brackety.auth.RequiresVerifiedEmail;
 import dev.rgal.brackety.common.CurrentAccount;
+import dev.rgal.brackety.event.dto.CategoriesRequest;
 import dev.rgal.brackety.event.dto.EventSettingsRequest;
 import dev.rgal.brackety.event.dto.EventSettingsResponse;
+import dev.rgal.brackety.event.dto.EventSettingsResponse.CategoryResponse;
 import dev.rgal.brackety.event.dto.MyEventResponse;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -23,9 +25,11 @@ import org.springframework.web.bind.annotation.RestController;
 class EventController {
 
     private final EventService events;
+    private final EventCategoryService categories;
 
-    EventController(EventService events) {
+    EventController(EventService events, EventCategoryService categories) {
         this.events = events;
+        this.categories = categories;
     }
 
     @GetMapping
@@ -44,5 +48,13 @@ class EventController {
             @Valid @RequestBody EventSettingsRequest request,
             @AuthenticationPrincipal Jwt jwt) {
         return events.updateSettings(eventId, CurrentAccount.id(jwt), request);
+    }
+
+    @PutMapping("/{eventId}/categories")
+    List<CategoryResponse> updateCategories(
+            @PathVariable UUID eventId,
+            @Valid @RequestBody CategoriesRequest request,
+            @AuthenticationPrincipal Jwt jwt) {
+        return categories.update(eventId, CurrentAccount.id(jwt), request);
     }
 }

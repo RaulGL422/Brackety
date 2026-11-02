@@ -9,13 +9,15 @@ import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.event.Mat;
 import dev.rgal.brackety.event.MatRepository;
+import dev.rgal.brackety.grouping.Competitor;
+import dev.rgal.brackety.grouping.CompetitorDirectory;
+import dev.rgal.brackety.grouping.Competitors;
 import dev.rgal.brackety.grouping.FightGroup;
 import dev.rgal.brackety.grouping.FightGroupRepository;
 import dev.rgal.brackety.grouping.GroupMember;
 import dev.rgal.brackety.grouping.GroupMemberRepository;
 import dev.rgal.brackety.grouping.Match;
 import dev.rgal.brackety.grouping.MatchRepository;
-import dev.rgal.brackety.participant.Participant;
 import dev.rgal.brackety.participant.ParticipantRepository;
 import dev.rgal.brackety.ranking.dto.StandingRow;
 import dev.rgal.brackety.scoreboard.MatchEvent;
@@ -46,6 +48,7 @@ class StandingsService {
     private static final DateTimeFormatter TIME = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     private final ParticipantRepository participants;
+    private final CompetitorDirectory directory;
     private final EventCategoryRepository categories;
     private final FightGroupRepository groups;
     private final GroupMemberRepository members;
@@ -59,6 +62,7 @@ class StandingsService {
 
     StandingsService(
             ParticipantRepository participants,
+            CompetitorDirectory directory,
             EventCategoryRepository categories,
             FightGroupRepository groups,
             GroupMemberRepository members,
@@ -70,6 +74,7 @@ class StandingsService {
             EventAccess access,
             Clock clock) {
         this.participants = participants;
+        this.directory = directory;
         this.categories = categories;
         this.groups = groups;
         this.members = members;
@@ -88,11 +93,13 @@ class StandingsService {
         access.require(eventId, accountId, EventRole.CLUB);
         var event = events.get(eventId);
         var eventCategories = categories.findByEventIdOrderByMinAge(eventId);
+        var competitors = directory.of(eventId);
+        var teamNumbers = directory.teamNumbers(eventId);
         var eventMembers = members.findByEventId(eventId);
-        var attending = eventMembers.stream()
+        var attending = competitors.participants(eventMembers.stream()
                 .filter(m -> !m.isGhost())
-                .map(GroupMember::getParticipantId)
-                .collect(Collectors.toSet());
+                .map(GroupMember::getCompetitorId)
+                .toArray(UUID[]::new));
         var ghosts = ghostsByGroup(eventMembers);
         var points = new HashMap<UUID, Integer>();
         var fought = new HashMap<UUID, Integer>();
@@ -100,8 +107,8 @@ class StandingsService {
             if (m.getStatus() != Match.Status.FINISHED) {
                 continue;
             }
-            count(m, m.getRedParticipantId(), Side.RED, m.getRedScore(), ghosts, points, fought);
-            count(m, m.getBlueParticipantId(), Side.BLUE, m.getBlueScore(), ghosts, points, fought);
+            count(m, competitors.get(m.getRedId()), Side.RED, m.getRedScore(), ghosts, points, fought);
+            count(m, competitors.get(m.getBlueId()), Side.BLUE, m.getBlueScore(), ghosts, points, fought);
         }
         var rows = participants.findByEventIdOrderByFirstNameAscLastNameAsc(eventId).stream()
                 .map(p -> {
@@ -122,7 +129,8 @@ class StandingsService {
                             attendance,
                             matchPoints,
                             attendance + matchPoints,
-                            fought.getOrDefault(p.getId(), 0));
+                            fought.getOrDefault(p.getId(), 0),
+                            teamNumbers.get(p.getId()));
                 })
                 .sorted(Comparator.comparingInt(StandingRow::total).reversed())
                 .toList();
@@ -143,6 +151,7 @@ class StandingsService {
                         r.lastName(),
                         r.age(),
                         r.categoryName(),
+                        r.teamNumber(),
                         r.attendancePoints(),
                         r.matchPoints(),
                         r.total(),
@@ -155,6 +164,7 @@ class StandingsService {
                         "Apellidos",
                         "Edad",
                         "Categoría",
+                        "Equipo",
                         "Asistencia",
                         "Puntos combates",
                         "Total",
@@ -165,7 +175,7 @@ class StandingsService {
     @Transactional(readOnly = true)
     String matchesCsv(UUID eventId, UUID accountId) {
         access.require(eventId, accountId, EventRole.CLUB);
-        var names = names(eventId);
+        var names = directory.of(eventId);
         var groupById = groupsById(eventId);
         var matNumbers = matNumbers(eventId);
         var categoryNames = categoryNames(eventId);
@@ -181,11 +191,11 @@ class StandingsService {
                             group.getNumber(),
                             categoryNames.get(group.getCategoryId()),
                             m.getOrderIndex() + 1,
-                            names.get(m.getRedParticipantId()),
-                            names.get(m.getBlueParticipantId()),
+                            label(names.get(m.getRedId())),
+                            label(names.get(m.getBlueId())),
                             m.getRedScore(),
                             m.getBlueScore(),
-                            names.get(ghosts.get(m.getGroupId())),
+                            names.name(ghosts.get(m.getGroupId())),
                             disqualifiedName(m, names),
                             status(m.getStatus()),
                             time(m.getStartedAt()),
@@ -214,7 +224,7 @@ class StandingsService {
     @Transactional(readOnly = true)
     String timelineCsv(UUID eventId, UUID accountId) {
         access.require(eventId, accountId, EventRole.CLUB);
-        var names = names(eventId);
+        var names = directory.of(eventId);
         var groupById = groupsById(eventId);
         var matNumbers = matNumbers(eventId);
         var matchById =
@@ -236,9 +246,7 @@ class StandingsService {
                     var m = matchById.get(e.getMatchId());
                     var side = e.getSide() == null
                             ? null
-                            : e.getSide() == Side.RED
-                                    ? names.get(m.getRedParticipantId())
-                                    : names.get(m.getBlueParticipantId());
+                            : e.getSide() == Side.RED ? names.name(m.getRedId()) : names.name(m.getBlueId());
                     return Arrays.asList(
                             matNumbers.get(m.getMatId()),
                             groupById.get(m.getGroupId()).getNumber(),
@@ -269,32 +277,30 @@ class StandingsService {
                 rows);
     }
 
+    /** Every member of a team gets the team's points. */
     private static void count(
             Match m,
-            UUID fighter,
+            Competitor fighter,
             Side side,
             int score,
             Map<UUID, UUID> ghosts,
             Map<UUID, Integer> points,
             Map<UUID, Integer> fought) {
-        if (fighter.equals(ghosts.get(m.getGroupId()))) {
+        if (fighter.id().equals(ghosts.get(m.getGroupId()))) {
             return;
         }
-        fought.merge(fighter, 1, Integer::sum);
-        if (!side.name().equals(m.getDisqualifiedSide())) {
-            points.merge(fighter, score, Integer::sum);
+        for (var participant : fighter.participantIds()) {
+            fought.merge(participant, 1, Integer::sum);
+            if (!side.name().equals(m.getDisqualifiedSide())) {
+                points.merge(participant, score, Integer::sum);
+            }
         }
     }
 
     private static Map<UUID, UUID> ghostsByGroup(List<GroupMember> eventMembers) {
         return eventMembers.stream()
                 .filter(GroupMember::isGhost)
-                .collect(Collectors.toMap(GroupMember::getGroupId, GroupMember::getParticipantId));
-    }
-
-    private Map<UUID, String> names(UUID eventId) {
-        return participants.findByEventIdOrderByFirstNameAscLastNameAsc(eventId).stream()
-                .collect(Collectors.toMap(Participant::getId, p -> p.getFirstName() + " " + p.getLastName()));
+                .collect(Collectors.toMap(GroupMember::getGroupId, GroupMember::getCompetitorId));
     }
 
     private Map<UUID, FightGroup> groupsById(UUID eventId) {
@@ -310,12 +316,16 @@ class StandingsService {
                 .collect(Collectors.toMap(EventCategory::getId, EventCategory::getName));
     }
 
-    private static String disqualifiedName(Match m, Map<UUID, String> names) {
+    private static String disqualifiedName(Match m, Competitors names) {
         if (m.getDisqualifiedSide() == null) {
             return null;
         }
-        return names.get(
-                m.getDisqualifiedSide().equals(Side.RED.name()) ? m.getRedParticipantId() : m.getBlueParticipantId());
+        return names.name(m.getDisqualifiedSide().equals(Side.RED.name()) ? m.getRedId() : m.getBlueId());
+    }
+
+    /** "Equipo N (names)" for a team, so the sheet says who fought. */
+    private static String label(Competitor c) {
+        return c.isTeam() ? c.name() + " (" + String.join(", ", c.memberNames()) + ")" : c.name();
     }
 
     private static String status(Match.Status status) {
