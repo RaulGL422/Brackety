@@ -105,7 +105,7 @@ Pasos generales: `09-despliegue.md`. Aquí solo lo propio del prototipo.
   - `API_BASE_URL=https://brackety-api.rgal.dev`, `ADMIN_API_BASE_URL=https://brackety-admin.rgal.dev`.
   - `DEMO_ACCOUNTS_ENABLED=true`, `DEMO_EVENT_DATE=2026-11-14`: crea las cuentas y el evento sin alumnos (los inscribe el club).
   - Vacías: Resend (emails al log), Google, superadmin y Cloudflare Access.
-- Sin SSD: `DB_DATA=pgdata` (volumen en la SD). Riesgo aceptado para la fase; copia con `backup.sh` al acabar cada jornada.
+- Sin SSD: `DB_DATA=pgdata` (volumen en la SD) y copia con `backup.sh` al acabar cada jornada. La SD puede corromperse con Postgres: pendiente de que Raul decida si basta (`pendientes.md`).
 - Ensayo: móvil y tablet con datos móviles (fuera de la wifi de casa), una cuenta por rol, un combate completo con campana y el CSV.
 
 ## Estado
