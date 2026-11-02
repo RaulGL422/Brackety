@@ -23,12 +23,42 @@ class AdaptiveScaffold extends StatelessWidget {
 
   static const maxContentWidth = 1200.0;
 
+  // NavigationBar caps its label text scale at this (Flutter's _kMaxLabelTextScaleFactor).
+  static const _navigationBarMaxTextScale = 1.3;
+
   final String title;
   final List<AdaptiveDestination> destinations;
   final int selectedIndex;
   final ValueChanged<int> onSelected;
   final Widget body;
   final List<Widget>? actions;
+
+  /// Whether every bottom-bar label fits on one line in its share of the width. If one does
+  /// not, the bar shows icons only (the label stays as tooltip and for screen readers): a
+  /// wrapped label breaks the bar, and showing only the selected one does not help because it
+  /// gets the same width. Measured like [NavigationBar] draws them (its text scale is capped).
+  bool _labelsFit(BuildContext context) {
+    final theme = Theme.of(context);
+    final style =
+        theme.navigationBarTheme.labelTextStyle?.resolve(const {
+          WidgetState.selected,
+        }) ??
+        theme.textTheme.labelMedium;
+    final room = MediaQuery.sizeOf(context).width / destinations.length;
+    final scaler = MediaQuery.textScalerOf(context)
+        .clamp(maxScaleFactor: _navigationBarMaxTextScale);
+    return destinations.every((d) {
+      final painter = TextPainter(
+        text: TextSpan(text: d.label, style: style),
+        textDirection: Directionality.of(context),
+        textScaler: scaler,
+        maxLines: 1,
+      )..layout();
+      final width = painter.width;
+      painter.dispose();
+      return width <= room;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +70,9 @@ class AdaptiveScaffold extends StatelessWidget {
         appBar: AppBar(title: Text(title), actions: actions),
         body: content,
         bottomNavigationBar: NavigationBar(
+          labelBehavior: _labelsFit(context)
+              ? NavigationDestinationLabelBehavior.alwaysShow
+              : NavigationDestinationLabelBehavior.alwaysHide,
           selectedIndex: selectedIndex,
           onDestinationSelected: onSelected,
           destinations: [

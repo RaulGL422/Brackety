@@ -36,11 +36,43 @@ void main() {
     );
   }
 
+  testWidgets('phone bar hides labels that would wrap', (tester) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: AdaptiveScaffold(
+          title: 'Brackety',
+          // The test font draws every glyph one font size wide: 13 × 12 px > 360 / 3.
+          destinations: const [
+            AdaptiveDestination(icon: Icons.home, label: 'Home'),
+            AdaptiveDestination(icon: Icons.group, label: 'Organizadores'),
+            AdaptiveDestination(icon: Icons.dns, label: 'Server'),
+          ],
+          selectedIndex: 0,
+          onSelected: (_) {},
+          body: const Text('body'),
+        ),
+      ),
+    );
+
+    expect(
+      tester.widget<NavigationBar>(find.byType(NavigationBar)).labelBehavior,
+      NavigationDestinationLabelBehavior.alwaysHide,
+    );
+    expect(find.byTooltip('Organizadores'), findsOneWidget);
+  });
+
   testWidgets('phone uses a bottom navigation bar', (tester) async {
     await pumpAt(tester, const Size(360, 800));
 
     expect(find.byType(NavigationBar), findsOneWidget);
     expect(find.byType(NavigationRail), findsNothing);
+    expect(
+      tester.widget<NavigationBar>(find.byType(NavigationBar)).labelBehavior,
+      NavigationDestinationLabelBehavior.alwaysShow,
+    );
   });
 
   testWidgets('tablet uses a navigation rail with labels', (tester) async {
