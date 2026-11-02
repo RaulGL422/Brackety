@@ -49,7 +49,9 @@ Cuentas, login y sesión compartidos entre web y Android.
 - Avisos por email: bloqueo por fallos, identidad vinculada/desvinculada, cambio de contraseña o email, reutilización de refresh.
 
 ### Registro y perfiles
-- Registro: fecha de nacimiento, perfil inicial (Club, Entidad Externa, Ayudante, Externo, Alumno) y aceptación de términos y privacidad con fecha y versión.
+- Registro: perfil inicial (Club, Entidad Externa, Ayudante, Externo, Alumno) y aceptación de términos y privacidad con fecha y versión.
+- Personas (Ayudante, Externo, Alumno): fecha de nacimiento obligatoria (mínimo 14 años).
+- Organizadores (Club, Entidad Externa): sin fecha de nacimiento. Casilla "soy mayor de edad y represento a esta organización" (se guarda como consentimiento `ORGANIZER_DECLARATION`), nombre y CIF obligatorios. CIF normalizado y validado por formato y dígito de control (400 `INVALID_TAX_ID`); puede repetirse entre cuentas. Mandar un dato del otro tipo: 400.
 - App: solo ofrece Club y Ayudante; el resto solo con `APP_ENV=dev` (entorno local) hasta que sus módulos existan.
 - App: tras el 202 del registro inicia sesión con los mismos datos. Cuenta nueva → dentro con el aviso de verificar; si no → "revisa tu email" (no revela más que el propio login).
 - Hasta `legal-paginas`, la app envía la versión provisional `2026-11-draft` en términos y privacidad, con una única casilla sin enlaces.
@@ -72,9 +74,9 @@ Cuentas, login y sesión compartidos entre web y Android.
 - Exportación: JSON descargable con cuenta (sin hash), perfiles, identidades (sin `sub`) y consentimientos.
 
 ## Datos
-- `account`: email, hash de contraseña, email verificado, fecha de nacimiento, idioma, estado (activa, borrada lógica) con `deleted_at`, corte de sesiones `sessions_revoked_at`, fechas.
+- `account`: email, hash de contraseña, email verificado, fecha de nacimiento (nula en organizadores), idioma, estado (activa, borrada lógica) con `deleted_at`, corte de sesiones `sessions_revoked_at`, fechas.
 - `identity`: cuenta, proveedor, `sub`, email del proveedor.
-- `profile`: cuenta, tipo, validado por superadmin (solo organizadores).
+- `profile`: cuenta, tipo, validado por superadmin, nombre de la organización y CIF (solo organizadores).
 - `consent`: cuenta, documento, versión, fecha.
 - `refresh_token`: hash, familia, cuenta, caducidad, usado/revocado.
 - `email_token`: hash, propósito (verificar, recuperar, cambio de email), email nuevo (solo cambio), caducidad.
@@ -84,13 +86,13 @@ Cuentas, login y sesión compartidos entre web y Android.
 ## API (borrador)
 - `POST /auth/google` `{idToken, registration?: {birthDate, profile, acceptedTermsVersion, acceptedPrivacyVersion, locale}}` → `{status: SIGNED_IN, accessToken, expiresIn, refreshToken?, emailVerified, replacedUnverifiedAccount}` (sesión como el login) o `{status: REGISTRATION_REQUIRED, email}`.
 - `GET /me/identities` → `[{method: PASSWORD}, {method: GOOGLE, email, linkedAt}]`. `POST /me/identities/google` `{idToken}`, `DELETE /me/identities/google`, `DELETE /me/password` → 204.
-- `GET /me` → `{email, emailVerified, birthDate, locale, profiles: [{type, validated}], signInMethods}`. `PATCH /me` `{locale: es|en}`. `POST /me/profiles` `{type}`, `DELETE /me/profiles/{type}` → 204.
+- `GET /me` → `{email, emailVerified, birthDate, locale, profiles: [{type, validated, organizationName?, taxId?}], signInMethods}` (`birthDate` nulo en organizadores). `PATCH /me` `{locale: es|en}`. `POST /me/profiles` `{type}`, `DELETE /me/profiles/{type}` → 204.
 - `POST /me/reauth` `{password}` o `{googleIdToken}` → `{reauthToken, expiresIn}`. Con `X-Reauth`: `POST /me/email` `{newEmail}` → 202; `DELETE /me` → `{deletesOn}`; `GET /me/export` → adjunto JSON.
 - `POST /auth/email/change/confirm` `{token}` → 204. `POST /auth/restore` `{restoreToken}` → sesión como el login.
 - Errores 409 con `code` en el problem+json. Solo en local: `POST /auth/dev/google-token` `{subject, email}` (doc 08).
 Todos bajo `/api/v1`: `POST /auth/register`, `/auth/login`, `/auth/google`, `/auth/refresh`, `/auth/logout`, `/auth/email/verify`, `/auth/email/resend`, `/auth/password/forgot`, `/auth/password/reset`, `/auth/password/reset/check` (`{token}` → 204 válido, 400 inválido; no lo gasta), `/me`, `/me/profiles`, `/me/identities`, `/me/email`, `DELETE /me`, `GET /me/export`. Superadmin: `/admin/auth/login`, `/admin/organizers/{id}/validate`, `GET /admin/auth/locks`, `DELETE /admin/auth/locks/{lockId}`.
 - `POST /admin/auth/login` `{email, password}` → `{accessToken, expiresIn}`. `GET /admin/auth/locks` → `[{lockId, type: EMAIL|IP|ADMIN, lockedUntil, email, ip}]`; `DELETE /admin/auth/locks/{lockId}` → 204.
-- `GET /admin/organizers?validated=true|false` (sin filtro: todos) → `[{accountId, email, profileType, validated, createdAt}]` (`createdAt` del perfil); `POST /admin/organizers/{accountId}/validate` → 204.
+- `GET /admin/organizers?validated=true|false` (sin filtro: todos) → `[{accountId, email, profileType, organizationName, taxId, validated, createdAt}]` (`createdAt` del perfil); `POST /admin/organizers/{accountId}/validate` → 204.
 
 ## Pantallas
 Inicio de sesión, registro con selector de perfil, verificación pendiente, recuperar contraseña, ajustes de cuenta (identidades, perfiles, email, idioma, exportar/borrar). Admin: login de superadmin, bloqueos activos con revocación.
