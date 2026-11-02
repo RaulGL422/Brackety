@@ -30,7 +30,7 @@ El club sube fotos de una lista, un CSV, un Excel, un TXT o texto pegado; Claude
 - Con grupos o equipos no cambia (como la fecha de nacimiento).
 
 ### Lectura con Claude
-- `claude -p` en una carpeta temporal con los archivos, solo con permiso de lectura de esa carpeta; respuesta JSON con esquema fijo; un reintento si no cumple.
+- `claude -p` sin herramientas y en una carpeta vacía; las fotos van dentro del mensaje (`--input-format stream-json`, base64), así un texto escrito en la lista no puede hacerle leer nada del servidor. Respuesta con `--json-schema`; un reintento si no cumple. Prompt de sistema mínimo y `--setting-sources ""` (el prompt de Claude Code multiplicaba el coste por 100).
 - El XLSX se convierte a texto en el servidor (Claude no lee `.xlsx`).
 - Claude propone, el servidor decide: todas las reglas de arriba las aplica el servidor.
 - La carpeta temporal se borra siempre, también si falla. No se guarda ningún archivo ni imagen.
@@ -50,6 +50,7 @@ El club sube fotos de una lista, un CSV, un Excel, un TXT o texto pegado; Claude
 - `POST /events/{id}/participants/import/read` (club, multipart: `files[]` o `text`; `consentVersion`) → filas validadas con errores y avisos por campo.
 - `POST /events/{id}/participants/import` (club, JSON: filas + `consentVersion`) → 201 con el número inscrito, o 422 con los errores por fila.
 - `POST /events/{id}/participants/import/check` (club, JSON: filas) → revalida tras editar, sin Claude.
+- Errores: 400 sin consentimiento o con archivos no admitidos; 429 tras 10 lecturas en una hora; 502 si Claude no la pudo leer; 503 sin clave.
 - `GET /events/{id}/participants/import/available` → si la lectura con IA está configurada.
 
 ## Pantallas
@@ -71,4 +72,4 @@ No aplica: necesita conexión con el servidor y con Anthropic.
 3. Despliegue: imagen del servidor con Node y `claude`, `ANTHROPIC_API_KEY` en `.env.example` y `09-despliegue.md`.
 
 ## Estado
-Diseñado 2026-11-02; en curso el paso 1.
+Diseñado 2026-11-02. Paso 1 (back) hecho 2026-11-02: `ParticipantImportControllerTest`, `ListReadingTest`; lectura real probada en local con una foto ficticia (Sonnet: ~0,013 $ y ~9 s por foto). Siguiente: paso 2 (front).
