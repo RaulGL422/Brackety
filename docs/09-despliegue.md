@@ -19,6 +19,7 @@ Imágenes y compose: `modulos/infra-deploy.md`. Variables: `05-seguridad-infra.m
    - Superadmin: `SUPERADMIN_EMAIL` y `SUPERADMIN_PASSWORD_HASH`. El hash, en tu PC: IntelliJ → run config `server · superadmin password hash`, escribe la contraseña (≥10) en la consola y copia la línea que imprime, **con comillas simples** (el hash lleva `$`). Cambiar la contraseña = nuevo hash y `./deploy.sh pi`. Si la contraseña se ha filtrado, rota también `JWT_SECRET`: el token de superadmin ya emitido sigue valiendo 1 h tras reiniciar (cambiarla cierra también todas las sesiones de usuario).
    - Cloudflare Access (tras el paso 8): `CF_ACCESS_TEAM_DOMAIN` = Zero Trust → Settings, *Team name and domain* (en paneles antiguos, Custom Pages) (`<equipo>.cloudflareaccess.com`); `CF_ACCESS_AUD` = Access → Applications → la de admin → *Overview*, *Application Audience (AUD) Tag*. Vacías: la API de superadmin responde 503.
    - `ADMIN_API_BASE_URL=https://admin.<dominio>`: la app admin llama a la API por su propio host (nginx reenvía `/api/` a la api), así pasa por Access. En CI, variable del repo `ADMIN_API_BASE_URL` (Settings → Variables); sin ella admin usa `API_BASE_URL` y el superadmin recibe 403.
+   - Importación de alumnos (`modulos/importacion-alumnos.md`): `ANTHROPIC_API_KEY` = console.anthropic.com → API Keys (clave de API con las condiciones comerciales, **nunca** el token de `claude setup-token`). Antes, aceptar el DPA de Anthropic (`pendientes.md`). Vacía: no aparece "Importar alumnos" y lo demás funciona. La imagen de la api ya trae `claude`.
    - `DB_DATA=/mnt/ssd/brackety/pgdata`.
    - `chmod 600 .env`: solo tu usuario puede leerlo.
 7. **GHCR**: si los paquetes son privados, `docker login ghcr.io -u RaulGL422` con un token de solo lectura (`read:packages`).
@@ -68,3 +69,4 @@ Tras un reinicio todo vuelve solo: Docker arranca con el sistema y los servicios
 - `Deploy failed`: `docker compose logs api --tail 100`.
 - `pull` denegado: falta `docker login ghcr.io` o el token caducó.
 - El túnel no conecta: token mal copiado o hostnames apuntando a `localhost` en vez de al nombre del servicio.
+- Importar responde "No se ha podido leer la lista": `docker compose logs api --tail 50 | grep -i "claude"`. Clave mal copiada o sin saldo en Anthropic; `docker compose exec api claude --version` comprueba que el CLI está.
