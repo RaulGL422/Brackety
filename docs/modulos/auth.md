@@ -58,7 +58,7 @@ Cuentas, login y sesión compartidos entre web y Android.
 - Menor de 14 no se registra solo: lo da de alta su tutor (`perfiles-menores.md`). La app lo bloquea también antes de enviar.
 - Perfiles adicionales desde ajustes (exige email verificado): un perfil cualquiera, o Alumno + Ayudante, o Externo + Ayudante; lo demás 409 `PROFILE_COMBINATION_NOT_ALLOWED`. El último no se quita (409 `LAST_PROFILE`). Organizador nuevo, sin validar.
 - Club y Entidad Externa: alta libre, pero no publican eventos hasta que el superadmin los valida.
-- App, ajustes: ofrecen añadir los perfiles del registro salvo organizadores (piden nombre y CIF); con un organizador, ninguno.
+- App, ajustes: ofrecen añadir los perfiles del registro que dejan una combinación permitida, nunca organizadores (piden nombre y CIF). El último perfil no muestra "quitar".
 - Idioma: con sesión, la app usa el de la cuenta (`/me`), que también es el de los emails; el selector de ajustes cambia los dos (`PATCH /me`). Sin sesión, el del dispositivo. es y en.
 
 ### Superadmin y RGPD
@@ -117,6 +117,6 @@ En curso. Tareas (una rama cada una, en este orden):
 4. `feat/auth-me` · `/me`, perfiles adicionales, cambio de email, borrado y exportación.
 5. `feat/auth-superadmin` · superadmin por entorno, validación de organizadores, listar y revocar bloqueos con auditoría. Hecha (2026-10-31).
 6. `feat/auth-screens-login` · app: login, registro, verificación pendiente, recuperar; cliente HTTP con refresh (uno a la vez) y 429 con `lockId`. Hecha (2026-10-31).
-7. `feat/auth-organizer-signup` · registro de Club y Entidad Externa sin fecha de nacimiento: casilla "soy mayor de edad y represento a la organización", nombre y CIF obligatorios (formato y dígito de control, repetible entre cuentas); el superadmin los ve al validar.
+7. `feat/auth-organizer-signup` · registro de Club y Entidad Externa sin fecha de nacimiento: casilla "soy mayor de edad y represento a la organización", nombre y CIF obligatorios (formato y dígito de control, repetible entre cuentas); el superadmin los ve al validar. Hecha (2026-11-02).
 8. `feat/auth-screens-settings` · app: ajustes de cuenta. Hecha (2026-11-02).
 9. `feat/auth-admin-login` · admin: login de superadmin y pantalla de bloqueos.
