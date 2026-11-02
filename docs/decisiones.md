@@ -127,3 +127,6 @@ Formato: fecha · decisión · motivo.
 - 2026-11-02 · Ajustes de la app sin Google (ni vincular ni reauth con Google) hasta tener los client IDs: se muestra el Google ya vinculado, con desvincular y quitar contraseña · decidido por Raul.
 - 2026-11-02 · Token del superadmin en la app admin solo en memoria (nunca localStorage, sessionStorage ni cookies): recargar o cerrar la pestaña = entrar otra vez; cualquier 401 de la API admin → login con "sesión caducada" · no hay refresh y es de uso esporádico; nada que robar del navegador; decidido por Raul.
 - 2026-11-02 · La tarea 9 de auth incluye la pantalla de organizadores (filtro y validar, con nombre y CIF) además de login y bloqueos · sin ella la validación solo se podía hacer por API; decidido por Raul.
+- 2026-11-02 · Importación masiva de alumnos (fotos, CSV, Excel, TXT) leída con `claude -p` y revisada por el club antes de inscribir; todo o nada · pruebas in situ con muchas inscripciones; decidido por Raul.
+- 2026-11-02 · Claude con `ANTHROPIC_API_KEY` (condiciones comerciales y DPA), no con el token de suscripción · trata datos de menores de terceros.
+- 2026-11-02 · Una inscripción puede llevar categoría elegida; si no, la de su edad · al importar, quien inscribe decide si la categoría escrita no cuadra con la edad; decidido por Raul.

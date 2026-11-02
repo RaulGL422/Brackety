@@ -113,9 +113,7 @@ class StandingsService {
         var rows = participants.findByEventIdOrderByFirstNameAscLastNameAsc(eventId).stream()
                 .map(p -> {
                     var age = event.ageOf(p.getBirthDate());
-                    var category = eventCategories.stream()
-                            .filter(c -> c.contains(age))
-                            .findFirst();
+                    var category = p.categoryIn(event, eventCategories);
                     var attendance = attending.contains(p.getId()) ? event.getAttendancePoints() : 0;
                     var matchPoints = points.getOrDefault(p.getId(), 0);
                     return new StandingRow(

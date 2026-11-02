@@ -4,7 +4,7 @@
 
 ## Responsable
 Raul (persona física). Contacto de privacidad: `PRIVACY_CONTACT_EMAIL` (pendiente). Sin él, no se puede publicar ni avanzar de fase.
-Encargados de tratamiento: Cloudflare (red/acceso), Resend (email), Firebase/Google (push, login), Apple (login).
+Encargados de tratamiento: Cloudflare (red/acceso), Resend (email), Firebase/Google (push, login), Apple (login), Anthropic (lectura de listas al importar alumnos, `modulos/importacion-alumnos.md`; sin guardar archivos).
 
 ## Minimización
 Datos del alumno: nombre, apellidos, fecha de nacimiento, estatura (aprox.), género, foto (opcional), peso (según configuración del evento). Sin datos de salud ni lesiones. Sin cobros ni datos de pago.

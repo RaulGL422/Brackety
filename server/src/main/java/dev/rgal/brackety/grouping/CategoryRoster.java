@@ -47,16 +47,19 @@ class CategoryRoster {
     }
 
     List<Participant> inCategory(Event event, EventCategory category) {
+        var all = categories.findByEventIdOrderByMinAge(event.getId());
         return participants.findByEventIdOrderByFirstNameAscLastNameAsc(event.getId()).stream()
-                .filter(p -> isIn(event, category, p))
+                .filter(p -> isIn(event, category, all, p))
                 .toList();
     }
 
     void requireAllIn(Event event, EventCategory category, Collection<UUID> ids) {
         var unique = new HashSet<>(ids);
         var found = participants.findAllById(unique);
+        var all = categories.findByEventIdOrderByMinAge(event.getId());
         if (found.size() != unique.size()
-                || !found.stream().allMatch(p -> p.getEventId().equals(event.getId()) && isIn(event, category, p))) {
+                || !found.stream()
+                        .allMatch(p -> p.getEventId().equals(event.getId()) && isIn(event, category, all, p))) {
             throw EventException.invalid("Every participant must be from this event and category.");
         }
     }
@@ -89,7 +92,10 @@ class CategoryRoster {
         return result;
     }
 
-    static boolean isIn(Event event, EventCategory category, Participant participant) {
-        return category.contains(event.ageOf(participant.getBirthDate()));
+    private static boolean isIn(Event event, EventCategory category, List<EventCategory> all, Participant participant) {
+        return participant
+                .categoryIn(event, all)
+                .filter(c -> c.getId().equals(category.getId()))
+                .isPresent();
     }
 }
