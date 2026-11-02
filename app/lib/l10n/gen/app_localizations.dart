@@ -1422,6 +1422,330 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Elegir alumnos · {count}/{size}'**
   String pickGhostTeam(int count, int size);
+
+  /// No description provided for @settingsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Ajustes de la cuenta'**
+  String get settingsTitle;
+
+  /// No description provided for @settingsAccount.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuenta'**
+  String get settingsAccount;
+
+  /// No description provided for @settingsEmailVerified.
+  ///
+  /// In es, this message translates to:
+  /// **'Verificado'**
+  String get settingsEmailVerified;
+
+  /// No description provided for @settingsEmailUnverified.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin verificar'**
+  String get settingsEmailUnverified;
+
+  /// No description provided for @settingsChangeEmail.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar email'**
+  String get settingsChangeEmail;
+
+  /// No description provided for @changeEmailNew.
+  ///
+  /// In es, this message translates to:
+  /// **'Email nuevo'**
+  String get changeEmailNew;
+
+  /// No description provided for @changeEmailSubmit.
+  ///
+  /// In es, this message translates to:
+  /// **'Enviar enlace'**
+  String get changeEmailSubmit;
+
+  /// No description provided for @changeEmailSent.
+  ///
+  /// In es, this message translates to:
+  /// **'Hemos enviado un email a {email}. Abre su enlace para terminar el cambio (caduca en 24 horas).'**
+  String changeEmailSent(String email);
+
+  /// No description provided for @settingsLanguage.
+  ///
+  /// In es, this message translates to:
+  /// **'Idioma'**
+  String get settingsLanguage;
+
+  /// No description provided for @settingsLanguageHint.
+  ///
+  /// In es, this message translates to:
+  /// **'También es el de los emails que te enviamos.'**
+  String get settingsLanguageHint;
+
+  /// No description provided for @languageSpanish.
+  ///
+  /// In es, this message translates to:
+  /// **'Español'**
+  String get languageSpanish;
+
+  /// No description provided for @languageEnglish.
+  ///
+  /// In es, this message translates to:
+  /// **'English'**
+  String get languageEnglish;
+
+  /// No description provided for @settingsLanguageError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se ha podido cambiar el idioma.'**
+  String get settingsLanguageError;
+
+  /// No description provided for @settingsProfiles.
+  ///
+  /// In es, this message translates to:
+  /// **'Perfiles'**
+  String get settingsProfiles;
+
+  /// No description provided for @profileValidated.
+  ///
+  /// In es, this message translates to:
+  /// **'Validado'**
+  String get profileValidated;
+
+  /// No description provided for @profilePendingValidation.
+  ///
+  /// In es, this message translates to:
+  /// **'Pendiente de validación'**
+  String get profilePendingValidation;
+
+  /// No description provided for @profileTaxId.
+  ///
+  /// In es, this message translates to:
+  /// **'CIF: {taxId}'**
+  String profileTaxId(String taxId);
+
+  /// No description provided for @profileAdd.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir perfil'**
+  String get profileAdd;
+
+  /// No description provided for @profileAdded.
+  ///
+  /// In es, this message translates to:
+  /// **'Perfil añadido.'**
+  String get profileAdded;
+
+  /// No description provided for @profileRemove.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar perfil'**
+  String get profileRemove;
+
+  /// No description provided for @profileRemoveConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Quitar el perfil {profile}?'**
+  String profileRemoveConfirm(String profile);
+
+  /// No description provided for @profileRemoved.
+  ///
+  /// In es, this message translates to:
+  /// **'Perfil quitado.'**
+  String get profileRemoved;
+
+  /// No description provided for @removeAction.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar'**
+  String get removeAction;
+
+  /// No description provided for @profileLast.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu cuenta necesita al menos un perfil.'**
+  String get profileLast;
+
+  /// No description provided for @profileCombination.
+  ///
+  /// In es, this message translates to:
+  /// **'Ese perfil no se puede combinar con los que ya tienes.'**
+  String get profileCombination;
+
+  /// No description provided for @profileNeedsVerifiedEmail.
+  ///
+  /// In es, this message translates to:
+  /// **'Verifica tu email antes de añadir perfiles.'**
+  String get profileNeedsVerifiedEmail;
+
+  /// No description provided for @settingsSignInMethods.
+  ///
+  /// In es, this message translates to:
+  /// **'Métodos de acceso'**
+  String get settingsSignInMethods;
+
+  /// No description provided for @signInPassword.
+  ///
+  /// In es, this message translates to:
+  /// **'Email y contraseña'**
+  String get signInPassword;
+
+  /// No description provided for @signInGoogle.
+  ///
+  /// In es, this message translates to:
+  /// **'Google'**
+  String get signInGoogle;
+
+  /// No description provided for @googleUnlink.
+  ///
+  /// In es, this message translates to:
+  /// **'Desvincular'**
+  String get googleUnlink;
+
+  /// No description provided for @googleUnlinkConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Desvincular tu cuenta de Google? Solo podrás entrar con email y contraseña.'**
+  String get googleUnlinkConfirm;
+
+  /// No description provided for @googleUnlinked.
+  ///
+  /// In es, this message translates to:
+  /// **'Google desvinculado.'**
+  String get googleUnlinked;
+
+  /// No description provided for @passwordRemove.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar contraseña'**
+  String get passwordRemove;
+
+  /// No description provided for @passwordRemoveConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'Solo podrás entrar con Google y se cerrarán todas tus sesiones, también esta. Para volver a tener contraseña, usa «¿Has olvidado la contraseña?».'**
+  String get passwordRemoveConfirm;
+
+  /// No description provided for @lastSignInMethod.
+  ///
+  /// In es, this message translates to:
+  /// **'Es tu único método de acceso. Añade otro antes.'**
+  String get lastSignInMethod;
+
+  /// No description provided for @needsGoogle.
+  ///
+  /// In es, this message translates to:
+  /// **'Esta acción pide confirmar con Google, que llegará pronto a la app.'**
+  String get needsGoogle;
+
+  /// No description provided for @settingsData.
+  ///
+  /// In es, this message translates to:
+  /// **'Tus datos'**
+  String get settingsData;
+
+  /// No description provided for @settingsDataHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Descarga una copia de los datos de tu cuenta (JSON).'**
+  String get settingsDataHint;
+
+  /// No description provided for @settingsExport.
+  ///
+  /// In es, this message translates to:
+  /// **'Exportar mis datos'**
+  String get settingsExport;
+
+  /// No description provided for @settingsDanger.
+  ///
+  /// In es, this message translates to:
+  /// **'Zona peligrosa'**
+  String get settingsDanger;
+
+  /// No description provided for @deleteAccount.
+  ///
+  /// In es, this message translates to:
+  /// **'Borrar cuenta'**
+  String get deleteAccount;
+
+  /// No description provided for @deleteAccountHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Se borra definitivamente a los 30 días. Hasta entonces puedes recuperarla iniciando sesión.'**
+  String get deleteAccountHint;
+
+  /// No description provided for @deleteAccountTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Borrar tu cuenta?'**
+  String get deleteAccountTitle;
+
+  /// No description provided for @deleteAccountBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Se cerrarán todas tus sesiones. La cuenta, con sus perfiles y datos, se borrará definitivamente a los 30 días. Hasta entonces puedes recuperarla iniciando sesión.'**
+  String get deleteAccountBody;
+
+  /// No description provided for @deleteOwnsEvents.
+  ///
+  /// In es, this message translates to:
+  /// **'Eres responsable de eventos. Cédelos a otra persona o bórralos antes de borrar tu cuenta.'**
+  String get deleteOwnsEvents;
+
+  /// No description provided for @loginAccountDeleted.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu cuenta se borrará el {date}. Inicia sesión antes para recuperarla.'**
+  String loginAccountDeleted(String date);
+
+  /// No description provided for @loginPasswordRemoved.
+  ///
+  /// In es, this message translates to:
+  /// **'Contraseña quitada y sesiones cerradas. Ya solo puedes entrar con Google.'**
+  String get loginPasswordRemoved;
+
+  /// No description provided for @reauthTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Confirma que eres tú'**
+  String get reauthTitle;
+
+  /// No description provided for @reauthBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe tu contraseña para continuar.'**
+  String get reauthBody;
+
+  /// No description provided for @reauthSubmit.
+  ///
+  /// In es, this message translates to:
+  /// **'Confirmar'**
+  String get reauthSubmit;
+
+  /// No description provided for @reauthFailed.
+  ///
+  /// In es, this message translates to:
+  /// **'Contraseña incorrecta.'**
+  String get reauthFailed;
+
+  /// No description provided for @settingsLogout.
+  ///
+  /// In es, this message translates to:
+  /// **'Cerrar sesión'**
+  String get settingsLogout;
+
+  /// No description provided for @confirmEmailChangeTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambio de email'**
+  String get confirmEmailChangeTitle;
+
+  /// No description provided for @confirmEmailChangeDone.
+  ///
+  /// In es, this message translates to:
+  /// **'Email cambiado. Se han cerrado todas las sesiones: inicia sesión con el email nuevo.'**
+  String get confirmEmailChangeDone;
 }
 
 class _AppLocalizationsDelegate

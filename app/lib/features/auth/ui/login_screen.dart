@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
 import '../data/api_error.dart';
@@ -99,15 +100,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     setState(() => _error = message(AppLocalizations.of(context)));
   }
 
+  String _noticeText(AppLocalizations l10n, SignedOutNotice notice) =>
+      switch (notice) {
+        AccountDeletionScheduled(:final deletesOn) => l10n.loginAccountDeleted(
+          DateFormat.yMMMMd(Localizations.localeOf(context).toLanguageTag())
+              .format(deletesOn),
+        ),
+        PasswordRemoved() => l10n.loginPasswordRemoved,
+      };
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final error = _error;
+    final notice = ref.watch(sessionProvider.select((s) => s.notice));
     return AuthFormPage(
       title: l10n.loginTitle,
       children: [
         if (widget.passwordChanged) ...[
           FormMessage.success(l10n.loginPasswordChanged),
+          const SizedBox(height: AppSpacing.l),
+        ],
+        if (notice != null) ...[
+          FormMessage.success(_noticeText(l10n, notice)),
           const SizedBox(height: AppSpacing.l),
         ],
         Form(
