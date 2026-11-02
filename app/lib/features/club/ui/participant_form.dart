@@ -55,6 +55,7 @@ class _ParticipantFormState extends ConsumerState<_ParticipantForm> {
   );
   late DateTime? _birthDate = widget.participant?.birthDate;
   late bool _consent = widget.participant?.guardianConsent ?? false;
+  late String? _categoryId = widget.participant?.chosenCategoryId;
   var _birthDateMissing = false;
   var _saving = false;
 
@@ -135,6 +136,12 @@ class _ParticipantFormState extends ConsumerState<_ParticipantForm> {
                         : null;
                   },
                 ),
+                const SizedBox(height: AppSpacing.s),
+                CategoryChoice(
+                  eventId: widget.eventId,
+                  value: _categoryId,
+                  onChanged: (id) => setState(() => _categoryId = id),
+                ),
                 if (_isMinor)
                   CheckboxListTile(
                     contentPadding: EdgeInsets.zero,
@@ -195,6 +202,7 @@ class _ParticipantFormState extends ConsumerState<_ParticipantForm> {
             birthDate: _birthDate!,
             heightCm: int.tryParse(_height.text.trim()),
             guardianConsent: _isMinor && _consent,
+            categoryId: _categoryId,
           );
       ref.invalidate(participantsProvider(widget.eventId));
       if (mounted) Navigator.pop(context);
@@ -204,5 +212,36 @@ class _ParticipantFormState extends ConsumerState<_ParticipantForm> {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(saveErrorMessage(l10n, e))));
     }
+  }
+}
+
+/// "By age" (null) or a category of the event chosen for this participant.
+class CategoryChoice extends ConsumerWidget {
+  const CategoryChoice({
+    super.key,
+    required this.eventId,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final String eventId;
+  final String? value;
+  final ValueChanged<String?> onChanged;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final categories =
+        ref.watch(eventSettingsProvider(eventId)).value?.categories ?? [];
+    return DropdownButtonFormField<String?>(
+      initialValue: categories.any((c) => c.id == value) ? value : null,
+      decoration: InputDecoration(labelText: l10n.categoryLabel),
+      items: [
+        DropdownMenuItem(child: Text(l10n.categoryByAge)),
+        for (final c in categories)
+          DropdownMenuItem(value: c.id, child: Text(c.name)),
+      ],
+      onChanged: onChanged,
+    );
   }
 }

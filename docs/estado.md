@@ -40,7 +40,7 @@ Estados: pendiente · en curso · en pruebas · cerrado.
 | sistema de diseño: tokens + página dev en admin | 07-diseno.md | cerrado (2026-10-30) | chore/design-system |
 | prototipo Fase 1 Yoseikan (uso real ≈ 2026-11-14) | modulos/prototipo-f1.md | en curso: back completo (pasos 1-3/7); front pasos 4-6/7 (login de `auth`, mis eventos, crear grupos; tablero del tapiz y marcador con campana; panel del club con puntuaciones, tapices, inscripciones, configuración y CSV). Probado a mano en Chrome (ayudante, árbitro y club). Paso 7 en curso: release `v0.1.0` y despliegue en la Pi (`brackety.rgal.dev`); después, categorías por equipos (2026-11-02) | docs/proto-f1-deploy |
 | prototipo F1: categorías por equipos | modulos/prototipo-f1-equipos.md | en pruebas: pasos 8-11 hechos (back, ayudante, árbitro, club con categorías editables). Falta: prueba manual de Raul (2026-11-02) | feat/proto-f1-teams-club |
-| prototipo F1: importación masiva de alumnos | modulos/importacion-alumnos.md | en curso: paso 1 (back: categoría elegida, lectura con `claude -p`, revisar, inscribir todo o nada). Falta: paso 2 (front) y 3 (despliegue) (2026-11-02) | feat/import-back |
+| prototipo F1: importación masiva de alumnos | modulos/importacion-alumnos.md | en curso: pasos 1 (back) y 2 (front: importar, revisar, elegir categoría, inscribir; categoría en el formulario). Falta: paso 3 (imagen del servidor con `claude`) (2026-11-02) | feat/import-front |
 - Motivo prototipo: Raul necesita usar la app en la Fase 1 real en 15 días; adelanta versiones mínimas de eventos, inscripciones, grupos, marcador y ranking.
 - Motivo sistema de diseño: fijar colores, tipografía, espaciado y componentes antes de la primera pantalla real (`auth`), para no repartir valores sueltos por el código.
 

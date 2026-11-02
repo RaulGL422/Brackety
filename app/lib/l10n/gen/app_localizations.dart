@@ -1837,6 +1837,258 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'años'**
   String get categoryAgeSuffix;
+
+  /// No description provided for @categoryLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Categoría'**
+  String get categoryLabel;
+
+  /// No description provided for @categoryByAge.
+  ///
+  /// In es, this message translates to:
+  /// **'Automática por edad'**
+  String get categoryByAge;
+
+  /// No description provided for @importButton.
+  ///
+  /// In es, this message translates to:
+  /// **'Importar alumnos'**
+  String get importButton;
+
+  /// No description provided for @importFormatTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Cómo debe ser la lista'**
+  String get importFormatTitle;
+
+  /// No description provided for @importFormatBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Una fila por alumno: nombre, apellidos, fecha de nacimiento (dd/mm/aaaa), estatura en cm (opcional) y categoría (opcional). Vale una o varias fotos, un CSV, un Excel, un TXT o el texto pegado.'**
+  String get importFormatBody;
+
+  /// No description provided for @importTemplate.
+  ///
+  /// In es, this message translates to:
+  /// **'Descargar plantilla'**
+  String get importTemplate;
+
+  /// No description provided for @importPickPhotos.
+  ///
+  /// In es, this message translates to:
+  /// **'Elegir fotos'**
+  String get importPickPhotos;
+
+  /// No description provided for @importPickFile.
+  ///
+  /// In es, this message translates to:
+  /// **'Elegir archivo'**
+  String get importPickFile;
+
+  /// No description provided for @importPasteHint.
+  ///
+  /// In es, this message translates to:
+  /// **'O pega aquí la lista'**
+  String get importPasteHint;
+
+  /// No description provided for @importConsent.
+  ///
+  /// In es, this message translates to:
+  /// **'Confirmo que todos los alumnos de esta lista, y sus tutores si son menores, han aceptado inscribirse en este evento sin excepción, y que la lista se procesará con un servicio de IA externo (Anthropic) solo para leerla. Las imágenes y archivos no se guardan.'**
+  String get importConsent;
+
+  /// No description provided for @importRead.
+  ///
+  /// In es, this message translates to:
+  /// **'Leer lista'**
+  String get importRead;
+
+  /// No description provided for @importReading.
+  ///
+  /// In es, this message translates to:
+  /// **'Leyendo la lista… puede tardar hasta un minuto.'**
+  String get importReading;
+
+  /// No description provided for @importReadError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se ha podido leer la lista. Prueba con una foto más nítida o con un archivo.'**
+  String get importReadError;
+
+  /// No description provided for @importTooMany.
+  ///
+  /// In es, this message translates to:
+  /// **'Has leído muchas listas en la última hora. Prueba más tarde.'**
+  String get importTooMany;
+
+  /// No description provided for @importInvalidFiles.
+  ///
+  /// In es, this message translates to:
+  /// **'Solo fotos (JPG, PNG, WebP), CSV, TXT o Excel: hasta {max} archivos de 10 MB.'**
+  String importInvalidFiles(int max);
+
+  /// No description provided for @importSummary.
+  ///
+  /// In es, this message translates to:
+  /// **'{total} alumnos · {errors} con errores · {warnings} para revisar'**
+  String importSummary(int total, int errors, int warnings);
+
+  /// No description provided for @importRegister.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{Inscribir 1 alumno} other{Inscribir {count} alumnos}}'**
+  String importRegister(int count);
+
+  /// No description provided for @importRegistered.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 alumno inscrito} other{{count} alumnos inscritos}}'**
+  String importRegistered(int count);
+
+  /// No description provided for @importRegisterRefused.
+  ///
+  /// In es, this message translates to:
+  /// **'No se ha inscrito nadie: revisa las filas marcadas.'**
+  String get importRegisterRefused;
+
+  /// No description provided for @importAddRow.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir alumno'**
+  String get importAddRow;
+
+  /// No description provided for @importEditRow.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar alumno'**
+  String get importEditRow;
+
+  /// No description provided for @importRemoveRow.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar de la lista'**
+  String get importRemoveRow;
+
+  /// No description provided for @importStartOver.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver a subir'**
+  String get importStartOver;
+
+  /// No description provided for @importEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'La lista no tiene alumnos.'**
+  String get importEmpty;
+
+  /// No description provided for @importUseCategory.
+  ///
+  /// In es, this message translates to:
+  /// **'Usar {name}'**
+  String importUseCategory(String name);
+
+  /// No description provided for @fieldFirstName.
+  ///
+  /// In es, this message translates to:
+  /// **'el nombre'**
+  String get fieldFirstName;
+
+  /// No description provided for @fieldLastName.
+  ///
+  /// In es, this message translates to:
+  /// **'los apellidos'**
+  String get fieldLastName;
+
+  /// No description provided for @fieldBirthDate.
+  ///
+  /// In es, this message translates to:
+  /// **'la fecha de nacimiento'**
+  String get fieldBirthDate;
+
+  /// No description provided for @fieldHeight.
+  ///
+  /// In es, this message translates to:
+  /// **'la estatura'**
+  String get fieldHeight;
+
+  /// No description provided for @fieldCategory.
+  ///
+  /// In es, this message translates to:
+  /// **'la categoría'**
+  String get fieldCategory;
+
+  /// No description provided for @issueMissing.
+  ///
+  /// In es, this message translates to:
+  /// **'Falta {field}'**
+  String issueMissing(String field);
+
+  /// No description provided for @issueTooLong.
+  ///
+  /// In es, this message translates to:
+  /// **'Demasiado largo: {field}'**
+  String issueTooLong(String field);
+
+  /// No description provided for @issueInvalidDate.
+  ///
+  /// In es, this message translates to:
+  /// **'Fecha no válida: {text}'**
+  String issueInvalidDate(String text);
+
+  /// No description provided for @issueFutureDate.
+  ///
+  /// In es, this message translates to:
+  /// **'La fecha de nacimiento tiene que ser anterior a hoy'**
+  String get issueFutureDate;
+
+  /// No description provided for @issueHeight.
+  ///
+  /// In es, this message translates to:
+  /// **'Estatura {cm}: tiene que estar entre 50 y 250 cm'**
+  String issueHeight(String cm);
+
+  /// No description provided for @issueNoCategory.
+  ///
+  /// In es, this message translates to:
+  /// **'Ninguna categoría del evento es para {age} años'**
+  String issueNoCategory(String age);
+
+  /// No description provided for @issueUnknownCategory.
+  ///
+  /// In es, this message translates to:
+  /// **'La categoría «{name}» no existe en el evento'**
+  String issueUnknownCategory(String name);
+
+  /// No description provided for @issueChosenCategoryGone.
+  ///
+  /// In es, this message translates to:
+  /// **'La categoría elegida ya no existe'**
+  String get issueChosenCategoryGone;
+
+  /// No description provided for @issueCategoryMismatch.
+  ///
+  /// In es, this message translates to:
+  /// **'Indica {written}, pero por su edad le corresponde {byAge}'**
+  String issueCategoryMismatch(String written, String byAge);
+
+  /// No description provided for @issueDuplicate.
+  ///
+  /// In es, this message translates to:
+  /// **'Repetido en la lista (fila {row})'**
+  String issueDuplicate(String row);
+
+  /// No description provided for @issueAlreadyRegistered.
+  ///
+  /// In es, this message translates to:
+  /// **'Ya está inscrito en el evento'**
+  String get issueAlreadyRegistered;
+
+  /// No description provided for @issueUnsure.
+  ///
+  /// In es, this message translates to:
+  /// **'Revisa {field}: no se leyó con seguridad'**
+  String issueUnsure(String field);
 }
 
 class _AppLocalizationsDelegate

@@ -72,4 +72,4 @@ No aplica: necesita conexión con el servidor y con Anthropic.
 3. Despliegue: imagen del servidor con Node y `claude`, `ANTHROPIC_API_KEY` en `.env.example` y `09-despliegue.md`.
 
 ## Estado
-Diseñado 2026-11-02. Paso 1 (back) hecho 2026-11-02: `ParticipantImportControllerTest`, `ListReadingTest`; lectura real probada en local con una foto ficticia (Sonnet: ~0,013 $ y ~9 s por foto). Siguiente: paso 2 (front).
+Diseñado 2026-11-02. Paso 1 (back) hecho 2026-11-02: `ParticipantImportControllerTest`, `ListReadingTest`; lectura real probada en local con una foto ficticia (Sonnet: ~0,013 $ y ~9 s por foto). Paso 2 (front) hecho 2026-11-02: `importing/ui/import_screen.dart` (ruta `/events/{id}/club/import`), selector de archivos propio en `core/upload` (web), selector de categoría en el formulario; widget tests en 3 tamaños; probado por Claude en Chrome sin interfaz con la foto ficticia y texto pegado (escritorio y móvil). La prueba destapó que Claude juntaba alumnos repetidos: el prompt ahora pide conservar cada aparición. Siguiente: paso 3 (despliegue).

@@ -4,7 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/async_view.dart';
+
+import 'package:go_router/go_router.dart';
+
 import '../../../l10n/gen/app_localizations.dart';
+import '../../importing/data/import_repository.dart';
 import '../data/club_models.dart';
 import '../data/club_repository.dart';
 import '../state/club_providers.dart';
@@ -36,13 +40,25 @@ class ParticipantsTab extends ConsumerWidget {
           children: [
             Padding(
               padding: const EdgeInsets.all(AppSpacing.l),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: FilledButton.icon(
-                  icon: const Icon(Icons.person_add_alt),
-                  label: Text(l10n.participantAdd),
-                  onPressed: () => showParticipantForm(context, eventId),
-                ),
+              child: Wrap(
+                spacing: AppSpacing.m,
+                runSpacing: AppSpacing.s,
+                children: [
+                  FilledButton.icon(
+                    icon: const Icon(Icons.person_add_alt),
+                    label: Text(l10n.participantAdd),
+                    onPressed: () => showParticipantForm(context, eventId),
+                  ),
+                  // Only when this server can read lists (it has an Anthropic key).
+                  if (ref.watch(importAvailableProvider(eventId)).value ??
+                      false)
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.document_scanner_outlined),
+                      label: Text(l10n.importButton),
+                      onPressed: () =>
+                          context.push('/events/$eventId/club/import'),
+                    ),
+                ],
               ),
             ),
             if (sorted.isEmpty)

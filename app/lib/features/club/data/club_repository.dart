@@ -80,6 +80,7 @@ class ClubRepository {
     required DateTime birthDate,
     required int? heightCm,
     required bool guardianConsent,
+    String? categoryId,
   }) async {
     final data = {
       'firstName': firstName,
@@ -87,6 +88,7 @@ class ClubRepository {
       'birthDate': _day.format(birthDate),
       'heightCm': heightCm,
       'guardianConsent': guardianConsent,
+      'categoryId': categoryId,
     };
     final path = '/api/v1/events/$eventId/participants';
     if (participantId == null) {

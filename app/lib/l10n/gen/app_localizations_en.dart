@@ -1010,4 +1010,175 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get categoryAgeSuffix => 'years';
+
+  @override
+  String get categoryLabel => 'Category';
+
+  @override
+  String get categoryByAge => 'By age';
+
+  @override
+  String get importButton => 'Import participants';
+
+  @override
+  String get importFormatTitle => 'What the list should look like';
+
+  @override
+  String get importFormatBody =>
+      'One row per participant: first name, last name, date of birth (dd/mm/yyyy), height in cm (optional) and category (optional). Photos, a CSV, an Excel or TXT file, or pasted text.';
+
+  @override
+  String get importTemplate => 'Download template';
+
+  @override
+  String get importPickPhotos => 'Choose photos';
+
+  @override
+  String get importPickFile => 'Choose a file';
+
+  @override
+  String get importPasteHint => 'Or paste the list here';
+
+  @override
+  String get importConsent =>
+      'I confirm that every participant on this list, and their guardians if they are minors, agreed to register for this event without exception, and that the list will be processed by an external AI service (Anthropic) only to read it. Images and files are not kept.';
+
+  @override
+  String get importRead => 'Read list';
+
+  @override
+  String get importReading => 'Reading the list… it can take up to a minute.';
+
+  @override
+  String get importReadError =>
+      'The list could not be read. Try a sharper photo or a file.';
+
+  @override
+  String get importTooMany =>
+      'Too many lists read in the last hour. Try again later.';
+
+  @override
+  String importInvalidFiles(int max) {
+    return 'Only photos (JPG, PNG, WebP), CSV, TXT or Excel: up to $max files of 10 MB.';
+  }
+
+  @override
+  String importSummary(int total, int errors, int warnings) {
+    return '$total participants · $errors with errors · $warnings to check';
+  }
+
+  @override
+  String importRegister(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Register $count participants',
+      one: 'Register 1 participant',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String importRegistered(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count participants registered',
+      one: '1 participant registered',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importRegisterRefused =>
+      'Nobody was registered: check the marked rows.';
+
+  @override
+  String get importAddRow => 'Add participant';
+
+  @override
+  String get importEditRow => 'Edit participant';
+
+  @override
+  String get importRemoveRow => 'Remove from the list';
+
+  @override
+  String get importStartOver => 'Upload again';
+
+  @override
+  String get importEmpty => 'The list has no participants.';
+
+  @override
+  String importUseCategory(String name) {
+    return 'Use $name';
+  }
+
+  @override
+  String get fieldFirstName => 'the first name';
+
+  @override
+  String get fieldLastName => 'the last name';
+
+  @override
+  String get fieldBirthDate => 'the date of birth';
+
+  @override
+  String get fieldHeight => 'the height';
+
+  @override
+  String get fieldCategory => 'the category';
+
+  @override
+  String issueMissing(String field) {
+    return 'Missing $field';
+  }
+
+  @override
+  String issueTooLong(String field) {
+    return 'Too long: $field';
+  }
+
+  @override
+  String issueInvalidDate(String text) {
+    return 'Not a valid date: $text';
+  }
+
+  @override
+  String get issueFutureDate => 'The date of birth must be before today';
+
+  @override
+  String issueHeight(String cm) {
+    return 'Height $cm: it must be between 50 and 250 cm';
+  }
+
+  @override
+  String issueNoCategory(String age) {
+    return 'No category of the event is for age $age';
+  }
+
+  @override
+  String issueUnknownCategory(String name) {
+    return 'There is no category \"$name\" in the event';
+  }
+
+  @override
+  String get issueChosenCategoryGone => 'The chosen category no longer exists';
+
+  @override
+  String issueCategoryMismatch(String written, String byAge) {
+    return 'It says $written, but by age it is $byAge';
+  }
+
+  @override
+  String issueDuplicate(String row) {
+    return 'Repeated in the list (row $row)';
+  }
+
+  @override
+  String get issueAlreadyRegistered => 'Already registered in the event';
+
+  @override
+  String issueUnsure(String field) {
+    return 'Check $field: it was not read with certainty';
+  }
 }
