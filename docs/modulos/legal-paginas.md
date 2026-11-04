@@ -28,8 +28,14 @@ Política de privacidad, términos de uso, política de cookies, aviso legal, co
 - Registro (contraseña y Google) con versión de términos o privacidad distinta de la actual → `409` `LEGAL_VERSION_OUTDATED`.
 
 ## Pantallas
-Páginas legales, pantalla de aceptación en registro, aviso de puerta legal para organizadores.
-- Licencias de software (`showLicensePage`): hoy en la pantalla Conexión de `brackety_core`; al hacer este módulo se mueve junto a los enlaces legales (ajustes / pie de la web).
+En `app/lib/features/legal/`:
+- Página legal `/legal/<tipo>`, con o sin sesión, en el idioma de la app. Columna de lectura (720), cargando / error con reintentar, tablas con scroll horizontal en móvil, enlaces a los otros 3 documentos. Tipo desconocido → "no existe". Enlaces del Markdown: fuera de la app solo http(s) y mailto.
+- Registro: la casilla enlaza "términos de uso" y "política de privacidad" (se abren encima, sin perder el formulario). Las versiones salen de `GET /api/v1/legal` al abrir (sin caché del navegador). Con `409 LEGAL_VERSION_OUTDATED`: recarga versiones, desmarca la casilla y pide aceptar de nuevo.
+- Pie en las pantallas sin sesión (todas las de `AuthFormPage`): Privacidad · Términos · Cookies · Aviso legal · Licencias.
+- Ajustes: sección "Legal" con los 4 documentos y las licencias.
+- Aviso "los datos del alumno se tratan según la política de privacidad" (enlazada) en el formulario de alumno del club y en el paso de consentimiento de la importación.
+- Licencias de software (`showLicensePage`): siguen en la pantalla Conexión de `brackety_core` (la usa el admin) y se añaden al pie y a los ajustes de la app.
+- Pendiente: aviso de puerta legal para organizadores (cuando exista publicar eventos).
 
 ## Tests
 Puerta legal activa/inactiva, versión de consentimiento, páginas servidas en ambos idiomas.
@@ -39,4 +45,4 @@ Puerta legal activa/inactiva, versión de consentimiento, páginas servidas en a
 2. Front: páginas públicas en la web y la app, casilla del registro con enlaces, pie, ajustes, licencias; aviso de privacidad visible en inscripción e importación (cubre el pendiente de la F1).
 
 ## Estado
-Pendiente; planificado (2026-11-04).
+En pruebas: pasos 1-2 hechos (back y front de la app). Falta la prueba manual de Raul y la puerta `LEGAL_GATE` cuando existan publicar eventos y pasar de fase (2026-11-04).

@@ -18,7 +18,6 @@
 - [ ] Resend: API key y remitente verificado en `rgal.dev` antes de `feat/auth-email` (en local los emails van al log).
 - [ ] Cloudflare: regla de rate limiting sobre `/api/v1/auth/*` al desplegar.
 - [ ] Producción: leer la IP real de `CF-Connecting-IP` y confiar solo en el túnel; comprobar en el despliegue real.
-- [ ] Validar en servidor las versiones de términos y privacidad aceptadas (depende de `legal-paginas`).
 - [ ] Emails de auth: pasar el envío directo (tras commit, sin reintentos) a la cola con reintentos del módulo `notificaciones`.
 - [ ] Register/forgot: queda una pequeña diferencia de tiempo de BD según exista la cuenta (enumeración por temporización, medible con muchas muestras). Aceptado por ahora; si hiciera falta, mover esas escrituras al hilo asíncrono.
 - [ ] Más adelante: 2FA (TOTP), lista de sesiones activas con "cerrar en todos", contraseñas contra filtraciones (HaveIBeenPwned).
@@ -29,7 +28,6 @@
 - [ ] Registro con el email de una cuenta borrada hace más de 30 días y aún sin purgar (hasta 1 día): el aviso dice que puede cancelar el borrado, ya no es cierto. ¿Callar o mensaje distinto?
 - [ ] Errores de la API sin texto en `i18n/messages*.properties` (la app traduce por `code`); `OWNS_EVENTS` sigue ese patrón. Confirmar si se quieren textos en servidor.
 - [ ] Login con Apple cuando haya cuenta Apple Developer o app iOS.
-- [ ] Versión legal provisional `2026-11-draft` (`app/lib/features/auth/data/registration.dart`): sustituirla en `legal-paginas` por las versiones reales y añadir los enlaces a la casilla.
 - [ ] Login con Google en la app (botón + `REGISTRATION_REQUIRED`) cuando existan los client IDs.
 
 ## Prototipo Fase 1 (bloquean el uso real)
@@ -54,7 +52,6 @@
 - [ ] SSD USB/NVMe para la base de datos (la SD no es fiable).
 - [ ] Backups cifrados + prueba de restauración.
 - [ ] Revisión legal profesional de privacidad, términos y cookies.
-- [ ] Raul: confirmar el reparto de la privacidad (`server/src/main/resources/legal/`): el organizador es responsable de los datos de los alumnos que inscribe y Brackety trata por su cuenta; Raul, responsable del resto. Alternativa: Raul responsable de todo.
 - [ ] Google Play: 12 testers × 14 días en pruebas cerradas (Raul tiene las personas).
 - [ ] Marca: comprobar "Brackety" en OEPM y dominio `brackety.rgal.dev` (existe una app llamada Brackify, parecida).
 
