@@ -35,9 +35,13 @@
 ## Prototipo Fase 1 (bloquean el uso real)
 - [ ] Raul: túnel de Cloudflare con `brackety.rgal.dev` y `brackety-api.rgal.dev` (`prototipo-f1.md`, Despliegue) y conexión a Internet en el pabellón: sin offline, sin red no funciona.
 - [ ] Categorías reales de la Fase 1 (ahora ficticias: tramos del ranking, mixtas).
-- [ ] Aviso de privacidad mínimo visible antes de la fase (datos reales de menores sin páginas legales ni `PRIVACY_CONTACT_EMAIL`); la casilla del tutor ya está en la inscripción. Aceptado por Raul.
+- [ ] Aviso de privacidad mínimo visible antes de la fase (datos reales de menores sin páginas legales ni `PRIVACY_CONTACT_EMAIL`); la casilla del tutor ya está en la inscripción. Aceptado por Raul; lo cubre `legal-paginas` paso 2, adelantado (2026-11-04).
 - [ ] Base de datos de la fase en la SD (sin SSD) con copia diaria: ¿se acepta el riesgo o se compra antes el SSD?
 - [ ] Tras la fase: desactivar `DEMO_ACCOUNTS_ENABLED` y borrar las cuentas demo.
+- [ ] Raul: probar que el punto de acceso de Windows se activa **sin Internet** en el portátil (Windows suele exigir una conexión que compartir). Si no, plan B: router de viaje barato.
+- [ ] Raul: crear `privacidad@rgal.dev` (p. ej. reenvío de Cloudflare Email Routing a su Gmail).
+- [ ] Portátil del pabellón: ¿BitLocker activo? Confirmar el borrado de `brackety-data/` y del paquete tras la fase (`servidor-local.md`).
+- [ ] Móviles de árbitros y ayudantes: ¿todos Android y con permiso para instalar la APK? Si hay iPhone, ese usa la web (sin offline).
 
 - [ ] Importación de alumnos: aceptar el DPA de Anthropic en su consola y confirmar el plazo de conservación de datos de la API (`modulos/importacion-alumnos.md`).
 
