@@ -4,7 +4,9 @@
 Páginas legales públicas y control de cumplimiento mínimo antes de publicar.
 
 ## Páginas (ES y EN)
-Política de privacidad, términos de uso, política de cookies, aviso legal, contacto/reportes. Incluyen: responsable (Raul, persona física), finalidades, base jurídica, destinatarios (Cloudflare, Resend, Firebase, Apple, Google), retención, derechos y cómo ejercerlos, menores, no gestión de pagos, canal de reportes.
+Política de privacidad, términos de uso, política de cookies, aviso legal, contacto/reportes. Incluyen: responsable (Raul, persona física), finalidades, base jurídica, destinatarios (Cloudflare, Resend, Firebase, Apple, Google, Anthropic), retención, derechos y cómo ejercerlos, menores, no gestión de pagos, canal de reportes.
+- Titular: nombre completo y `privacidad@rgal.dev`, sin NIF ni domicilio (decidido por Raul el 2026-11-04; se amplía con la revisión legal). Ambos por variables de entorno (`LEGAL_OWNER_NAME`, `PRIVACY_CONTACT_EMAIL`), nunca en el repo.
+- Los textos se sirven también desde el servidor del pabellón (`servidor-local.md`): sin Internet deben seguir visibles.
 
 ## Reglas
 - Textos versionados; cada aceptación guarda versión y fecha (`consent`).
@@ -24,5 +26,9 @@ Páginas legales, pantalla de aceptación en registro, aviso de puerta legal par
 ## Tests
 Puerta legal activa/inactiva, versión de consentimiento, páginas servidas en ambos idiomas.
 
+## Plan (PRs en serie)
+1. Back: textos versionados ES/EN, `GET /api/v1/legal/{tipo}`, validar versiones aceptadas en registro, puerta `LEGAL_GATE`, variables en `.env.example`.
+2. Front: páginas públicas en la web y la app, casilla del registro con enlaces, pie, ajustes, licencias; aviso de privacidad visible en inscripción e importación (cubre el pendiente de la F1).
+
 ## Estado
-Pendiente.
+Pendiente; planificado (2026-11-04).

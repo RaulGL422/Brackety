@@ -130,3 +130,8 @@ Formato: fecha · decisión · motivo.
 - 2026-11-02 · Importación masiva de alumnos (fotos, CSV, Excel, TXT) leída con `claude -p` y revisada por el club antes de inscribir; todo o nada · pruebas in situ con muchas inscripciones; decidido por Raul.
 - 2026-11-02 · Claude con `ANTHROPIC_API_KEY` (condiciones comerciales y DPA), no con el token de suscripción · trata datos de menores de terceros.
 - 2026-11-02 · Una inscripción puede llevar categoría elegida; si no, la de su edad · al importar, quien inscribe decide si la categoría escrita no cuadra con la edad; decidido por Raul.
+- 2026-11-04 · Servidor del pabellón: portátil Windows como punto de acceso, API nativa con PostgreSQL embebido persistente y web servida por la API (sin Docker) · seguridad si falla Internet o la Pi; ligero y sin instalaciones; decidido por Raul.
+- 2026-11-04 · El evento se lleva en un fichero "paquete" (configuración, staff e inscritos) que se carga al arrancar con BD vacía · arrancar en cualquier servidor sin preparar nada allí; decidido por Raul.
+- 2026-11-04 · Árbitros y ayudantes con APK Android y selector de servidor (pabellón / Internet / URL) · la web por http en la red local no puede funcionar offline; decidido por Raul.
+- 2026-11-04 · Offline para la F1 solo en el marcador del árbitro; el módulo completo, después · 10 días hasta la fase; decidido por Raul.
+- 2026-11-04 · `legal-paginas` se adelanta a la F1; titular con nombre y `privacidad@rgal.dev`, sin NIF ni domicilio · datos reales de menores en la fase; decidido por Raul.
