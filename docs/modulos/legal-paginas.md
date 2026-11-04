@@ -17,7 +17,15 @@ Política de privacidad, términos de uso, política de cookies, aviso legal, co
 - Claude redacta; antes del lanzamiento, revisión profesional (`pendientes.md`).
 
 ## Datos
-`legal_document` (tipo, idioma, versión, contenido), `consent`.
+- Textos en Markdown en `server/src/main/resources/legal/<tipo>.<idioma>.md` (tipos `privacy`, `terms`, `cookies`, `legal-notice`; `es`, `en`). Se leen al arrancar; si falta uno, el servidor no arranca.
+- Versión actual de cada texto solo en el enum `LegalDocument` (`2026-11-04`). Aceptación obligatoria: `terms` y `privacy`.
+- Marcadores `{{OWNER_NAME}}`, `{{PRIVACY_EMAIL}}`, `{{VERSION}}`; sin valor configurado se muestra "(pendiente de configurar)".
+- `consent` guarda la versión aceptada; la declaración de organizador va con la versión de los términos.
+
+## API
+- `GET /api/v1/legal` (pública): documentos con versión y `acceptanceRequired`, y `privacyContactConfigured`.
+- `GET /api/v1/legal/{tipo}?lang=es|en` (pública): `{type, version, lang, markdown}`. Idioma desconocido → `es`; tipo desconocido → 404. Caché pública de 5 min.
+- Registro (contraseña y Google) con versión de términos o privacidad distinta de la actual → `409` `LEGAL_VERSION_OUTDATED`.
 
 ## Pantallas
 Páginas legales, pantalla de aceptación en registro, aviso de puerta legal para organizadores.
