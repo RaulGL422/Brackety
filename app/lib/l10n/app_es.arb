@@ -412,10 +412,11 @@
       }
     }
   },
-  "exportCsv": "Exportar CSV",
-  "exportStandings": "Clasificación",
-  "exportMatches": "Combates",
-  "exportTimeline": "Línea de tiempo",
+  "exportMenu": "Exportar",
+  "exportStandings": "Clasificación (CSV)",
+  "exportMatches": "Combates (CSV)",
+  "exportTimeline": "Línea de tiempo (CSV)",
+  "exportEventPackage": "Exportar paquete del evento",
   "exportError": "No se ha podido exportar.",
   "matchLive": "En curso",
   "matchNotStarted": "Sin empezar",

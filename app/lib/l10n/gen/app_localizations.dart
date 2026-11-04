@@ -1262,29 +1262,35 @@ abstract class AppLocalizations {
   /// **'{name} · de {min} a {max} años'**
   String categoryRange(String name, int min, int max);
 
-  /// No description provided for @exportCsv.
+  /// No description provided for @exportMenu.
   ///
   /// In es, this message translates to:
-  /// **'Exportar CSV'**
-  String get exportCsv;
+  /// **'Exportar'**
+  String get exportMenu;
 
   /// No description provided for @exportStandings.
   ///
   /// In es, this message translates to:
-  /// **'Clasificación'**
+  /// **'Clasificación (CSV)'**
   String get exportStandings;
 
   /// No description provided for @exportMatches.
   ///
   /// In es, this message translates to:
-  /// **'Combates'**
+  /// **'Combates (CSV)'**
   String get exportMatches;
 
   /// No description provided for @exportTimeline.
   ///
   /// In es, this message translates to:
-  /// **'Línea de tiempo'**
+  /// **'Línea de tiempo (CSV)'**
   String get exportTimeline;
+
+  /// No description provided for @exportEventPackage.
+  ///
+  /// In es, this message translates to:
+  /// **'Exportar paquete del evento'**
+  String get exportEventPackage;
 
   /// No description provided for @exportError.
   ///
