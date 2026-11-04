@@ -27,7 +27,7 @@ class ConnectionScreen extends ConsumerWidget {
         ListTile(
           leading: const Icon(Icons.dns_outlined),
           title: Text(l10n.connectionServer),
-          subtitle: const SelectableText(apiBaseUrl),
+          subtitle: SelectableText(apiBaseUrl),
         ),
         switch (info) {
           AsyncData(:final value) => _StatusTile(
