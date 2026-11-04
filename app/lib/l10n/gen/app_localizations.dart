@@ -395,8 +395,8 @@ abstract class AppLocalizations {
   /// No description provided for @registerAccept.
   ///
   /// In es, this message translates to:
-  /// **'Acepto los términos de uso y la política de privacidad.'**
-  String get registerAccept;
+  /// **'Acepto los {terms} y la {privacy}.'**
+  String registerAccept(String terms, String privacy);
 
   /// No description provided for @registerAcceptRequired.
   ///
@@ -2089,6 +2089,96 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Revisa {field}: no se leyó con seguridad'**
   String issueUnsure(String field);
+
+  /// No description provided for @legalSection.
+  ///
+  /// In es, this message translates to:
+  /// **'Legal'**
+  String get legalSection;
+
+  /// No description provided for @legalPrivacy.
+  ///
+  /// In es, this message translates to:
+  /// **'Política de privacidad'**
+  String get legalPrivacy;
+
+  /// No description provided for @legalTerms.
+  ///
+  /// In es, this message translates to:
+  /// **'Términos de uso'**
+  String get legalTerms;
+
+  /// No description provided for @legalCookies.
+  ///
+  /// In es, this message translates to:
+  /// **'Política de cookies'**
+  String get legalCookies;
+
+  /// No description provided for @legalNotice.
+  ///
+  /// In es, this message translates to:
+  /// **'Aviso legal'**
+  String get legalNotice;
+
+  /// No description provided for @legalPrivacyShort.
+  ///
+  /// In es, this message translates to:
+  /// **'Privacidad'**
+  String get legalPrivacyShort;
+
+  /// No description provided for @legalTermsShort.
+  ///
+  /// In es, this message translates to:
+  /// **'Términos'**
+  String get legalTermsShort;
+
+  /// No description provided for @legalCookiesShort.
+  ///
+  /// In es, this message translates to:
+  /// **'Cookies'**
+  String get legalCookiesShort;
+
+  /// No description provided for @legalLicenses.
+  ///
+  /// In es, this message translates to:
+  /// **'Licencias'**
+  String get legalLicenses;
+
+  /// No description provided for @legalPrivacyLink.
+  ///
+  /// In es, this message translates to:
+  /// **'política de privacidad'**
+  String get legalPrivacyLink;
+
+  /// No description provided for @legalTermsLink.
+  ///
+  /// In es, this message translates to:
+  /// **'términos de uso'**
+  String get legalTermsLink;
+
+  /// No description provided for @legalNotFound.
+  ///
+  /// In es, this message translates to:
+  /// **'Esta página legal no existe.'**
+  String get legalNotFound;
+
+  /// No description provided for @registerLegalOutdated.
+  ///
+  /// In es, this message translates to:
+  /// **'Los términos de uso o la política de privacidad han cambiado. Revísalos y vuelve a aceptarlos.'**
+  String get registerLegalOutdated;
+
+  /// No description provided for @participantPrivacyNotice.
+  ///
+  /// In es, this message translates to:
+  /// **'Los datos del alumno se tratan según la {privacy}.'**
+  String participantPrivacyNotice(String privacy);
+
+  /// No description provided for @importPrivacyNotice.
+  ///
+  /// In es, this message translates to:
+  /// **'Los datos de los alumnos se tratan según la {privacy}.'**
+  String importPrivacyNotice(String privacy);
 }
 
 class _AppLocalizationsDelegate

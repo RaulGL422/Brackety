@@ -58,7 +58,7 @@ class OrganizationFields extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.s),
         AcceptanceCheckbox(
-          title: l10n.registerRepresentative,
+          title: Text(l10n.registerRepresentative),
           requiredText: l10n.registerRepresentativeRequired,
           initialValue: declared,
           onChanged: onDeclaredChanged,

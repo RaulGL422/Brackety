@@ -170,8 +170,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileStudentHint => 'Athlete who competes with their club.';
 
   @override
-  String get registerAccept =>
-      'I accept the terms of use and the privacy policy.';
+  String registerAccept(String terms, String privacy) {
+    return 'I accept the $terms and the $privacy.';
+  }
 
   @override
   String get registerAcceptRequired =>
@@ -1180,5 +1181,55 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String issueUnsure(String field) {
     return 'Check $field: it was not read with certainty';
+  }
+
+  @override
+  String get legalSection => 'Legal';
+
+  @override
+  String get legalPrivacy => 'Privacy policy';
+
+  @override
+  String get legalTerms => 'Terms of use';
+
+  @override
+  String get legalCookies => 'Cookie policy';
+
+  @override
+  String get legalNotice => 'Legal notice';
+
+  @override
+  String get legalPrivacyShort => 'Privacy';
+
+  @override
+  String get legalTermsShort => 'Terms';
+
+  @override
+  String get legalCookiesShort => 'Cookies';
+
+  @override
+  String get legalLicenses => 'Licenses';
+
+  @override
+  String get legalPrivacyLink => 'privacy policy';
+
+  @override
+  String get legalTermsLink => 'terms of use';
+
+  @override
+  String get legalNotFound => 'This legal page does not exist.';
+
+  @override
+  String get registerLegalOutdated =>
+      'The terms of use or the privacy policy have changed. Review them and accept them again.';
+
+  @override
+  String participantPrivacyNotice(String privacy) {
+    return 'The student\'s data is handled according to the $privacy.';
+  }
+
+  @override
+  String importPrivacyNotice(String privacy) {
+    return 'The students\' data is handled according to the $privacy.';
   }
 }

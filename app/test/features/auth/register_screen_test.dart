@@ -1,11 +1,14 @@
 import 'package:brackety/features/auth/data/registration.dart';
 import 'package:brackety/features/auth/ui/widgets/form_message.dart';
+import 'package:brackety/features/legal/data/legal_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/fakes.dart';
+import '../../support/legal_fakes.dart';
 import 'auth_app.dart';
 
+const _accept = 'I accept the terms of use and the privacy policy.';
 const _orgName = 'Organization name';
 const _taxId = 'CIF (Spanish tax ID)';
 const _declaration = 'I am of legal age and represent this organization.';
@@ -24,10 +27,25 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  // Its middle is a link: the box itself is tapped.
+  Future<void> tapAcceptance(WidgetTester tester) async {
+    final box = find.descendant(
+      of: find.widgetWithText(CheckboxListTile, _accept),
+      matching: find.byType(Checkbox),
+    );
+    await tester.ensureVisible(box);
+    await tester.tap(box);
+    await tester.pumpAndSettle();
+  }
+
+  bool accepted(WidgetTester tester) => tester
+      .widget<CheckboxListTile>(find.widgetWithText(CheckboxListTile, _accept))
+      .value!;
+
   Future<void> fillAccount(WidgetTester tester) async {
     await enterField(tester, 'Email', 'ana@example.com');
     await enterField(tester, 'Password', 'long enough pw');
-    await tapText(tester, 'I accept the terms of use and the privacy policy.');
+    await tapAcceptance(tester);
   }
 
   Future<void> fillHelper(
@@ -333,4 +351,105 @@ void main() {
       expect(find.byType(AlertDialog), findsNothing);
     });
   }
+
+  testWidgets('sends the versions the server has when the form opens', (
+    tester,
+  ) async {
+    final api = FakeAuthApi();
+    final legal = FakeLegalRepository(
+      versionsAnswer: const LegalVersions(terms: 't-7', privacy: 'p-3'),
+    );
+    await pumpAuthApp(tester, api, location: '/register', legal: legal);
+    expect(legal.versionsCalls, 1);
+
+    await fillHelper(tester, birthDate: '05/07/1990');
+    await tapText(tester, 'Create account');
+
+    final json = api.registrations.single.toJson();
+    expect(json['acceptedTermsVersion'], 't-7');
+    expect(json['acceptedPrivacyVersion'], 'p-3');
+  });
+
+  testWidgets('without the versions the sign-up says there is no server and '
+      'tries again on the next submit', (tester) async {
+    final api = FakeAuthApi();
+    final legal = FakeLegalRepository()..versionsError = networkError();
+    await pumpAuthApp(tester, api, location: '/register', legal: legal);
+
+    await fillHelper(tester, birthDate: '05/07/1990');
+    await tapText(tester, 'Create account');
+    expect(find.byType(FormMessage), findsOneWidget);
+    expect(api.registrations, isEmpty);
+
+    legal.versionsError = null;
+    await tapText(tester, 'Create account');
+    expect(api.registrations, hasLength(1));
+  });
+
+  for (final (link, title) in [
+    ('terms of use', 'Terms of use'),
+    ('privacy policy', 'Privacy policy'),
+  ]) {
+    testWidgets('"$link" opens its page and the form is kept on the way back', (
+      tester,
+    ) async {
+      final legal = FakeLegalRepository();
+      await pumpAuthApp(
+        tester,
+        FakeAuthApi(),
+        location: '/register',
+        legal: legal,
+      );
+      await enterField(tester, 'Email', 'ana@example.com');
+
+      final text = find.textRange.ofSubstring(link);
+      await tester.ensureVisible(find.text(_accept));
+      await tester.tapOnText(text);
+      await tester.pumpAndSettle();
+
+      expect(find.widgetWithText(AppBar, title), findsOneWidget);
+      expect(legal.texts.last.$2, 'en');
+
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      expect(find.text('ana@example.com'), findsOneWidget);
+      expect(accepted(tester), isFalse);
+    });
+  }
+
+  testWidgets('outdated versions untick the box, ask to accept again and the '
+      'next submit sends the new ones', (tester) async {
+    final api = FakeAuthApi()
+      ..registerError = httpError(
+        409,
+        body: {'code': 'LEGAL_VERSION_OUTDATED'},
+      );
+    final legal = FakeLegalRepository();
+    await pumpAuthApp(tester, api, location: '/register', legal: legal);
+
+    await fillHelper(tester, birthDate: '05/07/1990');
+    legal.versionsAnswer = const LegalVersions(
+      terms: '2026-12-01',
+      privacy: '2026-12-01',
+    );
+    await tapText(tester, 'Create account');
+
+    expect(
+      find.text(
+        'The terms of use or the privacy policy have changed. Review them '
+        'and accept them again.',
+      ),
+      findsOneWidget,
+    );
+    expect(accepted(tester), isFalse);
+    expect(legal.versionsCalls, 2);
+
+    api.registerError = null;
+    await tapAcceptance(tester);
+    await tapText(tester, 'Create account');
+
+    final json = api.registrations.single.toJson();
+    expect(json['acceptedTermsVersion'], '2026-12-01');
+    expect(json['acceptedPrivacyVersion'], '2026-12-01');
+  });
 }
