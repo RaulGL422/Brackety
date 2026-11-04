@@ -1,0 +1,581 @@
+{
+  "@@locale": "es",
+  "appTitle": "Brackety",
+  "navConnection": "Conexión",
+  "loading": "Cargando…",
+  "retry": "Reintentar",
+  "loadError": "No se ha podido cargar. Comprueba la conexión.",
+  "noServer": "No hay conexión con el servidor.",
+  "unexpectedError": "Algo ha ido mal. Inténtalo de nuevo.",
+  "tooManyRequests": "Demasiadas peticiones. Espera {seconds} s y vuelve a intentarlo.",
+  "@tooManyRequests": {"placeholders": {"seconds": {"type": "int"}}},
+  "tooManyRequestsWait": "Demasiadas peticiones. Espera un momento y vuelve a intentarlo.",
+  "cancel": "Cancelar",
+  "continueAction": "Continuar",
+  "fieldRequired": "Campo obligatorio.",
+  "emailLabel": "Email",
+  "emailInvalid": "Escribe un email válido.",
+  "passwordLabel": "Contraseña",
+  "passwordHint": "Mínimo 10 caracteres.",
+  "passwordTooShort": "La contraseña necesita al menos 10 caracteres.",
+  "passwordTooLong": "La contraseña admite como máximo 128 caracteres.",
+  "showPassword": "Mostrar contraseña",
+  "hidePassword": "Ocultar contraseña",
+  "goToLogin": "Ir a iniciar sesión",
+  "loginTitle": "Entrar",
+  "loginSubmit": "Entrar",
+  "loginInvalid": "Email o contraseña incorrectos.",
+  "loginLocked": "Cuenta bloqueada 15 minutos por demasiados intentos fallidos. Si necesitas ayuda, indica el código {lockId}.",
+  "@loginLocked": {"placeholders": {"lockId": {"type": "String"}}},
+  "loginForgot": "¿Has olvidado la contraseña?",
+  "loginNoAccount": "¿No tienes cuenta? Regístrate",
+  "loginPasswordChanged": "Contraseña cambiada. Ya puedes entrar con la nueva.",
+  "loginDemoAccounts": "Cuentas de prueba (solo en desarrollo)",
+  "restoreTitle": "Cuenta pendiente de borrado",
+  "restoreBody": "Tu cuenta se borrará el {date}. ¿Quieres recuperarla?",
+  "@restoreBody": {"placeholders": {"date": {"type": "String"}}},
+  "restoreConfirm": "Recuperar cuenta",
+  "restoreExpired": "Ha pasado demasiado tiempo. Vuelve a entrar para recuperar la cuenta.",
+  "registerTitle": "Crear cuenta",
+  "registerSubmit": "Crear cuenta",
+  "registerBirthDate": "Fecha de nacimiento",
+  "registerUnderage": "Los menores de 14 años no pueden crear su propia cuenta. Su padre, madre o tutor lo da de alta desde su cuenta añadiendo un perfil de menor (disponible próximamente).",
+  "registerProfile": "¿Cómo vas a usar Brackety?",
+  "registerProfileRequired": "Elige un perfil.",
+  "profileClub": "Club",
+  "profileClubHint": "Organiza eventos e inscribe a sus deportistas.",
+  "profileExternalEntity": "Entidad externa",
+  "profileExternalEntityHint": "Federación, ayuntamiento u otra entidad que organiza eventos.",
+  "profileHelper": "Ayudante",
+  "profileHelperHint": "Colabora en los eventos: grupos, mesa o arbitraje.",
+  "profileExternal": "Externo",
+  "profileExternalHint": "Sigue eventos y resultados sin pertenecer a un club.",
+  "profileStudent": "Alumno",
+  "profileStudentHint": "Deportista que compite con su club.",
+  "registerAccept": "Acepto los términos de uso y la política de privacidad.",
+  "registerAcceptRequired": "Debes aceptarlos para crear la cuenta.",
+  "registerOrganizationName": "Nombre de la organización",
+  "registerOrganizationNameLength": "Entre 2 y 200 caracteres.",
+  "registerTaxId": "CIF",
+  "registerTaxIdHelper": "La plataforma lo usa para verificar la organización antes de que pueda publicar eventos.",
+  "registerTaxIdInvalid": "CIF no válido.",
+  "registerRepresentative": "Soy mayor de edad y represento a esta organización.",
+  "registerRepresentativeRequired": "Debes confirmarlo para registrar la organización.",
+  "registerHaveAccount": "¿Ya tienes cuenta? Entra",
+  "checkEmailTitle": "Revisa tu email",
+  "checkEmailBody": "Te hemos enviado un email. Abre su enlace para verificar la cuenta; caduca en 24 horas.",
+  "resendEmail": "Reenviar email",
+  "resendSent": "Email enviado.",
+  "verifyBanner": "Verifica tu email: algunas acciones lo necesitan.",
+  "verifyTitle": "Verificar email",
+  "verifySuccess": "Email verificado. ¡Gracias!",
+  "linkInvalid": "El enlace no es válido o ha caducado.",
+  "forgotTitle": "Recuperar contraseña",
+  "forgotIntro": "Escribe tu email y te enviaremos un enlace para elegir una contraseña nueva.",
+  "forgotSubmit": "Enviar enlace",
+  "forgotSent": "Si hay una cuenta con ese email, te hemos enviado un enlace para cambiar la contraseña.",
+  "resetTitle": "Nueva contraseña",
+  "resetNewPassword": "Nueva contraseña",
+  "resetConfirmPassword": "Repite la contraseña",
+  "resetMismatch": "Las contraseñas no coinciden.",
+  "resetSubmit": "Cambiar contraseña",
+  "resetRequestNew": "Pedir otro enlace",
+  "logout": "Salir",
+  "eventsTitle": "Mis eventos",
+  "eventsEmpty": "No tienes eventos asignados.",
+  "roleClub": "Club",
+  "roleGrouper": "Ayudante",
+  "roleReferee": "Árbitro",
+  "eventMakeGroups": "Crear grupos",
+  "eventMyMat": "Tapiz {number}",
+  "@eventMyMat": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "eventClubPanel": "Panel del club",
+  "categoriesTitle": "Categorías",
+  "categoriesEmpty": "Todavía no hay inscritos.",
+  "categoryCounts": "{participants} inscritos · {grouped} en grupos",
+  "@categoryCounts": {
+    "placeholders": {
+      "participants": {
+        "type": "int"
+      },
+      "grouped": {
+        "type": "int"
+      }
+    }
+  },
+  "categoryAges": "{name} años",
+  "@categoryAges": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sortByName": "Nombre",
+  "sortByHeight": "Estatura",
+  "participantDetails": "{age} años · {height}",
+  "@participantDetails": {
+    "placeholders": {
+      "age": {
+        "type": "int"
+      },
+      "height": {
+        "type": "String"
+      }
+    }
+  },
+  "heightCm": "{cm} cm",
+  "@heightCm": {
+    "placeholders": {
+      "cm": {
+        "type": "int"
+      }
+    }
+  },
+  "heightUnknown": "sin estatura",
+  "participantGrouped": "Grupo {group} · Tapiz {mat}",
+  "@participantGrouped": {
+    "placeholders": {
+      "group": {
+        "type": "int"
+      },
+      "mat": {
+        "type": "int"
+      }
+    }
+  },
+  "draftGroup": "Grupo {number}",
+  "@draftGroup": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "draftCount": "{count}/4",
+  "@draftCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "draftGhost": "Competidor fantasma",
+  "draftGhostHint": "Elige al fantasma: combate pero no puntúa.",
+  "draftAddGroup": "Añadir grupo",
+  "draftRemoveGroup": "Quitar grupo",
+  "createGroup": "{count, plural, =1{Crear grupo} other{Crear grupos}}",
+  "@createGroup": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "groupsCreatedTitle": "{count, plural, =1{Grupo creado} other{Grupos creados}}",
+  "@groupsCreatedTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "groupsCreatedBody": "{groups} → Tapiz {mat}",
+  "@groupsCreatedBody": {
+    "placeholders": {
+      "groups": {
+        "type": "String"
+      },
+      "mat": {
+        "type": "int"
+      }
+    }
+  },
+  "groupsConflict": "Algún alumno ya está en un grupo. La lista se ha actualizado.",
+  "groupsError": "No se han podido crear los grupos.",
+  "ok": "Aceptar",
+  "ghostBadge": "Fantasma",
+  "matTitle": "Tapiz {number}",
+  "@matTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "matEmpty": "Todavía no hay grupos en este tapiz.",
+  "matGroupHeader": "Grupo {number} · {category} años",
+  "@matGroupHeader": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "matRecommended": "Siguiente recomendado",
+  "matInProgress": "En curso",
+  "matPending": "Pendientes",
+  "matFinished": "Terminados",
+  "matWaiting": "Un luchador está combatiendo ahora",
+  "matNoneAvailable": "Ningún combate puede empezar ahora.",
+  "versus": "vs",
+  "scoreboardTitle": "Tapiz {mat} · Grupo {group}",
+  "@scoreboardTitle": {
+    "placeholders": {
+      "mat": {
+        "type": "int"
+      },
+      "group": {
+        "type": "int"
+      }
+    }
+  },
+  "cornerRed": "Rojo",
+  "cornerBlue": "Azul",
+  "clockStart": "Iniciar",
+  "clockStop": "Parar",
+  "clockResume": "Reanudar",
+  "finishMatch": "Finalizar combate",
+  "matchFinished": "Combate finalizado",
+  "backToMat": "Volver al tapiz",
+  "undo": "Deshacer",
+  "timeline": "Línea de tiempo",
+  "addPoint": "+1",
+  "warningsCount": "Advertencias: {count}",
+  "@warningsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "oneHandCount": "Una mano: {count}",
+  "@oneHandCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "disqualified": "Descalificado",
+  "actionWarning": "Advertencia",
+  "actionOneHand": "Advertencia por golpear con una mano",
+  "actionDisqualify": "Descalificación",
+  "reasonTitle": "{action} · {fighter}",
+  "@reasonTitle": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      },
+      "fighter": {
+        "type": "String"
+      }
+    }
+  },
+  "reasonLabel": "Motivo (obligatorio)",
+  "reasonConfirm": "¿Seguro? Queda registrado.",
+  "confirm": "Confirmar",
+  "endPoints": "Fin por puntos",
+  "endTime": "Fin del tiempo",
+  "endDisqualification": "Fin por descalificación",
+  "actionRefused": "No se ha podido registrar. {detail}",
+  "@actionRefused": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "tlStart": "Inicio del tiempo",
+  "tlStop": "Parada",
+  "tlPoint": "Punto",
+  "tlUndo": "Deshacer",
+  "tlFinish": "Fin del combate",
+  "tlAutomatic": "automático",
+  "tlUndone": "deshecho",
+  "tlRivalPoint": "punto al rival",
+  "clubStandings": "Puntuaciones",
+  "clubMats": "Tapices",
+  "clubParticipants": "Inscripciones",
+  "clubSettings": "Configuración",
+  "allCategories": "Todas las categorías",
+  "noCategory": "Sin categoría",
+  "sortByPoints": "Puntos",
+  "standingsEmpty": "Todavía no hay puntuaciones.",
+  "standingsTotal": "{total} pts",
+  "@standingsTotal": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "standingsDetail": "Asistencia {attendance} · Combates {points} ({matches})",
+  "@standingsDetail": {
+    "placeholders": {
+      "attendance": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      },
+      "matches": {
+        "type": "int"
+      }
+    }
+  },
+  "matsEmpty": "No hay tapices.",
+  "matSummary": "{groups} grupos · {pending} combates pendientes",
+  "@matSummary": {
+    "placeholders": {
+      "groups": {
+        "type": "int"
+      },
+      "pending": {
+        "type": "int"
+      }
+    }
+  },
+  "matNoReferee": "Sin árbitro",
+  "matEstimatedEnd": "Fin estimado {time}",
+  "@matEstimatedEnd": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "matFighting": "Combate en curso",
+  "matIdle": "Parado",
+  "participantAdd": "Inscribir alumno",
+  "participantEdit": "Editar alumno",
+  "firstName": "Nombre",
+  "lastName": "Apellidos",
+  "birthDate": "Fecha de nacimiento",
+  "heightOptional": "Estatura en cm (opcional)",
+  "heightInvalid": "Entre 50 y 250 cm",
+  "guardianConsent": "El tutor legal está de acuerdo",
+  "guardianConsentRequired": "Obligatorio para menores de 18 años.",
+  "participantAgeCategory": "{age} años · {category}",
+  "@participantAgeCategory": {
+    "placeholders": {
+      "age": {
+        "type": "int"
+      },
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteParticipantTitle": "¿Borrar a {name}?",
+  "@deleteParticipantTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "save": "Guardar",
+  "delete": "Borrar",
+  "saved": "Guardado",
+  "saveConflict": "No se puede: ya hay grupos que dependen de esto.",
+  "saveInvalid": "Revisa los datos.",
+  "saveError": "No se ha podido guardar.",
+  "settingsName": "Nombre del evento",
+  "settingsDate": "Fecha",
+  "settingsMaxGroups": "Grupos por tapiz a la vez",
+  "settingsMaxGroupsHint": "1 = sin multigrupo",
+  "settingsAddMat": "Añadir tapiz",
+  "settingsRemoveMat": "Quitar el último tapiz",
+  "settingsReferee": "Árbitro",
+  "categoryRange": "{name} · de {min} a {max} años",
+  "@categoryRange": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "exportCsv": "Exportar CSV",
+  "exportStandings": "Clasificación",
+  "exportMatches": "Combates",
+  "exportTimeline": "Línea de tiempo",
+  "exportError": "No se ha podido exportar.",
+  "matchLive": "En curso",
+  "matchNotStarted": "Sin empezar",
+  "teamName": "Equipo {number}",
+  "@teamName": {"placeholders": {"number": {"type": "int"}}},
+  "teamGhostName": "Equipo {number} (fantasma)",
+  "@teamGhostName": {"placeholders": {"number": {"type": "int"}}},
+  "tabParticipants": "Alumnos",
+  "tabTeams": "Equipos",
+  "individualGroup": "Grupo individual",
+  "individualGroupHint": "Para quien se quede sin equipo: grupos de 4 alumnos.",
+  "categoryTeamCounts": "{participants} inscritos · {teams} equipos · {grouped} en grupos",
+  "@categoryTeamCounts": {"placeholders": {"participants": {"type": "int"}, "teams": {"type": "int"}, "grouped": {"type": "int"}}},
+  "newTeamCount": "Equipo nuevo · {count}/{size}",
+  "@newTeamCount": {"placeholders": {"count": {"type": "int"}, "size": {"type": "int"}}},
+  "createTeam": "Crear equipo",
+  "teamCreated": "Creado el {team}",
+  "@teamCreated": {"placeholders": {"team": {"type": "String"}}},
+  "teamConflict": "Algún alumno ya está en un equipo o grupo. La lista se ha actualizado.",
+  "teamError": "No se ha podido crear el equipo.",
+  "teamsEmpty": "Todavía no hay equipos: créalos en Alumnos.",
+  "deleteTeam": "Deshacer equipo",
+  "deleteTeamConfirm": "¿Deshacer el {team}? Sus alumnos quedan libres.",
+  "@deleteTeamConfirm": {"placeholders": {"team": {"type": "String"}}},
+  "deleteTeamError": "No se ha podido deshacer el equipo.",
+  "draftGhostTeam": "Equipo fantasma",
+  "draftGhostTeamHint": "Elige {size} alumnos cualesquiera de la categoría: combaten pero no puntúan.",
+  "@draftGhostTeamHint": {"placeholders": {"size": {"type": "int"}}},
+  "pickGhostTeam": "Elegir alumnos · {count}/{size}",
+  "@pickGhostTeam": {"placeholders": {"count": {"type": "int"}, "size": {"type": "int"}}},
+  "settingsTitle": "Ajustes de la cuenta",
+  "settingsAccount": "Cuenta",
+  "settingsEmailVerified": "Verificado",
+  "settingsEmailUnverified": "Sin verificar",
+  "settingsChangeEmail": "Cambiar email",
+  "changeEmailNew": "Email nuevo",
+  "changeEmailSubmit": "Enviar enlace",
+  "changeEmailSent": "Hemos enviado un email a {email}. Abre su enlace para terminar el cambio (caduca en 24 horas).",
+  "@changeEmailSent": {"placeholders": {"email": {"type": "String"}}},
+  "settingsLanguage": "Idioma",
+  "settingsLanguageHint": "También es el de los emails que te enviamos.",
+  "languageSpanish": "Español",
+  "languageEnglish": "English",
+  "settingsLanguageError": "No se ha podido cambiar el idioma.",
+  "settingsProfiles": "Perfiles",
+  "profileValidated": "Validado",
+  "profilePendingValidation": "Pendiente de validación",
+  "profileTaxId": "CIF: {taxId}",
+  "@profileTaxId": {"placeholders": {"taxId": {"type": "String"}}},
+  "profileAdd": "Añadir perfil",
+  "profileAdded": "Perfil añadido.",
+  "profileRemove": "Quitar perfil",
+  "profileRemoveConfirm": "¿Quitar el perfil {profile}?",
+  "@profileRemoveConfirm": {"placeholders": {"profile": {"type": "String"}}},
+  "profileRemoved": "Perfil quitado.",
+  "removeAction": "Quitar",
+  "profileLast": "Tu cuenta necesita al menos un perfil.",
+  "profileCombination": "Ese perfil no se puede combinar con los que ya tienes.",
+  "profileNeedsVerifiedEmail": "Verifica tu email antes de añadir perfiles.",
+  "settingsSignInMethods": "Métodos de acceso",
+  "signInPassword": "Email y contraseña",
+  "signInGoogle": "Google",
+  "googleUnlink": "Desvincular",
+  "googleUnlinkConfirm": "¿Desvincular tu cuenta de Google? Solo podrás entrar con email y contraseña.",
+  "googleUnlinked": "Google desvinculado.",
+  "passwordRemove": "Quitar contraseña",
+  "passwordRemoveConfirm": "Solo podrás entrar con Google y se cerrarán todas tus sesiones, también esta. Para volver a tener contraseña, usa «¿Has olvidado la contraseña?».",
+  "lastSignInMethod": "Es tu único método de acceso. Añade otro antes.",
+  "needsGoogle": "Esta acción pide confirmar con Google, que llegará pronto a la app.",
+  "settingsData": "Tus datos",
+  "settingsDataHint": "Descarga una copia de los datos de tu cuenta (JSON).",
+  "settingsExport": "Exportar mis datos",
+  "settingsDanger": "Zona peligrosa",
+  "deleteAccount": "Borrar cuenta",
+  "deleteAccountHint": "Se borra definitivamente a los 30 días. Hasta entonces puedes recuperarla iniciando sesión.",
+  "deleteAccountTitle": "¿Borrar tu cuenta?",
+  "deleteAccountBody": "Se cerrarán todas tus sesiones. La cuenta, con sus perfiles y datos, se borrará definitivamente a los 30 días. Hasta entonces puedes recuperarla iniciando sesión.",
+  "deleteOwnsEvents": "Eres responsable de eventos. Cédelos a otra persona o bórralos antes de borrar tu cuenta.",
+  "loginAccountDeleted": "Tu cuenta se borrará el {date}. Inicia sesión antes para recuperarla.",
+  "@loginAccountDeleted": {"placeholders": {"date": {"type": "String"}}},
+  "loginPasswordRemoved": "Contraseña quitada y sesiones cerradas. Ya solo puedes entrar con Google.",
+  "reauthTitle": "Confirma que eres tú",
+  "reauthBody": "Escribe tu contraseña para continuar.",
+  "reauthSubmit": "Confirmar",
+  "reauthFailed": "Contraseña incorrecta.",
+  "settingsLogout": "Cerrar sesión",
+  "confirmEmailChangeTitle": "Cambio de email",
+  "confirmEmailChangeDone": "Email cambiado. Se han cerrado todas las sesiones: inicia sesión con el email nuevo.",
+  "categoryIndividual": "Individual",
+  "categoryTeams": "Equipos de {size}",
+  "@categoryTeams": {"placeholders": {"size": {"type": "int"}}},
+  "categoryAdd": "Añadir categoría",
+  "categoryEdit": "Editar categoría",
+  "categoryRemove": "Quitar categoría",
+  "categoryNameLabel": "Nombre",
+  "categoryMinAge": "Desde",
+  "categoryMaxAge": "Hasta",
+  "categoryByTeams": "Por equipos",
+  "categoryTeamSize": "Alumnos por equipo",
+  "categoryGroupSize": "Grupos de {size}",
+  "@categoryGroupSize": {"placeholders": {"size": {"type": "int"}}},
+  "categoryAgesInvalid": "La edad mínima no puede ser mayor que la máxima.",
+  "categoriesInUse": "Una categoría con grupos o equipos solo puede cambiar de nombre.",
+  "categoriesInvalid": "Revisa las categorías: las edades no pueden solaparse.",
+  "standingTeam": "{team} · {detail}",
+  "@standingTeam": {"placeholders": {"team": {"type": "String"}, "detail": {"type": "String"}}},
+  "categoryAgeSuffix": "años",
+  "categoryLabel": "Categoría",
+  "categoryByAge": "Automática por edad",
+  "importButton": "Importar alumnos",
+  "importFormatTitle": "Cómo debe ser la lista",
+  "importFormatBody": "Una fila por alumno: nombre, apellidos, fecha de nacimiento (dd/mm/aaaa), estatura en cm (opcional) y categoría (opcional). Vale una o varias fotos, un CSV, un Excel, un TXT o el texto pegado.",
+  "importTemplate": "Descargar plantilla",
+  "importPickPhotos": "Elegir fotos",
+  "importPickFile": "Elegir archivo",
+  "importPasteHint": "O pega aquí la lista",
+  "importConsent": "Confirmo que todos los alumnos de esta lista, y sus tutores si son menores, han aceptado inscribirse en este evento sin excepción, y que la lista se procesará con un servicio de IA externo (Anthropic) solo para leerla. Las imágenes y archivos no se guardan.",
+  "importRead": "Leer lista",
+  "importReading": "Leyendo la lista… puede tardar hasta un minuto.",
+  "importReadError": "No se ha podido leer la lista. Prueba con una foto más nítida o con un archivo.",
+  "importTooMany": "Has leído muchas listas en la última hora. Prueba más tarde.",
+  "importInvalidFiles": "Solo fotos (JPG, PNG, WebP), CSV, TXT o Excel: hasta {max} archivos de 10 MB.",
+  "@importInvalidFiles": {"placeholders": {"max": {"type": "int"}}},
+  "importSummary": "{total} alumnos · {errors} con errores · {warnings} para revisar",
+  "@importSummary": {"placeholders": {"total": {"type": "int"}, "errors": {"type": "int"}, "warnings": {"type": "int"}}},
+  "importRegister": "{count, plural, =1{Inscribir 1 alumno} other{Inscribir {count} alumnos}}",
+  "@importRegister": {"placeholders": {"count": {"type": "int"}}},
+  "importRegistered": "{count, plural, =1{1 alumno inscrito} other{{count} alumnos inscritos}}",
+  "@importRegistered": {"placeholders": {"count": {"type": "int"}}},
+  "importRegisterRefused": "No se ha inscrito nadie: revisa las filas marcadas.",
+  "importAddRow": "Añadir alumno",
+  "importEditRow": "Editar alumno",
+  "importRemoveRow": "Quitar de la lista",
+  "importStartOver": "Volver a subir",
+  "importEmpty": "La lista no tiene alumnos.",
+  "importUseCategory": "Usar {name}",
+  "@importUseCategory": {"placeholders": {"name": {"type": "String"}}},
+  "fieldFirstName": "el nombre",
+  "fieldLastName": "los apellidos",
+  "fieldBirthDate": "la fecha de nacimiento",
+  "fieldHeight": "la estatura",
+  "fieldCategory": "la categoría",
+  "issueMissing": "Falta {field}",
+  "@issueMissing": {"placeholders": {"field": {"type": "String"}}},
+  "issueTooLong": "Demasiado largo: {field}",
+  "@issueTooLong": {"placeholders": {"field": {"type": "String"}}},
+  "issueInvalidDate": "Fecha no válida: {text}",
+  "@issueInvalidDate": {"placeholders": {"text": {"type": "String"}}},
+  "issueFutureDate": "La fecha de nacimiento tiene que ser anterior a hoy",
+  "issueHeight": "Estatura {cm}: tiene que estar entre 50 y 250 cm",
+  "@issueHeight": {"placeholders": {"cm": {"type": "String"}}},
+  "issueNoCategory": "Ninguna categoría del evento es para {age} años",
+  "@issueNoCategory": {"placeholders": {"age": {"type": "String"}}},
+  "issueUnknownCategory": "La categoría «{name}» no existe en el evento",
+  "@issueUnknownCategory": {"placeholders": {"name": {"type": "String"}}},
+  "issueChosenCategoryGone": "La categoría elegida ya no existe",
+  "issueCategoryMismatch": "Indica {written}, pero por su edad le corresponde {byAge}",
+  "@issueCategoryMismatch": {"placeholders": {"written": {"type": "String"}, "byAge": {"type": "String"}}},
+  "issueDuplicate": "Repetido en la lista (fila {row})",
+  "@issueDuplicate": {"placeholders": {"row": {"type": "String"}}},
+  "issueAlreadyRegistered": "Ya está inscrito en el evento",
+  "issueUnsure": "Revisa {field}: no se leyó con seguridad",
+  "@issueUnsure": {"placeholders": {"field": {"type": "String"}}}
+}

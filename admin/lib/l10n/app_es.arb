@@ -1,0 +1,213 @@
+{
+  "@@locale": "es",
+  "appTitle": "Brackety Admin",
+  "navDashboard": "Panel",
+  "navConnection": "Conexión",
+  "dashboardTitle": "Panel de superadmin",
+  "dashboardSubtitle": "Gestión global de la plataforma.",
+  "navDesignSystem": "Diseño",
+  "dsTitle": "Sistema de diseño",
+  "dsIntro": "Solo en builds debug. Todo lo de abajo usa el tema real en el modo elegido.",
+  "dsModeLight": "Claro",
+  "dsModeDark": "Oscuro",
+  "dsTextScale": "Texto al {percent} %",
+  "dsColors": "Colores",
+  "dsStatusColors": "Estados",
+  "dsCompetitorColors": "Colores de competidor",
+  "dsContrastHint": "AA: texto normal (≥ 4,5). AA grande: solo texto grande (≥ 3). ✗: no usar para texto.",
+  "dsContrastLarge": "AA grande",
+  "dsTypography": "Tipografía",
+  "dsTypeSample": "Liga de ejemplo 2027 · 0123456789",
+  "dsSpacing": "Espaciado",
+  "dsRadius": "Radios",
+  "dsComponents": "Componentes",
+  "dsSave": "Guardar",
+  "dsTonal": "Inscribirse",
+  "dsCancel": "Cancelar",
+  "dsMore": "Ver más",
+  "dsDisabled": "Desactivado",
+  "dsFieldLabel": "Nombre del club",
+  "dsFieldHint": "Club Deportivo Ejemplo",
+  "dsFieldError": "Campo obligatorio",
+  "dsNotifications": "Notificaciones",
+  "dsCategoryKids": "Infantil",
+  "dsCategoryCadet": "Cadete",
+  "dsCategorySenior": "Sénior",
+  "dsCardTitle": "Liga de ejemplo 2027",
+  "dsCardSubtitle": "3 fases · 120 inscritos",
+  "dsPaid": "Pagado",
+  "dsPending": "Pendiente",
+  "dsRejected": "Rechazado",
+  "dsSamples": "Ejemplos",
+  "dsScoreboard": "Marcador",
+  "dsColorA": "Color A",
+  "dsColorB": "Color B",
+  "dsPenalties": "Amonestaciones: {count}",
+  "dsStandings": "Clasificación",
+  "dsPosition": "Pos.",
+  "dsCompetitor": "Competidor",
+  "dsWins": "V",
+  "dsLosses": "D",
+  "dsPoints": "Pts",
+  "navLocks": "Bloqueos",
+  "navOrganizers": "Organizadores",
+  "logout": "Cerrar sesión",
+  "cancel": "Cancelar",
+  "retry": "Reintentar",
+  "refresh": "Actualizar",
+  "loadError": "No se han podido cargar los datos.",
+  "noServer": "No se puede conectar con el servidor.",
+  "unexpectedError": "Algo ha fallado. Inténtalo de nuevo.",
+  "adminNotConfigured": "El acceso de superadmin no está configurado en este servidor.",
+  "adminAccessDenied": "Acceso denegado: la administración solo funciona desde su dominio protegido (Cloudflare Access).",
+  "tooManyRequests": "Demasiadas peticiones. Espera {seconds} s y vuelve a intentarlo.",
+  "tooManyRequestsWait": "Demasiadas peticiones. Espera un momento y vuelve a intentarlo.",
+  "loginTitle": "Acceso de superadmin",
+  "emailLabel": "Email",
+  "passwordLabel": "Contraseña",
+  "showPassword": "Mostrar contraseña",
+  "hidePassword": "Ocultar contraseña",
+  "fieldRequired": "Campo obligatorio",
+  "loginSubmit": "Entrar",
+  "loginInvalid": "Email o contraseña incorrectos.",
+  "loginLocked": "Demasiados intentos fallidos: acceso bloqueado 15 minutos (bloqueo {lockId}).",
+  "sessionExpired": "Tu sesión ha caducado. Vuelve a entrar.",
+  "locksTitle": "Bloqueos activos",
+  "locksEmpty": "No hay bloqueos activos.",
+  "lockColumnId": "Bloqueo",
+  "lockColumnType": "Tipo",
+  "lockColumnWho": "Quién",
+  "lockColumnTimeLeft": "Tiempo restante",
+  "lockTypeEmail": "Email",
+  "lockTypeIp": "IP",
+  "lockTypeAdmin": "Superadmin",
+  "lockUnknownEmail": "Email sin cuenta",
+  "lockMinutesLeft": "{minutes, plural, =1{Queda 1 min} other{Quedan {minutes} min}}",
+  "lockUntil": "hasta las {time}",
+  "lockExpired": "Caducado",
+  "lockRevoke": "Revocar",
+  "lockRevokeTitle": "¿Revocar el bloqueo {lockId}?",
+  "lockRevokeBody": "Se borran sus intentos fallidos y se podrá volver a entrar al momento.",
+  "lockRevoked": "Bloqueo {lockId} revocado.",
+  "lockAlreadyExpired": "Ese bloqueo ya había caducado. Lista actualizada.",
+  "organizersTitle": "Organizadores",
+  "organizerFilterPending": "Pendientes",
+  "organizerFilterValidated": "Validados",
+  "organizerFilterAll": "Todos",
+  "organizersEmptyPending": "No hay organizadores pendientes de validar.",
+  "organizersEmpty": "No hay organizadores.",
+  "organizerColumnName": "Organización",
+  "organizerColumnTaxId": "CIF",
+  "organizerColumnType": "Tipo",
+  "organizerColumnEmail": "Email",
+  "organizerColumnCreated": "Alta",
+  "organizerColumnState": "Estado",
+  "organizerNoData": "Sin datos",
+  "organizerNoTaxId": "—",
+  "organizerTaxId": "CIF: {taxId}",
+  "organizerDate": "{date}",
+  "organizerCreated": "Alta: {date}",
+  "organizerClub": "Club",
+  "organizerExternalEntity": "Entidad externa",
+  "organizerPending": "Pendiente",
+  "organizerValidated": "Validado",
+  "organizerValidate": "Validar",
+  "organizerValidateTitle": "¿Validar {name}?",
+  "organizerValidateBody": "Podrá publicar eventos. Si es la primera vez que se valida, recibirá un email avisándole.",
+  "organizerValidatedDone": "{name} validado.",
+  "organizerNotFound": "Ese organizador ya no existe o ya no es organizador. Lista actualizada.",
+  "@tooManyRequests": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "@loginLocked": {
+    "placeholders": {
+      "lockId": {
+        "type": "String"
+      }
+    }
+  },
+  "@lockMinutesLeft": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "@lockUntil": {
+    "placeholders": {
+      "time": {
+        "type": "DateTime",
+        "format": "Hm"
+      }
+    }
+  },
+  "@lockRevokeTitle": {
+    "placeholders": {
+      "lockId": {
+        "type": "String"
+      }
+    }
+  },
+  "@lockRevoked": {
+    "placeholders": {
+      "lockId": {
+        "type": "String"
+      }
+    }
+  },
+  "@organizerTaxId": {
+    "placeholders": {
+      "taxId": {
+        "type": "String"
+      }
+    }
+  },
+  "@organizerDate": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMd"
+      }
+    }
+  },
+  "@organizerCreated": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMd"
+      }
+    }
+  },
+  "@organizerValidateTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@organizerValidatedDone": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@dsTextScale": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "@dsPenalties": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
+}

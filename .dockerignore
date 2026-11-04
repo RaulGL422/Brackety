@@ -1,0 +1,14 @@
+.git/
+.idea/
+graphify-out/
+server/
+docs/
+**/build/
+**/.dart_tool/
+**/.flutter-plugins*
+**/android/
+**/env/
+**/.env
+**/*.env.local
+**/key.properties
+**/*.jks

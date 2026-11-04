@@ -1,0 +1,140 @@
+name: Images
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compose-smoke:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: deploy
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Test environment
+        run: |
+          cp .env.example .env
+          sed -i 's/^DB_USER=.*/DB_USER=brackety/; s/^DB_PASSWORD=.*/DB_PASSWORD=ci-only-password/; s#^API_BASE_URL=.*#API_BASE_URL=http://localhost:8080#' .env
+          sed -i "s#^JWT_SECRET=.*#JWT_SECRET=$(openssl rand -base64 48 | tr -d '\n')#" .env
+      - name: Deploy refuses a short JWT_SECRET
+        run: |
+          cp .env "$RUNNER_TEMP/env.ok"
+          sed -i 's/^JWT_SECRET=.*/JWT_SECRET=too-short/' .env
+          status=0
+          ./deploy.sh local 2> "$RUNNER_TEMP/deploy.err" || status=$?
+          # Restore the good .env before any check, so later steps never run with the broken one.
+          cp "$RUNNER_TEMP/env.ok" .env
+          if [ "$status" -eq 0 ]; then echo "deploy with a short JWT_SECRET should fail"; exit 1; fi
+          grep -q "Set JWT_SECRET" "$RUNNER_TEMP/deploy.err"
+      - name: Build images
+        run: docker compose build
+      - name: Deploy
+        run: ./deploy.sh local
+      - name: Check endpoints
+        run: |
+          curl -fsS http://127.0.0.1:8080/actuator/health | grep -q UP
+          curl -fsS http://127.0.0.1:8081/ | grep -q flutter_bootstrap
+          curl -fsS http://127.0.0.1:8082/healthz
+          curl -fsSI http://127.0.0.1:8081/ | grep -qi "x-content-type-options: nosniff"
+          # Admin proxies /api/ to the api; web does not.
+          curl -fsS http://127.0.0.1:8082/api/v1/info | grep -q brackety
+          if curl -fsS http://127.0.0.1:8081/api/v1/info | grep -q '"today"'; then echo "web must not proxy the api"; exit 1; fi
+          # No Cloudflare Access settings in CI: the superadmin API is closed.
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8082/api/v1/admin/auth/locks)" = 503
+      - name: Backup and restore
+        run: |
+          sudo apt-get install -y -qq age > /dev/null
+          key="$RUNNER_TEMP/backup.key"
+          age-keygen -o "$key" 2> /dev/null
+          export BACKUP_DIR="$RUNNER_TEMP/backups" BACKUP_AGE_RECIPIENT="$(age-keygen -y "$key")"
+          docker compose exec -T db sh -c 'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d brackety -c "CREATE TABLE restore_probe (id int); INSERT INTO restore_probe SELECT generate_series(1, 42)"'
+          # Older copies so retention has something to prune.
+          mkdir -p "$BACKUP_DIR/daily"
+          for d in $(seq -w 1 20); do touch "$BACKUP_DIR/daily/brackety-2000-01-$d.dump.age"; done
+          ./backup.sh
+          backup="$BACKUP_DIR/daily/brackety-$(date +%F).dump.age"
+          test "$(ls "$BACKUP_DIR/daily" | wc -l)" -eq 14
+          if grep -qa restore_probe "$backup"; then echo "backup is not encrypted"; exit 1; fi
+          ./restore.sh "$backup" "$key"
+          docker compose exec -T db sh -c 'psql -tA -U "$POSTGRES_USER" -d restore_check -c "SELECT count(*) FROM restore_probe"' | grep -qx 42
+          # Full recovery over production: data changed after the backup must come back to the backup state.
+          docker compose exec -T db sh -c 'psql -U "$POSTGRES_USER" -d brackety -c "DELETE FROM restore_probe"'
+          echo brackety | ./restore.sh "$backup" "$key" brackety
+          docker compose up -d --wait --wait-timeout 300
+          docker compose exec -T db sh -c 'psql -tA -U "$POSTGRES_USER" -d brackety -c "SELECT count(*) FROM restore_probe"' | grep -qx 42
+          docker compose exec -T db sh -c 'psql -tA -U "$POSTGRES_USER" -d postgres -c "SELECT count(*) FROM pg_database WHERE datname LIKE '"'"'brackety_old_%'"'"'"' | grep -qx 1
+      - name: Broken release rolls back
+        run: |
+          # nginx never answers on :8080, so the api healthcheck fails like a bad release would.
+          docker pull --quiet nginx:1.30.6-alpine
+          docker tag nginx:1.30.6-alpine ghcr.io/raulgl422/brackety-api:latest
+          if ./deploy.sh local; then echo "deploy of a broken api should fail"; exit 1; fi
+          # A repeated failed deploy must still go back to the last good images.
+          if ./deploy.sh local; then echo "deploy of a broken api should fail"; exit 1; fi
+          docker compose ps api --format '{{.Image}}' | grep -q ':rollback'
+          curl -fsS http://127.0.0.1:8080/actuator/health | grep -q UP
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs
+      - name: Stop
+        if: always()
+        run: docker compose down -v
+
+  publish:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        include:
+          - image: api
+            context: server
+            file: server/Dockerfile
+          - image: web
+            context: .
+            file: deploy/web.Dockerfile
+            app: app
+          - image: admin
+            context: .
+            file: deploy/web.Dockerfile
+            app: admin
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: meta
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
+        with:
+          images: ghcr.io/raulgl422/brackety-${{ matrix.image }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha
+      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.file }}
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            APP=${{ matrix.app }}
+            API_BASE_URL=${{ matrix.app == 'admin' && vars.ADMIN_API_BASE_URL || vars.API_BASE_URL }}
+          cache-from: type=gha,scope=${{ matrix.image }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image }}

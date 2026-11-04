@@ -1,0 +1,48 @@
+version: 2
+
+# Weekly update PRs to development, grouped per ecosystem so there are few PRs to review.
+updates:
+  - package-ecosystem: maven
+    directory: /server
+    target-branch: development
+    schedule:
+      interval: weekly
+    groups:
+      maven:
+        patterns: ["*"]
+
+  - package-ecosystem: pub
+    directories: [/app, /admin, /packages/brackety_core]
+    target-branch: development
+    schedule:
+      interval: weekly
+    groups:
+      pub:
+        patterns: ["*"]
+
+  - package-ecosystem: docker
+    directories: [/server, /deploy]
+    target-branch: development
+    schedule:
+      interval: weekly
+    groups:
+      docker:
+        patterns: ["*"]
+
+  - package-ecosystem: docker-compose
+    directory: /deploy
+    target-branch: development
+    schedule:
+      interval: weekly
+    groups:
+      docker-compose:
+        patterns: ["*"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: development
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]

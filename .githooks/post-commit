@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+# Keeps the local Graphify graph current. Enable once per clone: git config core.hooksPath .githooks
+# Runs in the background and never blocks or fails the commit.
+if command -v graphify > /dev/null 2>&1; then
+  (graphify update . > /dev/null 2>&1 &)
+elif command -v python > /dev/null 2>&1 && python -c "import graphify" > /dev/null 2>&1; then
+  (python -m graphify update . > /dev/null 2>&1 &)
+fi
+exit 0

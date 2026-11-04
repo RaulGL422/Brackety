@@ -1,0 +1,113 @@
+name: brackety
+
+# Without a profile it starts everything except the tunnel (local test, CI).
+# On a public host: docker compose --profile pi up -d (or --profile windows).
+# Ports are bound to 127.0.0.1 only: public traffic always enters through the tunnel.
+
+services:
+  db:
+    image: postgres:18.6-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: brackety
+      POSTGRES_USER: ${DB_USER:?set DB_USER in .env}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+    volumes:
+      - ${DB_DATA:-pgdata}:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d brackety"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+  api:
+    image: ghcr.io/raulgl422/brackety-api:${IMAGE_TAG:-latest}
+    build: ../server
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: ${DB_URL:-jdbc:postgresql://db:5432/brackety}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:-}
+      # Google OAuth client IDs (web, Android), comma separated; empty = Google sign-in answers 503.
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      APPLE_CLIENT_ID: ${APPLE_CLIENT_ID:-}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
+      FCM_CREDENTIALS: ${FCM_CREDENTIALS:-}
+      # Participant import: an API key, never a subscription token. Empty = the import button is hidden.
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      BRACKETY_IMPORT_MODEL: ${BRACKETY_IMPORT_MODEL:-claude-sonnet-5-5}
+      SUPERADMIN_EMAIL: ${SUPERADMIN_EMAIL:-}
+      SUPERADMIN_PASSWORD_HASH: ${SUPERADMIN_PASSWORD_HASH:-}
+      # Cloudflare Access in front of /api/v1/admin/**; either empty = the superadmin API answers 503.
+      CF_ACCESS_TEAM_DOMAIN: ${CF_ACCESS_TEAM_DOMAIN:-}
+      CF_ACCESS_AUD: ${CF_ACCESS_AUD:-}
+      PRIVACY_CONTACT_EMAIL: ${PRIVACY_CONTACT_EMAIL:-}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-}
+      RATE_LIMIT_PER_MINUTE: ${RATE_LIMIT_PER_MINUTE:-3000}
+      DEMO_ACCOUNTS_ENABLED: ${DEMO_ACCOUNTS_ENABLED:-false}
+      DEMO_EVENT_DATE: ${DEMO_EVENT_DATE:-}
+      RATE_LIMIT_AUTH_PER_MINUTE: ${RATE_LIMIT_AUTH_PER_MINUTE:-20}
+      RATE_LIMIT_REFRESH_PER_MINUTE: ${RATE_LIMIT_REFRESH_PER_MINUTE:-600}
+    ports:
+      - "127.0.0.1:${API_PORT:-8080}:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 60s
+
+  web:
+    image: ghcr.io/raulgl422/brackety-web:${IMAGE_TAG:-latest}
+    build:
+      context: ..
+      dockerfile: deploy/web.Dockerfile
+      args:
+        APP: app
+        API_BASE_URL: ${API_BASE_URL:-}
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${WEB_PORT:-8081}:80"
+    healthcheck: &nginx-health
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+  admin:
+    image: ghcr.io/raulgl422/brackety-admin:${IMAGE_TAG:-latest}
+    build:
+      context: ..
+      dockerfile: deploy/web.Dockerfile
+      args:
+        APP: admin
+        # The admin host itself: its nginx proxies /api/ to the api, behind Cloudflare Access.
+        API_BASE_URL: ${ADMIN_API_BASE_URL:-${API_BASE_URL:-}}
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${ADMIN_PORT:-8082}:80"
+    healthcheck: *nginx-health
+
+  tunnel:
+    image: cloudflare/cloudflared:2026.10.6
+    profiles: [pi, windows]
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:-}
+    depends_on:
+      api:
+        condition: service_healthy
+      web:
+        condition: service_healthy
+      admin:
+        condition: service_healthy
+
+volumes:
+  pgdata:

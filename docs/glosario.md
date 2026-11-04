@@ -1,0 +1,21 @@
+# Glosario
+
+- **Cuenta**: identidad de acceso (email, Google, Apple). Tiene uno o varios perfiles.
+- **Perfil**: Club, Entidad Externa, Ayudante, Alumno, Externo.
+- **Evento**: Liga, Liga en fases o Torneo.
+- **Fase**: bloque de un evento por fases (en Yoseikan: una modalidad por fase).
+- **Modalidad**: tipo de prueba (tambo, suelo, derribos, expresión técnica).
+- **Categoría**: tramo de edad (y opcionalmente género, peso, etc.).
+- **Grupo**: conjunto de participantes que se enfrentan entre sí (en Yoseikan, de 4, sistema nórdico).
+- **Sistema nórdico**: todos contra todos dentro del grupo.
+- **Llave / cuadro**: emparejamientos eliminatorios de un torneo.
+- **Siembra**: cómo se colocan los participantes en un grupo o llave. Aquí: aleatoria con semilla guardada.
+- **Ubicación clave**: lugar del evento (tapiz, entrada de alumnos…).
+- **Tapiz**: ubicación donde se compite; un ayudante escritor a la vez.
+- **Rol de evento**: etiqueta de ayudante dentro de un evento (árbitro, mesa, organización…).
+- **Permiso**: acción concreta autorizada (aceptar participación, crear grupo, manejar marcador…).
+- **Tutor**: Externo que gestiona el perfil de un menor.
+- **Pesaje**: registro del peso exacto del participante; configurable por evento.
+- **Offline**: modo sin red del ayudante, con exportación e importación CSV.
+- **Amonestación**: sanción registrada en un combate.
+- **Semilla**: número que permite repetir un sorteo con el mismo resultado.

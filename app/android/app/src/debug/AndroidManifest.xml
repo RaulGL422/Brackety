@@ -1,0 +1,5 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Debug only: the local backend (10.0.2.2 or the PC's LAN IP) has no TLS. -->
+    <application android:usesCleartextTraffic="true"/>
+</manifest>
