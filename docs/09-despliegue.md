@@ -60,6 +60,9 @@ Tras un reinicio todo vuelve solo: Docker arranca con el sistema y los servicios
 - **Recuperación real**: añadir `brackety` como tercer argumento. Restaura primero en `brackety_restore`; solo si sale bien pide confirmación, para la api, cambia las bases y arranca la api. La anterior queda como `brackety_old_<fecha>`: borrarla cuando todo funcione.
 - Tras usar la clave privada en la Pi, retirar el USB.
 
+## Portátil del pabellón (sin Internet ni Docker)
+Carpeta portable con PostgreSQL, Java, API y web: cómo generarla y usarla en `modulos/servidor-local.md`.
+
 ## Windows (servidor alternativo)
 1. Docker Desktop con backend WSL 2, que arranque al iniciar sesión.
 2. Clonar el repo, `deploy\.env` desde `.env.example` (en `DB_DATA` dejar `pgdata` o una ruta tipo `D:/brackety/pgdata`).

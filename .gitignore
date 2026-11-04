@@ -15,6 +15,10 @@ build/
 hs_err_pid*
 node_modules/
 
+# Sports hall server bundle (deploy/local) and its data
+dist/
+brackety-data/
+
 # IDEs (shared run configs live in .run/)
 .idea/
 .vscode/
