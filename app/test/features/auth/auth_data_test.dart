@@ -90,8 +90,8 @@ void main() {
         'password': 'long enough',
         'birthDate': '1990-05-07',
         'profile': 'HELPER',
-        'acceptedTermsVersion': '2026-11-draft',
-        'acceptedPrivacyVersion': '2026-11-draft',
+        'acceptedTermsVersion': '2026-11-04',
+        'acceptedPrivacyVersion': '2026-11-04',
         'locale': 'es',
       });
     });
@@ -113,8 +113,8 @@ void main() {
         'profile': 'EXTERNAL_ENTITY',
         'organization': {'name': 'Federación', 'taxId': 'G12345674'},
         'representativeDeclaration': true,
-        'acceptedTermsVersion': '2026-11-draft',
-        'acceptedPrivacyVersion': '2026-11-draft',
+        'acceptedTermsVersion': '2026-11-04',
+        'acceptedPrivacyVersion': '2026-11-04',
         'locale': 'es',
       });
     });

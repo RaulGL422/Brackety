@@ -52,9 +52,9 @@ class GoogleSignInTest extends AuthIntegrationTest {
                         + " and locale = 'en' and birth_date = '1990-05-20'"))
                 .isOne();
         assertThat(count("profile where type = 'STUDENT'")).isOne();
-        assertThat(count("consent where document = 'TERMS' and version = '2027-01'"))
+        assertThat(count("consent where document = 'TERMS' and version = '2026-11-04'"))
                 .isOne();
-        assertThat(count("consent where document = 'PRIVACY' and version = '2027-02'"))
+        assertThat(count("consent where document = 'PRIVACY' and version = '2026-11-04'"))
                 .isOne();
         assertThat(count("identity where provider = 'GOOGLE' and subject = 'sub-ana'"
                         + " and provider_email = 'ana@example.test'"))
