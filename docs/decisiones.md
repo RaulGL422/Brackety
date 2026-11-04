@@ -139,3 +139,4 @@ Formato: fecha · decisión · motivo.
 - 2026-11-04 · Privacidad: el organizador es responsable de los datos de los alumnos que inscribe y Brackety los trata por su cuenta; Raul, responsable del resto · decidido por Raul.
 - 2026-11-04 · App: `flutter_markdown_plus` 1.0.12 para los textos legales · sucesor mantenido de `flutter_markdown` (descontinuado), sin dependencias extra y con tablas desplazables.
 - 2026-11-04 · App: `url_launcher` 6.3.3 · abrir fuera de la app los enlaces http(s) y mailto de los textos legales.
+- 2026-11-04 · Servidor del pabellón con PostgreSQL 18 oficial (binarios portables) y el jar de producción, no el Postgres embebido de los tests · mismo código que producción y pg_dump para las copias.

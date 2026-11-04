@@ -7,12 +7,23 @@ Llevar el evento ya preparado (configuración e inscripciones) y arrancarlo en c
 
 ## Reglas
 ### Servidor portable
-- Un script `deploy/local/start-event.ps1`: arranca la API (JDK 25) con PostgreSQL 18 embebido y **datos persistentes** en una carpeta (`brackety-data/`), y sirve la web desde la misma API (mismo origen, sin CORS).
+- Carpeta portable `dist/brackety-event/` (no se sube): `api/brackety.jar` (el jar de producción), `web/` (build web de `app/`), `jre/` (JDK 25 reducido con jlink), `pgsql/` (PostgreSQL 18 oficial de EnterpriseDB, solo `bin`, `lib`, `share` + runtime de Visual C++ del JDK), `start-event.ps1` y `LEEME.txt`. Unos 380 MB.
+- PostgreSQL real (binarios portables), no el embebido de los tests: mismo jar que producción y `pg_dump` para las copias.
+- `start-event.ps1` (PowerShell 7 o Windows PowerShell 5.1) arranca PostgreSQL solo en `127.0.0.1:15433` y la API en el puerto 8080 de todas las interfaces, con las variables de producción. La web sale de la propia API (mismo origen, sin CORS).
+- Datos en `brackety-data/` junto al script: `pgdata/`, `secrets.env` (contraseña de la BD y `JWT_SECRET`, aleatorios en el primer arranque), `event.env` (titular y email de privacidad, editable), `pg.log`, `api.log`, `backups/`.
 - Parar y volver a arrancar no pierde nada; solo se borra a mano.
-- Copia de la BD al cerrar cada jornada (y con `-Backup` cuando se quiera) en `brackety-data/backups/`.
-- Primera vez: regla del firewall para el puerto en la red del punto de acceso (pide admin una vez).
-- Muestra al arrancar la URL que deben usar los móviles (`http://192.168.137.1:8080`, IP fija del punto de acceso de Windows).
+- Al parar (Ctrl+C o si la API se cae): copia `pg_dump -Fc` en `brackety-data/backups/` (se guardan 20) y para PostgreSQL. `-Backup`: solo la copia, con el servidor en marcha o parado.
+- Punto de acceso: si está apagado intenta encenderlo (necesita una conexión que compartir, p. ej. la wifi del iPhone); si falla, avisa y sigue. `-NoHotspot` lo salta.
+- Firewall: si falta la regla de entrada para `jre\bin\java.exe` (TCP 8080, privada y pública), pregunta y la añade con permiso de administrador (UAC). `-NoFirewall` lo salta.
+- Muestra al arrancar la URL de los móviles (`http://192.168.137.1:8080`, IP fija del punto de acceso de Windows) y la del portátil (`http://localhost:8080`).
+- Cuentas demo del prototipo (`DEMO_ACCOUNTS_ENABLED=true`) con la fecha de `-EventDate` (por defecto hoy) hasta que llegue el paquete del evento (paso 2).
+- La cookie de refresco es `Secure`: en http solo `localhost` mantiene la sesión web al recargar. Los móviles usarán la APK (paso 3).
 - Sin Internet: sin emails, sin Google, sin importación con Claude (los alumnos se importan antes, en la Pi o en local).
+
+### Generar y usar la carpeta
+1. En el PC de desarrollo (Internet la primera vez; el zip de PostgreSQL queda en `dist/cache/`): `.\deploy\local\build-event-bundle.ps1`. Conserva `brackety-data/` si ya existe.
+2. Copiar `dist/brackety-event/` al disco del portátil.
+3. `powershell -ExecutionPolicy Bypass -File .\start-event.ps1 [-EventDate AAAA-MM-DD] [-LegalOwnerName …] [-PrivacyContactEmail …]`. Resto en `LEEME.txt` de la carpeta.
 
 ### Paquete del evento
 - El club exporta desde cualquier servidor un fichero `.brackety` (JSON con versión de esquema): evento, categorías, tapices, staff (cuentas por nombre de usuario) e inscritos. Sin grupos, combates ni datos de cuentas.
@@ -33,6 +44,8 @@ Llevar el evento ya preparado (configuración e inscripciones) y arrancarlo en c
 Sin tablas nuevas. Formato del paquete versionado (`schemaVersion`).
 
 ## API
+- `WEB_DIR` (`brackety.web-dir`): carpeta con la build web que sirve la propia API, sin login; un GET sin fichero que no sea `/api/**` ni `/actuator/**` devuelve `index.html`. Todo con `no-cache`. Vacía (Docker y producción, donde la sirve nginx) = la API no sirve web.
+- Web del paquete: `app/env/event-bundle.json` con `API_BASE_URL=same-origin` (la API es el origen de la página; solo web).
 - `GET /api/v1/events/{id}/export/package` (club): descarga el paquete.
 - Carga del paquete al arrancar (`--brackety.package=<ruta>`), no por API.
 
@@ -44,6 +57,7 @@ Sin tablas nuevas. Formato del paquete versionado (`schemaVersion`).
 Ver `offline.md` (adelanto F1: marcador del árbitro).
 
 ## Tests
+Web servida por la API (`WebAppConfigTest`, `WebAppDisabledTest`): fichero, `index.html` para rutas de la app, API sin cambios; apagada por defecto. `same-origin` en `api_config_test.dart`. Scripts: prueba a mano.
 Paquete: exportar → cargar en BD vacía → mismo evento e inscritos; rechazo con BD usada y con versión desconocida. Arranque persistente: datos tras reiniciar. Selector de servidor: widget test en 3 tamaños.
 
 ## Plan (PRs en serie)
@@ -53,4 +67,4 @@ Paquete: exportar → cargar en BD vacía → mismo evento e inscritos; rechazo 
 4. Ensayo: portátil como punto de acceso sin Internet, 3 móviles, un combate completo.
 
 ## Estado
-Pendiente (2026-11-04).
+En curso: paso 1 hecho (2026-11-04). Probado en el PC de desarrollo (arranque, web, login, datos tras reiniciar, copia al parar con Ctrl+C y con `-Backup`) sin punto de acceso ni UAC: falta probarlos en el portátil del evento.
