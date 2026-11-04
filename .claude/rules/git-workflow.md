@@ -9,5 +9,5 @@
 - `git add` con rutas concretas, nunca `-A` a ciegas: revisar `git status` antes (en una rama pueden quedar archivos generados sin seguimiento).
 - Antes de PR: `development` fusionado en la rama, tests locales verdes, `docs/estado.md` actualizado.
 - PR hacia `development`, merge squash solo con CI verde. Raul revisa y aprueba; Claude no fusiona a `main`.
-- `main` se actualiza desde `development` en releases etiquetadas (`vX.Y.Z`).
+- `main` se actualiza desde `development` en releases etiquetadas (`vX.Y.Z`), siempre a través de una rama `release/vX.Y.Z` (el repo borra la rama de origen al fusionar).
 - Prohibido: `push --force` (también en ramas propias: se corrige con commits nuevos), commitear `.env`, claves o datos reales.
