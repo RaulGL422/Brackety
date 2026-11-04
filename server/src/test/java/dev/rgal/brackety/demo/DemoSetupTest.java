@@ -21,4 +21,13 @@ class DemoSetupTest extends EventApiTest {
         assertThat(count("account")).isEqualTo(8);
         assertThat(count("event")).isOne();
     }
+
+    @Test
+    void anEventAlreadyThereStopsItEvenWithoutTheDemoClub() {
+        // As after loading an event package whose owner is another account.
+        jdbc.sql("update account set email = 'owner' where email = 'club1'").update();
+
+        assertThat(demo.seed()).isNull();
+        assertThat(count("event")).isOne();
+    }
 }

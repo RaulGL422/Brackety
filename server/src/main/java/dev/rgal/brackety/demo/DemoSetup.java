@@ -1,10 +1,6 @@
 package dev.rgal.brackety.demo;
 
-import dev.rgal.brackety.auth.account.Account;
 import dev.rgal.brackety.auth.account.AccountRepository;
-import dev.rgal.brackety.auth.account.Profile;
-import dev.rgal.brackety.auth.account.ProfileRepository;
-import dev.rgal.brackety.auth.account.ProfileType;
 import dev.rgal.brackety.event.Event;
 import dev.rgal.brackety.event.EventCategory;
 import dev.rgal.brackety.event.EventCategoryRepository;
@@ -23,14 +19,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionOperations;
 
 /**
  * Accounts and event for the Liga Yoseikan phase 1 prototype (docs/modulos/prototipo-f1.md).
  * Usernames double as passwords: a risk accepted for this phase only, so it runs only with
- * DEMO_ACCOUNTS_ENABLED=true and does nothing once the accounts exist.
+ * DEMO_ACCOUNTS_ENABLED=true and does nothing once the accounts or any event exist. With an event package to load
+ * (BRACKETY_PACKAGE) it does nothing either: the package brings its own event and accounts.
  */
 @Component
 public class DemoSetup {
@@ -58,66 +54,68 @@ public class DemoSetup {
     private static final Logger log = LoggerFactory.getLogger(DemoSetup.class);
 
     private final AccountRepository accounts;
-    private final ProfileRepository profiles;
+    private final DemoAccounts demoAccounts;
     private final EventRepository events;
     private final EventStaffRepository staff;
     private final MatRepository mats;
     private final EventCategoryRepository categories;
-    private final PasswordEncoder passwordEncoder;
     private final TransactionOperations transactions;
     private final Clock clock;
     private final boolean enabled;
     private final String eventDate;
+    private final String eventPackage;
 
     DemoSetup(
             AccountRepository accounts,
-            ProfileRepository profiles,
+            DemoAccounts demoAccounts,
             EventRepository events,
             EventStaffRepository staff,
             MatRepository mats,
             EventCategoryRepository categories,
-            PasswordEncoder passwordEncoder,
             TransactionOperations transactions,
             Clock clock,
             @Value("${brackety.demo.enabled}") boolean enabled,
-            @Value("${brackety.demo.event-date}") String eventDate) {
+            @Value("${brackety.demo.event-date}") String eventDate,
+            @Value("${brackety.package}") String eventPackage) {
         this.accounts = accounts;
-        this.profiles = profiles;
+        this.demoAccounts = demoAccounts;
         this.events = events;
         this.staff = staff;
         this.mats = mats;
         this.categories = categories;
-        this.passwordEncoder = passwordEncoder;
         this.transactions = transactions;
         this.clock = clock;
         this.enabled = enabled;
         this.eventDate = eventDate;
+        this.eventPackage = eventPackage;
     }
 
     @EventListener(ApplicationReadyEvent.class)
     void onStartup() {
-        if (enabled) {
+        if (enabled && !eventPackage.isBlank()) {
+            log.warn("Demo accounts are enabled but an event package is set: no demo event is created");
+        } else if (enabled) {
             log.warn("Demo accounts are enabled: their passwords equal their usernames");
             seed();
         }
     }
 
-    /** Creates the demo accounts and event unless they exist; returns the event id or null. */
+    /** Creates the demo accounts and event unless they or any event exist; returns the event id or null. */
     public UUID seed() {
         return transactions.execute(status -> {
-            if (accounts.findByEmail(CLUB).isPresent()) {
+            if (accounts.findByEmail(CLUB).isPresent() || events.count() > 0) {
                 return null;
             }
             var now = clock.instant();
-            var club = account(CLUB, ProfileType.CLUB);
+            var club = demoAccounts.club(CLUB, DEMO_CLUB_NAME, DEMO_CLUB_CIF);
             var date = eventDate.isBlank() ? LocalDate.now(clock) : LocalDate.parse(eventDate);
             var event = events.save(Event.tambo(club, "Liga Yoseikan 2027 · Fase 1 · Tambo", date, now));
             staff.save(new EventStaff(event.getId(), club, EventRole.CLUB));
             for (var grouper : GROUPERS) {
-                staff.save(new EventStaff(event.getId(), account(grouper, ProfileType.HELPER), EventRole.GROUPER));
+                staff.save(new EventStaff(event.getId(), demoAccounts.helper(grouper), EventRole.GROUPER));
             }
             for (int i = 0; i < REFEREES.size(); i++) {
-                var referee = account(REFEREES.get(i), ProfileType.HELPER);
+                var referee = demoAccounts.helper(REFEREES.get(i));
                 staff.save(new EventStaff(event.getId(), referee, EventRole.REFEREE));
                 mats.save(new Mat(event.getId(), i + 1, referee));
             }
@@ -126,19 +124,6 @@ public class DemoSetup {
             }
             return event.getId();
         });
-    }
-
-    private UUID account(String username, ProfileType profile) {
-        var now = clock.instant();
-        var birthDate = profile.isOrganizer() ? null : LocalDate.now(clock).minusYears(30);
-        var account = new Account(username, passwordEncoder.encode(username), birthDate, "es", now);
-        account.markEmailVerified(now);
-        accounts.save(account);
-        profiles.save(
-                profile.isOrganizer()
-                        ? new Profile(account.getId(), profile, DEMO_CLUB_NAME, DEMO_CLUB_CIF, now)
-                        : new Profile(account.getId(), profile, now));
-        return account.getId();
     }
 
     /** {@code teamSize}: null for an individual category. */
