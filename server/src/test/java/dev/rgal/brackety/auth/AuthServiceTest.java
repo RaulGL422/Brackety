@@ -47,9 +47,9 @@ class AuthServiceTest extends AuthIntegrationTest {
                                 rs.getTimestamp("accepted_at").toInstant()))
                         .list())
                 .containsExactlyInAnyOrder(
-                        tuple("TERMS", "2027-01", AuthTestConfig.START),
-                        tuple("PRIVACY", "2027-02", AuthTestConfig.START),
-                        tuple("ORGANIZER_DECLARATION", "2027-01", AuthTestConfig.START));
+                        tuple("TERMS", TERMS_VERSION, AuthTestConfig.START),
+                        tuple("PRIVACY", PRIVACY_VERSION, AuthTestConfig.START),
+                        tuple("ORGANIZER_DECLARATION", TERMS_VERSION, AuthTestConfig.START));
     }
 
     @Test
@@ -101,8 +101,8 @@ class AuthServiceTest extends AuthIntegrationTest {
                 LocalDate.of(1980, 1, 1),
                 null,
                 null,
-                "v",
-                "v",
+                TERMS_VERSION,
+                PRIVACY_VERSION,
                 "en");
 
         auth.register(duplicate);

@@ -135,3 +135,4 @@ Formato: fecha · decisión · motivo.
 - 2026-11-04 · Árbitros y ayudantes con APK Android y selector de servidor (pabellón / Internet / URL) · la web por http en la red local no puede funcionar offline; decidido por Raul.
 - 2026-11-04 · Offline para la F1 solo en el marcador del árbitro; el módulo completo, después · 10 días hasta la fase; decidido por Raul.
 - 2026-11-04 · `legal-paginas` se adelanta a la F1; titular con nombre y `privacidad@rgal.dev`, sin NIF ni domicilio · datos reales de menores en la fase; decidido por Raul.
+- 2026-11-04 · Textos legales como ficheros Markdown versionados en el servidor (no tabla `legal_document`); titular y email por variables de entorno · cambiar un texto pasa por un despliegue; también sin Internet en el servidor del pabellón.

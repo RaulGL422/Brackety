@@ -46,6 +46,7 @@ services:
       # Cloudflare Access in front of /api/v1/admin/**; either empty = the superadmin API answers 503.
       CF_ACCESS_TEAM_DOMAIN: ${CF_ACCESS_TEAM_DOMAIN:-}
       CF_ACCESS_AUD: ${CF_ACCESS_AUD:-}
+      LEGAL_OWNER_NAME: ${LEGAL_OWNER_NAME:-}
       PRIVACY_CONTACT_EMAIL: ${PRIVACY_CONTACT_EMAIL:-}
       PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-}

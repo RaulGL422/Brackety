@@ -28,7 +28,7 @@ class AuthControllerTest extends AuthIntegrationTest {
 
     private static final String REGISTER_JSON = """
             {"email":"%s","password":"%s","birthDate":"%s","profile":"HELPER",
-             "acceptedTermsVersion":"2027-01","acceptedPrivacyVersion":"2027-02","locale":"es"}""";
+             "acceptedTermsVersion":"2026-11-04","acceptedPrivacyVersion":"2026-11-04","locale":"es"}""";
     private static final String ORGANIZER = """
             "organization":{"name":"Club Ficticio","taxId":"G12345674"},"representativeDeclaration":true""";
 
@@ -88,7 +88,7 @@ class AuthControllerTest extends AuthIntegrationTest {
         assertThat(count("profile where type = 'CLUB' and organization_name = 'Club Ficticio'"
                         + " and tax_id = 'G12345674' and not validated"))
                 .isOne();
-        assertThat(count("consent where document = 'ORGANIZER_DECLARATION' and version = '2027-01'"))
+        assertThat(count("consent where document = 'ORGANIZER_DECLARATION' and version = '2026-11-04'"))
                 .isOne();
     }
 
@@ -129,6 +129,19 @@ class AuthControllerTest extends AuthIntegrationTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("$.code").value("INVALID_TAX_ID"));
+        assertThat(count("account")).isZero();
+    }
+
+    @Test
+    void anOutdatedLegalVersionIsA409ProblemWithItsCode() throws Exception {
+        var body = REGISTER_JSON.formatted("ana@example.test", PASSWORD, "1990-05-20");
+        for (var field : new String[] {"acceptedTermsVersion", "acceptedPrivacyVersion"}) {
+            register(body.replace(
+                            "\"%s\":\"2026-11-04\"".formatted(field), "\"%s\":\"2026-11-draft\"".formatted(field)))
+                    .andExpect(status().isConflict())
+                    .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                    .andExpect(jsonPath("$.code").value("LEGAL_VERSION_OUTDATED"));
+        }
         assertThat(count("account")).isZero();
     }
 
@@ -430,7 +443,7 @@ class AuthControllerTest extends AuthIntegrationTest {
     private static String json(String profile, String fields) {
         return """
                 {"email":"org@example.test","password":"%s","profile":"%s",%s,
-                 "acceptedTermsVersion":"2027-01","acceptedPrivacyVersion":"2027-02","locale":"es"}""".formatted(PASSWORD, profile, fields);
+                 "acceptedTermsVersion":"2026-11-04","acceptedPrivacyVersion":"2026-11-04","locale":"es"}""".formatted(PASSWORD, profile, fields);
     }
 
     private ResultActions register(String body) throws Exception {

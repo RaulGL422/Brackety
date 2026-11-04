@@ -1,5 +1,5 @@
 // Provisional until the legal-paginas module publishes the real texts and versions.
-const legalDocumentsVersion = '2026-11-draft';
+const legalDocumentsVersion = '2026-11-04';
 
 /// Younger people are registered by a guardian (module perfiles-menores).
 const minimumRegistrationAge = 14;

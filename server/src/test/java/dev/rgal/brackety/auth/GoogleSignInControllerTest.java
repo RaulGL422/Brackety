@@ -26,12 +26,12 @@ class GoogleSignInControllerTest extends AuthIntegrationTest {
 
     private static final String REGISTRATION = """
             ,"registration":{"birthDate":"%s","profile":"HELPER",
-             "acceptedTermsVersion":"2027-01","acceptedPrivacyVersion":"2027-02","locale":"es"}""";
+             "acceptedTermsVersion":"2026-11-04","acceptedPrivacyVersion":"2026-11-04","locale":"es"}""";
 
     private static final String ORGANIZER_REGISTRATION = """
             ,"registration":{"profile":"EXTERNAL_ENTITY",
              "organization":{"name":"Entidad Ficticia","taxId":"%s"},"representativeDeclaration":true,
-             "acceptedTermsVersion":"2027-01","acceptedPrivacyVersion":"2027-02","locale":"es"}""";
+             "acceptedTermsVersion":"2026-11-04","acceptedPrivacyVersion":"2026-11-04","locale":"es"}""";
 
     @Autowired
     MockMvc mvc;
@@ -138,6 +138,18 @@ class GoogleSignInControllerTest extends AuthIntegrationTest {
         signIn(null, google.idToken("sub-club", "club@example.test"), ORGANIZER_REGISTRATION.formatted("P12345674"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("INVALID_TAX_ID"));
+        assertThat(count("account")).isZero();
+    }
+
+    @Test
+    void anOutdatedLegalVersionIsA409ProblemWithItsCode() throws Exception {
+        var outdated = REGISTRATION
+                .formatted("1990-05-20")
+                .replace("\"acceptedPrivacyVersion\":\"2026-11-04\"", "\"acceptedPrivacyVersion\":\"2026-11-draft\"");
+        signIn(null, google.idToken("sub-ana", "ana@example.test"), outdated)
+                .andExpect(status().isConflict())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.code").value("LEGAL_VERSION_OUTDATED"));
         assertThat(count("account")).isZero();
     }
 

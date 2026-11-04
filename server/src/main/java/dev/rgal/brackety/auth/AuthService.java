@@ -17,6 +17,7 @@ import dev.rgal.brackety.auth.lockout.LoginAttemptRepository;
 import dev.rgal.brackety.auth.session.SessionService;
 import dev.rgal.brackety.auth.session.SessionService.Session;
 import dev.rgal.brackety.auth.session.ShortLivedTokens;
+import dev.rgal.brackety.legal.LegalDocument;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.Period;
@@ -100,8 +101,15 @@ public class AuthService {
         }
     }
 
-    /** The rules Bean Validation cannot check: the organizer's CIF, or the minimum age of everyone else. */
+    /**
+     * The rules Bean Validation cannot check: the current legal versions, the organizer's CIF, or the minimum age of
+     * everyone else.
+     */
     public void checkRegistration(RegistrationDetails details) {
+        if (!LegalDocument.TERMS.version().equals(details.acceptedTermsVersion())
+                || !LegalDocument.PRIVACY.version().equals(details.acceptedPrivacyVersion())) {
+            throw AuthException.legalVersionOutdated();
+        }
         if (details.isOrganizer()) {
             if (!Cif.isValid(details.organization().taxId())) {
                 throw AuthException.invalidTaxId();

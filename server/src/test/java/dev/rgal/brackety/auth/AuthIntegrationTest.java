@@ -8,6 +8,7 @@ import dev.rgal.brackety.auth.dto.RegistrationDetails;
 import dev.rgal.brackety.auth.google.FakeGoogle;
 import dev.rgal.brackety.auth.session.SessionService.Session;
 import dev.rgal.brackety.common.MutableClock;
+import dev.rgal.brackety.legal.LegalDocument;
 import dev.rgal.brackety.notifications.CapturingEmailSender;
 import dev.rgal.brackety.notifications.Email;
 import java.time.LocalDate;
@@ -49,6 +50,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @Import(AuthTestConfig.class)
 public abstract class AuthIntegrationTest {
 
+    protected static final String TERMS_VERSION = LegalDocument.TERMS.version();
+    protected static final String PRIVACY_VERSION = LegalDocument.PRIVACY.version();
     protected static final String PASSWORD = "correct-horse-battery";
     protected static final String SUPERADMIN_EMAIL = "superadmin@example.test";
     // PASSWORD, hashed with SuperadminPasswordHash.
@@ -83,7 +86,7 @@ public abstract class AuthIntegrationTest {
     /** A student born on {@code birthDate}. */
     protected static RegisterRequest registration(String email, LocalDate birthDate) {
         return new RegisterRequest(
-                email, PASSWORD, ProfileType.STUDENT, birthDate, null, null, "2027-01", "2027-02", "es");
+                email, PASSWORD, ProfileType.STUDENT, birthDate, null, null, TERMS_VERSION, PRIVACY_VERSION, "es");
     }
 
     /** An organizer gives {@link #ORGANIZATION}; anyone else is an adult. */
@@ -96,18 +99,19 @@ public abstract class AuthIntegrationTest {
                 organizer ? null : ADULT,
                 organizer ? ORGANIZATION : null,
                 organizer ? true : null,
-                "2027-01",
-                "2027-02",
+                TERMS_VERSION,
+                PRIVACY_VERSION,
                 locale);
     }
 
     /** A student born on {@code birthDate}. */
     protected static RegistrationDetails details(LocalDate birthDate) {
-        return new RegistrationDetails(ProfileType.STUDENT, birthDate, null, null, "2027-01", "2027-02", "en");
+        return new RegistrationDetails(
+                ProfileType.STUDENT, birthDate, null, null, TERMS_VERSION, PRIVACY_VERSION, "en");
     }
 
     protected static RegistrationDetails organizerDetails(ProfileType profile, OrganizationRequest organization) {
-        return new RegistrationDetails(profile, null, organization, true, "2027-01", "2027-02", "en");
+        return new RegistrationDetails(profile, null, organization, true, TERMS_VERSION, PRIVACY_VERSION, "en");
     }
 
     // The raw token is only in the emailed link, as a real user would get it.

@@ -4,6 +4,7 @@ import dev.rgal.brackety.auth.account.ProfileType;
 import dev.rgal.brackety.auth.dto.OrganizationRequest;
 import dev.rgal.brackety.auth.dto.RegisterRequest;
 import dev.rgal.brackety.devdata.ScenarioContext;
+import dev.rgal.brackety.legal.LegalDocument;
 
 /** Password sign-ups as the app sends them: organizers with a fictional organization, the rest aged 30. */
 final class SignUps {
@@ -18,9 +19,25 @@ final class SignUps {
         if (profile.isOrganizer()) {
             var organization = profile == ProfileType.CLUB ? CLUB : ENTITY;
             return new RegisterRequest(
-                    email, password, profile, null, organization, true, "2027-01", "2027-01", locale);
+                    email,
+                    password,
+                    profile,
+                    null,
+                    organization,
+                    true,
+                    LegalDocument.TERMS.version(),
+                    LegalDocument.PRIVACY.version(),
+                    locale);
         }
         return new RegisterRequest(
-                email, password, profile, ctx.daysFromToday(-30 * 365), null, null, "2027-01", "2027-01", locale);
+                email,
+                password,
+                profile,
+                ctx.daysFromToday(-30 * 365),
+                null,
+                null,
+                LegalDocument.TERMS.version(),
+                LegalDocument.PRIVACY.version(),
+                locale);
     }
 }
