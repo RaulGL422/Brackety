@@ -54,6 +54,7 @@
 - [ ] SSD USB/NVMe para la base de datos (la SD no es fiable).
 - [ ] Backups cifrados + prueba de restauración.
 - [ ] Revisión legal profesional de privacidad, términos y cookies.
+- [ ] Raul: confirmar el reparto de la privacidad (`server/src/main/resources/legal/`): el organizador es responsable de los datos de los alumnos que inscribe y Brackety trata por su cuenta; Raul, responsable del resto. Alternativa: Raul responsable de todo.
 - [ ] Google Play: 12 testers × 14 días en pruebas cerradas (Raul tiene las personas).
 - [ ] Marca: comprobar "Brackety" en OEPM y dominio `brackety.rgal.dev` (existe una app llamada Brackify, parecida).
 
