@@ -1,0 +1,41 @@
+BRACKETY - SERVIDOR DEL PABELLÓN
+================================
+
+Esta carpeta lleva todo lo necesario (Java, PostgreSQL, la API y la web).
+No hace falta instalar nada ni tener Internet.
+
+ANTES DEL EVENTO
+- Copia la carpeta entera al disco del portátil (no la uses desde el USB).
+- Disco cifrado con BitLocker y cuenta de Windows con contraseña: aquí se guardan datos de menores.
+- Opcional: edita brackety-data\event.env (titular y email de privacidad) tras el primer arranque.
+
+ARRANCAR
+1. Conecta el portátil a la wifi del móvil (Windows solo activa el punto de acceso si tiene una conexión que compartir).
+2. Clic derecho en start-event.ps1 > "Ejecutar con PowerShell"
+   o, en una ventana de PowerShell dentro de esta carpeta:
+     powershell -ExecutionPolicy Bypass -File .\start-event.ps1
+   Fecha del evento distinta de hoy:  ... -File .\start-event.ps1 -EventDate 2026-11-14
+3. La primera vez pide permiso de administrador para el firewall: acéptalo o los móviles no llegarán.
+4. Cuando ponga "Brackety listo":
+   - Móviles conectados al punto de acceso del portátil: http://192.168.137.1:8080
+   - Este portátil: http://localhost:8080
+
+PARAR
+- Ctrl+C en la ventana. Espera a que termine: guarda una copia de la base de datos y para PostgreSQL.
+
+COPIAS
+- Al parar se guarda una copia en brackety-data\backups\ (se conservan las 20 últimas).
+- Copia en cualquier momento (con el servidor en marcha o parado), desde otra ventana:
+     powershell -ExecutionPolicy Bypass -File .\start-event.ps1 -Backup
+
+DÓNDE ESTÁN LOS DATOS
+- brackety-data\  (base de datos, claves, registros pg.log y api.log, copias).
+- Parar y volver a arrancar no pierde nada.
+- No borres brackety-data\secrets.env: sin él no se abre la base de datos.
+- Al acabar la fase: borra brackety-data\ entera (lleva datos de menores).
+
+PROBLEMAS
+- "El puerto 8080 ya está en uso": cierra la otra ventana del servidor.
+- Los móviles no cargan: firewall (vuelve a arrancar y acepta el permiso), o el punto de acceso apagado.
+- Desactiva el ahorro de energía del punto de acceso (Configuración > Red e Internet > Zona con cobertura inalámbrica móvil).
+- En el navegador del móvil la sesión se pierde al recargar (http sin cifrar); en este portátil (localhost) no.
