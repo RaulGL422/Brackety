@@ -140,3 +140,5 @@ Formato: fecha · decisión · motivo.
 - 2026-11-04 · App: `flutter_markdown_plus` 1.0.12 para los textos legales · sucesor mantenido de `flutter_markdown` (descontinuado), sin dependencias extra y con tablas desplazables.
 - 2026-11-04 · App: `url_launcher` 6.3.3 · abrir fuera de la app los enlaces http(s) y mailto de los textos legales.
 - 2026-11-04 · Servidor del pabellón con PostgreSQL 18 oficial (binarios portables) y el jar de producción, no el Postgres embebido de los tests · mismo código que producción y pg_dump para las copias.
+- 2026-11-04 · Pabellón: el primer arranque exige `-Package` o `-Demo` (sin ninguno no arranca) · un olvido del `-Package` crearía el evento demo y obligaría a `-Reset` antes de cargar el real.
+- 2026-11-04 · El paquete se carga antes de que arranque el servidor web (al crear los beans), no en `ApplicationReadyEvent` · el script da la API por lista en cuanto responde; así nunca responde con el paquete a medio cargar o rechazado.

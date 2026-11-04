@@ -41,7 +41,7 @@ Estados: pendiente · en curso · en pruebas · cerrado.
 | prototipo Fase 1 Yoseikan (uso real ≈ 2026-11-14) | modulos/prototipo-f1.md | en curso: back completo (pasos 1-3/7); front pasos 4-6/7 (login de `auth`, mis eventos, crear grupos; tablero del tapiz y marcador con campana; panel del club con puntuaciones, tapices, inscripciones, configuración y CSV). Probado a mano en Chrome (ayudante, árbitro y club). Paso 7 en curso: release `v0.1.0` fusionada y etiquetada (#36, 2026-11-04); falta desplegar en la Pi (`brackety.rgal.dev`) | – |
 | prototipo F1: categorías por equipos | modulos/prototipo-f1-equipos.md | en pruebas: pasos 8-11 hechos (back, ayudante, árbitro, club con categorías editables). Falta: prueba manual de Raul (2026-11-02) | feat/proto-f1-teams-club |
 | prototipo F1: importación masiva de alumnos | modulos/importacion-alumnos.md | en pruebas: pasos 1-3 hechos (back, pantallas, imagen con `claude`). Falta: DPA y clave de Anthropic, prueba en la Pi y prueba manual de Raul (2026-11-02) | feat/import-deploy |
-| servidor del pabellón (portátil Windows) y paquete del evento | modulos/servidor-local.md | en curso: paso 1/4 hecho (2026-11-04) | feat/local-server |
+| servidor del pabellón (portátil Windows) y paquete del evento | modulos/servidor-local.md | en curso: pasos 1-2/4 hechos (2026-11-04) | feat/event-package |
 | offline: adelanto F1 (marcador del árbitro) | modulos/offline.md | pendiente: planificado (2026-11-04) | – |
 
 ## Hasta la Fase 1 (14-11)
