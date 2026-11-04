@@ -38,7 +38,7 @@
 - [ ] Aviso de privacidad mínimo visible antes de la fase (datos reales de menores sin páginas legales ni `PRIVACY_CONTACT_EMAIL`); la casilla del tutor ya está en la inscripción. Aceptado por Raul; lo cubre `legal-paginas` paso 2, adelantado (2026-11-04).
 - [ ] Base de datos de la fase en la SD (sin SSD) con copia diaria: ¿se acepta el riesgo o se compra antes el SSD?
 - [ ] Tras la fase: desactivar `DEMO_ACCOUNTS_ENABLED` y borrar las cuentas demo.
-- [ ] Raul: probar que el punto de acceso de Windows se activa **sin Internet** en el portátil (Windows suele exigir una conexión que compartir). Si no, plan B: router de viaje barato.
+- [ ] Wifi del pabellón: el punto de acceso de Windows no se activa sin Internet (probado por Raul el 2026-11-04) y la tarjeta AX200 no admite red hospedada. Opciones: router de viaje (recomendado), adaptador de bucle invertido para engañar al punto de acceso, o el punto de acceso de un móvil Android. Raul decide.
 - [ ] Raul: crear `privacidad@rgal.dev` (p. ej. reenvío de Cloudflare Email Routing a su Gmail).
 - [ ] Portátil del pabellón: ¿BitLocker activo? Confirmar el borrado de `brackety-data/` y del paquete tras la fase (`servidor-local.md`).
 - [ ] Móviles de árbitros y ayudantes: ¿todos Android y con permiso para instalar la APK? Si hay iPhone, ese usa la web (sin offline).
