@@ -254,6 +254,12 @@ void main() {
         find.widgetWithText(FilledButton, 'Save'),
       );
       expect(save().onPressed, isNull);
+      expect(
+        find.text(
+          "The student's data is handled according to the privacy policy.",
+        ),
+        findsOneWidget,
+      );
 
       await tester.tap(find.text('The legal guardian agrees'));
       await tester.pump();
