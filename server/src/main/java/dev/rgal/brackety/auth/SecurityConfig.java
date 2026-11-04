@@ -64,7 +64,9 @@ public class SecurityConfig {
 
     static final String ADMIN_PATHS = "/api/v1/admin/**";
     static final String ADMIN_LOGIN_PATH = "/api/v1/admin/auth/login";
-    static final String[] PUBLIC_PATHS = {"/api/v1/auth/**", "/api/v1/info", "/actuator/health", "/error"};
+    static final String[] PUBLIC_PATHS = {
+        "/api/v1/auth/**", "/api/v1/info", "/api/v1/legal/**", "/actuator/health", "/error"
+    };
 
     // The superadmin API: its own token (purpose ADMIN) and, ahead of everything, Cloudflare Access.
     @Bean
