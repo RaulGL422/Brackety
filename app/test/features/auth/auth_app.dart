@@ -2,6 +2,7 @@ import 'package:brackety/app.dart';
 import 'package:brackety/core/router.dart';
 import 'package:brackety/features/auth/state/auth_providers.dart';
 import 'package:brackety/features/events/state/events_providers.dart';
+import 'package:brackety/features/legal/data/legal_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
@@ -9,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../support/fakes.dart';
+import '../../support/legal_fakes.dart';
 
 const screenSizes = {
   'phone': Size(360, 800),
@@ -22,14 +24,15 @@ void useSize(WidgetTester tester, Size size) {
   addTearDown(tester.view.reset);
 }
 
-/// The whole app on [api] (and [account] for `/me`), opened at [location]; "today" is 2026-10-31
-/// and `APP_ENV` is not dev unless [devEnvironment].
+/// The whole app on [api] (and [account] for `/me`, [legal] for the legal texts), opened at
+/// [location]; "today" is 2026-10-31 and `APP_ENV` is not dev unless [devEnvironment].
 Future<GoRouter> pumpAuthApp(
   WidgetTester tester,
   FakeAuthApi api, {
   String? location,
   bool devEnvironment = false,
   FakeAccountApi? account,
+  FakeLegalRepository? legal,
   List<Override> overrides = const [],
 }) async {
   await tester.pumpWidget(
@@ -40,6 +43,9 @@ Future<GoRouter> pumpAuthApp(
         todayProvider.overrideWithValue(DateTime(2026, 10, 31)),
         devEnvironmentProvider.overrideWithValue(devEnvironment),
         myEventsProvider.overrideWith((ref) async => []),
+        legalRepositoryProvider.overrideWithValue(
+          legal ?? FakeLegalRepository(),
+        ),
       ],
       child: const BracketyApp(),
     ),
@@ -65,8 +71,9 @@ Future<void> tapText(WidgetTester tester, String text) async {
       ? button.last
       : find.text(text).last;
   await tester.ensureVisible(target);
-  // A ListView lays the jump out on the next frame.
-  await tester.pump();
+  // A ListView lays the jump out on the next frame, and a focused field may still be scrolling
+  // itself into view (the scroll ignores taps until it stops).
+  await tester.pumpAndSettle();
   await tester.tap(target);
   await tester.pumpAndSettle();
 }

@@ -136,3 +136,6 @@ Formato: fecha · decisión · motivo.
 - 2026-11-04 · Offline para la F1 solo en el marcador del árbitro; el módulo completo, después · 10 días hasta la fase; decidido por Raul.
 - 2026-11-04 · `legal-paginas` se adelanta a la F1; titular con nombre y `privacidad@rgal.dev`, sin NIF ni domicilio · datos reales de menores en la fase; decidido por Raul.
 - 2026-11-04 · Textos legales como ficheros Markdown versionados en el servidor (no tabla `legal_document`); titular y email por variables de entorno · cambiar un texto pasa por un despliegue; también sin Internet en el servidor del pabellón.
+- 2026-11-04 · Privacidad: el organizador es responsable de los datos de los alumnos que inscribe y Brackety los trata por su cuenta; Raul, responsable del resto · decidido por Raul.
+- 2026-11-04 · App: `flutter_markdown_plus` 1.0.12 para los textos legales · sucesor mantenido de `flutter_markdown` (descontinuado), sin dependencias extra y con tablas desplazables.
+- 2026-11-04 · App: `url_launcher` 6.3.3 · abrir fuera de la app los enlaces http(s) y mailto de los textos legales.

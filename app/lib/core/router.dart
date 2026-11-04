@@ -18,6 +18,7 @@ import '../features/events/ui/events_screen.dart';
 import '../features/grouping/ui/categories_screen.dart';
 import '../features/grouping/ui/group_builder_screen.dart';
 import '../features/grouping/ui/team_category_screen.dart';
+import '../features/legal/ui/legal_page_screen.dart';
 import '../features/mat/ui/mat_board_screen.dart';
 import '../features/scoreboard/ui/match_watch_screen.dart';
 import '../features/scoreboard/ui/scoreboard_screen.dart';
@@ -31,6 +32,8 @@ const _anySession = {
   '/forgot-password',
   '/confirm-email-change',
 };
+// Legal pages too: the sign-up links to them and the web shows them to anyone.
+const _anySessionPrefix = '/legal/';
 const _signedOutOnly = {'/login', '/register', '/register/sent'};
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -45,7 +48,9 @@ final routerProvider = Provider<GoRouter>((ref) {
     refreshListenable: sessionChanged,
     redirect: (context, state) {
       final at = state.matchedLocation;
-      if (_anySession.contains(at)) return null;
+      if (_anySession.contains(at) || at.startsWith(_anySessionPrefix)) {
+        return null;
+      }
       return switch (ref.read(sessionProvider).status) {
         SessionStatus.restoring => at == '/loading' ? null : '/loading',
         SessionStatus.signedOut =>
@@ -96,6 +101,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/confirm-email-change',
         builder: (_, state) =>
             ConfirmEmailChangeScreen(token: state.uri.queryParameters['token']),
+      ),
+      GoRoute(
+        path: '/legal/:type',
+        builder: (_, state) =>
+            LegalPageScreen(slug: state.pathParameters['type']!),
       ),
       GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
       GoRoute(

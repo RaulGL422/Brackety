@@ -10,6 +10,7 @@ import '../../../core/download/file_download.dart';
 import '../../../core/upload/file_upload.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../club/state/club_providers.dart';
+import '../../legal/ui/legal_links.dart';
 import '../data/import_models.dart';
 import '../data/import_repository.dart';
 import 'issue_text.dart';
@@ -222,6 +223,7 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
           onChanged: _busy ? null : (v) => setState(() => _consent = v!),
           title: Text(l10n.importConsent, style: text.bodySmall),
         ),
+        PrivacyNotice(message: l10n.importPrivacyNotice),
         const SizedBox(height: AppSpacing.m),
         if (_busy) ...[
           Text(l10n.importReading, textAlign: TextAlign.center),

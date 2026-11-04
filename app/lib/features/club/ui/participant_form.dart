@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
 import '../../events/state/events_providers.dart';
+import '../../legal/ui/legal_links.dart';
 import '../data/club_models.dart';
 import '../data/club_repository.dart';
 import '../state/club_providers.dart';
@@ -150,6 +151,8 @@ class _ParticipantFormState extends ConsumerState<_ParticipantForm> {
                     title: Text(l10n.guardianConsent),
                     subtitle: Text(l10n.guardianConsentRequired),
                   ),
+                const SizedBox(height: AppSpacing.s),
+                PrivacyNotice(message: l10n.participantPrivacyNotice),
               ],
             ),
           ),
