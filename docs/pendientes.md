@@ -36,6 +36,8 @@
 - [ ] Base de datos de la fase en la SD (sin SSD) con copia diaria: ¿se acepta el riesgo o se compra antes el SSD?
 - [ ] Tras la fase: desactivar `DEMO_ACCOUNTS_ENABLED` y borrar las cuentas demo.
 - [ ] Wifi del pabellón: el punto de acceso de Windows no se activa sin Internet (probado por Raul el 2026-11-04) y la tarjeta AX200 no admite red hospedada. El bucle invertido no se deja elegir y el iPhone por USB no lo reconoce Windows (fallo de cable). Decidido por Raul: el portátil se conecta por wifi al punto de acceso del iPhone (cargando por cable) y lo comparte con el suyo (`192.168.137.1`). Probado el 2026-11-04: un móvil en el punto de acceso llega a la API en `192.168.137.1:8080` y sigue llegando con el iPhone sin datos. Quedan: el ahorro de energía del punto de acceso (lo apaga sin clientes) y el límite de 8 dispositivos.
+- [ ] Carpeta del pabellón (`servidor-local.md`), sin probar aún: encender el punto de acceso desde `start-event.ps1`, el aviso de UAC del firewall y arrancar en un portátil limpio (sin Java ni Visual C++ instalados).
+- [ ] Reglas "java" del firewall creadas al probar la carpeta en el portátil de Raul (aviso de Windows): mantener o borrar.
 - [ ] Raul: crear `privacidad@rgal.dev` (p. ej. reenvío de Cloudflare Email Routing a su Gmail).
 - [ ] Portátil del pabellón: ¿BitLocker activo? Confirmar el borrado de `brackety-data/` y del paquete tras la fase (`servidor-local.md`).
 - [ ] Móviles de árbitros y ayudantes: ¿todos Android y con permiso para instalar la APK? Si hay iPhone, ese usa la web (sin offline).
