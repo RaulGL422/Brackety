@@ -16,31 +16,36 @@ import dev.rgal.brackety.grouping.GroupMember;
 import dev.rgal.brackety.grouping.GroupMemberRepository;
 import dev.rgal.brackety.grouping.Match;
 import dev.rgal.brackety.grouping.MatchRepository;
-import dev.rgal.brackety.participant.ParticipantRepository;
-import dev.rgal.brackety.scoreboard.TamboMatch.Rules;
+import dev.rgal.brackety.scoreboard.RejectedOp.Cause;
 import dev.rgal.brackety.scoreboard.dto.MatchEventRequest;
 import dev.rgal.brackety.scoreboard.dto.MatchView;
 import dev.rgal.brackety.scoreboard.dto.MatchView.Corner;
+import dev.rgal.brackety.scoreboard.dto.MatchView.Review;
+import dev.rgal.brackety.scoreboard.dto.MatchView.ReviewOp;
 import dev.rgal.brackety.scoreboard.dto.MatchView.TimelineEntry;
 import java.time.Clock;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 class ScoreboardService {
 
-    // Reglamento tambo: under 8, touching with one hand is warned and, twice, scores for the rival.
-    static final int ONE_HAND_MIN_AGE = 4;
-    static final int ONE_HAND_MAX_AGE = 7;
+    static final String MATCH_CONFLICT = "MATCH_CONFLICT";
+    static final String MATCH_IN_REVIEW = "MATCH_IN_REVIEW";
+
+    private static final Logger log = LoggerFactory.getLogger(ScoreboardService.class);
 
     private static final Set<MatchEventType> NEED_SIDE = EnumSet.of(
             MatchEventType.POINT,
@@ -50,41 +55,56 @@ class ScoreboardService {
     private static final Set<MatchEventType> NEED_REASON =
             EnumSet.of(MatchEventType.WARNING, MatchEventType.ONE_HAND_WARNING, MatchEventType.DISQUALIFICATION);
 
+    /** {@code conflictCode}: null when the action is applied (now or before), else the code of the 409. */
+    record Recorded(MatchView view, String conflictCode) {}
+
     private final MatchRepository matches;
     private final MatchEventRepository matchEvents;
+    private final RejectedOpRepository rejectedOps;
     private final MatRepository mats;
     private final FightGroupRepository groups;
     private final GroupMemberRepository members;
-    private final ParticipantRepository participants;
     private final CompetitorDirectory directory;
     private final AccountRepository accounts;
     private final EventService events;
     private final EventAccess access;
+    private final MatchWriter writer;
     private final Clock clock;
 
     ScoreboardService(
             MatchRepository matches,
             MatchEventRepository matchEvents,
+            RejectedOpRepository rejectedOps,
             MatRepository mats,
             FightGroupRepository groups,
             GroupMemberRepository members,
-            ParticipantRepository participants,
             CompetitorDirectory directory,
             AccountRepository accounts,
             EventService events,
             EventAccess access,
+            MatchWriter writer,
             Clock clock) {
         this.matches = matches;
         this.matchEvents = matchEvents;
+        this.rejectedOps = rejectedOps;
         this.mats = mats;
         this.groups = groups;
         this.members = members;
-        this.participants = participants;
         this.directory = directory;
         this.accounts = accounts;
         this.events = events;
         this.access = access;
+        this.writer = writer;
         this.clock = clock;
+    }
+
+    /** The 409 of an offline action: the same on the first try and on every retry. */
+    static EventException offlineConflict(String code) {
+        return EventException.conflict(
+                code,
+                MATCH_CONFLICT.equals(code)
+                        ? "The match clashed with another device: the club has to review it."
+                        : "The match is waiting for the club's review.");
     }
 
     /** For the mat's referee and the club (who follows the timeline). */
@@ -102,9 +122,12 @@ class ScoreboardService {
         return view(match, mat, events.get(mat.getEventId()), clock.instant());
     }
 
-    /** Only the referee of the mat writes its matches. */
+    /**
+     * Only the referee of the mat writes its matches. An action with {@code opId} (docs/modulos/offline.md)
+     * is applied once and at its own time; if it clashes, it is kept for the club's review instead.
+     */
     @Transactional
-    MatchView record(UUID matchId, UUID accountId, MatchEventRequest request) {
+    Recorded record(UUID matchId, UUID accountId, MatchEventRequest request) {
         var match = matches.lockById(matchId).orElseThrow(EventException::notFound);
         var mat = mat(match);
         var roles = access.roles(mat.getEventId(), accountId);
@@ -115,6 +138,15 @@ class ScoreboardService {
             throw EventException.forbidden();
         }
         var event = events.get(mat.getEventId());
+        var action = action(request, accountId);
+        var serverNow = clock.instant();
+        var conflict = request.opId() == null
+                ? recordOnline(match, event, action, serverNow)
+                : recordOffline(match, event, action, request, serverNow);
+        return new Recorded(conflict == null ? view(match, mat, event, serverNow) : null, conflict);
+    }
+
+    private static MatchWriter.Action action(MatchEventRequest request, UUID accountId) {
         var type = request.type();
         var side = NEED_SIDE.contains(type) ? request.side() : null;
         var reason = request.reason() == null ? "" : request.reason().strip();
@@ -124,83 +156,67 @@ class ScoreboardService {
         if (NEED_REASON.contains(type) && reason.isEmpty()) {
             throw EventException.invalid("A warning or disqualification needs a reason.");
         }
+        if (request.opId() != null && request.knownEvents() == null) {
+            throw EventException.invalid("An action with an opId needs knownEvents.");
+        }
+        return new MatchWriter.Action(
+                type, side, NEED_REASON.contains(type) ? reason : null, request.opId(), accountId);
+    }
 
-        var now = clock.instant();
-        var history = new ArrayList<>(matchEvents.findByMatchIdOrderByPosition(matchId));
-        var state = replay(event, history);
-        state.refuse(type, now).ifPresent(refusal -> {
-            throw EventException.conflict(refusal);
+    private String recordOnline(Match match, Event event, MatchWriter.Action action, Instant now) {
+        if (match.isInReview()) {
+            throw offlineConflict(MATCH_IN_REVIEW);
+        }
+        var history = new ArrayList<>(matchEvents.findByMatchIdOrderByPosition(match.getId()));
+        writer.append(match, event, history, action, now, true).ifPresent(refusal -> {
+            throw refusal.cause() == Cause.AGE
+                    ? EventException.invalid(refusal.detail())
+                    : EventException.conflict(refusal.detail());
         });
-        if (type == MatchEventType.START && !state.isStarted()) {
-            checkCanStart(match);
-        }
-        if (type == MatchEventType.ONE_HAND_WARNING && !oneHandRule(event, fighter(match, side))) {
-            throw EventException.invalid("The one-hand warning is only for fighters aged 4 to 7.");
-        }
-        var target =
-                type == MatchEventType.UNDO ? state.lastUndoable().orElseThrow().id() : null;
-        history.add(matchEvents.save(new MatchEvent(
-                matchId,
-                history.size(),
-                type,
-                side,
-                NEED_REASON.contains(type) ? reason : null,
-                target,
-                accountId,
-                false,
-                now,
-                state.elapsedAt(now))));
-
-        state = replay(event, history);
-        // Points or a disqualification end the match: the clock stops here and stays stopped after an undo.
-        var endsNow =
-                state.endReason(now).filter(r -> r != TamboMatch.EndReason.TIME).isPresent();
-        if (endsNow && state.isRunning(now)) {
-            history.add(matchEvents.save(new MatchEvent(
-                    matchId,
-                    history.size(),
-                    MatchEventType.STOP,
-                    null,
-                    null,
-                    null,
-                    accountId,
-                    true,
-                    now,
-                    state.elapsedAt(now))));
-            state = replay(event, history);
-        }
-        match.updateFromScoreboard(
-                state.corner(Side.RED).points(),
-                state.corner(Side.BLUE).points(),
-                state.elapsedAt(now),
-                state.isRunning(now) ? now : null,
-                state.disqualified() == null ? null : state.disqualified().name(),
-                state.isFinished(),
-                now);
-        return view(match, mat, event, now);
+        return null;
     }
 
-    private void checkCanStart(Match match) {
-        var eventMatches = matches.findByEventId(match.getEventId());
-        var inProgress = eventMatches.stream()
-                .filter(m ->
-                        m.getStatus() == Match.Status.IN_PROGRESS && !m.getId().equals(match.getId()))
-                .toList();
-        if (inProgress.stream().anyMatch(m -> m.getMatId().equals(match.getMatId()))) {
-            throw EventException.conflict("Another match is in progress on this mat.");
+    private String recordOffline(
+            Match match, Event event, MatchWriter.Action action, MatchEventRequest request, Instant serverNow) {
+        // A retry gets the first answer, even if the club has applied the action since.
+        var earlier = rejectedOps.findByOpId(action.opId());
+        if (earlier.isPresent()) {
+            return code(earlier.get().getCause());
         }
-        var competitors = directory.of(match.getEventId());
-        var fighters = competitors.participants(match.getRedId(), match.getBlueId());
-        if (inProgress.stream()
-                .flatMap(m -> competitors.participants(m.getRedId(), m.getBlueId()).stream())
-                .anyMatch(fighters::contains)) {
-            throw EventException.conflict("A fighter is in a match on another mat.");
+        if (matchEvents.existsByOpId(action.opId())) {
+            return null;
         }
+        var history = new ArrayList<>(matchEvents.findByMatchIdOrderByPosition(match.getId()));
+        var now = MatchWriter.effectiveTime(history, request.at(), serverNow);
+        if (match.isInReview()) {
+            return reject(match, action, now, Cause.IN_REVIEW, serverNow);
+        }
+        if (request.knownEvents() != MatchWriter.knownEvents(history)) {
+            return reject(match, action, now, Cause.KNOWN_EVENTS, serverNow);
+        }
+        return writer.append(match, event, history, action, now, true)
+                .map(refusal -> reject(match, action, now, refusal.cause(), serverNow))
+                .orElse(null);
     }
 
-    private MatchView view(Match match, Mat mat, Event event, Instant now) {
+    // The first clash puts the match in review; from then on every device action waits for the club.
+    private String reject(Match match, MatchWriter.Action action, Instant at, Cause cause, Instant serverNow) {
+        var position = rejectedOps.countByMatchId(match.getId());
+        rejectedOps.save(new RejectedOp(match.getId(), position, action, at, cause, serverNow));
+        if (cause != Cause.IN_REVIEW) {
+            match.putInReview(cause.name());
+            log.info("Match {} put in review: {} on {}", match.getId(), cause, action.type());
+        }
+        return code(cause);
+    }
+
+    private static String code(Cause cause) {
+        return cause == Cause.IN_REVIEW ? MATCH_IN_REVIEW : MATCH_CONFLICT;
+    }
+
+    MatchView view(Match match, Mat mat, Event event, Instant now) {
         var history = matchEvents.findByMatchIdOrderByPosition(match.getId());
-        var state = replay(event, history);
+        var state = MatchWriter.replay(event, history);
         var group = groups.findById(match.getGroupId()).orElseThrow();
         var competitors = directory.of(match.getEventId());
         var ghost = members.findByGroupIdInOrderByPosition(List.of(group.getId())).stream()
@@ -208,17 +224,12 @@ class ScoreboardService {
                 .map(GroupMember::getCompetitorId)
                 .findFirst()
                 .orElse(null);
-        var actors = accounts
-                .findAllById(history.stream()
-                        .map(MatchEvent::getActorAccountId)
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.toSet()))
-                .stream()
-                .collect(Collectors.toMap(Account::getId, Account::getEmail));
-        var undone = history.stream()
-                .map(MatchEvent::getTargetEventId)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+        var pending = match.isInReview()
+                ? rejectedOps.findByMatchIdAndResolutionIsNullOrderByPosition(match.getId())
+                : List.<RejectedOp>of();
+        var actors = actors(Stream.concat(
+                history.stream().map(MatchEvent::getActorAccountId),
+                pending.stream().map(RejectedOp::getActorAccountId)));
         return new MatchView(
                 match.getId(),
                 mat.getId(),
@@ -232,18 +243,49 @@ class ScoreboardService {
                 state.endReason(now).map(Enum::name).orElse(null),
                 corner(event, state, Side.RED, competitors.get(match.getRedId()), ghost),
                 corner(event, state, Side.BLUE, competitors.get(match.getBlueId()), ghost),
-                history.stream()
-                        .map(e -> new TimelineEntry(
-                                e.getId(),
-                                e.getType(),
-                                e.getSide(),
-                                e.getReason(),
-                                actors.get(e.getActorAccountId()),
-                                e.getAt(),
-                                e.getClockMs(),
-                                e.isAutomatic(),
-                                undone.contains(e.getId()),
-                                state.gaveAutoPoint(e.getId())))
+                timeline(history, state, actors),
+                now,
+                match.isInReview() ? review(match, pending, actors) : null);
+    }
+
+    private Map<UUID, String> actors(Stream<UUID> ids) {
+        return accounts.findAllById(ids.filter(Objects::nonNull).collect(Collectors.toSet())).stream()
+                .collect(Collectors.toMap(Account::getId, Account::getEmail));
+    }
+
+    private static List<TimelineEntry> timeline(List<MatchEvent> history, TamboMatch state, Map<UUID, String> actors) {
+        var undone = history.stream()
+                .map(MatchEvent::getTargetEventId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        return history.stream()
+                .map(e -> new TimelineEntry(
+                        e.getId(),
+                        e.getType(),
+                        e.getSide(),
+                        e.getReason(),
+                        actors.get(e.getActorAccountId()),
+                        e.getAt(),
+                        e.getClockMs(),
+                        e.isAutomatic(),
+                        undone.contains(e.getId()),
+                        state.gaveAutoPoint(e.getId())))
+                .toList();
+    }
+
+    private static Review review(Match match, List<RejectedOp> pending, Map<UUID, String> actors) {
+        return new Review(
+                match.getReviewReason(),
+                pending.stream()
+                        .map(op -> new ReviewOp(
+                                op.getOpId(),
+                                op.getType(),
+                                op.getSide(),
+                                op.getReason(),
+                                actors.get(op.getActorAccountId()),
+                                op.getAt(),
+                                op.getCreatedAt(),
+                                op.getCause().name()))
                         .toList());
     }
 
@@ -253,7 +295,7 @@ class ScoreboardService {
                 fighter.isTeam() ? null : fighter.id(),
                 fighter.isTeam() ? String.join(", ", fighter.memberNames()) : fighter.name(),
                 fighter.id().equals(ghost),
-                oneHandRule(event, fighter),
+                writer.oneHandRule(event, fighter),
                 tally.points(),
                 tally.warnings(),
                 tally.oneHandWarnings(),
@@ -263,28 +305,11 @@ class ScoreboardService {
                 fighter.memberNames());
     }
 
-    private Competitor fighter(Match match, Side side) {
-        return directory.of(match.getEventId()).get(side == Side.RED ? match.getRedId() : match.getBlueId());
-    }
-
-    // A team follows the rule if any of its members is young enough.
-    private boolean oneHandRule(Event event, Competitor fighter) {
-        return participants.findAllById(fighter.participantIds()).stream()
-                .map(p -> event.ageOf(p.getBirthDate()))
-                .anyMatch(age -> age >= ONE_HAND_MIN_AGE && age <= ONE_HAND_MAX_AGE);
-    }
-
-    private static TamboMatch replay(Event event, List<MatchEvent> history) {
-        return TamboMatch.replay(
-                new Rules(Duration.ofSeconds(event.getMatchSeconds()), event.getPointsLimit()),
-                history.stream().map(MatchEvent::toEntry).toList());
-    }
-
     private static boolean isReferee(Mat mat, UUID accountId, Set<EventRole> roles) {
         return roles.contains(EventRole.REFEREE) && accountId.equals(mat.getRefereeAccountId());
     }
 
-    private Mat mat(Match match) {
+    Mat mat(Match match) {
         return mats.findById(match.getMatId()).orElseThrow(EventException::notFound);
     }
 }
