@@ -32,7 +32,7 @@ class _ClubPanelScreenState extends ConsumerState<ClubPanelScreen> {
     final eventName = ref.watch(myEventProvider(widget.eventId)).value?.name;
     return AdaptiveScaffold(
       title: eventName ?? l10n.eventClubPanel,
-      actions: [if (kIsWeb) _ExportMenu(eventId: widget.eventId)],
+      actions: [if (kIsWeb) ClubExportMenu(eventId: widget.eventId)],
       destinations: [
         AdaptiveDestination(
           icon: Icons.leaderboard_outlined,
@@ -63,47 +63,52 @@ class _ClubPanelScreenState extends ConsumerState<ClubPanelScreen> {
   }
 }
 
-class _ExportMenu extends ConsumerWidget {
-  const _ExportMenu({required this.eventId});
+/// The CSVs and the event package, as downloads (web only for now, like the CSVs).
+class ClubExportMenu extends ConsumerWidget {
+  const ClubExportMenu({super.key, required this.eventId});
 
   final String eventId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    Future<void> export(CsvExport export) async {
+    Future<void> export(EventExport export) async {
       final messenger = ScaffoldMessenger.of(context);
-      final name = switch (export) {
-        CsvExport.standings => 'clasificacion.csv',
-        CsvExport.matches => 'combates.csv',
-        CsvExport.timeline => 'linea-de-tiempo.csv',
-      };
       try {
-        final bytes = await ref
+        final file = await ref
             .read(clubRepositoryProvider)
-            .csv(eventId, export);
-        saveFile(name, bytes, 'text/csv');
+            .export(eventId, export);
+        await ref.read(saveFileProvider)(
+          file.name,
+          file.bytes,
+          export.mimeType,
+        );
       } on DioException {
         messenger.showSnackBar(SnackBar(content: Text(l10n.exportError)));
       }
     }
 
-    return PopupMenuButton<CsvExport>(
-      tooltip: l10n.exportCsv,
+    return PopupMenuButton<EventExport>(
+      tooltip: l10n.exportMenu,
       icon: const Icon(Icons.download_outlined),
       onSelected: export,
       itemBuilder: (_) => [
         PopupMenuItem(
-          value: CsvExport.standings,
+          value: EventExport.standings,
           child: Text(l10n.exportStandings),
         ),
         PopupMenuItem(
-          value: CsvExport.matches,
+          value: EventExport.matches,
           child: Text(l10n.exportMatches),
         ),
         PopupMenuItem(
-          value: CsvExport.timeline,
+          value: EventExport.timeline,
           child: Text(l10n.exportTimeline),
+        ),
+        const PopupMenuDivider(),
+        PopupMenuItem(
+          value: EventExport.eventPackage,
+          child: Text(l10n.exportEventPackage),
         ),
       ],
     );

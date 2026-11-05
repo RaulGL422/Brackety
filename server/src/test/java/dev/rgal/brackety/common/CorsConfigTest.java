@@ -1,5 +1,6 @@
 package dev.rgal.brackety.common;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
@@ -50,6 +51,16 @@ class CorsConfigTest {
     void acceptsTheLocalNetworkPatterns() {
         assertThatNoException()
                 .isThrownBy(() -> new CorsConfig(List.of("http://localhost:[*]", "http://192.168.*.*:[*]")));
+    }
+
+    @Test
+    void exposesTheHeadersTheAppReads() {
+        var config = new CorsConfig(List.of("https://brackety.example.test"))
+                .corsConfigurationSource()
+                .getCorsConfigurations()
+                .get("/**");
+
+        assertThat(config.getExposedHeaders()).containsExactly("Retry-After", "Content-Disposition");
     }
 
     @TestConfiguration(proxyBeanMethods = false)

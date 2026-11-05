@@ -28,23 +28,38 @@ public class Event {
 
     protected Event() {}
 
+    public Event(
+            UUID ownerAccountId,
+            String name,
+            LocalDate eventDate,
+            int maxGroupsPerMat,
+            int matchSeconds,
+            int pointsLimit,
+            int changeoverSeconds,
+            int attendancePoints,
+            Instant now) {
+        this.ownerAccountId = ownerAccountId;
+        this.name = name;
+        this.eventDate = eventDate;
+        this.maxGroupsPerMat = maxGroupsPerMat;
+        this.matchSeconds = matchSeconds;
+        this.pointsLimit = pointsLimit;
+        this.changeoverSeconds = changeoverSeconds;
+        this.attendancePoints = attendancePoints;
+        this.createdAt = now;
+    }
+
     /** Liga Yoseikan tambo rules: 2 min per match, 15 points ends it, 10 points for attending. */
     public static Event tambo(UUID ownerAccountId, String name, LocalDate eventDate, Instant now) {
-        var event = new Event();
-        event.ownerAccountId = ownerAccountId;
-        event.name = name;
-        event.eventDate = eventDate;
-        event.maxGroupsPerMat = 1;
-        event.matchSeconds = 120;
-        event.pointsLimit = 15;
-        event.changeoverSeconds = 30;
-        event.attendancePoints = 10;
-        event.createdAt = now;
-        return event;
+        return new Event(ownerAccountId, name, eventDate, 1, 120, 15, 30, 10, now);
     }
 
     public UUID getId() {
         return id;
+    }
+
+    public UUID getOwnerAccountId() {
+        return ownerAccountId;
     }
 
     public String getName() {

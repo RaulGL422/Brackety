@@ -5,19 +5,28 @@
     PostgreSQL y la API con la web, todo dentro de esta carpeta. Los datos viven en brackety-data\ y se
     conservan entre arranques. Al parar (Ctrl+C) guarda una copia de la BD en brackety-data\backups\.
     Móviles: http://192.168.137.1:8080 (punto de acceso de Windows). Este portátil: http://localhost:8080.
+    El primer arranque necesita el evento: -Package (el fichero .brackety que exporta el club) o -Demo.
 .EXAMPLE
+    .\start-event.ps1 -Package .\fase-1.brackety
     .\start-event.ps1
-    .\start-event.ps1 -EventDate 2026-11-14
+    .\start-event.ps1 -Demo -EventDate 2026-11-14
     .\start-event.ps1 -Backup
+    .\start-event.ps1 -Reset
     .\start-event.ps1 -NoHotspot -NoFirewall
 #>
 param(
+    # Event package (.brackety) to load on the first start of an empty data folder.
+    [string]$Package = "",
+    # First start with the prototype's demo accounts and event instead of a package.
+    [switch]$Demo,
     # Day of the demo event (age categories), AAAA-MM-DD; empty = today. Only used when the accounts are created.
     [string]$EventDate = "",
     [string]$LegalOwnerName = "",
     [string]$PrivacyContactEmail = "",
     # Only a copy of the database, then exit.
     [switch]$Backup,
+    # Renames brackety-data to brackety-data.old-<date> (never deletes it) to start again with an empty one.
+    [switch]$Reset,
     [switch]$NoHotspot,
     [switch]$NoFirewall
 )
@@ -40,6 +49,9 @@ $jar = Join-Path $here "api\brackety.jar"
 $webDir = Join-Path $here "web"
 $secretsFile = Join-Path $data "secrets.env"
 $eventFile = Join-Path $data "event.env"
+# What the first start loaded: the package or the demo event. Without either, that start went wrong.
+$packageMark = Join-Path $data "package-loaded.txt"
+$demoMark = Join-Path $data "demo-loaded.txt"
 
 function Write-Step([string]$text) { Write-Host "-> $text" -ForegroundColor Cyan }
 function Write-Warn([string]$text) { Write-Host "AVISO: $text" -ForegroundColor Yellow }
@@ -230,7 +242,61 @@ New-NetFirewallRule -DisplayName 'Brackety pabellon (API $ApiPort)' -Direction I
     }
 }
 
-function Set-ApiEnvironment([hashtable]$secrets) {
+function Invoke-Reset {
+    if (-not (Test-Path $data)) {
+        Write-Step "No hay brackety-data: nada que archivar."
+        return
+    }
+    if ((Get-NetTCPConnection -LocalPort $ApiPort -State Listen -ErrorAction SilentlyContinue) -or (Test-PgRunning)) {
+        throw "El servidor está en marcha: páralo (Ctrl+C en su ventana) antes de usar -Reset."
+    }
+    $archive = "brackety-data.old-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
+    Write-Host "Se renombrará brackety-data a $archive (no se borra nada) y el próximo arranque empezará de cero."
+    $answer = Read-Host "¿Seguir? (s/N)"
+    if ($answer -notmatch '^[sS]') { throw "Cancelado: no se ha tocado nada." }
+    Rename-Item -Path $data -NewName $archive
+    Write-Step "Datos archivados en $(Join-Path $here $archive). Bórralos a mano cuando ya no hagan falta (datos de menores)."
+}
+
+# new-package / new-demo on the first start of an empty data folder; package / demo afterwards.
+function Get-StartMode {
+    if ($Package -and $Demo) { throw "Usa -Package o -Demo, no los dos." }
+    if (Test-Path "$pgData\PG_VERSION") {
+        if ($Package -or $Demo) {
+            throw ("brackety-data ya tiene un evento: arranca sin -Package ni -Demo para seguir con él, " +
+                "o archiva los datos con -Reset (no borra nada) y vuelve a cargar el evento.")
+        }
+        if (Test-Path $packageMark) { return "package" }
+        if (Test-Path $demoMark) { return "demo" }
+        throw ("El primer arranque no terminó bien (¿falló la carga del paquete? mira brackety-data\api.log). " +
+            "Archiva los datos con -Reset y vuelve a arrancar con -Package o -Demo.")
+    }
+    if ($Package) {
+        if (-not (Test-Path $Package -PathType Leaf)) { throw "No se encuentra el paquete $Package." }
+        return "new-package"
+    }
+    if ($Demo) { return "new-demo" }
+    throw ("Primer arranque: indica el evento con -Package <fichero .brackety> (el que exporta el club) " +
+        "o -Demo (evento de prueba con las cuentas demo).")
+}
+
+# Keeps the package with the data it brings (both hold data of minors and are deleted together).
+function Copy-Package {
+    $target = Join-Path $data (Split-Path $Package -Leaf)
+    if ((Resolve-Path $Package).Path -ne $target) { Copy-Item -Path $Package -Destination $target -Force }
+    return $target
+}
+
+function Show-PackageError {
+    $log = Join-Path $data "api.log"
+    $reason = if (Test-Path $log) {
+        Select-String -Path $log -Pattern 'Event package .* not loaded: .*' | Select-Object -Last 1
+    }
+    if ($reason) { Write-Warn "Paquete rechazado: $($reason.Matches[0].Value)" }
+    Write-Warn "No se ha cargado nada. Corrige el paquete (o exporta otro) y vuelve a cargarlo con -Reset -Package <fichero>."
+}
+
+function Set-ApiEnvironment([hashtable]$secrets, [string]$mode, [string]$packageFile) {
     $legal = Read-EnvFile $eventFile
     $owner = if ($LegalOwnerName) { $LegalOwnerName } else { $legal["LEGAL_OWNER_NAME"] }
     $privacy = if ($PrivacyContactEmail) { $PrivacyContactEmail } else { $legal["PRIVACY_CONTACT_EMAIL"] }
@@ -246,8 +312,10 @@ function Set-ApiEnvironment([hashtable]$secrets) {
     $env:WEB_DIR = $webDir
     $env:LEGAL_OWNER_NAME = $owner
     $env:PRIVACY_CONTACT_EMAIL = $privacy
-    $env:DEMO_ACCOUNTS_ENABLED = "true"
+    # Only the demo data folder creates demo accounts: a package brings its own and must not get a second event.
+    $env:DEMO_ACCOUNTS_ENABLED = if ($mode -like "*demo") { "true" } else { "false" }
     $env:DEMO_EVENT_DATE = $day
+    if ($packageFile) { $env:BRACKETY_PACKAGE = $packageFile } else { Remove-Item Env:BRACKETY_PACKAGE -ErrorAction SilentlyContinue }
     $env:LOGGING_FILE_NAME = Join-Path $data "api.log"
     foreach ($offline in @("RESEND_API_KEY", "GOOGLE_CLIENT_ID", "SUPERADMIN_EMAIL", "SUPERADMIN_PASSWORD_HASH",
             "CF_ACCESS_TEAM_DOMAIN", "CF_ACCESS_AUD", "ANTHROPIC_API_KEY")) {
@@ -277,6 +345,13 @@ function Stop-Api([System.Diagnostics.Process]$api) {
     if (-not $api.WaitForExit(30000)) { Stop-Process -Id $api.Id -Force }
 }
 
+if ($Reset) {
+    Invoke-Reset
+    if (-not $Package -and -not $Demo) { return }
+}
+# Before anything is created: a first start without the event must leave the folder empty.
+$mode = if ($Backup) { "" } else { Get-StartMode }
+
 Initialize-Data
 $secrets = Read-EnvFile $secretsFile
 $env:PGPASSWORD = $secrets["DB_PASSWORD"]
@@ -304,12 +379,26 @@ $api = $null
 try {
     Start-Postgres
     Confirm-DatabaseExists
-    Set-ApiEnvironment $secrets
-    Write-Step "Arrancando la API (puede tardar un minuto)"
+    $packageFile = if ($mode -eq "new-package") { Copy-Package } else { "" }
+    Set-ApiEnvironment $secrets $mode $packageFile
+    $loading = if ($packageFile) { " y cargando el paquete $(Split-Path $packageFile -Leaf)" } else { "" }
+    Write-Step "Arrancando la API$loading (puede tardar un minuto)"
     $api = Start-Process -FilePath $java -ArgumentList "-jar `"$jar`"" -WorkingDirectory $data -NoNewWindow -PassThru
     # Reading the handle now keeps ExitCode available after the process ends.
     $null = $api.Handle
-    Wait-ApiReady $api
+    try {
+        Wait-ApiReady $api
+    } catch {
+        if ($packageFile) { Show-PackageError }
+        throw
+    }
+    $loaded = "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+    if ($mode -eq "new-package") {
+        Set-Content -Path $packageMark -Encoding utf8 -Value @("Paquete: $(Split-Path $packageFile -Leaf)", "Cargado: $loaded")
+        Write-Step "Paquete $(Split-Path $packageFile -Leaf) cargado."
+    } elseif ($mode -eq "new-demo") {
+        Set-Content -Path $demoMark -Encoding utf8 -Value @("Evento demo y cuentas demo", "Creado: $loaded")
+    }
     Write-Host ""
     Write-Host "Brackety listo." -ForegroundColor Green
     Write-Host "  Móviles (wifi del punto de acceso): http://${HotspotIp}:$ApiPort"
@@ -330,5 +419,5 @@ try {
         Write-Warn "No se ha podido guardar la copia: $($_.Exception.Message)"
     }
     Stop-Postgres
-    Remove-Item Env:PGPASSWORD, Env:DB_PASSWORD, Env:JWT_SECRET -ErrorAction SilentlyContinue
+    Remove-Item Env:PGPASSWORD, Env:DB_PASSWORD, Env:JWT_SECRET, Env:BRACKETY_PACKAGE -ErrorAction SilentlyContinue
 }

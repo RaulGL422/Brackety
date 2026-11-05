@@ -103,7 +103,7 @@ class BracketyApplicationTests {
         var rejected = loginUntil429("192.0.2.51", "http://localhost:5000");
 
         assertThat(rejected.getHeader("Access-Control-Allow-Origin")).isEqualTo("http://localhost:5000");
-        assertThat(rejected.getHeader("Access-Control-Expose-Headers")).isEqualTo("Retry-After");
+        assertThat(rejected.getHeader("Access-Control-Expose-Headers")).isEqualTo("Retry-After, Content-Disposition");
         assertThat(rejected.getHeader("Retry-After")).isNotBlank();
     }
 

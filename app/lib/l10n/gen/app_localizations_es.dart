@@ -680,16 +680,19 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get exportCsv => 'Exportar CSV';
+  String get exportMenu => 'Exportar';
 
   @override
-  String get exportStandings => 'Clasificación';
+  String get exportStandings => 'Clasificación (CSV)';
 
   @override
-  String get exportMatches => 'Combates';
+  String get exportMatches => 'Combates (CSV)';
 
   @override
-  String get exportTimeline => 'Línea de tiempo';
+  String get exportTimeline => 'Línea de tiempo (CSV)';
+
+  @override
+  String get exportEventPackage => 'Exportar paquete del evento';
 
   @override
   String get exportError => 'No se ha podido exportar.';

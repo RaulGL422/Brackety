@@ -36,8 +36,8 @@ class CorsConfig {
         config.setAllowedOriginPatterns(allowedOriginPatterns);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of(CorsConfiguration.ALL));
-        // The app reads it to tell the user when to try again after a 429.
-        config.setExposedHeaders(List.of(HttpHeaders.RETRY_AFTER));
+        // The app reads them: when to try again after a 429, and the name of a downloaded file.
+        config.setExposedHeaders(List.of(HttpHeaders.RETRY_AFTER, HttpHeaders.CONTENT_DISPOSITION));
         // The web app sends the refresh cookie to /api/v1/auth from its own origin.
         config.setAllowCredentials(true);
         config.setMaxAge(Duration.ofMinutes(30));

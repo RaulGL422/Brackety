@@ -120,7 +120,7 @@ class RateLimitFilterTest {
         assertThat(rejected.getHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS))
                 .isEqualTo("true");
         assertThat(rejected.getHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS))
-                .isEqualTo(HttpHeaders.RETRY_AFTER);
+                .isEqualTo("Retry-After, Content-Disposition");
         assertThat(rejected.getHeader(HttpHeaders.RETRY_AFTER)).isEqualTo("20");
     }
 
