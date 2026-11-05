@@ -269,7 +269,8 @@ class ScoreboardService {
                         e.getClockMs(),
                         e.isAutomatic(),
                         undone.contains(e.getId()),
-                        state.gaveAutoPoint(e.getId())))
+                        state.gaveAutoPoint(e.getId()),
+                        e.getOpId()))
                 .toList();
     }
 

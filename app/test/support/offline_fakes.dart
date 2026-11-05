@@ -24,7 +24,8 @@ class MemoryOfflineStore implements OfflineStore {
   Future<void> write(String name, Object? json) async => docs[name] = json;
 
   @override
-  Future<void> clear() async => docs.clear();
+  Future<void> clear({Set<String> keep = const {}}) async =>
+      docs.removeWhere((name, _) => !keep.contains(name));
 }
 
 /// A device clock the test moves by hand.
@@ -41,8 +42,9 @@ List<Override> offlineOverrides({
   required MemoryOfflineStore store,
   required TestClock clock,
   required ScoreboardRepository repository,
+  FakeAuthApi? auth,
 }) => [
-  ...sessionOverrides(FakeAuthApi(signedIn: true)),
+  ...sessionOverrides(auth ?? FakeAuthApi(signedIn: true)),
   offlineEnabledProvider.overrideWithValue(true),
   offlineStoreProvider.overrideWithValue(store),
   deviceClockProvider.overrideWithValue(() => clock.now),

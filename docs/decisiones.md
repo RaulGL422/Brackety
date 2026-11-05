@@ -147,3 +147,4 @@ Formato: fecha · decisión · motivo.
 - 2026-11-05 · Offline F1: choque = combate "en revisión"; el club aplica o descarta las acciones del móvil · decidido por Raul.
 - 2026-11-05 · Offline F1: choque si `knownEvents` no coincide con las acciones no automáticas del servidor · detecta otro dispositivo sin contar las paradas automáticas, que añade el servidor.
 - 2026-11-05 · Offline F1: caché y cola en ficheros JSON, no drift · un tapiz y unas decenas de acciones; drift llega con el módulo completo.
+- 2026-11-05 · Offline F1: si el servidor rechaza la sesión, la cola del árbitro se guarda para su cuenta y se envía al volver a entrar · decidido por Raul; antes se perdía sin enviarse.

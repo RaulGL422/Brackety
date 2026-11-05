@@ -55,7 +55,7 @@ class ScoreboardOfflineTest extends ScoreboardApiTest {
         var again = scoreboard.record(match, referee(), start);
 
         assertThat(again.conflictCode()).isNull();
-        assertThat(again.view().timeline()).hasSize(1);
+        assertThat(again.view().timeline()).extracting(TimelineEntry::opId).containsExactly(start.opId());
 
         var stale = request(MatchEventType.POINT, Side.RED, UUID.randomUUID(), t0, 0);
         assertThat(scoreboard.record(match, referee(), stale).conflictCode()).isEqualTo("MATCH_CONFLICT");

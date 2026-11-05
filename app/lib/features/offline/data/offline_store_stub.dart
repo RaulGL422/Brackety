@@ -13,5 +13,5 @@ class _NoStore implements OfflineStore {
   Future<void> write(String name, Object? json) async {}
 
   @override
-  Future<void> clear() async {}
+  Future<void> clear({Set<String> keep = const {}}) async {}
 }

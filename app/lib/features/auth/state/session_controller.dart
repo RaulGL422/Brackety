@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:brackety_core/brackety_core.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -29,22 +31,49 @@ class SessionState {
   const SessionState(
     this.status, {
     this.accessToken,
+    this.accountId,
     this.emailVerified = true,
     this.notice,
+    this.expired = false,
   });
 
   static const signedOut = SessionState(SessionStatus.signedOut);
+
+  /// Signed out because the server rejected the refresh (expired or revoked session).
+  static const rejected = SessionState(SessionStatus.signedOut, expired: true);
 
   final SessionStatus status;
 
   /// Null while signed in without network: the next request renews it.
   final String? accessToken;
 
+  /// The `sub` of [accessToken]; null without one.
+  final String? accountId;
+
   /// Unknown while offline; assumed true so the banner only shows on the server's word.
   final bool emailVerified;
 
   /// Only while signed out by [SessionController.sessionsClosed].
   final SignedOutNotice? notice;
+
+  /// Only while signed out by the server's "no" to a refresh, not by the user or the account.
+  final bool expired;
+}
+
+/// The account id the server put in the token's `sub`; null if it is not a readable JWT.
+String? accountIdOf(String accessToken) {
+  final parts = accessToken.split('.');
+  if (parts.length != 3) return null;
+  try {
+    final payload = jsonDecode(
+      utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))),
+    );
+    return payload is Map && payload['sub'] is String
+        ? payload['sub'] as String
+        : null;
+  } on FormatException {
+    return null;
+  }
 }
 
 final authApiProvider = Provider<AuthApi>(
@@ -107,7 +136,7 @@ class SessionController extends Notifier<SessionState> {
     } on DioException catch (e) {
       // Only the server's "no" ends the session; a network failure keeps it for later.
       if (const {400, 401}.contains(e.response?.statusCode)) {
-        await _signOutLocally();
+        await _signOutLocally(expired: true);
       }
       return null;
     }
@@ -166,6 +195,7 @@ class SessionController extends Notifier<SessionState> {
     state = SessionState(
       SessionStatus.signedIn,
       accessToken: state.accessToken,
+      accountId: state.accountId,
     );
     await refresh();
   }
@@ -182,13 +212,14 @@ class SessionController extends Notifier<SessionState> {
     state = SessionState(
       SessionStatus.signedIn,
       accessToken: tokens.accessToken,
+      accountId: accountIdOf(tokens.accessToken),
       emailVerified: tokens.emailVerified,
     );
   }
 
-  Future<void> _signOutLocally() async {
+  Future<void> _signOutLocally({bool expired = false}) async {
     await _store.clear();
-    state = SessionState.signedOut;
+    state = expired ? SessionState.rejected : SessionState.signedOut;
   }
 }
 

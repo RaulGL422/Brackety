@@ -68,6 +68,10 @@ public class MatchEvent {
         return id;
     }
 
+    public UUID getOpId() {
+        return opId;
+    }
+
     public UUID getMatchId() {
         return matchId;
     }

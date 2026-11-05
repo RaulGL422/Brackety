@@ -53,6 +53,7 @@ class LocalMatch {
       timeline.add(
         TimelineEntry(
           id: op.opId,
+          opId: op.opId,
           action: op.action,
           side: op.side,
           reason: op.reason,

@@ -13,8 +13,8 @@ abstract interface class OfflineStore {
   /// Replaces the whole document at once: a crash never leaves half of it.
   Future<void> write(String name, Object? json);
 
-  /// Deletes every document (sign-out).
-  Future<void> clear();
+  /// Deletes every document but the ones named in [keep] (sign-out).
+  Future<void> clear({Set<String> keep = const {}});
 }
 
 final offlineStoreProvider = Provider<OfflineStore>(

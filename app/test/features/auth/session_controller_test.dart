@@ -52,7 +52,9 @@ void main() {
         FakeRefreshTokenStore(inCookie: true),
       );
 
-      expect((await restore(container)).status, SessionStatus.signedOut);
+      final state = await restore(container);
+      expect(state.status, SessionStatus.signedOut);
+      expect(state.expired, isTrue);
     });
 
     test('the web without network is signed out', () async {
@@ -135,6 +137,7 @@ void main() {
 
       expect(await container.read(sessionProvider.notifier).refresh(), isNull);
       expect(container.read(sessionProvider).status, SessionStatus.signedOut);
+      expect(container.read(sessionProvider).expired, isTrue);
       expect(store.token, isNull);
     });
 
@@ -179,6 +182,7 @@ void main() {
       await container.read(sessionProvider.notifier).logout();
 
       expect(container.read(sessionProvider).status, SessionStatus.signedOut);
+      expect(container.read(sessionProvider).expired, isFalse);
       expect(store.token, isNull);
       expect(api.logouts, ['refresh-1']);
     },
@@ -216,7 +220,20 @@ void main() {
         .resetPassword('t', 'new password');
 
     expect(container.read(sessionProvider).status, SessionStatus.signedOut);
+    expect(container.read(sessionProvider).expired, isFalse);
     expect(store.token, isNull);
+  });
+
+  test('the account id is the sub of the access token', () async {
+    final api = FakeAuthApi(jwt: true);
+    final container = containerFor(api, FakeRefreshTokenStore());
+    await restore(container);
+
+    await container.read(sessionProvider.notifier).login('club1', 'club1');
+
+    expect(container.read(sessionProvider).accountId, 'club1');
+    expect(accountIdOf('access-1'), isNull);
+    expect(accountIdOf('a.%%%.c'), isNull);
   });
 
   test('a verified email renews the session with a verified token', () async {

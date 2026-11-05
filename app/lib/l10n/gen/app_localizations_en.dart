@@ -1412,4 +1412,16 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String logoutPending(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'You have $count actions not sent yet; if you sign out they will be lost.',
+      one: 'You have 1 action not sent yet; if you sign out it will be lost.',
+    );
+    return '$_temp0';
+  }
 }

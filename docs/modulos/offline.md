@@ -64,7 +64,7 @@ Pedido por Raul el 2026-11-04 para la Fase 1. Solo APK Android (la web por http 
   - Error de red: reintenta más tarde.
   - 409: ese combate muestra "en revisión del club"; sus acciones salen de la cola, porque el servidor ya las guarda.
 - El estado del combate = la última vista del servidor + las acciones pendientes, con las reglas del marcador repetidas en Dart (mismos casos que `TamboMatch`).
-- Caché en ficheros JSON del dispositivo (no drift para la F1): último tablero del tapiz, combates abiertos y cola. Se borra al cerrar sesión.
+- Caché en ficheros JSON del dispositivo (no drift para la F1): último tablero del tapiz, combates abiertos y cola. Al cerrar sesión, ver "Cierre de sesión" abajo.
 - Sin red, el tablero sale de la caché, sin recomendado y con aviso. Se puede empezar un pendiente si en el tapiz no hay otro en curso.
 - La web no cambia (sin cola ni caché).
 - Club: el combate en revisión se marca en Tapices. Al abrirlo muestra lo que traía el móvil (quién, qué, cuándo) y los botones Aplicar y Descartar, con confirmación.
@@ -73,11 +73,16 @@ Pedido por Raul el 2026-11-04 para la Fase 1. Solo APK Android (la web por http 
 - Código: `app/lib/features/offline/` (cola, caché, indicador) y `scoreboard/data/tambo_match.dart` (reglas).
 - Antes de encolar, el móvil rechaza lo que el servidor mandaría a revisión: reglas, aviso de una mano fuera de 4-7, combate en revisión, otro combate en curso en el tapiz (según lo que sabe el móvil).
 - Con acciones pendientes de un combate, el sondeo no cambia su vista (podría traer ya alguna y `knownEvents` las contaría dos veces). Solo la cambia la respuesta de cada envío.
+- Una acción que ya está en el timeline del servidor (`opId`) sale de la cola. Si son las primeras de la cola, el sondeo sí acepta esa vista.
 - Otro 4xx (no 401): esa acción y las siguientes de su combate quedan "rechazadas", fuera del estado mostrado; el indicador las cuenta y deja verlas y quitarlas. No frenan a otros combates. 5xx y 401: reintento.
 - Reintento: cada 3 s mientras haya pendientes y al responder cualquier otra petición.
 - "En revisión" = la última vista trae `review`; tras un 409, también hasta que llegue la vista nueva.
 - Caché: en la carpeta privada de la app, `offline/queue.json`, `views.json` y `board-<tapiz>.json`, con fichero temporal + rename. Con red, el tablero descarga la vista de cada combate del tapiz que falte o haya cambiado, para poder abrir cualquiera sin red.
-- Se borra en todo cierre de sesión (salir, sesión cerrada por el servidor, cambio de servidor). En el móvil quedan solo nombres del tapiz y motivos de avisos.
+- Cierre de sesión (decidido por Raul el 2026-11-05: no perder acciones del árbitro):
+  - Salir a mano, cambio de servidor o sesiones cerradas por una acción de la cuenta: se borra todo. Si hay acciones sin enviar, "Salir" avisa con cuántas se perderán y pide confirmar.
+  - Sesión caducada o rechazada por el servidor (refresh 400/401): se borran tablero y vistas (llevan nombres), pero la cola se queda guardada con la cuenta que la creó y sin enviarse.
+  - Al volver a entrar esa misma cuenta, la cola se envía como siempre. Otra cuenta no la ve ni la envía; sigue guardada hasta que entre la suya o se salga a mano con ella.
+- En el móvil quedan solo nombres del tapiz y motivos de avisos.
 - Web: igual que antes; solo muestra el aviso de "en revisión" y bloquea los botones si el combate lo está.
 
 ## Datos
@@ -89,7 +94,7 @@ Estado de conexión, descarga previa, cola pendiente, exportar/importar CSV, res
 ## Tests
 Sin red → operaciones → sincronización; idempotencia; CSV round trip; choque de dos escritores; traspaso de tapiz.
 - Servidor F1 (`ScoreboardOfflineTest`, `ScoreboardReviewControllerTest`): con `opId` igual que sin él; reintentos sin duplicar (200 y 409); `at` recortado a ahora y subido a la última acción; combate jugado offline y fin por tiempo con los `at`; `knownEvents` distinto, alumno en otro tapiz y siguientes en revisión; web en revisión; paradas automáticas fuera de `knownEvents`; APPLY en orden saltando las que no valen y finalizando; DISCARD; permisos de `/review`, `serverTime`, `review`, tablero y códigos del problem+json.
-- App F1: `tambo_match_test` (los casos de `TamboMatchTest`); `local_match_test` (cola sobre la vista, parada automática, deshacer, `at` subido, tablero sin red); `offline_sync_test` (orden, sin red y envío al volver, reintento con el mismo `opId`, desfase con `serverTime`, 409 a revisión, revisión resuelta, otro 4xx, sobrevive al reinicio, borrado al salir, ficheros atómicos); `offline_screens_test` en 3 tamaños (tablero sin red con indicador, marcador con pendientes, revisión del club).
+- App F1: `tambo_match_test` (los casos de `TamboMatchTest`); `local_match_test` (cola sobre la vista, parada automática, deshacer, `at` subido, tablero sin red); `offline_sync_test` (orden, sin red y envío al volver, reintento con el mismo `opId`, vista que ya trae una pendiente (sale de la cola, cuenta una vez y `knownEvents` correcto), desfase con `serverTime`, 409 a revisión, revisión resuelta, otro 4xx, sobrevive al reinicio, borrado al salir, ficheros atómicos); `offline_session_test` (sesión rechazada: cola guardada sin vistas, misma cuenta la envía, otra no la ve ni la borra al salir, salir a mano y cambio de servidor la borran, `queue.json` sin cuenta); `confirm_sign_out_test` en 3 tamaños (aviso al salir con pendientes); `offline_screens_test` en 3 tamaños (tablero sin red con indicador, marcador con pendientes, revisión del club).
 
 ## Estado
 Pendiente; adelanto F1 en pruebas (2026-11-05, rama `feat/offline-f1-scoreboard`): servidor y app hechos. Falta la prueba manual de Raul y un escenario de datos con un combate en revisión (es de `server/`, sin hacer). Prueba a mano: APK sin red (modo avión) en un combate y en el tablero; volver la red; choque con el mismo árbitro en la web escribiendo el combate mientras el móvil está sin red; Aplicar y Descartar desde el club.
