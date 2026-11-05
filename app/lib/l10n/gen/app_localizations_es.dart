@@ -1239,4 +1239,41 @@ class AppLocalizationsEs extends AppLocalizations {
   String importPrivacyNotice(String privacy) {
     return 'Los datos de los alumnos se tratan según la $privacy.';
   }
+
+  @override
+  String serverCurrent(String name) {
+    return 'Servidor: $name';
+  }
+
+  @override
+  String get serverChange => 'Cambiar';
+
+  @override
+  String get serverDialogTitle => 'Elegir servidor';
+
+  @override
+  String get serverHall => 'Pabellón';
+
+  @override
+  String get serverInternet => 'Internet';
+
+  @override
+  String get serverOther => 'Otra URL';
+
+  @override
+  String get serverUrlLabel => 'URL del servidor';
+
+  @override
+  String get serverUrlHint => 'https://servidor.ejemplo';
+
+  @override
+  String get serverUrlInvalid =>
+      'Escribe una URL que empiece por http:// o https:// y tenga servidor.';
+
+  @override
+  String get serverUrlCleartext =>
+      'Sin https la app solo llega al pabellón (192.168.137.1): con esta URL no conectará.';
+
+  @override
+  String get serverUse => 'Usar';
 }

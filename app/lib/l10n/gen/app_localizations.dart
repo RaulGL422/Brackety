@@ -2185,6 +2185,72 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Los datos de los alumnos se tratan según la {privacy}.'**
   String importPrivacyNotice(String privacy);
+
+  /// No description provided for @serverCurrent.
+  ///
+  /// In es, this message translates to:
+  /// **'Servidor: {name}'**
+  String serverCurrent(String name);
+
+  /// No description provided for @serverChange.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar'**
+  String get serverChange;
+
+  /// No description provided for @serverDialogTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Elegir servidor'**
+  String get serverDialogTitle;
+
+  /// No description provided for @serverHall.
+  ///
+  /// In es, this message translates to:
+  /// **'Pabellón'**
+  String get serverHall;
+
+  /// No description provided for @serverInternet.
+  ///
+  /// In es, this message translates to:
+  /// **'Internet'**
+  String get serverInternet;
+
+  /// No description provided for @serverOther.
+  ///
+  /// In es, this message translates to:
+  /// **'Otra URL'**
+  String get serverOther;
+
+  /// No description provided for @serverUrlLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'URL del servidor'**
+  String get serverUrlLabel;
+
+  /// No description provided for @serverUrlHint.
+  ///
+  /// In es, this message translates to:
+  /// **'https://servidor.ejemplo'**
+  String get serverUrlHint;
+
+  /// No description provided for @serverUrlInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe una URL que empiece por http:// o https:// y tenga servidor.'**
+  String get serverUrlInvalid;
+
+  /// No description provided for @serverUrlCleartext.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin https la app solo llega al pabellón (192.168.137.1): con esta URL no conectará.'**
+  String get serverUrlCleartext;
+
+  /// No description provided for @serverUse.
+  ///
+  /// In es, this message translates to:
+  /// **'Usar'**
+  String get serverUse;
 }
 
 class _AppLocalizationsDelegate
