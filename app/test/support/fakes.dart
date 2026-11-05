@@ -25,6 +25,13 @@ DioException httpError(
   ),
 );
 
+/// An unsigned JWT with [subject] as its `sub`; [n] tells sessions apart.
+String fakeJwt(String subject, [int n = 1]) {
+  String part(Object json) =>
+      base64Url.encode(utf8.encode(jsonEncode(json))).replaceAll('=', '');
+  return '${part({'alg': 'none'})}.${part({'sub': subject, 'n': n})}.sig';
+}
+
 /// No answer at all: no network or a timeout.
 DioException networkError() => DioException.connectionError(
   requestOptions: RequestOptions(),
@@ -47,12 +54,22 @@ List<Override> sessionOverrides(
 /// Server auth without a server. Sign-in works for [accounts] and when the password equals the
 /// email (like the demo accounts); each `...Error` makes that call fail instead.
 class FakeAuthApi implements AuthApi {
-  FakeAuthApi({this.signedIn = false, this.issueRefreshTokens = false});
+  FakeAuthApi({
+    this.signedIn = false,
+    this.issueRefreshTokens = false,
+    this.jwt = false,
+  });
 
   bool signedIn;
 
   /// Android answers carry the refresh token; web answers do not.
   final bool issueRefreshTokens;
+
+  /// Access tokens as JWTs whose `sub` is [subject], instead of `access-<n>`.
+  final bool jwt;
+
+  /// The account signed in; the email of the last login.
+  String subject = 'referee@test.local';
   bool emailVerified = true;
 
   DioException? loginError;
@@ -88,7 +105,7 @@ class FakeAuthApi implements AuthApi {
     _sessions++;
     signedIn = true;
     return SessionTokens(
-      accessToken: 'access-$_sessions',
+      accessToken: jwt ? fakeJwt(subject, _sessions) : 'access-$_sessions',
       refreshToken: issueRefreshTokens ? 'refresh-$_sessions' : null,
       emailVerified: emailVerified,
     );
@@ -105,6 +122,7 @@ class FakeAuthApi implements AuthApi {
       throw httpError(401);
     }
     logins.add(email);
+    subject = email;
     return _session();
   }
 

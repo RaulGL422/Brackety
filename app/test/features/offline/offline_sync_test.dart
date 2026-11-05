@@ -277,6 +277,11 @@ void main() {
     ).list().toList()).map((f) => f.uri.pathSegments.last);
     expect(names, ['queue.json']);
 
+    await files.write('views', {'views': {}});
+    await files.clear(keep: {'queue'});
+    expect(await files.read('views'), isNull);
+    expect(await files.read('queue'), isNotNull);
+
     await files.clear();
     expect(await files.read('queue'), isNull);
   });
