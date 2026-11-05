@@ -1272,4 +1272,144 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get serverUse => 'Use';
+
+  @override
+  String get syncConnected => 'Connected';
+
+  @override
+  String get syncOffline => 'Offline';
+
+  @override
+  String syncPending(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count actions waiting',
+      one: '1 action waiting',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String syncRejected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count actions refused',
+      one: '1 action refused',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get syncRejectedShow => 'Show';
+
+  @override
+  String get syncRejectedTitle => 'Refused actions';
+
+  @override
+  String get syncRejectedBody =>
+      'The server did not accept these actions and they do not count in the match. Tell the club if needed.';
+
+  @override
+  String get syncRejectedDismiss => 'Remove from the list';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get matOfflineBoard =>
+      'Offline: board saved on the phone. No recommendation; you can start a pending match if none is in progress.';
+
+  @override
+  String get matInReview => 'Under the club\'s review';
+
+  @override
+  String get refusalFinished => 'The match is already finished.';
+
+  @override
+  String get refusalOver => 'The match is already over.';
+
+  @override
+  String get refusalRunning => 'The clock is already running.';
+
+  @override
+  String get refusalNotRunning => 'The clock is not running.';
+
+  @override
+  String get refusalNothingToUndo => 'Nothing to undo.';
+
+  @override
+  String get refusalNotOver => 'The match is not over yet.';
+
+  @override
+  String get refusalNotForAge =>
+      'The one-hand warning is only for fighters aged 4 to 7.';
+
+  @override
+  String get refusalInReview => 'The match is under the club\'s review.';
+
+  @override
+  String get refusalMatBusy => 'Another match is in progress on this mat.';
+
+  @override
+  String get reviewBannerReferee =>
+      'Under the club\'s review: this match waits until the club applies or discards this phone\'s actions.';
+
+  @override
+  String get reviewTitle => 'Phone actions under review';
+
+  @override
+  String get reviewReasonKnownEvents =>
+      'Another device wrote in the match while the phone was offline.';
+
+  @override
+  String get reviewReasonRules =>
+      'The scoreboard rules did not allow one of the phone\'s actions.';
+
+  @override
+  String get reviewReasonAge => 'One-hand warning to someone not aged 4 to 7.';
+
+  @override
+  String get reviewReasonMatBusy => 'Another match was in progress on the mat.';
+
+  @override
+  String get reviewReasonFighterBusy =>
+      'A fighter was in a match on another mat.';
+
+  @override
+  String get reviewReasonUnknown => 'Clash with the server.';
+
+  @override
+  String get reviewApply => 'Apply';
+
+  @override
+  String get reviewDiscard => 'Discard';
+
+  @override
+  String get reviewApplyConfirm =>
+      'The phone\'s actions go in, in order and at their time. Those the rules do not allow are skipped.';
+
+  @override
+  String get reviewDiscardConfirm =>
+      'The phone\'s actions do not count in the match. They stay in the log.';
+
+  @override
+  String reviewApplied(int applied, int skipped) {
+    return 'Applied: $applied · Skipped: $skipped';
+  }
+
+  @override
+  String get reviewDiscarded => 'Actions discarded.';
+
+  @override
+  String matsInReview(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count matches under review',
+      one: '1 match under review',
+    );
+    return '$_temp0';
+  }
 }

@@ -82,6 +82,7 @@ class BoardMatch {
     required this.redScore,
     required this.blueScore,
     required this.available,
+    this.inReview = false,
   });
 
   factory BoardMatch.fromJson(Map<String, dynamic> json) => BoardMatch(
@@ -94,6 +95,7 @@ class BoardMatch {
     redScore: json['redScore'] as int,
     blueScore: json['blueScore'] as int,
     available: json['available'] as bool,
+    inReview: json['inReview'] as bool? ?? false,
   );
 
   final String id;
@@ -105,8 +107,30 @@ class BoardMatch {
   final int redScore;
   final int blueScore;
 
-  /// Pending and neither fighter is in a match on any mat right now.
+  /// Pending, not in review and neither fighter is in a match on any mat right now.
   final bool available;
+
+  /// An offline action clashed: it waits for the club and cannot start.
+  final bool inReview;
+
+  BoardMatch copyWith({
+    MatchStatus? status,
+    int? redScore,
+    int? blueScore,
+    bool? available,
+    bool? inReview,
+  }) => BoardMatch(
+    id: id,
+    groupId: groupId,
+    groupNumber: groupNumber,
+    red: red,
+    blue: blue,
+    status: status ?? this.status,
+    redScore: redScore ?? this.redScore,
+    blueScore: blueScore ?? this.blueScore,
+    available: available ?? this.available,
+    inReview: inReview ?? this.inReview,
+  );
 }
 
 class MatBoard {
@@ -115,6 +139,7 @@ class MatBoard {
     required this.groups,
     required this.matches,
     this.recommendedMatchId,
+    this.offline = false,
   });
 
   factory MatBoard.fromJson(Map<String, dynamic> json) => MatBoard(
@@ -134,6 +159,9 @@ class MatBoard {
   final List<BoardGroup> groups;
   final List<BoardMatch> matches;
   final String? recommendedMatchId;
+
+  /// From the device's cache: the server did not answer.
+  final bool offline;
 
   /// Position of the group on this mat, which picks its colour.
   int groupIndex(String groupId) => groups.indexWhere((g) => g.id == groupId);

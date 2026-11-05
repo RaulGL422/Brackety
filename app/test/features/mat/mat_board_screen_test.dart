@@ -1,6 +1,7 @@
 import 'package:brackety/features/mat/data/mat_board.dart';
 import 'package:brackety/features/mat/state/mat_providers.dart';
 import 'package:brackety/features/mat/ui/mat_board_screen.dart';
+import 'package:brackety/features/offline/state/offline_sync.dart';
 import 'package:brackety/l10n/gen/app_localizations.dart';
 import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
@@ -68,6 +69,7 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
+              offlineEnabledProvider.overrideWithValue(false),
               matBoardProvider.overrideWith((ref, matId) async => board),
             ],
             child: MaterialApp(
@@ -98,7 +100,10 @@ void main() {
   ) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [matBoardProvider.overrideWith((ref, matId) async => board)],
+        overrides: [
+          offlineEnabledProvider.overrideWithValue(false),
+          matBoardProvider.overrideWith((ref, matId) async => board),
+        ],
         child: MaterialApp(
           theme: lightTheme(),
           localizationsDelegates: const [
@@ -166,6 +171,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            offlineEnabledProvider.overrideWithValue(false),
             matBoardProvider.overrideWith((ref, matId) async => teamBoard),
           ],
           child: MaterialApp(

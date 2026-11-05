@@ -1,0 +1,64 @@
+import '../../scoreboard/data/match_view.dart';
+
+/// A referee action waiting in the device's queue (docs/modulos/offline.md, "App (APK)").
+/// [knownEvents]: the non-automatic actions the device knew of this match before it.
+/// [rejected]: the server refused it (a 4xx that is not a review); it stays to be seen.
+class OfflineOp {
+  const OfflineOp({
+    required this.opId,
+    required this.matchId,
+    required this.action,
+    required this.at,
+    required this.knownEvents,
+    this.side,
+    this.reason,
+    this.rejected = false,
+  });
+
+  factory OfflineOp.fromJson(Map<String, dynamic> json) => OfflineOp(
+    opId: json['opId'] as String,
+    matchId: json['matchId'] as String,
+    action: MatchAction.fromWire(json['type'] as String),
+    side: sideFromJson(json['side']),
+    reason: json['reason'] as String?,
+    at: DateTime.parse(json['at'] as String),
+    knownEvents: json['knownEvents'] as int,
+    rejected: json['rejected'] as bool? ?? false,
+  );
+
+  final String opId;
+  final String matchId;
+  final MatchAction action;
+  final Side? side;
+  final String? reason;
+  final DateTime at;
+  final int knownEvents;
+  final bool rejected;
+
+  OfflineOp asRejected() => OfflineOp(
+    opId: opId,
+    matchId: matchId,
+    action: action,
+    side: side,
+    reason: reason,
+    at: at,
+    knownEvents: knownEvents,
+    rejected: true,
+  );
+
+  /// The body of `POST /matches/{id}/events`.
+  Map<String, dynamic> toRequest() => {
+    'type': action.wire,
+    'side': sideToJson(side),
+    'reason': reason,
+    'opId': opId,
+    'at': at.toUtc().toIso8601String(),
+    'knownEvents': knownEvents,
+  };
+
+  Map<String, dynamic> toJson() => {
+    ...toRequest(),
+    'matchId': matchId,
+    'rejected': rejected,
+  };
+}
