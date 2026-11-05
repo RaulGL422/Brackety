@@ -17,7 +17,10 @@ public record MatBoardResponse(
 
     public record BoardGroup(UUID id, int number, String categoryName, List<Fighter> members) {}
 
-    /** {@code available}: neither fighter is in a match in progress on any mat. */
+    /**
+     * {@code available}: neither fighter is in a match in progress on any mat, and it is not in review.
+     * {@code inReview}: an offline action clashed and the club has to apply or discard it.
+     */
     public record BoardMatch(
             UUID id,
             UUID groupId,
@@ -28,5 +31,6 @@ public record MatBoardResponse(
             Match.Status status,
             int redScore,
             int blueScore,
-            boolean available) {}
+            boolean available,
+            boolean inReview) {}
 }
