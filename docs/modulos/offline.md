@@ -64,7 +64,7 @@ Pedido por Raul el 2026-11-04 para la Fase 1. Solo APK Android (la web por http 
   - Error de red: reintenta más tarde.
   - 409: ese combate muestra "en revisión del club"; sus acciones salen de la cola, porque el servidor ya las guarda.
 - El estado del combate = la última vista del servidor + las acciones pendientes, con las reglas del marcador repetidas en Dart (mismos casos que `TamboMatch`).
-- Caché en ficheros JSON del dispositivo (no drift para la F1): último tablero del tapiz, combates abiertos y cola. Se borra al cerrar sesión.
+- Caché en ficheros JSON del dispositivo (no drift para la F1): último tablero del tapiz, combates abiertos y cola. Al cerrar sesión, ver "Cierre de sesión" abajo.
 - Sin red, el tablero sale de la caché, sin recomendado y con aviso. Se puede empezar un pendiente si en el tapiz no hay otro en curso.
 - La web no cambia (sin cola ni caché).
 - Club: el combate en revisión se marca en Tapices. Al abrirlo muestra lo que traía el móvil (quién, qué, cuándo) y los botones Aplicar y Descartar, con confirmación.
@@ -77,7 +77,11 @@ Pedido por Raul el 2026-11-04 para la Fase 1. Solo APK Android (la web por http 
 - Reintento: cada 3 s mientras haya pendientes y al responder cualquier otra petición.
 - "En revisión" = la última vista trae `review`; tras un 409, también hasta que llegue la vista nueva.
 - Caché: en la carpeta privada de la app, `offline/queue.json`, `views.json` y `board-<tapiz>.json`, con fichero temporal + rename. Con red, el tablero descarga la vista de cada combate del tapiz que falte o haya cambiado, para poder abrir cualquiera sin red.
-- Se borra en todo cierre de sesión (salir, sesión cerrada por el servidor, cambio de servidor). En el móvil quedan solo nombres del tapiz y motivos de avisos.
+- Cierre de sesión (decidido por Raul el 2026-11-05: no perder acciones del árbitro):
+  - Salir a mano, cambio de servidor o sesiones cerradas por una acción de la cuenta: se borra todo. Si hay acciones sin enviar, "Salir" avisa con cuántas se perderán y pide confirmar.
+  - Sesión caducada o rechazada por el servidor (refresh 400/401): se borran tablero y vistas (llevan nombres), pero la cola se queda guardada con la cuenta que la creó y sin enviarse.
+  - Al volver a entrar esa misma cuenta, la cola se envía como siempre. Otra cuenta no la ve ni la envía; sigue guardada hasta que entre la suya o se salga a mano con ella.
+- En el móvil quedan solo nombres del tapiz y motivos de avisos.
 - Web: igual que antes; solo muestra el aviso de "en revisión" y bloquea los botones si el combate lo está.
 
 ## Datos
