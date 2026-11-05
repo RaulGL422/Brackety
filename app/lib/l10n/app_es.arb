@@ -647,5 +647,7 @@
   "@reviewApplied": {"placeholders": {"applied": {"type": "int"}, "skipped": {"type": "int"}}},
   "reviewDiscarded": "Acciones descartadas.",
   "matsInReview": "{count, plural, =1{1 combate en revisión} other{{count} combates en revisión}}",
-  "@matsInReview": {"placeholders": {"count": {"type": "int"}}}
+  "@matsInReview": {"placeholders": {"count": {"type": "int"}}},
+  "logoutPending": "{count, plural, =1{Tienes 1 acción sin enviar; si sales se perderá.} other{Tienes {count} acciones sin enviar; si sales se perderán.}}",
+  "@logoutPending": {"placeholders": {"count": {"type": "int"}}}
 }

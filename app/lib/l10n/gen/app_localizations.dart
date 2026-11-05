@@ -2461,6 +2461,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'{count, plural, =1{1 combate en revisión} other{{count} combates en revisión}}'**
   String matsInReview(int count);
+
+  /// No description provided for @logoutPending.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{Tienes 1 acción sin enviar; si sales se perderá.} other{Tienes {count} acciones sin enviar; si sales se perderán.}}'**
+  String logoutPending(int count);
 }
 
 class _AppLocalizationsDelegate

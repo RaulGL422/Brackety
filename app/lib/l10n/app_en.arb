@@ -485,5 +485,6 @@
   "reviewDiscardConfirm": "The phone's actions do not count in the match. They stay in the log.",
   "reviewApplied": "Applied: {applied} · Skipped: {skipped}",
   "reviewDiscarded": "Actions discarded.",
-  "matsInReview": "{count, plural, =1{1 match under review} other{{count} matches under review}}"
+  "matsInReview": "{count, plural, =1{1 match under review} other{{count} matches under review}}",
+  "logoutPending": "{count, plural, =1{You have 1 action not sent yet; if you sign out it will be lost.} other{You have {count} actions not sent yet; if you sign out they will be lost.}}"
 }
