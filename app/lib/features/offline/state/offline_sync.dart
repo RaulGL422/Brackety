@@ -209,9 +209,10 @@ class OfflineSync extends Notifier<OfflineState> {
     if (state.pendingCount > 0) unawaited(flush());
   }
 
-  /// A view from a poll. Ignored while this match has actions in the queue and a view: it may
-  /// already hold some of them, and `knownEvents` would count them twice. Without a view (after
-  /// a rejected session) there is nothing better to show.
+  /// A view from a poll. While this match has actions queued it may already hold some of them,
+  /// and `knownEvents` would count them twice: the view is taken only if the ones its timeline
+  /// holds (by `opId`) are the first of the queue, and those leave it. Without a view (after a
+  /// rejected session) there is nothing better to show.
   Future<void> storeView(MatchView view) async {
     await ready;
     if (!ref.mounted) return;
@@ -221,16 +222,38 @@ class OfflineSync extends Notifier<OfflineState> {
         known?.serverTime != null &&
         view.serverTime != null &&
         view.serverTime!.isBefore(known!.serverTime!);
-    if ((known != null && state.pendingFor(view.id).isNotEmpty) || older) {
+    final applied = _appliedIn(view);
+    final pending = state.pendingFor(view.id);
+    final firstApplied =
+        applied.isNotEmpty &&
+        pending.take(applied.length).every((op) => applied.contains(op.opId));
+    if ((known != null && pending.isNotEmpty && !firstApplied) || older) {
       state = state.copyWith(clockOffset: offset);
       return;
     }
     state = state.copyWith(
+      ops: [
+        for (final op in state.ops)
+          if (!applied.contains(op.opId)) op,
+      ],
       views: {...state.views, view.id: view},
       heldForReview: state.heldForReview.difference({view.id}),
       clockOffset: offset,
     );
+    if (applied.isNotEmpty) await _saveQueue();
     await _saveViews();
+  }
+
+  /// The queued actions of [view]'s match that its timeline already holds.
+  Set<String> _appliedIn(MatchView view) {
+    final inTimeline = {
+      for (final e in view.timeline)
+        if (e.opId != null) e.opId,
+    };
+    return {
+      for (final op in state.pendingFor(view.id))
+        if (inTimeline.contains(op.opId)) op.opId,
+    };
   }
 
   /// Puts a referee action in the queue and starts sending. The match must have a view here.
@@ -251,7 +274,9 @@ class OfflineSync extends Notifier<OfflineState> {
       at: now(),
       account: _account,
       knownEvents:
-          state.views[matchId]!.knownEvents + state.pendingFor(matchId).length,
+          state.views[matchId]!.knownEvents +
+          state.pendingFor(matchId).length -
+          _appliedIn(state.views[matchId]!).length,
     );
     state = state.copyWith(ops: [...state.ops, op]);
     await _saveQueue();
@@ -285,10 +310,11 @@ class OfflineSync extends Notifier<OfflineState> {
     try {
       final view = await _repository.sendOp(op);
       if (!ref.mounted || generation != _generation) return false;
+      final applied = {op.opId, ..._appliedIn(view)};
       state = state.copyWith(
         ops: [
           for (final o in state.ops)
-            if (o.opId != op.opId) o,
+            if (!applied.contains(o.opId)) o,
         ],
         views: {...state.views, view.id: view},
         heldForReview: state.heldForReview.difference({view.id}),

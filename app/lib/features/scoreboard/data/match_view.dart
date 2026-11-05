@@ -121,6 +121,7 @@ class TimelineEntry {
     this.side,
     this.reason,
     this.actor,
+    this.opId,
   });
 
   factory TimelineEntry.fromJson(Map<String, dynamic> json) => TimelineEntry(
@@ -134,10 +135,14 @@ class TimelineEntry {
     automatic: json['automatic'] as bool,
     undone: json['undone'] as bool,
     gaveRivalPoint: json['gaveRivalPoint'] as bool,
+    opId: json['opId'] as String?,
   );
 
   /// The server's event id; for an action still in the device's queue, its `opId`.
   final String? id;
+
+  /// The device action it came from; null for the web and the automatic ones.
+  final String? opId;
   final MatchAction action;
   final Side? side;
   final String? reason;
@@ -164,6 +169,7 @@ class TimelineEntry {
     automatic: automatic,
     undone: undone,
     gaveRivalPoint: gaveRivalPoint,
+    opId: opId,
   );
 
   Map<String, dynamic> toJson() => {
@@ -177,6 +183,7 @@ class TimelineEntry {
     'automatic': automatic,
     'undone': undone,
     'gaveRivalPoint': gaveRivalPoint,
+    'opId': opId,
   };
 }
 

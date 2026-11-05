@@ -107,6 +107,39 @@ void main() {
     },
   );
 
+  test(
+    'a poll holding a queued action takes it out and counts it once',
+    () async {
+      final container = device();
+      final sync = await open(container);
+      server.loseNextAnswer = true;
+      await sync.enqueue('m1', MatchAction.start);
+      await pumpEventQueue();
+      expect(container.read(offlineSyncProvider).pendingCount, 1);
+
+      await sync.storeView(await server.load('m1'));
+
+      final offline = container.read(offlineSyncProvider);
+      expect(offline.pendingCount, 0);
+      expect(offline.views['m1']!.timeline.single.opId, isNotNull);
+      expect(offline.local('m1', sync.now())!.view.timeline, hasLength(1));
+
+      server.down = true;
+      await sync.enqueue('m1', MatchAction.point, side: Side.red);
+      expect(
+        container.read(offlineSyncProvider).pendingFor('m1').single.knownEvents,
+        1,
+      );
+
+      server.down = false;
+      sync.reportResponse();
+      await pumpEventQueue();
+      expect(server.views['m1']!.review, isNull);
+      expect(server.views['m1']!.timeline, hasLength(2));
+      expect(container.read(offlineSyncProvider).pendingCount, 0);
+    },
+  );
+
   test('at is the device time corrected with the last serverTime', () async {
     // The server's clock is 5 s ahead of the device's.
     final serverClock = TestClock(t0.add(const Duration(seconds: 5)));
