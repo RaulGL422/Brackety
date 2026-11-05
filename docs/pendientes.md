@@ -31,7 +31,14 @@
 - [ ] Login con Google en la app (botón + `REGISTRATION_REQUIRED`) cuando existan los client IDs.
 
 ## Prototipo Fase 1 (bloquean el uso real)
-- [ ] Raul: túnel de Cloudflare con `brackety.rgal.dev` y `brackety-api.rgal.dev` (`prototipo-f1.md`, Despliegue) y conexión a Internet en el pabellón: sin offline, sin red no funciona.
+- [ ] Raul · Cloudflare para dejarlo todo listo (sin configurar el 2026-11-05). Pasos en `09-despliegue.md` (paso 8); `.env` de la Pi en `prototipo-f1.md` (Despliegue):
+  - Un túnel en la Pi (Zero Trust → Networks → Tunnels, tipo Cloudflared); su token en `CLOUDFLARE_TUNNEL_TOKEN`.
+  - Hostname `brackety.rgal.dev` → `http://web:80` (web pública).
+  - Hostname `brackety-api.rgal.dev` → `http://api:8080` (API; la opción "Internet" de la APK apunta aquí y no funciona hasta entonces).
+  - Hostname `brackety-admin.rgal.dev` → `http://admin:80`, solo junto con su aplicación de Access (`CF_ACCESS_TEAM_DOMAIN`, `CF_ACCESS_AUD`). No hace falta para la F1.
+  - Relacionado: rate limiting de `/api/v1/auth/*` (Auth) y Email Routing de `privacidad@rgal.dev` (abajo).
+  - Comprobar desde datos móviles la web y `https://brackety-api.rgal.dev/actuator/health`.
+  - El pabellón no depende del túnel: va con el portátil (`modulos/servidor-local.md`).
 - [ ] Categorías reales de la Fase 1 (ahora ficticias: tramos del ranking, mixtas).
 - [ ] Base de datos de la fase en la SD (sin SSD) con copia diaria: ¿se acepta el riesgo o se compra antes el SSD?
 - [ ] Tras la fase: desactivar `DEMO_ACCOUNTS_ENABLED` y borrar las cuentas demo.
