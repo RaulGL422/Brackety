@@ -32,14 +32,18 @@ const _reviewCodes = {'MATCH_CONFLICT', 'MATCH_IN_REVIEW'};
 class OfflineState {
   const OfflineState({
     this.ops = const [],
+    this.hidden = const [],
     this.views = const {},
     this.heldForReview = const {},
     this.connected = true,
     this.clockOffset = Duration.zero,
   });
 
-  /// The queue in order, the rejected ones included.
+  /// The signed-in account's queue in order, the rejected ones included.
   final List<OfflineOp> ops;
+
+  /// Actions of other accounts (or of every one while signed out): kept, never shown or sent.
+  final List<OfflineOp> hidden;
 
   /// The last view the server sent of each match on the mat.
   final Map<String, MatchView> views;
@@ -80,12 +84,14 @@ class OfflineState {
 
   OfflineState copyWith({
     List<OfflineOp>? ops,
+    List<OfflineOp>? hidden,
     Map<String, MatchView>? views,
     Set<String>? heldForReview,
     bool? connected,
     Duration? clockOffset,
   }) => OfflineState(
     ops: ops ?? this.ops,
+    hidden: hidden ?? this.hidden,
     views: views ?? this.views,
     heldForReview: heldForReview ?? this.heldForReview,
     connected: connected ?? this.connected,
@@ -105,8 +111,13 @@ class OfflineSync extends Notifier<OfflineState> {
   Timer? _retry;
   var _flushing = false;
   var _prefetching = false;
-  // Bumped by [clear]: answers to requests from before it are dropped.
+  // Bumped by every sign-out: answers to requests from before it are dropped.
   var _generation = 0;
+  // Whose actions [OfflineState.ops] holds; also kept in `queue.json` for a session restored
+  // without network, whose token says nothing yet.
+  String? _account;
+  // Sign-ins and sign-outs, one after the other.
+  Future<void> _sessionJob = Future.value();
 
   OfflineStore get _store => ref.read(offlineStoreProvider);
   ScoreboardRepository get _repository =>
@@ -114,11 +125,26 @@ class OfflineSync extends Notifier<OfflineState> {
 
   @override
   OfflineState build() {
-    ref.listen(sessionProvider.select((s) => s.status), (_, status) {
-      if (status == SessionStatus.signedOut) unawaited(clear());
-    });
-    ref.onDispose(() => _retry?.cancel());
     ready = _load();
+    ref.listen(
+      sessionProvider.select((s) => (s.status, s.accountId, s.expired)),
+      (_, session) {
+        switch (session) {
+          case (SessionStatus.restoring, _, _):
+            break;
+          case (SessionStatus.signedIn, final account, _):
+            _serial(() => _enter(account ?? _account));
+          case (SessionStatus.signedOut, _, true):
+            _serial(_keepQueue);
+          case (SessionStatus.signedOut, _, false):
+            _serial(clear);
+        }
+      },
+      fireImmediately: true,
+    );
+    // Another server: nothing saved for the old one is any use.
+    ref.listen(serverProvider, (_, _) => _serial(_forgetAll));
+    ref.onDispose(() => _retry?.cancel());
     return const OfflineState();
   }
 
@@ -130,8 +156,10 @@ class OfflineSync extends Notifier<OfflineState> {
     final queue = await _store.read('queue');
     final saved = await _store.read('views');
     if (!ref.mounted) return;
+    if (queue case {'session': final String account}) _account = account;
     state = OfflineState(
-      ops: [
+      // Until the session says whose they are.
+      hidden: [
         if (queue case {'ops': final List ops})
           for (final op in ops) OfflineOp.fromJson(op as Map<String, dynamic>),
       ],
@@ -149,11 +177,41 @@ class OfflineSync extends Notifier<OfflineState> {
         _ => Duration.zero,
       },
     );
+  }
+
+  void _serial(Future<void> Function() job) {
+    _sessionJob = _sessionJob.catchError((_) {}).then((_) => job());
+  }
+
+  /// Shows and sends [account]'s actions; a queue saved without account becomes its own.
+  Future<void> _enter(String? account) async {
+    await ready;
+    if (!ref.mounted) return;
+    _account = account;
+    final all = [
+      for (final op in [...state.ops, ...state.hidden])
+        account != null && op.account == null ? op.ownedBy(account) : op,
+    ];
+    state = state.copyWith(
+      ops: [
+        for (final op in all)
+          if (op.account == account) op,
+      ],
+      hidden: [
+        for (final op in all)
+          if (op.account != account) op,
+      ],
+    );
+    await _saveQueue();
+    for (final id in {for (final op in state.ops) op.matchId}) {
+      if (state.views[id] == null) unawaited(_reload(id));
+    }
     if (state.pendingCount > 0) unawaited(flush());
   }
 
-  /// A view from a poll. Ignored while this match has actions in the queue: it may already hold
-  /// some of them, and `knownEvents` would count them twice.
+  /// A view from a poll. Ignored while this match has actions in the queue and a view: it may
+  /// already hold some of them, and `knownEvents` would count them twice. Without a view (after
+  /// a rejected session) there is nothing better to show.
   Future<void> storeView(MatchView view) async {
     await ready;
     if (!ref.mounted) return;
@@ -163,7 +221,7 @@ class OfflineSync extends Notifier<OfflineState> {
         known?.serverTime != null &&
         view.serverTime != null &&
         view.serverTime!.isBefore(known!.serverTime!);
-    if (state.pendingFor(view.id).isNotEmpty || older) {
+    if ((known != null && state.pendingFor(view.id).isNotEmpty) || older) {
       state = state.copyWith(clockOffset: offset);
       return;
     }
@@ -191,6 +249,7 @@ class OfflineSync extends Notifier<OfflineState> {
       side: side,
       reason: reason,
       at: now(),
+      account: _account,
       knownEvents:
           state.views[matchId]!.knownEvents + state.pendingFor(matchId).length,
     );
@@ -350,15 +409,29 @@ class OfflineSync extends Notifier<OfflineState> {
     await _saveQueue();
   }
 
-  /// Sign-out: nothing of this session stays on the device.
-  Future<void> clear() async {
+  /// Sign-out: nothing of this session stays on the device. Other accounts' actions stay.
+  Future<void> clear() => _signOut(state.hidden);
+
+  /// The server rejected the session: its actions stay to go out when the same account is back,
+  /// but the views and boards (with names) go.
+  Future<void> _keepQueue() => _signOut([...state.ops, ...state.hidden]);
+
+  Future<void> _forgetAll() => _signOut(const []);
+
+  Future<void> _signOut(List<OfflineOp> kept) async {
     await ready;
     if (!ref.mounted) return;
     _generation++;
     _retry?.cancel();
-    state = const OfflineState();
+    _account = null;
+    state = OfflineState(hidden: kept);
     try {
-      await _store.clear();
+      if (kept.isEmpty) {
+        await _store.clear();
+      } else {
+        await _saveQueue();
+        await _store.clear(keep: const {'queue'});
+      }
     } on Exception {
       // Nothing was saved without its folder.
     }
@@ -372,7 +445,10 @@ class OfflineSync extends Notifier<OfflineState> {
   }
 
   Future<void> _saveQueue() => _save('queue', {
-    'ops': [for (final op in state.ops) op.toJson()],
+    'session': _account,
+    'ops': [
+      for (final op in [...state.ops, ...state.hidden]) op.toJson(),
+    ],
     'heldForReview': [...state.heldForReview],
   });
 

@@ -48,9 +48,17 @@ class FileOfflineStore implements OfflineStore {
   });
 
   @override
-  Future<void> clear() => _serial(() async {
+  Future<void> clear({Set<String> keep = const {}}) => _serial(() async {
     final dir = await folder();
-    if (await dir.exists()) await dir.delete(recursive: true);
+    if (!await dir.exists()) return;
+    if (keep.isEmpty) {
+      await dir.delete(recursive: true);
+      return;
+    }
+    final kept = {for (final name in keep) '$name.json'};
+    await for (final file in dir.list()) {
+      if (!kept.contains(file.uri.pathSegments.last)) await file.delete();
+    }
   });
 
   Future<void> _serial(Future<void> Function() job) {
