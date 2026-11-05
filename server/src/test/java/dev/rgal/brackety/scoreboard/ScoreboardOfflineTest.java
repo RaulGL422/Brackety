@@ -12,6 +12,7 @@ import dev.rgal.brackety.scoreboard.dto.MatchView.TimelineEntry;
 import dev.rgal.brackety.scoreboard.dto.ReviewRequest;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -231,7 +232,7 @@ class ScoreboardOfflineTest extends ScoreboardApiTest {
         assertThat(discarded.match().red().points()).isZero();
         assertThat(resolutions()).containsExactly("DISCARDED");
         assertThat(jdbc.sql("select count(*) from offline_rejected_op where resolved_by = ? and resolved_at = ?")
-                        .params(club(), clock.instant())
+                        .params(club(), clock.instant().atOffset(ZoneOffset.UTC))
                         .query(Integer.class)
                         .single())
                 .isEqualTo(1);
