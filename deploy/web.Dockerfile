@@ -16,7 +16,7 @@ WORKDIR /src/${APP}
 RUN test -n "$API_BASE_URL" || (echo "API_BASE_URL build arg is required" && exit 1)
 RUN flutter build web --release --no-web-resources-cdn --dart-define=API_BASE_URL="$API_BASE_URL"
 
-FROM nginx:1.30.6-alpine
+FROM nginx:1.31.8-alpine
 ARG APP
 COPY deploy/nginx/security-headers.conf /etc/nginx/security-headers.conf
 COPY deploy/nginx/web.conf /etc/nginx/conf.d/default.conf
