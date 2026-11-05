@@ -9,6 +9,8 @@ public interface MatchEventRepository extends JpaRepository<MatchEvent, UUID> {
 
     List<MatchEvent> findByMatchIdOrderByPosition(UUID matchId);
 
+    boolean existsByOpId(UUID opId);
+
     @Query("select e from MatchEvent e where e.matchId in"
             + " (select m.id from Match m where m.eventId = :eventId) order by e.matchId, e.position")
     List<MatchEvent> findByEventId(UUID eventId);

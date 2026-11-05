@@ -26,4 +26,11 @@ public class EventException extends ErrorResponseException {
     public static EventException conflict(String detail) {
         return new EventException(HttpStatus.CONFLICT, detail);
     }
+
+    // The code lets the app react without parsing the detail.
+    public static EventException conflict(String code, String detail) {
+        var exception = conflict(detail);
+        exception.getBody().setProperty("code", code);
+        return exception;
+    }
 }

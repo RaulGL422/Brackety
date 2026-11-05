@@ -42,7 +42,7 @@ Estados: pendiente · en curso · en pruebas · cerrado.
 | prototipo F1: categorías por equipos | modulos/prototipo-f1-equipos.md | en pruebas: pasos 8-11 hechos (back, ayudante, árbitro, club con categorías editables). Falta: prueba manual de Raul (2026-11-02) | feat/proto-f1-teams-club |
 | prototipo F1: importación masiva de alumnos | modulos/importacion-alumnos.md | en pruebas: pasos 1-3 hechos (back, pantallas, imagen con `claude`). Falta: DPA y clave de Anthropic, prueba en la Pi y prueba manual de Raul (2026-11-02) | feat/import-deploy |
 | servidor del pabellón (portátil Windows) y paquete del evento | modulos/servidor-local.md | en curso: pasos 1-3/4 hechos (APK con selector de servidor; 2026-11-05) | feat/local-server-apk |
-| offline: adelanto F1 (marcador del árbitro) | modulos/offline.md | pendiente: planificado (2026-11-04) | – |
+| offline: adelanto F1 (marcador del árbitro) | modulos/offline.md | en pruebas: servidor (`opId`, `at`, `knownEvents`, revisión del club con `/review`) y app (cola y caché en el APK, tablero sin red, indicador, Aplicar/Descartar del club) hechos; falta la prueba manual de Raul y el escenario con un combate en revisión (2026-11-05) | feat/offline-f1-scoreboard |
 
 ## Hasta la Fase 1 (14-11)
 Orden acordado con Raul el 2026-11-04 (una PR abierta cada vez):

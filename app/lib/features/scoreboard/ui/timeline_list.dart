@@ -42,7 +42,7 @@ class TimelineList extends StatelessWidget {
           dense: true,
           leading: Text(_clock(e.clock)),
           title: Text(
-            _label(l10n, e.action),
+            actionLabel(l10n, e.action),
             style: e.undone
                 ? const TextStyle(decoration: TextDecoration.lineThrough)
                 : null,
@@ -56,16 +56,22 @@ class TimelineList extends StatelessWidget {
 
   static String _clock(Duration d) =>
       '${d.inMinutes}:${(d.inSeconds % 60).toString().padLeft(2, '0')}';
-
-  static String _label(AppLocalizations l10n, MatchAction action) =>
-      switch (action) {
-        MatchAction.start => l10n.tlStart,
-        MatchAction.stop => l10n.tlStop,
-        MatchAction.point => l10n.tlPoint,
-        MatchAction.warning => l10n.actionWarning,
-        MatchAction.oneHandWarning => l10n.actionOneHand,
-        MatchAction.disqualification => l10n.actionDisqualify,
-        MatchAction.undo => l10n.tlUndo,
-        MatchAction.finish => l10n.tlFinish,
-      };
 }
+
+String actionLabel(AppLocalizations l10n, MatchAction action) =>
+    switch (action) {
+      MatchAction.start => l10n.tlStart,
+      MatchAction.stop => l10n.tlStop,
+      MatchAction.point => l10n.tlPoint,
+      MatchAction.warning => l10n.actionWarning,
+      MatchAction.oneHandWarning => l10n.actionOneHand,
+      MatchAction.disqualification => l10n.actionDisqualify,
+      MatchAction.undo => l10n.tlUndo,
+      MatchAction.finish => l10n.tlFinish,
+    };
+
+String? sideLabel(AppLocalizations l10n, Side? side) => switch (side) {
+  Side.red => l10n.cornerRed,
+  Side.blue => l10n.cornerBlue,
+  null => null,
+};

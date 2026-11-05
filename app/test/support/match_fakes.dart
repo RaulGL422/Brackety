@@ -1,4 +1,5 @@
 import 'package:brackety/features/mat/data/mat_board.dart';
+import 'package:brackety/features/offline/data/offline_op.dart';
 import 'package:brackety/features/scoreboard/data/match_view.dart';
 import 'package:brackety/features/scoreboard/data/scoreboard_repository.dart';
 import 'package:brackety/features/scoreboard/state/bell.dart';
@@ -47,6 +48,7 @@ MatchView matchView({
   bool canUndo = false,
   Corner? red,
   Corner? blue,
+  MatchReview? review,
 }) => MatchView(
   id: 'm1',
   matId: 'mat1',
@@ -58,6 +60,7 @@ MatchView matchView({
   remaining: remaining,
   running: running,
   endReason: endReason,
+  review: review,
   red: red ?? corner('Ana Prueba', points: redPoints, oneHandRule: true),
   blue: blue ?? corner('Bea Prueba'),
   timeline: [
@@ -112,4 +115,12 @@ class FakeScoreboardRepository implements ScoreboardRepository {
     }
     return current;
   }
+
+  @override
+  Future<MatchView> sendOp(OfflineOp op) =>
+      throw UnimplementedError('the web has no queue');
+
+  @override
+  Future<ReviewOutcome> review(String matchId, ReviewDecision decision) =>
+      throw UnimplementedError();
 }

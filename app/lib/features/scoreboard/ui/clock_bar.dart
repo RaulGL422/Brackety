@@ -52,6 +52,8 @@ class _ClockBarState extends ConsumerState<ClockBar> {
     final left = controller.remainingNow();
     final timeUp = view.running && left == Duration.zero;
     final over = view.endReason != null || timeUp;
+    // In review nothing more is accepted until the club decides.
+    final locked = view.review != null;
     final button = FilledButton.styleFrom(
       minimumSize: const Size(0, AppSizes.scoreTouchTarget),
       textStyle: Theme.of(context).textTheme.titleLarge,
@@ -77,14 +79,18 @@ class _ClockBarState extends ConsumerState<ClockBar> {
                     style: button,
                     icon: const Icon(Icons.flag),
                     label: Text(l10n.finishMatch),
-                    onPressed: () => widget.onAction(MatchAction.finish),
+                    onPressed: locked
+                        ? null
+                        : () => widget.onAction(MatchAction.finish),
                   )
                 : view.running
                 ? FilledButton.tonalIcon(
                     style: button,
                     icon: const Icon(Icons.pause),
                     label: Text(l10n.clockStop),
-                    onPressed: () => widget.onAction(MatchAction.stop),
+                    onPressed: locked
+                        ? null
+                        : () => widget.onAction(MatchAction.stop),
                   )
                 : FilledButton.icon(
                     style: button,
@@ -94,7 +100,9 @@ class _ClockBarState extends ConsumerState<ClockBar> {
                           ? l10n.clockStart
                           : l10n.clockResume,
                     ),
-                    onPressed: () => widget.onAction(MatchAction.start),
+                    onPressed: locked
+                        ? null
+                        : () => widget.onAction(MatchAction.start),
                   ),
           ),
         ],

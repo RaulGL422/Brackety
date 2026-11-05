@@ -144,3 +144,6 @@ Formato: fecha · decisión · motivo.
 - 2026-11-04 · El paquete se carga antes de que arranque el servidor web (al crear los beans), no en `ApplicationReadyEvent` · el script da la API por lista en cuanto responde; así nunca responde con el paquete a medio cargar o rechazado.
 - 2026-11-05 · APK: las URLs de "Pabellón" e "Internet" fijas en el código (excepción a "solo `API_BASE_URL`") · son las opciones del selector y la IP del punto de acceso de Windows es fija; el `API_BASE_URL` del build sigue siendo el valor por defecto.
 - 2026-11-05 · APK: el servidor elegido se guarda con `flutter_secure_storage`, no `shared_preferences` · ya está para el refresh token (que es de ese servidor) y evita otra dependencia.
+- 2026-11-05 · Offline F1: choque = combate "en revisión"; el club aplica o descarta las acciones del móvil · decidido por Raul.
+- 2026-11-05 · Offline F1: choque si `knownEvents` no coincide con las acciones no automáticas del servidor · detecta otro dispositivo sin contar las paradas automáticas, que añade el servidor.
+- 2026-11-05 · Offline F1: caché y cola en ficheros JSON, no drift · un tapiz y unas decenas de acciones; drift llega con el módulo completo.

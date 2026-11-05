@@ -1,4 +1,5 @@
 import 'package:brackety/features/mat/data/mat_board.dart';
+import 'package:brackety/features/offline/state/offline_sync.dart';
 import 'package:brackety/features/scoreboard/data/match_view.dart';
 import 'package:brackety/features/scoreboard/data/scoreboard_repository.dart';
 import 'package:brackety/features/scoreboard/state/bell.dart';
@@ -34,6 +35,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          offlineEnabledProvider.overrideWithValue(false),
           scoreboardRepositoryProvider.overrideWithValue(repository),
           bellProvider.overrideWithValue(bell),
         ],

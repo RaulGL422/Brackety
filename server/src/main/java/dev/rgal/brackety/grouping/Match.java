@@ -44,6 +44,8 @@ public class Match {
     private long elapsedMs;
     private Instant runningSince;
     private String disqualifiedSide;
+    /** Why an offline action clashed; while set, the match takes no actions until the club reviews it. */
+    private String reviewReason;
 
     protected Match() {}
 
@@ -138,6 +140,22 @@ public class Match {
         if (finished) {
             finishedAt = now;
         }
+    }
+
+    public String getReviewReason() {
+        return reviewReason;
+    }
+
+    public boolean isInReview() {
+        return reviewReason != null;
+    }
+
+    public void putInReview(String reason) {
+        reviewReason = reason;
+    }
+
+    public void endReview() {
+        reviewReason = null;
     }
 
     Duration clockLeft(Instant now, Duration length) {

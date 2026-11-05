@@ -4,6 +4,14 @@ enum Side { red, blue }
 
 enum EndReason { points, time, disqualification }
 
+Side? sideFromJson(Object? value) => switch (value) {
+  'RED' => Side.red,
+  'BLUE' => Side.blue,
+  _ => null,
+};
+
+String? sideToJson(Side? side) => side?.name.toUpperCase();
+
 enum MatchAction {
   start,
   stop,
@@ -67,6 +75,38 @@ class Corner implements FighterInfo {
   final int warnings;
   final int oneHandWarnings;
   final bool disqualified;
+
+  /// The same fighter with the tally of a replay.
+  Corner withTally({
+    required int points,
+    required int warnings,
+    required int oneHandWarnings,
+    required bool disqualified,
+  }) => Corner(
+    participantId: participantId,
+    name: name,
+    ghost: ghost,
+    oneHandRule: oneHandRule,
+    points: points,
+    warnings: warnings,
+    oneHandWarnings: oneHandWarnings,
+    disqualified: disqualified,
+    teamNumber: teamNumber,
+    members: members,
+  );
+
+  Map<String, dynamic> toJson() => {
+    'participantId': participantId,
+    'name': name,
+    'ghost': ghost,
+    'oneHandRule': oneHandRule,
+    'points': points,
+    'warnings': warnings,
+    'oneHandWarnings': oneHandWarnings,
+    'disqualified': disqualified,
+    'teamNumber': teamNumber,
+    'members': members,
+  };
 }
 
 class TimelineEntry {
@@ -77,18 +117,16 @@ class TimelineEntry {
     required this.automatic,
     required this.undone,
     required this.gaveRivalPoint,
+    this.id,
     this.side,
     this.reason,
     this.actor,
   });
 
   factory TimelineEntry.fromJson(Map<String, dynamic> json) => TimelineEntry(
+    id: json['id'] as String?,
     action: MatchAction.fromWire(json['type'] as String),
-    side: switch (json['side']) {
-      'RED' => Side.red,
-      'BLUE' => Side.blue,
-      _ => null,
-    },
+    side: sideFromJson(json['side']),
     reason: json['reason'] as String?,
     actor: json['actor'] as String?,
     at: DateTime.parse(json['at'] as String),
@@ -98,6 +136,8 @@ class TimelineEntry {
     gaveRivalPoint: json['gaveRivalPoint'] as bool,
   );
 
+  /// The server's event id; for an action still in the device's queue, its `opId`.
+  final String? id;
   final MatchAction action;
   final Side? side;
   final String? reason;
@@ -109,6 +149,139 @@ class TimelineEntry {
   final bool automatic;
   final bool undone;
   final bool gaveRivalPoint;
+
+  TimelineEntry withFlags({
+    required bool undone,
+    required bool gaveRivalPoint,
+  }) => TimelineEntry(
+    id: id,
+    action: action,
+    side: side,
+    reason: reason,
+    actor: actor,
+    at: at,
+    clock: clock,
+    automatic: automatic,
+    undone: undone,
+    gaveRivalPoint: gaveRivalPoint,
+  );
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'type': action.wire,
+    'side': sideToJson(side),
+    'reason': reason,
+    'actor': actor,
+    'at': at.toUtc().toIso8601String(),
+    'clockMs': clock.inMilliseconds,
+    'automatic': automatic,
+    'undone': undone,
+    'gaveRivalPoint': gaveRivalPoint,
+  };
+}
+
+/// Why the first offline action of a match clashed (`review.reason` of the server).
+enum ReviewReason { knownEvents, rules, age, matBusy, fighterBusy, unknown }
+
+const _reviewReasons = {
+  'KNOWN_EVENTS': ReviewReason.knownEvents,
+  'RULES': ReviewReason.rules,
+  'AGE': ReviewReason.age,
+  'MAT_BUSY': ReviewReason.matBusy,
+  'FIGHTER_BUSY': ReviewReason.fighterBusy,
+};
+
+/// An action a device sent that the server kept for the club instead of applying it.
+class ReviewOp {
+  const ReviewOp({
+    required this.opId,
+    required this.action,
+    required this.at,
+    required this.receivedAt,
+    required this.cause,
+    this.side,
+    this.reason,
+    this.actor,
+  });
+
+  factory ReviewOp.fromJson(Map<String, dynamic> json) => ReviewOp(
+    opId: json['opId'] as String,
+    action: MatchAction.fromWire(json['type'] as String),
+    side: sideFromJson(json['side']),
+    reason: json['reason'] as String?,
+    actor: json['actor'] as String?,
+    at: DateTime.parse(json['at'] as String),
+    receivedAt: DateTime.parse(json['receivedAt'] as String),
+    cause: json['cause'] as String,
+  );
+
+  final String opId;
+  final MatchAction action;
+  final Side? side;
+  final String? reason;
+  final String? actor;
+  final DateTime at;
+  final DateTime receivedAt;
+  final String cause;
+
+  Map<String, dynamic> toJson() => {
+    'opId': opId,
+    'type': action.wire,
+    'side': sideToJson(side),
+    'reason': reason,
+    'actor': actor,
+    'at': at.toUtc().toIso8601String(),
+    'receivedAt': receivedAt.toUtc().toIso8601String(),
+    'cause': cause,
+  };
+}
+
+/// The match waits for the club to apply or discard what a device sent.
+class MatchReview {
+  const MatchReview({required this.reason, required this.ops});
+
+  /// Known only on this device so far (a 409): the details come with the next view.
+  const MatchReview.pending() : reason = ReviewReason.unknown, ops = const [];
+
+  factory MatchReview.fromJson(Map<String, dynamic> json) => MatchReview(
+    reason: _reviewReasons[json['reason']] ?? ReviewReason.unknown,
+    ops: [
+      for (final op in json['ops'] as List)
+        ReviewOp.fromJson(op as Map<String, dynamic>),
+    ],
+  );
+
+  final ReviewReason reason;
+  final List<ReviewOp> ops;
+
+  Map<String, dynamic> toJson() => {
+    'reason': _reviewReasons.entries
+        .where((e) => e.value == reason)
+        .firstOrNull
+        ?.key,
+    'ops': [for (final op in ops) op.toJson()],
+  };
+}
+
+enum ReviewDecision { apply, discard }
+
+/// The club's review done: the match now and how many actions went in or were skipped.
+class ReviewOutcome {
+  const ReviewOutcome({
+    required this.match,
+    required this.applied,
+    required this.skipped,
+  });
+
+  factory ReviewOutcome.fromJson(Map<String, dynamic> json) => ReviewOutcome(
+    match: MatchView.fromJson(json['match'] as Map<String, dynamic>),
+    applied: json['applied'] as int,
+    skipped: json['skipped'] as int,
+  );
+
+  final MatchView match;
+  final int applied;
+  final int skipped;
 }
 
 class MatchView {
@@ -126,6 +299,8 @@ class MatchView {
     required this.blue,
     required this.timeline,
     this.endReason,
+    this.serverTime,
+    this.review,
   });
 
   factory MatchView.fromJson(Map<String, dynamic> json) => MatchView(
@@ -150,7 +325,42 @@ class MatchView {
       for (final e in json['timeline'] as List)
         TimelineEntry.fromJson(e as Map<String, dynamic>),
     ],
+    serverTime: switch (json['serverTime']) {
+      final String at => DateTime.parse(at),
+      _ => null,
+    },
+    review: switch (json['review']) {
+      final Map<String, dynamic> review => MatchReview.fromJson(review),
+      _ => null,
+    },
   );
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'matId': matId,
+    'matNumber': matNumber,
+    'groupNumber': groupNumber,
+    'status': switch (status) {
+      MatchStatus.pending => 'PENDING',
+      MatchStatus.inProgress => 'IN_PROGRESS',
+      MatchStatus.finished => 'FINISHED',
+    },
+    'lengthSeconds': length.inSeconds,
+    'pointsLimit': pointsLimit,
+    'remainingMs': remaining.inMilliseconds,
+    'running': running,
+    'endReason': switch (endReason) {
+      EndReason.points => 'POINTS',
+      EndReason.time => 'TIME',
+      EndReason.disqualification => 'DISQUALIFICATION',
+      null => null,
+    },
+    'red': red.toJson(),
+    'blue': blue.toJson(),
+    'timeline': [for (final e in timeline) e.toJson()],
+    'serverTime': serverTime?.toUtc().toIso8601String(),
+    'review': review?.toJson(),
+  };
 
   final String id;
   final String matId;
@@ -167,6 +377,15 @@ class MatchView {
   final Corner red;
   final Corner blue;
   final List<TimelineEntry> timeline;
+
+  /// When the server computed this view; null from a server without the offline queue.
+  final DateTime? serverTime;
+
+  /// Set while the club has to review what a device sent: nothing more is accepted.
+  final MatchReview? review;
+
+  /// What the device counts in `knownEvents`: the automatic stops are left out.
+  int get knownEvents => timeline.where((e) => !e.automatic).length;
 
   Corner corner(Side side) => side == Side.red ? red : blue;
 

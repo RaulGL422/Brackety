@@ -183,6 +183,7 @@ void main() {
                 matchInProgress: true,
                 remaining: const Duration(minutes: 20),
                 estimatedEnd: DateTime(2026, 11, 14, 11, 30),
+                matchesInReview: 1,
               ),
             ],
           ),
@@ -240,6 +241,7 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('Estimated end 11:30'), findsOneWidget);
+      expect(find.textContaining('1 match under review'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
