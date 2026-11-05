@@ -23,7 +23,7 @@ Llevar el evento ya preparado (configuración e inscripciones) y arrancarlo en c
 - Sin Internet: sin emails, sin Google, sin importación con Claude (los alumnos se importan antes, en la Pi o en local).
 
 ### Generar y usar la carpeta
-1. En el PC de desarrollo (Internet la primera vez; el zip de PostgreSQL queda en `dist/cache/`): `.\deploy\local\build-event-bundle.ps1`. Conserva `brackety-data/` si ya existe.
+1. En el PC de desarrollo (Internet la primera vez; el zip de PostgreSQL queda en `dist/cache/`): `.\deploy\local\build-event-bundle.ps1 [-NoApk]`. Conserva `brackety-data/` si ya existe. Incluye `brackety.apk` salvo con `-NoApk` (el build tarda minutos).
 2. Copiar `dist/brackety-event/` al disco del portátil.
 3. `powershell -ExecutionPolicy Bypass -File .\start-event.ps1 -Package f1.brackety | -Demo [-EventDate AAAA-MM-DD]` la primera vez; después sin ellos. Además `[-LegalOwnerName …] [-PrivacyContactEmail …] [-Backup] [-Reset]`. Resto en `LEEME.txt` de la carpeta.
 
@@ -40,9 +40,15 @@ Llevar el evento ya preparado (configuración e inscripciones) y arrancarlo en c
 
 ### Dispositivos
 - Árbitros y ayudantes usan la **APK Android** (el offline de la web exige https, ver `offline.md`).
-- La APK elige el servidor en el login: "Pabellón" (`http://192.168.137.1:8080`), "Internet" (`https://brackety-api.rgal.dev`) o una URL a mano. Se recuerda en el dispositivo.
-- http sin cifrar solo hacia la IP del pabellón (configuración de red de Android); el resto, https.
+- La APK elige el servidor en el login: "Pabellón" (`http://192.168.137.1:8080`), "Internet" (`https://brackety-api.rgal.dev`) o "Otra URL" (http/https con host). Se recuerda en el dispositivo (almacén seguro, junto al refresh token).
+- Por defecto, el `API_BASE_URL` del build. Solo en el login: cambiarlo cierra la sesión guardada (sus tokens son del otro servidor) y las peticiones siguientes van al nuevo sin reiniciar. La web no lo muestra.
+- http sin cifrar solo hacia la IP del pabellón (`network_security_config.xml`); el resto, https. "Otra URL" con http a otra IP avisa de que no conectará. Los builds debug permiten http a cualquier IP (desarrollo local).
 - El club puede usar el navegador del propio portátil (`http://localhost:8080`).
+
+### APK (build e instalación)
+- `cd app; flutter build apk --release --dart-define-from-file=env/apk-event.json` (servidor por defecto: el pabellón). Sale en `app/build/app/outputs/flutter-apk/app-release.apk` (unos 59 MB, las 3 ABIs); el script del paquete la copia como `brackety.apk`.
+- Firma: aún con la clave debug (ver `pendientes.md`).
+- Instalar: copiar el `.apk` al móvil y abrirlo (permitir "Instalar apps desconocidas" a la app que lo abre), o `adb install -r brackety.apk` con depuración USB.
 
 ## Legal
 - El portátil guarda datos de menores: disco cifrado (BitLocker) y cuenta de Windows con contraseña. Al acabar la fase, borrar `brackety-data/` y el `.brackety` (pendiente de confirmar por Raul).
@@ -58,14 +64,14 @@ Sin tablas nuevas. Formato del paquete versionado (`schemaVersion`).
 
 ## Pantallas
 - Club: menú Exportar (icono de descarga, solo web como los CSV) con los 3 CSV y "Exportar paquete del evento"; el fichero se llama como dice el servidor.
-- Login (app): selector de servidor; la pantalla Conexión muestra el elegido.
+- Login (app, solo Android): línea "Servidor: <nombre>" con la URL y "Cambiar" (diálogo con las 3 opciones y el campo de URL). La pantalla Conexión muestra el elegido.
 
 ## Offline
 Ver `offline.md` (adelanto F1: marcador del árbitro).
 
 ## Tests
 Web servida por la API (`WebAppConfigTest`, `WebAppDisabledTest`): fichero, `index.html` para rutas de la app, API sin cambios; apagada por defecto. `same-origin` en `api_config_test.dart`. Scripts: prueba a mano.
-Paquete (`EventPackageServiceTest`, `EventPackageControllerTest`): ida y vuelta a BD vacía (ajustes, categorías por equipos, tapices con y sin árbitro, staff, inscritos con categoría elegida); rechazo con BD usada, versión desconocida y contenido inválido sin escribir nada; cuentas creadas que entran con usuario = contraseña y cuenta existente reutilizada; cargador de arranque; permisos (club 200, ayudante y árbitro 403, ajeno 404, sin token 401) y cabeceras. App: menú con el paquete en 3 tamaños (endpoint y nombre). Scripts: prueba a mano. Selector de servidor: widget test en 3 tamaños.
+Paquete (`EventPackageServiceTest`, `EventPackageControllerTest`): ida y vuelta a BD vacía (ajustes, categorías por equipos, tapices con y sin árbitro, staff, inscritos con categoría elegida); rechazo con BD usada, versión desconocida y contenido inválido sin escribir nada; cuentas creadas que entran con usuario = contraseña y cuenta existente reutilizada; cargador de arranque; permisos (club 200, ayudante y árbitro 403, ajeno 404, sin token 401) y cabeceras. App: menú con el paquete en 3 tamaños (endpoint y nombre). Scripts: prueba a mano. Selector de servidor (`test/features/server/`): diálogo en 3 tamaños (URL inválida, aviso de http, guardar), opción conocida y cancelar, Conexión con el elegido, web sin selector; unit de validación de URL, elección por defecto (build, guardado, web) y descarte de tokens al cambiar. Red de Android y APK: prueba a mano.
 
 ## Plan (PRs en serie)
 1. Servidor portable (`start-event.ps1`, BD persistente, web servida por la API, firewall, copia).
@@ -74,5 +80,6 @@ Paquete (`EventPackageServiceTest`, `EventPackageControllerTest`): ida y vuelta 
 4. Ensayo: portátil como punto de acceso sin Internet, 3 móviles, un combate completo.
 
 ## Estado
-En curso: pasos 1-2 hechos (2026-11-04). Probado en el PC de desarrollo (arranque, web, login, datos tras reiniciar, copia al parar con Ctrl+C y con `-Backup`) sin punto de acceso ni UAC: falta probarlos en el portátil del evento.
+En curso: pasos 1-3 hechos (2026-11-05). Paso 3: APK release generada; falta probarla en móviles reales con el punto de acceso (paso 4).
+Pasos 1-2 (2026-11-04). Probado en el PC de desarrollo (arranque, web, login, datos tras reiniciar, copia al parar con Ctrl+C y con `-Backup`) sin punto de acceso ni UAC: falta probarlos en el portátil del evento.
 Paso 2 probado a mano con la carpeta generada: paquete exportado de `yoseikan-f1` (75 inscritos, 5 tapices) → `-Package` en carpeta vacía (evento, inscritos, tapices con árbitro, `arbitro1` entra), reinicio sin recarga, `-Package` y `-Reset` rechazados con datos o en marcha, paquete inválido rechazado con su motivo, `-Demo`, `-Reset` archiva.
