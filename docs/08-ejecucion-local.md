@@ -54,7 +54,7 @@ La URL de la API entra por `--dart-define-from-file=env/<destino>.json` (`API_BA
 | `emulator` | `http://10.0.2.2:8080` | 10.0.2.2 = el PC visto desde el emulador |
 | `device` | `http://<IP LAN del PC>:8080` | el script detecta la IP; móvil en la misma wifi |
 | `url` | la que se pase | Pi, túnel o cualquier servidor remoto |
-- HTTP sin TLS solo en builds debug (`android/app/src/debug/AndroidManifest.xml`).
+- HTTP sin TLS a cualquier IP solo en builds debug (`android/app/src/debug/res/xml/network_security_config.xml`); en release, solo a `192.168.137.1` (pabellón, `servidor-local.md`).
 - En Android Studio el dispositivo (Chrome, emulador, móvil) se elige en el desplegable de dispositivos; la run config fija el backend.
 - `env/device.json` no se sube (lleva tu IP): lo crea `./run-app.ps1 -Target device`, o copia `env/device.example.json`.
 - La pantalla **Conexión** de app y admin muestra la URL usada y la fecha del servidor: así se ve si el reloj simulado está activo.
