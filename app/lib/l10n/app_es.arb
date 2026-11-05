@@ -596,5 +596,17 @@
   "participantPrivacyNotice": "Los datos del alumno se tratan según la {privacy}.",
   "@participantPrivacyNotice": {"placeholders": {"privacy": {"type": "String"}}},
   "importPrivacyNotice": "Los datos de los alumnos se tratan según la {privacy}.",
-  "@importPrivacyNotice": {"placeholders": {"privacy": {"type": "String"}}}
+  "@importPrivacyNotice": {"placeholders": {"privacy": {"type": "String"}}},
+  "serverCurrent": "Servidor: {name}",
+  "@serverCurrent": {"placeholders": {"name": {"type": "String"}}},
+  "serverChange": "Cambiar",
+  "serverDialogTitle": "Elegir servidor",
+  "serverHall": "Pabellón",
+  "serverInternet": "Internet",
+  "serverOther": "Otra URL",
+  "serverUrlLabel": "URL del servidor",
+  "serverUrlHint": "https://servidor.ejemplo",
+  "serverUrlInvalid": "Escribe una URL que empiece por http:// o https:// y tenga servidor.",
+  "serverUrlCleartext": "Sin https la app solo llega al pabellón (192.168.137.1): con esta URL no conectará.",
+  "serverUse": "Usar"
 }

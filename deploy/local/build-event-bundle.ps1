@@ -6,9 +6,15 @@
     dist/cache). La carpeta resultante se copia a cualquier portátil Windows 10/11 x64 y se arranca con
     start-event.ps1, sin instalar nada. Detalle en docs/modulos/servidor-local.md.
     Si la carpeta ya tiene datos (brackety-data), se conservan: solo se reemplazan los programas.
+    Incluye la APK de Android (brackety.apk) para los móviles de árbitros y ayudantes.
+.PARAMETER NoApk
+    Salta el build de la APK (tarda varios minutos): la carpeta queda sin brackety.apk.
 .EXAMPLE
     .\deploy\local\build-event-bundle.ps1
+.EXAMPLE
+    .\deploy\local\build-event-bundle.ps1 -NoApk
 #>
+param([switch]$NoApk)
 $ErrorActionPreference = "Stop"
 
 $PgVersion = "18.6-1"
@@ -35,18 +41,18 @@ $flutter = (Get-Command flutter -ErrorAction SilentlyContinue).Source
 if (-not $flutter) { $flutter = "C:\dev\flutter\bin\flutter.bat" }
 
 New-Item -ItemType Directory -Force -Path $bundle, $cache | Out-Null
-foreach ($old in @("api", "web", "jre", "pgsql", "start-event.ps1", "LEEME.txt")) {
+foreach ($old in @("api", "web", "jre", "pgsql", "brackety.apk", "start-event.ps1", "LEEME.txt")) {
     $path = Join-Path $bundle $old
     if (Test-Path $path) { Remove-Item -Recurse -Force $path }
 }
 
-Write-Host "1/5 API: jar de producción"
+Write-Host "1/6 API: jar de producción"
 Invoke-Checked "el build de la API" { & "$root\server\mvnw.cmd" -q -B -f "$root\server\pom.xml" package -DskipTests }
 $jar = Get-ChildItem "$root\server\target" -Filter "brackety-server-*.jar" | Select-Object -First 1
 New-Item -ItemType Directory -Force -Path "$bundle\api" | Out-Null
 Copy-Item $jar.FullName "$bundle\api\brackety.jar"
 
-Write-Host "2/5 Web: build de Flutter servida por la propia API"
+Write-Host "2/6 Web: build de Flutter servida por la propia API"
 Push-Location "$root\app"
 try {
     # No CDN: in the hall there is no Internet, CanvasKit and the fonts must come from the laptop.
@@ -58,13 +64,28 @@ try {
 }
 Copy-Item -Recurse "$root\app\build\web" "$bundle\web"
 
-Write-Host "3/5 Java: runtime reducido con jlink"
+if ($NoApk) {
+    Write-Host "3/6 APK Android: saltada (-NoApk)"
+} else {
+    Write-Host "3/6 APK Android: release con el pabellón como servidor por defecto"
+    Push-Location "$root\app"
+    try {
+        Invoke-Checked "el build de la APK" {
+            & $flutter build apk --release --dart-define-from-file=env/apk-event.json
+        }
+    } finally {
+        Pop-Location
+    }
+    Copy-Item "$root\app\build\app\outputs\flutter-apk\app-release.apk" "$bundle\brackety.apk"
+}
+
+Write-Host "4/6 Java: runtime reducido con jlink"
 Invoke-Checked "jlink" {
     & "$($jdk.FullName)\bin\jlink.exe" --module-path "$($jdk.FullName)\jmods" --add-modules ALL-MODULE-PATH `
         --strip-debug --no-header-files --no-man-pages --output "$bundle\jre"
 }
 
-Write-Host "4/5 PostgreSQL $PgVersion (binarios oficiales de EnterpriseDB)"
+Write-Host "5/6 PostgreSQL $PgVersion (binarios oficiales de EnterpriseDB)"
 $zip = Join-Path $cache "postgresql-$PgVersion-windows-x64-binaries.zip"
 if (-not (Test-Path $zip)) {
     Write-Host "   Descargando $PgUrl (unos 340 MB, solo la primera vez)"
@@ -92,7 +113,7 @@ foreach ($dll in @("vcruntime140.dll", "vcruntime140_1.dll", "msvcp140.dll")) {
     Copy-Item "$($jdk.FullName)\bin\$dll" "$bundle\pgsql\bin\"
 }
 
-Write-Host "5/5 Scripts"
+Write-Host "6/6 Scripts"
 Copy-Item "$PSScriptRoot\start-event.ps1" $bundle
 Copy-Item "$PSScriptRoot\LEEME.txt" $bundle
 

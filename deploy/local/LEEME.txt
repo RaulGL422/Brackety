@@ -32,6 +32,15 @@ ARRANCAR (las veces siguientes)
    - Móviles conectados al punto de acceso del portátil: http://192.168.137.1:8080
    - Este portátil: http://localhost:8080
 
+MÓVILES (APK ANDROID)
+- Árbitros y ayudantes usan la app de Android, no el navegador: brackety.apk en esta carpeta.
+- Instalar: copia brackety.apk al móvil (cable USB, Drive o WhatsApp) y ábrelo; Android pide permitir
+  "Instalar apps desconocidas" para la app con la que lo abres. O desde el PC con el móvil por USB
+  (depuración USB activada):  adb install -r brackety.apk
+- Al entrar, "Servidor" debe decir Pabellón (http://192.168.137.1:8080). Si no: "Cambiar" > Pabellón.
+  El móvil lo recuerda. Cambiar de servidor cierra la sesión guardada.
+- La app solo usa http sin cifrar con el pabellón; cualquier otra URL tiene que ser https.
+
 PARAR
 - Ctrl+C en la ventana. Espera a que termine: guarda una copia de la base de datos y para PostgreSQL.
 

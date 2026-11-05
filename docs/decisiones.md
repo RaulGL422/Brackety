@@ -142,3 +142,5 @@ Formato: fecha · decisión · motivo.
 - 2026-11-04 · Servidor del pabellón con PostgreSQL 18 oficial (binarios portables) y el jar de producción, no el Postgres embebido de los tests · mismo código que producción y pg_dump para las copias.
 - 2026-11-04 · Pabellón: el primer arranque exige `-Package` o `-Demo` (sin ninguno no arranca) · un olvido del `-Package` crearía el evento demo y obligaría a `-Reset` antes de cargar el real.
 - 2026-11-04 · El paquete se carga antes de que arranque el servidor web (al crear los beans), no en `ApplicationReadyEvent` · el script da la API por lista en cuanto responde; así nunca responde con el paquete a medio cargar o rechazado.
+- 2026-11-05 · APK: las URLs de "Pabellón" e "Internet" fijas en el código (excepción a "solo `API_BASE_URL`") · son las opciones del selector y la IP del punto de acceso de Windows es fija; el `API_BASE_URL` del build sigue siendo el valor por defecto.
+- 2026-11-05 · APK: el servidor elegido se guarda con `flutter_secure_storage`, no `shared_preferences` · ya está para el refresh token (que es de ese servidor) y evita otra dependencia.

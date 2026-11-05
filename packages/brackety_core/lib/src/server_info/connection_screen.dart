@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../l10n/gen/core_localizations.dart';
-import '../config/api_config.dart';
+import '../network/dio_provider.dart';
 import '../theme/brackety_colors.dart';
 import '../theme/tokens.dart';
 import 'server_info.dart';
 
-/// Shows which backend this build talks to and the server's "today" (shifted in local scenario runs).
+/// Shows which backend the app talks to and the server's "today" (shifted in local scenario runs).
 class ConnectionScreen extends ConsumerWidget {
   const ConnectionScreen({super.key});
 
@@ -27,7 +27,7 @@ class ConnectionScreen extends ConsumerWidget {
         ListTile(
           leading: const Icon(Icons.dns_outlined),
           title: Text(l10n.connectionServer),
-          subtitle: SelectableText(apiBaseUrl),
+          subtitle: SelectableText(ref.watch(apiBaseUrlProvider)),
         ),
         switch (info) {
           AsyncData(:final value) => _StatusTile(

@@ -439,5 +439,16 @@
   "legalNotFound": "This legal page does not exist.",
   "registerLegalOutdated": "The terms of use or the privacy policy have changed. Review them and accept them again.",
   "participantPrivacyNotice": "The student's data is handled according to the {privacy}.",
-  "importPrivacyNotice": "The students' data is handled according to the {privacy}."
+  "importPrivacyNotice": "The students' data is handled according to the {privacy}.",
+  "serverCurrent": "Server: {name}",
+  "serverChange": "Change",
+  "serverDialogTitle": "Choose server",
+  "serverHall": "Sports hall",
+  "serverInternet": "Internet",
+  "serverOther": "Other URL",
+  "serverUrlLabel": "Server URL",
+  "serverUrlHint": "https://server.example",
+  "serverUrlInvalid": "Type a URL starting with http:// or https:// with a host.",
+  "serverUrlCleartext": "Without https the app only reaches the sports hall (192.168.137.1): this URL will not connect.",
+  "serverUse": "Use"
 }

@@ -1235,4 +1235,41 @@ class AppLocalizationsEn extends AppLocalizations {
   String importPrivacyNotice(String privacy) {
     return 'The students\' data is handled according to the $privacy.';
   }
+
+  @override
+  String serverCurrent(String name) {
+    return 'Server: $name';
+  }
+
+  @override
+  String get serverChange => 'Change';
+
+  @override
+  String get serverDialogTitle => 'Choose server';
+
+  @override
+  String get serverHall => 'Sports hall';
+
+  @override
+  String get serverInternet => 'Internet';
+
+  @override
+  String get serverOther => 'Other URL';
+
+  @override
+  String get serverUrlLabel => 'Server URL';
+
+  @override
+  String get serverUrlHint => 'https://server.example';
+
+  @override
+  String get serverUrlInvalid =>
+      'Type a URL starting with http:// or https:// with a host.';
+
+  @override
+  String get serverUrlCleartext =>
+      'Without https the app only reaches the sports hall (192.168.137.1): this URL will not connect.';
+
+  @override
+  String get serverUse => 'Use';
 }
