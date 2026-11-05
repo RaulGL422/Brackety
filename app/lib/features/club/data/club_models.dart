@@ -195,6 +195,7 @@ class MatOverview {
     required this.remaining,
     required this.estimatedEnd,
     this.referee,
+    this.matchesInReview = 0,
   });
 
   factory MatOverview.fromJson(Map<String, dynamic> json) => MatOverview(
@@ -206,6 +207,7 @@ class MatOverview {
     matchInProgress: json['matchInProgress'] as bool,
     remaining: Duration(seconds: json['remainingSeconds'] as int),
     estimatedEnd: DateTime.parse(json['estimatedEnd'] as String).toLocal(),
+    matchesInReview: json['matchesInReview'] as int? ?? 0,
   );
 
   final String id;
@@ -216,4 +218,7 @@ class MatOverview {
   final bool matchInProgress;
   final Duration remaining;
   final DateTime estimatedEnd;
+
+  /// Matches waiting for the club to apply or discard what a phone sent.
+  final int matchesInReview;
 }
