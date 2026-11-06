@@ -7,6 +7,7 @@ No hace falta instalar nada ni tener Internet.
 ANTES DEL EVENTO
 - Copia la carpeta entera al disco del portátil (no la uses desde el USB).
 - Disco cifrado con BitLocker y cuenta de Windows con contraseña: aquí se guardan datos de menores.
+  El script avisa si el disco no tiene BitLocker; brackety-data\ queda solo para tu usuario de Windows.
 - El club exporta el paquete del evento (fichero .brackety) desde su panel en la web de Internet:
   icono de descarga (Exportar) > "Exportar paquete del evento". Lleva configuración, tapices, staff e inscritos.
 - Opcional: edita brackety-data\event.env (titular y email de privacidad) tras el primer arranque.

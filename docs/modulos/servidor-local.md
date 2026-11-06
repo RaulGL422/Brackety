@@ -54,7 +54,8 @@ Llevar el evento ya preparado (configuración e inscripciones) y arrancarlo en c
 - Instalar: copiar el `.apk` al móvil y abrirlo (permitir "Instalar apps desconocidas" a la app que lo abre), o `adb install -r brackety.apk` con depuración USB.
 
 ## Legal
-- El portátil guarda datos de menores: disco cifrado (BitLocker) y cuenta de Windows con contraseña. Al acabar la fase, borrar `brackety-data/` y el `.brackety` (pendiente de confirmar por Raul).
+- El portátil guarda datos de menores: disco cifrado (BitLocker) y cuenta de Windows con contraseña. `start-event.ps1` avisa en amarillo, sin parar, si el disco de la carpeta no tiene BitLocker activo (`Get-BitLockerVolume`; sin administrador, la propiedad de Explorer `System.Volume.BitLockerProtection`) o si no se pudo comprobar.
+- En el primer arranque, `icacls` deja `brackety-data/` solo para el usuario de Windows actual, SYSTEM y Administradores (sin herencia; lo de dentro la hereda). Al acabar la fase, borrar `brackety-data/` y el `.brackety` (pendiente de confirmar por Raul).
 
 ## Datos
 Sin tablas nuevas. Formato del paquete versionado (`schemaVersion`).

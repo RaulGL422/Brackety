@@ -77,11 +77,45 @@ function Read-EnvFile([string]$path) {
     return $values
 }
 
+# Data of minors: warns (never stops) if the disk of this folder is not encrypted.
+function Test-BitLocker {
+    $drive = Split-Path -Qualifier $here
+    $status = $null
+    try {
+        $status = "$((Get-BitLockerVolume -MountPoint $drive -ErrorAction Stop).ProtectionStatus)"
+    } catch {
+        # Without administrator rights Get-BitLockerVolume fails; the Explorer's property does not need them.
+        try {
+            $value = (New-Object -ComObject Shell.Application).NameSpace("$drive\").Self.ExtendedProperty("System.Volume.BitLockerProtection")
+            $status = switch ($value) { 1 { "On" } 2 { "Off" } default { $null } }
+        } catch {
+            $status = $null
+        }
+    }
+    if ($status -eq "On") { return }
+    if ($status -eq "Off") {
+        Write-Warn "El disco $drive no tiene BitLocker activo y aquí se guardan datos de menores: actívalo antes del evento."
+    } else {
+        Write-Warn "No se ha podido comprobar si el disco $drive tiene BitLocker; compruébalo a mano (datos de menores)."
+    }
+}
+
+# Only this Windows user (plus SYSTEM and Administrators) can open brackety-data: it holds data of minors,
+# the database keys and the staff passwords. Everything created inside inherits it.
+function Protect-DataFolder {
+    $me = [System.Security.Principal.WindowsIdentity]::GetCurrent().User.Value
+    & icacls.exe $data /inheritance:r /grant:r "*${me}:(OI)(CI)F" "*S-1-5-18:(OI)(CI)F" "*S-1-5-32-544:(OI)(CI)F" > $null
+    if ($LASTEXITCODE -ne 0) { Write-Warn "No se han podido restringir los permisos de brackety-data (icacls)." }
+}
+
 function Initialize-Data {
     foreach ($needed in @($java, $jar, "$pgBin\postgres.exe", "$webDir\index.html")) {
         if (-not (Test-Path $needed)) { throw "Falta $needed. Vuelve a generar la carpeta con build-event-bundle.ps1." }
     }
-    New-Item -ItemType Directory -Force -Path $data, (Join-Path $data "backups") | Out-Null
+    $firstStart = -not (Test-Path $data)
+    New-Item -ItemType Directory -Force -Path $data | Out-Null
+    if ($firstStart) { Protect-DataFolder }
+    New-Item -ItemType Directory -Force -Path (Join-Path $data "backups") | Out-Null
     if (-not (Test-Path $secretsFile)) {
         Set-Content -Path $secretsFile -Encoding ascii -Value @(
             "# Generado en el primer arranque. No lo compartas ni lo borres: sin él no se abre la BD.",
@@ -409,6 +443,7 @@ if ($Backup) {
 if (Get-NetTCPConnection -LocalPort $ApiPort -State Listen -ErrorAction SilentlyContinue) {
     throw "El puerto $ApiPort ya está en uso (¿otro servidor de Brackety abierto?). Ciérralo y vuelve a arrancar."
 }
+Test-BitLocker
 if (-not $NoHotspot) { Enable-Hotspot }
 if (-not $NoFirewall) { Confirm-FirewallRule }
 
