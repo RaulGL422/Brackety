@@ -30,6 +30,7 @@ ARRANCAR (las veces siguientes)
      powershell -ExecutionPolicy Bypass -File .\start-event.ps1
    Sigue con el evento que ya tiene (no vuelve a cargar el paquete). Con -Package o -Demo se niega: usa -Reset.
 3. La primera vez pide permiso de administrador para el firewall: acéptalo o los móviles no llegarán.
+   La regla solo deja entrar desde el punto de acceso (192.168.137.x); si había una más abierta, la corrige.
 4. Cuando ponga "Brackety listo":
    - Móviles conectados al punto de acceso del portátil: http://192.168.137.1:8080
    - Este portátil: http://localhost:8080

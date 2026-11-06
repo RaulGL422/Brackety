@@ -14,7 +14,7 @@ Llevar el evento ya preparado (configuración e inscripciones) y arrancarlo en c
 - Parar y volver a arrancar no pierde nada; solo se borra a mano.
 - Al parar (Ctrl+C o si la API se cae): copia `pg_dump -Fc` en `brackety-data/backups/` (se guardan 20) y para PostgreSQL. `-Backup`: solo la copia, con el servidor en marcha o parado.
 - Punto de acceso: si está apagado intenta encenderlo (necesita una conexión que compartir, p. ej. la wifi del iPhone); si falla, avisa y sigue. `-NoHotspot` lo salta.
-- Firewall: si falta la regla de entrada para `jre\bin\java.exe` (TCP 8080, privada y pública), pregunta y la añade con permiso de administrador (UAC). `-NoFirewall` lo salta.
+- Firewall: regla de entrada para `jre\bin\java.exe` (TCP 8080, privada y pública) solo desde `192.168.137.0/24` (el punto de acceso; otra wifi a la que se una el portátil no llega). Si falta, o hay una regla de entrada de ese `java.exe` abierta a cualquier red (p. ej. el aviso de Windows aceptado) o de bloqueo, pregunta y con un solo UAC borra las de ese programa y crea la buena. `localhost` no pasa por el firewall. `-NoFirewall` lo salta.
 - Muestra al arrancar la URL de los móviles (`http://192.168.137.1:8080`, IP fija del punto de acceso de Windows) y la del portátil (`http://localhost:8080`).
 - El primer arranque de una carpeta sin datos exige `-Package <fichero>` o `-Demo` (cuentas y evento demo del prototipo con la fecha de `-EventDate`, por defecto hoy). Sin ninguno no arranca: el evento de prueba nunca se mezcla con el real.
 - `brackety-data/package-loaded.txt` o `demo-loaded.txt` (nombre y hora) marcan qué cargó el primer arranque; solo se escriben si la API arrancó bien. Con datos y sin marca (primer arranque fallido) se niega y sugiere `-Reset`.
