@@ -73,7 +73,7 @@ Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, f
 - `POST /events/{id}/groups` (uno o varios grupos → tapiz asignado).
 - `GET /events/{id}/mats` (club y ayudantes) · `GET /mats/{id}/board` (árbitro de ese tapiz y club: grupos, combates, disponible, recomendado).
 - `GET /matches/{id}` · `POST /matches/{id}/events` (`START`, `STOP`, `POINT`, `WARNING`, `ONE_HAND_WARNING`, `DISQUALIFICATION`, `UNDO`, `FINISH`).
-- `GET /events/{id}/standings` · `GET /events/{id}/export/{standings|matches|timeline}.csv` (club; `;` y BOM para Excel en español; celdas que empiezan por `= + - @` se neutralizan).
+- `GET /events/{id}/standings` · `GET /events/{id}/export/{standings|matches|timeline}.csv` (club; `;` y BOM para Excel en español; celdas que empiezan por `= + - @`, tabulador o retorno se neutralizan con `'`).
 - Permisos por rol y evento en servidor; el árbitro solo escribe en su tapiz.
 
 ## Pantallas
