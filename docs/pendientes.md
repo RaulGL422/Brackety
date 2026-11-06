@@ -49,6 +49,10 @@
 - [ ] Portátil del pabellón: ¿BitLocker activo? Confirmar el borrado de `brackety-data/` y del paquete tras la fase (`servidor-local.md`).
 - [ ] Móviles de árbitros y ayudantes: ¿todos Android y con permiso para instalar la APK? Si hay iPhone, ese usa la web (sin offline).
 
+- [ ] Revisión del 2026-11-06 (`revision-f1.md`): lo que quede abierto tras la fase pasa aquí.
+- [ ] Refresh idempotente (`SessionService`): la caché vive en memoria y supone una sola instancia de la API (vale para el portátil y la Pi).
+- [ ] `docs/decisiones.md` está en 150 líneas: dividirlo antes de añadir más.
+
 - [ ] Importación de alumnos: aceptar el DPA de Anthropic en su consola y confirmar el plazo de conservación de datos de la API (`modulos/importacion-alumnos.md`).
 
 ## Repositorio público

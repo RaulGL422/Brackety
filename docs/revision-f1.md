@@ -21,14 +21,14 @@ Revisión de seguridad, código y diseño visual (86 capturas en 3 tamaños, hor
 - [x] `start-event.ps1`: avisar si el disco no tiene BitLocker; `brackety-data` solo para el usuario (`icacls`).
 
 ### App (`fix/f1-app-polish`)
-- [ ] Pantalla siempre encendida en el tablero y el marcador (wakelock).
-- [ ] Sondeo: el siguiente al acabar el anterior y en pausa con la app en segundo plano.
-- [ ] `views.json`: no reescribir ni notificar si nada cambió.
-- [ ] `android:allowBackup="false"`: la copia de Google no sube la caché con nombres.
-- [ ] Marcador: diseño horizontal; sin desbordes al 200 %; reloj grande con color en los últimos 10 s; "Parar" en color fuerte; Deshacer de 48 dp junto a los +1 diciendo qué deshace; ganador destacado al finalizar; Descalificación en color de error; esquinas desactivadas antes de Iniciar.
-- [ ] Tablero: contraste AA en "En curso" y "Recomendado" y que se distingan; rojo y azul en cada combate; pendientes legibles con candado y motivo.
-- [ ] Ayudante: flecha del popup sin caja; categoría con 0 inscritos sin check.
-- [ ] Club: chip "Falta tutor" en Inscripciones; tarjeta en revisión legible; fin estimado oculto sin pendientes; título de la revisión con tapiz y combate; confirmar "Quitar el último tapiz".
+- [x] Pantalla siempre encendida en el tablero y el marcador (wakelock).
+- [x] Sondeo: el siguiente al acabar el anterior y en pausa con la app en segundo plano.
+- [x] `views.json`: no reescribir ni notificar si nada cambió.
+- [x] `android:allowBackup="false"`: la copia de Google no sube la caché con nombres.
+- [x] Marcador: diseño horizontal; sin desbordes al 200 %; reloj grande con color en los últimos 10 s; "Parar" en color fuerte; Deshacer de 48 dp junto a los +1 diciendo qué deshace; ganador destacado al finalizar; Descalificación en color de error; esquinas desactivadas antes de Iniciar.
+- [x] Tablero: contraste AA en "En curso" y "Recomendado" y que se distingan; rojo y azul en cada combate; pendientes legibles con candado y motivo.
+- [x] Ayudante: flecha del popup sin caja; categoría con 0 inscritos sin check.
+- [x] Club: chip "Falta tutor" en Inscripciones; tarjeta en revisión legible; fin estimado oculto sin pendientes; título de la revisión con tapiz y combate; confirmar "Quitar el último tapiz".
 
 ## Antes del 14-11 (Raul)
 - Clave del punto de acceso larga y solo para el staff; cambiarla antes del evento.
