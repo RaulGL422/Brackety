@@ -53,7 +53,7 @@ Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, f
 - Estado = repetición de los eventos (`TamboMatch`); deshacer es un evento más que anula el último punto, aviso o descalificación.
 - 15 puntos o descalificación paran el reloj con una parada automática registrada: al deshacer, sigue parado.
 - Antes del primer "Iniciar" no se puntúa: punto, advertencias y descalificación → 409 "The match has not started: press Start first." (con `opId`, choque `RULES`). Con el reloj ya iniciado y parado sí.
-- "Finalizar" solo con el combate acabado; después no se acepta nada. Un combate en curso por tapiz y ningún alumno en dos a la vez.
+- "Finalizar" solo con el combate acabado; después no se acepta nada. Un combate en curso por tapiz y ningún alumno en dos a la vez. El primer "Iniciar" de un combate bloquea la fila del evento hasta acabar (como crear grupos): dos tapices que empiezan a la vez con un alumno compartido no pasan los dos.
 - Escribe solo el árbitro del tapiz; el club ve el combate y su línea de tiempo.
 
 ### Puntuación global
