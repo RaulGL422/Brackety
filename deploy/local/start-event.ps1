@@ -313,6 +313,9 @@ function Set-ApiEnvironment([hashtable]$secrets, [string]$mode, [string]$package
     $env:CORS_ALLOWED_ORIGINS = ""
     # Phones without signal for a while keep their session; the refresh token still rotates.
     $env:ACCESS_TTL = "12h"
+    # No proxy in front: Tomcat would trust X-Forwarded-For from any private IP, so a phone of the hotspot
+    # could pick its own IP and dodge the sign-in lockout and the rate limiter.
+    $env:SERVER_FORWARD_HEADERS_STRATEGY = "none"
     $env:WEB_DIR = $webDir
     $env:LEGAL_OWNER_NAME = $owner
     $env:PRIVACY_CONTACT_EMAIL = $privacy
