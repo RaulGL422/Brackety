@@ -108,14 +108,51 @@ class SessionServiceTest extends AuthIntegrationTest {
     }
 
     @Test
-    void aConcurrentRefreshWithinTheGraceIsRejectedWithoutRevokingTheSession() {
+    void aRepeatWithinTheGraceGetsTheSamePairWithoutRevokingTheSession() {
         var second = sessions.refresh(first.refreshToken());
         clock.advance(SessionService.REUSE_GRACE);
+
+        var repeat = sessions.refresh(first.refreshToken());
+
+        assertThat(repeat.accessToken()).isEqualTo(second.accessToken());
+        assertThat(repeat.refreshToken()).isEqualTo(second.refreshToken());
+        assertThat(repeat.expiresIn()).isEqualTo(second.expiresIn() - SessionService.REUSE_GRACE.toSeconds());
+        assertThat(sessions.refresh(first.refreshToken()).refreshToken()).isEqualTo(second.refreshToken());
+        assertThat(count("refresh_token")).isEqualTo(2);
+        assertThat(count("refresh_token where revoked_at is not null")).isZero();
+        assertThat(emails.sentTo("ana@example.test")).hasSize(1);
+        assertThat(sessions.refresh(second.refreshToken()).accessToken()).isNotBlank();
+    }
+
+    @Test
+    void aRepeatAfterTheNewPairWasRotatedIsRejectedWithoutRevokingTheSession() {
+        var second = sessions.refresh(first.refreshToken());
+        var third = sessions.refresh(second.refreshToken());
+        clock.advance(Duration.ofSeconds(5));
 
         assertUnauthorized(() -> sessions.refresh(first.refreshToken()));
 
         assertThat(count("refresh_token where revoked_at is not null")).isZero();
-        assertThat(sessions.refresh(second.refreshToken()).accessToken()).isNotBlank();
+        assertThat(sessions.refresh(third.refreshToken()).accessToken()).isNotBlank();
+    }
+
+    @Test
+    void aRepeatAfterLogoutIsRejected() {
+        var second = sessions.refresh(first.refreshToken());
+        sessions.logout(second.refreshToken());
+
+        assertUnauthorized(() -> sessions.refresh(first.refreshToken()));
+    }
+
+    @Test
+    void aRepeatAfterTheGraceRevokesTheFamilyAsAnyReuse() {
+        sessions.refresh(first.refreshToken());
+        sessions.refresh(first.refreshToken());
+        clock.advance(SessionService.REUSE_GRACE.plusSeconds(1));
+
+        assertUnauthorized(() -> sessions.refresh(first.refreshToken()));
+
+        assertThat(count("refresh_token where revoked_at is null")).isZero();
     }
 
     @Test

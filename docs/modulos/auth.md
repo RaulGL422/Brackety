@@ -30,7 +30,8 @@ Cuentas, login y sesión compartidos entre web y Android.
 
 ### Sesión
 - JWT de acceso 15 min + refresh rotatorio de 30 días (se renueva en cada uso).
-- Reutilizar un refresh ya usado → se revoca toda su familia (sesión) y se avisa por email. Excepción: en los 10 s siguientes a usarlo solo da 401, sin revocar ni avisar (dos pestañas o peticiones a la vez).
+- Reutilizar un refresh ya usado → se revoca toda su familia (sesión) y se avisa por email. Excepción: en los 10 s siguientes a usarlo devuelve el mismo par que emitió (respuesta perdida en una wifi mala, dos pestañas), con `expiresIn` restante; si ese par ya no es el último de la sesión (rotado, revocado o caducado), cuenta borrada o la API se reinició, 401. Nunca revoca ni avisa dentro del margen.
+- Decisión (2026-11-06): el par emitido se guarda en memoria del proceso solo durante el margen, por hash del token rotado; la BD solo tiene hashes y no permite recuperarlo. Cifrarlo en la misma memoria no añade nada; emitir otro par de la familia dejaría dos hijos vivos. Vale porque la API es una sola instancia (Pi y portátil).
 - El cliente hace un solo refresh a la vez.
 - Cambio de credenciales (recuperar contraseña, confirmar cambio de email, quitar contraseña) o borrado: se revocan los refresh, se borran los enlaces de email pendientes y se fija `sessions_revoked_at`. Los tokens de acceso y reauth emitidos antes (`iat` en segundos) dejan de valer: 401 y 403 `REAUTH_REQUIRED`.
 - Cada petición lee la cuenta una vez: inexistente o borrada → 401.

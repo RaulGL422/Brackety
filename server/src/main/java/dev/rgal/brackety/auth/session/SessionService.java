@@ -11,6 +11,7 @@ import dev.rgal.brackety.common.crypto.Sha256;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,8 @@ public class SessionService {
 
     static final Duration ACCESS_TTL = Duration.ofMinutes(15);
     public static final Duration REFRESH_TTL = Duration.ofDays(30);
-    // Two tabs or two app calls refreshing at once are not a theft: the late one gets 401 and retries.
+    // Two tabs, two app calls at once or a repeat after a lost answer are not a theft: within this time the
+    // repeat gets the same pair the first refresh issued (or a 401 if it can no longer be given).
     static final Duration REUSE_GRACE = Duration.ofSeconds(10);
     public static final String EMAIL_VERIFIED_CLAIM = "email_verified";
     // Tells an access token from the other tokens signed with the same key (see ShortLivedTokens).
@@ -43,6 +45,7 @@ public class SessionService {
     private final EmailTokens emailTokens;
     private final JwtEncoder jwtEncoder;
     private final Clock clock;
+    private final RecentRefreshes recent = new RecentRefreshes(REUSE_GRACE);
 
     SessionService(
             RefreshTokenRepository refreshTokens,
@@ -75,7 +78,7 @@ public class SessionService {
             throw AuthException.invalidSession();
         }
         if (token.isUsed() && token.wasUsedSince(now.minus(REUSE_GRACE))) {
-            throw AuthException.invalidSession();
+            return repeat(Sha256.hex(rawToken), token, now).orElseThrow(AuthException::invalidSession);
         }
         if (token.isUsed()) {
             refreshTokens.revokeFamily(token.getFamilyId(), now);
@@ -88,7 +91,26 @@ public class SessionService {
             throw AuthException.invalidSession();
         }
         token.markUsed(now);
-        return issue(account.get(), token.getFamilyId(), now);
+        var session = issue(account.get(), token.getFamilyId(), now);
+        recent.put(Sha256.hex(rawToken), session, now);
+        return session;
+    }
+
+    // Only while the pair it issued is still the session's latest: never a token the client has already rotated.
+    private Optional<Session> repeat(String rotatedHash, RefreshToken rotated, Instant now) {
+        return recent.get(rotatedHash, now)
+                .filter(issued -> refreshTokens
+                        .findByTokenHash(Sha256.hex(issued.session().refreshToken()))
+                        .filter(child -> !child.isUsed() && !child.isRevoked() && !child.isExpired(now))
+                        .isPresent())
+                .filter(issued -> accounts.findById(rotated.getAccountId())
+                        .filter(Account::isActive)
+                        .isPresent())
+                .map(issued -> {
+                    var s = issued.session();
+                    var left = ACCESS_TTL.minus(Duration.between(issued.at(), now));
+                    return new Session(s.accessToken(), left.toSeconds(), s.refreshToken(), s.emailVerified());
+                });
     }
 
     @Transactional
