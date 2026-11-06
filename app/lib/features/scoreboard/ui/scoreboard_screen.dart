@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/async_view.dart';
+import '../../../core/keep_screen_on.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../mat/state/mat_providers.dart';
 import '../../mat/ui/fighter_text.dart';
@@ -13,8 +14,13 @@ import '../data/tambo_match.dart';
 import '../state/match_controller.dart';
 import 'clock_bar.dart';
 import 'corner_panel.dart';
+import 'final_score.dart';
 import 'reason_dialog.dart';
 import 'timeline_list.dart';
+import 'undo_text.dart';
+
+/// How long the "undone" message stays.
+const undoneNotice = Duration(seconds: 3);
 
 /// The referee's scoreboard for one tambo match: clock, both corners, undo and finish.
 class ScoreboardScreen extends ConsumerWidget {
@@ -28,47 +34,41 @@ class ScoreboardScreen extends ConsumerWidget {
     final provider = matchControllerProvider(matchId);
     final match = ref.watch(provider);
     final view = match.value;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          view == null
-              ? ''
-              : l10n.scoreboardTitle(view.matNumber, view.groupNumber),
+    return KeepScreenOn(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            view == null
+                ? ''
+                : l10n.scoreboardTitle(view.matNumber, view.groupNumber),
+          ),
+          actions: [
+            if (view != null)
+              IconButton(
+                tooltip: l10n.timeline,
+                icon: const Icon(Icons.history),
+                onPressed: () => _showTimeline(context, view),
+              ),
+          ],
         ),
-        actions: [
-          if (view != null) ...[
-            TextButton.icon(
-              icon: const Icon(Icons.undo),
-              label: Text(l10n.undo),
-              onPressed: view.canUndo && view.review == null
-                  ? () => _send(context, ref, MatchAction.undo)
-                  : null,
-            ),
-            IconButton(
-              tooltip: l10n.timeline,
-              icon: const Icon(Icons.history),
-              onPressed: () => _showTimeline(context, view),
+        body: Column(
+          children: [
+            const SyncStatusBar(),
+            Expanded(
+              child: AsyncView(
+                value: match,
+                onRetry: () => ref.invalidate(provider),
+                data: (view) => view.finished
+                    ? _Finished(view: view)
+                    : _Live(
+                        view: view,
+                        onAction: (action, {side}) =>
+                            _act(context, ref, view, action, side: side),
+                      ),
+              ),
             ),
           ],
-        ],
-      ),
-      body: Column(
-        children: [
-          const SyncStatusBar(),
-          Expanded(
-            child: AsyncView(
-              value: match,
-              onRetry: () => ref.invalidate(provider),
-              data: (view) => view.finished
-                  ? _Finished(view: view)
-                  : _Live(
-                      view: view,
-                      onAction: (action, {side}) =>
-                          _act(context, ref, view, action, side: side),
-                    ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -94,7 +94,14 @@ class ScoreboardScreen extends ConsumerWidget {
       );
       if (reason == null || !context.mounted) return;
     }
-    await _send(context, ref, action, side: side, reason: reason);
+    await _send(
+      context,
+      ref,
+      action,
+      side: side,
+      reason: reason,
+      undoing: action == MatchAction.undo ? view.lastUndoable : null,
+    );
     // The match is over: the mat board must show the next recommendation.
     if (action == MatchAction.finish) {
       ref.invalidate(matBoardProvider(view.matId));
@@ -108,6 +115,7 @@ class ScoreboardScreen extends ConsumerWidget {
     MatchAction action, {
     Side? side,
     String? reason,
+    TimelineEntry? undoing,
   }) async {
     final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
@@ -118,6 +126,13 @@ class ScoreboardScreen extends ConsumerWidget {
       messenger.showSnackBar(
         SnackBar(content: Text(_refusalText(l10n, refused))),
       );
+    } else if (undoing != null) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(l10n.undoneWhat(undoTarget(l10n, undoing))),
+          duration: undoneNotice,
+        ),
+      );
     }
   }
 
@@ -126,6 +141,7 @@ class ScoreboardScreen extends ConsumerWidget {
         null => l10n.actionRefused(refusal.detail ?? ''),
         MatchRefusal.finished => l10n.refusalFinished,
         MatchRefusal.over => l10n.refusalOver,
+        MatchRefusal.notStarted => l10n.refusalNotStarted,
         MatchRefusal.running => l10n.refusalRunning,
         MatchRefusal.notRunning => l10n.refusalNotRunning,
         MatchRefusal.nothingToUndo => l10n.refusalNothingToUndo,
@@ -148,16 +164,22 @@ class ScoreboardScreen extends ConsumerWidget {
   }
 }
 
+/// Portrait: the controls on top and the corners stacked. Landscape (wider than tall: phone
+/// on its side, tablet, desktop): red | controls | blue.
 class _Live extends StatelessWidget {
   const _Live({required this.view, required this.onAction});
 
   final MatchView view;
   final void Function(MatchAction action, {Side? side}) onAction;
 
+  /// Share of the height the clock takes in portrait.
+  static const _clockShare = 0.16;
+
   @override
   Widget build(BuildContext context) {
     final locked = view.review != null;
-    final scoring = view.endReason == null && !locked;
+    // Nothing scores before the clock was first started (decided with Raul, 2026-11-06).
+    final scoring = view.endReason == null && !locked && view.started;
     Widget corner(Side side) => Expanded(
       child: CornerPanel(
         side: side,
@@ -167,15 +189,37 @@ class _Live extends StatelessWidget {
         onSanction: (action) => onAction(action, side: side),
       ),
     );
-    // Side by side when there is room (tablet, landscape phone); stacked on a portrait phone.
-    final wide = MediaQuery.sizeOf(context).aspectRatio > 0.8;
-    final corners = [corner(Side.red), corner(Side.blue)];
     return Column(
       children: [
         if (locked) const _ReviewBanner(),
-        ClockBar(view: view, onAction: (action) => onAction(action)),
         Expanded(
-          child: wide ? Row(children: corners) : Column(children: corners),
+          child: LayoutBuilder(
+            builder: (context, size) {
+              if (size.maxWidth > size.maxHeight) {
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    corner(Side.red),
+                    Expanded(
+                      child: ClockBar(view: view, onAction: onAction),
+                    ),
+                    corner(Side.blue),
+                  ],
+                );
+              }
+              return Column(
+                children: [
+                  ClockBar(
+                    view: view,
+                    onAction: onAction,
+                    clockHeight: size.maxHeight * _clockShare,
+                  ),
+                  corner(Side.red),
+                  corner(Side.blue),
+                ],
+              );
+            },
+          ),
         ),
       ],
     );
@@ -210,6 +254,7 @@ class _ReviewBanner extends StatelessWidget {
   }
 }
 
+/// The result, then the timeline: side by side in landscape.
 class _Finished extends StatelessWidget {
   const _Finished({required this.view});
 
@@ -218,35 +263,45 @@ class _Finished extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final text = Theme.of(context).textTheme;
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(AppSpacing.l),
-          child: Column(
-            children: [
-              Text(l10n.matchFinished, style: text.headlineSmall),
-              const SizedBox(height: AppSpacing.s),
-              Text(
-                '${view.red.title(l10n)}  ${view.red.points} - '
-                '${view.blue.points}  ${view.blue.title(l10n)}',
-                style: text.titleLarge,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.m),
-              FilledButton.icon(
-                icon: const Icon(Icons.arrow_back),
-                label: Text(l10n.backToMat),
-                onPressed: () => context.canPop()
-                    ? context.pop()
-                    : context.go('/mats/${view.matId}'),
-              ),
-            ],
+    final summary = SingleChildScrollView(
+      padding: const EdgeInsets.all(AppSpacing.l),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        spacing: AppSpacing.m,
+        children: [
+          Text(
+            l10n.matchFinished,
+            style: Theme.of(context).textTheme.headlineSmall,
+            textAlign: TextAlign.center,
           ),
-        ),
-        const Divider(height: 1),
-        Expanded(child: TimelineList(view: view)),
-      ],
+          FinalScore(view: view),
+          FilledButton.icon(
+            icon: const Icon(Icons.arrow_back),
+            label: Text(l10n.backToMat),
+            onPressed: () => context.canPop()
+                ? context.pop()
+                : context.go('/mats/${view.matId}'),
+          ),
+        ],
+      ),
+    );
+    return LayoutBuilder(
+      builder: (context, size) => size.maxWidth > size.maxHeight
+          ? Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(child: summary),
+                const VerticalDivider(width: 1),
+                Expanded(child: TimelineList(view: view)),
+              ],
+            )
+          : Column(
+              children: [
+                Flexible(child: summary),
+                const Divider(height: 1),
+                Expanded(child: TimelineList(view: view)),
+              ],
+            ),
     );
   }
 }

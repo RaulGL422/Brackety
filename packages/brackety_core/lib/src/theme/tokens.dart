@@ -19,6 +19,8 @@ abstract final class AppSizes {
   static const double touchTarget = 48;
   // Scoreboard buttons are pressed in a hurry, one-handed, at arm's length.
   static const double scoreTouchTarget = 72;
+  // Icons on those buttons: recognisable at a glance from the side of the mat.
+  static const double scoreIcon = 40;
   // Short forms (sign-in, sign-up) stay readable on wide windows instead of stretching.
   static const double formMaxWidth = 480;
   // Long texts (legal pages): a comfortable line length on wide windows.

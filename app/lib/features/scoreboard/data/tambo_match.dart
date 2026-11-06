@@ -6,6 +6,7 @@ import 'match_view.dart';
 enum MatchRefusal {
   finished,
   over,
+  notStarted,
   running,
   notRunning,
   nothingToUndo,
@@ -150,7 +151,12 @@ class TamboMatch {
       MatchAction.point ||
       MatchAction.warning ||
       MatchAction.oneHandWarning ||
-      MatchAction.disqualification => over ? MatchRefusal.over : null,
+      MatchAction.disqualification =>
+        over
+            ? MatchRefusal.over
+            : !_started
+            ? MatchRefusal.notStarted
+            : null,
       MatchAction.undo =>
         _lastUndoable == null ? MatchRefusal.nothingToUndo : null,
       MatchAction.finish => over ? null : MatchRefusal.notOver,

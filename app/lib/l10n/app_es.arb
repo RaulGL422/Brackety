@@ -187,17 +187,6 @@
       }
     }
   },
-  "groupsCreatedBody": "{groups} → Tapiz {mat}",
-  "@groupsCreatedBody": {
-    "placeholders": {
-      "groups": {
-        "type": "String"
-      },
-      "mat": {
-        "type": "int"
-      }
-    }
-  },
   "groupsConflict": "Algún alumno ya está en un grupo. La lista se ha actualizado.",
   "groupsError": "No se han podido crear los grupos.",
   "ok": "Aceptar",
@@ -649,5 +638,24 @@
   "matsInReview": "{count, plural, =1{1 combate en revisión} other{{count} combates en revisión}}",
   "@matsInReview": {"placeholders": {"count": {"type": "int"}}},
   "logoutPending": "{count, plural, =1{Tienes 1 acción sin enviar; si sales se perderá.} other{Tienes {count} acciones sin enviar; si sales se perderán.}}",
-  "@logoutPending": {"placeholders": {"count": {"type": "int"}}}
+  "@logoutPending": {"placeholders": {"count": {"type": "int"}}},
+  "refusalNotStarted": "Inicia el tiempo antes de puntuar.",
+  "undoWhat": "Deshacer: {what}",
+  "@undoWhat": {"placeholders": {"what": {"type": "String"}}},
+  "undoneWhat": "Deshecho: {what}",
+  "@undoneWhat": {"placeholders": {"what": {"type": "String"}}},
+  "whatPoint": "+1 {corner}",
+  "@whatPoint": {"placeholders": {"corner": {"type": "String"}}},
+  "whatWarning": "advertencia {corner}",
+  "@whatWarning": {"placeholders": {"corner": {"type": "String"}}},
+  "whatOneHand": "una mano {corner}",
+  "@whatOneHand": {"placeholders": {"corner": {"type": "String"}}},
+  "whatDisqualification": "descalificación {corner}",
+  "@whatDisqualification": {"placeholders": {"corner": {"type": "String"}}},
+  "winner": "Ganador",
+  "draw": "Empate",
+  "matLocked": "No se puede abrir todavía",
+  "needsGuardian": "Falta tutor",
+  "settingsRemoveMatConfirm": "Se quita el Tapiz {number}; su árbitro deja de estar asignado.",
+  "@settingsRemoveMatConfirm": {"placeholders": {"number": {"type": "int"}}}
 }

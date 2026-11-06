@@ -49,6 +49,7 @@ MatchView matchView({
   Corner? red,
   Corner? blue,
   MatchReview? review,
+  bool? started,
 }) => MatchView(
   id: 'm1',
   matId: 'mat1',
@@ -64,6 +65,16 @@ MatchView matchView({
   red: red ?? corner('Ana Prueba', points: redPoints, oneHandRule: true),
   blue: blue ?? corner('Bea Prueba'),
   timeline: [
+    // Started unless still pending: nothing scores before the first START.
+    if (started ?? status != MatchStatus.pending)
+      TimelineEntry(
+        action: MatchAction.start,
+        at: DateTime(2027, 3, 10, 10),
+        clock: Duration.zero,
+        automatic: false,
+        undone: false,
+        gaveRivalPoint: false,
+      ),
     if (canUndo)
       TimelineEntry(
         action: MatchAction.point,
