@@ -10,15 +10,15 @@ Revisión de seguridad, código y diseño visual (86 capturas en 3 tamaños, hor
 
 ## Antes del 10-11
 ### Servidor y pabellón (`fix/f1-hardening-server`)
-- [ ] Contraseñas aleatorias para las cuentas del paquete (`EventPackageService`).
-- [ ] Rechazar POINT, WARNING, ONE_HAND_WARNING y DISQUALIFICATION antes del START (`TamboMatch`, `MatchWriter`).
-- [ ] Refresh idempotente en el margen de gracia (`SessionService`); `ACCESS_TTL` por variable de entorno, 12 h en `start-event.ps1`.
-- [ ] `X-Forwarded-For` ignorado en el pabellón: sin él, un móvil del hotspot se salta el bloqueo por IP y el limitador (`server.forward-headers-strategy`).
-- [ ] Firewall: el 8080 solo desde `192.168.137.0/24` (`start-event.ps1`).
-- [ ] Primer START bloquea el evento: dos tapices no empiezan a la vez con un alumno compartido.
-- [ ] `GET /participants` solo CLUB (hoy también el ayudante, con nacimiento y consentimiento).
-- [ ] CSV: neutralizar también celdas que empiezan por tabulador o retorno.
-- [ ] `start-event.ps1`: avisar si el disco no tiene BitLocker; `brackety-data` solo para el usuario (`icacls`).
+- [x] Contraseñas aleatorias para las cuentas del paquete (`EventPackageService`).
+- [x] Rechazar POINT, WARNING, ONE_HAND_WARNING y DISQUALIFICATION antes del START (`TamboMatch`, `MatchWriter`).
+- [x] Refresh idempotente en el margen de gracia (`SessionService`); `ACCESS_TTL` por variable de entorno, 12 h en `start-event.ps1`.
+- [x] `X-Forwarded-For` ignorado en el pabellón: sin él, un móvil del hotspot se salta el bloqueo por IP y el limitador (`server.forward-headers-strategy`).
+- [x] Firewall: el 8080 solo desde `192.168.137.0/24` (`start-event.ps1`).
+- [x] Primer START bloquea el evento: dos tapices no empiezan a la vez con un alumno compartido.
+- [x] `GET /participants` solo CLUB (hoy también el ayudante, con nacimiento y consentimiento).
+- [x] CSV: neutralizar también celdas que empiezan por tabulador o retorno.
+- [x] `start-event.ps1`: avisar si el disco no tiene BitLocker; `brackety-data` solo para el usuario (`icacls`).
 
 ### App (`fix/f1-app-polish`)
 - [ ] Pantalla siempre encendida en el tablero y el marcador (wakelock).
