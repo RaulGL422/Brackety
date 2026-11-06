@@ -88,8 +88,15 @@ class _ParticipantTile extends ConsumerWidget {
         : l10n.heightCm(p.heightCm!);
     return ListTile(
       title: Text('${p.firstName} ${p.lastName}'),
-      subtitle: Text(
-        '${l10n.participantAgeCategory(p.age, p.categoryName ?? l10n.noCategory)} · $height',
+      subtitle: Wrap(
+        spacing: AppSpacing.s,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          Text(
+            '${l10n.participantAgeCategory(p.age, p.categoryName ?? l10n.noCategory)} · $height',
+          ),
+          if (p.needsGuardian) const _NeedsGuardianChip(),
+        ],
       ),
       onTap: () => showParticipantForm(context, eventId, participant: p),
       trailing: IconButton(
@@ -130,5 +137,22 @@ class _ParticipantTile extends ConsumerWidget {
         SnackBar(content: Text(saveErrorMessage(l10n, e))),
       );
     }
+  }
+}
+
+class _NeedsGuardianChip extends StatelessWidget {
+  const _NeedsGuardianChip();
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Chip(
+      avatar: Icon(Icons.warning_amber, color: scheme.onErrorContainer),
+      label: Text(AppLocalizations.of(context).needsGuardian),
+      labelStyle: TextStyle(color: scheme.onErrorContainer),
+      backgroundColor: scheme.errorContainer,
+      side: BorderSide.none,
+      visualDensity: VisualDensity.compact,
+    );
   }
 }

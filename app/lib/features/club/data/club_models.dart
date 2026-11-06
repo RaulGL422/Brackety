@@ -95,6 +95,9 @@ class EventSettings {
   final List<EventCategory> categories;
 }
 
+/// From this age on the day of the event no guardian has to agree.
+const adultAge = 18;
+
 class Participant {
   const Participant({
     required this.id,
@@ -135,6 +138,9 @@ class Participant {
 
   /// Set when a category was chosen for them instead of following their age.
   final String? chosenCategoryId;
+
+  /// A minor on the day of the event whose guardian's agreement is not ticked.
+  bool get needsGuardian => age < adultAge && !guardianConsent;
 }
 
 class StandingRow {

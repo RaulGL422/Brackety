@@ -136,7 +136,9 @@ void main() {
       final group = repository.created.single.single;
       expect(group.members, ['t1', 't2', 't3']);
       expect(group.ghostTeam, ['p9', 'p10', 'p11']);
-      expect(find.text('Group 1 → Mat 2'), findsOneWidget);
+      expect(find.text('Group 1'), findsWidgets);
+      expect(find.text('Mat 2'), findsOneWidget);
+      expect(find.byIcon(Icons.arrow_forward), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   }

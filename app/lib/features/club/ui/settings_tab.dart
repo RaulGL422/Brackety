@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/async_view.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../auth/ui/widgets/confirm_dialog.dart';
 import '../../events/state/events_providers.dart';
 import '../data/club_models.dart';
 import '../data/club_repository.dart';
@@ -149,9 +150,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
               TextButton.icon(
                 icon: const Icon(Icons.remove),
                 label: Text(l10n.settingsRemoveMat),
-                onPressed: _matReferees.length <= 1
-                    ? null
-                    : () => _change(() => _matReferees.removeLast()),
+                onPressed: _matReferees.length <= 1 ? null : _removeLastMat,
               ),
             ],
           ),
@@ -164,6 +163,17 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
         ],
       ),
     );
+  }
+
+  Future<void> _removeLastMat() async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await confirmAction(
+      context,
+      body: l10n.settingsRemoveMatConfirm(_matReferees.length),
+      confirmLabel: l10n.settingsRemoveMat,
+      destructive: true,
+    );
+    if (confirmed && mounted) _change(() => _matReferees.removeLast());
   }
 
   Future<void> _pickDate() async {
