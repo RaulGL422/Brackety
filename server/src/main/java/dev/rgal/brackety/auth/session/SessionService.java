@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -26,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class SessionService {
 
-    static final Duration ACCESS_TTL = Duration.ofMinutes(15);
     public static final Duration REFRESH_TTL = Duration.ofDays(30);
     // Two tabs, two app calls at once or a repeat after a lost answer are not a theft: within this time the
     // repeat gets the same pair the first refresh issued (or a 401 if it can no longer be given).
@@ -45,6 +45,7 @@ public class SessionService {
     private final EmailTokens emailTokens;
     private final JwtEncoder jwtEncoder;
     private final Clock clock;
+    private final Duration accessTtl;
     private final RecentRefreshes recent = new RecentRefreshes(REUSE_GRACE);
 
     SessionService(
@@ -54,7 +55,8 @@ public class SessionService {
             AuthEmails authEmails,
             EmailTokens emailTokens,
             JwtEncoder jwtEncoder,
-            Clock clock) {
+            Clock clock,
+            @Value("${brackety.auth.access-ttl}") Duration accessTtl) {
         this.refreshTokens = refreshTokens;
         this.accounts = accounts;
         this.profiles = profiles;
@@ -62,6 +64,7 @@ public class SessionService {
         this.emailTokens = emailTokens;
         this.jwtEncoder = jwtEncoder;
         this.clock = clock;
+        this.accessTtl = accessTtl;
     }
 
     @Transactional
@@ -108,7 +111,7 @@ public class SessionService {
                         .isPresent())
                 .map(issued -> {
                     var s = issued.session();
-                    var left = ACCESS_TTL.minus(Duration.between(issued.at(), now));
+                    var left = accessTtl.minus(Duration.between(issued.at(), now));
                     return new Session(s.accessToken(), left.toSeconds(), s.refreshToken(), s.emailVerified());
                 });
     }
@@ -146,7 +149,7 @@ public class SessionService {
         var rawRefresh = RandomTokens.newToken();
         refreshTokens.save(
                 new RefreshToken(Sha256.hex(rawRefresh), familyId, account.getId(), now, now.plus(REFRESH_TTL)));
-        return new Session(accessToken(account, now), ACCESS_TTL.toSeconds(), rawRefresh, account.isEmailVerified());
+        return new Session(accessToken(account, now), accessTtl.toSeconds(), rawRefresh, account.isEmailVerified());
     }
 
     // email_verified is read again on every refresh, so verifying shows up in the next access token.
@@ -157,7 +160,7 @@ public class SessionService {
         var claims = JwtClaimsSet.builder()
                 .subject(account.getId().toString())
                 .issuedAt(now)
-                .expiresAt(now.plus(ACCESS_TTL))
+                .expiresAt(now.plus(accessTtl))
                 .claim("profiles", profileTypes)
                 .claim(EMAIL_VERIFIED_CLAIM, account.isEmailVerified())
                 .claim(PURPOSE_CLAIM, ACCESS_PURPOSE)

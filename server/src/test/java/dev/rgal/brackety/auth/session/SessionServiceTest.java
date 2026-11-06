@@ -8,6 +8,9 @@ import dev.rgal.brackety.auth.AuthIntegrationTest;
 import dev.rgal.brackety.auth.AuthService;
 import dev.rgal.brackety.auth.AuthTestConfig;
 import dev.rgal.brackety.auth.account.AccountRepository;
+import dev.rgal.brackety.auth.account.AuthEmails;
+import dev.rgal.brackety.auth.account.ProfileRepository;
+import dev.rgal.brackety.auth.email.EmailTokens;
 import dev.rgal.brackety.auth.email.EmailVerificationService;
 import dev.rgal.brackety.auth.session.SessionService.Session;
 import dev.rgal.brackety.common.crypto.Sha256;
@@ -17,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
 
 class SessionServiceTest extends AuthIntegrationTest {
 
@@ -35,6 +39,21 @@ class SessionServiceTest extends AuthIntegrationTest {
     @Autowired
     EmailVerificationService verification;
 
+    @Autowired
+    RefreshTokenRepository refreshTokens;
+
+    @Autowired
+    ProfileRepository profiles;
+
+    @Autowired
+    AuthEmails authEmails;
+
+    @Autowired
+    EmailTokens emailTokens;
+
+    @Autowired
+    JwtEncoder jwtEncoder;
+
     private Session first;
 
     @BeforeEach
@@ -51,6 +70,20 @@ class SessionServiceTest extends AuthIntegrationTest {
         assertThat(jwt.getSubject()).isEqualTo(accountId.toString());
         assertThat(jwt.getClaimAsStringList("profiles")).containsExactly("CLUB");
         assertThat(jwt.getExpiresAt()).isEqualTo(AuthTestConfig.START.plus(Duration.ofMinutes(15)));
+    }
+
+    @Test
+    void theAccessTokenLifeComesFromTheConfiguration() {
+        var account = accounts.findByEmail("ana@example.test").orElseThrow();
+        var hall = new SessionService(
+                refreshTokens, accounts, profiles, authEmails, emailTokens, jwtEncoder, clock, Duration.ofHours(12));
+
+        var session = hall.start(account);
+
+        assertThat(first.expiresIn()).isEqualTo(Duration.ofMinutes(15).toSeconds());
+        assertThat(session.expiresIn()).isEqualTo(Duration.ofHours(12).toSeconds());
+        assertThat(jwtDecoder.decode(session.accessToken()).getExpiresAt())
+                .isEqualTo(AuthTestConfig.START.plus(Duration.ofHours(12)));
     }
 
     @Test

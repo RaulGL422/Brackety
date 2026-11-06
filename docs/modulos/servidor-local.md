@@ -19,6 +19,7 @@ Llevar el evento ya preparado (configuración e inscripciones) y arrancarlo en c
 - El primer arranque de una carpeta sin datos exige `-Package <fichero>` o `-Demo` (cuentas y evento demo del prototipo con la fecha de `-EventDate`, por defecto hoy). Sin ninguno no arranca: el evento de prueba nunca se mezcla con el real.
 - `brackety-data/package-loaded.txt` o `demo-loaded.txt` (nombre y hora) marcan qué cargó el primer arranque; solo se escriben si la API arrancó bien. Con datos y sin marca (primer arranque fallido) se niega y sugiere `-Reset`.
 - `-Reset` (servidor parado, confirma s/N): renombra `brackety-data` a `brackety-data.old-AAAAMMDD-HHmmss`, nunca borra. Con `-Package` o `-Demo` sigue con un primer arranque.
+- `ACCESS_TTL=12h`: un móvil sin red un rato no pierde la sesión (el refresh sigue rotando).
 - La cookie de refresco es `Secure`: en http solo `localhost` mantiene la sesión web al recargar. Los móviles usarán la APK (paso 3).
 - Sin Internet: sin emails, sin Google, sin importación con Claude (los alumnos se importan antes, en la Pi o en local).
 

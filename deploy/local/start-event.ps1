@@ -311,6 +311,8 @@ function Set-ApiEnvironment([hashtable]$secrets, [string]$mode, [string]$package
     $env:JWT_SECRET = $secrets["JWT_SECRET"]
     $env:PUBLIC_BASE_URL = "http://${HotspotIp}:$ApiPort"
     $env:CORS_ALLOWED_ORIGINS = ""
+    # Phones without signal for a while keep their session; the refresh token still rotates.
+    $env:ACCESS_TTL = "12h"
     $env:WEB_DIR = $webDir
     $env:LEGAL_OWNER_NAME = $owner
     $env:PRIVACY_CONTACT_EMAIL = $privacy
