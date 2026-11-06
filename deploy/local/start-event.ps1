@@ -36,6 +36,7 @@ $ErrorActionPreference = "Stop"
 $PgPort = 15433
 $ApiPort = 8080
 $HotspotIp = "192.168.137.1"
+$HallSubnet = "192.168.137.0/24"
 $DbName = "brackety"
 $DbUser = "brackety"
 $KeptBackups = 20
@@ -215,32 +216,47 @@ try {
     }
 }
 
+# Only the hotspot's network: another wifi the laptop joins (a hotel, the sports hall's) cannot reach the API.
+# Loopback is never filtered, so http://localhost keeps working.
+function Test-HallOnly($rule) {
+    $remote = @(($rule | Get-NetFirewallAddressFilter).RemoteAddress)
+    return $remote.Count -eq 1 -and $remote[0] -in @($HallSubnet, "192.168.137.0/255.255.255.0")
+}
+
 function Confirm-FirewallRule {
     $rules = Get-NetFirewallApplicationFilter -Program $java -ErrorAction SilentlyContinue |
         Get-NetFirewallRule -ErrorAction SilentlyContinue | Where-Object { $_.Enabled -eq "True" -and $_.Direction -eq "Inbound" }
     $blocked = $rules | Where-Object { $_.Action -eq "Block" }
-    if (($rules | Where-Object { $_.Action -eq "Allow" }) -and -not $blocked) { return }
+    $allowed = @($rules | Where-Object { $_.Action -eq "Allow" })
+    $open = @($allowed | Where-Object { -not (Test-HallOnly $_) })
+    if ($allowed.Count -gt 0 -and -not $blocked -and $open.Count -eq 0) { return }
+    $problem = if ($open.Count -gt 0) {
+        "La regla del firewall deja entrar al servidor desde cualquier red; hay que limitarla al punto de acceso ($HallSubnet)."
+    } else {
+        "Falta la regla del firewall para que los móviles lleguen al servidor (puerto $ApiPort, solo desde $HallSubnet)."
+    }
     if ([Console]::IsInputRedirected) {
-        Write-Warn "Falta la regla del firewall: los móviles no llegarán al servidor (arranca a mano una vez)."
+        Write-Warn "$problem Arranca a mano una vez para corregirla."
         return
     }
-    Write-Host "Falta la regla del firewall para que los móviles lleguen al servidor (puerto $ApiPort)."
-    $answer = Read-Host "¿Añadirla ahora? Windows pedirá permiso de administrador (S/n)"
+    Write-Host $problem
+    $answer = Read-Host "¿Corregirla ahora? Windows pedirá permiso de administrador (S/n)"
     if ($answer -match '^[nN]') {
-        Write-Warn "Sin la regla los móviles no llegarán al servidor; desde este portátil sí funciona."
+        Write-Warn "Sin corregirla los móviles pueden no llegar al servidor (o llegaría cualquiera); desde este portátil sí funciona."
         return
     }
-    # Windows' own "Java" block rules (a declined pop-up) win over any allow rule: they go first.
+    # Every inbound rule of this java.exe goes first: Windows' own "Java" block rules (a declined pop-up) win
+    # over any allow rule, and its allow rules (an accepted pop-up) open every port from any network.
     $ruleScript = @"
-Get-NetFirewallApplicationFilter -Program '$java' -ErrorAction SilentlyContinue | Get-NetFirewallRule | Where-Object { `$_.Direction -eq 'Inbound' -and `$_.Action -eq 'Block' } | Remove-NetFirewallRule
-New-NetFirewallRule -DisplayName 'Brackety pabellon (API $ApiPort)' -Direction Inbound -Action Allow -Program '$java' -Protocol TCP -LocalPort $ApiPort -Profile Private,Public | Out-Null
+Get-NetFirewallApplicationFilter -Program '$java' -ErrorAction SilentlyContinue | Get-NetFirewallRule | Where-Object { `$_.Direction -eq 'Inbound' } | Remove-NetFirewallRule
+New-NetFirewallRule -DisplayName 'Brackety pabellon (API $ApiPort)' -Direction Inbound -Action Allow -Program '$java' -Protocol TCP -LocalPort $ApiPort -RemoteAddress '$HallSubnet' -Profile Private,Public | Out-Null
 "@
     $encoded = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($ruleScript))
     try {
         Start-Process powershell.exe -Verb RunAs -Wait -WindowStyle Hidden -ArgumentList "-NoProfile -EncodedCommand $encoded"
-        Write-Step "Regla del firewall añadida."
+        Write-Step "Regla del firewall lista (puerto $ApiPort, solo desde $HallSubnet)."
     } catch {
-        Write-Warn "No se ha añadido la regla del firewall: los móviles no llegarán al servidor."
+        Write-Warn "No se ha corregido la regla del firewall: los móviles pueden no llegar al servidor."
     }
 }
 
