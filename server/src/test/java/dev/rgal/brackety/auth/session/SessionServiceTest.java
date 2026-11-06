@@ -8,6 +8,9 @@ import dev.rgal.brackety.auth.AuthIntegrationTest;
 import dev.rgal.brackety.auth.AuthService;
 import dev.rgal.brackety.auth.AuthTestConfig;
 import dev.rgal.brackety.auth.account.AccountRepository;
+import dev.rgal.brackety.auth.account.AuthEmails;
+import dev.rgal.brackety.auth.account.ProfileRepository;
+import dev.rgal.brackety.auth.email.EmailTokens;
 import dev.rgal.brackety.auth.email.EmailVerificationService;
 import dev.rgal.brackety.auth.session.SessionService.Session;
 import dev.rgal.brackety.common.crypto.Sha256;
@@ -17,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
 
 class SessionServiceTest extends AuthIntegrationTest {
 
@@ -35,6 +39,21 @@ class SessionServiceTest extends AuthIntegrationTest {
     @Autowired
     EmailVerificationService verification;
 
+    @Autowired
+    RefreshTokenRepository refreshTokens;
+
+    @Autowired
+    ProfileRepository profiles;
+
+    @Autowired
+    AuthEmails authEmails;
+
+    @Autowired
+    EmailTokens emailTokens;
+
+    @Autowired
+    JwtEncoder jwtEncoder;
+
     private Session first;
 
     @BeforeEach
@@ -51,6 +70,20 @@ class SessionServiceTest extends AuthIntegrationTest {
         assertThat(jwt.getSubject()).isEqualTo(accountId.toString());
         assertThat(jwt.getClaimAsStringList("profiles")).containsExactly("CLUB");
         assertThat(jwt.getExpiresAt()).isEqualTo(AuthTestConfig.START.plus(Duration.ofMinutes(15)));
+    }
+
+    @Test
+    void theAccessTokenLifeComesFromTheConfiguration() {
+        var account = accounts.findByEmail("ana@example.test").orElseThrow();
+        var hall = new SessionService(
+                refreshTokens, accounts, profiles, authEmails, emailTokens, jwtEncoder, clock, Duration.ofHours(12));
+
+        var session = hall.start(account);
+
+        assertThat(first.expiresIn()).isEqualTo(Duration.ofMinutes(15).toSeconds());
+        assertThat(session.expiresIn()).isEqualTo(Duration.ofHours(12).toSeconds());
+        assertThat(jwtDecoder.decode(session.accessToken()).getExpiresAt())
+                .isEqualTo(AuthTestConfig.START.plus(Duration.ofHours(12)));
     }
 
     @Test
@@ -108,14 +141,51 @@ class SessionServiceTest extends AuthIntegrationTest {
     }
 
     @Test
-    void aConcurrentRefreshWithinTheGraceIsRejectedWithoutRevokingTheSession() {
+    void aRepeatWithinTheGraceGetsTheSamePairWithoutRevokingTheSession() {
         var second = sessions.refresh(first.refreshToken());
         clock.advance(SessionService.REUSE_GRACE);
+
+        var repeat = sessions.refresh(first.refreshToken());
+
+        assertThat(repeat.accessToken()).isEqualTo(second.accessToken());
+        assertThat(repeat.refreshToken()).isEqualTo(second.refreshToken());
+        assertThat(repeat.expiresIn()).isEqualTo(second.expiresIn() - SessionService.REUSE_GRACE.toSeconds());
+        assertThat(sessions.refresh(first.refreshToken()).refreshToken()).isEqualTo(second.refreshToken());
+        assertThat(count("refresh_token")).isEqualTo(2);
+        assertThat(count("refresh_token where revoked_at is not null")).isZero();
+        assertThat(emails.sentTo("ana@example.test")).hasSize(1);
+        assertThat(sessions.refresh(second.refreshToken()).accessToken()).isNotBlank();
+    }
+
+    @Test
+    void aRepeatAfterTheNewPairWasRotatedIsRejectedWithoutRevokingTheSession() {
+        var second = sessions.refresh(first.refreshToken());
+        var third = sessions.refresh(second.refreshToken());
+        clock.advance(Duration.ofSeconds(5));
 
         assertUnauthorized(() -> sessions.refresh(first.refreshToken()));
 
         assertThat(count("refresh_token where revoked_at is not null")).isZero();
-        assertThat(sessions.refresh(second.refreshToken()).accessToken()).isNotBlank();
+        assertThat(sessions.refresh(third.refreshToken()).accessToken()).isNotBlank();
+    }
+
+    @Test
+    void aRepeatAfterLogoutIsRejected() {
+        var second = sessions.refresh(first.refreshToken());
+        sessions.logout(second.refreshToken());
+
+        assertUnauthorized(() -> sessions.refresh(first.refreshToken()));
+    }
+
+    @Test
+    void aRepeatAfterTheGraceRevokesTheFamilyAsAnyReuse() {
+        sessions.refresh(first.refreshToken());
+        sessions.refresh(first.refreshToken());
+        clock.advance(SessionService.REUSE_GRACE.plusSeconds(1));
+
+        assertUnauthorized(() -> sessions.refresh(first.refreshToken()));
+
+        assertThat(count("refresh_token where revoked_at is null")).isZero();
     }
 
     @Test

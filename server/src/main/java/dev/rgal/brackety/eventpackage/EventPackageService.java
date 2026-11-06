@@ -23,13 +23,16 @@ import dev.rgal.brackety.eventpackage.EventPackage.Owner;
 import dev.rgal.brackety.eventpackage.EventPackage.ParticipantEntry;
 import dev.rgal.brackety.eventpackage.EventPackage.Settings;
 import dev.rgal.brackety.eventpackage.EventPackage.StaffMember;
+import dev.rgal.brackety.eventpackage.LoadedPackage.NewAccount;
 import dev.rgal.brackety.participant.Participant;
 import dev.rgal.brackety.participant.ParticipantRepository;
 import jakarta.validation.Validator;
 import java.time.Clock;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -137,16 +140,17 @@ public class EventPackageService {
         return result;
     }
 
-    /** All or nothing; refused if the database already has an event. Returns the new event's id. */
+    /** All or nothing; refused if the database already has an event. */
     @Transactional
-    public UUID load(byte[] content) {
+    public LoadedPackage load(byte[] content) {
         var p = parse(content);
         if (events.count() > 0) {
             throw new InvalidEventPackageException(
                     "the database already has an event: a package only loads into an empty one");
         }
         EventPackageRules.check(p, validator);
-        var accountIds = createAccounts(p);
+        var passwords = new HashMap<String, String>();
+        var accountIds = createAccounts(p, passwords);
         var settings = p.event();
         var event = events.save(new Event(
                 accountIds.get(EventPackageRules.username(p.owner().username())),
@@ -181,14 +185,31 @@ public class EventPackageService {
                     entry.categoryName() == null ? null : categoryIds.get(entry.categoryName()));
             participants.save(participant);
         }
-        log.warn("Event package accounts that did not exist were created with their usernames as passwords");
         log.info(
-                "Event package loaded: {} staff, {} categories, {} mats, {} participants",
+                "Event package loaded: {} staff, {} categories, {} mats, {} participants, {} new accounts",
                 p.staff().size(),
                 p.categories().size(),
                 p.mats().size(),
-                p.participants().size());
-        return event.getId();
+                p.participants().size(),
+                passwords.size());
+        return new LoadedPackage(event.getId(), newAccounts(p, passwords));
+    }
+
+    private static List<NewAccount> newAccounts(EventPackage p, Map<String, String> passwords) {
+        return passwords.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .map(e -> new NewAccount(
+                        e.getKey(),
+                        p.staff().stream()
+                                .filter(s -> s.username().equals(e.getKey()))
+                                .map(s -> s.role().name())
+                                .collect(Collectors.joining(",")),
+                        e.getValue(),
+                        p.mats().stream()
+                                .filter(m -> e.getKey().equals(m.refereeUsername()))
+                                .map(m -> String.valueOf(m.number()))
+                                .collect(Collectors.joining(","))))
+                .toList();
     }
 
     private EventPackage parse(byte[] content) {
@@ -219,20 +240,37 @@ public class EventPackageService {
                 : path.replaceFirst("^\\.", "");
     }
 
-    /** Usernames → account ids; the owner gets a club profile, everyone else a helper one. */
-    private Map<String, UUID> createAccounts(EventPackage p) {
+    /**
+     * Usernames → account ids; the owner gets a club profile, everyone else a helper one. Accounts that already exist
+     * keep their password; the new ones get a random one, added to {@code passwords}.
+     */
+    private Map<String, UUID> createAccounts(EventPackage p, Map<String, String> passwords) {
         var owner = EventPackageRules.username(p.owner().username());
         var ids = new HashMap<String, UUID>();
         ids.put(
                 owner,
-                demoAccounts.club(
-                        owner,
-                        strip(p.owner().organizationName()),
-                        Cif.normalize(p.owner().taxId())));
+                existing(owner)
+                        .orElseGet(() -> demoAccounts.club(
+                                owner,
+                                strip(p.owner().organizationName()),
+                                Cif.normalize(p.owner().taxId()),
+                                newPassword(owner, passwords))));
         for (var member : p.staff()) {
-            ids.computeIfAbsent(member.username(), demoAccounts::helper);
+            var username = member.username();
+            ids.computeIfAbsent(
+                    username, u -> existing(u).orElseGet(() -> demoAccounts.helper(u, newPassword(u, passwords))));
         }
         return ids;
+    }
+
+    private Optional<UUID> existing(String username) {
+        return accounts.findByEmail(username).map(Account::getId);
+    }
+
+    private static String newPassword(String username, Map<String, String> passwords) {
+        var password = StaffPasswords.next();
+        passwords.put(username, password);
+        return password;
     }
 
     private static String strip(String value) {

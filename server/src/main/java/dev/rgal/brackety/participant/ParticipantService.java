@@ -42,7 +42,7 @@ public class ParticipantService {
 
     @Transactional(readOnly = true)
     public List<ParticipantResponse> list(UUID eventId, UUID accountId) {
-        access.require(eventId, accountId, EventRole.CLUB, EventRole.GROUPER);
+        access.require(eventId, accountId, EventRole.CLUB);
         var event = events.get(eventId);
         var eventCategories = categories.findByEventIdOrderByMinAge(eventId);
         return participants.findByEventIdOrderByFirstNameAscLastNameAsc(eventId).stream()
