@@ -17,11 +17,17 @@ final t0 = DateTime.utc(2027, 3, 10, 9);
 class MemoryOfflineStore implements OfflineStore {
   final docs = <String, Object?>{};
 
+  /// The name of every document written, in order.
+  final written = <String>[];
+
   @override
   Future<Object?> read(String name) async => docs[name];
 
   @override
-  Future<void> write(String name, Object? json) async => docs[name] = json;
+  Future<void> write(String name, Object? json) async {
+    written.add(name);
+    docs[name] = json;
+  }
 
   @override
   Future<void> clear({Set<String> keep = const {}}) async =>

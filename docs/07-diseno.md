@@ -18,7 +18,7 @@ Validación visual: página **Diseño** del admin, solo en debug (`./run-app.ps1
 - Estados: `BracketyColors` (`ThemeExtension`): success, warning (+ containers). Error usa el de Material.
 - Competidores: `CompetitorColor` (12 colores fijos en claro y oscuro, cada uno con su color de texto AA).
 - Tipografía: Barlow (texto) y Barlow Condensed (display, headline, números del marcador), empaquetadas en assets (offline), licencia OFL.
-- Espaciado `AppSpacing` 4·8·12·16·24·32·48. Radios `AppRadius` 8·12·20·full. Táctil `AppSizes` 48 (general) y 72 (marcador). Anchos: formulario 480, lectura 720, columna de tabla en móvil 200 (la tabla se desplaza en horizontal).
+- Espaciado `AppSpacing` 4·8·12·16·24·32·48. Radios `AppRadius` 8·12·20·full. Táctil `AppSizes` 48 (general) y 72 (marcador); iconos del marcador 40. Anchos: formulario 480, lectura 720, columna de tabla en móvil 200 (la tabla se desplaza en horizontal).
 - Componentes: estilo vía `ThemeData` (botones, tarjetas, campos, chips, diálogos). Widgets propios solo al repetirse.
 - Regla: ningún widget de producto usa colores, tamaños o espaciados fijos; todo sale del tema o de los tokens (la página Diseño fija anchos solo para maquetar la muestra).
 - Test `theme_test.dart`: contraste AA de todos los pares de color en claro y oscuro.

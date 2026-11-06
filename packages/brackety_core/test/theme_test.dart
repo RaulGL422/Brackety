@@ -37,6 +37,11 @@ void main() {
         });
       }
 
+      // The scoreboard clock turns this colour in its last seconds: large text, 3:1.
+      test('warning text on the surface meets AA for large text', () {
+        expect(contrastRatio(c.surface, b.warning), greaterThanOrEqualTo(3));
+      });
+
       test('buttons keep the minimum touch target', () {
         final size = theme.filledButtonTheme.style!.minimumSize!.resolve({});
         expect(size!.height, AppSizes.touchTarget);

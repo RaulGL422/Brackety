@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -36,7 +37,6 @@ class OfflineState {
     this.views = const {},
     this.heldForReview = const {},
     this.connected = true,
-    this.clockOffset = Duration.zero,
   });
 
   /// The signed-in account's queue in order, the rejected ones included.
@@ -53,9 +53,6 @@ class OfflineState {
 
   /// The last request got an answer.
   final bool connected;
-
-  /// Server time minus device time, from the last `serverTime`.
-  final Duration clockOffset;
 
   List<OfflineOp> pendingFor(String matchId) => [
     for (final op in ops)
@@ -88,14 +85,12 @@ class OfflineState {
     Map<String, MatchView>? views,
     Set<String>? heldForReview,
     bool? connected,
-    Duration? clockOffset,
   }) => OfflineState(
     ops: ops ?? this.ops,
     hidden: hidden ?? this.hidden,
     views: views ?? this.views,
     heldForReview: heldForReview ?? this.heldForReview,
     connected: connected ?? this.connected,
-    clockOffset: clockOffset ?? this.clockOffset,
   );
 }
 
@@ -118,6 +113,9 @@ class OfflineSync extends Notifier<OfflineState> {
   String? _account;
   // Sign-ins and sign-outs, one after the other.
   Future<void> _sessionJob = Future.value();
+  // Server time minus device time, from the last `serverTime`. Not in the state: it changes
+  // with every poll and nothing on screen depends on it.
+  var _clockOffset = Duration.zero;
 
   OfflineStore get _store => ref.read(offlineStoreProvider);
   ScoreboardRepository get _repository =>
@@ -149,14 +147,16 @@ class OfflineSync extends Notifier<OfflineState> {
   }
 
   /// The device's time corrected with the server's.
-  DateTime now() =>
-      ref.read(deviceClockProvider)().toUtc().add(state.clockOffset);
+  DateTime now() => ref.read(deviceClockProvider)().toUtc().add(_clockOffset);
 
   Future<void> _load() async {
     final queue = await _store.read('queue');
     final saved = await _store.read('views');
     if (!ref.mounted) return;
     if (queue case {'session': final String account}) _account = account;
+    if (saved case {'clockOffsetMs': final int ms}) {
+      _clockOffset = Duration(milliseconds: ms);
+    }
     state = OfflineState(
       // Until the session says whose they are.
       hidden: [
@@ -171,10 +171,6 @@ class OfflineSync extends Notifier<OfflineState> {
         if (saved case {'views': final Map views})
           for (final MapEntry(:key, :value) in views.entries)
             key as String: MatchView.fromJson(value as Map<String, dynamic>),
-      },
-      clockOffset: switch (saved) {
-        {'clockOffsetMs': final int ms} => Duration(milliseconds: ms),
-        _ => Duration.zero,
       },
     );
   }
@@ -203,6 +199,7 @@ class OfflineSync extends Notifier<OfflineState> {
       ],
     );
     await _saveQueue();
+    if (!ref.mounted) return;
     for (final id in {for (final op in state.ops) op.matchId}) {
       if (state.views[id] == null) unawaited(_reload(id));
     }
@@ -212,11 +209,12 @@ class OfflineSync extends Notifier<OfflineState> {
   /// A view from a poll. While this match has actions queued it may already hold some of them,
   /// and `knownEvents` would count them twice: the view is taken only if the ones its timeline
   /// holds (by `opId`) are the first of the queue, and those leave it. Without a view (after a
-  /// rejected session) there is nothing better to show.
+  /// rejected session) there is nothing better to show. A view like the known one is not
+  /// written nor shown again.
   Future<void> storeView(MatchView view) async {
     await ready;
     if (!ref.mounted) return;
-    final offset = _offsetFrom(view);
+    _clockOffset = _offsetFrom(view);
     final known = state.views[view.id];
     final older =
         known?.serverTime != null &&
@@ -228,7 +226,10 @@ class OfflineSync extends Notifier<OfflineState> {
         applied.isNotEmpty &&
         pending.take(applied.length).every((op) => applied.contains(op.opId));
     if ((known != null && pending.isNotEmpty && !firstApplied) || older) {
-      state = state.copyWith(clockOffset: offset);
+      return;
+    }
+    final held = state.heldForReview.contains(view.id);
+    if (known != null && !held && applied.isEmpty && _sameView(known, view)) {
       return;
     }
     state = state.copyWith(
@@ -238,10 +239,20 @@ class OfflineSync extends Notifier<OfflineState> {
       ],
       views: {...state.views, view.id: view},
       heldForReview: state.heldForReview.difference({view.id}),
-      clockOffset: offset,
     );
-    if (applied.isNotEmpty) await _saveQueue();
+    if (applied.isNotEmpty || held) await _saveQueue();
     await _saveViews();
+  }
+
+  // Equal but for when the server computed them: the device counts the clock from the
+  // timeline, so the time left is not news either.
+  static bool _sameView(MatchView a, MatchView b) {
+    String key(MatchView view) => jsonEncode(
+      view.toJson()
+        ..remove('serverTime')
+        ..remove('remainingMs'),
+    );
+    return key(a) == key(b);
   }
 
   /// The queued actions of [view]'s match that its timeline already holds.
@@ -256,15 +267,17 @@ class OfflineSync extends Notifier<OfflineState> {
     };
   }
 
-  /// Puts a referee action in the queue and starts sending. The match must have a view here.
-  Future<void> enqueue(
+  /// Puts a referee action in the queue and starts sending. False, and nothing queued, when
+  /// the device has no view of the match.
+  Future<bool> enqueue(
     String matchId,
     MatchAction action, {
     Side? side,
     String? reason,
   }) async {
     await ready;
-    if (!ref.mounted) return;
+    final view = ref.mounted ? state.views[matchId] : null;
+    if (view == null) return false;
     final op = OfflineOp(
       opId: const Uuid().v4(),
       matchId: matchId,
@@ -274,13 +287,14 @@ class OfflineSync extends Notifier<OfflineState> {
       at: now(),
       account: _account,
       knownEvents:
-          state.views[matchId]!.knownEvents +
+          view.knownEvents +
           state.pendingFor(matchId).length -
-          _appliedIn(state.views[matchId]!).length,
+          _appliedIn(view).length,
     );
     state = state.copyWith(ops: [...state.ops, op]);
     await _saveQueue();
     unawaited(flush());
+    return true;
   }
 
   /// Sends the queue in order until it is empty or the server stops answering.
@@ -319,8 +333,8 @@ class OfflineSync extends Notifier<OfflineState> {
         views: {...state.views, view.id: view},
         heldForReview: state.heldForReview.difference({view.id}),
         connected: true,
-        clockOffset: _offsetFrom(view),
       );
+      _clockOffset = _offsetFrom(view);
       await _saveQueue();
       await _saveViews();
       return true;
@@ -450,6 +464,7 @@ class OfflineSync extends Notifier<OfflineState> {
     _generation++;
     _retry?.cancel();
     _account = null;
+    _clockOffset = Duration.zero;
     state = OfflineState(hidden: kept);
     try {
       if (kept.isEmpty) {
@@ -466,7 +481,7 @@ class OfflineSync extends Notifier<OfflineState> {
   Duration _offsetFrom(MatchView view) {
     final serverTime = view.serverTime;
     return serverTime == null
-        ? state.clockOffset
+        ? _clockOffset
         : serverTime.difference(ref.read(deviceClockProvider)());
   }
 
@@ -479,7 +494,7 @@ class OfflineSync extends Notifier<OfflineState> {
   });
 
   Future<void> _saveViews() => _save('views', {
-    'clockOffsetMs': state.clockOffset.inMilliseconds,
+    'clockOffsetMs': _clockOffset.inMilliseconds,
     'views': {
       for (final MapEntry(:key, :value) in state.views.entries)
         key: value.toJson(),

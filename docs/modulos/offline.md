@@ -77,7 +77,8 @@ Pedido por Raul el 2026-11-04 para la Fase 1. Solo APK Android (la web por http 
 - Otro 4xx (no 401): esa acción y las siguientes de su combate quedan "rechazadas", fuera del estado mostrado; el indicador las cuenta y deja verlas y quitarlas. No frenan a otros combates. 5xx y 401: reintento.
 - Reintento: cada 3 s mientras haya pendientes y al responder cualquier otra petición.
 - "En revisión" = la última vista trae `review`; tras un 409, también hasta que llegue la vista nueva.
-- Caché: en la carpeta privada de la app, `offline/queue.json`, `views.json` y `board-<tapiz>.json`, con fichero temporal + rename. Con red, el tablero descarga la vista de cada combate del tapiz que falte o haya cambiado, para poder abrir cualquiera sin red.
+- Una vista igual a la guardada (solo cambian `serverTime` y el tiempo restante) no se escribe ni avisa a la pantalla. La diferencia de reloj con el servidor se actualiza en cada respuesta, pero solo se guarda junto con las vistas.
+- Caché: en la carpeta privada de la app, `offline/queue.json`, `views.json` y `board-<tapiz>.json`, con fichero temporal + rename. Fuera de la copia de Google y de la transferencia a otro móvil (`allowBackup="false"`, `dataExtractionRules`). Con red, el tablero descarga la vista de cada combate del tapiz que falte o haya cambiado, para poder abrir cualquiera sin red.
 - Cierre de sesión (decidido por Raul el 2026-11-05: no perder acciones del árbitro):
   - Salir a mano, cambio de servidor o sesiones cerradas por una acción de la cuenta: se borra todo. Si hay acciones sin enviar, "Salir" avisa con cuántas se perderán y pide confirmar.
   - Sesión caducada o rechazada por el servidor (refresh 400/401): se borran tablero y vistas (llevan nombres), pero la cola se queda guardada con la cuenta que la creó y sin enviarse.

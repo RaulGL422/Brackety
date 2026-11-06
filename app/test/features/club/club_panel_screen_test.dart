@@ -22,6 +22,7 @@ class FakeClubRepository extends Fake implements ClubRepository {
   EventSettings current;
   int? refuseWith;
   final savedMaxGroups = <int>[];
+  final savedMatReferees = <List<String?>>[];
   final savedCategories = <List<EventCategory>>[];
   final savedParticipantCategories = <String?>[];
 
@@ -78,6 +79,7 @@ class FakeClubRepository extends Fake implements ClubRepository {
   }) async {
     _refuse();
     savedMaxGroups.add(maxGroupsPerMat);
+    savedMatReferees.add(matReferees);
     return current = EventSettings(
       name: name,
       date: date,
@@ -185,6 +187,15 @@ void main() {
                 estimatedEnd: DateTime(2026, 11, 14, 11, 30),
                 matchesInReview: 1,
               ),
+              MatOverview(
+                id: 'm2',
+                number: 2,
+                groups: 0,
+                pendingMatches: 0,
+                matchInProgress: false,
+                remaining: Duration.zero,
+                estimatedEnd: DateTime(2026, 11, 14, 9),
+              ),
             ],
           ),
         ],
@@ -240,8 +251,31 @@ void main() {
         find.textContaining('2 groups · 9 pending matches'),
         findsOneWidget,
       );
-      expect(find.text('Estimated end 11:30'), findsOneWidget);
+      expect(find.textContaining('Estimated end 11:30'), findsOneWidget);
       expect(find.textContaining('1 match under review'), findsOneWidget);
+      // Nothing left on mat 2: no estimated end.
+      expect(find.text('Mat 2 · No referee'), findsOneWidget);
+      expect(find.textContaining('Estimated end 9:00'), findsNothing);
+      // The card in review keeps its text readable on the warning colour.
+      final review = tester.widget<Text>(
+        find.textContaining('1 match under review'),
+      );
+      final colors = BracketyColors.of(
+        tester.element(find.textContaining('1 match under review')),
+      );
+      expect(review.style?.color, colors.onWarningContainer);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('a minor without the guardian is flagged on $device', (
+      tester,
+    ) async {
+      await pumpPanel(tester, size);
+
+      await tester.tap(find.text('Entries'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Guardian missing'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
@@ -310,6 +344,28 @@ void main() {
 
     expect(repository.savedMaxGroups, [2]);
     expect(find.text('Saved'), findsOneWidget);
+  });
+
+  testWidgets('removing the last mat asks first', (tester) async {
+    final repository = FakeClubRepository(settings);
+    await pumpPanel(tester, const Size(800, 1280), repository: repository);
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Remove the last mat'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Mat 2 is removed'), findsOneWidget);
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(repository.savedMatReferees, isEmpty);
+
+    await tester.tap(find.text('Remove the last mat'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Remove the last mat'));
+    await tester.pumpAndSettle();
+    expect(repository.savedMatReferees, [
+      ['r1'],
+    ]);
   });
 
   testWidgets('a refused change explains why and shows the saved value', (

@@ -1,3 +1,4 @@
+import 'package:brackety_core/brackety_core.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,12 +29,18 @@ Future<bool> createGroups(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l10n.groupsCreatedTitle(created.groupNumbers.length)),
-        content: Text(
-          l10n.groupsCreatedBody(
-            created.groupNumbers.map(l10n.draftGroup).join(', '),
-            created.matNumber,
-          ),
+        // An icon, not "→": the display font has no arrow.
+        content: DefaultTextStyle.merge(
           style: Theme.of(context).textTheme.headlineSmall,
+          child: Wrap(
+            spacing: AppSpacing.s,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Text(created.groupNumbers.map(l10n.draftGroup).join(', ')),
+              const Icon(Icons.arrow_forward),
+              Text(l10n.matTitle(created.matNumber)),
+            ],
+          ),
         ),
         actions: [
           FilledButton(

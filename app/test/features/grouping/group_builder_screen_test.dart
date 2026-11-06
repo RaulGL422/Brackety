@@ -101,7 +101,9 @@ void main() {
         'p2',
         'p3',
       ]);
-      expect(find.text('Group 1 → Mat 2'), findsOneWidget);
+      expect(find.text('Group 1'), findsWidgets);
+      expect(find.text('Mat 2'), findsOneWidget);
+      expect(find.byIcon(Icons.arrow_forward), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   }

@@ -12,8 +12,6 @@ import '../data/club_repository.dart';
 import '../state/club_providers.dart';
 import 'club_panel_screen.dart';
 
-const adultAge = 18;
-
 /// Age on [day], as the server counts it for categories.
 int ageOn(DateTime birthDate, DateTime day) {
   final age = day.year - birthDate.year;

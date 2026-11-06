@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/polling.dart';
 import '../../auth/data/api_error.dart';
 import '../../mat/data/mat_board.dart';
 import '../../offline/data/local_match.dart';
@@ -12,7 +13,8 @@ import '../data/scoreboard_repository.dart';
 import '../data/tambo_match.dart';
 import 'bell.dart';
 
-/// The server is the source of truth; this resyncs often so a reload or a second device never drifts.
+/// The server is the source of truth; this resyncs often so a reload or a second device never
+/// drifts. Counted from the end of the last poll ([Poller]).
 const matchRefresh = Duration(seconds: 2);
 
 final matchControllerProvider = AsyncNotifierProvider.autoDispose
@@ -49,12 +51,11 @@ class MatchController extends AsyncNotifier<MatchView> {
 
   @override
   Future<MatchView> build() async {
-    final timer = Timer.periodic(matchRefresh, (_) => _refresh());
-    ref.onDispose(timer.cancel);
+    final poller = startPolling(ref, matchRefresh, _refresh);
     _queued = ref.read(offlineEnabledProvider);
-    final view = _queued
-        ? await _loadQueued()
-        : await _repository.load(matchId);
+    final view = await poller.track(
+      () => _queued ? _loadQueued() : _repository.load(matchId),
+    );
     _endRung = view.endReason != null;
     _sinceSync
       ..reset()
@@ -131,7 +132,7 @@ class MatchController extends AsyncNotifier<MatchView> {
     String? reason,
   }) async {
     final local = _local();
-    if (local == null) return null;
+    if (local == null) return const ActionRefusal.server('');
     final now = _sync.now();
     final refusal =
         local.refuse(action, side, now) ??
@@ -141,8 +142,13 @@ class MatchController extends AsyncNotifier<MatchView> {
             ? MatchRefusal.matBusy
             : null);
     if (refusal != null) return ActionRefusal.local(refusal);
-    await _sync.enqueue(matchId, action, side: side, reason: reason);
-    return null;
+    final queued = await _sync.enqueue(
+      matchId,
+      action,
+      side: side,
+      reason: reason,
+    );
+    return queued ? null : const ActionRefusal.server('');
   }
 
   // Another match of this mat in progress, as far as this device knows: the server would put

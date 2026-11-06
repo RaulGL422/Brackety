@@ -376,11 +376,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String groupsCreatedBody(String groups, int mat) {
-    return '$groups → Mat $mat';
-  }
-
-  @override
   String get groupsConflict =>
       'A participant is already in a group. The list has been refreshed.';
 
@@ -1423,5 +1418,55 @@ class AppLocalizationsEn extends AppLocalizations {
       one: 'You have 1 action not sent yet; if you sign out it will be lost.',
     );
     return '$_temp0';
+  }
+
+  @override
+  String get refusalNotStarted => 'Start the clock before scoring.';
+
+  @override
+  String undoWhat(String what) {
+    return 'Undo: $what';
+  }
+
+  @override
+  String undoneWhat(String what) {
+    return 'Undone: $what';
+  }
+
+  @override
+  String whatPoint(String corner) {
+    return '+1 $corner';
+  }
+
+  @override
+  String whatWarning(String corner) {
+    return '$corner warning';
+  }
+
+  @override
+  String whatOneHand(String corner) {
+    return '$corner one-hand warning';
+  }
+
+  @override
+  String whatDisqualification(String corner) {
+    return '$corner disqualification';
+  }
+
+  @override
+  String get winner => 'Winner';
+
+  @override
+  String get draw => 'Draw';
+
+  @override
+  String get matLocked => 'Cannot open yet';
+
+  @override
+  String get needsGuardian => 'Guardian missing';
+
+  @override
+  String settingsRemoveMatConfirm(int number) {
+    return 'Mat $number is removed; its referee is no longer assigned.';
   }
 }

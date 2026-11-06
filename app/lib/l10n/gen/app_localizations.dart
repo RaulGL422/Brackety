@@ -722,12 +722,6 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{Grupo creado} other{Grupos creados}}'**
   String groupsCreatedTitle(int count);
 
-  /// No description provided for @groupsCreatedBody.
-  ///
-  /// In es, this message translates to:
-  /// **'{groups} → Tapiz {mat}'**
-  String groupsCreatedBody(String groups, int mat);
-
   /// No description provided for @groupsConflict.
   ///
   /// In es, this message translates to:
@@ -2467,6 +2461,78 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'{count, plural, =1{Tienes 1 acción sin enviar; si sales se perderá.} other{Tienes {count} acciones sin enviar; si sales se perderán.}}'**
   String logoutPending(int count);
+
+  /// No description provided for @refusalNotStarted.
+  ///
+  /// In es, this message translates to:
+  /// **'Inicia el tiempo antes de puntuar.'**
+  String get refusalNotStarted;
+
+  /// No description provided for @undoWhat.
+  ///
+  /// In es, this message translates to:
+  /// **'Deshacer: {what}'**
+  String undoWhat(String what);
+
+  /// No description provided for @undoneWhat.
+  ///
+  /// In es, this message translates to:
+  /// **'Deshecho: {what}'**
+  String undoneWhat(String what);
+
+  /// No description provided for @whatPoint.
+  ///
+  /// In es, this message translates to:
+  /// **'+1 {corner}'**
+  String whatPoint(String corner);
+
+  /// No description provided for @whatWarning.
+  ///
+  /// In es, this message translates to:
+  /// **'advertencia {corner}'**
+  String whatWarning(String corner);
+
+  /// No description provided for @whatOneHand.
+  ///
+  /// In es, this message translates to:
+  /// **'una mano {corner}'**
+  String whatOneHand(String corner);
+
+  /// No description provided for @whatDisqualification.
+  ///
+  /// In es, this message translates to:
+  /// **'descalificación {corner}'**
+  String whatDisqualification(String corner);
+
+  /// No description provided for @winner.
+  ///
+  /// In es, this message translates to:
+  /// **'Ganador'**
+  String get winner;
+
+  /// No description provided for @draw.
+  ///
+  /// In es, this message translates to:
+  /// **'Empate'**
+  String get draw;
+
+  /// No description provided for @matLocked.
+  ///
+  /// In es, this message translates to:
+  /// **'No se puede abrir todavía'**
+  String get matLocked;
+
+  /// No description provided for @needsGuardian.
+  ///
+  /// In es, this message translates to:
+  /// **'Falta tutor'**
+  String get needsGuardian;
+
+  /// No description provided for @settingsRemoveMatConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'Se quita el Tapiz {number}; su árbitro deja de estar asignado.'**
+  String settingsRemoveMatConfirm(int number);
 }
 
 class _AppLocalizationsDelegate

@@ -32,6 +32,25 @@ void main() {
     entries: entries,
   );
 
+  test('nothing scores before the first start; after a stop it does', () {
+    const scoring = [
+      MatchAction.point,
+      MatchAction.warning,
+      MatchAction.oneHandWarning,
+      MatchAction.disqualification,
+    ];
+    for (final action in scoring) {
+      expect(replay().refuse(action, at(5)), MatchRefusal.notStarted);
+    }
+
+    add(MatchAction.start, null, 0);
+    add(MatchAction.stop, null, 10);
+
+    for (final action in scoring) {
+      expect(replay().refuse(action, at(20)), isNull);
+    }
+  });
+
   test('the clock only runs between start and stop', () {
     add(MatchAction.start, null, 0);
     add(MatchAction.stop, null, 30);

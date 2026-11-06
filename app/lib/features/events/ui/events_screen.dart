@@ -88,7 +88,9 @@ class _EventCard extends StatelessWidget {
                   FilledButton.icon(
                     icon: const Icon(Icons.sports_martial_arts),
                     label: Text(l10n.eventMyMat(event.matNumber!)),
-                    onPressed: () => context.push('/mats/${event.matId}'),
+                    onPressed: () => context.push(
+                      '/mats/${event.matId}?number=${event.matNumber}',
+                    ),
                   ),
                 if (event.roles.contains(EventRole.club))
                   FilledButton.icon(
