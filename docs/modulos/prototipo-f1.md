@@ -68,7 +68,7 @@ Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, f
 `event` (tapices, multigrupo, duración, límite), `event_category`, `mat` (árbitro), `event_staff` (cuenta, rol `CLUB`/`GROUPER`/`REFEREE`), `participant`, `fight_group`, `group_member` (orden, fantasma), `fight_match`, `match_event` (tipo, lado, motivo, autor, hora, reloj).
 
 ## API
-- `GET /api/v1/me/events` · `GET|PUT /events/{id}/settings` · `GET|POST|PUT|DELETE /events/{id}/participants`.
+- `GET /api/v1/me/events` · `GET|PUT /events/{id}/settings` · `GET|POST|PUT|DELETE /events/{id}/participants` (solo CLUB: lleva nacimiento y consentimiento; el ayudante usa el de su categoría).
 - `GET /events/{id}/categories` (con nº inscritos y agrupados) · `GET /events/{id}/categories/{cat}/participants`.
 - `POST /events/{id}/groups` (uno o varios grupos → tapiz asignado).
 - `GET /events/{id}/mats` (club y ayudantes) · `GET /mats/{id}/board` (árbitro de ese tapiz y club: grupos, combates, disponible, recomendado).
