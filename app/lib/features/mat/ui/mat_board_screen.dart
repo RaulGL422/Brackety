@@ -5,9 +5,11 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/async_view.dart';
 import '../../../core/group_colors.dart';
+import '../../../core/keep_screen_on.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../offline/state/offline_sync.dart';
 import '../../offline/ui/sync_status_bar.dart';
+import '../../scoreboard/data/match_view.dart';
 import '../data/mat_board.dart';
 import '../state/mat_providers.dart';
 import 'fighter_text.dart';
@@ -15,11 +17,18 @@ import 'fighter_text.dart';
 /// The referee's mat: its groups, the recommended match and every match by status.
 /// With [readOnly] (the club) every match opens its timeline instead of the scoreboard.
 /// The Android referee gets it through the device's queue and cache ([localBoardProvider]).
+/// [matNumber] titles the screen before the board loads (or if it fails).
 class MatBoardScreen extends ConsumerWidget {
-  const MatBoardScreen({super.key, required this.matId, this.readOnly = false});
+  const MatBoardScreen({
+    super.key,
+    required this.matId,
+    this.readOnly = false,
+    this.matNumber,
+  });
 
   final String matId;
   final bool readOnly;
+  final int? matNumber;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,28 +40,29 @@ class MatBoardScreen extends ConsumerWidget {
     final board = queued
         ? ref.watch(localBoardProvider(matId))
         : ref.watch(provider);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          board.value == null ? '' : l10n.matTitle(board.value!.matNumber),
+    final number = board.value?.matNumber ?? matNumber;
+    return KeepScreenOn(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(number == null ? '' : l10n.matTitle(number)),
         ),
-      ),
-      body: Column(
-        children: [
-          if (queued) const SyncStatusBar(),
-          Expanded(
-            child: AsyncView(
-              value: board,
-              onRetry: () => ref.invalidate(provider),
-              data: (board) => board.groups.isEmpty
-                  ? Center(child: Text(l10n.matEmpty))
-                  : RefreshIndicator(
-                      onRefresh: () => ref.refresh(provider.future),
-                      child: _BoardList(board: board, readOnly: readOnly),
-                    ),
+        body: Column(
+          children: [
+            if (queued) const SyncStatusBar(),
+            Expanded(
+              child: AsyncView(
+                value: board,
+                onRetry: () => ref.invalidate(provider),
+                data: (board) => board.groups.isEmpty
+                    ? Center(child: Text(l10n.matEmpty))
+                    : RefreshIndicator(
+                        onRefresh: () => ref.refresh(provider.future),
+                        child: _BoardList(board: board, readOnly: readOnly),
+                      ),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -105,7 +115,7 @@ class _BoardList extends StatelessWidget {
               board: board,
               readOnly: readOnly,
               match: m,
-              highlight: true,
+              highlight: _Highlight.inProgress,
             ),
         ],
         if (board.offline)
@@ -122,7 +132,7 @@ class _BoardList extends StatelessWidget {
               board: board,
               readOnly: readOnly,
               match: recommended,
-              highlight: true,
+              highlight: _Highlight.recommended,
             ),
         ],
         if (byStatus[MatchStatus.pending]!.isNotEmpty) ...[
@@ -216,39 +226,63 @@ class _GroupCard extends StatelessWidget {
   }
 }
 
+enum _Highlight { none, inProgress, recommended }
+
+/// One match: group, red and blue, and why it waits. In progress: outlined, with a play icon.
+/// Recommended: in the accent container, never a blue that looks like the blue corner. One
+/// that cannot start keeps readable colours with a lock and its reason, and does not open.
 class _MatchTile extends StatelessWidget {
   const _MatchTile({
     required this.board,
     required this.match,
     required this.readOnly,
-    this.highlight = false,
+    this.highlight = _Highlight.none,
   });
 
   final MatBoard board;
   final BoardMatch match;
   final bool readOnly;
-  final bool highlight;
+  final _Highlight highlight;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final scheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final finished = match.status == MatchStatus.finished;
     final waiting = match.status == MatchStatus.pending && !match.available;
+    final locked = waiting && !readOnly;
+    final recommended = highlight == _Highlight.recommended;
+    final foreground = recommended
+        ? scheme.onTertiaryContainer
+        : scheme.onSurface;
     return Card(
-      color: highlight ? scheme.primaryContainer : null,
+      color: recommended ? scheme.tertiaryContainer : null,
+      shape: highlight == _Highlight.inProgress
+          ? RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadius.l),
+              side: BorderSide(color: scheme.primary, width: AppSpacing.xs),
+            )
+          : null,
       margin: const EdgeInsets.symmetric(
         horizontal: AppSpacing.l,
         vertical: AppSpacing.xs,
       ),
       child: ListTile(
         minTileHeight: AppSizes.scoreTouchTarget,
+        textColor: foreground,
+        iconColor: foreground,
         leading: _GroupBadge(
           number: match.groupNumber,
           color: groupColor(board.groupIndex(match.groupId)),
+          outline: foreground,
         ),
-        title: Text(
-          '${match.red.label(l10n)}  ${l10n.versus}  ${match.blue.label(l10n)}',
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _CornerLine(side: Side.red, fighter: match.red),
+            _CornerLine(side: Side.blue, fighter: match.blue),
+          ],
         ),
         subtitle: match.inReview
             ? Text(l10n.matInReview)
@@ -258,28 +292,80 @@ class _MatchTile extends StatelessWidget {
         trailing: finished
             ? Text(
                 '${match.redScore} - ${match.blueScore}',
-                style: Theme.of(context).textTheme.titleLarge,
+                style: theme.textTheme.titleLarge,
               )
-            : const Icon(Icons.chevron_right),
-        enabled: readOnly || !waiting,
-        onTap: () => context.push(
-          readOnly ? '/club/matches/${match.id}' : '/matches/${match.id}',
-        ),
+            : Icon(
+                locked
+                    ? Icons.lock_outline
+                    : switch (highlight) {
+                        _Highlight.inProgress => Icons.play_circle,
+                        _Highlight.recommended => Icons.star,
+                        _Highlight.none => Icons.chevron_right,
+                      },
+              ),
+        onTap: locked
+            ? null
+            : () => context.push(
+                readOnly ? '/club/matches/${match.id}' : '/matches/${match.id}',
+              ),
       ),
     );
   }
 }
 
+/// A coloured dot (with its corner's name for screen readers) and the fighter.
+class _CornerLine extends StatelessWidget {
+  const _CornerLine({required this.side, required this.fighter});
+
+  final Side side;
+  final Fighter fighter;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final corner = side == Side.red ? l10n.cornerRed : l10n.cornerBlue;
+    final color = side == Side.red ? CompetitorColor.red : CompetitorColor.blue;
+    return Semantics(
+      label: '$corner: ${fighter.label(l10n)}',
+      excludeSemantics: true,
+      child: Row(
+        spacing: AppSpacing.s,
+        children: [
+          Container(
+            width: AppSpacing.m,
+            height: AppSpacing.m,
+            decoration: BoxDecoration(
+              color: color.color,
+              shape: BoxShape.circle,
+              border: Border.all(color: color.onColor),
+            ),
+          ),
+          Expanded(child: Text(fighter.label(l10n))),
+        ],
+      ),
+    );
+  }
+}
+
+/// The group's colour and number; [outline] keeps it apart from a tile of a similar colour
+/// (an orange group on the recommended tile).
 class _GroupBadge extends StatelessWidget {
-  const _GroupBadge({required this.number, required this.color});
+  const _GroupBadge({required this.number, required this.color, this.outline});
 
   final int number;
   final CompetitorColor color;
+  final Color? outline;
 
   @override
-  Widget build(BuildContext context) => CircleAvatar(
-    backgroundColor: color.color,
-    foregroundColor: color.onColor,
-    child: Text('$number'),
+  Widget build(BuildContext context) => DecoratedBox(
+    decoration: BoxDecoration(
+      shape: BoxShape.circle,
+      border: outline == null ? null : Border.all(color: outline!),
+    ),
+    child: CircleAvatar(
+      backgroundColor: color.color,
+      foregroundColor: color.onColor,
+      child: Text('$number'),
+    ),
   );
 }
