@@ -53,6 +53,22 @@ class ScoreboardControllerTest extends ScoreboardApiTest {
     }
 
     @Test
+    void nothingIsScoredBeforeStart() throws Exception {
+        var match = match(young, 0, 1);
+
+        event(match, "POINT", "RED")
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.detail").value("The match has not started: press Start first."));
+        event(match, "WARNING", "BLUE", "Salida").andExpect(status().isConflict());
+        event(match, "DISQUALIFICATION", "BLUE", "Conducta").andExpect(status().isConflict());
+        event(match, "START");
+        event(match, "STOP");
+        event(match, "POINT", "RED")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.red.points").value(1));
+    }
+
+    @Test
     void fifteenPointsStopTheClockAndUndoingKeepsItStopped() throws Exception {
         var match = match(young, 0, 1);
         event(match, "START");

@@ -141,6 +141,28 @@ class TamboMatchTest {
     }
 
     @Test
+    void nothingIsScoredBeforeTheFirstStart() {
+        var match = replay();
+        for (var type : List.of(POINT, WARNING, ONE_HAND_WARNING, DISQUALIFICATION)) {
+            assertThat(match.refuse(type, T0)).contains(TamboMatch.NOT_STARTED);
+        }
+        assertThat(match.refuse(START, T0)).isEmpty();
+        assertThat(match.refuse(UNDO, T0)).contains("Nothing to undo.");
+        assertThat(match.refuse(FINISH, T0)).contains("The match is not over yet.");
+    }
+
+    @Test
+    void aStartedAndStoppedClockStillScores() {
+        add(START, null, 0);
+        add(STOP, null, 10);
+
+        var match = replay();
+        for (var type : List.of(POINT, WARNING, ONE_HAND_WARNING, DISQUALIFICATION)) {
+            assertThat(match.refuse(type, at(20))).isEmpty();
+        }
+    }
+
+    @Test
     void stopNeedsARunningClock() {
         assertThat(replay().refuse(STOP, T0)).contains("The clock is not running.");
         assertThat(replay().isStarted()).isFalse();

@@ -52,6 +52,7 @@ Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, f
 - Todo queda en la línea de tiempo (quién, qué, cuándo, tiempo de combate).
 - Estado = repetición de los eventos (`TamboMatch`); deshacer es un evento más que anula el último punto, aviso o descalificación.
 - 15 puntos o descalificación paran el reloj con una parada automática registrada: al deshacer, sigue parado.
+- Antes del primer "Iniciar" no se puntúa: punto, advertencias y descalificación → 409 "The match has not started: press Start first." (con `opId`, choque `RULES`). Con el reloj ya iniciado y parado sí.
 - "Finalizar" solo con el combate acabado; después no se acepta nada. Un combate en curso por tapiz y ningún alumno en dos a la vez.
 - Escribe solo el árbitro del tapiz; el club ve el combate y su línea de tiempo.
 

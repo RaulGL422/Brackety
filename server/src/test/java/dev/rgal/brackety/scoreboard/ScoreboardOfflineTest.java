@@ -49,6 +49,17 @@ class ScoreboardOfflineTest extends ScoreboardApiTest {
     }
 
     @Test
+    void aPointBeforeStartIsARulesClash() {
+        assertThat(offline(MatchEventType.POINT, Side.RED, t0, 0).conflictCode())
+                .isEqualTo("MATCH_CONFLICT");
+
+        var review = view().review();
+        assertThat(review.reason()).isEqualTo("RULES");
+        assertThat(review.ops()).extracting(ReviewOp::cause).containsExactly("RULES");
+        assertThat(view().red().points()).isZero();
+    }
+
+    @Test
     void aRetryOfTheSameOpIdIsAnsweredLikeTheFirstTimeWithoutWriting() {
         var start = request(MatchEventType.START, null, UUID.randomUUID(), t0, 0);
         scoreboard.record(match, referee(), start);
