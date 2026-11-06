@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/polling.dart';
 import '../../auth/data/api_error.dart';
 import '../../auth/state/session_controller.dart';
 import '../../offline/data/local_board.dart';
@@ -13,49 +14,49 @@ import '../data/mat_board.dart';
 /// The board refreshes on its own: other mats finish matches that change what is available here.
 const boardRefresh = Duration(seconds: 5);
 
-final matBoardProvider = FutureProvider.autoDispose.family<MatBoard, String>((
-  ref,
-  matId,
-) async {
-  final timer = Timer(boardRefresh, ref.invalidateSelf);
-  ref.onDispose(timer.cancel);
-  final response = await ref
-      .watch(apiProvider)
-      .get<Map<String, dynamic>>('/api/v1/mats/$matId/board');
-  return MatBoard.fromJson(response.data!);
-});
+final matBoardProvider = FutureProvider.autoDispose.family<MatBoard, String>(
+  (ref, matId) => reloadEvery(ref, boardRefresh, () => _board(ref, matId)),
+);
 
 /// The referee's board on Android: from the server, kept on the device, and from there when
 /// the server does not answer ([MatBoard.offline]).
 final cachedBoardProvider = FutureProvider.autoDispose.family<MatBoard, String>(
-  (ref, matId) async {
-    final timer = Timer(boardRefresh, ref.invalidateSelf);
-    ref.onDispose(timer.cancel);
-    final sync = ref.read(offlineSyncProvider.notifier);
-    try {
-      final response = await ref
-          .watch(apiProvider)
-          .get<Map<String, dynamic>>('/api/v1/mats/$matId/board');
-      sync.reportResponse();
-      final board = MatBoard.fromJson(response.data!);
-      unawaited(sync.saveBoard(matId, response.data));
-      unawaited(sync.syncBoard(board));
-      return board;
-    } on DioException catch (e) {
-      if (!ApiError.from(e).noResponse) rethrow;
-      sync.reportNoResponse();
-      final cached = await sync.cachedBoard(matId);
-      if (cached is! Map<String, dynamic>) rethrow;
-      final board = MatBoard.fromJson(cached);
-      return MatBoard(
-        matNumber: board.matNumber,
-        groups: board.groups,
-        matches: board.matches,
-        offline: true,
-      );
-    }
-  },
+  (ref, matId) =>
+      reloadEvery(ref, boardRefresh, () => _cachedBoard(ref, matId)),
 );
+
+Future<MatBoard> _board(Ref ref, String matId) async {
+  final response = await ref
+      .watch(apiProvider)
+      .get<Map<String, dynamic>>('/api/v1/mats/$matId/board');
+  return MatBoard.fromJson(response.data!);
+}
+
+Future<MatBoard> _cachedBoard(Ref ref, String matId) async {
+  final sync = ref.read(offlineSyncProvider.notifier);
+  try {
+    final response = await ref
+        .watch(apiProvider)
+        .get<Map<String, dynamic>>('/api/v1/mats/$matId/board');
+    sync.reportResponse();
+    final board = MatBoard.fromJson(response.data!);
+    unawaited(sync.saveBoard(matId, response.data));
+    unawaited(sync.syncBoard(board));
+    return board;
+  } on DioException catch (e) {
+    if (!ApiError.from(e).noResponse) rethrow;
+    sync.reportNoResponse();
+    final cached = await sync.cachedBoard(matId);
+    if (cached is! Map<String, dynamic>) rethrow;
+    final board = MatBoard.fromJson(cached);
+    return MatBoard(
+      matNumber: board.matNumber,
+      groups: board.groups,
+      matches: board.matches,
+      offline: true,
+    );
+  }
+}
 
 /// [cachedBoardProvider] with the device's queue on top: the matches played here, the ones in
 /// review and, offline, what can start.

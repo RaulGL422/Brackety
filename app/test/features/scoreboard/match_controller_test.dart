@@ -10,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../support/match_fakes.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   late FakeBell bell;
   late FakeScoreboardRepository repository;
   late ProviderContainer container;
