@@ -16,7 +16,13 @@ import org.springframework.stereotype.Component;
 @Component
 class MatSchedule {
 
-    record MatState(Mat mat, int groups, int pendingMatches, boolean matchInProgress, Duration remaining) {}
+    record MatState(
+            Mat mat,
+            int groups,
+            int pendingMatches,
+            boolean matchInProgress,
+            int matchesInReview,
+            Duration remaining) {}
 
     private final MatRepository mats;
     private final FightGroupRepository groups;
@@ -70,6 +76,7 @@ class MatSchedule {
                 lastFinished.map(f -> Duration.between(f, now)).orElse(null),
                 match,
                 Duration.ofSeconds(event.getChangeoverSeconds()));
-        return new MatState(mat, groupCount, pending, current.isPresent(), remaining);
+        var inReview = (int) onMat.stream().filter(Match::isInReview).count();
+        return new MatState(mat, groupCount, pending, current.isPresent(), inReview, remaining);
     }
 }

@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,19 +7,12 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../../mat/data/mat_board.dart';
 import '../../mat/ui/fighter_text.dart';
 import '../data/match_view.dart';
-import '../data/scoreboard_repository.dart';
+import '../state/match_review.dart';
+import 'review_panel.dart';
 import 'timeline_list.dart';
 
-const _watchRefresh = Duration(seconds: 5);
-
-final watchedMatchProvider = FutureProvider.autoDispose
-    .family<MatchView, String>((ref, matchId) {
-      final timer = Timer(_watchRefresh, ref.invalidateSelf);
-      ref.onDispose(timer.cancel);
-      return ref.watch(scoreboardRepositoryProvider).load(matchId);
-    });
-
-/// A match seen by the club: score and timeline, without controls.
+/// A match seen by the club: score and timeline, without controls. In review, what the phone
+/// sent and the buttons to apply or discard it.
 class MatchWatchScreen extends ConsumerWidget {
   const MatchWatchScreen({super.key, required this.matchId});
 
@@ -31,36 +22,57 @@ class MatchWatchScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final provider = watchedMatchProvider(matchId);
+    final match = ref.watch(provider);
     return Scaffold(
       appBar: AppBar(title: Text(l10n.timeline)),
+      persistentFooterButtons: match.value?.review == null
+          ? null
+          : [ReviewButtons(matchId: matchId)],
       body: AsyncView(
-        value: ref.watch(provider),
+        value: match,
         onRetry: () => ref.invalidate(provider),
         data: (view) => Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.l),
-              child: Column(
-                children: [
-                  Text(switch (view.status) {
-                    MatchStatus.pending => l10n.matchNotStarted,
-                    MatchStatus.inProgress => l10n.matchLive,
-                    MatchStatus.finished => l10n.matchFinished,
-                  }, style: Theme.of(context).textTheme.titleMedium),
-                  const SizedBox(height: AppSpacing.s),
-                  Text(
-                    '${view.red.title(l10n)}  ${view.red.points} - '
-                    '${view.blue.points}  ${view.blue.title(l10n)}',
-                    style: Theme.of(context).textTheme.titleLarge,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+            _Score(view: view),
+            if (view.review != null)
+              // Shares the height with the timeline; scrolls when the phone sent many actions.
+              Flexible(
+                child: SingleChildScrollView(child: ReviewPanel(view: view)),
               ),
-            ),
             const Divider(height: 1),
             Expanded(child: TimelineList(view: view)),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _Score extends StatelessWidget {
+  const _Score({required this.view});
+
+  final MatchView view;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.all(AppSpacing.l),
+      child: Column(
+        children: [
+          Text(switch (view.status) {
+            MatchStatus.pending => l10n.matchNotStarted,
+            MatchStatus.inProgress => l10n.matchLive,
+            MatchStatus.finished => l10n.matchFinished,
+          }, style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: AppSpacing.s),
+          Text(
+            '${view.red.title(l10n)}  ${view.red.points} - '
+            '${view.blue.points}  ${view.blue.title(l10n)}',
+            style: Theme.of(context).textTheme.titleLarge,
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }

@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/async_view.dart';
 import '../../../l10n/gen/app_localizations.dart';
-import '../../auth/state/session_controller.dart';
+import '../../offline/ui/confirm_sign_out.dart';
 import '../data/my_event.dart';
 import '../state/events_providers.dart';
 
@@ -33,7 +33,7 @@ class EventsScreen extends ConsumerWidget {
           IconButton(
             tooltip: l10n.logout,
             icon: const Icon(Icons.logout),
-            onPressed: () => ref.read(sessionProvider.notifier).logout(),
+            onPressed: () => confirmSignOut(context, ref),
           ),
         ],
       ),

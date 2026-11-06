@@ -2,6 +2,7 @@
 
 ## Ramas
 - `main`: producción, solo releases etiquetadas (`vX.Y.Z`).
+- Release: rama `release/vX.Y.Z` desde `development`, PR a `main` con merge commit y tag en ese merge. Nunca la PR directa desde `development`: el repo borra la rama de origen al fusionar.
 - `development`: integración. Siempre compila y pasa tests.
 - Trabajo: `feat/<modulo>-<tarea>`, `fix/…`, `chore/…`, `docs/…`, creadas desde `development`.
 

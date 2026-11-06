@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../l10n/gen/app_localizations.dart';
+import '../../../offline/ui/confirm_sign_out.dart';
 import '../../state/account_controller.dart';
-import '../../state/session_controller.dart';
 import '../widgets/confirm_dialog.dart';
 import '../widgets/reauth_dialog.dart';
 import 'account_action.dart';
@@ -96,7 +96,7 @@ class LogoutButton extends ConsumerWidget {
     return OutlinedButton.icon(
       icon: const Icon(Icons.logout),
       label: Text(AppLocalizations.of(context).settingsLogout),
-      onPressed: () => ref.read(sessionProvider.notifier).logout(),
+      onPressed: () => confirmSignOut(context, ref),
     );
   }
 }

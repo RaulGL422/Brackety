@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 
 /// A required checkbox: the form does not validate until it is ticked.
-// No links yet in the terms one: legal-paginas will add the texts and their real versions.
 class AcceptanceCheckbox extends FormField<bool> {
   AcceptanceCheckbox({
     super.key,
-    required String title,
+    required Widget title,
     required String requiredText,
     bool initialValue = false,
     ValueChanged<bool>? onChanged,
@@ -30,7 +29,7 @@ class _AcceptanceTile extends StatelessWidget {
   });
 
   final FormFieldState<bool> field;
-  final String title;
+  final Widget title;
   final String requiredText;
   final ValueChanged<bool>? onChanged;
 
@@ -46,7 +45,7 @@ class _AcceptanceTile extends StatelessWidget {
       contentPadding: EdgeInsets.zero,
       controlAffinity: ListTileControlAffinity.leading,
       isError: field.hasError,
-      title: Text(title),
+      title: title,
       subtitle: field.hasError
           ? Text(requiredText, style: TextStyle(color: theme.colorScheme.error))
           : null,

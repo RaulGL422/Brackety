@@ -5,6 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
+import '../../legal/data/legal_repository.dart';
+import '../../legal/state/legal_providers.dart';
+import '../../legal/ui/legal_links.dart';
+import '../../legal/ui/linked_text.dart';
 import '../data/api_error.dart';
 import '../data/registration.dart';
 import '../data/tax_id.dart';
@@ -28,6 +32,7 @@ class RegisterScreen extends ConsumerStatefulWidget {
 
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _acceptance = GlobalKey<FormFieldState<bool>>();
   final _email = TextEditingController();
   final _password = TextEditingController();
   final _organizationName = TextEditingController();
@@ -49,13 +54,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     super.dispose();
   }
 
-  Registration _registration(ProfileType profile) {
+  Registration _registration(ProfileType profile, LegalVersions versions) {
     final organizer = profile.isOrganizer;
     return Registration(
       email: _email.text.trim(),
       password: _password.text,
       profile: profile,
       locale: Localizations.localeOf(context).languageCode,
+      termsVersion: versions.terms,
+      privacyVersion: versions.privacy,
       birthDate: organizer ? null : _birthDate,
       organization: organizer
           ? Organization(
@@ -70,12 +77,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Future<void> _submit() async {
     final form = _formKey.currentState!;
     if (_busy || !form.validate()) return;
-    final registration = _registration(_profile!);
     setState(() {
       _busy = true;
       _error = null;
     });
     try {
+      // A failed load would fail every submit: try again instead.
+      if (ref.read(legalVersionsProvider).hasError) {
+        ref.invalidate(legalVersionsProvider);
+      }
+      final versions = await ref.read(legalVersionsProvider.future);
+      if (!mounted) return;
+      final registration = _registration(_profile!, versions);
       final signedIn = await ref
           .read(sessionProvider.notifier)
           .register(registration);
@@ -95,6 +108,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     setState(() {
       if (error.status == 400 && error.code == 'INVALID_TAX_ID') {
         _taxIdError = l10n.registerTaxIdInvalid;
+      } else if (error.status == 409 &&
+          error.code == 'LEGAL_VERSION_OUTDATED') {
+        // The texts changed while the form was open: the new ones must be accepted.
+        ref.invalidate(legalVersionsProvider);
+        _acceptance.currentState?.didChange(false);
+        _error = l10n.registerLegalOutdated;
       } else {
         _error = apiErrorMessage(l10n, error);
       }
@@ -137,6 +156,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final l10n = AppLocalizations.of(context);
     final error = _error;
     final profile = _profile;
+    // Loaded on open, so the submit rarely waits for it.
+    ref.watch(legalVersionsProvider);
     return AuthFormPage(
       title: l10n.registerTitle,
       children: [
@@ -181,7 +202,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: AppSpacing.s),
                 AcceptanceCheckbox(
-                  title: l10n.registerAccept,
+                  key: _acceptance,
+                  title: const _AcceptanceText(),
                   requiredText: l10n.registerAcceptRequired,
                 ),
               ],
@@ -203,6 +225,24 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           child: Text(l10n.registerHaveAccount),
         ),
       ],
+    );
+  }
+}
+
+class _AcceptanceText extends StatelessWidget {
+  const _AcceptanceText();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final terms = l10n.legalTermsLink;
+    final privacy = l10n.legalPrivacyLink;
+    return LinkedText(
+      text: l10n.registerAccept(terms, privacy),
+      links: {
+        terms: () => openLegalPage(context, LegalDocumentType.terms),
+        privacy: () => openLegalPage(context, LegalDocumentType.privacy),
+      },
     );
   }
 }

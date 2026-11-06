@@ -7,7 +7,9 @@ import '../../../core/async_view.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../mat/state/mat_providers.dart';
 import '../../mat/ui/fighter_text.dart';
+import '../../offline/ui/sync_status_bar.dart';
 import '../data/match_view.dart';
+import '../data/tambo_match.dart';
 import '../state/match_controller.dart';
 import 'clock_bar.dart';
 import 'corner_panel.dart';
@@ -38,7 +40,7 @@ class ScoreboardScreen extends ConsumerWidget {
             TextButton.icon(
               icon: const Icon(Icons.undo),
               label: Text(l10n.undo),
-              onPressed: view.canUndo
+              onPressed: view.canUndo && view.review == null
                   ? () => _send(context, ref, MatchAction.undo)
                   : null,
             ),
@@ -50,16 +52,23 @@ class ScoreboardScreen extends ConsumerWidget {
           ],
         ],
       ),
-      body: AsyncView(
-        value: match,
-        onRetry: () => ref.invalidate(provider),
-        data: (view) => view.finished
-            ? _Finished(view: view)
-            : _Live(
-                view: view,
-                onAction: (action, {side}) =>
-                    _act(context, ref, view, action, side: side),
-              ),
+      body: Column(
+        children: [
+          const SyncStatusBar(),
+          Expanded(
+            child: AsyncView(
+              value: match,
+              onRetry: () => ref.invalidate(provider),
+              data: (view) => view.finished
+                  ? _Finished(view: view)
+                  : _Live(
+                      view: view,
+                      onAction: (action, {side}) =>
+                          _act(context, ref, view, action, side: side),
+                    ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -89,6 +98,7 @@ class ScoreboardScreen extends ConsumerWidget {
     // The match is over: the mat board must show the next recommendation.
     if (action == MatchAction.finish) {
       ref.invalidate(matBoardProvider(view.matId));
+      ref.invalidate(cachedBoardProvider(view.matId));
     }
   }
 
@@ -106,10 +116,24 @@ class ScoreboardScreen extends ConsumerWidget {
         .send(action, side: side, reason: reason);
     if (refused != null) {
       messenger.showSnackBar(
-        SnackBar(content: Text(l10n.actionRefused(refused))),
+        SnackBar(content: Text(_refusalText(l10n, refused))),
       );
     }
   }
+
+  static String _refusalText(AppLocalizations l10n, ActionRefusal refusal) =>
+      switch (refusal.local) {
+        null => l10n.actionRefused(refusal.detail ?? ''),
+        MatchRefusal.finished => l10n.refusalFinished,
+        MatchRefusal.over => l10n.refusalOver,
+        MatchRefusal.running => l10n.refusalRunning,
+        MatchRefusal.notRunning => l10n.refusalNotRunning,
+        MatchRefusal.nothingToUndo => l10n.refusalNothingToUndo,
+        MatchRefusal.notOver => l10n.refusalNotOver,
+        MatchRefusal.notForAge => l10n.refusalNotForAge,
+        MatchRefusal.inReview => l10n.refusalInReview,
+        MatchRefusal.matBusy => l10n.refusalMatBusy,
+      };
 
   void _showTimeline(BuildContext context, MatchView view) {
     showModalBottomSheet<void>(
@@ -132,7 +156,8 @@ class _Live extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scoring = view.endReason == null;
+    final locked = view.review != null;
+    final scoring = view.endReason == null && !locked;
     Widget corner(Side side) => Expanded(
       child: CornerPanel(
         side: side,
@@ -147,11 +172,40 @@ class _Live extends StatelessWidget {
     final corners = [corner(Side.red), corner(Side.blue)];
     return Column(
       children: [
+        if (locked) const _ReviewBanner(),
         ClockBar(view: view, onAction: (action) => onAction(action)),
         Expanded(
           child: wide ? Row(children: corners) : Column(children: corners),
         ),
       ],
+    );
+  }
+}
+
+/// The club has to review this match: the referee waits.
+class _ReviewBanner extends StatelessWidget {
+  const _ReviewBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = BracketyColors.of(context);
+    return Material(
+      color: colors.warningContainer,
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.m),
+        child: Row(
+          children: [
+            Icon(Icons.gavel, color: colors.onWarningContainer),
+            const SizedBox(width: AppSpacing.s),
+            Expanded(
+              child: Text(
+                AppLocalizations.of(context).reviewBannerReferee,
+                style: TextStyle(color: colors.onWarningContainer),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

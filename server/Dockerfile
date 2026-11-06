@@ -1,5 +1,5 @@
 # The jar is architecture-independent: build it once on the runner's platform, not under emulation.
-FROM --platform=$BUILDPLATFORM eclipse-temurin:25.0.4.1_1-jdk AS build
+FROM --platform=$BUILDPLATFORM eclipse-temurin:27_35-jdk AS build
 WORKDIR /src
 COPY .mvn .mvn
 COPY mvnw pom.xml ./
@@ -7,7 +7,7 @@ COPY src/main src/main
 RUN --mount=type=cache,target=/root/.m2 ./mvnw -B -q package -Dmaven.test.skip=true \
     && cp target/brackety-server-*.jar /app.jar
 
-FROM eclipse-temurin:25.0.4.1_1-jre
+FROM eclipse-temurin:27_35-jre
 RUN apt-get update \
     && apt-get install -y --no-install-recommends curl \
     && rm -rf /var/lib/apt/lists/* \

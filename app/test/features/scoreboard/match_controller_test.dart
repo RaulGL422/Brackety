@@ -1,4 +1,5 @@
 import 'package:brackety/features/mat/data/mat_board.dart';
+import 'package:brackety/features/offline/state/offline_sync.dart';
 import 'package:brackety/features/scoreboard/data/match_view.dart';
 import 'package:brackety/features/scoreboard/data/scoreboard_repository.dart';
 import 'package:brackety/features/scoreboard/state/bell.dart';
@@ -18,6 +19,8 @@ void main() {
     repository = FakeScoreboardRepository(matchView());
     container = ProviderContainer(
       overrides: [
+        // The web: actions straight to the server (the queue has its own tests).
+        offlineEnabledProvider.overrideWithValue(false),
         bellProvider.overrideWithValue(bell),
         scoreboardRepositoryProvider.overrideWithValue(repository),
       ],
@@ -122,7 +125,7 @@ void main() {
     repository.refusal = 'The match is not over yet.';
 
     expect(
-      await controller.send(MatchAction.finish),
+      (await controller.send(MatchAction.finish))?.detail,
       'The match is not over yet.',
     );
   });

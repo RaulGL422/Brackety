@@ -36,8 +36,8 @@ class SecurityEmailsTest extends AuthIntegrationTest {
                 LocalDate.of(1980, 1, 1),
                 null,
                 null,
-                "v",
-                "v",
+                TERMS_VERSION,
+                PRIVACY_VERSION,
                 "en"));
 
         var email = emails.sentTo(ANA).getFirst();

@@ -6,11 +6,15 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   Future<void> pump(
     WidgetTester tester,
-    Future<ServerInfo> Function() fetch,
-  ) async {
+    Future<ServerInfo> Function() fetch, {
+    String? url,
+  }) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [serverInfoProvider.overrideWith((ref) => fetch())],
+        overrides: [
+          serverInfoProvider.overrideWith((ref) => fetch()),
+          if (url != null) apiBaseUrlProvider.overrideWithValue(url),
+        ],
         child: const MaterialApp(
           locale: Locale('es'),
           supportedLocales: CoreLocalizations.supportedLocales,
@@ -34,6 +38,18 @@ void main() {
       find.text('Fecha del servidor: 10 de marzo de 2027'),
       findsOneWidget,
     );
+  });
+
+  testWidgets('shows the server the app picked, not the build one', (
+    tester,
+  ) async {
+    await pump(
+      tester,
+      () async => ServerInfo(name: 'brackety', today: DateTime(2027, 3, 10)),
+      url: 'http://192.168.137.1:8080',
+    );
+
+    expect(find.text('http://192.168.137.1:8080'), findsOneWidget);
   });
 
   testWidgets('offers a retry when the server is unreachable', (tester) async {

@@ -170,8 +170,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileStudentHint => 'Athlete who competes with their club.';
 
   @override
-  String get registerAccept =>
-      'I accept the terms of use and the privacy policy.';
+  String registerAccept(String terms, String privacy) {
+    return 'I accept the $terms and the $privacy.';
+  }
 
   @override
   String get registerAcceptRequired =>
@@ -677,16 +678,19 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get exportCsv => 'Export CSV';
+  String get exportMenu => 'Export';
 
   @override
-  String get exportStandings => 'Standings';
+  String get exportStandings => 'Standings (CSV)';
 
   @override
-  String get exportMatches => 'Matches';
+  String get exportMatches => 'Matches (CSV)';
 
   @override
-  String get exportTimeline => 'Timeline';
+  String get exportTimeline => 'Timeline (CSV)';
+
+  @override
+  String get exportEventPackage => 'Export event package';
 
   @override
   String get exportError => 'Could not export.';
@@ -1180,5 +1184,244 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String issueUnsure(String field) {
     return 'Check $field: it was not read with certainty';
+  }
+
+  @override
+  String get legalSection => 'Legal';
+
+  @override
+  String get legalPrivacy => 'Privacy policy';
+
+  @override
+  String get legalTerms => 'Terms of use';
+
+  @override
+  String get legalCookies => 'Cookie policy';
+
+  @override
+  String get legalNotice => 'Legal notice';
+
+  @override
+  String get legalPrivacyShort => 'Privacy';
+
+  @override
+  String get legalTermsShort => 'Terms';
+
+  @override
+  String get legalCookiesShort => 'Cookies';
+
+  @override
+  String get legalLicenses => 'Licenses';
+
+  @override
+  String get legalPrivacyLink => 'privacy policy';
+
+  @override
+  String get legalTermsLink => 'terms of use';
+
+  @override
+  String get legalNotFound => 'This legal page does not exist.';
+
+  @override
+  String get registerLegalOutdated =>
+      'The terms of use or the privacy policy have changed. Review them and accept them again.';
+
+  @override
+  String participantPrivacyNotice(String privacy) {
+    return 'The student\'s data is handled according to the $privacy.';
+  }
+
+  @override
+  String importPrivacyNotice(String privacy) {
+    return 'The students\' data is handled according to the $privacy.';
+  }
+
+  @override
+  String serverCurrent(String name) {
+    return 'Server: $name';
+  }
+
+  @override
+  String get serverChange => 'Change';
+
+  @override
+  String get serverDialogTitle => 'Choose server';
+
+  @override
+  String get serverHall => 'Sports hall';
+
+  @override
+  String get serverInternet => 'Internet';
+
+  @override
+  String get serverOther => 'Other URL';
+
+  @override
+  String get serverUrlLabel => 'Server URL';
+
+  @override
+  String get serverUrlHint => 'https://server.example';
+
+  @override
+  String get serverUrlInvalid =>
+      'Type a URL starting with http:// or https:// with a host.';
+
+  @override
+  String get serverUrlCleartext =>
+      'Without https the app only reaches the sports hall (192.168.137.1): this URL will not connect.';
+
+  @override
+  String get serverUse => 'Use';
+
+  @override
+  String get syncConnected => 'Connected';
+
+  @override
+  String get syncOffline => 'Offline';
+
+  @override
+  String syncPending(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count actions waiting',
+      one: '1 action waiting',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String syncRejected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count actions refused',
+      one: '1 action refused',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get syncRejectedShow => 'Show';
+
+  @override
+  String get syncRejectedTitle => 'Refused actions';
+
+  @override
+  String get syncRejectedBody =>
+      'The server did not accept these actions and they do not count in the match. Tell the club if needed.';
+
+  @override
+  String get syncRejectedDismiss => 'Remove from the list';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get matOfflineBoard =>
+      'Offline: board saved on the phone. No recommendation; you can start a pending match if none is in progress.';
+
+  @override
+  String get matInReview => 'Under the club\'s review';
+
+  @override
+  String get refusalFinished => 'The match is already finished.';
+
+  @override
+  String get refusalOver => 'The match is already over.';
+
+  @override
+  String get refusalRunning => 'The clock is already running.';
+
+  @override
+  String get refusalNotRunning => 'The clock is not running.';
+
+  @override
+  String get refusalNothingToUndo => 'Nothing to undo.';
+
+  @override
+  String get refusalNotOver => 'The match is not over yet.';
+
+  @override
+  String get refusalNotForAge =>
+      'The one-hand warning is only for fighters aged 4 to 7.';
+
+  @override
+  String get refusalInReview => 'The match is under the club\'s review.';
+
+  @override
+  String get refusalMatBusy => 'Another match is in progress on this mat.';
+
+  @override
+  String get reviewBannerReferee =>
+      'Under the club\'s review: this match waits until the club applies or discards this phone\'s actions.';
+
+  @override
+  String get reviewTitle => 'Phone actions under review';
+
+  @override
+  String get reviewReasonKnownEvents =>
+      'Another device wrote in the match while the phone was offline.';
+
+  @override
+  String get reviewReasonRules =>
+      'The scoreboard rules did not allow one of the phone\'s actions.';
+
+  @override
+  String get reviewReasonAge => 'One-hand warning to someone not aged 4 to 7.';
+
+  @override
+  String get reviewReasonMatBusy => 'Another match was in progress on the mat.';
+
+  @override
+  String get reviewReasonFighterBusy =>
+      'A fighter was in a match on another mat.';
+
+  @override
+  String get reviewReasonUnknown => 'Clash with the server.';
+
+  @override
+  String get reviewApply => 'Apply';
+
+  @override
+  String get reviewDiscard => 'Discard';
+
+  @override
+  String get reviewApplyConfirm =>
+      'The phone\'s actions go in, in order and at their time. Those the rules do not allow are skipped.';
+
+  @override
+  String get reviewDiscardConfirm =>
+      'The phone\'s actions do not count in the match. They stay in the log.';
+
+  @override
+  String reviewApplied(int applied, int skipped) {
+    return 'Applied: $applied · Skipped: $skipped';
+  }
+
+  @override
+  String get reviewDiscarded => 'Actions discarded.';
+
+  @override
+  String matsInReview(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count matches under review',
+      one: '1 match under review',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String logoutPending(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'You have $count actions not sent yet; if you sign out they will be lost.',
+      one: 'You have 1 action not sent yet; if you sign out it will be lost.',
+    );
+    return '$_temp0';
   }
 }

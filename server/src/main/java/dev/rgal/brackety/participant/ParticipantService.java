@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ParticipantService {
 
-    static final int ADULT_AGE = 18;
+    public static final int ADULT_AGE = 18;
 
     private final ParticipantRepository participants;
     private final EventCategoryRepository categories;

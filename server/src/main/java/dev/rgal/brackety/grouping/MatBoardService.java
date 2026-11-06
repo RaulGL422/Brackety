@@ -93,6 +93,7 @@ class MatBoardService {
                         s.groups(),
                         s.pendingMatches(),
                         s.matchInProgress(),
+                        s.matchesInReview(),
                         s.remaining().toSeconds(),
                         now.plus(s.remaining())))
                 .toList();
@@ -145,7 +146,7 @@ class MatBoardService {
                 .orElse(Set.of());
 
         var candidates = onMat.stream()
-                .filter(m -> m.getStatus() == Match.Status.PENDING)
+                .filter(m -> m.getStatus() == Match.Status.PENDING && !m.isInReview())
                 .map(m -> new Candidate(
                         m.getId(),
                         m.getGroupId(),
@@ -192,8 +193,10 @@ class MatBoardService {
                                 m.getRedScore(),
                                 m.getBlueScore(),
                                 m.getStatus() == Match.Status.PENDING
+                                        && !m.isInReview()
                                         && competitors.participants(m.getRedId(), m.getBlueId()).stream()
-                                                .noneMatch(busy::contains)))
+                                                .noneMatch(busy::contains),
+                                m.isInReview()))
                         .toList(),
                 recommended);
     }

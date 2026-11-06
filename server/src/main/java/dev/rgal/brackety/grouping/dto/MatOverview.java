@@ -10,5 +10,6 @@ public record MatOverview(
         int groups,
         int pendingMatches,
         boolean matchInProgress,
+        int matchesInReview,
         long remainingSeconds,
         Instant estimatedEnd) {}

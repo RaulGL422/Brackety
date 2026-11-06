@@ -1,3 +1,6 @@
+import 'dart:typed_data';
+
+import 'package:brackety/core/download/file_download.dart';
 import 'package:brackety/features/club/data/club_models.dart';
 import 'package:brackety/features/club/data/club_repository.dart';
 import 'package:brackety/features/club/state/club_providers.dart';
@@ -180,6 +183,7 @@ void main() {
                 matchInProgress: true,
                 remaining: const Duration(minutes: 20),
                 estimatedEnd: DateTime(2026, 11, 14, 11, 30),
+                matchesInReview: 1,
               ),
             ],
           ),
@@ -237,6 +241,7 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('Estimated end 11:30'), findsOneWidget);
+      expect(find.textContaining('1 match under review'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
@@ -254,6 +259,12 @@ void main() {
         find.widgetWithText(FilledButton, 'Save'),
       );
       expect(save().onPressed, isNull);
+      expect(
+        find.text(
+          "The student's data is handled according to the privacy policy.",
+        ),
+        findsOneWidget,
+      );
 
       await tester.tap(find.text('The legal guardian agrees'));
       await tester.pump();
@@ -430,4 +441,74 @@ void main() {
     expect(ageOn(birth, DateTime(2026, 11, 14)), 7);
     expect(ageOn(DateTime(2008, 12, 1), DateTime(2026, 11, 14)), 17);
   });
+
+  for (final MapEntry(key: device, value: size) in sizes.entries) {
+    testWidgets('the event package downloads with the server name on $device', (
+      tester,
+    ) async {
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final server = _FileServer();
+      final saved = <(String, String)>[];
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            clubRepositoryProvider.overrideWithValue(
+              ClubRepository(Dio()..httpClientAdapter = server),
+            ),
+            saveFileProvider.overrideWithValue(
+              (name, bytes, mimeType) async => saved.add((name, mimeType)),
+            ),
+          ],
+          child: MaterialApp(
+            theme: lightTheme(),
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              ...coreLocalizationsDelegates,
+            ],
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              appBar: AppBar(actions: const [ClubExportMenu(eventId: 'e1')]),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byTooltip('Export'));
+      await tester.pumpAndSettle();
+      expect(find.text('Standings (CSV)'), findsOneWidget);
+      await tester.tap(find.text('Export event package'));
+      await tester.pumpAndSettle();
+
+      expect(server.paths, ['/api/v1/events/e1/export/package']);
+      expect(saved, [('fase-1-2026-11-14.brackety', 'application/json')]);
+    });
+  }
+}
+
+/// Answers any download with a small file named by Content-Disposition, like the API.
+class _FileServer implements HttpClientAdapter {
+  final paths = <String>[];
+
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    paths.add(options.uri.path);
+    return ResponseBody.fromString(
+      '{"schemaVersion":1}',
+      200,
+      headers: {
+        'content-disposition': [
+          'attachment; filename="fase-1-2026-11-14.brackety"',
+        ],
+      },
+    );
+  }
+
+  @override
+  void close({bool force = false}) {}
 }

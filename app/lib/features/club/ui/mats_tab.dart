@@ -42,11 +42,18 @@ class _MatCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final time = DateFormat.Hm(Localizations.localeOf(context).toLanguageTag());
     final scheme = Theme.of(context).colorScheme;
+    final inReview = mat.matchesInReview > 0;
     return Card(
-      color: mat.matchInProgress ? scheme.primaryContainer : null,
+      color: inReview
+          ? BracketyColors.of(context).warningContainer
+          : mat.matchInProgress
+          ? scheme.primaryContainer
+          : null,
       child: ListTile(
         leading: Icon(
-          mat.matchInProgress
+          inReview
+              ? Icons.gavel
+              : mat.matchInProgress
               ? Icons.sports_martial_arts
               : Icons.pause_circle_outline,
         ),
@@ -55,8 +62,11 @@ class _MatCard extends StatelessWidget {
           '${mat.referee ?? l10n.matNoReferee}',
         ),
         subtitle: Text(
-          '${mat.matchInProgress ? l10n.matFighting : l10n.matIdle}\n'
-          '${l10n.matSummary(mat.groups, mat.pendingMatches)}',
+          [
+            mat.matchInProgress ? l10n.matFighting : l10n.matIdle,
+            l10n.matSummary(mat.groups, mat.pendingMatches),
+            if (inReview) l10n.matsInReview(mat.matchesInReview),
+          ].join('\n'),
         ),
         isThreeLine: true,
         trailing: Text(

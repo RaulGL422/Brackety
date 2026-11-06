@@ -9,7 +9,21 @@ final clubRepositoryProvider = Provider<ClubRepository>(
   (ref) => ClubRepository(ref.watch(apiProvider)),
 );
 
-enum CsvExport { standings, matches, timeline }
+/// What the club can download: three CSVs and the event package (`.brackety`) for the sports hall server.
+enum EventExport {
+  standings('export/standings.csv', 'clasificacion.csv', 'text/csv'),
+  matches('export/matches.csv', 'combates.csv', 'text/csv'),
+  timeline('export/timeline.csv', 'linea-de-tiempo.csv', 'text/csv'),
+  eventPackage('export/package', 'evento.brackety', 'application/json');
+
+  const EventExport(this.path, this.fallbackName, this.mimeType);
+
+  final String path;
+
+  /// Only if the server's Content-Disposition does not reach the app.
+  final String fallbackName;
+  final String mimeType;
+}
 
 class ClubRepository {
   ClubRepository(this._dio);
@@ -121,12 +135,19 @@ class ClubRepository {
     ];
   }
 
-  /// The file as the server sends it (UTF-8 with BOM, `;`-separated).
-  Future<List<int>> csv(String eventId, CsvExport export) async {
+  /// The file as the server sends it (CSVs: UTF-8 with BOM, `;`-separated), with the name it gives.
+  Future<({String name, List<int> bytes})> export(
+    String eventId,
+    EventExport export,
+  ) async {
     final response = await _dio.get<List<int>>(
-      '/api/v1/events/$eventId/export/${export.name}.csv',
+      '/api/v1/events/$eventId/${export.path}',
       options: Options(responseType: ResponseType.bytes),
     );
-    return response.data!;
+    final disposition = response.headers.value('content-disposition') ?? '';
+    final name = RegExp(r'filename="([^"]+)"')
+        .firstMatch(disposition)
+        ?.group(1);
+    return (name: name ?? export.fallbackName, bytes: response.data!);
   }
 }

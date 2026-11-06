@@ -53,6 +53,13 @@ public class AuthException extends ErrorResponseException {
         return withCode(HttpStatus.BAD_REQUEST, "INVALID_TAX_ID", "The CIF is not valid.");
     }
 
+    static AuthException legalVersionOutdated() {
+        return withCode(
+                HttpStatus.CONFLICT,
+                "LEGAL_VERSION_OUTDATED",
+                "The terms or the privacy policy have changed. Review and accept the current version.");
+    }
+
     public static AuthException googleNotConfigured() {
         return new AuthException(HttpStatus.SERVICE_UNAVAILABLE, "Google sign-in is not configured.");
     }

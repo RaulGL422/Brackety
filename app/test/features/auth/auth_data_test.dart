@@ -76,13 +76,15 @@ void main() {
       expect(isOldEnoughToRegister(DateTime(1980, 1, 1), today), isTrue);
     });
 
-    test('sends the provisional legal version and the server field names', () {
+    test('sends the accepted legal versions and the server field names', () {
       final json = Registration(
         email: 'ana@example.com',
         password: 'long enough',
         birthDate: DateTime(1990, 5, 7),
         profile: ProfileType.helper,
         locale: 'es',
+        termsVersion: '2026-11-04',
+        privacyVersion: '2026-11-05',
       ).toJson();
 
       expect(json, {
@@ -90,8 +92,8 @@ void main() {
         'password': 'long enough',
         'birthDate': '1990-05-07',
         'profile': 'HELPER',
-        'acceptedTermsVersion': '2026-11-draft',
-        'acceptedPrivacyVersion': '2026-11-draft',
+        'acceptedTermsVersion': '2026-11-04',
+        'acceptedPrivacyVersion': '2026-11-05',
         'locale': 'es',
       });
     });
@@ -103,6 +105,8 @@ void main() {
         password: 'long enough',
         profile: ProfileType.externalEntity,
         locale: 'es',
+        termsVersion: '2026-11-04',
+        privacyVersion: '2026-11-04',
         organization: Organization(name: 'Federación', taxId: 'G12345674'),
         representativeDeclaration: true,
       ).toJson();
@@ -113,8 +117,8 @@ void main() {
         'profile': 'EXTERNAL_ENTITY',
         'organization': {'name': 'Federación', 'taxId': 'G12345674'},
         'representativeDeclaration': true,
-        'acceptedTermsVersion': '2026-11-draft',
-        'acceptedPrivacyVersion': '2026-11-draft',
+        'acceptedTermsVersion': '2026-11-04',
+        'acceptedPrivacyVersion': '2026-11-04',
         'locale': 'es',
       });
     });

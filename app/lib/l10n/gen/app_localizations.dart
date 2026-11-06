@@ -395,8 +395,8 @@ abstract class AppLocalizations {
   /// No description provided for @registerAccept.
   ///
   /// In es, this message translates to:
-  /// **'Acepto los términos de uso y la política de privacidad.'**
-  String get registerAccept;
+  /// **'Acepto los {terms} y la {privacy}.'**
+  String registerAccept(String terms, String privacy);
 
   /// No description provided for @registerAcceptRequired.
   ///
@@ -1262,29 +1262,35 @@ abstract class AppLocalizations {
   /// **'{name} · de {min} a {max} años'**
   String categoryRange(String name, int min, int max);
 
-  /// No description provided for @exportCsv.
+  /// No description provided for @exportMenu.
   ///
   /// In es, this message translates to:
-  /// **'Exportar CSV'**
-  String get exportCsv;
+  /// **'Exportar'**
+  String get exportMenu;
 
   /// No description provided for @exportStandings.
   ///
   /// In es, this message translates to:
-  /// **'Clasificación'**
+  /// **'Clasificación (CSV)'**
   String get exportStandings;
 
   /// No description provided for @exportMatches.
   ///
   /// In es, this message translates to:
-  /// **'Combates'**
+  /// **'Combates (CSV)'**
   String get exportMatches;
 
   /// No description provided for @exportTimeline.
   ///
   /// In es, this message translates to:
-  /// **'Línea de tiempo'**
+  /// **'Línea de tiempo (CSV)'**
   String get exportTimeline;
+
+  /// No description provided for @exportEventPackage.
+  ///
+  /// In es, this message translates to:
+  /// **'Exportar paquete del evento'**
+  String get exportEventPackage;
 
   /// No description provided for @exportError.
   ///
@@ -2089,6 +2095,378 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Revisa {field}: no se leyó con seguridad'**
   String issueUnsure(String field);
+
+  /// No description provided for @legalSection.
+  ///
+  /// In es, this message translates to:
+  /// **'Legal'**
+  String get legalSection;
+
+  /// No description provided for @legalPrivacy.
+  ///
+  /// In es, this message translates to:
+  /// **'Política de privacidad'**
+  String get legalPrivacy;
+
+  /// No description provided for @legalTerms.
+  ///
+  /// In es, this message translates to:
+  /// **'Términos de uso'**
+  String get legalTerms;
+
+  /// No description provided for @legalCookies.
+  ///
+  /// In es, this message translates to:
+  /// **'Política de cookies'**
+  String get legalCookies;
+
+  /// No description provided for @legalNotice.
+  ///
+  /// In es, this message translates to:
+  /// **'Aviso legal'**
+  String get legalNotice;
+
+  /// No description provided for @legalPrivacyShort.
+  ///
+  /// In es, this message translates to:
+  /// **'Privacidad'**
+  String get legalPrivacyShort;
+
+  /// No description provided for @legalTermsShort.
+  ///
+  /// In es, this message translates to:
+  /// **'Términos'**
+  String get legalTermsShort;
+
+  /// No description provided for @legalCookiesShort.
+  ///
+  /// In es, this message translates to:
+  /// **'Cookies'**
+  String get legalCookiesShort;
+
+  /// No description provided for @legalLicenses.
+  ///
+  /// In es, this message translates to:
+  /// **'Licencias'**
+  String get legalLicenses;
+
+  /// No description provided for @legalPrivacyLink.
+  ///
+  /// In es, this message translates to:
+  /// **'política de privacidad'**
+  String get legalPrivacyLink;
+
+  /// No description provided for @legalTermsLink.
+  ///
+  /// In es, this message translates to:
+  /// **'términos de uso'**
+  String get legalTermsLink;
+
+  /// No description provided for @legalNotFound.
+  ///
+  /// In es, this message translates to:
+  /// **'Esta página legal no existe.'**
+  String get legalNotFound;
+
+  /// No description provided for @registerLegalOutdated.
+  ///
+  /// In es, this message translates to:
+  /// **'Los términos de uso o la política de privacidad han cambiado. Revísalos y vuelve a aceptarlos.'**
+  String get registerLegalOutdated;
+
+  /// No description provided for @participantPrivacyNotice.
+  ///
+  /// In es, this message translates to:
+  /// **'Los datos del alumno se tratan según la {privacy}.'**
+  String participantPrivacyNotice(String privacy);
+
+  /// No description provided for @importPrivacyNotice.
+  ///
+  /// In es, this message translates to:
+  /// **'Los datos de los alumnos se tratan según la {privacy}.'**
+  String importPrivacyNotice(String privacy);
+
+  /// No description provided for @serverCurrent.
+  ///
+  /// In es, this message translates to:
+  /// **'Servidor: {name}'**
+  String serverCurrent(String name);
+
+  /// No description provided for @serverChange.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar'**
+  String get serverChange;
+
+  /// No description provided for @serverDialogTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Elegir servidor'**
+  String get serverDialogTitle;
+
+  /// No description provided for @serverHall.
+  ///
+  /// In es, this message translates to:
+  /// **'Pabellón'**
+  String get serverHall;
+
+  /// No description provided for @serverInternet.
+  ///
+  /// In es, this message translates to:
+  /// **'Internet'**
+  String get serverInternet;
+
+  /// No description provided for @serverOther.
+  ///
+  /// In es, this message translates to:
+  /// **'Otra URL'**
+  String get serverOther;
+
+  /// No description provided for @serverUrlLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'URL del servidor'**
+  String get serverUrlLabel;
+
+  /// No description provided for @serverUrlHint.
+  ///
+  /// In es, this message translates to:
+  /// **'https://servidor.ejemplo'**
+  String get serverUrlHint;
+
+  /// No description provided for @serverUrlInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe una URL que empiece por http:// o https:// y tenga servidor.'**
+  String get serverUrlInvalid;
+
+  /// No description provided for @serverUrlCleartext.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin https la app solo llega al pabellón (192.168.137.1): con esta URL no conectará.'**
+  String get serverUrlCleartext;
+
+  /// No description provided for @serverUse.
+  ///
+  /// In es, this message translates to:
+  /// **'Usar'**
+  String get serverUse;
+
+  /// No description provided for @syncConnected.
+  ///
+  /// In es, this message translates to:
+  /// **'Conectado'**
+  String get syncConnected;
+
+  /// No description provided for @syncOffline.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin conexión'**
+  String get syncOffline;
+
+  /// No description provided for @syncPending.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 acción pendiente} other{{count} acciones pendientes}}'**
+  String syncPending(int count);
+
+  /// No description provided for @syncRejected.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 acción rechazada} other{{count} acciones rechazadas}}'**
+  String syncRejected(int count);
+
+  /// No description provided for @syncRejectedShow.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver'**
+  String get syncRejectedShow;
+
+  /// No description provided for @syncRejectedTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Acciones rechazadas'**
+  String get syncRejectedTitle;
+
+  /// No description provided for @syncRejectedBody.
+  ///
+  /// In es, this message translates to:
+  /// **'El servidor no aceptó estas acciones y no cuentan en el combate. Avisa al club si hace falta.'**
+  String get syncRejectedBody;
+
+  /// No description provided for @syncRejectedDismiss.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar de la lista'**
+  String get syncRejectedDismiss;
+
+  /// No description provided for @close.
+  ///
+  /// In es, this message translates to:
+  /// **'Cerrar'**
+  String get close;
+
+  /// No description provided for @matOfflineBoard.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin conexión: tablero guardado en el móvil. Sin recomendado; puedes empezar un pendiente si no hay otro en curso.'**
+  String get matOfflineBoard;
+
+  /// No description provided for @matInReview.
+  ///
+  /// In es, this message translates to:
+  /// **'En revisión del club'**
+  String get matInReview;
+
+  /// No description provided for @refusalFinished.
+  ///
+  /// In es, this message translates to:
+  /// **'El combate ya está finalizado.'**
+  String get refusalFinished;
+
+  /// No description provided for @refusalOver.
+  ///
+  /// In es, this message translates to:
+  /// **'El combate ya ha acabado.'**
+  String get refusalOver;
+
+  /// No description provided for @refusalRunning.
+  ///
+  /// In es, this message translates to:
+  /// **'El reloj ya está en marcha.'**
+  String get refusalRunning;
+
+  /// No description provided for @refusalNotRunning.
+  ///
+  /// In es, this message translates to:
+  /// **'El reloj no está en marcha.'**
+  String get refusalNotRunning;
+
+  /// No description provided for @refusalNothingToUndo.
+  ///
+  /// In es, this message translates to:
+  /// **'No hay nada que deshacer.'**
+  String get refusalNothingToUndo;
+
+  /// No description provided for @refusalNotOver.
+  ///
+  /// In es, this message translates to:
+  /// **'El combate todavía no ha acabado.'**
+  String get refusalNotOver;
+
+  /// No description provided for @refusalNotForAge.
+  ///
+  /// In es, this message translates to:
+  /// **'El aviso de una mano solo es para alumnos de 4 a 7 años.'**
+  String get refusalNotForAge;
+
+  /// No description provided for @refusalInReview.
+  ///
+  /// In es, this message translates to:
+  /// **'El combate está en revisión del club.'**
+  String get refusalInReview;
+
+  /// No description provided for @refusalMatBusy.
+  ///
+  /// In es, this message translates to:
+  /// **'Hay otro combate en curso en este tapiz.'**
+  String get refusalMatBusy;
+
+  /// No description provided for @reviewBannerReferee.
+  ///
+  /// In es, this message translates to:
+  /// **'En revisión del club: este combate queda parado hasta que el club aplique o descarte las acciones de este móvil.'**
+  String get reviewBannerReferee;
+
+  /// No description provided for @reviewTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Acciones del móvil en revisión'**
+  String get reviewTitle;
+
+  /// No description provided for @reviewReasonKnownEvents.
+  ///
+  /// In es, this message translates to:
+  /// **'Otro dispositivo escribió en el combate mientras el móvil estaba sin conexión.'**
+  String get reviewReasonKnownEvents;
+
+  /// No description provided for @reviewReasonRules.
+  ///
+  /// In es, this message translates to:
+  /// **'Las reglas del marcador no permitían una acción del móvil.'**
+  String get reviewReasonRules;
+
+  /// No description provided for @reviewReasonAge.
+  ///
+  /// In es, this message translates to:
+  /// **'Aviso de una mano a quien no tiene de 4 a 7 años.'**
+  String get reviewReasonAge;
+
+  /// No description provided for @reviewReasonMatBusy.
+  ///
+  /// In es, this message translates to:
+  /// **'Había otro combate en curso en el tapiz.'**
+  String get reviewReasonMatBusy;
+
+  /// No description provided for @reviewReasonFighterBusy.
+  ///
+  /// In es, this message translates to:
+  /// **'Un alumno estaba combatiendo en otro tapiz.'**
+  String get reviewReasonFighterBusy;
+
+  /// No description provided for @reviewReasonUnknown.
+  ///
+  /// In es, this message translates to:
+  /// **'Choque con el servidor.'**
+  String get reviewReasonUnknown;
+
+  /// No description provided for @reviewApply.
+  ///
+  /// In es, this message translates to:
+  /// **'Aplicar'**
+  String get reviewApply;
+
+  /// No description provided for @reviewDiscard.
+  ///
+  /// In es, this message translates to:
+  /// **'Descartar'**
+  String get reviewDiscard;
+
+  /// No description provided for @reviewApplyConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'Se añaden las acciones del móvil en orden y con su hora. Las que las reglas no permitan se saltan.'**
+  String get reviewApplyConfirm;
+
+  /// No description provided for @reviewDiscardConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'Las acciones del móvil no cuentan en el combate. Quedan guardadas en el registro.'**
+  String get reviewDiscardConfirm;
+
+  /// No description provided for @reviewApplied.
+  ///
+  /// In es, this message translates to:
+  /// **'Aplicadas: {applied} · Saltadas: {skipped}'**
+  String reviewApplied(int applied, int skipped);
+
+  /// No description provided for @reviewDiscarded.
+  ///
+  /// In es, this message translates to:
+  /// **'Acciones descartadas.'**
+  String get reviewDiscarded;
+
+  /// No description provided for @matsInReview.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 combate en revisión} other{{count} combates en revisión}}'**
+  String matsInReview(int count);
+
+  /// No description provided for @logoutPending.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{Tienes 1 acción sin enviar; si sales se perderá.} other{Tienes {count} acciones sin enviar; si sales se perderán.}}'**
+  String logoutPending(int count);
 }
 
 class _AppLocalizationsDelegate

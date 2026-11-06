@@ -18,6 +18,6 @@ Guía para Claude sobre la máquina donde se trabaja. No son datos sensibles; es
 
 ## Avisos conocidos
 - En Windows, texto con tildes por Bash heredoc se corrompe: usar Write/Edit.
-- PC de escritorio: el PATH de sistema tiene una entrada entre comillas (`"C:\WINDOWS;…;jdk-22\bin"`) y desde Git Bash `flutter` falla con "pwsh.exe no se reconoce". Lanzar Flutter desde PowerShell. Java por defecto es el 22: para `./mvnw`, `JAVA_HOME=~/.jdks/openjdk-25`. Hay un Flutter 3.29 antiguo en `Documents\flutter`; manda `C:\dev\flutter` (primero en el PATH de usuario).
+- Portátil (Intel Wi-Fi AX200, sin red hospedada): el PATH de sistema tiene una entrada entre comillas (`"C:\WINDOWS;…;jdk-22\bin"`) y desde Git Bash `flutter` falla con "pwsh.exe no se reconoce". Lanzar Flutter desde PowerShell. Java por defecto es el 22: para `./mvnw`, `JAVA_HOME=~/.jdks/openjdk-25`. Hay un Flutter 3.29 antiguo en `Documents\flutter`; manda `C:\dev\flutter` (primero en el PATH de usuario).
 - Graphify se instala con `python -m pip install graphifyy` y se usa como `python -m graphify`.
 - El antivirus (Surfshark) pone en cuarentena ejecutables de desarrollo (`dart.exe`, `git.exe`, `java.exe`…) como `Drop.Win64.RoamingSelfRun`. Si desaparece un `.exe`, mirar su cuarentena; las carpetas de herramientas y del repo deben estar excluidas.

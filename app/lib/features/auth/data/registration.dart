@@ -1,6 +1,3 @@
-// Provisional until the legal-paginas module publishes the real texts and versions.
-const legalDocumentsVersion = '2026-11-draft';
-
 /// Younger people are registered by a guardian (module perfiles-menores).
 const minimumRegistrationAge = 14;
 
@@ -68,6 +65,8 @@ class Registration {
     required this.password,
     required this.profile,
     required this.locale,
+    required this.termsVersion,
+    required this.privacyVersion,
     this.birthDate,
     this.organization,
     this.representativeDeclaration = false,
@@ -77,6 +76,10 @@ class Registration {
   final String password;
   final ProfileType profile;
   final String locale;
+
+  /// The versions shown when the box was ticked; the server rejects old ones.
+  final String termsVersion;
+  final String privacyVersion;
   final DateTime? birthDate;
   final Organization? organization;
   final bool representativeDeclaration;
@@ -91,8 +94,8 @@ class Registration {
       if (birthDate != null) 'birthDate': _isoDate(birthDate),
       if (organization != null) 'organization': organization.toJson(),
       if (representativeDeclaration) 'representativeDeclaration': true,
-      'acceptedTermsVersion': legalDocumentsVersion,
-      'acceptedPrivacyVersion': legalDocumentsVersion,
+      'acceptedTermsVersion': termsVersion,
+      'acceptedPrivacyVersion': privacyVersion,
       'locale': locale,
     };
   }

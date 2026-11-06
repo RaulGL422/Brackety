@@ -34,6 +34,8 @@ public class MatchEvent {
 
     private Instant at;
     private long clockMs;
+    /** The device's id for an action sent from the Android queue; null from the web. */
+    private UUID opId;
 
     protected MatchEvent() {}
 
@@ -47,7 +49,8 @@ public class MatchEvent {
             UUID actorAccountId,
             boolean automatic,
             Instant at,
-            Duration clock) {
+            Duration clock,
+            UUID opId) {
         this.matchId = matchId;
         this.position = position;
         this.type = type;
@@ -58,10 +61,15 @@ public class MatchEvent {
         this.automatic = automatic;
         this.at = at;
         this.clockMs = clock.toMillis();
+        this.opId = opId;
     }
 
     public UUID getId() {
         return id;
+    }
+
+    public UUID getOpId() {
+        return opId;
     }
 
     public UUID getMatchId() {

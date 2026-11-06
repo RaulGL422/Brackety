@@ -168,6 +168,20 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  testWidgets('the consent step links to the privacy policy', (tester) async {
+    await open(tester, sizes['phone']!);
+
+    final notice = find.text(
+      "The students' data is handled according to the privacy policy.",
+    );
+    await tester.scrollUntilVisible(
+      notice,
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(notice, findsOneWidget);
+  });
+
   for (final MapEntry(key: device, value: size) in sizes.entries) {
     testWidgets(
       'the club reads photos, settles a category and registers on $device',

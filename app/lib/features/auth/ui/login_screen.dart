@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
+import '../../server/ui/server_tile.dart';
 import '../data/api_error.dart';
 import '../state/session_controller.dart';
 import 'auth_texts.dart';
@@ -125,6 +126,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           FormMessage.success(_noticeText(l10n, notice)),
           const SizedBox(height: AppSpacing.l),
         ],
+        const ServerTile(),
         Form(
           key: _formKey,
           child: AutofillGroup(

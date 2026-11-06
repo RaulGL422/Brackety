@@ -135,3 +135,16 @@ Formato: fecha · decisión · motivo.
 - 2026-11-04 · Árbitros y ayudantes con APK Android y selector de servidor (pabellón / Internet / URL) · la web por http en la red local no puede funcionar offline; decidido por Raul.
 - 2026-11-04 · Offline para la F1 solo en el marcador del árbitro; el módulo completo, después · 10 días hasta la fase; decidido por Raul.
 - 2026-11-04 · `legal-paginas` se adelanta a la F1; titular con nombre y `privacidad@rgal.dev`, sin NIF ni domicilio · datos reales de menores en la fase; decidido por Raul.
+- 2026-11-04 · Textos legales como ficheros Markdown versionados en el servidor (no tabla `legal_document`); titular y email por variables de entorno · cambiar un texto pasa por un despliegue; también sin Internet en el servidor del pabellón.
+- 2026-11-04 · Privacidad: el organizador es responsable de los datos de los alumnos que inscribe y Brackety los trata por su cuenta; Raul, responsable del resto · decidido por Raul.
+- 2026-11-04 · App: `flutter_markdown_plus` 1.0.12 para los textos legales · sucesor mantenido de `flutter_markdown` (descontinuado), sin dependencias extra y con tablas desplazables.
+- 2026-11-04 · App: `url_launcher` 6.3.3 · abrir fuera de la app los enlaces http(s) y mailto de los textos legales.
+- 2026-11-04 · Servidor del pabellón con PostgreSQL 18 oficial (binarios portables) y el jar de producción, no el Postgres embebido de los tests · mismo código que producción y pg_dump para las copias.
+- 2026-11-04 · Pabellón: el primer arranque exige `-Package` o `-Demo` (sin ninguno no arranca) · un olvido del `-Package` crearía el evento demo y obligaría a `-Reset` antes de cargar el real.
+- 2026-11-04 · El paquete se carga antes de que arranque el servidor web (al crear los beans), no en `ApplicationReadyEvent` · el script da la API por lista en cuanto responde; así nunca responde con el paquete a medio cargar o rechazado.
+- 2026-11-05 · APK: las URLs de "Pabellón" e "Internet" fijas en el código (excepción a "solo `API_BASE_URL`") · son las opciones del selector y la IP del punto de acceso de Windows es fija; el `API_BASE_URL` del build sigue siendo el valor por defecto.
+- 2026-11-05 · APK: el servidor elegido se guarda con `flutter_secure_storage`, no `shared_preferences` · ya está para el refresh token (que es de ese servidor) y evita otra dependencia.
+- 2026-11-05 · Offline F1: choque = combate "en revisión"; el club aplica o descarta las acciones del móvil · decidido por Raul.
+- 2026-11-05 · Offline F1: choque si `knownEvents` no coincide con las acciones no automáticas del servidor · detecta otro dispositivo sin contar las paradas automáticas, que añade el servidor.
+- 2026-11-05 · Offline F1: caché y cola en ficheros JSON, no drift · un tapiz y unas decenas de acciones; drift llega con el módulo completo.
+- 2026-11-05 · Offline F1: si el servidor rechaza la sesión, la cola del árbitro se guarda para su cuenta y se envía al volver a entrar · decidido por Raul; antes se perdía sin enviarse.

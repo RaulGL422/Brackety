@@ -173,8 +173,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get profileStudentHint => 'Deportista que compite con su club.';
 
   @override
-  String get registerAccept =>
-      'Acepto los términos de uso y la política de privacidad.';
+  String registerAccept(String terms, String privacy) {
+    return 'Acepto los $terms y la $privacy.';
+  }
 
   @override
   String get registerAcceptRequired => 'Debes aceptarlos para crear la cuenta.';
@@ -679,16 +680,19 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get exportCsv => 'Exportar CSV';
+  String get exportMenu => 'Exportar';
 
   @override
-  String get exportStandings => 'Clasificación';
+  String get exportStandings => 'Clasificación (CSV)';
 
   @override
-  String get exportMatches => 'Combates';
+  String get exportMatches => 'Combates (CSV)';
 
   @override
-  String get exportTimeline => 'Línea de tiempo';
+  String get exportTimeline => 'Línea de tiempo (CSV)';
+
+  @override
+  String get exportEventPackage => 'Exportar paquete del evento';
 
   @override
   String get exportError => 'No se ha podido exportar.';
@@ -1184,5 +1188,244 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String issueUnsure(String field) {
     return 'Revisa $field: no se leyó con seguridad';
+  }
+
+  @override
+  String get legalSection => 'Legal';
+
+  @override
+  String get legalPrivacy => 'Política de privacidad';
+
+  @override
+  String get legalTerms => 'Términos de uso';
+
+  @override
+  String get legalCookies => 'Política de cookies';
+
+  @override
+  String get legalNotice => 'Aviso legal';
+
+  @override
+  String get legalPrivacyShort => 'Privacidad';
+
+  @override
+  String get legalTermsShort => 'Términos';
+
+  @override
+  String get legalCookiesShort => 'Cookies';
+
+  @override
+  String get legalLicenses => 'Licencias';
+
+  @override
+  String get legalPrivacyLink => 'política de privacidad';
+
+  @override
+  String get legalTermsLink => 'términos de uso';
+
+  @override
+  String get legalNotFound => 'Esta página legal no existe.';
+
+  @override
+  String get registerLegalOutdated =>
+      'Los términos de uso o la política de privacidad han cambiado. Revísalos y vuelve a aceptarlos.';
+
+  @override
+  String participantPrivacyNotice(String privacy) {
+    return 'Los datos del alumno se tratan según la $privacy.';
+  }
+
+  @override
+  String importPrivacyNotice(String privacy) {
+    return 'Los datos de los alumnos se tratan según la $privacy.';
+  }
+
+  @override
+  String serverCurrent(String name) {
+    return 'Servidor: $name';
+  }
+
+  @override
+  String get serverChange => 'Cambiar';
+
+  @override
+  String get serverDialogTitle => 'Elegir servidor';
+
+  @override
+  String get serverHall => 'Pabellón';
+
+  @override
+  String get serverInternet => 'Internet';
+
+  @override
+  String get serverOther => 'Otra URL';
+
+  @override
+  String get serverUrlLabel => 'URL del servidor';
+
+  @override
+  String get serverUrlHint => 'https://servidor.ejemplo';
+
+  @override
+  String get serverUrlInvalid =>
+      'Escribe una URL que empiece por http:// o https:// y tenga servidor.';
+
+  @override
+  String get serverUrlCleartext =>
+      'Sin https la app solo llega al pabellón (192.168.137.1): con esta URL no conectará.';
+
+  @override
+  String get serverUse => 'Usar';
+
+  @override
+  String get syncConnected => 'Conectado';
+
+  @override
+  String get syncOffline => 'Sin conexión';
+
+  @override
+  String syncPending(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count acciones pendientes',
+      one: '1 acción pendiente',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String syncRejected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count acciones rechazadas',
+      one: '1 acción rechazada',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get syncRejectedShow => 'Ver';
+
+  @override
+  String get syncRejectedTitle => 'Acciones rechazadas';
+
+  @override
+  String get syncRejectedBody =>
+      'El servidor no aceptó estas acciones y no cuentan en el combate. Avisa al club si hace falta.';
+
+  @override
+  String get syncRejectedDismiss => 'Quitar de la lista';
+
+  @override
+  String get close => 'Cerrar';
+
+  @override
+  String get matOfflineBoard =>
+      'Sin conexión: tablero guardado en el móvil. Sin recomendado; puedes empezar un pendiente si no hay otro en curso.';
+
+  @override
+  String get matInReview => 'En revisión del club';
+
+  @override
+  String get refusalFinished => 'El combate ya está finalizado.';
+
+  @override
+  String get refusalOver => 'El combate ya ha acabado.';
+
+  @override
+  String get refusalRunning => 'El reloj ya está en marcha.';
+
+  @override
+  String get refusalNotRunning => 'El reloj no está en marcha.';
+
+  @override
+  String get refusalNothingToUndo => 'No hay nada que deshacer.';
+
+  @override
+  String get refusalNotOver => 'El combate todavía no ha acabado.';
+
+  @override
+  String get refusalNotForAge =>
+      'El aviso de una mano solo es para alumnos de 4 a 7 años.';
+
+  @override
+  String get refusalInReview => 'El combate está en revisión del club.';
+
+  @override
+  String get refusalMatBusy => 'Hay otro combate en curso en este tapiz.';
+
+  @override
+  String get reviewBannerReferee =>
+      'En revisión del club: este combate queda parado hasta que el club aplique o descarte las acciones de este móvil.';
+
+  @override
+  String get reviewTitle => 'Acciones del móvil en revisión';
+
+  @override
+  String get reviewReasonKnownEvents =>
+      'Otro dispositivo escribió en el combate mientras el móvil estaba sin conexión.';
+
+  @override
+  String get reviewReasonRules =>
+      'Las reglas del marcador no permitían una acción del móvil.';
+
+  @override
+  String get reviewReasonAge =>
+      'Aviso de una mano a quien no tiene de 4 a 7 años.';
+
+  @override
+  String get reviewReasonMatBusy => 'Había otro combate en curso en el tapiz.';
+
+  @override
+  String get reviewReasonFighterBusy =>
+      'Un alumno estaba combatiendo en otro tapiz.';
+
+  @override
+  String get reviewReasonUnknown => 'Choque con el servidor.';
+
+  @override
+  String get reviewApply => 'Aplicar';
+
+  @override
+  String get reviewDiscard => 'Descartar';
+
+  @override
+  String get reviewApplyConfirm =>
+      'Se añaden las acciones del móvil en orden y con su hora. Las que las reglas no permitan se saltan.';
+
+  @override
+  String get reviewDiscardConfirm =>
+      'Las acciones del móvil no cuentan en el combate. Quedan guardadas en el registro.';
+
+  @override
+  String reviewApplied(int applied, int skipped) {
+    return 'Aplicadas: $applied · Saltadas: $skipped';
+  }
+
+  @override
+  String get reviewDiscarded => 'Acciones descartadas.';
+
+  @override
+  String matsInReview(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count combates en revisión',
+      one: '1 combate en revisión',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String logoutPending(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Tienes $count acciones sin enviar; si sales se perderán.',
+      one: 'Tienes 1 acción sin enviar; si sales se perderá.',
+    );
+    return '$_temp0';
   }
 }

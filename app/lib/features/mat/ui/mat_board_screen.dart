@@ -6,12 +6,15 @@ import 'package:go_router/go_router.dart';
 import '../../../core/async_view.dart';
 import '../../../core/group_colors.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../offline/state/offline_sync.dart';
+import '../../offline/ui/sync_status_bar.dart';
 import '../data/mat_board.dart';
 import '../state/mat_providers.dart';
 import 'fighter_text.dart';
 
 /// The referee's mat: its groups, the recommended match and every match by status.
 /// With [readOnly] (the club) every match opens its timeline instead of the scoreboard.
+/// The Android referee gets it through the device's queue and cache ([localBoardProvider]).
 class MatBoardScreen extends ConsumerWidget {
   const MatBoardScreen({super.key, required this.matId, this.readOnly = false});
 
@@ -21,23 +24,35 @@ class MatBoardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final provider = matBoardProvider(matId);
-    final board = ref.watch(provider);
+    final queued = !readOnly && ref.watch(offlineEnabledProvider);
+    final provider = queued
+        ? cachedBoardProvider(matId)
+        : matBoardProvider(matId);
+    final board = queued
+        ? ref.watch(localBoardProvider(matId))
+        : ref.watch(provider);
     return Scaffold(
       appBar: AppBar(
         title: Text(
           board.value == null ? '' : l10n.matTitle(board.value!.matNumber),
         ),
       ),
-      body: AsyncView(
-        value: board,
-        onRetry: () => ref.invalidate(provider),
-        data: (board) => board.groups.isEmpty
-            ? Center(child: Text(l10n.matEmpty))
-            : RefreshIndicator(
-                onRefresh: () => ref.refresh(provider.future),
-                child: _BoardList(board: board, readOnly: readOnly),
-              ),
+      body: Column(
+        children: [
+          if (queued) const SyncStatusBar(),
+          Expanded(
+            child: AsyncView(
+              value: board,
+              onRetry: () => ref.invalidate(provider),
+              data: (board) => board.groups.isEmpty
+                  ? Center(child: Text(l10n.matEmpty))
+                  : RefreshIndicator(
+                      onRefresh: () => ref.refresh(provider.future),
+                      child: _BoardList(board: board, readOnly: readOnly),
+                    ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -93,19 +108,23 @@ class _BoardList extends StatelessWidget {
               highlight: true,
             ),
         ],
-        section(l10n.matRecommended),
-        if (recommended == null)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.l),
-            child: Text(l10n.matNoneAvailable),
-          )
-        else
-          _MatchTile(
-            board: board,
-            readOnly: readOnly,
-            match: recommended,
-            highlight: true,
-          ),
+        if (board.offline)
+          const _OfflineNotice()
+        else ...[
+          section(l10n.matRecommended),
+          if (recommended == null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.l),
+              child: Text(l10n.matNoneAvailable),
+            )
+          else
+            _MatchTile(
+              board: board,
+              readOnly: readOnly,
+              match: recommended,
+              highlight: true,
+            ),
+        ],
         if (byStatus[MatchStatus.pending]!.isNotEmpty) ...[
           section(l10n.matPending),
           for (final m in byStatus[MatchStatus.pending]!)
@@ -118,6 +137,29 @@ class _BoardList extends StatelessWidget {
             _MatchTile(board: board, readOnly: readOnly, match: m),
         ],
       ],
+    );
+  }
+}
+
+/// Without network: the board saved here, and no recommendation.
+class _OfflineNotice extends StatelessWidget {
+  const _OfflineNotice();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = BracketyColors.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.l),
+      child: Card(
+        color: colors.warningContainer,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.m),
+          child: Text(
+            AppLocalizations.of(context).matOfflineBoard,
+            style: TextStyle(color: colors.onWarningContainer),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -208,7 +250,11 @@ class _MatchTile extends StatelessWidget {
         title: Text(
           '${match.red.label(l10n)}  ${l10n.versus}  ${match.blue.label(l10n)}',
         ),
-        subtitle: waiting ? Text(l10n.matWaiting) : null,
+        subtitle: match.inReview
+            ? Text(l10n.matInReview)
+            : waiting
+            ? Text(l10n.matWaiting)
+            : null,
         trailing: finished
             ? Text(
                 '${match.redScore} - ${match.blueScore}',

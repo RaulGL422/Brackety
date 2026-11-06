@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/router.dart';
 import 'features/auth/state/account_controller.dart';
 import 'features/auth/ui/verification_banner.dart';
+import 'features/offline/state/offline_sync.dart';
 import 'l10n/gen/app_localizations.dart';
 
 class BracketyApp extends ConsumerWidget {
@@ -12,6 +13,10 @@ class BracketyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // From the start on Android: a queue left from the last run goes out, and sign-out clears it.
+    if (ref.watch(offlineEnabledProvider)) {
+      ref.listen(offlineSyncProvider, (_, _) {});
+    }
     return MaterialApp.router(
       onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
       theme: lightTheme(),

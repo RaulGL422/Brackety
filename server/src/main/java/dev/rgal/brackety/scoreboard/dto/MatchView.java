@@ -10,6 +10,8 @@ import java.util.UUID;
 /**
  * A match as the scoreboard shows it. The client counts {@code remainingMs} down while
  * {@code running} and resyncs on every poll. {@code endReason}: POINTS, TIME, DISQUALIFICATION or null.
+ * {@code serverTime}: the instant the view is computed at, so the device can correct its clock.
+ * {@code review}: null unless an offline action clashed and the club has to review it.
  */
 public record MatchView(
         UUID id,
@@ -24,7 +26,9 @@ public record MatchView(
         String endReason,
         Corner red,
         Corner blue,
-        List<TimelineEntry> timeline) {
+        List<TimelineEntry> timeline,
+        Instant serverTime,
+        Review review) {
 
     /**
      * A participant ({@code participantId}) or a team ({@code teamId}, {@code teamNumber}); {@code members}
@@ -44,7 +48,7 @@ public record MatchView(
             Integer teamNumber,
             List<String> members) {}
 
-    /** {@code gaveRivalPoint}: a second one-hand warning that gave the rival a point. */
+    /** {@code gaveRivalPoint}: a second one-hand warning that gave the rival a point. {@code opId}: the device action it came from, or null. */
     public record TimelineEntry(
             UUID id,
             MatchEventType type,
@@ -55,5 +59,23 @@ public record MatchView(
             long clockMs,
             boolean automatic,
             boolean undone,
-            boolean gaveRivalPoint) {}
+            boolean gaveRivalPoint,
+            UUID opId) {}
+
+    /**
+     * {@code reason}: why the first action clashed (KNOWN_EVENTS, RULES, AGE, MAT_BUSY, FIGHTER_BUSY).
+     * {@code ops}: the actions the device sent since, in arrival order.
+     */
+    public record Review(String reason, List<ReviewOp> ops) {}
+
+    /** {@code reason}: the warning's or disqualification's; {@code cause}: why it was not applied. */
+    public record ReviewOp(
+            UUID opId,
+            MatchEventType type,
+            Side side,
+            String reason,
+            String actor,
+            Instant at,
+            Instant receivedAt,
+            String cause) {}
 }

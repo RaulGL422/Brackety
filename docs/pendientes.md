@@ -18,7 +18,6 @@
 - [ ] Resend: API key y remitente verificado en `rgal.dev` antes de `feat/auth-email` (en local los emails van al log).
 - [ ] Cloudflare: regla de rate limiting sobre `/api/v1/auth/*` al desplegar.
 - [ ] Producción: leer la IP real de `CF-Connecting-IP` y confiar solo en el túnel; comprobar en el despliegue real.
-- [ ] Validar en servidor las versiones de términos y privacidad aceptadas (depende de `legal-paginas`).
 - [ ] Emails de auth: pasar el envío directo (tras commit, sin reintentos) a la cola con reintentos del módulo `notificaciones`.
 - [ ] Register/forgot: queda una pequeña diferencia de tiempo de BD según exista la cuenta (enumeración por temporización, medible con muchas muestras). Aceptado por ahora; si hiciera falta, mover esas escrituras al hilo asíncrono.
 - [ ] Más adelante: 2FA (TOTP), lista de sesiones activas con "cerrar en todos", contraseñas contra filtraciones (HaveIBeenPwned).
@@ -29,16 +28,23 @@
 - [ ] Registro con el email de una cuenta borrada hace más de 30 días y aún sin purgar (hasta 1 día): el aviso dice que puede cancelar el borrado, ya no es cierto. ¿Callar o mensaje distinto?
 - [ ] Errores de la API sin texto en `i18n/messages*.properties` (la app traduce por `code`); `OWNS_EVENTS` sigue ese patrón. Confirmar si se quieren textos en servidor.
 - [ ] Login con Apple cuando haya cuenta Apple Developer o app iOS.
-- [ ] Versión legal provisional `2026-11-draft` (`app/lib/features/auth/data/registration.dart`): sustituirla en `legal-paginas` por las versiones reales y añadir los enlaces a la casilla.
 - [ ] Login con Google en la app (botón + `REGISTRATION_REQUIRED`) cuando existan los client IDs.
 
 ## Prototipo Fase 1 (bloquean el uso real)
-- [ ] Raul: túnel de Cloudflare con `brackety.rgal.dev` y `brackety-api.rgal.dev` (`prototipo-f1.md`, Despliegue) y conexión a Internet en el pabellón: sin offline, sin red no funciona.
+- [ ] Raul · Cloudflare para dejarlo todo listo (sin configurar el 2026-11-05). Pasos en `09-despliegue.md` (paso 8); `.env` de la Pi en `prototipo-f1.md` (Despliegue):
+  - Un túnel en la Pi (Zero Trust → Networks → Tunnels, tipo Cloudflared); su token en `CLOUDFLARE_TUNNEL_TOKEN`.
+  - Hostname `brackety.rgal.dev` → `http://web:80` (web pública).
+  - Hostname `brackety-api.rgal.dev` → `http://api:8080` (API; la opción "Internet" de la APK apunta aquí y no funciona hasta entonces).
+  - Hostname `brackety-admin.rgal.dev` → `http://admin:80`, solo junto con su aplicación de Access (`CF_ACCESS_TEAM_DOMAIN`, `CF_ACCESS_AUD`). No hace falta para la F1.
+  - Relacionado: rate limiting de `/api/v1/auth/*` (Auth) y Email Routing de `privacidad@rgal.dev` (abajo).
+  - Comprobar desde datos móviles la web y `https://brackety-api.rgal.dev/actuator/health`.
+  - El pabellón no depende del túnel: va con el portátil (`modulos/servidor-local.md`).
 - [ ] Categorías reales de la Fase 1 (ahora ficticias: tramos del ranking, mixtas).
-- [ ] Aviso de privacidad mínimo visible antes de la fase (datos reales de menores sin páginas legales ni `PRIVACY_CONTACT_EMAIL`); la casilla del tutor ya está en la inscripción. Aceptado por Raul; lo cubre `legal-paginas` paso 2, adelantado (2026-11-04).
 - [ ] Base de datos de la fase en la SD (sin SSD) con copia diaria: ¿se acepta el riesgo o se compra antes el SSD?
 - [ ] Tras la fase: desactivar `DEMO_ACCOUNTS_ENABLED` y borrar las cuentas demo.
-- [ ] Raul: probar que el punto de acceso de Windows se activa **sin Internet** en el portátil (Windows suele exigir una conexión que compartir). Si no, plan B: router de viaje barato.
+- [ ] Wifi del pabellón: el punto de acceso de Windows no se activa sin Internet (probado por Raul el 2026-11-04) y la tarjeta AX200 no admite red hospedada. El bucle invertido no se deja elegir y el iPhone por USB no lo reconoce Windows (fallo de cable). Decidido por Raul: el portátil se conecta por wifi al punto de acceso del iPhone (cargando por cable) y lo comparte con el suyo (`192.168.137.1`). Probado el 2026-11-04: un móvil en el punto de acceso llega a la API en `192.168.137.1:8080` y sigue llegando con el iPhone sin datos. Quedan: el ahorro de energía del punto de acceso (lo apaga sin clientes) y el límite de 8 dispositivos.
+- [ ] Carpeta del pabellón (`servidor-local.md`), sin probar aún: encender el punto de acceso desde `start-event.ps1`, el aviso de UAC del firewall y arrancar en un portátil limpio (sin Java ni Visual C++ instalados).
+- [ ] Reglas "java" del firewall creadas al probar la carpeta en el portátil de Raul (aviso de Windows): mantener o borrar.
 - [ ] Raul: crear `privacidad@rgal.dev` (p. ej. reenvío de Cloudflare Email Routing a su Gmail).
 - [ ] Portátil del pabellón: ¿BitLocker activo? Confirmar el borrado de `brackety-data/` y del paquete tras la fase (`servidor-local.md`).
 - [ ] Móviles de árbitros y ayudantes: ¿todos Android y con permiso para instalar la APK? Si hay iPhone, ese usa la web (sin offline).
