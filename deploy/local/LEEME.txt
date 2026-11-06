@@ -14,7 +14,9 @@ ANTES DEL EVENTO
 PRIMER ARRANQUE (carpeta sin datos)
 - Con el paquete del evento:
      powershell -ExecutionPolicy Bypass -File .\start-event.ps1 -Package C:\ruta\fase-1-2026-11-14.brackety
-  Lo copia a brackety-data\ y lo carga. Crea las cuentas del staff que falten con contraseña = nombre de usuario.
+  Lo copia a brackety-data\ y lo carga. Crea las cuentas del staff que falten con una contraseña aleatoria
+  (10 letras y números) y las muestra al acabar; también quedan en brackety-data\credentials.txt
+  (usuario;rol;contraseña;tapices). Reparte cada una a mano a su dueño y borra el fichero tras la fase.
   Si el paquete no es válido, dice por qué y no carga nada: corrígelo y vuelve con -Reset -Package.
 - O un evento de prueba con las cuentas demo (club1, ayudante1-2, arbitro1-5):
      ... -File .\start-event.ps1 -Demo                (fecha de hoy)
@@ -58,7 +60,8 @@ DÓNDE ESTÁN LOS DATOS
      ... -File .\start-event.ps1 -Reset                     (solo archiva)
      ... -File .\start-event.ps1 -Reset -Package C:\ruta\evento.brackety
   Pide confirmación (s/N) y renombra brackety-data a brackety-data.old-AAAAMMDD-HHMMSS. No borra nada.
-- Al acabar la fase: borra brackety-data\, las brackety-data.old-* y el .brackety (llevan datos de menores).
+- Al acabar la fase: borra brackety-data\ (con credentials.txt), las brackety-data.old-* y el .brackety
+  (llevan datos de menores y contraseñas).
 
 PROBLEMAS
 - "El puerto 8080 ya está en uso": cierra la otra ventana del servidor.

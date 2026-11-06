@@ -52,6 +52,8 @@ $eventFile = Join-Path $data "event.env"
 # What the first start loaded: the package or the demo event. Without either, that start went wrong.
 $packageMark = Join-Path $data "package-loaded.txt"
 $demoMark = Join-Path $data "demo-loaded.txt"
+# Staff accounts the package created, with their random passwords (written by the API, never logged).
+$credentialsFile = Join-Path $data "credentials.txt"
 
 function Write-Step([string]$text) { Write-Host "-> $text" -ForegroundColor Cyan }
 function Write-Warn([string]$text) { Write-Host "AVISO: $text" -ForegroundColor Yellow }
@@ -315,13 +317,27 @@ function Set-ApiEnvironment([hashtable]$secrets, [string]$mode, [string]$package
     # Only the demo data folder creates demo accounts: a package brings its own and must not get a second event.
     $env:DEMO_ACCOUNTS_ENABLED = if ($mode -like "*demo") { "true" } else { "false" }
     $env:DEMO_EVENT_DATE = $day
-    if ($packageFile) { $env:BRACKETY_PACKAGE = $packageFile } else { Remove-Item Env:BRACKETY_PACKAGE -ErrorAction SilentlyContinue }
+    if ($packageFile) {
+        $env:BRACKETY_PACKAGE = $packageFile
+        $env:BRACKETY_PACKAGE_CREDENTIALS = $credentialsFile
+    } else {
+        Remove-Item Env:BRACKETY_PACKAGE, Env:BRACKETY_PACKAGE_CREDENTIALS -ErrorAction SilentlyContinue
+    }
     $env:LOGGING_FILE_NAME = Join-Path $data "api.log"
     foreach ($offline in @("RESEND_API_KEY", "GOOGLE_CLIENT_ID", "SUPERADMIN_EMAIL", "SUPERADMIN_PASSWORD_HASH",
             "CF_ACCESS_TEAM_DOMAIN", "CF_ACCESS_AUD", "ANTHROPIC_API_KEY")) {
         Remove-Item "env:$offline" -ErrorAction SilentlyContinue
     }
     if (-not $privacy) { Write-Warn "Sin PRIVACY_CONTACT_EMAIL (brackety-data\event.env) no se pueden publicar eventos." }
+}
+
+function Show-Credentials {
+    if (-not (Test-Path $credentialsFile)) { return }
+    Write-Host ""
+    Write-Host "Cuentas del staff creadas por el paquete (también en $credentialsFile):" -ForegroundColor Green
+    Get-Content $credentialsFile -Encoding UTF8 | ForEach-Object { Write-Host "  $_" }
+    Write-Warn "Reparte cada contraseña a mano solo a su dueño (no por grupos de mensajería)."
+    Write-Warn "Borra credentials.txt cuando acabe la fase."
 }
 
 function Wait-ApiReady([System.Diagnostics.Process]$api) {
@@ -396,6 +412,7 @@ try {
     if ($mode -eq "new-package") {
         Set-Content -Path $packageMark -Encoding utf8 -Value @("Paquete: $(Split-Path $packageFile -Leaf)", "Cargado: $loaded")
         Write-Step "Paquete $(Split-Path $packageFile -Leaf) cargado."
+        Show-Credentials
     } elseif ($mode -eq "new-demo") {
         Set-Content -Path $demoMark -Encoding utf8 -Value @("Evento demo y cuentas demo", "Creado: $loaded")
     }
@@ -419,5 +436,6 @@ try {
         Write-Warn "No se ha podido guardar la copia: $($_.Exception.Message)"
     }
     Stop-Postgres
-    Remove-Item Env:PGPASSWORD, Env:DB_PASSWORD, Env:JWT_SECRET, Env:BRACKETY_PACKAGE -ErrorAction SilentlyContinue
+    Remove-Item Env:PGPASSWORD, Env:DB_PASSWORD, Env:JWT_SECRET, Env:BRACKETY_PACKAGE,
+        Env:BRACKETY_PACKAGE_CREDENTIALS -ErrorAction SilentlyContinue
 }
