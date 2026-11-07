@@ -60,6 +60,12 @@ La URL de la API entra por `--dart-define-from-file=env/<destino>.json` (`API_BA
 - La pantalla **Conexión** de app y admin muestra la URL usada y la fecha del servidor: así se ve si el reloj simulado está activo.
 - Gradle (Android) usa JDK 21 (`flutter config --jdk-dir`); el servidor, JDK 25.
 
+## Navegador automatizado (Claude Code)
+- Plugin `playwright` del proyecto (`.claude/settings.json`): Claude abre app (5000) y admin (5001), recorre flujos y hace capturas en 360×800, 800×1280 y 1440×900.
+- Flutter web pinta en un canvas: en debug y con `APP_ENV=dev`, `enableSemanticsForAutomation()` (de `brackety_core`) activa el árbol de semántica para que Playwright encuentre botones y campos por su etiqueta. En release sigue apagado.
+- Widgets sin texto visible (iconos): añadir `tooltip` o `Semantics(label:)` traducido; sirve también a lectores de pantalla.
+- No sustituye a los widget tests ni a la prueba manual de Raul.
+
 ## Catálogo de escenarios
 | Nombre | Contenido | Para probar |
 |---|---|---|

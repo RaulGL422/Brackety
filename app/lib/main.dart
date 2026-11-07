@@ -14,6 +14,7 @@ Future<void> main() async {
   // URLs without '#', so the email links (/verify-email?token=…) open the right screen.
   usePathUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
+  enableSemanticsForAutomation();
   // Before the first request: the saved session belongs to the saved server.
   final savedServer = kIsWeb ? null : await const SecureServerStore().read();
   runApp(

@@ -1,5 +1,6 @@
 export 'l10n/gen/core_localizations.dart';
 export 'src/config/api_config.dart';
+export 'src/config/automation.dart';
 export 'src/l10n/localizations.dart';
 export 'src/layout/adaptive_scaffold.dart';
 export 'src/layout/adaptive_shell.dart';
