@@ -196,6 +196,16 @@ void main() {
                 remaining: Duration.zero,
                 estimatedEnd: DateTime(2026, 11, 14, 9),
               ),
+              MatOverview(
+                id: 'm3',
+                number: 3,
+                referee: 'arbitro3',
+                groups: 1,
+                pendingMatches: 1,
+                matchInProgress: false,
+                remaining: const Duration(minutes: 3),
+                estimatedEnd: DateTime(2026, 11, 14, 9, 3),
+              ),
             ],
           ),
         ],
@@ -251,6 +261,7 @@ void main() {
         find.textContaining('2 groups · 9 pending matches'),
         findsOneWidget,
       );
+      expect(find.textContaining('1 group · 1 pending match'), findsOneWidget);
       expect(find.textContaining('Estimated end 11:30'), findsOneWidget);
       expect(find.textContaining('1 match under review'), findsOneWidget);
       // Nothing left on mat 2: no estimated end.

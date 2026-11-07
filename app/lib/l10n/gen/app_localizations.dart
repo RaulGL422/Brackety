@@ -878,6 +878,18 @@ abstract class AppLocalizations {
   /// **'+1'**
   String get addPoint;
 
+  /// No description provided for @addPointFor.
+  ///
+  /// In es, this message translates to:
+  /// **'+1 {corner}'**
+  String addPointFor(String corner);
+
+  /// No description provided for @sanctionsFor.
+  ///
+  /// In es, this message translates to:
+  /// **'Avisos: {corner}'**
+  String sanctionsFor(String corner);
+
   /// No description provided for @warningsCount.
   ///
   /// In es, this message translates to:
@@ -1079,7 +1091,7 @@ abstract class AppLocalizations {
   /// No description provided for @matSummary.
   ///
   /// In es, this message translates to:
-  /// **'{groups} grupos · {pending} combates pendientes'**
+  /// **'{groups, plural, =1{1 grupo} other{{groups} grupos}} · {pending, plural, =1{1 combate pendiente} other{{pending} combates pendientes}}'**
   String matSummary(int groups, int pending);
 
   /// No description provided for @matNoReferee.
