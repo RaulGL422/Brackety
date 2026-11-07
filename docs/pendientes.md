@@ -75,6 +75,11 @@
 - [ ] Recopilar el reglamento completo en PDF para consulta cerca del marcador.
 - [ ] Confirmar orden de fases: deducido del Registro general (F1 suelo, F2 armas, F3 expresión técnica, F4 derribos).
 
+## Diseño tras la Fase 1 (revisión con Playwright, 2026-11-07)
+- [ ] Escritorio: Configuración, Puntuaciones y Tapices ocupan todo el ancho; aplicar anchos de formulario (480) y lectura (720) de `07-diseno.md`.
+- [ ] Tarjeta "Siguiente recomendado": naranja lleno + círculo de grupo + punto rojo chocan; probar `tertiaryContainer` con borde de acento.
+- [ ] Lector de pantalla: la lista de Puntuaciones se lee como un único bloque; una fila por alumno.
+
 ## Producto
 - [ ] Grupo con sobrante: opciones (promedio por combate / puntos brutos / decidir caso a caso) y respuesta final del organizador; será opción del evento.
 - [ ] Modelo exacto de equipos en torneos por equipos (plantilla, suplentes, entrenadores).

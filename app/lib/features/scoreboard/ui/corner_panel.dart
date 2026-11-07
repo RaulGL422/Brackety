@@ -60,6 +60,7 @@ class CornerPanel extends StatelessWidget {
             _Tally(corner: corner, style: onColor),
             const SizedBox(height: AppSpacing.s),
             _Buttons(
+              side: side,
               corner: corner,
               color: color,
               enabled: enabled,
@@ -99,6 +100,8 @@ class _Header extends StatelessWidget {
         Expanded(
           child: Tooltip(
             message: name,
+            // The text already gives the name to screen readers; the tooltip would repeat it.
+            excludeFromSemantics: true,
             child: Text(
               name,
               style: text.titleLarge?.merge(style),
@@ -145,6 +148,7 @@ class _Tally extends StatelessWidget {
 
 class _Buttons extends StatelessWidget {
   const _Buttons({
+    required this.side,
     required this.corner,
     required this.color,
     required this.enabled,
@@ -152,6 +156,7 @@ class _Buttons extends StatelessWidget {
     required this.onSanction,
   });
 
+  final Side side;
   final Corner corner;
   final CompetitorColor color;
   final bool enabled;
@@ -162,6 +167,7 @@ class _Buttons extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
+    final cornerLabel = cornerName(l10n, side);
     return Row(
       children: [
         Expanded(
@@ -173,12 +179,17 @@ class _Buttons extends StatelessWidget {
               textStyle: Theme.of(context).textTheme.headlineMedium,
             ),
             onPressed: enabled ? onPoint : null,
-            child: Text(l10n.addPoint, maxLines: 1),
+            child: Text(
+              l10n.addPoint,
+              maxLines: 1,
+              semanticsLabel: l10n.addPointFor(cornerLabel),
+            ),
           ),
         ),
         const SizedBox(width: AppSpacing.s),
         PopupMenuButton<MatchAction>(
           enabled: enabled,
+          tooltip: l10n.sanctionsFor(cornerLabel),
           iconColor: color.onColor,
           iconSize: AppSizes.touchTarget,
           onSelected: onSanction,

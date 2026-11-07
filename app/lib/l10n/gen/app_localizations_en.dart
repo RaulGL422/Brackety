@@ -461,6 +461,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addPoint => '+1';
 
   @override
+  String addPointFor(String corner) {
+    return '+1 $corner';
+  }
+
+  @override
+  String sanctionsFor(String corner) {
+    return 'Warnings: $corner';
+  }
+
+  @override
   String warningsCount(int count) {
     return 'Warnings: $count';
   }
@@ -573,7 +583,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String matSummary(int groups, int pending) {
-    return '$groups groups · $pending pending matches';
+    String _temp0 = intl.Intl.pluralLogic(
+      groups,
+      locale: localeName,
+      other: '$groups groups',
+      one: '1 group',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      pending,
+      locale: localeName,
+      other: '$pending pending matches',
+      one: '1 pending match',
+    );
+    return '$_temp0 · $_temp1';
   }
 
   @override

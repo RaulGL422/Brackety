@@ -240,6 +240,10 @@
   "undo": "Deshacer",
   "timeline": "Línea de tiempo",
   "addPoint": "+1",
+  "addPointFor": "+1 {corner}",
+  "@addPointFor": {"placeholders": {"corner": {"type": "String"}}},
+  "sanctionsFor": "Avisos: {corner}",
+  "@sanctionsFor": {"placeholders": {"corner": {"type": "String"}}},
   "warningsCount": "Advertencias: {count}",
   "@warningsCount": {
     "placeholders": {
@@ -324,7 +328,7 @@
     }
   },
   "matsEmpty": "No hay tapices.",
-  "matSummary": "{groups} grupos · {pending} combates pendientes",
+  "matSummary": "{groups, plural, =1{1 grupo} other{{groups} grupos}} · {pending, plural, =1{1 combate pendiente} other{{pending} combates pendientes}}",
   "@matSummary": {
     "placeholders": {
       "groups": {

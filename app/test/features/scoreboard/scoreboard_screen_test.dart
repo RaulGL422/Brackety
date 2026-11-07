@@ -406,6 +406,24 @@ void main() {
     await tester.pumpWidget(const SizedBox());
   });
 
+  testWidgets('screen readers tell the corners apart and hear each name once', (
+    tester,
+  ) async {
+    setSize(tester, sizes['phone']!);
+    await open(tester, matchView(status: MatchStatus.inProgress));
+
+    expect(find.bySemanticsLabel('+1 Red'), findsOneWidget);
+    expect(find.bySemanticsLabel('+1 Blue'), findsOneWidget);
+    expect(find.byTooltip('Warnings: Red'), findsOneWidget);
+    expect(find.byTooltip('Warnings: Blue'), findsOneWidget);
+    expect(
+      find.bySemanticsLabel(RegExp('Ana Prueba.*Ana Prueba')),
+      findsNothing,
+    );
+
+    await tester.pumpWidget(const SizedBox());
+  });
+
   for (final MapEntry(key: device, value: size) in layouts.entries) {
     testWidgets('a finished match marks the winner on $device', (tester) async {
       setSize(tester, size, scale: 2);
