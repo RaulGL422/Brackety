@@ -677,5 +677,10 @@
   "draftSlot": "Hueco {number}",
   "@draftSlot": {"placeholders": {"number": {"type": "int"}}},
   "ghostOf": "{name} (fantasma)",
-  "@ghostOf": {"placeholders": {"name": {"type": "String"}}}
+  "@ghostOf": {"placeholders": {"name": {"type": "String"}}},
+  "settingsAppearance": "Apariencia",
+  "settingsAppearanceHint": "Automático sigue al modo claro u oscuro del dispositivo. Se guarda solo en este dispositivo.",
+  "themeSystem": "Automático",
+  "themeLight": "Claro",
+  "themeDark": "Oscuro"
 }

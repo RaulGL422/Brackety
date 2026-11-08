@@ -2617,6 +2617,36 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'{name} (fantasma)'**
   String ghostOf(String name);
+
+  /// No description provided for @settingsAppearance.
+  ///
+  /// In es, this message translates to:
+  /// **'Apariencia'**
+  String get settingsAppearance;
+
+  /// No description provided for @settingsAppearanceHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Automático sigue al modo claro u oscuro del dispositivo. Se guarda solo en este dispositivo.'**
+  String get settingsAppearanceHint;
+
+  /// No description provided for @themeSystem.
+  ///
+  /// In es, this message translates to:
+  /// **'Automático'**
+  String get themeSystem;
+
+  /// No description provided for @themeLight.
+  ///
+  /// In es, this message translates to:
+  /// **'Claro'**
+  String get themeLight;
+
+  /// No description provided for @themeDark.
+  ///
+  /// In es, this message translates to:
+  /// **'Oscuro'**
+  String get themeDark;
 }
 
 class _AppLocalizationsDelegate

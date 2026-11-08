@@ -1536,4 +1536,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String ghostOf(String name) {
     return '$name (ghost)';
   }
+
+  @override
+  String get settingsAppearance => 'Appearance';
+
+  @override
+  String get settingsAppearanceHint =>
+      'Automatic follows the device\'s light or dark mode. It is saved on this device only.';
+
+  @override
+  String get themeSystem => 'Automatic';
+
+  @override
+  String get themeLight => 'Light';
+
+  @override
+  String get themeDark => 'Dark';
 }

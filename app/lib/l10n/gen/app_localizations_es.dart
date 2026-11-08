@@ -1552,4 +1552,20 @@ class AppLocalizationsEs extends AppLocalizations {
   String ghostOf(String name) {
     return '$name (fantasma)';
   }
+
+  @override
+  String get settingsAppearance => 'Apariencia';
+
+  @override
+  String get settingsAppearanceHint =>
+      'Automático sigue al modo claro u oscuro del dispositivo. Se guarda solo en este dispositivo.';
+
+  @override
+  String get themeSystem => 'Automático';
+
+  @override
+  String get themeLight => 'Claro';
+
+  @override
+  String get themeDark => 'Oscuro';
 }
