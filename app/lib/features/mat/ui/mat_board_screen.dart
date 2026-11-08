@@ -52,8 +52,8 @@ class MatBoardScreen extends ConsumerWidget {
     return KeepScreenOn(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: colors.heri,
-          foregroundColor: colors.onHeri,
+          backgroundColor: colors.band,
+          foregroundColor: colors.onBand,
           shape: const Border(),
           toolbarHeight: 88,
           title: Column(
@@ -62,11 +62,11 @@ class MatBoardScreen extends ConsumerWidget {
               if (!readOnly)
                 Text(
                   l10n.matYours,
-                  style: text.bodyMedium?.copyWith(color: colors.onHeri),
+                  style: text.bodyMedium?.copyWith(color: colors.onBand),
                 ),
               Text(
                 number == null ? '' : l10n.matTitle(number),
-                style: text.displaySmall?.copyWith(color: colors.onHeri),
+                style: text.displaySmall?.copyWith(color: colors.onBand),
               ),
             ],
           ),
@@ -76,7 +76,7 @@ class MatBoardScreen extends ConsumerWidget {
                 padding: const EdgeInsets.only(right: AppSpacing.l),
                 child: Text(
                   l10n.matToPlay(toPlay),
-                  style: text.bodyMedium?.copyWith(color: colors.onHeri),
+                  style: text.bodyMedium?.copyWith(color: colors.onBand),
                 ),
               ),
           ],
@@ -228,13 +228,20 @@ class _FeaturedMatch extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
+    // In progress: an ink band. Next: a thick frame. Neither borrows a colour a competitor may wear.
     final (band, onBand) = inProgress
         ? (scheme.inverseSurface, scheme.onInverseSurface)
-        : (scheme.tertiary, scheme.onTertiary);
+        : (scheme.surfaceContainerLow, scheme.onSurface);
     final group = board.groups.where((g) => g.id == match.groupId).firstOrNull;
     void open() => _open(context, match, readOnly);
     return Card(
       clipBehavior: Clip.antiAlias,
+      shape: inProgress
+          ? null
+          : RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadius.m),
+              side: BorderSide(color: scheme.onSurface, width: 3),
+            ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -261,6 +268,7 @@ class _FeaturedMatch extends StatelessWidget {
               ),
             ),
           ),
+          if (!inProgress) const Divider(),
           ListTile(
             contentPadding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.l,

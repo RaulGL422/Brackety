@@ -5,13 +5,13 @@ import 'package:flutter/services.dart';
 import 'brackety_colors.dart';
 import 'tokens.dart';
 
-const _bodyFont = 'packages/brackety_core/ZenKakuGothicNew';
+const _bodyFont = 'packages/brackety_core/AtkinsonHyperlegibleNext';
 const _displayFont = 'packages/brackety_core/SairaCondensed';
 
 /// The bundled fonts are OFL: their notices must appear in the licenses page.
 void registerFontLicenses() {
   for (final (name, file) in [
-    ('Zen Kaku Gothic New', 'OFL-ZenKakuGothicNew.txt'),
+    ('Atkinson Hyperlegible Next', 'OFL-AtkinsonHyperlegibleNext.txt'),
     ('Saira Condensed', 'OFL-SairaCondensed.txt'),
   ]) {
     LicenseRegistry.addLicense(() async* {
@@ -136,75 +136,73 @@ ThemeData buildTheme(Brightness brightness) {
   );
 }
 
-// Tatami: the mat is the object of the day. Igusa green (the straw) is the
-// action colour, so red and blue stay for the two corners only.
+// Neutral: colour belongs to the competitors, which every event picks from
+// [CompetitorColor], and to the states. Ink is the action colour.
 const _light = ColorScheme(
   brightness: Brightness.light,
-  primary: Color(0xFF4A6B2A),
+  primary: Color(0xFF1A1A1A),
   onPrimary: Color(0xFFFFFFFF),
-  primaryContainer: Color(0xFFDDE4CF),
-  onPrimaryContainer: Color(0xFF22241F),
-  secondary: Color(0xFF2F3B26),
+  primaryContainer: Color(0xFFE2E2E2),
+  onPrimaryContainer: Color(0xFF1A1A1A),
+  secondary: Color(0xFF4A4A4A),
   onSecondary: Color(0xFFFFFFFF),
-  secondaryContainer: Color(0xFFE6E9DF),
-  onSecondaryContainer: Color(0xFF22241F),
-  tertiary: Color(0xFFD9A83A),
-  onTertiary: Color(0xFF22241F),
-  tertiaryContainer: Color(0xFFF6E7C2),
-  onTertiaryContainer: Color(0xFF22241F),
+  secondaryContainer: Color(0xFFE4E4E4),
+  onSecondaryContainer: Color(0xFF1A1A1A),
+  tertiary: Color(0xFF3A3A3A),
+  onTertiary: Color(0xFFFFFFFF),
+  tertiaryContainer: Color(0xFFEBEBEB),
+  onTertiaryContainer: Color(0xFF1A1A1A),
   error: Color(0xFF8A3A12),
   onError: Color(0xFFFFFFFF),
   errorContainer: Color(0xFFF6DFD3),
   onErrorContainer: Color(0xFF4A1C06),
-  surface: Color(0xFFF3F4EF),
-  onSurface: Color(0xFF22241F),
-  onSurfaceVariant: Color(0xFF4C5245),
+  surface: Color(0xFFF2F2F2),
+  onSurface: Color(0xFF1A1A1A),
+  onSurfaceVariant: Color(0xFF555555),
   surfaceContainerLowest: Color(0xFFFFFFFF),
   surfaceContainerLow: Color(0xFFFFFFFF),
-  surfaceContainer: Color(0xFFEBEDE5),
-  surfaceContainerHigh: Color(0xFFE4E7DD),
-  surfaceContainerHighest: Color(0xFFDDE1D5),
-  outline: Color(0xFF8B9180),
-  outlineVariant: Color(0xFFD5D8CE),
-  inverseSurface: Color(0xFF22241F),
-  onInverseSurface: Color(0xFFF3F4EF),
-  inversePrimary: Color(0xFF8DB25A),
+  surfaceContainer: Color(0xFFEAEAEA),
+  surfaceContainerHigh: Color(0xFFE4E4E4),
+  surfaceContainerHighest: Color(0xFFDCDCDC),
+  outline: Color(0xFF8A8A8A),
+  outlineVariant: Color(0xFFD4D4D4),
+  inverseSurface: Color(0xFF1A1A1A),
+  onInverseSurface: Color(0xFFF2F2F2),
+  inversePrimary: Color(0xFFEDEDED),
   surfaceTint: Colors.transparent,
 );
 
-// Not an inverted palette: the hall with the lights down. The green gets
-// lighter to stay the action colour, with dark text on it.
 const _dark = ColorScheme(
   brightness: Brightness.dark,
-  primary: Color(0xFF8DB25A),
-  onPrimary: Color(0xFF161914),
-  primaryContainer: Color(0xFF27301D),
-  onPrimaryContainer: Color(0xFFDDE8C8),
-  secondary: Color(0xFFC9D8AE),
-  onSecondary: Color(0xFF161914),
-  secondaryContainer: Color(0xFF2A3024),
-  onSecondaryContainer: Color(0xFFECEEE6),
-  tertiary: Color(0xFFE0B354),
-  onTertiary: Color(0xFF161914),
-  tertiaryContainer: Color(0xFF4A3A12),
-  onTertiaryContainer: Color(0xFFF6E7C2),
+  primary: Color(0xFFEDEDED),
+  onPrimary: Color(0xFF141414),
+  primaryContainer: Color(0xFF333333),
+  onPrimaryContainer: Color(0xFFEDEDED),
+  secondary: Color(0xFFC8C8C8),
+  onSecondary: Color(0xFF141414),
+  secondaryContainer: Color(0xFF2E2E2E),
+  onSecondaryContainer: Color(0xFFEDEDED),
+  tertiary: Color(0xFFC8C8C8),
+  onTertiary: Color(0xFF141414),
+  tertiaryContainer: Color(0xFF2A2A2A),
+  onTertiaryContainer: Color(0xFFEDEDED),
   error: Color(0xFFF0A27A),
   onError: Color(0xFF2A1105),
   errorContainer: Color(0xFF5A2810),
   onErrorContainer: Color(0xFFF6DFD3),
-  surface: Color(0xFF161914),
-  onSurface: Color(0xFFECEEE6),
-  onSurfaceVariant: Color(0xFFA7AE9B),
-  surfaceContainerLowest: Color(0xFF10130E),
-  surfaceContainerLow: Color(0xFF1F231B),
-  surfaceContainer: Color(0xFF232820),
-  surfaceContainerHigh: Color(0xFF2A2F25),
-  surfaceContainerHighest: Color(0xFF333A2C),
-  outline: Color(0xFF5A6150),
-  outlineVariant: Color(0xFF333A2C),
-  inverseSurface: Color(0xFFECEEE6),
-  onInverseSurface: Color(0xFF22241F),
-  inversePrimary: Color(0xFF4A6B2A),
+  surface: Color(0xFF141414),
+  onSurface: Color(0xFFEDEDED),
+  onSurfaceVariant: Color(0xFFA8A8A8),
+  surfaceContainerLowest: Color(0xFF0E0E0E),
+  surfaceContainerLow: Color(0xFF1F1F1F),
+  surfaceContainer: Color(0xFF232323),
+  surfaceContainerHigh: Color(0xFF2A2A2A),
+  surfaceContainerHighest: Color(0xFF353535),
+  outline: Color(0xFF6B6B6B),
+  outlineVariant: Color(0xFF353535),
+  inverseSurface: Color(0xFFEDEDED),
+  onInverseSurface: Color(0xFF1A1A1A),
+  inversePrimary: Color(0xFF1A1A1A),
   surfaceTint: Colors.transparent,
 );
 

@@ -14,19 +14,20 @@ Salida: `docs/07-diseno.md` actualizado con tokens (colores, tipografía, espaci
 Validación visual: página **Diseño** del admin, solo en debug (`./run-app.ps1 -Target web -App admin`). Muestra colores con su contraste, tipografía, espaciados, radios, componentes y ejemplos (marcador, clasificación), en claro/oscuro y con texto hasta 200 %. Revisarla al cambiar el tema.
 
 ## Tokens (en `packages/brackety_core/lib/src/theme`)
-Sistema **Tatami**: el tapiz es el objeto del día y todo se organiza a su alrededor. Maquetas: canvas de diseño de Raul (2026-11-08).
-- Color: `ColorScheme` fijo, claro y oscuro (no generado por semilla).
+Sistema **neutro multideporte**: el color es de quien compite. La app se queda en blanco, gris y tinta, y cada evento elige los colores de sus competidores sin que choquen con ningún botón. Maquetas: canvas de diseño de Raul (2026-11-08).
+- Color: `ColorScheme` fijo, claro y oscuro (no generado por semilla), sin tinte.
   | Papel | Claro | Oscuro |
   |---|---|---|
-  | Acción, igusa (`primary`) | `#4A6B2A` | `#8DB25A` |
-  | Ribete, heri (`BracketyColors.heri`, cabeceras) | `#2F3B26` | `#0E110B` |
-  | Lo siguiente, kin (`tertiary`) | `#D9A83A` | `#E0B354` |
-  | Fondo, washi (`surface`) | `#F3F4EF` | `#161914` |
-  | Texto, sumi (`onSurface`) | `#22241F` | `#ECEEE6` |
-- Rojo `#C62B2B` y azul `#1F57B8` solo para las esquinas (`CompetitorColor`). El error usa un ladrillo (`#8A3A12`), no rojo.
-- Estados: `BracketyColors` (`ThemeExtension`): success, warning (+ containers), `heri`/`onHeri` y `matFrame` (ribete de un tapiz).
-- Competidores: `CompetitorColor` (12 colores fijos en claro y oscuro, cada uno con su color de texto AA).
-- Tipografía: Zen Kaku Gothic New (texto; solo glifos latinos) y Saira Condensed (display, headline, reloj, puntos, número de tapiz), empaquetadas en assets (offline), licencia OFL.
+  | Tinta y acción (`primary`, `onSurface`) | `#1A1A1A` | `#EDEDED` |
+  | Fondo (`surface`) | `#F2F2F2` | `#141414` |
+  | Tarjeta (`surfaceContainerLow`) | `#FFFFFF` | `#1F1F1F` |
+  | Secundario (`onSurfaceVariant`) | `#555555` | `#A8A8A8` |
+  | Banda de cabecera (`BracketyColors.band`) | `#1A1A1A` | `#000000` |
+- "Siguiente combate" se marca con marco grueso de tinta, icono y palabra; "En curso", con banda de tinta. Nunca con un color que pueda llevar un competidor.
+- Estados con color propio y siempre con icono y palabra: error ladrillo (`#8A3A12`), aviso ámbar, correcto verde. No se usan en el marcador.
+- Estados: `BracketyColors` (`ThemeExtension`): success, warning (+ containers) y `band`/`onBand`.
+- Competidores: `CompetitorColor` (12 colores fijos en claro y oscuro, cada uno con su color de texto AA). En artes marciales, siempre rojo `#C62B2B` y azul `#1F57B8`.
+- Tipografía: Atkinson Hyperlegible Next (texto: distingue I, l, 1 y O, 0 con poca vista o al sol) y Saira Condensed (display, headline, reloj, puntos, número de ubicación), empaquetadas en assets sin modificar (offline), licencia OFL.
 - Espaciado `AppSpacing` 4·8·12·16·24·32·48. Radios `AppRadius` 4·6·8·full: rectángulos con esquina corta, nunca cápsulas. Táctil `AppSizes` 48 (general) y 72 (marcador); iconos del marcador 40. Anchos: formulario 480, lectura 720, columna de tabla en móvil 200 (la tabla se desplaza en horizontal).
 - Marcador: siempre con el tema oscuro, también en modo claro.
 - Componentes: estilo vía `ThemeData` (botones, tarjetas, campos, chips, diálogos, barras). Widgets propios solo al repetirse.
@@ -59,4 +60,4 @@ Cada pantalla se diseña y prueba en móvil, tablet y escritorio. Clases de vent
 - Marcador/tapiz: en horizontal aprovecha el ancho; en tablet, los botones siguen al alcance de una mano.
 
 ## Estado
-Tatami (2026-11-08) sustituye a Eléctrico + Barlow (2026-10-30). Aplicado al tema y a las pantallas de la F1 (tablero del árbitro, marcador, crear grupo); el resto, en `pendientes.md`.
+Neutro multideporte (2026-11-08) sustituye a Tatami (el mismo día, demasiado ligado a artes marciales) y a Eléctrico + Barlow (2026-10-30). Aplicado al tema y a las pantallas de la F1 (tablero del árbitro, marcador, crear grupo); el resto, en `pendientes.md`.

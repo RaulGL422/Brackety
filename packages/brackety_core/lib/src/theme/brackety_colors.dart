@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Colors that Material's [ColorScheme] does not cover: states and the mat.
+/// Colors that Material's [ColorScheme] does not cover: states and the header band.
 class BracketyColors extends ThemeExtension<BracketyColors> {
   const BracketyColors({
     required this.success,
@@ -11,9 +11,8 @@ class BracketyColors extends ThemeExtension<BracketyColors> {
     required this.onWarning,
     required this.warningContainer,
     required this.onWarningContainer,
-    required this.heri,
-    required this.onHeri,
-    required this.matFrame,
+    required this.band,
+    required this.onBand,
   });
 
   factory BracketyColors.from(Brightness brightness) =>
@@ -28,23 +27,21 @@ class BracketyColors extends ThemeExtension<BracketyColors> {
     onWarning: Color(0xFFFFFFFF),
     warningContainer: Color(0xFFF6E7C2),
     onWarningContainer: Color(0xFF3D2A00),
-    heri: Color(0xFF2F3B26),
-    onHeri: Color(0xFFFFFFFF),
-    matFrame: Color(0xFF2F3B26),
+    band: Color(0xFF1A1A1A),
+    onBand: Color(0xFFFFFFFF),
   );
 
   static const _dark = BracketyColors(
     success: Color(0xFF9CC46A),
-    onSuccess: Color(0xFF161914),
+    onSuccess: Color(0xFF141414),
     successContainer: Color(0xFF2F3F1E),
     onSuccessContainer: Color(0xFFDDE8C8),
     warning: Color(0xFFE0B354),
-    onWarning: Color(0xFF161914),
+    onWarning: Color(0xFF141414),
     warningContainer: Color(0xFF4A3A12),
     onWarningContainer: Color(0xFFF6E7C2),
-    heri: Color(0xFF0E110B),
-    onHeri: Color(0xFFECEEE6),
-    matFrame: Color(0xFF3E5326),
+    band: Color(0xFF000000),
+    onBand: Color(0xFFEDEDED),
   );
 
   final Color success;
@@ -56,12 +53,9 @@ class BracketyColors extends ThemeExtension<BracketyColors> {
   final Color warningContainer;
   final Color onWarningContainer;
 
-  /// The mat border (heri): headers and side bars that frame the mat.
-  final Color heri;
-  final Color onHeri;
-
-  /// The border of a mat tile in the club's floor plan.
-  final Color matFrame;
+  /// The dark band of the headers that frame a location (the referee's mat).
+  final Color band;
+  final Color onBand;
 
   static BracketyColors of(BuildContext context) {
     final theme = Theme.of(context);
@@ -79,9 +73,8 @@ class BracketyColors extends ThemeExtension<BracketyColors> {
     Color? onWarning,
     Color? warningContainer,
     Color? onWarningContainer,
-    Color? heri,
-    Color? onHeri,
-    Color? matFrame,
+    Color? band,
+    Color? onBand,
   }) => BracketyColors(
     success: success ?? this.success,
     onSuccess: onSuccess ?? this.onSuccess,
@@ -91,9 +84,8 @@ class BracketyColors extends ThemeExtension<BracketyColors> {
     onWarning: onWarning ?? this.onWarning,
     warningContainer: warningContainer ?? this.warningContainer,
     onWarningContainer: onWarningContainer ?? this.onWarningContainer,
-    heri: heri ?? this.heri,
-    onHeri: onHeri ?? this.onHeri,
-    matFrame: matFrame ?? this.matFrame,
+    band: band ?? this.band,
+    onBand: onBand ?? this.onBand,
   );
 
   @override
@@ -124,9 +116,8 @@ class BracketyColors extends ThemeExtension<BracketyColors> {
         other.onWarningContainer,
         t,
       )!,
-      heri: Color.lerp(heri, other.heri, t)!,
-      onHeri: Color.lerp(onHeri, other.onHeri, t)!,
-      matFrame: Color.lerp(matFrame, other.matFrame, t)!,
+      band: Color.lerp(band, other.band, t)!,
+      onBand: Color.lerp(onBand, other.onBand, t)!,
     );
   }
 }

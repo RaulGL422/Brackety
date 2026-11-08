@@ -77,8 +77,10 @@
 
 ## Diseño tras la Fase 1 (revisión con Playwright, 2026-11-07)
 - [ ] Escritorio: Configuración, Puntuaciones y Tapices ocupan todo el ancho; aplicar anchos de formulario (480) y lectura (720) de `07-diseno.md` (el tablero del árbitro ya lo hace).
-- [ ] Tatami en el resto de pantallas: maquetas antes de programar (inicio, login, mesa del club como planta de tapices, inscripciones, ajustes, admin). Quitar los textos con punto medio ("6 años · 132 cm") en favor de columnas con etiqueta.
-- [ ] Marcador en la web (sin `opId`): dos pestañas o móviles del mismo árbitro pulsando a la vez suman dos acciones; no se comprueba qué veía cada uno. ¿Mandar también `knownEvents` desde la web y responder 409 si no cuadra? Preguntar a Raul.
+- [ ] Sistema neutro en el resto de pantallas: maquetas antes de programar (inicio, login, mesa del club como planta de tapices, inscripciones, ajustes, admin). Quitar los textos con punto medio ("6 años · 132 cm") en favor de columnas con etiqueta.
+- [ ] Web sin conexión (offline), después de la F1, en dos pasos. 1) Con la pestaña abierta: cola del marcador guardada en el navegador y enviada al volver la red (vale en http y https). 2) Completa por https (`brackety.rgal.dev`): la app se guarda en el navegador y abre sin red. En http (pabellón) el navegador no permite el paso 2. Útil sobre todo para iPhone. Aprobado por Raul el 2026-11-08.
+- [ ] "Tapiz" fijo en los textos: en otros deportes será Pista, Campo… Debe salir del nombre de la ubicación del evento (módulo `eventos`).
+- [ ] Marcador en la web (sin `opId`): dos pestañas o móviles del mismo árbitro pulsando a la vez suman dos acciones. Aprobado por Raul el 2026-11-08, rama propia tras fusionar la #57: `knownEvents` obligatorio en toda acción; en la web, si no cuadra, 409 sin revisión del club, recarga y aviso; la web envía de una en una.
 - [ ] Lector de pantalla: la lista de Puntuaciones se lee como un único bloque; una fila por alumno.
 - [ ] Quitar `maxGroupsPerMat` del servidor (BD, API, paquete con nueva `schemaVersion`) y del límite de grupos por petición; la app ya no lo usa.
 
@@ -94,6 +96,7 @@
 - 2026-10-30 · Tokens de acceso y reauth emitidos antes de un cambio de credenciales o borrado se rechazan (`sessions_revoked_at`).
 - 2026-10-30 · Cuenta en borrado lógico: durante 30 días el dueño la reactiva al iniciar sesión (`ACCOUNT_PENDING_DELETION` + restaurar); registrarse con ese email avisa al dueño y no crea otra.
 - 2026-11-08 · Dirección de diseño Tatami (claro y oscuro) aceptada por Raul; sustituye a Eléctrico y Barlow.
+- 2026-11-08 · Tatami sustituido por el sistema neutro multideporte con Atkinson Hyperlegible Next (Raul).
 - 2026-11-08 · Modo claro u oscuro fijable en Ajustes (Automático, Claro, Oscuro), guardado en el dispositivo.
 - 2026-10-30 · Sistema de diseño validado: paleta Eléctrico y Barlow.
 - 2026-10-28 · Android cmdline-tools instaladas; `flutter doctor` sin errores para Android y web.

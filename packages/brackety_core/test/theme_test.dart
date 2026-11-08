@@ -29,7 +29,7 @@ void main() {
         'successContainer': (b.successContainer, b.onSuccessContainer),
         'warning': (b.warning, b.onWarning),
         'warningContainer': (b.warningContainer, b.onWarningContainer),
-        'heri': (b.heri, b.onHeri),
+        'band': (b.band, b.onBand),
       };
 
       for (final MapEntry(key: name, value: (bg, fg)) in pairs.entries) {

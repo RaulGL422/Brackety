@@ -164,10 +164,11 @@ void main() {
           ),
           findsOneWidget,
         );
-        expect(
-          contrastRatio(scheme.tertiary, scheme.onTertiary),
-          greaterThanOrEqualTo(4.5),
-        );
+        // Next stands out by a thick ink frame, not by a colour a competitor may wear.
+        final frame =
+            tester.widget<Card>(recommended).shape! as RoundedRectangleBorder;
+        expect(frame.side.color, scheme.onSurface);
+        expect(frame.side.width, 3);
 
         final waiting = matchTile('Carla', 'Diego · Ghost');
         expect(tile(waiting).onTap, isNull);
