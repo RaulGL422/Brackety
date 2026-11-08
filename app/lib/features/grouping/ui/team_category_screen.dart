@@ -44,8 +44,9 @@ class TeamCategoryScreen extends ConsumerWidget {
             TextButton.icon(
               icon: const Icon(Icons.person_outline),
               label: Text(l10n.individualGroup),
-              onPressed: () => context.push(
-                '/events/$eventId/categories/$categoryId?fromTeams=1',
+              // Replaces this screen, so back goes to the categories, not here.
+              onPressed: () => context.pushReplacement(
+                '/events/$eventId/categories/$categoryId?teamSize=$teamSize',
                 extra: categoryName,
               ),
             ),

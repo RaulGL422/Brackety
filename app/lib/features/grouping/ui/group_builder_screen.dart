@@ -13,20 +13,22 @@ import 'draft_panel.dart';
 import 'pick_mark.dart';
 
 /// A category's participants: pick 4 (or 3 and a ghost) and send them to a mat.
-/// Opened from a team category ([fromTeams]) for those left without a team, with a way back.
+/// Opened from a team category ([teamSize] set) for those left without a team, with a way back.
 class GroupBuilderScreen extends ConsumerStatefulWidget {
   const GroupBuilderScreen({
     super.key,
     required this.eventId,
     required this.categoryId,
     this.categoryName,
-    this.fromTeams = false,
+    this.teamSize,
   });
 
   final String eventId;
   final String categoryId;
   final String? categoryName;
-  final bool fromTeams;
+
+  /// Set when opened from a team category.
+  final int? teamSize;
 
   @override
   ConsumerState<GroupBuilderScreen> createState() => _GroupBuilderScreenState();
@@ -113,11 +115,21 @@ class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
               : l10n.categoryAges(widget.categoryName!),
         ),
         actions: [
-          if (widget.fromTeams)
+          if (widget.teamSize != null)
             TextButton.icon(
               icon: const Icon(Icons.groups_outlined),
               label: Text(l10n.teamGroup),
-              onPressed: () => context.pop(),
+              // Replaces this screen, so back goes to the categories.
+              onPressed: () => context.pushReplacement(
+                Uri(
+                  path:
+                      '/events/${widget.eventId}/categories/${widget.categoryId}/teams',
+                  queryParameters: {
+                    'name': widget.categoryName ?? '',
+                    'size': '${widget.teamSize}',
+                  },
+                ).toString(),
+              ),
             ),
         ],
         bottom: PreferredSize(

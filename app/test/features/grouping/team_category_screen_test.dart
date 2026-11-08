@@ -162,6 +162,12 @@ void main() {
     await tester.tap(find.text('Team group'));
     await tester.pumpAndSettle();
     expect(find.text('New team · 0/3'), findsOneWidget);
+
+    // The two screens replace each other: back leaves the category, not to the other one.
+    await tester.tap(find.byTooltip('Back'));
+    await tester.pumpAndSettle();
+    expect(find.text('Team group'), findsNothing);
+    expect(find.text('Individual group'), findsNothing);
   });
 
   testWidgets('a team without a group can be undone', (tester) async {
