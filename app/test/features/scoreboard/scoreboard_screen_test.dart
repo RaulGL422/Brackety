@@ -386,7 +386,8 @@ void main() {
     await tester.tap(find.text('Resume'));
     await settle(tester);
 
-    expect(background('Stop'), scheme.inverseSurface);
+    expect(background('Stop'), Colors.transparent);
+    expect(start, scheme.primary);
     expect(background('Stop'), isNot(start));
 
     await tester.pumpWidget(const SizedBox());

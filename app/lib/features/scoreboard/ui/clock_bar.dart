@@ -136,7 +136,10 @@ class _Clock extends StatelessWidget {
   }
 }
 
-/// Start (green), stop (dark, strong) or finish; in review nothing is accepted.
+/// Start, stop or finish, by icon and word and without state colours: the colours on the
+/// scoreboard are the competitors'. Stop is outlined, start and finish filled, so the button
+/// also says whether the clock runs, and none looks like undo. In review
+/// nothing is accepted.
 class _ClockButton extends StatelessWidget {
   const _ClockButton({
     required this.view,
@@ -152,7 +155,6 @@ class _ClockButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
-    final colors = BracketyColors.of(context);
     final locked = view.review != null;
     final (action, icon, label, background, foreground) = over
         ? (
@@ -167,8 +169,8 @@ class _ClockButton extends StatelessWidget {
             MatchAction.stop,
             Icons.pause,
             l10n.clockStop,
-            scheme.inverseSurface,
-            scheme.onInverseSurface,
+            Colors.transparent,
+            scheme.onSurface,
           )
         : (
             MatchAction.start,
@@ -176,19 +178,27 @@ class _ClockButton extends StatelessWidget {
             view.status == MatchStatus.pending
                 ? l10n.clockStart
                 : l10n.clockResume,
-            colors.success,
-            colors.onSuccess,
+            scheme.primary,
+            scheme.onPrimary,
           );
     return FilledButton.icon(
       style: FilledButton.styleFrom(
         backgroundColor: background,
         foregroundColor: foreground,
+        side: view.running && !over
+            ? BorderSide(color: scheme.onSurface, width: 2)
+            : null,
         iconSize: AppSizes.scoreIcon,
         minimumSize: const Size(0, AppSizes.scoreTouchTarget),
         textStyle: Theme.of(context).textTheme.titleLarge,
       ),
       icon: Icon(icon),
-      label: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
+      label: Text(
+        label,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        textAlign: TextAlign.center,
+      ),
       onPressed: locked ? null : () => onAction(action),
     );
   }
