@@ -7,9 +7,12 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 import java.util.UUID;
 
-/** One or more groups of one category, all sent to the same mat. */
+/**
+ * One or more groups of one category, all sent to the same mat: {@code matId} if the helper picked
+ * one, otherwise the one that will be free first.
+ */
 public record CreateGroupsRequest(
-        @NotNull UUID categoryId, @NotEmpty @Size(max = 4) List<@Valid @NotNull GroupRequest> groups) {
+        @NotNull UUID categoryId, @NotEmpty @Size(max = 4) List<@Valid @NotNull GroupRequest> groups, UUID matId) {
 
     /**
      * A group of participants (4, or 3 plus {@code ghostId}) or, in a team category, of teams (4, or
