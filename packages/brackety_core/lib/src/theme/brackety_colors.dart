@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Status colors that Material's [ColorScheme] does not cover.
+/// Colors that Material's [ColorScheme] does not cover: states and the mat.
 class BracketyColors extends ThemeExtension<BracketyColors> {
   const BracketyColors({
     required this.success,
@@ -11,22 +11,41 @@ class BracketyColors extends ThemeExtension<BracketyColors> {
     required this.onWarning,
     required this.warningContainer,
     required this.onWarningContainer,
+    required this.heri,
+    required this.onHeri,
+    required this.matFrame,
   });
 
-  factory BracketyColors.from(Brightness brightness) {
-    final success = _scheme(const Color(0xFF1E8E3E), brightness);
-    final warning = _scheme(const Color(0xFFF59E0B), brightness);
-    return BracketyColors(
-      success: success.primary,
-      onSuccess: success.onPrimary,
-      successContainer: success.primaryContainer,
-      onSuccessContainer: success.onPrimaryContainer,
-      warning: warning.primary,
-      onWarning: warning.onPrimary,
-      warningContainer: warning.primaryContainer,
-      onWarningContainer: warning.onPrimaryContainer,
-    );
-  }
+  factory BracketyColors.from(Brightness brightness) =>
+      brightness == Brightness.light ? _light : _dark;
+
+  static const _light = BracketyColors(
+    success: Color(0xFF3D6B2E),
+    onSuccess: Color(0xFFFFFFFF),
+    successContainer: Color(0xFFDDE8D0),
+    onSuccessContainer: Color(0xFF1E3312),
+    warning: Color(0xFF8A5A00),
+    onWarning: Color(0xFFFFFFFF),
+    warningContainer: Color(0xFFF6E7C2),
+    onWarningContainer: Color(0xFF3D2A00),
+    heri: Color(0xFF2F3B26),
+    onHeri: Color(0xFFFFFFFF),
+    matFrame: Color(0xFF2F3B26),
+  );
+
+  static const _dark = BracketyColors(
+    success: Color(0xFF9CC46A),
+    onSuccess: Color(0xFF161914),
+    successContainer: Color(0xFF2F3F1E),
+    onSuccessContainer: Color(0xFFDDE8C8),
+    warning: Color(0xFFE0B354),
+    onWarning: Color(0xFF161914),
+    warningContainer: Color(0xFF4A3A12),
+    onWarningContainer: Color(0xFFF6E7C2),
+    heri: Color(0xFF0E110B),
+    onHeri: Color(0xFFECEEE6),
+    matFrame: Color(0xFF3E5326),
+  );
 
   final Color success;
   final Color onSuccess;
@@ -37,18 +56,18 @@ class BracketyColors extends ThemeExtension<BracketyColors> {
   final Color warningContainer;
   final Color onWarningContainer;
 
+  /// The mat border (heri): headers and side bars that frame the mat.
+  final Color heri;
+  final Color onHeri;
+
+  /// The border of a mat tile in the club's floor plan.
+  final Color matFrame;
+
   static BracketyColors of(BuildContext context) {
     final theme = Theme.of(context);
     return theme.extension<BracketyColors>() ??
         BracketyColors.from(theme.brightness);
   }
-
-  static ColorScheme _scheme(Color seed, Brightness brightness) =>
-      ColorScheme.fromSeed(
-        seedColor: seed,
-        brightness: brightness,
-        dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
-      );
 
   @override
   BracketyColors copyWith({
@@ -60,6 +79,9 @@ class BracketyColors extends ThemeExtension<BracketyColors> {
     Color? onWarning,
     Color? warningContainer,
     Color? onWarningContainer,
+    Color? heri,
+    Color? onHeri,
+    Color? matFrame,
   }) => BracketyColors(
     success: success ?? this.success,
     onSuccess: onSuccess ?? this.onSuccess,
@@ -69,6 +91,9 @@ class BracketyColors extends ThemeExtension<BracketyColors> {
     onWarning: onWarning ?? this.onWarning,
     warningContainer: warningContainer ?? this.warningContainer,
     onWarningContainer: onWarningContainer ?? this.onWarningContainer,
+    heri: heri ?? this.heri,
+    onHeri: onHeri ?? this.onHeri,
+    matFrame: matFrame ?? this.matFrame,
   );
 
   @override
@@ -99,6 +124,9 @@ class BracketyColors extends ThemeExtension<BracketyColors> {
         other.onWarningContainer,
         t,
       )!,
+      heri: Color.lerp(heri, other.heri, t)!,
+      onHeri: Color.lerp(onHeri, other.onHeri, t)!,
+      matFrame: Color.lerp(matFrame, other.matFrame, t)!,
     );
   }
 }
@@ -106,8 +134,8 @@ class BracketyColors extends ThemeExtension<BracketyColors> {
 /// Colors a location can assign to each competitor (red/white, red/blue…).
 /// Fixed in both light and dark mode: a red corner is red everywhere.
 enum CompetitorColor {
-  red(Color(0xFFD32F2F), Colors.white),
-  blue(Color(0xFF1565C0), Colors.white),
+  red(Color(0xFFC62B2B), Colors.white),
+  blue(Color(0xFF1F57B8), Colors.white),
   white(Colors.white, _ink),
   black(_ink, Colors.white),
   yellow(Color(0xFFFFD600), _ink),
