@@ -17,9 +17,8 @@ import 'categories_editor.dart';
 import 'club_panel_screen.dart';
 
 const maxMats = 20;
-const maxGroupsPerMatLimit = 4;
 
-/// Event name and date, mats with their referee, and multigroup. Categories are shown, not edited.
+/// Event name and date, mats with their referee, and the categories.
 /// Every change saves on its own; a refused one goes back to what the server has.
 class SettingsTab extends ConsumerWidget {
   const SettingsTab({super.key, required this.eventId});
@@ -51,7 +50,6 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
   late var _saved = widget.initial;
   late final _name = TextEditingController(text: _saved.name);
   late var _date = _saved.date;
-  late var _maxGroups = _saved.maxGroupsPerMat;
   late var _matReferees = [..._saved.matReferees];
   Timer? _nameTyping;
   var _saving = false;
@@ -102,18 +100,6 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
               ),
               child: Text(DateFormat.yMMMMd(locale).format(_date)),
             ),
-          ),
-          const SizedBox(height: AppSpacing.l),
-          Text(l10n.settingsMaxGroups, style: text.titleSmall),
-          Text(l10n.settingsMaxGroupsHint, style: text.bodySmall),
-          const SizedBox(height: AppSpacing.s),
-          SegmentedButton<int>(
-            segments: [
-              for (var n = 1; n <= maxGroupsPerMatLimit; n++)
-                ButtonSegment(value: n, label: Text('$n')),
-            ],
-            selected: {_maxGroups},
-            onSelectionChanged: (s) => _change(() => _maxGroups = s.single),
           ),
           const SizedBox(height: AppSpacing.xl),
           Text(l10n.clubMats, style: text.titleMedium),
@@ -206,7 +192,6 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
               widget.eventId,
               name: _name.text.trim(),
               date: _date,
-              maxGroupsPerMat: _maxGroups,
               matReferees: [..._matReferees],
             );
       } while (_changedWhileSaving && mounted);
@@ -234,7 +219,6 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
   void _showSaved() => setState(() {
     _name.text = _saved.name;
     _date = _saved.date;
-    _maxGroups = _saved.maxGroupsPerMat;
     _matReferees = [..._saved.matReferees];
   });
 }

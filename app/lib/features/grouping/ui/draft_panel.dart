@@ -1,26 +1,34 @@
 import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 
-import '../../../core/group_colors.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../state/group_draft.dart';
+import 'mat_picker.dart';
 
-/// The groups being built: pick which one to fill, the ghost box and the create button.
+/// The group being built: the ghost box, the create button and the mat it goes to.
 class DraftPanel extends StatelessWidget {
   const DraftPanel({
     super.key,
-    required this.draft,
+    required this.eventId,
+    required this.group,
+    required this.matId,
     required this.busy,
     required this.onChanged,
+    required this.onMatChanged,
     required this.onCreate,
     this.onPickGhostTeam,
   });
 
-  final GroupDraft draft;
+  final String eventId;
+  final DraftGroup group;
+
+  /// Null = automatic.
+  final String? matId;
   final bool busy;
 
-  /// Applies a change to the draft as it is when the tap lands, not as it was when built.
-  final void Function(GroupDraft Function(GroupDraft draft) change) onChanged;
+  /// Applies a change to the group as it is when the tap lands, not as it was when built.
+  final void Function(DraftGroup Function(DraftGroup group) change) onChanged;
+  final ValueChanged<String?> onMatChanged;
   final VoidCallback onCreate;
 
   /// Opens the ghost team picker; only for groups of teams.
@@ -29,7 +37,6 @@ class DraftPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final group = draft.currentGroup;
     return Material(
       elevation: 3,
       child: SafeArea(
@@ -40,33 +47,6 @@ class DraftPanel extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Wrap(
-                spacing: AppSpacing.s,
-                runSpacing: AppSpacing.s,
-                children: [
-                  for (var i = 0; i < draft.groups.length; i++)
-                    _GroupChip(
-                      index: i,
-                      group: draft.groups[i],
-                      selected: i == draft.current,
-                      onTap: () => onChanged((d) => d.select(i)),
-                    ),
-                  if (draft.maxGroups > 1)
-                    ActionChip(
-                      avatar: const Icon(Icons.add),
-                      label: Text(l10n.draftAddGroup),
-                      onPressed: draft.canAddGroup
-                          ? () => onChanged((d) => d.addGroup())
-                          : null,
-                    ),
-                  if (draft.groups.length > 1)
-                    ActionChip(
-                      avatar: const Icon(Icons.remove),
-                      label: Text(l10n.draftRemoveGroup),
-                      onPressed: () => onChanged((d) => d.removeCurrent()),
-                    ),
-                ],
-              ),
               CheckboxListTile(
                 contentPadding: EdgeInsets.zero,
                 value: group.ghostMode,
@@ -76,10 +56,10 @@ class DraftPanel extends StatelessWidget {
                 subtitle: group.choosingGhost
                     ? Text(l10n.draftGhostHint)
                     : group.ofTeams && group.ghostMode
-                    ? Text(l10n.draftGhostTeamHint(draft.ghostTeamSize!))
+                    ? Text(l10n.draftGhostTeamHint(group.ghostTeamSize!))
                     : null,
                 onChanged: (on) =>
-                    onChanged((d) => d.setGhostMode(on ?? false)),
+                    onChanged((g) => g.setGhostMode(on ?? false)),
               ),
               if (group.ofTeams &&
                   group.ghostMode &&
@@ -92,56 +72,42 @@ class DraftPanel extends StatelessWidget {
                   label: Text(
                     l10n.pickGhostTeam(
                       group.ghostTeam.length,
-                      draft.ghostTeamSize!,
+                      group.ghostTeamSize!,
                     ),
                   ),
                   onPressed: onPickGhostTeam,
                 ),
                 const SizedBox(height: AppSpacing.s),
               ],
-              FilledButton(
-                style: FilledButton.styleFrom(
-                  minimumSize: const Size.fromHeight(AppSizes.touchTarget),
-                ),
-                onPressed: draft.isReady && !busy ? onCreate : null,
-                child: Text(l10n.createGroup(draft.groups.length)),
+              Row(
+                children: [
+                  Expanded(
+                    child: FilledButton(
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size.fromHeight(
+                          AppSizes.touchTarget,
+                        ),
+                      ),
+                      onPressed: group.isComplete && !busy ? onCreate : null,
+                      child: Text(l10n.createGroup(1)),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.s),
+                  Expanded(
+                    child: MatPicker(
+                      eventId: eventId,
+                      matId: matId,
+                      onChanged: onMatChanged,
+                    ),
+                  ),
+                ],
               ),
+              const SizedBox(height: AppSpacing.xs),
+              MatPickerHint(eventId: eventId, matId: matId),
             ],
           ),
         ),
       ),
-    );
-  }
-}
-
-class _GroupChip extends StatelessWidget {
-  const _GroupChip({
-    required this.index,
-    required this.group,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final int index;
-  final DraftGroup group;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final color = groupColor(index);
-    final count =
-        group.members.length + (group.ghostMode && group.isComplete ? 1 : 0);
-    return ChoiceChip(
-      selected: selected,
-      onSelected: (_) => onTap(),
-      avatar: CircleAvatar(
-        backgroundColor: color.color,
-        foregroundColor: color.onColor,
-        child: Text('${index + 1}'),
-      ),
-      label: Text('${l10n.draftGroup(index + 1)} · ${l10n.draftCount(count)}'),
     );
   }
 }

@@ -1,5 +1,5 @@
-/// Groups a helper is putting together before sending them to a mat (docs/modulos/prototipo-f1.md):
-/// 4 participants, or 3 and a ghost. With multigroup there are several, all for one mat.
+/// The group a helper is putting together before sending it to a mat (docs/modulos/prototipo-f1.md):
+/// 4 participants, or 3 and a ghost.
 ///
 /// In a team category (docs/modulos/prototipo-f1-equipos.md) the members are teams and the ghost
 /// is a ghost team: [ghostTeamSize] participants picked from the category's list, not a team.
@@ -61,138 +61,58 @@ class DraftGroup {
     ghostTeam: ghostTeam ?? this.ghostTeam,
     ghostTeamSize: ghostTeamSize,
   );
-}
 
-enum PickState { free, member, ghost, unavailable }
-
-class GroupDraft {
-  GroupDraft({
-    required this.maxGroups,
-    this.ghostTeamSize,
-    List<DraftGroup>? groups,
-    this.current = 0,
-  }) : groups = groups ?? [DraftGroup(ghostTeamSize: ghostTeamSize)];
-
-  final int maxGroups;
-
-  /// Set for groups of teams: the size of the category's teams.
-  final int? ghostTeamSize;
-  final List<DraftGroup> groups;
-  final int current;
-
-  DraftGroup get currentGroup => groups[current];
-
-  /// At least one group and every group complete.
-  bool get isReady => groups.every((g) => g.isComplete);
-
-  bool get canAddGroup => groups.length < maxGroups && currentGroup.isComplete;
-
-  /// Where [id] stands for the group being built; [grouped] = already in a group on the server.
+  /// Where [id] stands; [grouped] = already in a group on the server.
   PickState stateOf(String id, {required bool grouped}) {
-    final group = currentGroup;
-    if (group.ghost == id) return PickState.ghost;
-    if (group.members.contains(id)) return PickState.member;
-    if (group.choosingGhost) return PickState.free;
-    final inOtherGroup = [
-      for (var i = 0; i < groups.length; i++)
-        if (i != current) ...groups[i].members,
-    ].contains(id);
-    final full =
-        group.isComplete ||
-        (group.ghostMode && group.members.length == DraftGroup.size - 1);
-    return grouped || inOtherGroup || full
-        ? PickState.unavailable
-        : PickState.free;
+    if (ghost == id) return PickState.ghost;
+    if (members.contains(id)) return PickState.member;
+    if (choosingGhost) return PickState.free;
+    final full = isComplete || (ghostMode && members.length == size - 1);
+    return grouped || full ? PickState.unavailable : PickState.free;
   }
 
-  /// The group index [id] belongs to in this draft, as a member or ghost, or null.
-  int? groupOf(String id) {
-    final index = groups.indexWhere((g) => g.contains(id));
-    return index < 0 ? null : index;
-  }
-
-  GroupDraft toggle(String id, {required bool grouped}) {
-    final group = currentGroup;
+  DraftGroup toggle(String id, {required bool grouped}) {
     switch (stateOf(id, grouped: grouped)) {
       case PickState.ghost:
-        return _withCurrent(group.copyWith(ghost: () => null));
+        return copyWith(ghost: () => null);
       case PickState.member:
-        return _withCurrent(
-          group.copyWith(
-            members: [...group.members]..remove(id),
-            ghost: () => null,
-            ghostTeam: const [],
-          ),
+        return copyWith(
+          members: [...members]..remove(id),
+          ghost: () => null,
+          ghostTeam: const [],
         );
       case PickState.free:
-        return group.choosingGhost
-            ? _withCurrent(group.copyWith(ghost: () => id))
-            : _withCurrent(group.copyWith(members: [...group.members, id]));
+        return choosingGhost
+            ? copyWith(ghost: () => id)
+            : copyWith(members: [...members, id]);
       case PickState.unavailable:
         return this;
     }
   }
 
-  /// The participants of the current group's ghost team, once its 3 teams are picked.
-  GroupDraft setGhostTeam(List<String> ids) {
-    final group = currentGroup;
-    final ready =
-        group.ofTeams &&
-        group.ghostMode &&
-        group.members.length == DraftGroup.size - 1;
+  /// The participants of the ghost team, once its 3 teams are picked.
+  DraftGroup setGhostTeam(List<String> ids) {
+    final ready = ofTeams && ghostMode && members.length == size - 1;
     if (!ready || ids.length > ghostTeamSize!) return this;
-    return _withCurrent(group.copyWith(ghostTeam: ids));
+    return copyWith(ghostTeam: ids);
   }
 
-  GroupDraft setGhostMode(bool on) {
-    final group = currentGroup;
-    var members = group.members;
-    String? ghost;
+  DraftGroup setGhostMode(bool on) {
+    var kept = members;
+    String? newGhost;
     // Turning it on with 4 picked: the last participant becomes the ghost; a 4th team is dropped,
     // since a ghost team is made of participants.
-    if (on && members.length == DraftGroup.size) {
-      if (!group.ofTeams) ghost = members.last;
-      members = members.sublist(0, DraftGroup.size - 1);
+    if (on && kept.length == size) {
+      if (!ofTeams) newGhost = kept.last;
+      kept = kept.sublist(0, size - 1);
     }
-    return _withCurrent(
-      DraftGroup(
-        members: members,
-        ghostMode: on,
-        ghost: ghost,
-        ghostTeamSize: ghostTeamSize,
-      ),
+    return DraftGroup(
+      members: kept,
+      ghostMode: on,
+      ghost: newGhost,
+      ghostTeamSize: ghostTeamSize,
     );
   }
-
-  GroupDraft addGroup() => canAddGroup
-      ? _copy(
-          groups: [
-            ...groups,
-            DraftGroup(ghostTeamSize: ghostTeamSize),
-          ],
-          current: groups.length,
-        )
-      : this;
-
-  GroupDraft select(int index) => _copy(groups: groups, current: index);
-
-  /// Drops the current group (if there is more than one).
-  GroupDraft removeCurrent() {
-    if (groups.length == 1) {
-      return GroupDraft(maxGroups: maxGroups, ghostTeamSize: ghostTeamSize);
-    }
-    final rest = [...groups]..removeAt(current);
-    return _copy(groups: rest, current: rest.length - 1);
-  }
-
-  GroupDraft _withCurrent(DraftGroup group) =>
-      _copy(groups: [...groups]..[current] = group, current: current);
-
-  GroupDraft _copy({required List<DraftGroup> groups, required int current}) =>
-      GroupDraft(
-        maxGroups: maxGroups,
-        ghostTeamSize: ghostTeamSize,
-        groups: groups,
-        current: current,
-      );
 }
+
+enum PickState { free, member, ghost, unavailable }

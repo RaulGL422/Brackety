@@ -21,7 +21,6 @@ class FakeClubRepository extends Fake implements ClubRepository {
 
   EventSettings current;
   int? refuseWith;
-  final savedMaxGroups = <int>[];
   final savedMatReferees = <List<String?>>[];
   final savedCategories = <List<EventCategory>>[];
   final savedParticipantCategories = <String?>[];
@@ -74,16 +73,13 @@ class FakeClubRepository extends Fake implements ClubRepository {
     String eventId, {
     required String name,
     required DateTime date,
-    required int maxGroupsPerMat,
     required List<String?> matReferees,
   }) async {
     _refuse();
-    savedMaxGroups.add(maxGroupsPerMat);
     savedMatReferees.add(matReferees);
     return current = EventSettings(
       name: name,
       date: date,
-      maxGroupsPerMat: maxGroupsPerMat,
       matReferees: matReferees,
       referees: current.referees,
       categories: current.categories,
@@ -103,13 +99,11 @@ void main() {
     name: 'Fase 1',
     date: DateTime(2026, 11, 14),
     roles: {EventRole.club},
-    maxGroupsPerMat: 1,
   );
 
   final settings = EventSettings(
     name: 'Fase 1',
     date: DateTime(2026, 11, 14),
-    maxGroupsPerMat: 1,
     matReferees: const ['r1', null],
     referees: const [StaffMember(id: 'r1', username: 'arbitro1')],
     categories: const [
@@ -350,10 +344,13 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.widgetWithText(FilledButton, 'Save'), findsNothing);
-    await tester.tap(find.text('2'));
+    expect(find.text('Groups per mat at once'), findsNothing);
+    await tester.tap(find.text('Add mat'));
     await tester.pumpAndSettle();
 
-    expect(repository.savedMaxGroups, [2]);
+    expect(repository.savedMatReferees, [
+      ['r1', null, null],
+    ]);
     expect(find.text('Saved'), findsOneWidget);
   });
 
@@ -387,17 +384,14 @@ void main() {
     await tester.tap(find.text('Settings'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('2'));
+    await tester.tap(find.text('Add mat'));
     await tester.pumpAndSettle();
 
     expect(
       find.text('Not possible: there are groups that depend on it.'),
       findsOneWidget,
     );
-    final segments = tester.widget<SegmentedButton<int>>(
-      find.byType(SegmentedButton<int>),
-    );
-    expect(segments.selected, {1});
+    expect(find.text('Mat 3 · Referee'), findsNothing);
   });
 
   Future<void> openCategories(WidgetTester tester) async {

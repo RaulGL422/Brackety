@@ -7,14 +7,16 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../data/grouping_repository.dart';
 import '../state/group_draft.dart';
 
-/// Sends the draft's groups to a mat and shows which one. Calls [refresh] after creating them or
-/// on a conflict (someone else took a participant or team); returns whether they were created.
-Future<bool> createGroups(
+/// Sends the group to [matId], or to the mat the server picks if null, and shows which one. Calls
+/// [refresh] after creating it or on a conflict (someone else took a participant or team, or the
+/// mat lost its referee); returns whether it was created.
+Future<bool> createGroup(
   BuildContext context,
   WidgetRef ref, {
   required String eventId,
   required String categoryId,
-  required GroupDraft draft,
+  required DraftGroup group,
+  required String? matId,
   required VoidCallback refresh,
 }) async {
   final l10n = AppLocalizations.of(context);
@@ -22,7 +24,7 @@ Future<bool> createGroups(
   try {
     final created = await ref
         .read(groupingRepositoryProvider)
-        .create(eventId, categoryId, draft.groups);
+        .create(eventId, categoryId, group, matId: matId);
     refresh();
     if (!context.mounted) return true;
     await showDialog<void>(

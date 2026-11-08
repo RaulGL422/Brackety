@@ -57,7 +57,6 @@ class EventSettings {
   const EventSettings({
     required this.name,
     required this.date,
-    required this.maxGroupsPerMat,
     required this.matReferees,
     required this.referees,
     required this.categories,
@@ -70,7 +69,6 @@ class EventSettings {
     return EventSettings(
       name: json['name'] as String,
       date: DateTime.parse(json['date'] as String),
-      maxGroupsPerMat: json['maxGroupsPerMat'] as int,
       matReferees: [for (final m in mats) m['refereeId'] as String?],
       referees: [
         for (final r in json['referees'] as List)
@@ -85,7 +83,6 @@ class EventSettings {
 
   final String name;
   final DateTime date;
-  final int maxGroupsPerMat;
 
   /// One entry per mat, mat 1 first: the referee's account id, or null.
   final List<String?> matReferees;

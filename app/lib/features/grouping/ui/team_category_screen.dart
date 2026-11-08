@@ -5,15 +5,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/async_view.dart';
-import '../../../core/group_colors.dart';
 import '../../../l10n/gen/app_localizations.dart';
-import '../../events/state/events_providers.dart';
 import '../data/grouping_models.dart';
 import '../data/grouping_repository.dart';
 import '../state/group_draft.dart';
 import '../state/grouping_providers.dart';
 import 'create_groups.dart';
 import 'draft_panel.dart';
+import 'pick_mark.dart';
 
 /// A team category (docs/modulos/prototipo-f1-equipos.md): make teams from its participants, then
 /// group 4 teams (or 3 and a ghost team) and send them to a mat. "Individual group" opens the usual
@@ -46,7 +45,7 @@ class TeamCategoryScreen extends ConsumerWidget {
               icon: const Icon(Icons.person_outline),
               label: Text(l10n.individualGroup),
               onPressed: () => context.push(
-                '/events/$eventId/categories/$categoryId',
+                '/events/$eventId/categories/$categoryId?fromTeams=1',
                 extra: categoryName,
               ),
             ),
@@ -144,7 +143,7 @@ class _TeamMakerState extends ConsumerState<_TeamMaker> {
                 )
               : _PersonTile(
                   participant: sorted[i - 1],
-                  pick: _picks.indexOf(sorted[i - 1].id),
+                  picked: _picks.contains(sorted[i - 1].id),
                   enabled:
                       !sorted[i - 1].isTaken &&
                       (_picks.contains(sorted[i - 1].id) ||
@@ -199,38 +198,38 @@ class _TeamGroups extends ConsumerStatefulWidget {
 }
 
 class _TeamGroupsState extends ConsumerState<_TeamGroups> {
-  GroupDraft? _draft;
+  late var _group = _fresh();
+  String? _matId;
   var _busy = false;
 
-  GroupDraft _fresh(int maxGroups) =>
-      GroupDraft(maxGroups: maxGroups, ghostTeamSize: widget.teamSize);
+  DraftGroup _fresh() => DraftGroup(ghostTeamSize: widget.teamSize);
 
-  void _change(GroupDraft Function(GroupDraft) change, int maxGroups) =>
-      setState(() => _draft = change(_draft ?? _fresh(maxGroups)));
+  void _change(DraftGroup Function(DraftGroup) change) =>
+      setState(() => _group = change(_group));
 
-  Future<void> _create(GroupDraft draft) async {
+  Future<void> _create() async {
     setState(() => _busy = true);
-    final created = await createGroups(
+    final created = await createGroup(
       context,
       ref,
       eventId: widget.categoryKey.eventId,
       categoryId: widget.categoryKey.categoryId,
-      draft: draft,
+      group: _group,
+      matId: _matId,
       refresh: () => _refresh(ref, widget.categoryKey),
     );
     if (!mounted) return;
     setState(() {
       _busy = false;
-      if (created) _draft = _fresh(draft.maxGroups);
+      if (created) {
+        _group = _fresh();
+        _matId = null;
+      }
     });
   }
 
-  Future<void> _pickGhostTeam(
-    GroupDraft draft,
-    List<Team> teams,
-    int maxGroups,
-  ) async {
-    final group = draft.currentGroup;
+  Future<void> _pickGhostTeam(List<Team> teams) async {
+    final group = _group;
     final own = {
       for (final t in teams)
         if (group.members.contains(t.id))
@@ -247,7 +246,7 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
         excluded: own,
       ),
     );
-    if (picked != null) _change((d) => d.setGhostTeam(picked), maxGroups);
+    if (picked != null) _change((g) => g.setGhostTeam(picked));
   }
 
   Future<void> _delete(Team team) async {
@@ -279,9 +278,7 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
     } on DioException {
       messenger.showSnackBar(SnackBar(content: Text(l10n.deleteTeamError)));
     }
-    if (_draft?.groupOf(team.id) != null) {
-      setState(() => _draft = _fresh(_draft!.maxGroups));
-    }
+    if (_group.contains(team.id)) setState(() => _group = _fresh());
     _refresh(ref, widget.categoryKey);
   }
 
@@ -289,9 +286,6 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final key = widget.categoryKey;
-    final maxGroups =
-        ref.watch(myEventProvider(key.eventId)).value?.maxGroupsPerMat ?? 1;
-    final draft = _draft ?? _fresh(maxGroups);
     final teams = ref.watch(categoryTeamsProvider(key));
     final list = AsyncView(
       value: teams,
@@ -302,22 +296,23 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
               itemCount: all.length,
               itemBuilder: (context, i) => _TeamTile(
                 team: all[i],
-                draft: draft,
+                group: _group,
                 onTap: () => _change(
-                  (d) => d.toggle(all[i].id, grouped: all[i].isGrouped),
-                  maxGroups,
+                  (g) => g.toggle(all[i].id, grouped: all[i].isGrouped),
                 ),
                 onDelete: all[i].isGrouped ? null : () => _delete(all[i]),
               ),
             ),
     );
     final panel = DraftPanel(
-      draft: draft,
+      eventId: key.eventId,
+      group: _group,
+      matId: _matId,
       busy: _busy,
-      onChanged: (change) => _change(change, maxGroups),
-      onCreate: () => _create(draft),
-      onPickGhostTeam: () =>
-          _pickGhostTeam(draft, teams.value ?? const [], maxGroups),
+      onChanged: _change,
+      onMatChanged: (id) => setState(() => _matId = id),
+      onCreate: _create,
+      onPickGhostTeam: () => _pickGhostTeam(teams.value ?? const []),
     );
     return _ListWithPanel(list: list, panel: panel);
   }
@@ -326,29 +321,25 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
 class _TeamTile extends StatelessWidget {
   const _TeamTile({
     required this.team,
-    required this.draft,
+    required this.group,
     required this.onTap,
     required this.onDelete,
   });
 
   final Team team;
-  final GroupDraft draft;
+  final DraftGroup group;
   final VoidCallback onTap;
   final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final state = draft.stateOf(team.id, grouped: team.isGrouped);
-    final draftIndex = draft.groupOf(team.id);
+    final state = group.stateOf(team.id, grouped: team.isGrouped);
     final names = team.members.map((m) => m.fullName).join(', ');
     return ListTile(
       enabled: state != PickState.unavailable,
       onTap: onTap,
-      leading: _Mark(
-        index: draftIndex,
-        unavailable: state == PickState.unavailable,
-      ),
+      leading: PickMark(state: state, onTap: onTap),
       title: Text(l10n.teamName(team.number)),
       subtitle: Text(
         team.isGrouped
@@ -465,15 +456,13 @@ class _GhostTeamSheetState extends ConsumerState<_GhostTeamSheet> {
 class _PersonTile extends StatelessWidget {
   const _PersonTile({
     required this.participant,
-    required this.pick,
+    required this.picked,
     required this.enabled,
     required this.onTap,
   });
 
   final CategoryParticipant participant;
-
-  /// Position in the new team, or -1.
-  final int pick;
+  final bool picked;
   final bool enabled;
   final VoidCallback onTap;
 
@@ -487,9 +476,10 @@ class _PersonTile extends StatelessWidget {
     return ListTile(
       enabled: enabled,
       onTap: onTap,
-      leading: pick < 0
-          ? Icon(enabled ? Icons.check_box_outline_blank : Icons.block)
-          : CircleAvatar(child: Text('${pick + 1}')),
+      leading: Checkbox(
+        value: picked,
+        onChanged: enabled ? (_) => onTap() : null,
+      ),
       title: Text(p.fullName),
       subtitle: Text(
         [
@@ -499,26 +489,6 @@ class _PersonTile extends StatelessWidget {
             l10n.participantGrouped(p.groupNumber!, p.matNumber!),
         ].join(' · '),
       ),
-    );
-  }
-}
-
-class _Mark extends StatelessWidget {
-  const _Mark({required this.index, required this.unavailable});
-
-  final int? index;
-  final bool unavailable;
-
-  @override
-  Widget build(BuildContext context) {
-    if (index == null) {
-      return Icon(unavailable ? Icons.block : Icons.check_box_outline_blank);
-    }
-    final color = groupColor(index!);
-    return CircleAvatar(
-      backgroundColor: color.color,
-      foregroundColor: color.onColor,
-      child: Text('${index! + 1}'),
     );
   }
 }

@@ -7,7 +7,6 @@ class MyEvent {
     required this.name,
     required this.date,
     required this.roles,
-    required this.maxGroupsPerMat,
     this.matId,
     this.matNumber,
   });
@@ -20,7 +19,6 @@ class MyEvent {
       for (final role in json['roles'] as List)
         EventRole.values.byName((role as String).toLowerCase()),
     },
-    maxGroupsPerMat: json['maxGroupsPerMat'] as int,
     matId: json['matId'] as String?,
     matNumber: json['matNumber'] as int?,
   );
@@ -29,9 +27,6 @@ class MyEvent {
   final String name;
   final DateTime date;
   final Set<EventRole> roles;
-
-  /// How many groups a helper sends to one mat at once (1 = no multigroup).
-  final int maxGroupsPerMat;
 
   /// The referee's mat, if any.
   final String? matId;

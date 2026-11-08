@@ -55,6 +55,7 @@ void main() {
         overrides: [
           ...sessionOverrides(FakeAuthApi(signedIn: true)),
           groupingRepositoryProvider.overrideWithValue(repository),
+          fakeMatsOverride,
           myEventsProvider.overrideWith((ref) async => []),
         ],
         child: const BracketyApp(),
@@ -133,15 +134,35 @@ void main() {
       await tester.tap(find.text('Create group'));
       await tester.pumpAndSettle();
 
-      final group = repository.created.single.single;
+      final group = repository.created.single;
       expect(group.members, ['t1', 't2', 't3']);
       expect(group.ghostTeam, ['p9', 'p10', 'p11']);
       expect(find.text('Group 1'), findsWidgets);
-      expect(find.text('Mat 2'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.text('Mat 2'),
+        ),
+        findsOneWidget,
+      );
       expect(find.byIcon(Icons.arrow_forward), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   }
+
+  testWidgets('the individual group leads back to the team group', (
+    tester,
+  ) async {
+    await open(tester, sizes['phone']!);
+
+    await tester.tap(find.text('Individual group'));
+    await tester.pumpAndSettle();
+    expect(find.text('New team · 0/3'), findsNothing);
+
+    await tester.tap(find.text('Team group'));
+    await tester.pumpAndSettle();
+    expect(find.text('New team · 0/3'), findsOneWidget);
+  });
 
   testWidgets('a team without a group can be undone', (tester) async {
     final repository = await open(tester, sizes['tablet']!);

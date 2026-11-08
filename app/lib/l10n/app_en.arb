@@ -158,18 +158,8 @@
       }
     }
   },
-  "draftCount": "{count}/4",
-  "@draftCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "draftGhost": "Ghost competitor",
   "draftGhostHint": "Pick the ghost: fights but does not score.",
-  "draftAddGroup": "Add group",
-  "draftRemoveGroup": "Remove group",
   "createGroup": "{count, plural, =1{Create group} other{Create groups}}",
   "@createGroup": {
     "placeholders": {
@@ -186,8 +176,8 @@
       }
     }
   },
-  "groupsConflict": "A participant is already in a group. The list has been refreshed.",
-  "groupsError": "The groups could not be created.",
+  "groupsConflict": "A participant is already in a group or the mat has lost its referee. The list has been refreshed.",
+  "groupsError": "The group could not be created.",
   "ok": "OK",
   "ghostBadge": "Ghost",
   "matTitle": "Mat {number}",
@@ -273,8 +263,6 @@
   "saveError": "Could not save.",
   "settingsName": "Event name",
   "settingsDate": "Date",
-  "settingsMaxGroups": "Groups per mat at once",
-  "settingsMaxGroupsHint": "1 = no multigroup",
   "settingsAddMat": "Add mat",
   "settingsRemoveMat": "Remove the last mat",
   "settingsReferee": "Referee",
@@ -292,6 +280,13 @@
   "tabParticipants": "Participants",
   "tabTeams": "Teams",
   "individualGroup": "Individual group",
+  "teamGroup": "Team group",
+  "matPickerLabel": "Mat",
+  "matAuto": "Automatic",
+  "matAutoOption": "The one free first",
+  "matAutoHint": "It is assigned automatically to the mat that will be free first.",
+  "matManualHint": "It goes to {mat}, picked by hand.",
+  "@matManualHint": {"placeholders": {"mat": {"type": "String"}}},
   "individualGroupHint": "For those left without a team: groups of 4 participants.",
   "categoryTeamCounts": "{participants} registered · {teams} teams · {grouped} in groups",
   "newTeamCount": "New team · {count}/{size}",

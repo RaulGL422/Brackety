@@ -37,24 +37,26 @@ class GroupingRepository {
     ];
   }
 
+  /// Without [matId] the server picks the mat that will be free first.
   Future<CreatedGroups> create(
     String eventId,
     String categoryId,
-    List<DraftGroup> groups,
-  ) async {
+    DraftGroup group, {
+    String? matId,
+  }) async {
     final response = await _dio.post<Map<String, dynamic>>(
       '/api/v1/events/$eventId/groups',
       data: {
         'categoryId': categoryId,
         'groups': [
-          for (final g in groups)
-            g.ofTeams
-                ? {
-                    'teamIds': g.members,
-                    if (g.ghostMode) 'ghostTeam': g.ghostTeam,
-                  }
-                : {'participantIds': g.members, 'ghostId': g.ghost},
+          group.ofTeams
+              ? {
+                  'teamIds': group.members,
+                  if (group.ghostMode) 'ghostTeam': group.ghostTeam,
+                }
+              : {'participantIds': group.members, 'ghostId': group.ghost},
         ],
+        'matId': ?matId,
       },
     );
     return CreatedGroups.fromJson(response.data!);

@@ -340,21 +340,10 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String draftCount(int count) {
-    return '$count/4';
-  }
-
-  @override
   String get draftGhost => 'Competidor fantasma';
 
   @override
   String get draftGhostHint => 'Elige al fantasma: combate pero no puntúa.';
-
-  @override
-  String get draftAddGroup => 'Añadir grupo';
-
-  @override
-  String get draftRemoveGroup => 'Quitar grupo';
 
   @override
   String createGroup(int count) {
@@ -380,10 +369,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get groupsConflict =>
-      'Algún alumno ya está en un grupo. La lista se ha actualizado.';
+      'Algún alumno ya está en un grupo o el tapiz se ha quedado sin árbitro. La lista se ha actualizado.';
 
   @override
-  String get groupsError => 'No se han podido crear los grupos.';
+  String get groupsError => 'No se ha podido crear el grupo.';
 
   @override
   String get ok => 'Aceptar';
@@ -677,12 +666,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsDate => 'Fecha';
 
   @override
-  String get settingsMaxGroups => 'Grupos por tapiz a la vez';
-
-  @override
-  String get settingsMaxGroupsHint => '1 = sin multigrupo';
-
-  @override
   String get settingsAddMat => 'Añadir tapiz';
 
   @override
@@ -738,6 +721,27 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get individualGroup => 'Grupo individual';
+
+  @override
+  String get teamGroup => 'Grupo por equipos';
+
+  @override
+  String get matPickerLabel => 'Tapiz';
+
+  @override
+  String get matAuto => 'Automático';
+
+  @override
+  String get matAutoOption => 'El que antes quede libre';
+
+  @override
+  String get matAutoHint =>
+      'Se asignará automáticamente al tapiz que antes quede libre.';
+
+  @override
+  String matManualHint(String mat) {
+    return 'Irá al $mat, elegido a mano.';
+  }
 
   @override
   String get individualGroupHint =>
