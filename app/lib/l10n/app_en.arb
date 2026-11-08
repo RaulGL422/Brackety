@@ -182,15 +182,28 @@
   "ghostBadge": "Ghost",
   "matTitle": "Mat {number}",
   "matEmpty": "No groups on this mat yet.",
-  "matGroupHeader": "Group {number} · ages {category}",
-  "matRecommended": "Recommended next",
+  "matGroupHeader": "Group {number}, ages {category}",
+  "matRecommended": "Next match",
   "matInProgress": "In progress",
-  "matPending": "Pending",
+  "matPending": "Later",
+  "matYours": "Your mat",
+  "matToPlay": "{count} to play",
+  "@matToPlay": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "matOpenScoreboard": "Open the scoreboard",
+  "matBackToScoreboard": "Back to the scoreboard",
+  "matWatch": "Watch the match",
+  "matGroups": "Groups on this mat",
   "matFinished": "Finished",
   "matWaiting": "A fighter is in a match right now",
   "matNoneAvailable": "No match can start right now.",
   "versus": "vs",
-  "scoreboardTitle": "Mat {mat} · Group {group}",
+  "scoreboardTitle": "Mat {mat}, group {group}",
   "cornerRed": "Red",
   "cornerBlue": "Blue",
   "clockStart": "Start",
@@ -486,5 +499,18 @@
   "draw": "Draw",
   "matLocked": "Cannot open yet",
   "needsGuardian": "Guardian missing",
-  "settingsRemoveMatConfirm": "Mat {number} is removed; its referee is no longer assigned."
+  "settingsRemoveMatConfirm": "Mat {number} is removed; its referee is no longer assigned.",
+  "draftTitle": "New group",
+  "draftReady": "Complete",
+  "draftMissing": "{count} to go",
+  "@draftMissing": {"placeholders": {"count": {"type": "int"}}},
+  "draftSlot": "Slot {number}",
+  "@draftSlot": {"placeholders": {"number": {"type": "int"}}},
+  "ghostOf": "{name} (ghost)",
+  "@ghostOf": {"placeholders": {"name": {"type": "String"}}},
+  "settingsAppearance": "Appearance",
+  "settingsAppearanceHint": "Automatic follows the device's light or dark mode. It is saved on this device only.",
+  "themeSystem": "Automatic",
+  "themeLight": "Light",
+  "themeDark": "Dark"
 }

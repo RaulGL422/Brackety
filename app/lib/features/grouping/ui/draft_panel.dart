@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
 import '../state/group_draft.dart';
+import 'draft_slots.dart';
 import 'mat_picker.dart';
 
-/// The group being built: the ghost box, the create button and the mat it goes to.
+/// The group being built: its slots, the ghost box, the create button and the mat it goes to.
 class DraftPanel extends StatelessWidget {
   const DraftPanel({
     super.key,
@@ -16,6 +17,7 @@ class DraftPanel extends StatelessWidget {
     required this.onChanged,
     required this.onMatChanged,
     required this.onCreate,
+    required this.labelOf,
     this.onPickGhostTeam,
   });
 
@@ -30,6 +32,7 @@ class DraftPanel extends StatelessWidget {
   final void Function(DraftGroup Function(DraftGroup group) change) onChanged;
   final ValueChanged<String?> onMatChanged;
   final VoidCallback onCreate;
+  final String Function(String id) labelOf;
 
   /// Opens the ghost team picker; only for groups of teams.
   final VoidCallback? onPickGhostTeam;
@@ -37,8 +40,16 @@ class DraftPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    final text = Theme.of(context).textTheme;
+    final hint = group.choosingGhost
+        ? l10n.draftGhostHint
+        : group.ofTeams && group.ghostMode
+        ? l10n.draftGhostTeamHint(group.ghostTeamSize!)
+        : null;
     return Material(
-      elevation: 3,
+      color: scheme.surfaceContainerLowest,
+      shape: Border(top: BorderSide(color: scheme.outlineVariant)),
       child: SafeArea(
         top: false,
         child: Padding(
@@ -46,21 +57,46 @@ class DraftPanel extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: AppSpacing.s,
             children: [
-              CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                value: group.ghostMode,
-                title: Text(
-                  group.ofTeams ? l10n.draftGhostTeam : l10n.draftGhost,
-                ),
-                subtitle: group.choosingGhost
-                    ? Text(l10n.draftGhostHint)
-                    : group.ofTeams && group.ghostMode
-                    ? Text(l10n.draftGhostTeamHint(group.ghostTeamSize!))
-                    : null,
-                onChanged: (on) =>
-                    onChanged((g) => g.setGhostMode(on ?? false)),
+              Row(
+                spacing: AppSpacing.s,
+                children: [
+                  Expanded(
+                    child: Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: l10n.draftTitle,
+                            style: text.titleMedium,
+                          ),
+                          TextSpan(
+                            text: '  ${_status(l10n)}',
+                            style: text.bodyMedium?.copyWith(
+                              color: scheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  FilterChip(
+                    label: Text(
+                      group.ofTeams ? l10n.draftGhostTeam : l10n.draftGhost,
+                    ),
+                    selected: group.ghostMode,
+                    onSelected: (on) => onChanged((g) => g.setGhostMode(on)),
+                  ),
+                ],
               ),
+              DraftSlots(group: group, labelOf: labelOf, onChanged: onChanged),
+              if (hint != null)
+                Text(
+                  hint,
+                  style: text.bodyMedium?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
               if (group.ofTeams &&
                   group.ghostMode &&
                   group.members.length == DraftGroup.size - 1) ...[
@@ -77,16 +113,13 @@ class DraftPanel extends StatelessWidget {
                   ),
                   onPressed: onPickGhostTeam,
                 ),
-                const SizedBox(height: AppSpacing.s),
               ],
               Row(
                 children: [
                   Expanded(
                     child: FilledButton(
                       style: FilledButton.styleFrom(
-                        minimumSize: const Size.fromHeight(
-                          AppSizes.touchTarget,
-                        ),
+                        minimumSize: const Size.fromHeight(56),
                       ),
                       onPressed: group.isComplete && !busy ? onCreate : null,
                       child: Text(l10n.createGroup(1)),
@@ -102,12 +135,20 @@ class DraftPanel extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: AppSpacing.xs),
               MatPickerHint(eventId: eventId, matId: matId),
             ],
           ),
         ),
       ),
     );
+  }
+
+  String _status(AppLocalizations l10n) {
+    final ghostDone = group.ofTeams
+        ? group.ghostMode && group.ghostTeam.length == group.ghostTeamSize
+        : group.ghost != null;
+    final missing =
+        DraftGroup.size - group.members.length - (ghostDone ? 1 : 0);
+    return missing == 0 ? l10n.draftReady : l10n.draftMissing(missing);
   }
 }

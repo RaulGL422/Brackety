@@ -25,22 +25,21 @@ dev_dependencies:
 flutter:
   generate: true
   assets:
-    - assets/fonts/OFL.txt
+    - assets/fonts/OFL-AtkinsonHyperlegibleNext.txt
+    - assets/fonts/OFL-SairaCondensed.txt
   fonts:
-    - family: Barlow
+    - family: AtkinsonHyperlegibleNext
       fonts:
-        - asset: assets/fonts/Barlow-Regular.ttf
-        - asset: assets/fonts/Barlow-Medium.ttf
+        - asset: assets/fonts/AtkinsonHyperlegibleNext-Regular.ttf
+        - asset: assets/fonts/AtkinsonHyperlegibleNext-Medium.ttf
           weight: 500
-        - asset: assets/fonts/Barlow-SemiBold.ttf
-          weight: 600
-        - asset: assets/fonts/Barlow-Bold.ttf
+        - asset: assets/fonts/AtkinsonHyperlegibleNext-Bold.ttf
           weight: 700
-    - family: BarlowCondensed
+    - family: SairaCondensed
       fonts:
-        - asset: assets/fonts/BarlowCondensed-SemiBold.ttf
+        - asset: assets/fonts/SairaCondensed-SemiBold.ttf
           weight: 600
-        - asset: assets/fonts/BarlowCondensed-Bold.ttf
+        - asset: assets/fonts/SairaCondensed-Bold.ttf
           weight: 700
-        - asset: assets/fonts/BarlowCondensed-ExtraBold.ttf
+        - asset: assets/fonts/SairaCondensed-ExtraBold.ttf
           weight: 800

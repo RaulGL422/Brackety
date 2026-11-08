@@ -9,9 +9,10 @@ abstract final class AppSpacing {
 }
 
 abstract final class AppRadius {
-  static const double s = 8;
-  static const double m = 12;
-  static const double l = 20;
+  // Short corners, never pills: buttons and mats are rectangles.
+  static const double s = 4;
+  static const double m = 6;
+  static const double l = 8;
   static const double full = 999;
 }
 

@@ -81,7 +81,7 @@ Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, f
 - Ayudante: categorías (con inscritos/agrupados) → alumnos por nombre o estatura → grupos en borrador con color y número (nunca rojo/azul) y casilla de fantasma → popup con el tapiz.
 - Árbitro: tablero del tapiz (sondeo 5 s; grupos con color y número; en curso con borde e icono de reproducción; recomendado en el color de acento; rojo y azul con punto de color en cada combate; pendientes que esperan con candado y motivo, sin abrirse; terminados) → marcador (sondeo 2 s, reloj contado en el dispositivo y resincronizado, +1, menú de avisos con motivo, deshacer, finalizar, línea de tiempo). Campana generada (`app/tool/make_bell.py`), una vez al iniciar y una al acabar.
 - Marcador (2026-11-06):
-  - Vertical: reloj (16 % del alto), Iniciar (verde) / Parar (oscuro) / Finalizar y Deshacer arriba; rojo y azul debajo. Horizontal (más ancho que alto: móvil girado, tablet, escritorio): rojo | reloj y botones | azul.
+  - Vertical: reloj (16 % del alto), Iniciar o Finalizar (relleno) / Parar (con borde) y Deshacer arriba; rojo y azul debajo. Horizontal (más ancho que alto: móvil girado, tablet, escritorio): rojo | reloj y botones | azul.
   - Esquinas desactivadas hasta el primer Iniciar. Nombre en una línea (completo en tooltip y lector), número que llena el hueco; sin desbordes con texto al 200 %.
   - Reloj en color de aviso los últimos 10 s. Descalificación en color de error.
   - Deshacer bajo los botones, 48 dp, dice qué deshace ("Deshacer: +1 Rojo"); sin diálogo y con un aviso de 3 s.

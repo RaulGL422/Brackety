@@ -190,7 +190,7 @@
     }
   },
   "matEmpty": "Todavía no hay grupos en este tapiz.",
-  "matGroupHeader": "Grupo {number} · {category} años",
+  "matGroupHeader": "Grupo {number}, de {category} años",
   "@matGroupHeader": {
     "placeholders": {
       "number": {
@@ -201,14 +201,27 @@
       }
     }
   },
-  "matRecommended": "Siguiente recomendado",
+  "matRecommended": "Siguiente combate",
   "matInProgress": "En curso",
-  "matPending": "Pendientes",
+  "matPending": "Después",
+  "matYours": "Tu tapiz",
+  "matToPlay": "{count, plural, =1{1 por jugar} other{{count} por jugar}}",
+  "@matToPlay": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "matOpenScoreboard": "Abrir el marcador",
+  "matBackToScoreboard": "Volver al marcador",
+  "matWatch": "Ver el combate",
+  "matGroups": "Grupos en este tapiz",
   "matFinished": "Terminados",
   "matWaiting": "Un luchador está combatiendo ahora",
   "matNoneAvailable": "Ningún combate puede empezar ahora.",
   "versus": "vs",
-  "scoreboardTitle": "Tapiz {mat} · Grupo {group}",
+  "scoreboardTitle": "Tapiz {mat}, grupo {group}",
   "@scoreboardTitle": {
     "placeholders": {
       "mat": {
@@ -656,5 +669,18 @@
   "matLocked": "No se puede abrir todavía",
   "needsGuardian": "Falta tutor",
   "settingsRemoveMatConfirm": "Se quita el Tapiz {number}; su árbitro deja de estar asignado.",
-  "@settingsRemoveMatConfirm": {"placeholders": {"number": {"type": "int"}}}
+  "@settingsRemoveMatConfirm": {"placeholders": {"number": {"type": "int"}}},
+  "draftTitle": "Grupo nuevo",
+  "draftReady": "Completo",
+  "draftMissing": "{count, plural, =1{Falta 1} other{Faltan {count}}}",
+  "@draftMissing": {"placeholders": {"count": {"type": "int"}}},
+  "draftSlot": "Hueco {number}",
+  "@draftSlot": {"placeholders": {"number": {"type": "int"}}},
+  "ghostOf": "{name} (fantasma)",
+  "@ghostOf": {"placeholders": {"name": {"type": "String"}}},
+  "settingsAppearance": "Apariencia",
+  "settingsAppearanceHint": "Automático sigue al modo claro u oscuro del dispositivo. Se guarda solo en este dispositivo.",
+  "themeSystem": "Automático",
+  "themeLight": "Claro",
+  "themeDark": "Oscuro"
 }

@@ -81,6 +81,13 @@ class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
       onChanged: (change) => setState(() => _group = change(_group)),
       onMatChanged: (id) => setState(() => _matId = id),
       onCreate: _create,
+      labelOf: (id) {
+        final p = participants.value?.where((p) => p.id == id).firstOrNull;
+        if (p == null) return '';
+        return p.lastName.isEmpty
+            ? p.firstName
+            : '${p.firstName} ${p.lastName.characters.first}.';
+      },
     );
     final list = AsyncView(
       value: participants,

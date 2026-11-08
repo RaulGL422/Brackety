@@ -313,6 +313,10 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
       onChanged: _change,
       onMatChanged: (id) => setState(() => _matId = id),
       onCreate: _create,
+      labelOf: (id) {
+        final team = teams.value?.where((t) => t.id == id).firstOrNull;
+        return team == null ? '' : l10n.teamName(team.number);
+      },
       onPickGhostTeam: () => _pickGhostTeam(teams.value ?? const []),
     );
     return _ListWithPanel(list: list, panel: panel);

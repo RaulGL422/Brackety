@@ -196,7 +196,7 @@ void main() {
 
   Finder undoButton(String label) => find.ancestor(
     of: find.text(label),
-    matching: find.byWidgetPredicate((w) => w is OutlinedButton),
+    matching: find.byWidgetPredicate((w) => w is FilledButton),
   );
 
   void setSize(WidgetTester tester, Size size, {double scale = 1}) {
@@ -386,7 +386,8 @@ void main() {
     await tester.tap(find.text('Resume'));
     await settle(tester);
 
-    expect(background('Stop'), scheme.inverseSurface);
+    expect(background('Stop'), Colors.transparent);
+    expect(start, scheme.primary);
     expect(background('Stop'), isNot(start));
 
     await tester.pumpWidget(const SizedBox());

@@ -89,6 +89,9 @@ void main() {
       expect(names.first, 'Zoe Prueba');
 
       for (final name in ['Ana', 'Bea', 'Carla', 'Diego']) {
+        // On a phone the group's slots leave room for a few rows: scroll to each one.
+        await tester.ensureVisible(find.text('$name Prueba'));
+        await tester.pumpAndSettle();
         await tester.tap(find.text('$name Prueba'));
         await tester.pump();
       }
@@ -143,6 +146,53 @@ void main() {
     final DraftGroup group = repository.created.single;
     expect(group.members, ['p0', 'p1', 'p2']);
     expect(group.ghost, 'grouped');
+  });
+
+  testWidgets('the slots fill as the helper picks and a tap empties one', (
+    tester,
+  ) async {
+    tester.view.physicalSize = sizes['tablet']!;
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...sessionOverrides(FakeAuthApi(signedIn: true)),
+          groupingRepositoryProvider.overrideWithValue(
+            FakeGroupingRepository(participants),
+          ),
+          fakeMatsOverride,
+          myEventsProvider.overrideWith((ref) async => []),
+        ],
+        child: const BracketyApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
+        .read(routerProvider)
+        .push('/events/e1/categories/c1');
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('4 to go', findRichText: true), findsOneWidget);
+    expect(find.text('Slot 1'), findsOneWidget);
+    for (final name in ['Ana', 'Bea']) {
+      await tester.tap(find.text('$name Prueba'));
+      await tester.pump();
+    }
+    expect(find.textContaining('2 to go', findRichText: true), findsOneWidget);
+    expect(find.text('Ana P.'), findsOneWidget);
+    expect(find.text('Slot 3'), findsOneWidget);
+
+    await tester.tap(find.text('Ana P.'));
+    await tester.pump();
+    expect(find.text('Ana P.'), findsNothing);
+    expect(find.textContaining('3 to go', findRichText: true), findsOneWidget);
+
+    for (final name in ['Ana', 'Carla', 'Diego']) {
+      await tester.tap(find.text('$name Prueba'));
+      await tester.pump();
+    }
+    expect(find.textContaining('Complete', findRichText: true), findsOneWidget);
   });
 
   for (final MapEntry(key: device, value: size) in sizes.entries) {

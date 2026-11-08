@@ -743,13 +743,13 @@ abstract class AppLocalizations {
   /// No description provided for @matGroupHeader.
   ///
   /// In es, this message translates to:
-  /// **'Grupo {number} · {category} años'**
+  /// **'Grupo {number}, de {category} años'**
   String matGroupHeader(int number, String category);
 
   /// No description provided for @matRecommended.
   ///
   /// In es, this message translates to:
-  /// **'Siguiente recomendado'**
+  /// **'Siguiente combate'**
   String get matRecommended;
 
   /// No description provided for @matInProgress.
@@ -761,8 +761,44 @@ abstract class AppLocalizations {
   /// No description provided for @matPending.
   ///
   /// In es, this message translates to:
-  /// **'Pendientes'**
+  /// **'Después'**
   String get matPending;
+
+  /// No description provided for @matYours.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu tapiz'**
+  String get matYours;
+
+  /// No description provided for @matToPlay.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 por jugar} other{{count} por jugar}}'**
+  String matToPlay(int count);
+
+  /// No description provided for @matOpenScoreboard.
+  ///
+  /// In es, this message translates to:
+  /// **'Abrir el marcador'**
+  String get matOpenScoreboard;
+
+  /// No description provided for @matBackToScoreboard.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver al marcador'**
+  String get matBackToScoreboard;
+
+  /// No description provided for @matWatch.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver el combate'**
+  String get matWatch;
+
+  /// No description provided for @matGroups.
+  ///
+  /// In es, this message translates to:
+  /// **'Grupos en este tapiz'**
+  String get matGroups;
 
   /// No description provided for @matFinished.
   ///
@@ -791,7 +827,7 @@ abstract class AppLocalizations {
   /// No description provided for @scoreboardTitle.
   ///
   /// In es, this message translates to:
-  /// **'Tapiz {mat} · Grupo {group}'**
+  /// **'Tapiz {mat}, grupo {group}'**
   String scoreboardTitle(int mat, int group);
 
   /// No description provided for @cornerRed.
@@ -2551,6 +2587,66 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Se quita el Tapiz {number}; su árbitro deja de estar asignado.'**
   String settingsRemoveMatConfirm(int number);
+
+  /// No description provided for @draftTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Grupo nuevo'**
+  String get draftTitle;
+
+  /// No description provided for @draftReady.
+  ///
+  /// In es, this message translates to:
+  /// **'Completo'**
+  String get draftReady;
+
+  /// No description provided for @draftMissing.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{Falta 1} other{Faltan {count}}}'**
+  String draftMissing(int count);
+
+  /// No description provided for @draftSlot.
+  ///
+  /// In es, this message translates to:
+  /// **'Hueco {number}'**
+  String draftSlot(int number);
+
+  /// No description provided for @ghostOf.
+  ///
+  /// In es, this message translates to:
+  /// **'{name} (fantasma)'**
+  String ghostOf(String name);
+
+  /// No description provided for @settingsAppearance.
+  ///
+  /// In es, this message translates to:
+  /// **'Apariencia'**
+  String get settingsAppearance;
+
+  /// No description provided for @settingsAppearanceHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Automático sigue al modo claro u oscuro del dispositivo. Se guarda solo en este dispositivo.'**
+  String get settingsAppearanceHint;
+
+  /// No description provided for @themeSystem.
+  ///
+  /// In es, this message translates to:
+  /// **'Automático'**
+  String get themeSystem;
+
+  /// No description provided for @themeLight.
+  ///
+  /// In es, this message translates to:
+  /// **'Claro'**
+  String get themeLight;
+
+  /// No description provided for @themeDark.
+  ///
+  /// In es, this message translates to:
+  /// **'Oscuro'**
+  String get themeDark;
 }
 
 class _AppLocalizationsDelegate

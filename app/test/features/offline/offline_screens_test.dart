@@ -169,7 +169,7 @@ void main() {
 
       expect(find.text('Offline · 1 action waiting'), findsOneWidget);
       expect(find.textContaining('board saved on the phone'), findsOneWidget);
-      expect(find.text('Recommended next'), findsNothing);
+      expect(find.text('Next match'), findsNothing);
       expect(find.text('In progress'), findsOneWidget);
       expect(find.text("Under the club's review"), findsOneWidget);
       ListTile tile(String red, String blue) =>

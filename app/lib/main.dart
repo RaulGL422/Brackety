@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 
 import 'app.dart';
+import 'features/appearance/data/theme_store.dart';
+import 'features/appearance/state/theme_mode_provider.dart';
 import 'features/server/data/server_store.dart';
 import 'features/server/state/server_providers.dart';
 
@@ -17,9 +19,13 @@ Future<void> main() async {
   enableSemanticsForAutomation();
   // Before the first request: the saved session belongs to the saved server.
   final savedServer = kIsWeb ? null : await const SecureServerStore().read();
+  final savedTheme = await const SecureThemeStore().read();
   runApp(
     ProviderScope(
-      overrides: serverOverrides(savedServer),
+      overrides: [
+        ...serverOverrides(savedServer),
+        savedThemeModeProvider.overrideWithValue(savedTheme),
+      ],
       child: const BracketyApp(),
     ),
   );
