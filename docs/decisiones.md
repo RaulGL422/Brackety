@@ -40,4 +40,6 @@ Las de octubre de 2026, en `decisiones-2026-10.md`.
 - 2026-11-05 · Offline F1: caché y cola en ficheros JSON, no drift · un tapiz y unas decenas de acciones; drift llega con el módulo completo.
 - 2026-11-05 · Offline F1: si el servidor rechaza la sesión, la cola del árbitro se guarda para su cuenta y se envía al volver a entrar · decidido por Raul; antes se perdía sin enviarse.
 - 2026-11-07 · Plugins de Claude Code `playwright` y `frontend-design` en el proyecto; `headroom` descartado · Playwright verifica la web y el admin en navegador y el diseño guía pantallas nuevas; headroom es de terceros y enruta el tráfico al modelo por un proxy.
+- 2026-11-07 · Sin multigrupo en la app: un grupo cada vez; el campo `maxGroupsPerMat` sigue en servidor y paquete hasta después de la F1 · pedido por Raul; no cambiar el formato del paquete a una semana del evento.
+- 2026-11-07 · Al crear grupo, tapiz Automático (menor fin estimado) o elegido a mano entre los que tienen árbitro · pedido por Raul.
 - 2026-11-07 · Árbol de semántica activo en builds debug y `APP_ENV=dev` (`enableSemanticsForAutomation`) · sin él, Flutter web es un canvas y Playwright no encuentra botones ni campos; en release se mantiene apagado por rendimiento.

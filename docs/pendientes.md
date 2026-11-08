@@ -79,6 +79,7 @@
 - [ ] Escritorio: Configuración, Puntuaciones y Tapices ocupan todo el ancho; aplicar anchos de formulario (480) y lectura (720) de `07-diseno.md`.
 - [ ] Tarjeta "Siguiente recomendado": naranja lleno + círculo de grupo + punto rojo chocan; probar `tertiaryContainer` con borde de acento.
 - [ ] Lector de pantalla: la lista de Puntuaciones se lee como un único bloque; una fila por alumno.
+- [ ] Quitar `maxGroupsPerMat` del servidor (BD, API, paquete con nueva `schemaVersion`) y del límite de grupos por petición; la app ya no lo usa.
 
 ## Producto
 - [ ] Grupo con sobrante: opciones (promedio por combate / puntos brutos / decidir caso a caso) y respuesta final del organizador; será opción del evento.
