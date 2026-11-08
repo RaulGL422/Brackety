@@ -14,14 +14,29 @@ Salida: `docs/07-diseno.md` actualizado con tokens (colores, tipografía, espaci
 Validación visual: página **Diseño** del admin, solo en debug (`./run-app.ps1 -Target web -App admin`). Muestra colores con su contraste, tipografía, espaciados, radios, componentes y ejemplos (marcador, clasificación), en claro/oscuro y con texto hasta 200 %. Revisarla al cambiar el tema.
 
 ## Tokens (en `packages/brackety_core/lib/src/theme`)
-- Color: paleta **Eléctrico**. `ColorScheme` Material 3 (variante *fidelity*) desde el primario `#2F5BFF`; el acento `#FF6B00` va en `tertiary` con su propia gama.
-- Estados: `BracketyColors` (`ThemeExtension`): success, warning (+ containers). Error usa el de Material.
+Sistema **Tatami**: el tapiz es el objeto del día y todo se organiza a su alrededor. Maquetas: canvas de diseño de Raul (2026-11-08).
+- Color: `ColorScheme` fijo, claro y oscuro (no generado por semilla).
+  | Papel | Claro | Oscuro |
+  |---|---|---|
+  | Acción, igusa (`primary`) | `#4A6B2A` | `#8DB25A` |
+  | Ribete, heri (`BracketyColors.heri`, cabeceras) | `#2F3B26` | `#0E110B` |
+  | Lo siguiente, kin (`tertiary`) | `#D9A83A` | `#E0B354` |
+  | Fondo, washi (`surface`) | `#F3F4EF` | `#161914` |
+  | Texto, sumi (`onSurface`) | `#22241F` | `#ECEEE6` |
+- Rojo `#C62B2B` y azul `#1F57B8` solo para las esquinas (`CompetitorColor`). El error usa un ladrillo (`#8A3A12`), no rojo.
+- Estados: `BracketyColors` (`ThemeExtension`): success, warning (+ containers), `heri`/`onHeri` y `matFrame` (ribete de un tapiz).
 - Competidores: `CompetitorColor` (12 colores fijos en claro y oscuro, cada uno con su color de texto AA).
-- Tipografía: Barlow (texto) y Barlow Condensed (display, headline, números del marcador), empaquetadas en assets (offline), licencia OFL.
-- Espaciado `AppSpacing` 4·8·12·16·24·32·48. Radios `AppRadius` 8·12·20·full. Táctil `AppSizes` 48 (general) y 72 (marcador); iconos del marcador 40. Anchos: formulario 480, lectura 720, columna de tabla en móvil 200 (la tabla se desplaza en horizontal).
-- Componentes: estilo vía `ThemeData` (botones, tarjetas, campos, chips, diálogos). Widgets propios solo al repetirse.
+- Tipografía: Zen Kaku Gothic New (texto; solo glifos latinos) y Saira Condensed (display, headline, reloj, puntos, número de tapiz), empaquetadas en assets (offline), licencia OFL.
+- Espaciado `AppSpacing` 4·8·12·16·24·32·48. Radios `AppRadius` 4·6·8·full: rectángulos con esquina corta, nunca cápsulas. Táctil `AppSizes` 48 (general) y 72 (marcador); iconos del marcador 40. Anchos: formulario 480, lectura 720, columna de tabla en móvil 200 (la tabla se desplaza en horizontal).
+- Marcador: siempre con el tema oscuro, también en modo claro.
+- Componentes: estilo vía `ThemeData` (botones, tarjetas, campos, chips, diálogos, barras). Widgets propios solo al repetirse.
 - Regla: ningún widget de producto usa colores, tamaños o espaciados fijos; todo sale del tema o de los tokens (la página Diseño fija anchos solo para maquetar la muestra).
 - Test `theme_test.dart`: contraste AA de todos los pares de color en claro y oscuro.
+
+## Reglas de pantalla
+- Cada pantalla abre con lo que toca hacer ahora: el siguiente combate, el grupo a medias.
+- El estado se dice con palabra e icono, nunca solo con color.
+- Datos en columnas con su etiqueta, no en frases unidas por puntos medios.
 
 ## Público objetivo
 Familias, deportistas (niños y adultos), entrenadores, árbitros y mesa. Muchos usuarios no técnicos, uso en móvil, a veces al aire libre (luz fuerte, arena).
@@ -44,4 +59,4 @@ Cada pantalla se diseña y prueba en móvil, tablet y escritorio. Clases de vent
 - Marcador/tapiz: en horizontal aprovecha el ancho; en tablet, los botones siguen al alcance de una mano.
 
 ## Estado
-Tokens cerrados (2026-10-30): paleta Eléctrico, Barlow / Barlow Condensed. Las pantallas de cada módulo se diseñan sobre estos tokens.
+Tatami (2026-11-08) sustituye a Eléctrico + Barlow (2026-10-30). Aplicado al tema y a las pantallas de la F1 (tablero del árbitro, marcador, crear grupo); el resto, en `pendientes.md`.

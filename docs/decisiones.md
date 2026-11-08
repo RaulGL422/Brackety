@@ -43,3 +43,6 @@ Las de octubre de 2026, en `decisiones-2026-10.md`.
 - 2026-11-07 · Sin multigrupo en la app: un grupo cada vez; el campo `maxGroupsPerMat` sigue en servidor y paquete hasta después de la F1 · pedido por Raul; no cambiar el formato del paquete a una semana del evento.
 - 2026-11-07 · Al crear grupo, tapiz Automático (menor fin estimado) o elegido a mano entre los que tienen árbitro · pedido por Raul.
 - 2026-11-07 · Árbol de semántica activo en builds debug y `APP_ENV=dev` (`enableSemanticsForAutomation`) · sin él, Flutter web es un canvas y Playwright no encuentra botones ni campos; en release se mantiene apagado por rendimiento.
+- 2026-11-08 · Sistema de diseño Tatami (verde igusa para la acción, oro kin para "siguiente", rojo y azul solo para esquinas) y fuentes Zen Kaku Gothic New + Saira Condensed; sustituye a Eléctrico y Barlow · pedido por Raul: la app no le resultaba intuitiva ni original, y el azul de marca se confundía con la esquina azul.
+- 2026-11-08 · Marcador siempre oscuro, también en modo claro · las esquinas a todo color sobre tinta se leen mejor desde el lateral del tapiz.
+- 2026-11-08 · Zen Kaku Gothic New empaquetada solo con glifos latinos (30 KB por grosor en vez de 2,3 MB) · la app no muestra japonés; la licencia OFL no reserva el nombre de esta fuente.

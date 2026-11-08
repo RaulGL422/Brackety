@@ -76,8 +76,9 @@
 - [ ] Confirmar orden de fases: deducido del Registro general (F1 suelo, F2 armas, F3 expresión técnica, F4 derribos).
 
 ## Diseño tras la Fase 1 (revisión con Playwright, 2026-11-07)
-- [ ] Escritorio: Configuración, Puntuaciones y Tapices ocupan todo el ancho; aplicar anchos de formulario (480) y lectura (720) de `07-diseno.md`.
-- [ ] Tarjeta "Siguiente recomendado": naranja lleno + círculo de grupo + punto rojo chocan; probar `tertiaryContainer` con borde de acento.
+- [ ] Escritorio: Configuración, Puntuaciones y Tapices ocupan todo el ancho; aplicar anchos de formulario (480) y lectura (720) de `07-diseno.md` (el tablero del árbitro ya lo hace).
+- [ ] Tatami en el resto de pantallas: maquetas antes de programar (inicio, login, mesa del club como planta de tapices, inscripciones, ajustes, admin). Quitar los textos con punto medio ("6 años · 132 cm") en favor de columnas con etiqueta.
+- [ ] Modo oscuro: hoy sigue al sistema; ¿opción para fijarlo en Ajustes? Preguntar a Raul.
 - [ ] Lector de pantalla: la lista de Puntuaciones se lee como un único bloque; una fila por alumno.
 - [ ] Quitar `maxGroupsPerMat` del servidor (BD, API, paquete con nueva `schemaVersion`) y del límite de grupos por petición; la app ya no lo usa.
 
@@ -92,6 +93,7 @@
 ## Hecho
 - 2026-10-30 · Tokens de acceso y reauth emitidos antes de un cambio de credenciales o borrado se rechazan (`sessions_revoked_at`).
 - 2026-10-30 · Cuenta en borrado lógico: durante 30 días el dueño la reactiva al iniciar sesión (`ACCOUNT_PENDING_DELETION` + restaurar); registrarse con ese email avisa al dueño y no crea otra.
+- 2026-11-08 · Dirección de diseño Tatami (claro y oscuro) aceptada por Raul; sustituye a Eléctrico y Barlow.
 - 2026-10-30 · Sistema de diseño validado: paleta Eléctrico y Barlow.
 - 2026-10-28 · Android cmdline-tools instaladas; `flutter doctor` sin errores para Android y web.
 - 2026-10-28 · Graphify configurado a partir de ClipHive (`CLAUDE.md`, `.gitignore`).
