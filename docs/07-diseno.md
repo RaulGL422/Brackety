@@ -24,6 +24,7 @@ Sistema **neutro multideporte**: el color es de quien compite. La app se queda e
   | Secundario (`onSurfaceVariant`) | `#555555` | `#A8A8A8` |
   | Banda de cabecera (`BracketyColors.band`) | `#1A1A1A` | `#000000` |
 - "Siguiente combate" se marca con marco grueso de tinta, icono y palabra; "En curso", con banda de tinta. Nunca con un color que pueda llevar un competidor.
+- Los grupos se distinguen por su número en un cuadrado de tinta, no por color.
 - Estados con color propio y siempre con icono y palabra: error ladrillo (`#8A3A12`), aviso ámbar, correcto verde. No se usan en el marcador.
 - Estados: `BracketyColors` (`ThemeExtension`): success, warning (+ containers) y `band`/`onBand`.
 - Competidores: `CompetitorColor` (12 colores fijos en claro y oscuro, cada uno con su color de texto AA). En artes marciales, siempre rojo `#C62B2B` y azul `#1F57B8`.
