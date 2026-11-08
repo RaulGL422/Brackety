@@ -141,8 +141,10 @@ class GroupService {
         var category = roster.category(eventId, request.categoryId());
         checkParticipantGroups(event, category, request.groups());
         checkTeamGroups(event, category, request.groups());
-        var mat = schedule.soonestFree(event, clock.instant())
-                .orElseThrow(() -> EventException.conflict("No mat has a referee yet."));
+        var mat = request.matId() == null
+                ? schedule.soonestFree(event, clock.instant())
+                        .orElseThrow(() -> EventException.conflict("No mat has a referee yet."))
+                : chosenMat(event, request.matId());
         var number = groups.maxNumber(eventId);
         var numbers = new ArrayList<Integer>();
         for (var group : request.groups()) {
@@ -151,6 +153,16 @@ class GroupService {
             numbers.add(number);
         }
         return new CreateGroupsResponse(mat.getId(), mat.getNumber(), numbers);
+    }
+
+    private Mat chosenMat(Event event, UUID matId) {
+        var mat = mats.findById(matId)
+                .filter(m -> m.getEventId().equals(event.getId()))
+                .orElseThrow(() -> EventException.invalid("That mat is not in this event."));
+        if (mat.getRefereeAccountId() == null) {
+            throw EventException.conflict("That mat has no referee yet.");
+        }
+        return mat;
     }
 
     // Also in a team category: the "individual group" for those left without a team.

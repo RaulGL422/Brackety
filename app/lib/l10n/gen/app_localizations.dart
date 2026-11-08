@@ -680,12 +680,6 @@ abstract class AppLocalizations {
   /// **'Grupo {number}'**
   String draftGroup(int number);
 
-  /// No description provided for @draftCount.
-  ///
-  /// In es, this message translates to:
-  /// **'{count}/4'**
-  String draftCount(int count);
-
   /// No description provided for @draftGhost.
   ///
   /// In es, this message translates to:
@@ -697,18 +691,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Elige al fantasma: combate pero no puntúa.'**
   String get draftGhostHint;
-
-  /// No description provided for @draftAddGroup.
-  ///
-  /// In es, this message translates to:
-  /// **'Añadir grupo'**
-  String get draftAddGroup;
-
-  /// No description provided for @draftRemoveGroup.
-  ///
-  /// In es, this message translates to:
-  /// **'Quitar grupo'**
-  String get draftRemoveGroup;
 
   /// No description provided for @createGroup.
   ///
@@ -725,13 +707,13 @@ abstract class AppLocalizations {
   /// No description provided for @groupsConflict.
   ///
   /// In es, this message translates to:
-  /// **'Algún alumno ya está en un grupo. La lista se ha actualizado.'**
+  /// **'Algún alumno ya está en un grupo o el tapiz se ha quedado sin árbitro. La lista se ha actualizado.'**
   String get groupsConflict;
 
   /// No description provided for @groupsError.
   ///
   /// In es, this message translates to:
-  /// **'No se han podido crear los grupos.'**
+  /// **'No se ha podido crear el grupo.'**
   String get groupsError;
 
   /// No description provided for @ok.
@@ -1232,18 +1214,6 @@ abstract class AppLocalizations {
   /// **'Fecha'**
   String get settingsDate;
 
-  /// No description provided for @settingsMaxGroups.
-  ///
-  /// In es, this message translates to:
-  /// **'Grupos por tapiz a la vez'**
-  String get settingsMaxGroups;
-
-  /// No description provided for @settingsMaxGroupsHint.
-  ///
-  /// In es, this message translates to:
-  /// **'1 = sin multigrupo'**
-  String get settingsMaxGroupsHint;
-
   /// No description provided for @settingsAddMat.
   ///
   /// In es, this message translates to:
@@ -1345,6 +1315,42 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Grupo individual'**
   String get individualGroup;
+
+  /// No description provided for @teamGroup.
+  ///
+  /// In es, this message translates to:
+  /// **'Grupo por equipos'**
+  String get teamGroup;
+
+  /// No description provided for @matPickerLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Tapiz'**
+  String get matPickerLabel;
+
+  /// No description provided for @matAuto.
+  ///
+  /// In es, this message translates to:
+  /// **'Automático'**
+  String get matAuto;
+
+  /// No description provided for @matAutoOption.
+  ///
+  /// In es, this message translates to:
+  /// **'El que antes quede libre'**
+  String get matAutoOption;
+
+  /// No description provided for @matAutoHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Se asignará automáticamente al tapiz que antes quede libre.'**
+  String get matAutoHint;
+
+  /// No description provided for @matManualHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Irá al {mat}, elegido a mano.'**
+  String matManualHint(String mat);
 
   /// No description provided for @individualGroupHint.
   ///

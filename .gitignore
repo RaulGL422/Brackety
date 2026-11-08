@@ -28,3 +28,5 @@ brackety-data/
 
 # graphify — local knowledge graph, regenerated with `graphify update .`, never committed
 graphify-out/
+# Playwright plugin (Claude Code): screenshots and page snapshots, never committed
+.playwright-mcp/

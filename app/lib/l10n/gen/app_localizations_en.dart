@@ -337,21 +337,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String draftCount(int count) {
-    return '$count/4';
-  }
-
-  @override
   String get draftGhost => 'Ghost competitor';
 
   @override
   String get draftGhostHint => 'Pick the ghost: fights but does not score.';
-
-  @override
-  String get draftAddGroup => 'Add group';
-
-  @override
-  String get draftRemoveGroup => 'Remove group';
 
   @override
   String createGroup(int count) {
@@ -377,10 +366,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get groupsConflict =>
-      'A participant is already in a group. The list has been refreshed.';
+      'A participant is already in a group or the mat has lost its referee. The list has been refreshed.';
 
   @override
-  String get groupsError => 'The groups could not be created.';
+  String get groupsError => 'The group could not be created.';
 
   @override
   String get ok => 'OK';
@@ -675,12 +664,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsDate => 'Date';
 
   @override
-  String get settingsMaxGroups => 'Groups per mat at once';
-
-  @override
-  String get settingsMaxGroupsHint => '1 = no multigroup';
-
-  @override
   String get settingsAddMat => 'Add mat';
 
   @override
@@ -736,6 +719,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get individualGroup => 'Individual group';
+
+  @override
+  String get teamGroup => 'Team group';
+
+  @override
+  String get matPickerLabel => 'Mat';
+
+  @override
+  String get matAuto => 'Automatic';
+
+  @override
+  String get matAutoOption => 'The one free first';
+
+  @override
+  String get matAutoHint =>
+      'It is assigned automatically to the mat that will be free first.';
+
+  @override
+  String matManualHint(String mat) {
+    return 'It goes to $mat, picked by hand.';
+  }
 
   @override
   String get individualGroupHint =>

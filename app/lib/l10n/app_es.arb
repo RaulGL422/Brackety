@@ -159,18 +159,8 @@
       }
     }
   },
-  "draftCount": "{count}/4",
-  "@draftCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "draftGhost": "Competidor fantasma",
   "draftGhostHint": "Elige al fantasma: combate pero no puntúa.",
-  "draftAddGroup": "Añadir grupo",
-  "draftRemoveGroup": "Quitar grupo",
   "createGroup": "{count, plural, =1{Crear grupo} other{Crear grupos}}",
   "@createGroup": {
     "placeholders": {
@@ -187,8 +177,8 @@
       }
     }
   },
-  "groupsConflict": "Algún alumno ya está en un grupo. La lista se ha actualizado.",
-  "groupsError": "No se han podido crear los grupos.",
+  "groupsConflict": "Algún alumno ya está en un grupo o el tapiz se ha quedado sin árbitro. La lista se ha actualizado.",
+  "groupsError": "No se ha podido crear el grupo.",
   "ok": "Aceptar",
   "ghostBadge": "Fantasma",
   "matTitle": "Tapiz {number}",
@@ -386,8 +376,6 @@
   "saveError": "No se ha podido guardar.",
   "settingsName": "Nombre del evento",
   "settingsDate": "Fecha",
-  "settingsMaxGroups": "Grupos por tapiz a la vez",
-  "settingsMaxGroupsHint": "1 = sin multigrupo",
   "settingsAddMat": "Añadir tapiz",
   "settingsRemoveMat": "Quitar el último tapiz",
   "settingsReferee": "Árbitro",
@@ -420,6 +408,13 @@
   "tabParticipants": "Alumnos",
   "tabTeams": "Equipos",
   "individualGroup": "Grupo individual",
+  "teamGroup": "Grupo por equipos",
+  "matPickerLabel": "Tapiz",
+  "matAuto": "Automático",
+  "matAutoOption": "El que antes quede libre",
+  "matAutoHint": "Se asignará automáticamente al tapiz que antes quede libre.",
+  "matManualHint": "Irá al {mat}, elegido a mano.",
+  "@matManualHint": {"placeholders": {"mat": {"type": "String"}}},
   "individualGroupHint": "Para quien se quede sin equipo: grupos de 4 alumnos.",
   "categoryTeamCounts": "{participants} inscritos · {teams} equipos · {grouped} en grupos",
   "@categoryTeamCounts": {"placeholders": {"participants": {"type": "int"}, "teams": {"type": "int"}, "grouped": {"type": "int"}}},

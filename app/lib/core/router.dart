@@ -129,6 +129,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           eventId: state.pathParameters['eventId']!,
           categoryId: state.pathParameters['categoryId']!,
           categoryName: state.extra as String?,
+          teamSize: int.tryParse(state.uri.queryParameters['teamSize'] ?? ''),
         ),
       ),
       GoRoute(
