@@ -88,8 +88,9 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('Mat 2'), findsOneWidget);
-        expect(find.text('Group 3 · ages 7-8'), findsOneWidget);
-        expect(find.text('Recommended next'), findsOneWidget);
+        expect(find.text('Group 3, ages 7-8'), findsNWidgets(2));
+        expect(find.text('Next match'), findsOneWidget);
+        expect(find.text('2 to play'), findsOneWidget);
         expect(matchTile('Ana', 'Carla'), findsOneWidget);
         expect(find.text('A fighter is in a match right now'), findsOneWidget);
         expect(find.text('4 - 15'), findsOneWidget);
@@ -134,28 +135,37 @@ void main() {
 
         final scheme = Theme.of(tester.element(find.byType(ListView)))
             .colorScheme;
-        Card card(Finder tile) => tester.widget<Card>(
-          find.ancestor(of: tile, matching: find.byType(Card)),
-        );
+        Finder card(Finder tile) =>
+            find.ancestor(of: tile, matching: find.byType(Card)).first;
         ListTile tile(Finder tile) => tester.widget<ListTile>(tile);
 
-        final inProgress = matchTile('Bea', 'Carla');
-        final shape = card(inProgress).shape! as RoundedRectangleBorder;
-        expect(shape.side.color, scheme.primary);
-        expect(tile(inProgress).textColor, scheme.onSurface);
+        final inProgress = card(matchTile('Bea', 'Carla'));
+        expect(
+          find.descendant(of: inProgress, matching: find.text('In progress')),
+          findsOneWidget,
+        );
         expect(
           find.descendant(
             of: inProgress,
-            matching: find.byIcon(Icons.play_circle),
+            matching: find.text('Back to the scoreboard'),
           ),
           findsOneWidget,
         );
 
-        final recommended = matchTile('Ana', 'Carla');
-        expect(card(recommended).color, scheme.tertiaryContainer);
-        expect(tile(recommended).textColor, scheme.onTertiaryContainer);
+        final recommended = card(matchTile('Ana', 'Carla'));
         expect(
-          contrastRatio(scheme.tertiaryContainer, scheme.onTertiaryContainer),
+          find.descendant(of: recommended, matching: find.text('Next match')),
+          findsOneWidget,
+        );
+        expect(
+          find.descendant(
+            of: recommended,
+            matching: find.text('Open the scoreboard'),
+          ),
+          findsOneWidget,
+        );
+        expect(
+          contrastRatio(scheme.tertiary, scheme.onTertiary),
           greaterThanOrEqualTo(4.5),
         );
 

@@ -390,17 +390,43 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String matGroupHeader(int number, String category) {
-    return 'Grupo $number · $category años';
+    return 'Grupo $number, de $category años';
   }
 
   @override
-  String get matRecommended => 'Siguiente recomendado';
+  String get matRecommended => 'Siguiente combate';
 
   @override
   String get matInProgress => 'En curso';
 
   @override
-  String get matPending => 'Pendientes';
+  String get matPending => 'Después';
+
+  @override
+  String get matYours => 'Tu tapiz';
+
+  @override
+  String matToPlay(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count por jugar',
+      one: '1 por jugar',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get matOpenScoreboard => 'Abrir el marcador';
+
+  @override
+  String get matBackToScoreboard => 'Volver al marcador';
+
+  @override
+  String get matWatch => 'Ver el combate';
+
+  @override
+  String get matGroups => 'Grupos en este tapiz';
 
   @override
   String get matFinished => 'Terminados';
@@ -416,7 +442,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String scoreboardTitle(int mat, int group) {
-    return 'Tapiz $mat · Grupo $group';
+    return 'Tapiz $mat, grupo $group';
   }
 
   @override
@@ -1498,5 +1524,32 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String settingsRemoveMatConfirm(int number) {
     return 'Se quita el Tapiz $number; su árbitro deja de estar asignado.';
+  }
+
+  @override
+  String get draftTitle => 'Grupo nuevo';
+
+  @override
+  String get draftReady => 'Completo';
+
+  @override
+  String draftMissing(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Faltan $count',
+      one: 'Falta 1',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String draftSlot(int number) {
+    return 'Hueco $number';
+  }
+
+  @override
+  String ghostOf(String name) {
+    return '$name (fantasma)';
   }
 }

@@ -387,17 +387,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String matGroupHeader(int number, String category) {
-    return 'Group $number · ages $category';
+    return 'Group $number, ages $category';
   }
 
   @override
-  String get matRecommended => 'Recommended next';
+  String get matRecommended => 'Next match';
 
   @override
   String get matInProgress => 'In progress';
 
   @override
-  String get matPending => 'Pending';
+  String get matPending => 'Later';
+
+  @override
+  String get matYours => 'Your mat';
+
+  @override
+  String matToPlay(int count) {
+    return '$count to play';
+  }
+
+  @override
+  String get matOpenScoreboard => 'Open the scoreboard';
+
+  @override
+  String get matBackToScoreboard => 'Back to the scoreboard';
+
+  @override
+  String get matWatch => 'Watch the match';
+
+  @override
+  String get matGroups => 'Groups on this mat';
 
   @override
   String get matFinished => 'Finished';
@@ -413,7 +433,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String scoreboardTitle(int mat, int group) {
-    return 'Mat $mat · Group $group';
+    return 'Mat $mat, group $group';
   }
 
   @override
@@ -1494,5 +1514,26 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String settingsRemoveMatConfirm(int number) {
     return 'Mat $number is removed; its referee is no longer assigned.';
+  }
+
+  @override
+  String get draftTitle => 'New group';
+
+  @override
+  String get draftReady => 'Complete';
+
+  @override
+  String draftMissing(int count) {
+    return '$count to go';
+  }
+
+  @override
+  String draftSlot(int number) {
+    return 'Slot $number';
+  }
+
+  @override
+  String ghostOf(String name) {
+    return '$name (ghost)';
   }
 }

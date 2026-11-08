@@ -65,19 +65,36 @@ class _ClockBarState extends ConsumerState<ClockBar> {
     final over =
         view.endReason != null || (view.running && left == Duration.zero);
     final clock = _Clock(view: view, left: left, over: over);
+    final clockButton = _ClockButton(
+      view: view,
+      over: over,
+      onAction: widget.onAction,
+    );
+    final undo = _UndoButton(view: view, onAction: widget.onAction);
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.m),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
+        spacing: AppSpacing.s,
         children: [
-          if (widget.clockHeight case final height?)
-            SizedBox(height: height, child: clock)
-          else
+          if (widget.clockHeight case final height?) ...[
+            SizedBox(height: height, child: clock),
+            // Portrait: both buttons on one row, under the thumb, the same height.
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: AppSpacing.s,
+                children: [
+                  Expanded(child: clockButton),
+                  Expanded(child: undo),
+                ],
+              ),
+            ),
+          ] else ...[
             Expanded(child: clock),
-          const SizedBox(height: AppSpacing.s),
-          _ClockButton(view: view, over: over, onAction: widget.onAction),
-          const SizedBox(height: AppSpacing.s),
-          _UndoButton(view: view, onAction: widget.onAction),
+            clockButton,
+            undo,
+          ],
         ],
       ),
     );
@@ -187,7 +204,10 @@ class _UndoButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final target = view.review == null ? view.lastUndoable : null;
-    return OutlinedButton.icon(
+    return FilledButton.tonalIcon(
+      style: FilledButton.styleFrom(
+        minimumSize: const Size(0, AppSizes.scoreTouchTarget),
+      ),
       icon: const Icon(Icons.undo),
       label: Text(
         target == null ? l10n.undo : l10n.undoWhat(undoTarget(l10n, target)),

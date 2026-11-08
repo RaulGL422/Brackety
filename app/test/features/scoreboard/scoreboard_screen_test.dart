@@ -196,7 +196,7 @@ void main() {
 
   Finder undoButton(String label) => find.ancestor(
     of: find.text(label),
-    matching: find.byWidgetPredicate((w) => w is OutlinedButton),
+    matching: find.byWidgetPredicate((w) => w is FilledButton),
   );
 
   void setSize(WidgetTester tester, Size size, {double scale = 1}) {

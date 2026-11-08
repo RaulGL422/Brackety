@@ -74,7 +74,7 @@ class CornerPanel extends StatelessWidget {
   }
 }
 
-/// "Rojo" and the name on one line; the full name in the tooltip and to screen readers.
+/// "Rojo" over the name; the full name in the tooltip and to screen readers.
 class _Header extends StatelessWidget {
   const _Header({
     required this.side,
@@ -91,23 +91,19 @@ class _Header extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final text = Theme.of(context).textTheme;
     final name = corner.label(l10n);
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.baseline,
-      textBaseline: TextBaseline.alphabetic,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(cornerName(l10n, side), style: text.labelLarge?.merge(style)),
-        const SizedBox(width: AppSpacing.s),
-        Expanded(
-          child: Tooltip(
-            message: name,
-            // The text already gives the name to screen readers; the tooltip would repeat it.
-            excludeFromSemantics: true,
-            child: Text(
-              name,
-              style: text.titleLarge?.merge(style),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
+        Tooltip(
+          message: name,
+          // The text already gives the name to screen readers; the tooltip would repeat it.
+          excludeFromSemantics: true,
+          child: Text(
+            name,
+            style: text.titleLarge?.merge(style),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],
@@ -190,9 +186,24 @@ class _Buttons extends StatelessWidget {
         PopupMenuButton<MatchAction>(
           enabled: enabled,
           tooltip: l10n.sanctionsFor(cornerLabel),
-          iconColor: color.onColor,
-          iconSize: AppSizes.touchTarget,
           onSelected: onSanction,
+          // Faded like the +1 button while nothing can be scored.
+          child: Opacity(
+            opacity: enabled ? 1 : 0.38,
+            child: Container(
+              width: AppSizes.scoreTouchTarget,
+              height: AppSizes.scoreTouchTarget,
+              decoration: BoxDecoration(
+                border: Border.all(color: color.onColor, width: 2),
+                borderRadius: BorderRadius.circular(AppRadius.m),
+              ),
+              child: Icon(
+                Icons.flag_outlined,
+                color: color.onColor,
+                size: AppSizes.scoreIcon,
+              ),
+            ),
+          ),
           itemBuilder: (_) => [
             PopupMenuItem(
               value: MatchAction.warning,

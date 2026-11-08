@@ -22,6 +22,10 @@ import 'undo_text.dart';
 /// How long the "undone" message stays.
 const undoneNotice = Duration(seconds: 3);
 
+/// The scoreboard is always dark, in light mode too: the corners' red and blue at full
+/// strength on ink, readable from the side of the mat.
+final _scoreboardTheme = darkTheme();
+
 /// The referee's scoreboard for one tambo match: clock, both corners, undo and finish.
 class ScoreboardScreen extends ConsumerWidget {
   const ScoreboardScreen({super.key, required this.matchId});
@@ -35,39 +39,42 @@ class ScoreboardScreen extends ConsumerWidget {
     final match = ref.watch(provider);
     final view = match.value;
     return KeepScreenOn(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            view == null
-                ? ''
-                : l10n.scoreboardTitle(view.matNumber, view.groupNumber),
-          ),
-          actions: [
-            if (view != null)
-              IconButton(
-                tooltip: l10n.timeline,
-                icon: const Icon(Icons.history),
-                onPressed: () => _showTimeline(context, view),
-              ),
-          ],
-        ),
-        body: Column(
-          children: [
-            const SyncStatusBar(),
-            Expanded(
-              child: AsyncView(
-                value: match,
-                onRetry: () => ref.invalidate(provider),
-                data: (view) => view.finished
-                    ? _Finished(view: view)
-                    : _Live(
-                        view: view,
-                        onAction: (action, {side}) =>
-                            _act(context, ref, view, action, side: side),
-                      ),
-              ),
+      child: Theme(
+        data: _scoreboardTheme,
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(
+              view == null
+                  ? ''
+                  : l10n.scoreboardTitle(view.matNumber, view.groupNumber),
             ),
-          ],
+            actions: [
+              if (view != null)
+                IconButton(
+                  tooltip: l10n.timeline,
+                  icon: const Icon(Icons.history),
+                  onPressed: () => _showTimeline(context, view),
+                ),
+            ],
+          ),
+          body: Column(
+            children: [
+              const SyncStatusBar(),
+              Expanded(
+                child: AsyncView(
+                  value: match,
+                  onRetry: () => ref.invalidate(provider),
+                  data: (view) => view.finished
+                      ? _Finished(view: view)
+                      : _Live(
+                          view: view,
+                          onAction: (action, {side}) =>
+                              _act(context, ref, view, action, side: side),
+                        ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
