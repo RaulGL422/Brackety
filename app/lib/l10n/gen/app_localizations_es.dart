@@ -1568,4 +1568,8 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get themeDark => 'Oscuro';
+
+  @override
+  String get refusalStale =>
+      'El combate ha cambiado en otro dispositivo. Revisa el marcador y vuelve a pulsar.';
 }

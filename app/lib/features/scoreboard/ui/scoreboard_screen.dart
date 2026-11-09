@@ -145,6 +145,7 @@ class ScoreboardScreen extends ConsumerWidget {
 
   static String _refusalText(AppLocalizations l10n, ActionRefusal refusal) =>
       switch (refusal.local) {
+        null when refusal.stale => l10n.refusalStale,
         null => l10n.actionRefused(refusal.detail ?? ''),
         MatchRefusal.finished => l10n.refusalFinished,
         MatchRefusal.over => l10n.refusalOver,

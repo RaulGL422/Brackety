@@ -191,7 +191,7 @@ class ScoreboardOfflineTest extends ScoreboardApiTest {
 
         var refused = assertThrows(
                 EventException.class,
-                () -> scoreboard.record(match, referee(), request(MatchEventType.POINT, Side.RED, null, null, null)));
+                () -> scoreboard.record(match, referee(), request(MatchEventType.POINT, Side.RED, null, null, 1)));
 
         assertThat(refused.getBody().getProperties()).containsEntry("code", "MATCH_IN_REVIEW");
         assertThat(rejectedRows()).isEqualTo(1);
@@ -199,13 +199,17 @@ class ScoreboardOfflineTest extends ScoreboardApiTest {
     }
 
     @Test
-    void anOpIdNeedsKnownEvents() {
+    void everyActionNeedsKnownEvents() {
         var refused = assertThrows(
                 EventException.class,
                 () -> scoreboard.record(
                         match, referee(), request(MatchEventType.START, null, UUID.randomUUID(), t0, null)));
+        var web = assertThrows(
+                EventException.class,
+                () -> scoreboard.record(match, referee(), request(MatchEventType.START, null, null, null, null)));
 
         assertThat(refused.getStatusCode().value()).isEqualTo(400);
+        assertThat(web.getStatusCode().value()).isEqualTo(400);
     }
 
     @Test
@@ -284,7 +288,8 @@ class ScoreboardOfflineTest extends ScoreboardApiTest {
                         .query(Integer.class)
                         .single())
                 .isEqualTo(1);
-        var web = scoreboard.record(match, referee(), request(MatchEventType.POINT, Side.BLUE, null, null, null));
+        var web = scoreboard.record(
+                match, referee(), request(MatchEventType.POINT, Side.BLUE, null, null, knownEvents(match)));
         assertThat(web.view().blue().points()).isEqualTo(1);
     }
 

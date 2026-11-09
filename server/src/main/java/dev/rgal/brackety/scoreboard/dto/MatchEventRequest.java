@@ -10,9 +10,9 @@ import java.util.UUID;
 
 /**
  * {@code side} for points, warnings and disqualifications; {@code reason} required for warnings and
- * disqualifications. From the Android queue (docs/modulos/offline.md): {@code opId} is the action's id,
- * {@code at} when it happened on the device and {@code knownEvents} how many non-automatic actions the
- * device knew before it (required with {@code opId}). Without {@code opId}, {@code at} is ignored.
+ * disqualifications. {@code knownEvents} (required, so two tabs pressing at once do not both count): how
+ * many non-automatic actions the sender knew before this one. From the Android queue (docs/modulos/offline.md): {@code opId} is the action's id and
+ * {@code at} when it happened on the device. Without {@code opId}, {@code at} is ignored.
  */
 public record MatchEventRequest(
         @NotNull MatchEventType type,

@@ -21,15 +21,23 @@ class ScoreboardRepository {
     return MatchView.fromJson(response.data!);
   }
 
+  /// [knownEvents]: the match's non-automatic actions this screen had seen. If the server has
+  /// more (another tab or device wrote), it refuses with a 409 `MATCH_STALE`.
   Future<MatchView> send(
     String matchId,
     MatchAction action, {
     Side? side,
     String? reason,
+    required int knownEvents,
   }) async {
     final response = await _dio.post<Map<String, dynamic>>(
       '/api/v1/matches/$matchId/events',
-      data: {'type': action.wire, 'side': sideToJson(side), 'reason': reason},
+      data: {
+        'type': action.wire,
+        'side': sideToJson(side),
+        'reason': reason,
+        'knownEvents': knownEvents,
+      },
     );
     return MatchView.fromJson(response.data!);
   }

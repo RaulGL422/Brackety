@@ -80,7 +80,6 @@
 - [ ] Sistema neutro en el resto de pantallas: maquetas antes de programar (inicio, login, mesa del club como planta de tapices, inscripciones, ajustes, admin). Quitar los textos con punto medio ("6 años · 132 cm") en favor de columnas con etiqueta.
 - [ ] Web sin conexión (offline), después de la F1, en dos pasos. 1) Con la pestaña abierta: cola del marcador guardada en el navegador y enviada al volver la red (vale en http y https). 2) Completa por https (`brackety.rgal.dev`): la app se guarda en el navegador y abre sin red. En http (pabellón) el navegador no permite el paso 2. Útil sobre todo para iPhone. Aprobado por Raul el 2026-11-08.
 - [ ] "Tapiz" fijo en los textos: en otros deportes será Pista, Campo… Debe salir del nombre de la ubicación del evento (módulo `eventos`).
-- [ ] Marcador en la web (sin `opId`): dos pestañas o móviles del mismo árbitro pulsando a la vez suman dos acciones. Aprobado por Raul el 2026-11-08, rama propia tras fusionar la #57: `knownEvents` obligatorio en toda acción; en la web, si no cuadra, 409 sin revisión del club, recarga y aviso; la web envía de una en una.
 - [ ] Lector de pantalla: la lista de Puntuaciones se lee como un único bloque; una fila por alumno.
 - [ ] Quitar `maxGroupsPerMat` del servidor (BD, API, paquete con nueva `schemaVersion`) y del límite de grupos por petición; la app ya no lo usa.
 
@@ -101,3 +100,4 @@
 - 2026-10-30 · Sistema de diseño validado: paleta Eléctrico y Barlow.
 - 2026-10-28 · Android cmdline-tools instaladas; `flutter doctor` sin errores para Android y web.
 - 2026-10-28 · Graphify configurado a partir de ClipHive (`CLAUDE.md`, `.gitignore`).
+- 2026-11-09 · Marcador web: `knownEvents` obligatorio; dos pestañas a la vez ya no suman dos (409 `MATCH_STALE`).

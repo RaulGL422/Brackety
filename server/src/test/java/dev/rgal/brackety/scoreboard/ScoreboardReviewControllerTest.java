@@ -40,7 +40,7 @@ class ScoreboardReviewControllerTest extends ScoreboardApiTest {
                 .andExpect(jsonPath("$.code").value("MATCH_CONFLICT"));
         offline("STOP", 1).andExpect(jsonPath("$.code").value("MATCH_IN_REVIEW"));
         call(post(path(match) + "/events").content("""
-                                {"type":"STOP"}"""), "arbitro1")
+                                {"type":"STOP","knownEvents":1}"""), "arbitro1")
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value("MATCH_IN_REVIEW"));
 

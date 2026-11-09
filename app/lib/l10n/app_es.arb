@@ -682,5 +682,6 @@
   "settingsAppearanceHint": "Automático sigue al modo claro u oscuro del dispositivo. Se guarda solo en este dispositivo.",
   "themeSystem": "Automático",
   "themeLight": "Claro",
-  "themeDark": "Oscuro"
+  "themeDark": "Oscuro",
+  "refusalStale": "El combate ha cambiado en otro dispositivo. Revisa el marcador y vuelve a pulsar."
 }
