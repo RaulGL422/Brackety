@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/async_view.dart';
-import '../../../core/group_colors.dart';
 import '../../../core/keep_screen_on.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../offline/state/offline_sync.dart';
@@ -173,10 +172,7 @@ class _BoardList extends StatelessWidget {
           Wrap(
             spacing: AppSpacing.s,
             runSpacing: AppSpacing.s,
-            children: [
-              for (final (i, g) in board.groups.indexed)
-                _GroupCard(index: i, group: g),
-            ],
+            children: [for (final g in board.groups) _GroupCard(group: g)],
           ),
         ],
       ),
@@ -376,10 +372,7 @@ class _MatchRow extends StatelessWidget {
     final locked = waiting && !readOnly;
     return ListTile(
       minTileHeight: AppSizes.scoreTouchTarget,
-      leading: _GroupBadge(
-        number: match.groupNumber,
-        color: groupColor(board.groupIndex(match.groupId)),
-      ),
+      leading: _GroupBadge(number: match.groupNumber),
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -481,9 +474,8 @@ class _Mark extends StatelessWidget {
 }
 
 class _GroupCard extends StatelessWidget {
-  const _GroupCard({required this.index, required this.group});
+  const _GroupCard({required this.group});
 
-  final int index;
   final BoardGroup group;
 
   @override
@@ -500,7 +492,7 @@ class _GroupCard extends StatelessWidget {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _GroupBadge(number: group.number, color: groupColor(index)),
+                _GroupBadge(number: group.number),
                 const SizedBox(width: AppSpacing.s),
                 Flexible(
                   child: Text(
@@ -530,25 +522,28 @@ class _GroupCard extends StatelessWidget {
 }
 
 /// The group's colour and number, as a small square tile.
+/// The group's number in ink: a colour here could be taken for a competitor's.
 class _GroupBadge extends StatelessWidget {
-  const _GroupBadge({required this.number, required this.color});
+  const _GroupBadge({required this.number});
 
   final int number;
-  final CompetitorColor color;
 
   @override
-  Widget build(BuildContext context) => Container(
-    width: 36,
-    height: 36,
-    alignment: Alignment.center,
-    decoration: BoxDecoration(
-      color: color.color,
-      borderRadius: BorderRadius.circular(AppRadius.s),
-    ),
-    child: Text(
-      '$number',
-      style: Theme.of(context).textTheme.titleMedium
-          ?.copyWith(color: color.onColor),
-    ),
-  );
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      width: 36,
+      height: 36,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: scheme.inverseSurface,
+        borderRadius: BorderRadius.circular(AppRadius.s),
+      ),
+      child: Text(
+        '$number',
+        style: Theme.of(context).textTheme.titleMedium
+            ?.copyWith(color: scheme.onInverseSurface),
+      ),
+    );
+  }
 }

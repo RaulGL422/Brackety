@@ -180,6 +180,19 @@ void main() {
           ),
           findsOneWidget,
         );
+        // The group is its number in ink: a colour could be taken for a competitor's.
+        final badge = tester.widget<Container>(
+          find
+              .ancestor(
+                of: find.descendant(of: waiting, matching: find.text('3')),
+                matching: find.byType(Container),
+              )
+              .first,
+        );
+        expect(
+          (badge.decoration! as BoxDecoration).color,
+          scheme.inverseSurface,
+        );
         expect(tester.takeException(), isNull);
       },
     );
