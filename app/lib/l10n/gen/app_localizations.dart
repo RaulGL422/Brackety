@@ -2647,6 +2647,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Oscuro'**
   String get themeDark;
+
+  /// No description provided for @refusalStale.
+  ///
+  /// In es, this message translates to:
+  /// **'El combate ha cambiado en otro dispositivo. Revisa el marcador y vuelve a pulsar.'**
+  String get refusalStale;
 }
 
 class _AppLocalizationsDelegate

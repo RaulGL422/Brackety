@@ -220,6 +220,7 @@ class FakeMatchServer implements ScoreboardRepository {
     MatchAction action, {
     Side? side,
     String? reason,
+    required int knownEvents,
   }) => throw UnimplementedError('Android sends through the queue');
 
   @override

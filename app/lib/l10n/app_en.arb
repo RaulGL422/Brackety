@@ -512,5 +512,6 @@
   "settingsAppearanceHint": "Automatic follows the device's light or dark mode. It is saved on this device only.",
   "themeSystem": "Automatic",
   "themeLight": "Light",
-  "themeDark": "Dark"
+  "themeDark": "Dark",
+  "refusalStale": "The match changed on another device. Check the scoreboard and press again."
 }

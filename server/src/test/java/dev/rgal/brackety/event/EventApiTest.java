@@ -35,6 +35,14 @@ public abstract class EventApiTest extends AuthIntegrationTest {
         eventId = demo.seed();
     }
 
+    /** What a referee's screen knows of the match: its non-automatic actions so far. */
+    protected int knownEvents(UUID match) {
+        return jdbc.sql("select count(*) from match_event where match_id = ? and not automatic")
+                .param(match)
+                .query(Integer.class)
+                .single();
+    }
+
     protected UUID accountId(String username) {
         return accounts.findByEmail(username).orElseThrow().getId();
     }

@@ -130,4 +130,39 @@ void main() {
       'The match is not over yet.',
     );
   });
+
+  test(
+    'two quick actions go one at a time, each with what the last one left',
+    () async {
+      repository.current = matchView(status: MatchStatus.inProgress);
+      final controller = await load();
+      repository.next = matchView(
+        status: MatchStatus.inProgress,
+        canUndo: true,
+      );
+
+      final first = controller.send(MatchAction.point, side: Side.red);
+      final second = controller.send(MatchAction.point, side: Side.red);
+      await (first, second).wait;
+
+      expect(repository.knownSent, [1, 2]);
+    },
+  );
+
+  test('another device wrote first: refused as stale and reloaded', () async {
+    final controller = await load();
+    repository
+      ..checkKnownEvents = true
+      // The other device started the match meanwhile.
+      ..current = matchView(status: MatchStatus.inProgress);
+
+    final refusal = await controller.send(MatchAction.start);
+    await Future<void>.delayed(Duration.zero);
+
+    expect(refusal?.stale, isTrue);
+    expect(
+      container.read(matchControllerProvider('m1')).value?.status,
+      MatchStatus.inProgress,
+    );
+  });
 }

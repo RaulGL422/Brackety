@@ -1552,4 +1552,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get themeDark => 'Dark';
+
+  @override
+  String get refusalStale =>
+      'The match changed on another device. Check the scoreboard and press again.';
 }
