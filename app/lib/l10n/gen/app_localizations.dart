@@ -773,7 +773,7 @@ abstract class AppLocalizations {
   /// No description provided for @matToPlay.
   ///
   /// In es, this message translates to:
-  /// **'{count, plural, =1{1 por jugar} other{{count} por jugar}}'**
+  /// **'{count, plural, =1{1 por disputar} other{{count} por disputar}}'**
   String matToPlay(int count);
 
   /// No description provided for @matOpenScoreboard.
