@@ -6,16 +6,47 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.env.MockEnvironment;
 import tools.jackson.databind.json.JsonMapper;
 
 class ListReadingTest {
 
-    private final ClaudeListReader claude = new ClaudeListReader(new JsonMapper(), "claude", "model", "key", false);
+    private final ClaudeListReader claude =
+            new ClaudeListReader(new JsonMapper(), "claude", "model", "key", false, new MockEnvironment());
+
+    private static ClaudeListReader reader(String apiKey, boolean localCli, String... profiles) {
+        var environment = new MockEnvironment();
+        environment.setActiveProfiles(profiles);
+        return new ClaudeListReader(new JsonMapper(), "claude", "model", apiKey, localCli, environment);
+    }
+
+    @Test
+    void theDevelopersLoginStandsInOnlyOnTheLocalRunner() {
+        assertThat(reader("", false).isAvailable()).isFalse();
+        assertThat(reader("key", false).isAvailable()).isTrue();
+        // In production the flag is ignored: without a key, no import.
+        assertThat(reader("", true).isAvailable()).isFalse();
+        assertThat(reader("", true, "local").isAvailable()).isTrue();
+    }
+
+    @Test
+    void withTheDevelopersLoginTheKeyNeverReachesClaude() {
+        var developer = new HashMap<>(Map.of("ANTHROPIC_API_KEY", "sk-ant-x", "PATH", "/bin"));
+        var api = new HashMap<>(developer);
+
+        reader("sk-ant-x", true, "local").environment(developer);
+        reader("sk-ant-x", false).environment(api);
+
+        assertThat(developer).containsOnlyKeys("PATH");
+        // With the API, claude gets the server's environment as it is.
+        assertThat(api).containsKeys("ANTHROPIC_API_KEY", "PATH");
+    }
 
     @Test
     void anExcelSheetBecomesTextWithItsDates() throws Exception {
