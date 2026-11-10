@@ -683,5 +683,6 @@
   "themeSystem": "Automático",
   "themeLight": "Claro",
   "themeDark": "Oscuro",
-  "refusalStale": "El combate ha cambiado en otro dispositivo. Revisa el marcador y vuelve a pulsar."
+  "refusalStale": "El combate ha cambiado en otro dispositivo. Revisa el marcador y vuelve a pulsar.",
+  "accountSuspended": "Esta cuenta está suspendida. Si crees que es un error, escribe al contacto de privacidad que aparece en las páginas legales."
 }

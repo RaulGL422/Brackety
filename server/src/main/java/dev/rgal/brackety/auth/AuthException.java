@@ -126,6 +126,10 @@ public class AuthException extends ErrorResponseException {
         return exception;
     }
 
+    public static AuthException suspended() {
+        return withCode(HttpStatus.FORBIDDEN, "ACCOUNT_SUSPENDED", "This account is suspended.");
+    }
+
     public static AuthException ownsEvents() {
         return withCode(
                 HttpStatus.CONFLICT, "OWNS_EVENTS", "This account owns events. Hand them over or delete them first.");

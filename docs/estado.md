@@ -20,7 +20,7 @@
 | offline | modulos/offline.md | pendiente | – |
 | ranking | modulos/ranking.md | pendiente | – |
 | notificaciones | modulos/notificaciones.md | pendiente | – |
-| superadmin-reportes | modulos/superadmin-reportes.md | en curso: operaciones de evento (#64, en la Pi con la v0.3.1) y métricas en la portada del admin en pruebas; faltan usuarios y reportes (2026-11-10) | feat/superadmin-metrics |
+| superadmin-reportes | modulos/superadmin-reportes.md | en curso: operaciones de evento (#64, en la Pi con la v0.3.1), métricas (#67) y usuarios (buscar, suspender, borrar) en pruebas; faltan reportes y el resto de eventos (2026-11-10) | feat/superadmin-users |
 
 Estados: pendiente · en curso · en pruebas · cerrado.
 

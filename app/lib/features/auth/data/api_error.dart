@@ -45,6 +45,9 @@ class ApiError {
   /// The per-IP request limiter, not a lock: waiting [retryAfter] is enough.
   bool get isRateLimited => status == 429 && lockId == null;
 
+  /// Suspended by the superadmin: no sign-in until it is lifted.
+  bool get isSuspended => status == 403 && code == 'ACCOUNT_SUSPENDED';
+
   bool get isPendingDeletion =>
       status == 403 &&
       code == 'ACCOUNT_PENDING_DELETION' &&

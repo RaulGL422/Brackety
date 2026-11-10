@@ -1,7 +1,7 @@
 import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 
-import '../../../l10n/gen/app_localizations.dart';
+import '../l10n/gen/app_localizations.dart';
 
 /// Asks why before an event operation (it goes to the audit). With [typeToConfirm], the
 /// confirm button waits until that text is typed too. Returns the reason, or null if cancelled.

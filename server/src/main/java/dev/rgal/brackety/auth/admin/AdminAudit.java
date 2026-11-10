@@ -18,7 +18,10 @@ class AdminAudit {
         ORGANIZER_VALIDATED,
         MATCH_RESET,
         GROUP_DISSOLVED,
-        COMPETITION_CLEARED
+        COMPETITION_CLEARED,
+        USER_SUSPENDED,
+        USER_UNSUSPENDED,
+        USER_DELETED
     }
 
     @Id
