@@ -20,7 +20,7 @@
 | offline | modulos/offline.md | pendiente | – |
 | ranking | modulos/ranking.md | pendiente | – |
 | notificaciones | modulos/notificaciones.md | pendiente | – |
-| superadmin-reportes | modulos/superadmin-reportes.md | pendiente | – |
+| superadmin-reportes | modulos/superadmin-reportes.md | en curso: operaciones de evento (lista y detalle de eventos; reiniciar combate, deshacer grupo y vaciar la competición, con motivo y auditoría) en pruebas; faltan métricas, usuarios y reportes (2026-11-10) | feat/superadmin-event-ops |
 
 Estados: pendiente · en curso · en pruebas · cerrado.
 

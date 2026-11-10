@@ -407,4 +407,211 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get organizerNotFound =>
       'Ese organizador ya no existe o ya no es organizador. Lista actualizada.';
+
+  @override
+  String get navEvents => 'Eventos';
+
+  @override
+  String get eventsTitle => 'Eventos';
+
+  @override
+  String get eventsEmpty => 'Todavía no hay eventos.';
+
+  @override
+  String get eventColumnName => 'Evento';
+
+  @override
+  String get eventColumnDate => 'Fecha';
+
+  @override
+  String get eventColumnOwner => 'Organizador';
+
+  @override
+  String get eventColumnMats => 'Tapices';
+
+  @override
+  String get eventColumnEntries => 'Inscritos';
+
+  @override
+  String get eventColumnGroups => 'Grupos';
+
+  @override
+  String get eventColumnMatches => 'Combates disputados';
+
+  @override
+  String eventDate(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return '$dateString';
+  }
+
+  @override
+  String eventMatchesProgress(int finished, int total) {
+    return '$finished de $total';
+  }
+
+  @override
+  String eventCounts(int entries, int groups, int finished, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      entries,
+      locale: localeName,
+      other: '$entries inscritos',
+      one: '1 inscrito',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      groups,
+      locale: localeName,
+      other: '$groups grupos',
+      one: '1 grupo',
+    );
+    return '$_temp0, $_temp1, $finished de $total combates disputados';
+  }
+
+  @override
+  String eventsPageOf(int page, int pages) {
+    return 'Página $page de $pages';
+  }
+
+  @override
+  String get eventsPrevious => 'Anterior';
+
+  @override
+  String get eventsNext => 'Siguiente';
+
+  @override
+  String get eventBack => 'Volver a los eventos';
+
+  @override
+  String eventEntries(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count inscritos',
+      one: '1 inscrito',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get eventMats => 'Tapices';
+
+  @override
+  String eventMatNoReferee(int number) {
+    return 'Tapiz $number: sin árbitro';
+  }
+
+  @override
+  String eventMatReferee(int number, String referee) {
+    return 'Tapiz $number: $referee';
+  }
+
+  @override
+  String get eventGroups => 'Grupos';
+
+  @override
+  String get eventNoGroups => 'Todavía no hay grupos.';
+
+  @override
+  String groupTitle(int number, String category) {
+    return 'Grupo $number, $category';
+  }
+
+  @override
+  String groupMat(int number) {
+    return 'Tapiz $number';
+  }
+
+  @override
+  String matchTeam(int number) {
+    return 'Equipo $number';
+  }
+
+  @override
+  String get matchPending => 'Pendiente';
+
+  @override
+  String get matchInProgress => 'En curso';
+
+  @override
+  String get matchFinished => 'Terminado';
+
+  @override
+  String get matchInReview => 'En revisión';
+
+  @override
+  String get matchReset => 'Reiniciar';
+
+  @override
+  String matchResetTitle(int order) {
+    return '¿Reiniciar el combate $order?';
+  }
+
+  @override
+  String get matchResetBody =>
+      'Se borran todas sus acciones y vuelve a estar pendiente, como si no hubiera empezado. El árbitro lo verá al actualizarse su tablero.';
+
+  @override
+  String get matchResetDone => 'Combate reiniciado.';
+
+  @override
+  String get groupDissolve => 'Deshacer grupo';
+
+  @override
+  String groupDissolveTitle(int number) {
+    return '¿Deshacer el grupo $number?';
+  }
+
+  @override
+  String get groupDissolveBody =>
+      'Se borran el grupo y sus combates, también los ya disputados. Sus alumnos vuelven a estar sin grupo y el ayudante puede agruparlos otra vez.';
+
+  @override
+  String groupDissolved(int number) {
+    return 'Grupo $number deshecho.';
+  }
+
+  @override
+  String get competitionClear => 'Vaciar la competición';
+
+  @override
+  String competitionClearTitle(String name) {
+    return '¿Vaciar la competición de $name?';
+  }
+
+  @override
+  String get competitionClearBody =>
+      'Se borran todos los grupos, combates, puntuaciones y equipos. Se conservan la configuración, los tapices, los árbitros y los inscritos. No se puede deshacer.';
+
+  @override
+  String competitionCleared(int groups, int teams) {
+    String _temp0 = intl.Intl.pluralLogic(
+      groups,
+      locale: localeName,
+      other: '$groups grupos',
+      one: '1 grupo',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      teams,
+      locale: localeName,
+      other: '$teams equipos',
+      one: '1 equipo',
+    );
+    return 'Competición vaciada: $_temp0 y $_temp1 borrados.';
+  }
+
+  @override
+  String get reasonLabel => 'Motivo';
+
+  @override
+  String get reasonHelper => 'Queda guardado en la auditoría.';
+
+  @override
+  String typeToConfirm(String name) {
+    return 'Escribe «$name» para confirmar';
+  }
+
+  @override
+  String get eventChanged =>
+      'El evento ha cambiado mientras tanto; se ha recargado.';
 }

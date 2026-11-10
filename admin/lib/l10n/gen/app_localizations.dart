@@ -793,6 +793,282 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Ese organizador ya no existe o ya no es organizador. Lista actualizada.'**
   String get organizerNotFound;
+
+  /// No description provided for @navEvents.
+  ///
+  /// In es, this message translates to:
+  /// **'Eventos'**
+  String get navEvents;
+
+  /// No description provided for @eventsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Eventos'**
+  String get eventsTitle;
+
+  /// No description provided for @eventsEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no hay eventos.'**
+  String get eventsEmpty;
+
+  /// No description provided for @eventColumnName.
+  ///
+  /// In es, this message translates to:
+  /// **'Evento'**
+  String get eventColumnName;
+
+  /// No description provided for @eventColumnDate.
+  ///
+  /// In es, this message translates to:
+  /// **'Fecha'**
+  String get eventColumnDate;
+
+  /// No description provided for @eventColumnOwner.
+  ///
+  /// In es, this message translates to:
+  /// **'Organizador'**
+  String get eventColumnOwner;
+
+  /// No description provided for @eventColumnMats.
+  ///
+  /// In es, this message translates to:
+  /// **'Tapices'**
+  String get eventColumnMats;
+
+  /// No description provided for @eventColumnEntries.
+  ///
+  /// In es, this message translates to:
+  /// **'Inscritos'**
+  String get eventColumnEntries;
+
+  /// No description provided for @eventColumnGroups.
+  ///
+  /// In es, this message translates to:
+  /// **'Grupos'**
+  String get eventColumnGroups;
+
+  /// No description provided for @eventColumnMatches.
+  ///
+  /// In es, this message translates to:
+  /// **'Combates disputados'**
+  String get eventColumnMatches;
+
+  /// No description provided for @eventDate.
+  ///
+  /// In es, this message translates to:
+  /// **'{date}'**
+  String eventDate(DateTime date);
+
+  /// No description provided for @eventMatchesProgress.
+  ///
+  /// In es, this message translates to:
+  /// **'{finished} de {total}'**
+  String eventMatchesProgress(int finished, int total);
+
+  /// No description provided for @eventCounts.
+  ///
+  /// In es, this message translates to:
+  /// **'{entries, plural, =1{1 inscrito} other{{entries} inscritos}}, {groups, plural, =1{1 grupo} other{{groups} grupos}}, {finished} de {total} combates disputados'**
+  String eventCounts(int entries, int groups, int finished, int total);
+
+  /// No description provided for @eventsPageOf.
+  ///
+  /// In es, this message translates to:
+  /// **'Página {page} de {pages}'**
+  String eventsPageOf(int page, int pages);
+
+  /// No description provided for @eventsPrevious.
+  ///
+  /// In es, this message translates to:
+  /// **'Anterior'**
+  String get eventsPrevious;
+
+  /// No description provided for @eventsNext.
+  ///
+  /// In es, this message translates to:
+  /// **'Siguiente'**
+  String get eventsNext;
+
+  /// No description provided for @eventBack.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver a los eventos'**
+  String get eventBack;
+
+  /// No description provided for @eventEntries.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 inscrito} other{{count} inscritos}}'**
+  String eventEntries(int count);
+
+  /// No description provided for @eventMats.
+  ///
+  /// In es, this message translates to:
+  /// **'Tapices'**
+  String get eventMats;
+
+  /// No description provided for @eventMatNoReferee.
+  ///
+  /// In es, this message translates to:
+  /// **'Tapiz {number}: sin árbitro'**
+  String eventMatNoReferee(int number);
+
+  /// No description provided for @eventMatReferee.
+  ///
+  /// In es, this message translates to:
+  /// **'Tapiz {number}: {referee}'**
+  String eventMatReferee(int number, String referee);
+
+  /// No description provided for @eventGroups.
+  ///
+  /// In es, this message translates to:
+  /// **'Grupos'**
+  String get eventGroups;
+
+  /// No description provided for @eventNoGroups.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no hay grupos.'**
+  String get eventNoGroups;
+
+  /// No description provided for @groupTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Grupo {number}, {category}'**
+  String groupTitle(int number, String category);
+
+  /// No description provided for @groupMat.
+  ///
+  /// In es, this message translates to:
+  /// **'Tapiz {number}'**
+  String groupMat(int number);
+
+  /// No description provided for @matchTeam.
+  ///
+  /// In es, this message translates to:
+  /// **'Equipo {number}'**
+  String matchTeam(int number);
+
+  /// No description provided for @matchPending.
+  ///
+  /// In es, this message translates to:
+  /// **'Pendiente'**
+  String get matchPending;
+
+  /// No description provided for @matchInProgress.
+  ///
+  /// In es, this message translates to:
+  /// **'En curso'**
+  String get matchInProgress;
+
+  /// No description provided for @matchFinished.
+  ///
+  /// In es, this message translates to:
+  /// **'Terminado'**
+  String get matchFinished;
+
+  /// No description provided for @matchInReview.
+  ///
+  /// In es, this message translates to:
+  /// **'En revisión'**
+  String get matchInReview;
+
+  /// No description provided for @matchReset.
+  ///
+  /// In es, this message translates to:
+  /// **'Reiniciar'**
+  String get matchReset;
+
+  /// No description provided for @matchResetTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Reiniciar el combate {order}?'**
+  String matchResetTitle(int order);
+
+  /// No description provided for @matchResetBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Se borran todas sus acciones y vuelve a estar pendiente, como si no hubiera empezado. El árbitro lo verá al actualizarse su tablero.'**
+  String get matchResetBody;
+
+  /// No description provided for @matchResetDone.
+  ///
+  /// In es, this message translates to:
+  /// **'Combate reiniciado.'**
+  String get matchResetDone;
+
+  /// No description provided for @groupDissolve.
+  ///
+  /// In es, this message translates to:
+  /// **'Deshacer grupo'**
+  String get groupDissolve;
+
+  /// No description provided for @groupDissolveTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Deshacer el grupo {number}?'**
+  String groupDissolveTitle(int number);
+
+  /// No description provided for @groupDissolveBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Se borran el grupo y sus combates, también los ya disputados. Sus alumnos vuelven a estar sin grupo y el ayudante puede agruparlos otra vez.'**
+  String get groupDissolveBody;
+
+  /// No description provided for @groupDissolved.
+  ///
+  /// In es, this message translates to:
+  /// **'Grupo {number} deshecho.'**
+  String groupDissolved(int number);
+
+  /// No description provided for @competitionClear.
+  ///
+  /// In es, this message translates to:
+  /// **'Vaciar la competición'**
+  String get competitionClear;
+
+  /// No description provided for @competitionClearTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Vaciar la competición de {name}?'**
+  String competitionClearTitle(String name);
+
+  /// No description provided for @competitionClearBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Se borran todos los grupos, combates, puntuaciones y equipos. Se conservan la configuración, los tapices, los árbitros y los inscritos. No se puede deshacer.'**
+  String get competitionClearBody;
+
+  /// No description provided for @competitionCleared.
+  ///
+  /// In es, this message translates to:
+  /// **'Competición vaciada: {groups, plural, =1{1 grupo} other{{groups} grupos}} y {teams, plural, =1{1 equipo} other{{teams} equipos}} borrados.'**
+  String competitionCleared(int groups, int teams);
+
+  /// No description provided for @reasonLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Motivo'**
+  String get reasonLabel;
+
+  /// No description provided for @reasonHelper.
+  ///
+  /// In es, this message translates to:
+  /// **'Queda guardado en la auditoría.'**
+  String get reasonHelper;
+
+  /// No description provided for @typeToConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe «{name}» para confirmar'**
+  String typeToConfirm(String name);
+
+  /// No description provided for @eventChanged.
+  ///
+  /// In es, this message translates to:
+  /// **'El evento ha cambiado mientras tanto; se ha recargado.'**
+  String get eventChanged;
 }
 
 class _AppLocalizationsDelegate
