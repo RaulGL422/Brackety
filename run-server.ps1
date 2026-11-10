@@ -8,10 +8,15 @@
     .\run-server.ps1
     .\run-server.ps1 -Scenario empty -Today 2027-03-10
     .\run-server.ps1 -Scenario ?
+    .\run-server.ps1 -Scenario yoseikan-f1 -LocalClaude
+.PARAMETER LocalClaude
+    Importar alumnos con el `claude` y la sesión de quien desarrolla (suscripción, no la API).
+    Solo con listas ficticias; en producción se ignora.
 #>
 param(
     [string]$Scenario = "empty",
-    [string]$Today = ""
+    [string]$Today = "",
+    [switch]$LocalClaude
 )
 
 $ErrorActionPreference = "Stop"
@@ -28,6 +33,7 @@ if ($jdk) {
 
 $appArgs = "--brackety.scenario=$Scenario"
 if ($Today) { $appArgs += " --brackety.clock.today=$Today" }
+if ($LocalClaude) { $appArgs += " --brackety.import.local-cli=true" }
 
 & "$PSScriptRoot\server\mvnw.cmd" -q -f "$PSScriptRoot\server\pom.xml" spring-boot:test-run `
     "-Dspring-boot.run.main-class=dev.rgal.brackety.local.LocalBracketyApplication" `

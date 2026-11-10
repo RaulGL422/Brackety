@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.util.FileSystemUtils;
 import tools.jackson.databind.JsonNode;
@@ -64,19 +65,26 @@ class ClaudeListReader implements ListReader {
     private final String claudePath;
     private final String model;
     private final boolean available;
+    private final boolean developerLogin;
 
     ClaudeListReader(
             JsonMapper json,
             @Value("${brackety.import.claude-path:claude}") String claudePath,
             @Value("${brackety.import.model:claude-sonnet-5-5}") String model,
             @Value("${ANTHROPIC_API_KEY:}") String apiKey,
-            @Value("${brackety.import.local-cli:false}") boolean localCli) {
+            @Value("${brackety.import.local-cli:false}") boolean localCli,
+            Environment environment) {
         this.json = json;
         this.claudePath = claudePath;
         this.model = model;
         // Only with an API key: the subscription token's terms do not cover other people's data.
-        // Locally the developer's own Claude login can stand in, with fictitious lists only.
-        this.available = !apiKey.isBlank() || localCli;
+        // On the developer's machine (the local runner's profile, never in the production jar) their own
+        // Claude login can stand in, with fictitious lists only.
+        this.developerLogin = localCli && environment.matchesProfiles("local");
+        if (localCli && !developerLogin) {
+            log.warn("brackety.import.local-cli is only for the local runner: ignored");
+        }
+        this.available = !apiKey.isBlank() || developerLogin;
     }
 
     @Override
@@ -171,6 +179,19 @@ class ClaudeListReader implements ListReader {
         }
     }
 
+    private ProcessBuilder processBuilder(List<String> command) {
+        var builder = new ProcessBuilder(command);
+        environment(builder.environment());
+        return builder;
+    }
+
+    // With the developer's login the key must not reach claude: it would bill the API instead.
+    void environment(Map<String, String> environment) {
+        if (developerLogin) {
+            environment.remove("ANTHROPIC_API_KEY");
+        }
+    }
+
     private String run(String input) {
         var command = List.of(
                 claudePath,
@@ -193,7 +214,7 @@ class ClaudeListReader implements ListReader {
         try {
             var workDir = Files.createTempDirectory("brackety-import-");
             try {
-                var process = new ProcessBuilder(command)
+                var process = processBuilder(command)
                         .directory(workDir.toFile())
                         .redirectErrorStream(false)
                         .start();
