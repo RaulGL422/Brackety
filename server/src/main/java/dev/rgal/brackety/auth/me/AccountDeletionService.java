@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 // Logical deletion: the owner can restore the account by signing in until DeletedAccountPurge removes it.
 @Service
-class AccountDeletionService {
+public class AccountDeletionService {
 
     private final AccountRepository accounts;
     private final EventRepository events;
@@ -39,7 +39,13 @@ class AccountDeletionService {
     @Transactional
     DeletionResponse delete(UUID accountId) {
         var account = accounts.lockById(accountId).filter(Account::isActive).orElseThrow(AuthException::invalidSession);
-        if (events.existsByOwnerAccountId(accountId)) {
+        return schedule(account);
+    }
+
+    /** For the owner or the superadmin: {@code account} is active and locked by the caller. */
+    @Transactional
+    public DeletionResponse schedule(Account account) {
+        if (events.existsByOwnerAccountId(account.getId())) {
             throw AuthException.ownsEvents();
         }
         account.markDeleted(clock.instant());

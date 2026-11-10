@@ -32,6 +32,21 @@ public class AdminAuditLog {
         save(AdminAudit.Action.COMPETITION_CLEARED, eventId, reason);
     }
 
+    @Transactional
+    public void userSuspended(UUID accountId, String reason) {
+        save(AdminAudit.Action.USER_SUSPENDED, accountId, reason);
+    }
+
+    @Transactional
+    public void userUnsuspended(UUID accountId, String reason) {
+        save(AdminAudit.Action.USER_UNSUSPENDED, accountId, reason);
+    }
+
+    @Transactional
+    public void userDeleted(UUID accountId, String reason) {
+        save(AdminAudit.Action.USER_DELETED, accountId, reason);
+    }
+
     private void save(AdminAudit.Action action, UUID target, String reason) {
         audit.save(new AdminAudit(action, target.toString(), reason, clock.instant()));
     }
