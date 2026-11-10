@@ -716,4 +716,150 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get metricsServerErrorsNote => 'Check the API logs';
+
+  @override
+  String get navUsers => 'Users';
+
+  @override
+  String get usersTitle => 'Users';
+
+  @override
+  String get usersSearch => 'Search by email or organization';
+
+  @override
+  String get usersEmpty => 'No account matches.';
+
+  @override
+  String get userColumnEmail => 'Email';
+
+  @override
+  String get userColumnOrganization => 'Organization';
+
+  @override
+  String get userColumnProfiles => 'Profiles';
+
+  @override
+  String get userColumnCreated => 'Signed up';
+
+  @override
+  String get userColumnState => 'State';
+
+  @override
+  String get userProfileClub => 'Club';
+
+  @override
+  String get userProfileEntity => 'External entity';
+
+  @override
+  String get userProfileHelper => 'Helper';
+
+  @override
+  String get userProfileStudent => 'Student';
+
+  @override
+  String get userProfileExternal => 'External';
+
+  @override
+  String get userStateActive => 'Active';
+
+  @override
+  String get userStateUnverified => 'Email not verified';
+
+  @override
+  String get userStateSuspended => 'Suspended';
+
+  @override
+  String get userStateDeleted => 'Deleted, awaiting purge';
+
+  @override
+  String userDate(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return '$dateString';
+  }
+
+  @override
+  String get userBack => 'Back to the users';
+
+  @override
+  String get userSignInMethods => 'Sign-in';
+
+  @override
+  String get userPassword => 'Password';
+
+  @override
+  String get userLastSignIn => 'Last session';
+
+  @override
+  String get userNever => 'Never';
+
+  @override
+  String get userOwnedEvents => 'Own events';
+
+  @override
+  String get userStaffEvents => 'Events helping at';
+
+  @override
+  String get userSuspendedSince => 'Suspended since';
+
+  @override
+  String get userDeletesOn => 'Deleted for good on';
+
+  @override
+  String get userSuspend => 'Suspend';
+
+  @override
+  String userSuspendTitle(String email) {
+    return 'Suspend $email?';
+  }
+
+  @override
+  String get userSuspendBody =>
+      'All its sessions close at once and it cannot sign in until you lift the suspension. Its data and events stay.';
+
+  @override
+  String get userSuspended => 'Account suspended.';
+
+  @override
+  String get userUnsuspend => 'Lift the suspension';
+
+  @override
+  String userUnsuspendTitle(String email) {
+    return 'Lift the suspension of $email?';
+  }
+
+  @override
+  String get userUnsuspendBody => 'It can sign in again as before.';
+
+  @override
+  String get userUnsuspended => 'Suspension lifted.';
+
+  @override
+  String get userDelete => 'Delete the account';
+
+  @override
+  String userDeleteTitle(String email) {
+    return 'Delete the account $email?';
+  }
+
+  @override
+  String get userDeleteBody =>
+      'The same deletion the user can ask for: it is signed out, emailed, and deleted for good after 30 days. Until then it can restore it by signing in. An owner of events cannot be deleted.';
+
+  @override
+  String userDeleted(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Account deleted. It goes for good on $dateString.';
+  }
+
+  @override
+  String get userOwnsEvents =>
+      'This account owns events: hand them over or delete them first.';
+
+  @override
+  String get userChanged =>
+      'The account changed meanwhile; it has been reloaded.';
 }

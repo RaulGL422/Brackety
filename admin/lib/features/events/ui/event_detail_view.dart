@@ -1,15 +1,13 @@
 import 'package:brackety_core/brackety_core.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/async_view.dart';
+import '../../../core/reason_dialog.dart';
+import '../../../core/run_action.dart';
 import '../../../l10n/gen/app_localizations.dart';
-import '../../auth/data/admin_api_error.dart';
-import '../../auth/ui/admin_texts.dart';
 import '../data/events_api.dart';
 import '../state/events_controller.dart';
-import 'reason_dialog.dart';
 
 /// An event's mats and groups, and the three things the superadmin can undo in it.
 class EventDetailView extends ConsumerWidget {
@@ -139,6 +137,7 @@ class _Detail extends ConsumerWidget {
           .read(eventDetailProvider(event.id).notifier)
           .clearCompetition(reason),
       done: (cleared) => l10n.competitionCleared(cleared.groups, cleared.teams),
+      notFound: l10n.eventChanged,
     );
   }
 }
@@ -201,6 +200,7 @@ class _GroupCard extends ConsumerWidget {
           .read(eventDetailProvider(eventId).notifier)
           .dissolveGroup(group.id, reason),
       done: (_) => l10n.groupDissolved(group.number),
+      notFound: l10n.eventChanged,
     );
   }
 }
@@ -294,6 +294,7 @@ class _MatchRow extends ConsumerWidget {
           .read(eventDetailProvider(eventId).notifier)
           .resetMatch(match.id, reason),
       done: (_) => l10n.matchResetDone,
+      notFound: l10n.eventChanged,
     );
   }
 }
@@ -323,25 +324,4 @@ class _Corner extends StatelessWidget {
       ],
     );
   }
-}
-
-/// Runs an operation and says how it went in a snackbar: [done] on success, the reason on failure.
-/// A 404 (someone changed the event meanwhile) reloads it.
-Future<void> runAction<T>(
-  BuildContext context,
-  Future<T> Function() action, {
-  required String Function(T result) done,
-}) async {
-  final l10n = AppLocalizations.of(context);
-  final messenger = ScaffoldMessenger.of(context);
-  String? message;
-  try {
-    message = done(await action());
-  } on DioException catch (e) {
-    final error = AdminApiError.from(e);
-    message = error.status == 404
-        ? l10n.eventChanged
-        : actionErrorMessage(l10n, error);
-  }
-  if (message != null) messenger.showSnackBar(SnackBar(content: Text(message)));
 }

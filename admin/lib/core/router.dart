@@ -12,6 +12,7 @@ import '../features/design_system/ui/design_system_screen.dart';
 import '../features/events/ui/events_screen.dart';
 import '../features/locks/ui/locks_screen.dart';
 import '../features/organizers/ui/organizers_screen.dart';
+import '../features/users/ui/users_screen.dart';
 import '../l10n/gen/app_localizations.dart';
 
 // They call no admin endpoint, so they open without a session.
@@ -43,6 +44,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         icon: Icons.dashboard_outlined,
         label: (context) => AppLocalizations.of(context).navDashboard,
         builder: (_) => const DashboardScreen(),
+      ),
+      AdaptiveTab(
+        path: '/users',
+        icon: Icons.people_outline,
+        label: (context) => AppLocalizations.of(context).navUsers,
+        builder: (_) => const UsersScreen(),
       ),
       AdaptiveTab(
         path: '/events',

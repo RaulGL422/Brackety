@@ -51,6 +51,16 @@ void main() {
     expect(find.textContaining('15 minutes'), findsOneWidget);
   });
 
+  testWidgets('a suspended account is told so', (tester) async {
+    final api = FakeAuthApi()
+      ..loginError = httpError(403, body: {'code': 'ACCOUNT_SUSPENDED'});
+    await pumpAuthApp(tester, api);
+
+    await signIn(tester, 'ana@example.com', 'whatever123');
+
+    expect(find.textContaining('This account is suspended'), findsOneWidget);
+  });
+
   testWidgets('the rate limiter says how long to wait', (tester) async {
     final api = FakeAuthApi()
       ..loginError = httpError(

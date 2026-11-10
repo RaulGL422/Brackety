@@ -1572,4 +1572,8 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get refusalStale =>
       'El combate ha cambiado en otro dispositivo. Revisa el marcador y vuelve a pulsar.';
+
+  @override
+  String get accountSuspended =>
+      'Esta cuenta está suspendida. Si crees que es un error, escribe al contacto de privacidad que aparece en las páginas legales.';
 }

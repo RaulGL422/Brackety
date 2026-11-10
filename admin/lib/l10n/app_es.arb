@@ -439,5 +439,84 @@
         "format": "yMMMd"
       }
     }
+  },
+  "navUsers": "Usuarios",
+  "usersTitle": "Usuarios",
+  "usersSearch": "Buscar por email u organización",
+  "usersEmpty": "Ninguna cuenta coincide.",
+  "userColumnEmail": "Email",
+  "userColumnOrganization": "Organización",
+  "userColumnProfiles": "Perfiles",
+  "userColumnCreated": "Alta",
+  "userColumnState": "Estado",
+  "userProfileClub": "Club",
+  "userProfileEntity": "Entidad externa",
+  "userProfileHelper": "Ayudante",
+  "userProfileStudent": "Alumno",
+  "userProfileExternal": "Externo",
+  "userStateActive": "Activa",
+  "userStateUnverified": "Sin verificar el email",
+  "userStateSuspended": "Suspendida",
+  "userStateDeleted": "Borrada, pendiente de purga",
+  "userDate": "{date}",
+  "userBack": "Volver a los usuarios",
+  "userSignInMethods": "Acceso",
+  "userPassword": "Contraseña",
+  "userLastSignIn": "Última sesión",
+  "userNever": "Nunca",
+  "userOwnedEvents": "Eventos propios",
+  "userStaffEvents": "Eventos donde ayuda",
+  "userSuspendedSince": "Suspendida desde",
+  "userDeletesOn": "Se borra del todo el",
+  "userSuspend": "Suspender",
+  "userSuspendTitle": "¿Suspender {email}?",
+  "userSuspendBody": "Se cierran todas sus sesiones al momento y no podrá entrar hasta que levantes la suspensión. Sus datos y sus eventos se conservan.",
+  "userSuspended": "Cuenta suspendida.",
+  "userUnsuspend": "Levantar la suspensión",
+  "userUnsuspendTitle": "¿Levantar la suspensión de {email}?",
+  "userUnsuspendBody": "Podrá volver a entrar con sus datos de siempre.",
+  "userUnsuspended": "Suspensión levantada.",
+  "userDelete": "Borrar la cuenta",
+  "userDeleteTitle": "¿Borrar la cuenta {email}?",
+  "userDeleteBody": "Es el mismo borrado que pide el usuario: se cierra su sesión, le llega un email y se borra del todo a los 30 días. Hasta entonces puede recuperarla entrando. Una cuenta dueña de eventos no se puede borrar.",
+  "userDeleted": "Cuenta borrada. Se borra del todo el {date}.",
+  "userOwnsEvents": "Esta cuenta es dueña de eventos: hay que traspasarlos o borrarlos antes.",
+  "userChanged": "La cuenta ha cambiado mientras tanto; se ha recargado.",
+  "@userDate": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMd"
+      }
+    }
+  },
+  "@userSuspendTitle": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "@userUnsuspendTitle": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "@userDeleteTitle": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "@userDeleted": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMd"
+      }
+    }
   }
 }

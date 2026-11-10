@@ -2,17 +2,19 @@ import 'package:dio/dio.dart';
 
 /// What the admin needs from a failed call: the status and the problem+json properties it reacts to.
 class AdminApiError {
-  const AdminApiError({this.status, this.lockId, this.retryAfter});
+  const AdminApiError({this.status, this.code, this.lockId, this.retryAfter});
 
   factory AdminApiError.from(DioException error) {
     final response = error.response;
     final body = response?.data;
     final lockId = body is Map ? body['lockId'] : null;
+    final code = body is Map ? body['code'] : null;
     final retryAfter = int.tryParse(
       response?.headers.value('retry-after') ?? '',
     );
     return AdminApiError(
       status: response?.statusCode,
+      code: code is String ? code : null,
       lockId: lockId is String ? lockId : null,
       retryAfter: retryAfter == null ? null : Duration(seconds: retryAfter),
     );
@@ -20,6 +22,9 @@ class AdminApiError {
 
   /// Null when the server never answered (no network, timeout).
   final int? status;
+
+  /// The problem+json `code`, when the API sends one (OWNS_EVENTS…).
+  final String? code;
   final String? lockId;
   final Duration? retryAfter;
 

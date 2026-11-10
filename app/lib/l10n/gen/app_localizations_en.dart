@@ -1556,4 +1556,8 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get refusalStale =>
       'The match changed on another device. Check the scoreboard and press again.';
+
+  @override
+  String get accountSuspended =>
+      'This account is suspended. If you think it is a mistake, write to the privacy contact on the legal pages.';
 }
