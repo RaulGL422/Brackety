@@ -6,6 +6,8 @@ import 'package:brackety_admin/core/clock.dart';
 import 'package:brackety_admin/core/router.dart';
 import 'package:brackety_admin/features/auth/data/admin_auth_api.dart';
 import 'package:brackety_admin/features/auth/state/admin_session.dart';
+import 'package:brackety_admin/features/dashboard/data/metrics_api.dart';
+import 'package:brackety_admin/features/dashboard/state/metrics_controller.dart';
 import 'package:brackety_admin/features/locks/data/locks_api.dart';
 import 'package:brackety_admin/features/locks/state/locks_controller.dart';
 import 'package:brackety_admin/features/organizers/data/organizers_api.dart';
@@ -116,6 +118,49 @@ class FakeOrganizersApi implements OrganizersApi {
   }
 }
 
+AdminMetrics metrics({int inReview = 0, int serverErrors = 0}) => AdminMetrics(
+  at: now,
+  activeAccounts: 12,
+  unverified: 2,
+  newLast7Days: 5,
+  pendingDeletion: 1,
+  organizersPending: 3,
+  activeSessions: 7,
+  activeLocks: 0,
+  byProfile: const {
+    'CLUB': 1,
+    'EXTERNAL_ENTITY': 0,
+    'HELPER': 2,
+    'STUDENT': 0,
+    'EXTERNAL': 0,
+  },
+  events: 1,
+  upcomingEvents: 1,
+  entries: 75,
+  importsLast7Days: 2,
+  importedLast7Days: 40,
+  matchesFinished24h: 18,
+  scoreboardActions24h: 240,
+  groupsCreated24h: 6,
+  matchesInProgress: 3,
+  matchesInReview: inReview,
+  startedAt: now.subtract(const Duration(hours: 5)),
+  serverErrors: serverErrors,
+);
+
+class FakeMetricsApi implements MetricsApi {
+  FakeMetricsApi([AdminMetrics? value]) : value = value ?? metrics();
+
+  AdminMetrics value;
+  var reads = 0;
+
+  @override
+  Future<AdminMetrics> read() async {
+    reads++;
+    return value;
+  }
+}
+
 Lock lock(String id, LockType type, {String? email, String? ip}) => Lock(
   lockId: id,
   type: type,
@@ -154,6 +199,7 @@ Future<GoRouter> pumpAdmin(
   FakeAdminAuthApi? auth,
   FakeLocksApi? locks,
   FakeOrganizersApi? organizers,
+  FakeMetricsApi? metrics,
   bool realApis = false,
   List<Override> overrides = const [],
 }) async {
@@ -167,6 +213,7 @@ Future<GoRouter> pumpAdmin(
           organizersApiProvider.overrideWithValue(
             organizers ?? FakeOrganizersApi([]),
           ),
+          metricsApiProvider.overrideWithValue(metrics ?? FakeMetricsApi()),
         ],
         if (signedIn) adminSessionProvider.overrideWith(SignedInSession.new),
         ...overrides,

@@ -22,9 +22,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dashboardTitle => 'Panel de superadmin';
 
   @override
-  String get dashboardSubtitle => 'Gestión global de la plataforma.';
-
-  @override
   String get navDesignSystem => 'Diseño';
 
   @override
@@ -614,4 +611,110 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get eventChanged =>
       'El evento ha cambiado mientras tanto; se ha recargado.';
+
+  @override
+  String metricsAt(DateTime time) {
+    final intl.DateFormat timeDateFormat = intl.DateFormat.Hm(localeName);
+    final String timeString = timeDateFormat.format(time);
+
+    return 'Datos de las $timeString';
+  }
+
+  @override
+  String get metricsUsers => 'Usuarios';
+
+  @override
+  String get metricsActiveAccounts => 'Cuentas activas';
+
+  @override
+  String get metricsNewLast7Days => 'Altas en 7 días';
+
+  @override
+  String get metricsUnverified => 'Sin verificar el email';
+
+  @override
+  String get metricsPendingDeletion => 'Pendientes de borrado';
+
+  @override
+  String get metricsOrganizersPending => 'Organizadores por validar';
+
+  @override
+  String get metricsActiveSessions => 'Sesiones abiertas';
+
+  @override
+  String get metricsActiveLocks => 'Bloqueos activos';
+
+  @override
+  String get metricsProfiles => 'Perfiles';
+
+  @override
+  String get metricsClubs => 'Clubes';
+
+  @override
+  String get metricsEntities => 'Entidades externas';
+
+  @override
+  String get metricsHelpers => 'Ayudantes';
+
+  @override
+  String get metricsStudents => 'Alumnos';
+
+  @override
+  String get metricsExternals => 'Externos';
+
+  @override
+  String get metricsEvents => 'Eventos';
+
+  @override
+  String get metricsEventsTotal => 'Eventos';
+
+  @override
+  String get metricsUpcoming => 'Hoy o más adelante';
+
+  @override
+  String get metricsEntries => 'Inscritos';
+
+  @override
+  String get metricsImports => 'Importaciones en 7 días';
+
+  @override
+  String get metricsImported => 'Importados en 7 días';
+
+  @override
+  String get metricsActivity => 'Actividad';
+
+  @override
+  String get metricsMatchesFinished => 'Combates terminados en 24 h';
+
+  @override
+  String get metricsScoreboardActions => 'Acciones del marcador en 24 h';
+
+  @override
+  String get metricsGroupsCreated => 'Grupos creados en 24 h';
+
+  @override
+  String get metricsInProgress => 'Combates en curso ahora';
+
+  @override
+  String get metricsInReview => 'Combates en revisión';
+
+  @override
+  String get metricsInReviewNote => 'El club tiene que revisarlos';
+
+  @override
+  String get metricsServer => 'Servidor';
+
+  @override
+  String get metricsServerErrors => 'Errores 5xx de la API';
+
+  @override
+  String metricsSince(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Desde el arranque: $dateString';
+  }
+
+  @override
+  String get metricsServerErrorsNote => 'Mira los logs de la API';
 }

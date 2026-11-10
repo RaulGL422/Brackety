@@ -91,9 +91,7 @@ void main() {
         overrides: [dioProvider.overrideWithValue(fakeDio(adapter))],
       );
 
-      await tester.tap(find.text('Locks').first);
-      await tester.pumpAndSettle();
-
+      // The dashboard asks for the metrics on opening: the 401 comes from there.
       expect(find.text('Superadmin sign-in'), findsOneWidget);
       expect(
         find.text('Your session has expired. Sign in again.'),
