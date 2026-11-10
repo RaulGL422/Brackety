@@ -1,7 +1,7 @@
 name: brackety
 description: Brackety app for Android and the public web.
 publish_to: 'none'
-version: 0.3.1+4
+version: 0.3.2+5
 
 environment:
   sdk: ^3.13.7
