@@ -32,6 +32,8 @@ class MatsTab extends ConsumerWidget {
   }
 }
 
+/// In review: the warning container, its text readable in light and dark. The estimated end
+/// only while the mat has something left to play.
 class _MatCard extends StatelessWidget {
   const _MatCard({required this.mat});
 
@@ -42,14 +44,19 @@ class _MatCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final time = DateFormat.Hm(Localizations.localeOf(context).toLanguageTag());
     final scheme = Theme.of(context).colorScheme;
+    final colors = BracketyColors.of(context);
     final inReview = mat.matchesInReview > 0;
+    final busy = mat.matchInProgress || mat.pendingMatches > 0;
+    final (background, foreground) = inReview
+        ? (colors.warningContainer, colors.onWarningContainer)
+        : mat.matchInProgress
+        ? (scheme.secondaryContainer, scheme.onSecondaryContainer)
+        : (null, scheme.onSurface);
     return Card(
-      color: inReview
-          ? BracketyColors.of(context).warningContainer
-          : mat.matchInProgress
-          ? scheme.primaryContainer
-          : null,
+      color: background,
       child: ListTile(
+        textColor: foreground,
+        iconColor: foreground,
         leading: Icon(
           inReview
               ? Icons.gavel
@@ -65,15 +72,13 @@ class _MatCard extends StatelessWidget {
           [
             mat.matchInProgress ? l10n.matFighting : l10n.matIdle,
             l10n.matSummary(mat.groups, mat.pendingMatches),
+            if (busy) l10n.matEstimatedEnd(time.format(mat.estimatedEnd)),
             if (inReview) l10n.matsInReview(mat.matchesInReview),
           ].join('\n'),
+          style: TextStyle(color: foreground),
         ),
-        isThreeLine: true,
-        trailing: Text(
-          l10n.matEstimatedEnd(time.format(mat.estimatedEnd)),
-          textAlign: TextAlign.end,
-        ),
-        onTap: () => context.push('/club/mats/${mat.id}'),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () => context.push('/club/mats/${mat.id}?number=${mat.number}'),
       ),
     );
   }

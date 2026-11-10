@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/router.dart';
+import 'features/appearance/state/theme_mode_provider.dart';
 import 'features/auth/state/account_controller.dart';
 import 'features/auth/ui/verification_banner.dart';
 import 'features/offline/state/offline_sync.dart';
@@ -21,6 +22,7 @@ class BracketyApp extends ConsumerWidget {
       onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
       theme: lightTheme(),
       darkTheme: darkTheme(),
+      themeMode: ref.watch(themeModeProvider),
       routerConfig: ref.watch(routerProvider),
       locale: ref.watch(appLocaleProvider),
       builder: (_, child) => VerificationBanner(child: child!),

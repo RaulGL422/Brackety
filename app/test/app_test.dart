@@ -30,7 +30,6 @@ void main() {
             name: 'Liga Yoseikan · Fase 1',
             date: DateTime(2027, 3, 10),
             roles: const {EventRole.grouper},
-            maxGroupsPerMat: 1,
           ),
         ],
       ),

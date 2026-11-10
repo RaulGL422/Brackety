@@ -36,6 +36,8 @@ final class TamboMatch {
         int oneHandWarnings;
     }
 
+    static final String NOT_STARTED = "The match has not started: press Start first.";
+
     private final Rules rules;
     private final Map<Side, Tally> tallies = new EnumMap<>(Side.class);
     private final Set<UUID> autoPointWarnings = new HashSet<>();
@@ -158,7 +160,8 @@ final class TamboMatch {
         String reason = switch (type) {
             case START -> over ? "The match is over." : isRunning(now) ? "The clock is already running." : null;
             case STOP -> isRunning(now) ? null : "The clock is not running.";
-            case POINT, WARNING, ONE_HAND_WARNING, DISQUALIFICATION -> over ? "The match is over." : null;
+            case POINT, WARNING, ONE_HAND_WARNING, DISQUALIFICATION ->
+                over ? "The match is over." : started ? null : NOT_STARTED;
             case UNDO -> lastUndoable == null ? "Nothing to undo." : null;
             case FINISH -> over ? null : "The match is not over yet.";
         };

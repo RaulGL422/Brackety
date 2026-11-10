@@ -10,6 +10,7 @@ import '../data/account.dart';
 import '../data/api_error.dart';
 import '../state/account_controller.dart';
 import 'settings/account_section.dart';
+import 'settings/appearance_section.dart';
 import 'settings/data_sections.dart';
 import 'settings/language_section.dart';
 import 'settings/legal_section.dart';
@@ -87,6 +88,8 @@ class _Sections extends StatelessWidget {
             ProfilesSection(account: account),
             gap,
             SignInMethodsSection(account: account),
+            gap,
+            const AppearanceSection(),
             gap,
             const ExportSection(),
             gap,

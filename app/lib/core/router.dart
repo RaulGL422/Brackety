@@ -129,6 +129,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           eventId: state.pathParameters['eventId']!,
           categoryId: state.pathParameters['categoryId']!,
           categoryName: state.extra as String?,
+          teamSize: int.tryParse(state.uri.queryParameters['teamSize'] ?? ''),
         ),
       ),
       GoRoute(
@@ -155,6 +156,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, state) => MatBoardScreen(
           matId: state.pathParameters['matId']!,
           readOnly: true,
+          matNumber: int.tryParse(state.uri.queryParameters['number'] ?? ''),
         ),
       ),
       GoRoute(
@@ -164,8 +166,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/mats/:matId',
-        builder: (_, state) =>
-            MatBoardScreen(matId: state.pathParameters['matId']!),
+        builder: (_, state) => MatBoardScreen(
+          matId: state.pathParameters['matId']!,
+          matNumber: int.tryParse(state.uri.queryParameters['number'] ?? ''),
+        ),
       ),
       GoRoute(
         path: '/matches/:matchId',

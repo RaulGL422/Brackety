@@ -20,7 +20,7 @@ A partir de cierta edad, la categoría compite **por equipos de 3** en lugar de 
 - Un equipo sin grupo se puede deshacer (borrar); con grupo, no.
 
 ### Grupos de equipos (ayudante)
-- Lista de equipos de la categoría sin grupo → selecciona 4 → "Crear grupo". Multigrupo igual que en individual (colores, números, mismo tapiz).
+- Lista de equipos de la categoría sin grupo → selecciona 4 → "Crear grupo", con el mismo desplegable de tapiz que en individual.
 - **Equipo fantasma**: casilla en el grupo; con 3 equipos seleccionados se eligen 3 alumnos cualesquiera de la categoría (también los que ya están en equipos o grupos, salvo los de los equipos de ese grupo). Forma "Equipo N (fantasma)": combate, no puntúa.
 - Grupo = 4 equipos reales, o 3 + 1 equipo fantasma. Los equipos reales son siempre de 3 reales (sin alumno fantasma dentro).
 - Tapiz: mismo criterio (menor fin estimado).
@@ -59,7 +59,7 @@ A partir de cierta edad, la categoría compite **por equipos de 3** en lugar de 
 - Código: `grouping/Team*`, `CategoryRoster` (quién está libre o agrupado), `CompetitorDirectory` (alumno o equipo → nombre y alumnos; lo usan tablero, recomendado, marcador y clasificación).
 
 ## Pantallas
-- Ayudante, categoría por equipos (`grouping/ui/team_category_screen.dart`, ruta `…/categories/{cat}/teams?name=&size=`): pestañas **Alumnos** (elegir 3 libres → crear equipo) y **Equipos** (deshacer equipo sin grupo; elegir 4, o 3 + casilla de equipo fantasma que abre una hoja con los alumnos de la categoría salvo los del propio grupo); botón "Grupo individual" abre la pantalla de siempre, donde quien tiene equipo solo puede ser fantasma. Mismo borrador (`GroupDraft`) y multigrupo que en individual.
+- Ayudante, categoría por equipos (`grouping/ui/team_category_screen.dart`, ruta `…/categories/{cat}/teams?name=&size=`): pestañas **Alumnos** (elegir 3 libres → crear equipo) y **Equipos** (deshacer equipo sin grupo; elegir 4, o 3 + casilla de equipo fantasma que abre una hoja con los alumnos de la categoría salvo los del propio grupo); botón "Grupo individual" abre la pantalla de siempre, donde quien tiene equipo solo puede ser fantasma. Mismo borrador (`DraftGroup`) que en individual; desde "Grupo individual" vuelve "Grupo por equipos".
 - Árbitro y club (tablero, marcador, vista del combate, línea de tiempo): "Equipo N" como nombre y miembros en pequeño debajo (`mat/ui/fighter_text.dart`, común a alumnos y equipos).
 - Club (`club/ui/categories_editor.dart`): en Configuración, categorías editables (añadir, editar nombre/edades/por equipos/alumnos por equipo, quitar), cada cambio se guarda solo; 409 y 400 se explican. Grupos de 4 fijo (solo lectura). Puntuaciones con "Equipo N"; tapices en solo lectura con equipos (paso 10).
 

@@ -152,10 +152,11 @@ class StandingsControllerTest extends EventApiTest {
     private void referee(UUID match, String type, String side, String reason) throws Exception {
         call(
                         post("/api/v1/matches/" + match + "/events").content("""
-                                {"type":"%s","side":%s,"reason":%s}""".formatted(
+                                {"type":"%s","side":%s,"reason":%s,"knownEvents":%d}""".formatted(
                                         type,
                                         side == null ? "null" : "\"" + side + "\"",
-                                        reason == null ? "null" : "\"" + reason + "\"")),
+                                        reason == null ? "null" : "\"" + reason + "\"",
+                                        knownEvents(match))),
                         "arbitro1")
                 .andExpect(status().isOk());
     }

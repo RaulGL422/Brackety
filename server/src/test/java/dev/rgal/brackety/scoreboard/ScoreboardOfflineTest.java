@@ -1,9 +1,11 @@
 package dev.rgal.brackety.scoreboard;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import dev.rgal.brackety.event.EventException;
+import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.scoreboard.ScoreboardService.Recorded;
 import dev.rgal.brackety.scoreboard.dto.MatchEventRequest;
 import dev.rgal.brackety.scoreboard.dto.MatchView;
@@ -15,9 +17,15 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 // Actions from the Android queue (docs/modulos/offline.md): with opId, at and knownEvents.
 class ScoreboardOfflineTest extends ScoreboardApiTest {
@@ -27,6 +35,12 @@ class ScoreboardOfflineTest extends ScoreboardApiTest {
 
     @Autowired
     MatchReviewService reviews;
+
+    @Autowired
+    EventService eventService;
+
+    @Autowired
+    PlatformTransactionManager transactions;
 
     UUID match;
     Instant t0;
@@ -46,6 +60,40 @@ class ScoreboardOfflineTest extends ScoreboardApiTest {
         assertThat(view.running()).isTrue();
         assertThat(view.serverTime()).isEqualTo(clock.instant());
         assertThat(view.review()).isNull();
+    }
+
+    @Test
+    void aPointBeforeStartIsARulesClash() {
+        assertThat(offline(MatchEventType.POINT, Side.RED, t0, 0).conflictCode())
+                .isEqualTo("MATCH_CONFLICT");
+
+        var review = view().review();
+        assertThat(review.reason()).isEqualTo("RULES");
+        assertThat(review.ops()).extracting(ReviewOp::cause).containsExactly("RULES");
+        assertThat(view().red().points()).isZero();
+    }
+
+    // Deterministic instead of racing two starts on two mats: while another transaction holds the event row
+    // (as the other start would), a first start waits for it before looking at the other mats.
+    @Test
+    void aFirstStartWaitsForTheEventLock() throws Exception {
+        var locked = new CountDownLatch(1);
+        var release = new CountDownLatch(1);
+        try (var pool = Executors.newFixedThreadPool(2)) {
+            var holder = pool.submit(() -> new TransactionTemplate(transactions).executeWithoutResult(status -> {
+                eventService.lock(eventId);
+                locked.countDown();
+                await(release);
+            }));
+            assertThat(locked.await(10, TimeUnit.SECONDS)).isTrue();
+
+            var start = pool.submit(() -> offline(MatchEventType.START, null, t0, 0));
+            assertThatThrownBy(() -> start.get(500, TimeUnit.MILLISECONDS)).isInstanceOf(TimeoutException.class);
+
+            release.countDown();
+            holder.get(10, TimeUnit.SECONDS);
+            assertThat(start.get(10, TimeUnit.SECONDS).view().running()).isTrue();
+        }
     }
 
     @Test
@@ -143,7 +191,7 @@ class ScoreboardOfflineTest extends ScoreboardApiTest {
 
         var refused = assertThrows(
                 EventException.class,
-                () -> scoreboard.record(match, referee(), request(MatchEventType.POINT, Side.RED, null, null, null)));
+                () -> scoreboard.record(match, referee(), request(MatchEventType.POINT, Side.RED, null, null, 1)));
 
         assertThat(refused.getBody().getProperties()).containsEntry("code", "MATCH_IN_REVIEW");
         assertThat(rejectedRows()).isEqualTo(1);
@@ -151,13 +199,17 @@ class ScoreboardOfflineTest extends ScoreboardApiTest {
     }
 
     @Test
-    void anOpIdNeedsKnownEvents() {
+    void everyActionNeedsKnownEvents() {
         var refused = assertThrows(
                 EventException.class,
                 () -> scoreboard.record(
                         match, referee(), request(MatchEventType.START, null, UUID.randomUUID(), t0, null)));
+        var web = assertThrows(
+                EventException.class,
+                () -> scoreboard.record(match, referee(), request(MatchEventType.START, null, null, null, null)));
 
         assertThat(refused.getStatusCode().value()).isEqualTo(400);
+        assertThat(web.getStatusCode().value()).isEqualTo(400);
     }
 
     @Test
@@ -236,8 +288,17 @@ class ScoreboardOfflineTest extends ScoreboardApiTest {
                         .query(Integer.class)
                         .single())
                 .isEqualTo(1);
-        var web = scoreboard.record(match, referee(), request(MatchEventType.POINT, Side.BLUE, null, null, null));
+        var web = scoreboard.record(
+                match, referee(), request(MatchEventType.POINT, Side.BLUE, null, null, knownEvents(match)));
         assertThat(web.view().blue().points()).isEqualTo(1);
+    }
+
+    private static void await(CountDownLatch latch) {
+        try {
+            latch.await(10, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     private Recorded offline(MatchEventType type, Side side, Instant at, int knownEvents) {

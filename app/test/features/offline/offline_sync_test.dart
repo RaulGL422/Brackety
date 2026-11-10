@@ -2,12 +2,14 @@ import 'dart:io';
 
 import 'package:brackety/features/auth/state/session_controller.dart';
 import 'package:brackety/features/offline/data/offline_store_io.dart';
+import 'package:brackety/features/mat/data/mat_board.dart';
 import 'package:brackety/features/offline/state/offline_sync.dart';
 import 'package:brackety/features/scoreboard/data/match_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/fakes.dart';
+import '../../support/match_fakes.dart';
 import '../../support/offline_fakes.dart';
 
 void main() {
@@ -139,6 +141,55 @@ void main() {
       expect(container.read(offlineSyncProvider).pendingCount, 0);
     },
   );
+
+  test(
+    'a poll that brings the same view writes nothing and tells no one',
+    () async {
+      final container = device();
+      final sync = await open(container);
+      store.written.clear();
+      var changes = 0;
+      container.listen(offlineSyncProvider, (_, _) => changes++);
+
+      // Only serverTime (and the time left) differ.
+      clock.advance(const Duration(seconds: 2));
+      await sync.storeView(await server.load('m1'));
+      expect(store.written, isEmpty);
+      expect(changes, 0);
+
+      server.views['m1'] = matchView(status: MatchStatus.inProgress);
+      await sync.storeView(await server.load('m1'));
+      expect(store.written, ['views']);
+      expect(changes, 1);
+    },
+  );
+
+  test('the clock offset follows every poll without saving it', () async {
+    final serverClock = TestClock(t0.add(const Duration(seconds: 5)));
+    server = FakeMatchServer([serverMatch('m1')], serverClock);
+    final container = device();
+    final sync = container.read(offlineSyncProvider.notifier);
+    await sync.ready;
+    await pumpEventQueue();
+    await sync.storeView(await server.load('m1'));
+    store.written.clear();
+
+    serverClock.advance(const Duration(seconds: 3));
+    await sync.storeView(await server.load('m1'));
+
+    expect(store.written, isEmpty);
+    expect(sync.now(), t0.add(const Duration(seconds: 8)));
+  });
+
+  test('an action for a match the device never saw is not queued', () async {
+    final container = device();
+    final sync = container.read(offlineSyncProvider.notifier);
+    await sync.ready;
+    await pumpEventQueue();
+
+    expect(await sync.enqueue('unknown', MatchAction.start), isFalse);
+    expect(container.read(offlineSyncProvider).ops, isEmpty);
+  });
 
   test('at is the device time corrected with the last serverTime', () async {
     // The server's clock is 5 s ahead of the device's.

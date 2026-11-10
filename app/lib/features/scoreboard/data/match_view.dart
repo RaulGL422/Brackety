@@ -398,17 +398,32 @@ class MatchView {
 
   bool get finished => status == MatchStatus.finished;
 
-  /// Something the referee can still undo: a point, warning or disqualification in force.
-  bool get canUndo =>
-      !finished &&
-      timeline.any(
-        (e) =>
-            !e.undone &&
-            const {
-              MatchAction.point,
-              MatchAction.warning,
-              MatchAction.oneHandWarning,
-              MatchAction.disqualification,
-            }.contains(e.action),
-      );
+  /// The clock was started at least once: only then can anyone score.
+  bool get started => timeline.any((e) => e.action == MatchAction.start);
+
+  /// What an undo would undo now: the last point, warning or disqualification in force.
+  TimelineEntry? get lastUndoable => finished
+      ? null
+      : timeline
+            .where(
+              (e) =>
+                  !e.undone &&
+                  const {
+                    MatchAction.point,
+                    MatchAction.warning,
+                    MatchAction.oneHandWarning,
+                    MatchAction.disqualification,
+                  }.contains(e.action),
+            )
+            .lastOrNull;
+
+  bool get canUndo => lastUndoable != null;
+
+  /// The rival of a disqualified fighter, else the one with more points; null on a draw.
+  Side? get winner {
+    if (red.disqualified) return Side.blue;
+    if (blue.disqualified) return Side.red;
+    if (red.points == blue.points) return null;
+    return red.points > blue.points ? Side.red : Side.blue;
+  }
 }

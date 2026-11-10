@@ -7,6 +7,7 @@ No hace falta instalar nada ni tener Internet.
 ANTES DEL EVENTO
 - Copia la carpeta entera al disco del portátil (no la uses desde el USB).
 - Disco cifrado con BitLocker y cuenta de Windows con contraseña: aquí se guardan datos de menores.
+  El script avisa si el disco no tiene BitLocker; brackety-data\ queda solo para tu usuario de Windows.
 - El club exporta el paquete del evento (fichero .brackety) desde su panel en la web de Internet:
   icono de descarga (Exportar) > "Exportar paquete del evento". Lleva configuración, tapices, staff e inscritos.
 - Opcional: edita brackety-data\event.env (titular y email de privacidad) tras el primer arranque.
@@ -14,7 +15,9 @@ ANTES DEL EVENTO
 PRIMER ARRANQUE (carpeta sin datos)
 - Con el paquete del evento:
      powershell -ExecutionPolicy Bypass -File .\start-event.ps1 -Package C:\ruta\fase-1-2026-11-14.brackety
-  Lo copia a brackety-data\ y lo carga. Crea las cuentas del staff que falten con contraseña = nombre de usuario.
+  Lo copia a brackety-data\ y lo carga. Crea las cuentas del staff que falten con una contraseña aleatoria
+  (10 letras y números) y las muestra al acabar; también quedan en brackety-data\credentials.txt
+  (usuario;rol;contraseña;tapices). Reparte cada una a mano a su dueño y borra el fichero tras la fase.
   Si el paquete no es válido, dice por qué y no carga nada: corrígelo y vuelve con -Reset -Package.
 - O un evento de prueba con las cuentas demo (club1, ayudante1-2, arbitro1-5):
      ... -File .\start-event.ps1 -Demo                (fecha de hoy)
@@ -28,6 +31,7 @@ ARRANCAR (las veces siguientes)
      powershell -ExecutionPolicy Bypass -File .\start-event.ps1
    Sigue con el evento que ya tiene (no vuelve a cargar el paquete). Con -Package o -Demo se niega: usa -Reset.
 3. La primera vez pide permiso de administrador para el firewall: acéptalo o los móviles no llegarán.
+   La regla solo deja entrar desde el punto de acceso (192.168.137.x); si había una más abierta, la corrige.
 4. Cuando ponga "Brackety listo":
    - Móviles conectados al punto de acceso del portátil: http://192.168.137.1:8080
    - Este portátil: http://localhost:8080
@@ -58,7 +62,8 @@ DÓNDE ESTÁN LOS DATOS
      ... -File .\start-event.ps1 -Reset                     (solo archiva)
      ... -File .\start-event.ps1 -Reset -Package C:\ruta\evento.brackety
   Pide confirmación (s/N) y renombra brackety-data a brackety-data.old-AAAAMMDD-HHMMSS. No borra nada.
-- Al acabar la fase: borra brackety-data\, las brackety-data.old-* y el .brackety (llevan datos de menores).
+- Al acabar la fase: borra brackety-data\ (con credentials.txt), las brackety-data.old-* y el .brackety
+  (llevan datos de menores y contraseñas).
 
 PROBLEMAS
 - "El puerto 8080 ya está en uso": cierra la otra ventana del servidor.

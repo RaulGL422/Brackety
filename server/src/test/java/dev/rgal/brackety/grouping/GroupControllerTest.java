@@ -76,6 +76,21 @@ class GroupControllerTest extends EventApiTest {
     }
 
     @Test
+    void aHelperCanPickTheMatIfItHasAReferee() throws Exception {
+        call(post(event() + "/groups").content(jsonOnMat(matId(3), group(0, 1, 2, 3))), "ayudante1")
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.matNumber").value(3));
+        call(get("/api/v1/mats/" + matId(3) + "/board"), "arbitro3").andExpect(jsonPath("$.matches", hasSize(6)));
+
+        jdbc.sql("update mat set referee_account_id = null where number = 4").update();
+        call(post(event() + "/groups").content(jsonOnMat(matId(4), group(4, 5, 6, 7))), "ayudante1")
+                .andExpect(status().isConflict());
+        call(post(event() + "/groups").content(jsonOnMat(UUID.randomUUID(), group(4, 5, 6, 7))), "ayudante1")
+                .andExpect(status().isBadRequest());
+        assertThat(count("fight_group")).isOne();
+    }
+
+    @Test
     void multigroupSendsEveryGroupToOneMatOnlyWhenTheEventAllowsIt() throws Exception {
         createGroups(group(0, 1, 2, 3), group(4, 5, 6, 7)).andExpect(status().isBadRequest());
         jdbc.sql("update event set max_groups_per_mat = 2").update();
@@ -173,6 +188,11 @@ class GroupControllerTest extends EventApiTest {
     private String json(String... groups) {
         return """
                 {"categoryId":"%s","groups":[%s]}""".formatted(categoryId("7-8"), String.join(",", groups));
+    }
+
+    private String jsonOnMat(UUID matId, String... groups) {
+        return """
+                {"categoryId":"%s","groups":[%s],"matId":"%s"}""".formatted(categoryId("7-8"), String.join(",", groups), matId);
     }
 
     private String group(int... positions) {

@@ -49,6 +49,7 @@ MatchView matchView({
   Corner? red,
   Corner? blue,
   MatchReview? review,
+  bool? started,
 }) => MatchView(
   id: 'm1',
   matId: 'mat1',
@@ -64,6 +65,16 @@ MatchView matchView({
   red: red ?? corner('Ana Prueba', points: redPoints, oneHandRule: true),
   blue: blue ?? corner('Bea Prueba'),
   timeline: [
+    // Started unless still pending: nothing scores before the first START.
+    if (started ?? status != MatchStatus.pending)
+      TimelineEntry(
+        action: MatchAction.start,
+        at: DateTime(2027, 3, 10, 10),
+        clock: Duration.zero,
+        automatic: false,
+        undone: false,
+        gaveRivalPoint: false,
+      ),
     if (canUndo)
       TimelineEntry(
         action: MatchAction.point,
@@ -86,7 +97,12 @@ class FakeScoreboardRepository implements ScoreboardRepository {
 
   /// When set, the next action is refused with this reason, as the server does with a 409.
   String? refusal;
+
+  /// When set, an action whose `knownEvents` differs from [current]'s is refused as the server
+  /// does (409 `MATCH_STALE`), as if another tab or device had written.
+  bool checkKnownEvents = false;
   final sent = <(MatchAction, Side?, String?)>[];
+  final knownSent = <int>[];
 
   @override
   Future<MatchView> load(String matchId) async => current;
@@ -97,8 +113,20 @@ class FakeScoreboardRepository implements ScoreboardRepository {
     MatchAction action, {
     Side? side,
     String? reason,
+    required int knownEvents,
   }) async {
     sent.add((action, side, reason));
+    knownSent.add(knownEvents);
+    if (checkKnownEvents && knownEvents != current.knownEvents) {
+      throw DioException(
+        requestOptions: RequestOptions(),
+        response: Response(
+          requestOptions: RequestOptions(),
+          statusCode: 409,
+          data: {'code': 'MATCH_STALE', 'detail': 'The match changed.'},
+        ),
+      );
+    }
     if (refusal != null) {
       throw DioException(
         requestOptions: RequestOptions(),

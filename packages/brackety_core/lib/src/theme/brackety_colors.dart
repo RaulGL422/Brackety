@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Status colors that Material's [ColorScheme] does not cover.
+/// Colors that Material's [ColorScheme] does not cover: states and the header band.
 class BracketyColors extends ThemeExtension<BracketyColors> {
   const BracketyColors({
     required this.success,
@@ -11,22 +11,38 @@ class BracketyColors extends ThemeExtension<BracketyColors> {
     required this.onWarning,
     required this.warningContainer,
     required this.onWarningContainer,
+    required this.band,
+    required this.onBand,
   });
 
-  factory BracketyColors.from(Brightness brightness) {
-    final success = _scheme(const Color(0xFF1E8E3E), brightness);
-    final warning = _scheme(const Color(0xFFF59E0B), brightness);
-    return BracketyColors(
-      success: success.primary,
-      onSuccess: success.onPrimary,
-      successContainer: success.primaryContainer,
-      onSuccessContainer: success.onPrimaryContainer,
-      warning: warning.primary,
-      onWarning: warning.onPrimary,
-      warningContainer: warning.primaryContainer,
-      onWarningContainer: warning.onPrimaryContainer,
-    );
-  }
+  factory BracketyColors.from(Brightness brightness) =>
+      brightness == Brightness.light ? _light : _dark;
+
+  static const _light = BracketyColors(
+    success: Color(0xFF3D6B2E),
+    onSuccess: Color(0xFFFFFFFF),
+    successContainer: Color(0xFFDDE8D0),
+    onSuccessContainer: Color(0xFF1E3312),
+    warning: Color(0xFF8A5A00),
+    onWarning: Color(0xFFFFFFFF),
+    warningContainer: Color(0xFFF6E7C2),
+    onWarningContainer: Color(0xFF3D2A00),
+    band: Color(0xFF1A1A1A),
+    onBand: Color(0xFFFFFFFF),
+  );
+
+  static const _dark = BracketyColors(
+    success: Color(0xFF9CC46A),
+    onSuccess: Color(0xFF141414),
+    successContainer: Color(0xFF2F3F1E),
+    onSuccessContainer: Color(0xFFDDE8C8),
+    warning: Color(0xFFE0B354),
+    onWarning: Color(0xFF141414),
+    warningContainer: Color(0xFF4A3A12),
+    onWarningContainer: Color(0xFFF6E7C2),
+    band: Color(0xFF000000),
+    onBand: Color(0xFFEDEDED),
+  );
 
   final Color success;
   final Color onSuccess;
@@ -37,18 +53,15 @@ class BracketyColors extends ThemeExtension<BracketyColors> {
   final Color warningContainer;
   final Color onWarningContainer;
 
+  /// The dark band of the headers that frame a location (the referee's mat).
+  final Color band;
+  final Color onBand;
+
   static BracketyColors of(BuildContext context) {
     final theme = Theme.of(context);
     return theme.extension<BracketyColors>() ??
         BracketyColors.from(theme.brightness);
   }
-
-  static ColorScheme _scheme(Color seed, Brightness brightness) =>
-      ColorScheme.fromSeed(
-        seedColor: seed,
-        brightness: brightness,
-        dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
-      );
 
   @override
   BracketyColors copyWith({
@@ -60,6 +73,8 @@ class BracketyColors extends ThemeExtension<BracketyColors> {
     Color? onWarning,
     Color? warningContainer,
     Color? onWarningContainer,
+    Color? band,
+    Color? onBand,
   }) => BracketyColors(
     success: success ?? this.success,
     onSuccess: onSuccess ?? this.onSuccess,
@@ -69,6 +84,8 @@ class BracketyColors extends ThemeExtension<BracketyColors> {
     onWarning: onWarning ?? this.onWarning,
     warningContainer: warningContainer ?? this.warningContainer,
     onWarningContainer: onWarningContainer ?? this.onWarningContainer,
+    band: band ?? this.band,
+    onBand: onBand ?? this.onBand,
   );
 
   @override
@@ -99,6 +116,8 @@ class BracketyColors extends ThemeExtension<BracketyColors> {
         other.onWarningContainer,
         t,
       )!,
+      band: Color.lerp(band, other.band, t)!,
+      onBand: Color.lerp(onBand, other.onBand, t)!,
     );
   }
 }
@@ -106,8 +125,8 @@ class BracketyColors extends ThemeExtension<BracketyColors> {
 /// Colors a location can assign to each competitor (red/white, red/blue…).
 /// Fixed in both light and dark mode: a red corner is red everywhere.
 enum CompetitorColor {
-  red(Color(0xFFD32F2F), Colors.white),
-  blue(Color(0xFF1565C0), Colors.white),
+  red(Color(0xFFC62B2B), Colors.white),
+  blue(Color(0xFF1F57B8), Colors.white),
   white(Colors.white, _ink),
   black(_ink, Colors.white),
   yellow(Color(0xFFFFD600), _ink),

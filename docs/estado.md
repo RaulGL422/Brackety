@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-Última actualización: 2026-11-05. Fase 0 cerrada; en curso: **auth** (pruebas) y la preparación de la Fase 1 (ver "Hasta la Fase 1").
+Última actualización: 2026-11-06. Fase 0 cerrada; en curso: **auth** (pruebas) y la preparación de la Fase 1 (ver "Hasta la Fase 1").
 
 | Módulo | Doc | Estado | Rama activa |
 |---|---|---|---|
@@ -38,11 +38,15 @@ Estados: pendiente · en curso · en pruebas · cerrado.
 | Tarea | Doc | Estado | Rama activa |
 |---|---|---|---|
 | sistema de diseño: tokens + página dev en admin | 07-diseno.md | cerrado (2026-10-30) | chore/design-system |
+| rediseño neutro multideporte (pedido de Raul) | 07-diseno.md | en pruebas: tema neutro claro y oscuro (fijable en Ajustes), Atkinson Hyperlegible Next + Saira Condensed, tablero del árbitro (grupos en tinta), marcador y crear grupo con huecos (#57); resto de pantallas en `pendientes.md` (2026-11-08) | feat/design-neutral-groups |
 | prototipo Fase 1 Yoseikan (uso real ≈ 2026-11-14) | modulos/prototipo-f1.md | en curso: back completo (pasos 1-3/7); front pasos 4-6/7 (login de `auth`, mis eventos, crear grupos; tablero del tapiz y marcador con campana; panel del club con puntuaciones, tapices, inscripciones, configuración y CSV). Probado a mano en Chrome (ayudante, árbitro y club). Paso 7 en curso: release `v0.1.0` fusionada y etiquetada (#36, 2026-11-04); falta desplegar en la Pi (`brackety.rgal.dev`) | – |
 | prototipo F1: categorías por equipos | modulos/prototipo-f1-equipos.md | en pruebas: pasos 8-11 hechos (back, ayudante, árbitro, club con categorías editables). Falta: prueba manual de Raul (2026-11-02) | feat/proto-f1-teams-club |
 | prototipo F1: importación masiva de alumnos | modulos/importacion-alumnos.md | en pruebas: pasos 1-3 hechos (back, pantallas, imagen con `claude`). Falta: DPA y clave de Anthropic, prueba en la Pi y prueba manual de Raul (2026-11-02) | feat/import-deploy |
-| servidor del pabellón (portátil Windows) y paquete del evento | modulos/servidor-local.md | en curso: pasos 1-3/4 hechos (APK con selector de servidor; 2026-11-05) | feat/local-server-apk |
+| servidor del pabellón (portátil Windows) y paquete del evento | modulos/servidor-local.md | en curso: pasos 1-3/4 hechos (APK con selector de servidor; 2026-11-05). Endurecido tras la revisión (`revision-f1.md`, servidor y pabellón): contraseñas aleatorias del paquete, sin puntuar antes de iniciar, refresh idempotente, acceso de 12 h, sin `X-Forwarded-For`, firewall solo del punto de acceso, bloqueo de evento al primer inicio, inscritos solo para el club, CSV, BitLocker e `icacls` (2026-11-06) | fix/f1-hardening-server |
 | offline: adelanto F1 (marcador del árbitro) | modulos/offline.md | en pruebas: servidor (`opId`, `at`, `knownEvents`, revisión del club con `/review`) y app (cola y caché en el APK, tablero sin red, indicador, Aplicar/Descartar del club) hechos; falta la prueba manual de Raul y el escenario con un combate en revisión (2026-11-05) | feat/offline-f1-scoreboard |
+| herramientas: plugins `playwright` y `frontend-design` + semántica para navegador automatizado | 08-ejecucion-local.md | cerrado: plugins del proyecto y `enableSemanticsForAutomation` en app y admin (#54). Revisión de F1 con Playwright en 3 tamaños: flujos de club, ayudante y árbitro sin fallos; arreglados etiquetas por esquina del marcador para lector de pantalla y plural de Tapices; el resto de diseño, en `pendientes.md` (2026-11-07) | – |
+| prototipo F1: crear grupos (pedido de Raul) | modulos/prototipo-f1.md | en pruebas: sin multigrupo (Configuración y borrador), casilla en lugar del círculo con número, desplegable de tapiz Automático o a mano junto a "Crear grupo" (`matId` en la API), vuelta "Grupo por equipos" desde el grupo individual; falta prueba manual de Raul (2026-11-07) | feat/proto-f1-group-mat |
+| marcador web: doble pulsación (pedido de Raul) | modulos/offline.md | cerrado: `knownEvents` obligatorio, 409 `MATCH_STALE` en la web, envío de una en una; probado a mano por Raul con dos pestañas (#59, 2026-11-09) | – |
 
 ## Hasta la Fase 1 (14-11)
 Orden acordado con Raul el 2026-11-04 (una PR abierta cada vez):

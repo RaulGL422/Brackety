@@ -337,21 +337,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String draftCount(int count) {
-    return '$count/4';
-  }
-
-  @override
   String get draftGhost => 'Ghost competitor';
 
   @override
   String get draftGhostHint => 'Pick the ghost: fights but does not score.';
-
-  @override
-  String get draftAddGroup => 'Add group';
-
-  @override
-  String get draftRemoveGroup => 'Remove group';
 
   @override
   String createGroup(int count) {
@@ -376,16 +365,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String groupsCreatedBody(String groups, int mat) {
-    return '$groups → Mat $mat';
-  }
-
-  @override
   String get groupsConflict =>
-      'A participant is already in a group. The list has been refreshed.';
+      'A participant is already in a group or the mat has lost its referee. The list has been refreshed.';
 
   @override
-  String get groupsError => 'The groups could not be created.';
+  String get groupsError => 'The group could not be created.';
 
   @override
   String get ok => 'OK';
@@ -403,17 +387,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String matGroupHeader(int number, String category) {
-    return 'Group $number · ages $category';
+    return 'Group $number, ages $category';
   }
 
   @override
-  String get matRecommended => 'Recommended next';
+  String get matRecommended => 'Next match';
 
   @override
   String get matInProgress => 'In progress';
 
   @override
-  String get matPending => 'Pending';
+  String get matPending => 'Later';
+
+  @override
+  String get matYours => 'Your mat';
+
+  @override
+  String matToPlay(int count) {
+    return '$count to play';
+  }
+
+  @override
+  String get matOpenScoreboard => 'Open the scoreboard';
+
+  @override
+  String get matBackToScoreboard => 'Back to the scoreboard';
+
+  @override
+  String get matWatch => 'Watch the match';
+
+  @override
+  String get matGroups => 'Groups on this mat';
 
   @override
   String get matFinished => 'Finished';
@@ -429,7 +433,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String scoreboardTitle(int mat, int group) {
-    return 'Mat $mat · Group $group';
+    return 'Mat $mat, group $group';
   }
 
   @override
@@ -464,6 +468,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addPoint => '+1';
+
+  @override
+  String addPointFor(String corner) {
+    return '+1 $corner';
+  }
+
+  @override
+  String sanctionsFor(String corner) {
+    return 'Warnings: $corner';
+  }
 
   @override
   String warningsCount(int count) {
@@ -578,7 +592,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String matSummary(int groups, int pending) {
-    return '$groups groups · $pending pending matches';
+    String _temp0 = intl.Intl.pluralLogic(
+      groups,
+      locale: localeName,
+      other: '$groups groups',
+      one: '1 group',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      pending,
+      locale: localeName,
+      other: '$pending pending matches',
+      one: '1 pending match',
+    );
+    return '$_temp0 · $_temp1';
   }
 
   @override
@@ -658,12 +684,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsDate => 'Date';
 
   @override
-  String get settingsMaxGroups => 'Groups per mat at once';
-
-  @override
-  String get settingsMaxGroupsHint => '1 = no multigroup';
-
-  @override
   String get settingsAddMat => 'Add mat';
 
   @override
@@ -719,6 +739,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get individualGroup => 'Individual group';
+
+  @override
+  String get teamGroup => 'Team group';
+
+  @override
+  String get matPickerLabel => 'Mat';
+
+  @override
+  String get matAuto => 'Automatic';
+
+  @override
+  String get matAutoOption => 'The one free first';
+
+  @override
+  String get matAutoHint =>
+      'It is assigned automatically to the mat that will be free first.';
+
+  @override
+  String matManualHint(String mat) {
+    return 'It goes to $mat, picked by hand.';
+  }
 
   @override
   String get individualGroupHint =>
@@ -1424,4 +1465,95 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get refusalNotStarted => 'Start the clock before scoring.';
+
+  @override
+  String undoWhat(String what) {
+    return 'Undo: $what';
+  }
+
+  @override
+  String undoneWhat(String what) {
+    return 'Undone: $what';
+  }
+
+  @override
+  String whatPoint(String corner) {
+    return '+1 $corner';
+  }
+
+  @override
+  String whatWarning(String corner) {
+    return '$corner warning';
+  }
+
+  @override
+  String whatOneHand(String corner) {
+    return '$corner one-hand warning';
+  }
+
+  @override
+  String whatDisqualification(String corner) {
+    return '$corner disqualification';
+  }
+
+  @override
+  String get winner => 'Winner';
+
+  @override
+  String get draw => 'Draw';
+
+  @override
+  String get matLocked => 'Cannot open yet';
+
+  @override
+  String get needsGuardian => 'Guardian missing';
+
+  @override
+  String settingsRemoveMatConfirm(int number) {
+    return 'Mat $number is removed; its referee is no longer assigned.';
+  }
+
+  @override
+  String get draftTitle => 'New group';
+
+  @override
+  String get draftReady => 'Complete';
+
+  @override
+  String draftMissing(int count) {
+    return '$count to go';
+  }
+
+  @override
+  String draftSlot(int number) {
+    return 'Slot $number';
+  }
+
+  @override
+  String ghostOf(String name) {
+    return '$name (ghost)';
+  }
+
+  @override
+  String get settingsAppearance => 'Appearance';
+
+  @override
+  String get settingsAppearanceHint =>
+      'Automatic follows the device\'s light or dark mode. It is saved on this device only.';
+
+  @override
+  String get themeSystem => 'Automatic';
+
+  @override
+  String get themeLight => 'Light';
+
+  @override
+  String get themeDark => 'Dark';
+
+  @override
+  String get refusalStale =>
+      'The match changed on another device. Check the scoreboard and press again.';
 }

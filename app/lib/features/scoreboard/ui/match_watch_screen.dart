@@ -5,9 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/async_view.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../mat/data/mat_board.dart';
-import '../../mat/ui/fighter_text.dart';
 import '../data/match_view.dart';
 import '../state/match_review.dart';
+import 'final_score.dart';
 import 'review_panel.dart';
 import 'timeline_list.dart';
 
@@ -24,7 +24,12 @@ class MatchWatchScreen extends ConsumerWidget {
     final provider = watchedMatchProvider(matchId);
     final match = ref.watch(provider);
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.timeline)),
+      appBar: AppBar(
+        title: Text(switch (match.value) {
+          final view? => l10n.scoreboardTitle(view.matNumber, view.groupNumber),
+          null => l10n.timeline,
+        }),
+      ),
       persistentFooterButtons: match.value?.review == null
           ? null
           : [ReviewButtons(matchId: matchId)],
@@ -33,12 +38,18 @@ class MatchWatchScreen extends ConsumerWidget {
         onRetry: () => ref.invalidate(provider),
         data: (view) => Column(
           children: [
-            _Score(view: view),
-            if (view.review != null)
-              // Shares the height with the timeline; scrolls when the phone sent many actions.
-              Flexible(
-                child: SingleChildScrollView(child: ReviewPanel(view: view)),
+            // Shares the height with the timeline; scrolls when the phone sent many actions
+            // or the text is large.
+            Flexible(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _Score(view: view),
+                    if (view.review != null) ReviewPanel(view: view),
+                  ],
+                ),
               ),
+            ),
             const Divider(height: 1),
             Expanded(child: TimelineList(view: view)),
           ],
@@ -66,12 +77,7 @@ class _Score extends StatelessWidget {
             MatchStatus.finished => l10n.matchFinished,
           }, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: AppSpacing.s),
-          Text(
-            '${view.red.title(l10n)}  ${view.red.points} - '
-            '${view.blue.points}  ${view.blue.title(l10n)}',
-            style: Theme.of(context).textTheme.titleLarge,
-            textAlign: TextAlign.center,
-          ),
+          FinalScore(view: view, showWinner: view.finished),
         ],
       ),
     );

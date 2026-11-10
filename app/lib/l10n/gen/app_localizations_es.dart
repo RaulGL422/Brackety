@@ -340,21 +340,10 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String draftCount(int count) {
-    return '$count/4';
-  }
-
-  @override
   String get draftGhost => 'Competidor fantasma';
 
   @override
   String get draftGhostHint => 'Elige al fantasma: combate pero no puntúa.';
-
-  @override
-  String get draftAddGroup => 'Añadir grupo';
-
-  @override
-  String get draftRemoveGroup => 'Quitar grupo';
 
   @override
   String createGroup(int count) {
@@ -379,16 +368,11 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String groupsCreatedBody(String groups, int mat) {
-    return '$groups → Tapiz $mat';
-  }
-
-  @override
   String get groupsConflict =>
-      'Algún alumno ya está en un grupo. La lista se ha actualizado.';
+      'Algún alumno ya está en un grupo o el tapiz se ha quedado sin árbitro. La lista se ha actualizado.';
 
   @override
-  String get groupsError => 'No se han podido crear los grupos.';
+  String get groupsError => 'No se ha podido crear el grupo.';
 
   @override
   String get ok => 'Aceptar';
@@ -406,17 +390,43 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String matGroupHeader(int number, String category) {
-    return 'Grupo $number · $category años';
+    return 'Grupo $number, de $category años';
   }
 
   @override
-  String get matRecommended => 'Siguiente recomendado';
+  String get matRecommended => 'Siguiente combate';
 
   @override
   String get matInProgress => 'En curso';
 
   @override
-  String get matPending => 'Pendientes';
+  String get matPending => 'Después';
+
+  @override
+  String get matYours => 'Tu tapiz';
+
+  @override
+  String matToPlay(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count por jugar',
+      one: '1 por jugar',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get matOpenScoreboard => 'Abrir el marcador';
+
+  @override
+  String get matBackToScoreboard => 'Volver al marcador';
+
+  @override
+  String get matWatch => 'Ver el combate';
+
+  @override
+  String get matGroups => 'Grupos en este tapiz';
 
   @override
   String get matFinished => 'Terminados';
@@ -432,7 +442,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String scoreboardTitle(int mat, int group) {
-    return 'Tapiz $mat · Grupo $group';
+    return 'Tapiz $mat, grupo $group';
   }
 
   @override
@@ -467,6 +477,16 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get addPoint => '+1';
+
+  @override
+  String addPointFor(String corner) {
+    return '+1 $corner';
+  }
+
+  @override
+  String sanctionsFor(String corner) {
+    return 'Avisos: $corner';
+  }
 
   @override
   String warningsCount(int count) {
@@ -581,7 +601,19 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String matSummary(int groups, int pending) {
-    return '$groups grupos · $pending combates pendientes';
+    String _temp0 = intl.Intl.pluralLogic(
+      groups,
+      locale: localeName,
+      other: '$groups grupos',
+      one: '1 grupo',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      pending,
+      locale: localeName,
+      other: '$pending combates pendientes',
+      one: '1 combate pendiente',
+    );
+    return '$_temp0 · $_temp1';
   }
 
   @override
@@ -660,12 +692,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsDate => 'Fecha';
 
   @override
-  String get settingsMaxGroups => 'Grupos por tapiz a la vez';
-
-  @override
-  String get settingsMaxGroupsHint => '1 = sin multigrupo';
-
-  @override
   String get settingsAddMat => 'Añadir tapiz';
 
   @override
@@ -721,6 +747,27 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get individualGroup => 'Grupo individual';
+
+  @override
+  String get teamGroup => 'Grupo por equipos';
+
+  @override
+  String get matPickerLabel => 'Tapiz';
+
+  @override
+  String get matAuto => 'Automático';
+
+  @override
+  String get matAutoOption => 'El que antes quede libre';
+
+  @override
+  String get matAutoHint =>
+      'Se asignará automáticamente al tapiz que antes quede libre.';
+
+  @override
+  String matManualHint(String mat) {
+    return 'Irá al $mat, elegido a mano.';
+  }
 
   @override
   String get individualGroupHint =>
@@ -1428,4 +1475,101 @@ class AppLocalizationsEs extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get refusalNotStarted => 'Inicia el tiempo antes de puntuar.';
+
+  @override
+  String undoWhat(String what) {
+    return 'Deshacer: $what';
+  }
+
+  @override
+  String undoneWhat(String what) {
+    return 'Deshecho: $what';
+  }
+
+  @override
+  String whatPoint(String corner) {
+    return '+1 $corner';
+  }
+
+  @override
+  String whatWarning(String corner) {
+    return 'advertencia $corner';
+  }
+
+  @override
+  String whatOneHand(String corner) {
+    return 'una mano $corner';
+  }
+
+  @override
+  String whatDisqualification(String corner) {
+    return 'descalificación $corner';
+  }
+
+  @override
+  String get winner => 'Ganador';
+
+  @override
+  String get draw => 'Empate';
+
+  @override
+  String get matLocked => 'No se puede abrir todavía';
+
+  @override
+  String get needsGuardian => 'Falta tutor';
+
+  @override
+  String settingsRemoveMatConfirm(int number) {
+    return 'Se quita el Tapiz $number; su árbitro deja de estar asignado.';
+  }
+
+  @override
+  String get draftTitle => 'Grupo nuevo';
+
+  @override
+  String get draftReady => 'Completo';
+
+  @override
+  String draftMissing(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Faltan $count',
+      one: 'Falta 1',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String draftSlot(int number) {
+    return 'Hueco $number';
+  }
+
+  @override
+  String ghostOf(String name) {
+    return '$name (fantasma)';
+  }
+
+  @override
+  String get settingsAppearance => 'Apariencia';
+
+  @override
+  String get settingsAppearanceHint =>
+      'Automático sigue al modo claro u oscuro del dispositivo. Se guarda solo en este dispositivo.';
+
+  @override
+  String get themeSystem => 'Automático';
+
+  @override
+  String get themeLight => 'Claro';
+
+  @override
+  String get themeDark => 'Oscuro';
+
+  @override
+  String get refusalStale =>
+      'El combate ha cambiado en otro dispositivo. Revisa el marcador y vuelve a pulsar.';
 }

@@ -1,7 +1,7 @@
 name: brackety
 description: Brackety app for Android and the public web.
 publish_to: 'none'
-version: 0.2.0+2
+version: 0.3.0+3
 
 environment:
   sdk: ^3.13.7
@@ -26,6 +26,7 @@ dependencies:
   share_plus: 13.3.1
   url_launcher: 6.3.3
   uuid: 4.6.0
+  wakelock_plus: 1.8.2
   web: 1.1.2
 
 dev_dependencies:

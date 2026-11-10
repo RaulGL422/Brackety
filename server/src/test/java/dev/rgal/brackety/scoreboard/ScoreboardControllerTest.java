@@ -3,12 +3,14 @@ package dev.rgal.brackety.scoreboard;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.Duration;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
 class ScoreboardControllerTest extends ScoreboardApiTest {
@@ -53,6 +55,22 @@ class ScoreboardControllerTest extends ScoreboardApiTest {
     }
 
     @Test
+    void nothingIsScoredBeforeStart() throws Exception {
+        var match = match(young, 0, 1);
+
+        event(match, "POINT", "RED")
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.detail").value("The match has not started: press Start first."));
+        event(match, "WARNING", "BLUE", "Salida").andExpect(status().isConflict());
+        event(match, "DISQUALIFICATION", "BLUE", "Conducta").andExpect(status().isConflict());
+        event(match, "START");
+        event(match, "STOP");
+        event(match, "POINT", "RED")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.red.points").value(1));
+    }
+
+    @Test
     void fifteenPointsStopTheClockAndUndoingKeepsItStopped() throws Exception {
         var match = match(young, 0, 1);
         event(match, "START");
@@ -93,8 +111,33 @@ class ScoreboardControllerTest extends ScoreboardApiTest {
                 .andExpect(jsonPath("$.running").value(false));
 
         var olderMatch = match(older, 0, 1);
-        call(post(path(olderMatch) + "/events").content(body("START", null, null)), "arbitro2");
-        call(post(path(olderMatch) + "/events").content(body("ONE_HAND_WARNING", "RED", "Una mano")), "arbitro2")
+        call(post(path(olderMatch) + "/events").content(body("START", null, null, 0)), "arbitro2");
+        call(post(path(olderMatch) + "/events").content(body("ONE_HAND_WARNING", "RED", "Una mano", 1)), "arbitro2")
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void twoTabsPressingAtOnceCountOnce() throws Exception {
+        var match = match(young, 0, 1);
+        event(match, "START");
+        var seen = knownEvents(match);
+
+        call(post(path(match) + "/events").content(body("POINT", "RED", null, seen)), "arbitro1")
+                .andExpect(status().isOk());
+        call(post(path(match) + "/events").content(body("POINT", "RED", null, seen)), "arbitro1")
+                .andExpect(status().isConflict())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.code").value("MATCH_STALE"));
+
+        call(get(path(match)), "arbitro1")
+                .andExpect(jsonPath("$.red.points").value(1))
+                .andExpect(jsonPath("$.review").doesNotExist());
+    }
+
+    @Test
+    void withoutKnownEventsTheActionIsRefused() throws Exception {
+        call(post(path(match(young, 0, 1)) + "/events").content("""
+                                {"type":"START"}"""), "arbitro1")
                 .andExpect(status().isBadRequest());
     }
 
@@ -109,9 +152,9 @@ class ScoreboardControllerTest extends ScoreboardApiTest {
     void onlyTheMatsRefereeWritesAndTheClubOnlyReads() throws Exception {
         var match = match(young, 0, 1);
 
-        call(post(path(match) + "/events").content(body("START", null, null)), "arbitro2")
+        call(post(path(match) + "/events").content(body("START", null, null, 0)), "arbitro2")
                 .andExpect(status().isForbidden());
-        call(post(path(match) + "/events").content(body("START", null, null)), "club1")
+        call(post(path(match) + "/events").content(body("START", null, null, 0)), "club1")
                 .andExpect(status().isForbidden());
         call(get(path(match)), "club1").andExpect(status().isOk());
         call(get(path(match)), "ayudante1").andExpect(status().isForbidden());
@@ -127,12 +170,12 @@ class ScoreboardControllerTest extends ScoreboardApiTest {
     }
 
     private ResultActions event(UUID match, String type, String side, String reason) throws Exception {
-        return call(post(path(match) + "/events").content(body(type, side, reason)), "arbitro1");
+        return call(post(path(match) + "/events").content(body(type, side, reason, knownEvents(match))), "arbitro1");
     }
 
-    private static String body(String type, String side, String reason) {
+    private static String body(String type, String side, String reason, int knownEvents) {
         return """
-                {"type":"%s","side":%s,"reason":%s}""".formatted(type, quote(side), quote(reason));
+                {"type":"%s","side":%s,"reason":%s,"knownEvents":%d}""".formatted(type, quote(side), quote(reason), knownEvents);
     }
 
     private static String quote(String value) {

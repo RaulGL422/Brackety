@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/polling.dart';
 import '../../auth/data/api_error.dart';
 import '../../mat/data/mat_board.dart';
 import '../../offline/data/local_match.dart';
@@ -12,19 +14,25 @@ import '../data/scoreboard_repository.dart';
 import '../data/tambo_match.dart';
 import 'bell.dart';
 
-/// The server is the source of truth; this resyncs often so a reload or a second device never drifts.
+/// The server is the source of truth; this resyncs often so a reload or a second device never
+/// drifts. Counted from the end of the last poll ([Poller]).
 const matchRefresh = Duration(seconds: 2);
 
 final matchControllerProvider = AsyncNotifierProvider.autoDispose
     .family<MatchController, MatchView, String>(MatchController.new);
 
-/// Why an action did not go in: the device's own rules ([local]) or the server's words.
+/// Why an action did not go in: the device's own rules ([local]), another tab or device wrote
+/// first ([stale]), or the server's words.
 class ActionRefusal {
-  const ActionRefusal.local(MatchRefusal this.local) : detail = null;
-  const ActionRefusal.server(String this.detail) : local = null;
+  const ActionRefusal.local(MatchRefusal this.local)
+    : detail = null,
+      stale = false;
+  const ActionRefusal.server(String this.detail) : local = null, stale = false;
+  const ActionRefusal.stale() : local = null, detail = null, stale = true;
 
   final MatchRefusal? local;
   final String? detail;
+  final bool stale;
 }
 
 /// On the web every action goes straight to the server. On Android ([offlineEnabledProvider])
@@ -42,6 +50,11 @@ class MatchController extends AsyncNotifier<MatchView> {
   var _applied = 0;
   var _endRung = false;
   var _queued = false;
+  // Web: the most actions any answer showed. They only grow (an undo is one more), so this is
+  // the latest the screen knows, even when an older answer is dropped.
+  var _known = 0;
+  // Web: actions go one at a time, each with what the one before it left.
+  Future<void> _sending = Future.value();
 
   OfflineSync get _sync => ref.read(offlineSyncProvider.notifier);
   ScoreboardRepository get _repository =>
@@ -49,13 +62,13 @@ class MatchController extends AsyncNotifier<MatchView> {
 
   @override
   Future<MatchView> build() async {
-    final timer = Timer.periodic(matchRefresh, (_) => _refresh());
-    ref.onDispose(timer.cancel);
+    final poller = startPolling(ref, matchRefresh, _refresh);
     _queued = ref.read(offlineEnabledProvider);
-    final view = _queued
-        ? await _loadQueued()
-        : await _repository.load(matchId);
+    final view = await poller.track(
+      () => _queued ? _loadQueued() : _repository.load(matchId),
+    );
     _endRung = view.endReason != null;
+    _known = view.knownEvents;
     _sinceSync
       ..reset()
       ..start();
@@ -106,6 +119,22 @@ class MatchController extends AsyncNotifier<MatchView> {
     String? reason,
   }) async {
     if (_queued) return _enqueue(action, side: side, reason: reason);
+    final previous = _sending;
+    final turn = Completer<void>();
+    _sending = turn.future;
+    try {
+      await previous;
+      return await _sendNow(action, side: side, reason: reason);
+    } finally {
+      turn.complete();
+    }
+  }
+
+  Future<ActionRefusal?> _sendNow(
+    MatchAction action, {
+    Side? side,
+    String? reason,
+  }) async {
     final request = ++_requests;
     try {
       final view = await _repository.send(
@@ -113,12 +142,16 @@ class MatchController extends AsyncNotifier<MatchView> {
         action,
         side: side,
         reason: reason,
+        knownEvents: _known,
       );
       _apply(view, request);
       return null;
     } on DioException catch (e) {
       unawaited(_refresh());
       final body = e.response?.data;
+      if (body is Map && body['code'] == 'MATCH_STALE') {
+        return const ActionRefusal.stale();
+      }
       return ActionRefusal.server(
         body is Map && body['detail'] is String ? body['detail'] as String : '',
       );
@@ -131,7 +164,7 @@ class MatchController extends AsyncNotifier<MatchView> {
     String? reason,
   }) async {
     final local = _local();
-    if (local == null) return null;
+    if (local == null) return const ActionRefusal.server('');
     final now = _sync.now();
     final refusal =
         local.refuse(action, side, now) ??
@@ -141,8 +174,13 @@ class MatchController extends AsyncNotifier<MatchView> {
             ? MatchRefusal.matBusy
             : null);
     if (refusal != null) return ActionRefusal.local(refusal);
-    await _sync.enqueue(matchId, action, side: side, reason: reason);
-    return null;
+    final queued = await _sync.enqueue(
+      matchId,
+      action,
+      side: side,
+      reason: reason,
+    );
+    return queued ? null : const ActionRefusal.server('');
   }
 
   // Another match of this mat in progress, as far as this device knows: the server would put
@@ -177,6 +215,7 @@ class MatchController extends AsyncNotifier<MatchView> {
   }
 
   void _apply(MatchView view, int request) {
+    _known = max(_known, view.knownEvents);
     if (request < _applied) return;
     _applied = request;
     _show(view);

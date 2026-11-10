@@ -29,6 +29,7 @@ void main() {
         'successContainer': (b.successContainer, b.onSuccessContainer),
         'warning': (b.warning, b.onWarning),
         'warningContainer': (b.warningContainer, b.onWarningContainer),
+        'band': (b.band, b.onBand),
       };
 
       for (final MapEntry(key: name, value: (bg, fg)) in pairs.entries) {
@@ -36,6 +37,11 @@ void main() {
           expect(contrastRatio(bg, fg), greaterThanOrEqualTo(aa));
         });
       }
+
+      // The scoreboard clock turns this colour in its last seconds: large text, 3:1.
+      test('warning text on the surface meets AA for large text', () {
+        expect(contrastRatio(c.surface, b.warning), greaterThanOrEqualTo(3));
+      });
 
       test('buttons keep the minimum touch target', () {
         final size = theme.filledButtonTheme.style!.minimumSize!.resolve({});

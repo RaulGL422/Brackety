@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/board_finders.dart';
 import '../../support/match_fakes.dart';
 import '../../support/offline_fakes.dart';
 
@@ -168,16 +169,15 @@ void main() {
 
       expect(find.text('Offline · 1 action waiting'), findsOneWidget);
       expect(find.textContaining('board saved on the phone'), findsOneWidget);
-      expect(find.text('Recommended next'), findsNothing);
+      expect(find.text('Next match'), findsNothing);
       expect(find.text('In progress'), findsOneWidget);
       expect(find.text("Under the club's review"), findsOneWidget);
-      ListTile tile(String title) => tester.widget<ListTile>(
-        find.ancestor(of: find.text(title), matching: find.byType(ListTile)),
-      );
-      expect(tile('Ana  vs  Bea').enabled, isTrue);
+      ListTile tile(String red, String blue) =>
+          tester.widget<ListTile>(matchTile(red, blue));
+      expect(tile('Ana', 'Bea').onTap, isNotNull);
       // One match at a time on the mat, and none in review.
-      expect(tile('Carla  vs  Diana').enabled, isFalse);
-      expect(tile('Ana  vs  Carla').enabled, isFalse);
+      expect(tile('Carla', 'Diana').onTap, isNull);
+      expect(tile('Ana', 'Carla').onTap, isNull);
       expect(tester.takeException(), isNull);
     });
 

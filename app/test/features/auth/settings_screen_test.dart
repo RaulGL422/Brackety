@@ -1,4 +1,6 @@
 import 'package:brackety/core/download/file_download.dart';
+import 'package:brackety/features/appearance/data/theme_store.dart';
+import 'package:brackety/features/appearance/state/theme_mode_provider.dart';
 import 'package:brackety/features/auth/data/account.dart';
 import 'package:brackety/features/auth/data/registration.dart';
 import 'package:brackety/features/auth/state/session_controller.dart';
@@ -21,6 +23,8 @@ void main() {
     Account? account,
     bool devEnvironment = false,
     List<(String, List<int>)>? saved,
+    ThemeStore? themes,
+    ThemeMode savedTheme = ThemeMode.system,
   }) async {
     final api = FakeAccountApi(account: account);
     await pumpAuthApp(
@@ -33,6 +37,8 @@ void main() {
         saveFileProvider.overrideWithValue(
           (name, bytes, _) async => saved?.add((name, bytes)),
         ),
+        if (themes != null) themeStoreProvider.overrideWithValue(themes),
+        savedThemeModeProvider.overrideWithValue(savedTheme),
       ],
     );
     return api;
@@ -73,6 +79,7 @@ void main() {
       for (final text in [
         'Helper',
         'Email and password',
+        'Appearance',
         'Export my data',
         'Danger zone',
         'Delete account',
@@ -348,6 +355,40 @@ void main() {
     });
   });
 
+  group('appearance', () {
+    ThemeMode appMode(WidgetTester tester) =>
+        tester.widget<MaterialApp>(find.byType(MaterialApp)).themeMode!;
+
+    testWidgets('dark fixes the app dark and is saved on the device', (
+      tester,
+    ) async {
+      final store = _FakeThemeStore();
+      await openSettings(tester, themes: store);
+      expect(appMode(tester), ThemeMode.system);
+
+      await scrollTo(tester, 'Dark');
+      await tapText(tester, 'Dark');
+
+      expect(appMode(tester), ThemeMode.dark);
+      expect(store.saved, ThemeMode.dark);
+      expect(
+        Theme.of(tester.element(find.text('Appearance'))).brightness,
+        Brightness.dark,
+      );
+    });
+
+    testWidgets('the app starts with the saved choice', (tester) async {
+      await openSettings(tester, savedTheme: ThemeMode.light);
+
+      expect(appMode(tester), ThemeMode.light);
+      await scrollTo(tester, 'Light');
+      final segments = tester.widget<SegmentedButton<ThemeMode>>(
+        find.byType(SegmentedButton<ThemeMode>),
+      );
+      expect(segments.selected, {ThemeMode.light});
+    });
+  });
+
   group('language', () {
     testWidgets('switching changes the app and the account', (tester) async {
       final api = await openSettings(tester);
@@ -587,4 +628,14 @@ void main() {
       lessThanOrEqualTo(AppSizes.formMaxWidth + 2 * AppSpacing.xl * 2),
     );
   });
+}
+
+class _FakeThemeStore implements ThemeStore {
+  ThemeMode? saved;
+
+  @override
+  Future<ThemeMode> read() async => saved ?? ThemeMode.system;
+
+  @override
+  Future<void> write(ThemeMode mode) async => saved = mode;
 }

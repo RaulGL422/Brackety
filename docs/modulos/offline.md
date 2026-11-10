@@ -26,7 +26,7 @@ Pedido por Raul el 2026-11-04 para la Fase 1. Solo APK Android (la web por http 
 - Choque: el club elige **aplicar** las acciones del móvil o **descartarlas** (decidido por Raul el 2026-11-05).
 
 ### Servidor (contrato)
-- `POST /matches/{id}/events` acepta además `opId` (UUID del dispositivo), `at` (hora de la acción) y `knownEvents` (acciones no automáticas que el dispositivo conocía antes de esta). Sin `opId` funciona como hoy (web).
+- `POST /matches/{id}/events` acepta además `opId` (UUID del dispositivo), `at` (hora de la acción) y `knownEvents` (acciones no automáticas que el dispositivo conocía antes de esta; obligatorio en toda acción, también en la web). Sin `opId` (web): si `knownEvents` no cuadra, 409 `MATCH_STALE` sin guardar nada ni pasar a revisión (2026-11-09).
 - Con `opId`:
   - **Idempotente**: si ya se aplicó ese `opId`, devuelve 200 con el combate actual y no escribe nada.
   - **Hora**: `at` hace de "ahora" para esa acción: reglas, reloj y fin por tiempo. Si es posterior a la hora del servidor, se usa la del servidor; si es anterior a la última acción del combate, se usa esa.
@@ -44,7 +44,7 @@ Pedido por Raul el 2026-11-04 para la Fase 1. Solo APK Android (la web por http 
 - La respuesta del marcador lleva la hora del servidor (`serverTime`), que la app usa para corregir el reloj del dispositivo.
 
 ### Servidor: forma exacta (hecho el 2026-11-05)
-- Petición: `{"type":"POINT","side":"RED","reason":null,"opId":"<uuid>","at":"2027-03-10T09:00:30Z","knownEvents":3}`. `at` en ISO-8601 UTC; sin `at` vale la hora del servidor. Con `opId` y sin `knownEvents` (o negativo): 400.
+- Petición: `{"type":"POINT","side":"RED","reason":null,"opId":"<uuid>","at":"2027-03-10T09:00:30Z","knownEvents":3}`. `at` en ISO-8601 UTC; sin `at` vale la hora del servidor. Sin `knownEvents` (o negativo): 400.
 - 409 en `application/problem+json` con `code`: `MATCH_CONFLICT` (primera) o `MATCH_IN_REVIEW` (siguientes, y la web con el combate en revisión).
 - Reintento de un `opId` rechazado: el mismo 409 y código, aunque el club ya lo haya revisado. Uno aplicado: 200.
 - Con `opId`, el aviso de una mano a quien no tiene 4-7 años también es choque (en la web sigue siendo 400).
@@ -77,13 +77,14 @@ Pedido por Raul el 2026-11-04 para la Fase 1. Solo APK Android (la web por http 
 - Otro 4xx (no 401): esa acción y las siguientes de su combate quedan "rechazadas", fuera del estado mostrado; el indicador las cuenta y deja verlas y quitarlas. No frenan a otros combates. 5xx y 401: reintento.
 - Reintento: cada 3 s mientras haya pendientes y al responder cualquier otra petición.
 - "En revisión" = la última vista trae `review`; tras un 409, también hasta que llegue la vista nueva.
-- Caché: en la carpeta privada de la app, `offline/queue.json`, `views.json` y `board-<tapiz>.json`, con fichero temporal + rename. Con red, el tablero descarga la vista de cada combate del tapiz que falte o haya cambiado, para poder abrir cualquiera sin red.
+- Una vista igual a la guardada (solo cambian `serverTime` y el tiempo restante) no se escribe ni avisa a la pantalla. La diferencia de reloj con el servidor se actualiza en cada respuesta, pero solo se guarda junto con las vistas.
+- Caché: en la carpeta privada de la app, `offline/queue.json`, `views.json` y `board-<tapiz>.json`, con fichero temporal + rename. Fuera de la copia de Google y de la transferencia a otro móvil (`allowBackup="false"`, `dataExtractionRules`). Con red, el tablero descarga la vista de cada combate del tapiz que falte o haya cambiado, para poder abrir cualquiera sin red.
 - Cierre de sesión (decidido por Raul el 2026-11-05: no perder acciones del árbitro):
   - Salir a mano, cambio de servidor o sesiones cerradas por una acción de la cuenta: se borra todo. Si hay acciones sin enviar, "Salir" avisa con cuántas se perderán y pide confirmar.
   - Sesión caducada o rechazada por el servidor (refresh 400/401): se borran tablero y vistas (llevan nombres), pero la cola se queda guardada con la cuenta que la creó y sin enviarse.
   - Al volver a entrar esa misma cuenta, la cola se envía como siempre. Otra cuenta no la ve ni la envía; sigue guardada hasta que entre la suya o se salga a mano con ella.
 - En el móvil quedan solo nombres del tapiz y motivos de avisos.
-- Web: igual que antes; solo muestra el aviso de "en revisión" y bloquea los botones si el combate lo está.
+- Web: sin cola ni caché. Envía las acciones de una en una, cada una con `knownEvents` = el máximo visto en las respuestas (solo crece). Ante `MATCH_STALE` recarga el combate y avisa "El combate ha cambiado en otro dispositivo". Muestra el aviso de "en revisión" y bloquea los botones si el combate lo está.
 
 ## Datos
 `offline_op` (cliente), `import_log` (servidor), formato CSV versionado.
@@ -93,8 +94,8 @@ Estado de conexión, descarga previa, cola pendiente, exportar/importar CSV, res
 
 ## Tests
 Sin red → operaciones → sincronización; idempotencia; CSV round trip; choque de dos escritores; traspaso de tapiz.
-- Servidor F1 (`ScoreboardOfflineTest`, `ScoreboardReviewControllerTest`): con `opId` igual que sin él; reintentos sin duplicar (200 y 409); `at` recortado a ahora y subido a la última acción; combate jugado offline y fin por tiempo con los `at`; `knownEvents` distinto, alumno en otro tapiz y siguientes en revisión; web en revisión; paradas automáticas fuera de `knownEvents`; APPLY en orden saltando las que no valen y finalizando; DISCARD; permisos de `/review`, `serverTime`, `review`, tablero y códigos del problem+json.
-- App F1: `tambo_match_test` (los casos de `TamboMatchTest`); `local_match_test` (cola sobre la vista, parada automática, deshacer, `at` subido, tablero sin red); `offline_sync_test` (orden, sin red y envío al volver, reintento con el mismo `opId`, vista que ya trae una pendiente (sale de la cola, cuenta una vez y `knownEvents` correcto), desfase con `serverTime`, 409 a revisión, revisión resuelta, otro 4xx, sobrevive al reinicio, borrado al salir, ficheros atómicos); `offline_session_test` (sesión rechazada: cola guardada sin vistas, misma cuenta la envía, otra no la ve ni la borra al salir, salir a mano y cambio de servidor la borran, `queue.json` sin cuenta); `confirm_sign_out_test` en 3 tamaños (aviso al salir con pendientes); `offline_screens_test` en 3 tamaños (tablero sin red con indicador, marcador con pendientes, revisión del club).
+- Servidor F1 (`ScoreboardOfflineTest`, `ScoreboardReviewControllerTest`): con `opId` igual que sin él; reintentos sin duplicar (200 y 409); `at` recortado a ahora y subido a la última acción; combate jugado offline y fin por tiempo con los `at`; `knownEvents` distinto, alumno en otro tapiz y siguientes en revisión; web en revisión; web sin `knownEvents` (400) y dos pestañas a la vez (la segunda, 409 `MATCH_STALE`, `ScoreboardControllerTest`); paradas automáticas fuera de `knownEvents`; APPLY en orden saltando las que no valen y finalizando; DISCARD; permisos de `/review`, `serverTime`, `review`, tablero y códigos del problem+json.
+- App F1: `tambo_match_test` (los casos de `TamboMatchTest`); `local_match_test` (cola sobre la vista, parada automática, deshacer, `at` subido, tablero sin red); `offline_sync_test` (orden, sin red y envío al volver, reintento con el mismo `opId`, vista que ya trae una pendiente (sale de la cola, cuenta una vez y `knownEvents` correcto), desfase con `serverTime`, 409 a revisión, revisión resuelta, otro 4xx, sobrevive al reinicio, borrado al salir, ficheros atómicos); `offline_session_test` (sesión rechazada: cola guardada sin vistas, misma cuenta la envía, otra no la ve ni la borra al salir, salir a mano y cambio de servidor la borran, `queue.json` sin cuenta); `confirm_sign_out_test` en 3 tamaños (aviso al salir con pendientes); `offline_screens_test` en 3 tamaños (tablero sin red con indicador, marcador con pendientes, revisión del club); `match_controller_test` (web: dos acciones seguidas de una en una con su `knownEvents`; `MATCH_STALE` recarga).
 
 ## Estado
 Pendiente; adelanto F1 en pruebas (2026-11-05, rama `feat/offline-f1-scoreboard`): servidor y app hechos. Falta la prueba manual de Raul y un escenario de datos con un combate en revisión (es de `server/`, sin hacer). Prueba a mano: APK sin red (modo avión) en un combate y en el tablero; volver la red; choque con el mismo árbitro en la web escribiendo el combate mientras el móvil está sin red; Aplicar y Descartar desde el club.

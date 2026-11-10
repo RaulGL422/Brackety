@@ -25,8 +25,9 @@ final class Csv {
             return "";
         }
         var text = value.toString();
-        // A leading = + - @ would run as a formula when the file is opened (CSV injection).
-        if (!text.isEmpty() && "=+-@".indexOf(text.charAt(0)) >= 0 && !(value instanceof Number)) {
+        // A leading = + - @ would run as a formula when the file is opened (CSV injection); a leading tab or
+        // carriage return can hide one from a spreadsheet that skips them.
+        if (!text.isEmpty() && "=+-@\t\r".indexOf(text.charAt(0)) >= 0 && !(value instanceof Number)) {
             text = "'" + text;
         }
         if (text.contains(";") || text.contains("\"") || text.contains("\n") || text.contains("\r")) {

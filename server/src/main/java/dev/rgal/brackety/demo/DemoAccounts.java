@@ -12,8 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 /**
- * Accounts whose password is their username, already verified (docs/modulos/prototipo-f1.md): the demo ones and
- * the staff an event package brings (docs/modulos/servidor-local.md).
+ * Verified accounts created on the fly: the demo ones, whose password is their username (docs/modulos/prototipo-f1.md),
+ * and the staff an event package brings, with the password it chooses (docs/modulos/servidor-local.md).
  */
 @Component
 public class DemoAccounts {
@@ -32,22 +32,31 @@ public class DemoAccounts {
 
     /** A helper's account, created if missing. */
     public UUID helper(String username) {
-        return findOrCreate(username, ProfileType.HELPER, null, null);
+        return helper(username, username);
+    }
+
+    public UUID helper(String username, String password) {
+        return findOrCreate(username, password, ProfileType.HELPER, null, null);
     }
 
     /** An organizer's account with a club profile, created if missing; the organization may be unknown. */
     public UUID club(String username, String organizationName, String taxId) {
-        return findOrCreate(username, ProfileType.CLUB, organizationName, taxId);
+        return club(username, organizationName, taxId, username);
     }
 
-    private UUID findOrCreate(String username, ProfileType profile, String organizationName, String taxId) {
+    public UUID club(String username, String organizationName, String taxId, String password) {
+        return findOrCreate(username, password, ProfileType.CLUB, organizationName, taxId);
+    }
+
+    private UUID findOrCreate(
+            String username, String password, ProfileType profile, String organizationName, String taxId) {
         var existing = accounts.findByEmail(username);
         if (existing.isPresent()) {
             return existing.get().getId();
         }
         var now = clock.instant();
         var birthDate = profile.isOrganizer() ? null : LocalDate.now(clock).minusYears(30);
-        var account = new Account(username, passwordEncoder.encode(username), birthDate, "es", now);
+        var account = new Account(username, passwordEncoder.encode(password), birthDate, "es", now);
         account.markEmailVerified(now);
         accounts.save(account);
         profiles.save(

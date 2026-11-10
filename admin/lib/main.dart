@@ -7,5 +7,7 @@ import 'app.dart';
 void main() {
   ensureApiConfigured();
   registerFontLicenses();
+  WidgetsFlutterBinding.ensureInitialized();
+  enableSemanticsForAutomation();
   runApp(const ProviderScope(child: AdminApp()));
 }

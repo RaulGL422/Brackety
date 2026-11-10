@@ -44,6 +44,7 @@ class ScoreboardService {
 
     static final String MATCH_CONFLICT = "MATCH_CONFLICT";
     static final String MATCH_IN_REVIEW = "MATCH_IN_REVIEW";
+    static final String MATCH_STALE = "MATCH_STALE";
 
     private static final Logger log = LoggerFactory.getLogger(ScoreboardService.class);
 
@@ -141,7 +142,7 @@ class ScoreboardService {
         var action = action(request, accountId);
         var serverNow = clock.instant();
         var conflict = request.opId() == null
-                ? recordOnline(match, event, action, serverNow)
+                ? recordOnline(match, event, action, request.knownEvents(), serverNow)
                 : recordOffline(match, event, action, request, serverNow);
         return new Recorded(conflict == null ? view(match, mat, event, serverNow) : null, conflict);
     }
@@ -156,18 +157,24 @@ class ScoreboardService {
         if (NEED_REASON.contains(type) && reason.isEmpty()) {
             throw EventException.invalid("A warning or disqualification needs a reason.");
         }
-        if (request.opId() != null && request.knownEvents() == null) {
-            throw EventException.invalid("An action with an opId needs knownEvents.");
+        // Two tabs pressing at once would otherwise both count: every action says what it saw.
+        if (request.knownEvents() == null) {
+            throw EventException.invalid("Every action needs knownEvents.");
         }
         return new MatchWriter.Action(
                 type, side, NEED_REASON.contains(type) ? reason : null, request.opId(), accountId);
     }
 
-    private String recordOnline(Match match, Event event, MatchWriter.Action action, Instant now) {
+    // Online the referee sees the clash at once: refused, not sent to the club's review.
+    private String recordOnline(Match match, Event event, MatchWriter.Action action, int knownEvents, Instant now) {
         if (match.isInReview()) {
             throw offlineConflict(MATCH_IN_REVIEW);
         }
         var history = new ArrayList<>(matchEvents.findByMatchIdOrderByPosition(match.getId()));
+        if (knownEvents != MatchWriter.knownEvents(history)) {
+            throw EventException.conflict(
+                    MATCH_STALE, "The match changed on another device: check the scoreboard and try again.");
+        }
         writer.append(match, event, history, action, now, true).ifPresent(refusal -> {
             throw refusal.cause() == Cause.AGE
                     ? EventException.invalid(refusal.detail())

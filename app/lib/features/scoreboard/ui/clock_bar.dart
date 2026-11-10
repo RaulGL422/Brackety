@@ -8,13 +8,25 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../../mat/data/mat_board.dart';
 import '../data/match_view.dart';
 import '../state/match_controller.dart';
+import 'undo_text.dart';
 
-/// Big countdown with start/stop; once the match is over, the finish button instead.
+/// The last seconds show in the warning colour.
+const clockWarningFrom = Duration(seconds: 10);
+
+/// The scoreboard's controls: big countdown, start/stop (finish once the match is over) and
+/// undo saying what it undoes. With [clockHeight] the clock takes that height (portrait);
+/// without it, all the room left (landscape, between the corners).
 class ClockBar extends ConsumerStatefulWidget {
-  const ClockBar({super.key, required this.view, required this.onAction});
+  const ClockBar({
+    super.key,
+    required this.view,
+    required this.onAction,
+    this.clockHeight,
+  });
 
   final MatchView view;
   final void Function(MatchAction action) onAction;
+  final double? clockHeight;
 
   @override
   ConsumerState<ClockBar> createState() => _ClockBarState();
@@ -46,67 +58,74 @@ class _ClockBarState extends ConsumerState<ClockBar> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final view = widget.view;
-    final controller = ref.read(matchControllerProvider(view.id).notifier);
-    final left = controller.remainingNow();
-    final timeUp = view.running && left == Duration.zero;
-    final over = view.endReason != null || timeUp;
-    // In review nothing more is accepted until the club decides.
-    final locked = view.review != null;
-    final button = FilledButton.styleFrom(
-      minimumSize: const Size(0, AppSizes.scoreTouchTarget),
-      textStyle: Theme.of(context).textTheme.titleLarge,
+    final left = ref
+        .read(matchControllerProvider(view.id).notifier)
+        .remainingNow();
+    final over =
+        view.endReason != null || (view.running && left == Duration.zero);
+    final clock = _Clock(view: view, left: left, over: over);
+    final clockButton = _ClockButton(
+      view: view,
+      over: over,
+      onAction: widget.onAction,
     );
+    final undo = _UndoButton(view: view, onAction: widget.onAction);
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.m),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        spacing: AppSpacing.s,
         children: [
-          if (!over)
-            Text(_format(left), style: Theme.of(context).textTheme.displayLarge)
-          else
-            Text(switch (view.endReason) {
+          if (widget.clockHeight case final height?) ...[
+            SizedBox(height: height, child: clock),
+            // Portrait: both buttons on one row, under the thumb, the same height.
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: AppSpacing.s,
+                children: [
+                  Expanded(child: clockButton),
+                  Expanded(child: undo),
+                ],
+              ),
+            ),
+          ] else ...[
+            Expanded(child: clock),
+            clockButton,
+            undo,
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _Clock extends StatelessWidget {
+  const _Clock({required this.view, required this.left, required this.over});
+
+  final MatchView view;
+  final Duration left;
+  final bool over;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final text = Theme.of(context).textTheme;
+    final ending = !over && left <= clockWarningFrom;
+    return FittedBox(
+      child: over
+          ? Text(switch (view.endReason) {
               EndReason.points => l10n.endPoints,
               EndReason.disqualification => l10n.endDisqualification,
               _ => l10n.endTime,
-            }, style: Theme.of(context).textTheme.headlineMedium),
-          const SizedBox(height: AppSpacing.s),
-          SizedBox(
-            width: double.infinity,
-            child: over
-                ? FilledButton.icon(
-                    style: button,
-                    icon: const Icon(Icons.flag),
-                    label: Text(l10n.finishMatch),
-                    onPressed: locked
-                        ? null
-                        : () => widget.onAction(MatchAction.finish),
-                  )
-                : view.running
-                ? FilledButton.tonalIcon(
-                    style: button,
-                    icon: const Icon(Icons.pause),
-                    label: Text(l10n.clockStop),
-                    onPressed: locked
-                        ? null
-                        : () => widget.onAction(MatchAction.stop),
-                  )
-                : FilledButton.icon(
-                    style: button,
-                    icon: const Icon(Icons.play_arrow),
-                    label: Text(
-                      view.status == MatchStatus.pending
-                          ? l10n.clockStart
-                          : l10n.clockResume,
-                    ),
-                    onPressed: locked
-                        ? null
-                        : () => widget.onAction(MatchAction.start),
-                  ),
-          ),
-        ],
-      ),
+            }, style: text.headlineMedium)
+          : Text(
+              _format(left),
+              style: text.displayLarge?.copyWith(
+                color: ending ? BracketyColors.of(context).warning : null,
+              ),
+            ),
     );
   }
 
@@ -114,5 +133,99 @@ class _ClockBarState extends ConsumerState<ClockBar> {
   static String _format(Duration left) {
     final seconds = (left.inMilliseconds / 1000).ceil();
     return '${seconds ~/ 60}:${(seconds % 60).toString().padLeft(2, '0')}';
+  }
+}
+
+/// Start, stop or finish, by icon and word and without state colours: the colours on the
+/// scoreboard are the competitors'. Stop is outlined, start and finish filled, so the button
+/// also says whether the clock runs, and none looks like undo. In review
+/// nothing is accepted.
+class _ClockButton extends StatelessWidget {
+  const _ClockButton({
+    required this.view,
+    required this.over,
+    required this.onAction,
+  });
+
+  final MatchView view;
+  final bool over;
+  final void Function(MatchAction action) onAction;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    final locked = view.review != null;
+    final (action, icon, label, background, foreground) = over
+        ? (
+            MatchAction.finish,
+            Icons.flag,
+            l10n.finishMatch,
+            scheme.primary,
+            scheme.onPrimary,
+          )
+        : view.running
+        ? (
+            MatchAction.stop,
+            Icons.pause,
+            l10n.clockStop,
+            Colors.transparent,
+            scheme.onSurface,
+          )
+        : (
+            MatchAction.start,
+            Icons.play_arrow,
+            view.status == MatchStatus.pending
+                ? l10n.clockStart
+                : l10n.clockResume,
+            scheme.primary,
+            scheme.onPrimary,
+          );
+    return FilledButton.icon(
+      style: FilledButton.styleFrom(
+        backgroundColor: background,
+        foregroundColor: foreground,
+        side: view.running && !over
+            ? BorderSide(color: scheme.onSurface, width: 2)
+            : null,
+        iconSize: AppSizes.scoreIcon,
+        minimumSize: const Size(0, AppSizes.scoreTouchTarget),
+        textStyle: Theme.of(context).textTheme.titleLarge,
+      ),
+      icon: Icon(icon),
+      label: Text(
+        label,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        textAlign: TextAlign.center,
+      ),
+      onPressed: locked ? null : () => onAction(action),
+    );
+  }
+}
+
+class _UndoButton extends StatelessWidget {
+  const _UndoButton({required this.view, required this.onAction});
+
+  final MatchView view;
+  final void Function(MatchAction action) onAction;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final target = view.review == null ? view.lastUndoable : null;
+    return FilledButton.tonalIcon(
+      style: FilledButton.styleFrom(
+        minimumSize: const Size(0, AppSizes.scoreTouchTarget),
+      ),
+      icon: const Icon(Icons.undo),
+      label: Text(
+        target == null ? l10n.undo : l10n.undoWhat(undoTarget(l10n, target)),
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        textAlign: TextAlign.center,
+      ),
+      onPressed: target == null ? null : () => onAction(MatchAction.undo),
+    );
   }
 }

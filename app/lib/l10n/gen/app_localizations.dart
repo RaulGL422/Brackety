@@ -680,12 +680,6 @@ abstract class AppLocalizations {
   /// **'Grupo {number}'**
   String draftGroup(int number);
 
-  /// No description provided for @draftCount.
-  ///
-  /// In es, this message translates to:
-  /// **'{count}/4'**
-  String draftCount(int count);
-
   /// No description provided for @draftGhost.
   ///
   /// In es, this message translates to:
@@ -697,18 +691,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Elige al fantasma: combate pero no puntúa.'**
   String get draftGhostHint;
-
-  /// No description provided for @draftAddGroup.
-  ///
-  /// In es, this message translates to:
-  /// **'Añadir grupo'**
-  String get draftAddGroup;
-
-  /// No description provided for @draftRemoveGroup.
-  ///
-  /// In es, this message translates to:
-  /// **'Quitar grupo'**
-  String get draftRemoveGroup;
 
   /// No description provided for @createGroup.
   ///
@@ -722,22 +704,16 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{Grupo creado} other{Grupos creados}}'**
   String groupsCreatedTitle(int count);
 
-  /// No description provided for @groupsCreatedBody.
-  ///
-  /// In es, this message translates to:
-  /// **'{groups} → Tapiz {mat}'**
-  String groupsCreatedBody(String groups, int mat);
-
   /// No description provided for @groupsConflict.
   ///
   /// In es, this message translates to:
-  /// **'Algún alumno ya está en un grupo. La lista se ha actualizado.'**
+  /// **'Algún alumno ya está en un grupo o el tapiz se ha quedado sin árbitro. La lista se ha actualizado.'**
   String get groupsConflict;
 
   /// No description provided for @groupsError.
   ///
   /// In es, this message translates to:
-  /// **'No se han podido crear los grupos.'**
+  /// **'No se ha podido crear el grupo.'**
   String get groupsError;
 
   /// No description provided for @ok.
@@ -767,13 +743,13 @@ abstract class AppLocalizations {
   /// No description provided for @matGroupHeader.
   ///
   /// In es, this message translates to:
-  /// **'Grupo {number} · {category} años'**
+  /// **'Grupo {number}, de {category} años'**
   String matGroupHeader(int number, String category);
 
   /// No description provided for @matRecommended.
   ///
   /// In es, this message translates to:
-  /// **'Siguiente recomendado'**
+  /// **'Siguiente combate'**
   String get matRecommended;
 
   /// No description provided for @matInProgress.
@@ -785,8 +761,44 @@ abstract class AppLocalizations {
   /// No description provided for @matPending.
   ///
   /// In es, this message translates to:
-  /// **'Pendientes'**
+  /// **'Después'**
   String get matPending;
+
+  /// No description provided for @matYours.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu tapiz'**
+  String get matYours;
+
+  /// No description provided for @matToPlay.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 por jugar} other{{count} por jugar}}'**
+  String matToPlay(int count);
+
+  /// No description provided for @matOpenScoreboard.
+  ///
+  /// In es, this message translates to:
+  /// **'Abrir el marcador'**
+  String get matOpenScoreboard;
+
+  /// No description provided for @matBackToScoreboard.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver al marcador'**
+  String get matBackToScoreboard;
+
+  /// No description provided for @matWatch.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver el combate'**
+  String get matWatch;
+
+  /// No description provided for @matGroups.
+  ///
+  /// In es, this message translates to:
+  /// **'Grupos en este tapiz'**
+  String get matGroups;
 
   /// No description provided for @matFinished.
   ///
@@ -815,7 +827,7 @@ abstract class AppLocalizations {
   /// No description provided for @scoreboardTitle.
   ///
   /// In es, this message translates to:
-  /// **'Tapiz {mat} · Grupo {group}'**
+  /// **'Tapiz {mat}, grupo {group}'**
   String scoreboardTitle(int mat, int group);
 
   /// No description provided for @cornerRed.
@@ -883,6 +895,18 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'+1'**
   String get addPoint;
+
+  /// No description provided for @addPointFor.
+  ///
+  /// In es, this message translates to:
+  /// **'+1 {corner}'**
+  String addPointFor(String corner);
+
+  /// No description provided for @sanctionsFor.
+  ///
+  /// In es, this message translates to:
+  /// **'Avisos: {corner}'**
+  String sanctionsFor(String corner);
 
   /// No description provided for @warningsCount.
   ///
@@ -1085,7 +1109,7 @@ abstract class AppLocalizations {
   /// No description provided for @matSummary.
   ///
   /// In es, this message translates to:
-  /// **'{groups} grupos · {pending} combates pendientes'**
+  /// **'{groups, plural, =1{1 grupo} other{{groups} grupos}} · {pending, plural, =1{1 combate pendiente} other{{pending} combates pendientes}}'**
   String matSummary(int groups, int pending);
 
   /// No description provided for @matNoReferee.
@@ -1226,18 +1250,6 @@ abstract class AppLocalizations {
   /// **'Fecha'**
   String get settingsDate;
 
-  /// No description provided for @settingsMaxGroups.
-  ///
-  /// In es, this message translates to:
-  /// **'Grupos por tapiz a la vez'**
-  String get settingsMaxGroups;
-
-  /// No description provided for @settingsMaxGroupsHint.
-  ///
-  /// In es, this message translates to:
-  /// **'1 = sin multigrupo'**
-  String get settingsMaxGroupsHint;
-
   /// No description provided for @settingsAddMat.
   ///
   /// In es, this message translates to:
@@ -1339,6 +1351,42 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Grupo individual'**
   String get individualGroup;
+
+  /// No description provided for @teamGroup.
+  ///
+  /// In es, this message translates to:
+  /// **'Grupo por equipos'**
+  String get teamGroup;
+
+  /// No description provided for @matPickerLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Tapiz'**
+  String get matPickerLabel;
+
+  /// No description provided for @matAuto.
+  ///
+  /// In es, this message translates to:
+  /// **'Automático'**
+  String get matAuto;
+
+  /// No description provided for @matAutoOption.
+  ///
+  /// In es, this message translates to:
+  /// **'El que antes quede libre'**
+  String get matAutoOption;
+
+  /// No description provided for @matAutoHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Se asignará automáticamente al tapiz que antes quede libre.'**
+  String get matAutoHint;
+
+  /// No description provided for @matManualHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Irá al {mat}, elegido a mano.'**
+  String matManualHint(String mat);
 
   /// No description provided for @individualGroupHint.
   ///
@@ -2467,6 +2515,144 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'{count, plural, =1{Tienes 1 acción sin enviar; si sales se perderá.} other{Tienes {count} acciones sin enviar; si sales se perderán.}}'**
   String logoutPending(int count);
+
+  /// No description provided for @refusalNotStarted.
+  ///
+  /// In es, this message translates to:
+  /// **'Inicia el tiempo antes de puntuar.'**
+  String get refusalNotStarted;
+
+  /// No description provided for @undoWhat.
+  ///
+  /// In es, this message translates to:
+  /// **'Deshacer: {what}'**
+  String undoWhat(String what);
+
+  /// No description provided for @undoneWhat.
+  ///
+  /// In es, this message translates to:
+  /// **'Deshecho: {what}'**
+  String undoneWhat(String what);
+
+  /// No description provided for @whatPoint.
+  ///
+  /// In es, this message translates to:
+  /// **'+1 {corner}'**
+  String whatPoint(String corner);
+
+  /// No description provided for @whatWarning.
+  ///
+  /// In es, this message translates to:
+  /// **'advertencia {corner}'**
+  String whatWarning(String corner);
+
+  /// No description provided for @whatOneHand.
+  ///
+  /// In es, this message translates to:
+  /// **'una mano {corner}'**
+  String whatOneHand(String corner);
+
+  /// No description provided for @whatDisqualification.
+  ///
+  /// In es, this message translates to:
+  /// **'descalificación {corner}'**
+  String whatDisqualification(String corner);
+
+  /// No description provided for @winner.
+  ///
+  /// In es, this message translates to:
+  /// **'Ganador'**
+  String get winner;
+
+  /// No description provided for @draw.
+  ///
+  /// In es, this message translates to:
+  /// **'Empate'**
+  String get draw;
+
+  /// No description provided for @matLocked.
+  ///
+  /// In es, this message translates to:
+  /// **'No se puede abrir todavía'**
+  String get matLocked;
+
+  /// No description provided for @needsGuardian.
+  ///
+  /// In es, this message translates to:
+  /// **'Falta tutor'**
+  String get needsGuardian;
+
+  /// No description provided for @settingsRemoveMatConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'Se quita el Tapiz {number}; su árbitro deja de estar asignado.'**
+  String settingsRemoveMatConfirm(int number);
+
+  /// No description provided for @draftTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Grupo nuevo'**
+  String get draftTitle;
+
+  /// No description provided for @draftReady.
+  ///
+  /// In es, this message translates to:
+  /// **'Completo'**
+  String get draftReady;
+
+  /// No description provided for @draftMissing.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{Falta 1} other{Faltan {count}}}'**
+  String draftMissing(int count);
+
+  /// No description provided for @draftSlot.
+  ///
+  /// In es, this message translates to:
+  /// **'Hueco {number}'**
+  String draftSlot(int number);
+
+  /// No description provided for @ghostOf.
+  ///
+  /// In es, this message translates to:
+  /// **'{name} (fantasma)'**
+  String ghostOf(String name);
+
+  /// No description provided for @settingsAppearance.
+  ///
+  /// In es, this message translates to:
+  /// **'Apariencia'**
+  String get settingsAppearance;
+
+  /// No description provided for @settingsAppearanceHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Automático sigue al modo claro u oscuro del dispositivo. Se guarda solo en este dispositivo.'**
+  String get settingsAppearanceHint;
+
+  /// No description provided for @themeSystem.
+  ///
+  /// In es, this message translates to:
+  /// **'Automático'**
+  String get themeSystem;
+
+  /// No description provided for @themeLight.
+  ///
+  /// In es, this message translates to:
+  /// **'Claro'**
+  String get themeLight;
+
+  /// No description provided for @themeDark.
+  ///
+  /// In es, this message translates to:
+  /// **'Oscuro'**
+  String get themeDark;
+
+  /// No description provided for @refusalStale.
+  ///
+  /// In es, this message translates to:
+  /// **'El combate ha cambiado en otro dispositivo. Revisa el marcador y vuelve a pulsar.'**
+  String get refusalStale;
 }
 
 class _AppLocalizationsDelegate

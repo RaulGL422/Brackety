@@ -49,6 +49,10 @@
 - [ ] Portátil del pabellón: ¿BitLocker activo? Confirmar el borrado de `brackety-data/` y del paquete tras la fase (`servidor-local.md`).
 - [ ] Móviles de árbitros y ayudantes: ¿todos Android y con permiso para instalar la APK? Si hay iPhone, ese usa la web (sin offline).
 
+- [ ] Revisión del 2026-11-06 (`revision-f1.md`): lo que quede abierto tras la fase pasa aquí.
+- [ ] Refresh idempotente (`SessionService`): la caché vive en memoria y supone una sola instancia de la API (vale para el portátil y la Pi).
+- [ ] `docs/decisiones.md` está en 150 líneas: dividirlo antes de añadir más.
+
 - [ ] Importación de alumnos: aceptar el DPA de Anthropic en su consola y confirmar el plazo de conservación de datos de la API (`modulos/importacion-alumnos.md`).
 
 ## Repositorio público
@@ -71,6 +75,15 @@
 - [ ] Recopilar el reglamento completo en PDF para consulta cerca del marcador.
 - [ ] Confirmar orden de fases: deducido del Registro general (F1 suelo, F2 armas, F3 expresión técnica, F4 derribos).
 
+## Diseño tras la Fase 1 (revisión con Playwright, 2026-11-07)
+- [ ] Escritorio: Configuración, Puntuaciones y Tapices ocupan todo el ancho; aplicar anchos de formulario (480) y lectura (720) de `07-diseno.md` (el tablero del árbitro ya lo hace).
+- [ ] Escritorio con más información por pantalla (maquetas del canvas, 2026-11-09; después de la F1): mesa del club con pestañas arriba y totales, tabla de tapices (combate en curso con marcador, siguiente, grupo con avance, árbitro, hora de fin), "Pendiente de ti", avance por categoría y últimos resultados; crear grupo con tabla de alumnos y huecos con edad y estatura. Raul quiere la **previsión del día** por tapiz (jugado, en curso, por jugar): necesita en el servidor la duración media de los combates por categoría y la hora estimada de fin de cada grupo.
+- [ ] Sistema neutro en el resto de pantallas: maquetas antes de programar (inicio, login, mesa del club como planta de tapices, inscripciones, ajustes, admin). Quitar los textos con punto medio ("6 años · 132 cm") en favor de columnas con etiqueta.
+- [ ] Web sin conexión (offline), después de la F1, en dos pasos. 1) Con la pestaña abierta: cola del marcador guardada en el navegador y enviada al volver la red (vale en http y https). 2) Completa por https (`brackety.rgal.dev`): la app se guarda en el navegador y abre sin red. En http (pabellón) el navegador no permite el paso 2. Útil sobre todo para iPhone. Aprobado por Raul el 2026-11-08.
+- [ ] "Tapiz" fijo en los textos: en otros deportes será Pista, Campo… Debe salir del nombre de la ubicación del evento (módulo `eventos`).
+- [ ] Lector de pantalla: la lista de Puntuaciones se lee como un único bloque; una fila por alumno.
+- [ ] Quitar `maxGroupsPerMat` del servidor (BD, API, paquete con nueva `schemaVersion`) y del límite de grupos por petición; la app ya no lo usa.
+
 ## Producto
 - [ ] Grupo con sobrante: opciones (promedio por combate / puntos brutos / decidir caso a caso) y respuesta final del organizador; será opción del evento.
 - [ ] Modelo exacto de equipos en torneos por equipos (plantilla, suplentes, entrenadores).
@@ -82,6 +95,10 @@
 ## Hecho
 - 2026-10-30 · Tokens de acceso y reauth emitidos antes de un cambio de credenciales o borrado se rechazan (`sessions_revoked_at`).
 - 2026-10-30 · Cuenta en borrado lógico: durante 30 días el dueño la reactiva al iniciar sesión (`ACCOUNT_PENDING_DELETION` + restaurar); registrarse con ese email avisa al dueño y no crea otra.
+- 2026-11-08 · Dirección de diseño Tatami (claro y oscuro) aceptada por Raul; sustituye a Eléctrico y Barlow.
+- 2026-11-08 · Tatami sustituido por el sistema neutro multideporte con Atkinson Hyperlegible Next (Raul).
+- 2026-11-08 · Modo claro u oscuro fijable en Ajustes (Automático, Claro, Oscuro), guardado en el dispositivo.
 - 2026-10-30 · Sistema de diseño validado: paleta Eléctrico y Barlow.
 - 2026-10-28 · Android cmdline-tools instaladas; `flutter doctor` sin errores para Android y web.
 - 2026-10-28 · Graphify configurado a partir de ClipHive (`CLAUDE.md`, `.gitignore`).
+- 2026-11-09 · Marcador web: `knownEvents` obligatorio; dos pestañas a la vez ya no suman dos (409 `MATCH_STALE`).

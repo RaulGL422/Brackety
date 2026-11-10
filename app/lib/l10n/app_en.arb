@@ -158,18 +158,8 @@
       }
     }
   },
-  "draftCount": "{count}/4",
-  "@draftCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "draftGhost": "Ghost competitor",
   "draftGhostHint": "Pick the ghost: fights but does not score.",
-  "draftAddGroup": "Add group",
-  "draftRemoveGroup": "Remove group",
   "createGroup": "{count, plural, =1{Create group} other{Create groups}}",
   "@createGroup": {
     "placeholders": {
@@ -186,32 +176,34 @@
       }
     }
   },
-  "groupsCreatedBody": "{groups} → Mat {mat}",
-  "@groupsCreatedBody": {
-    "placeholders": {
-      "groups": {
-        "type": "String"
-      },
-      "mat": {
-        "type": "int"
-      }
-    }
-  },
-  "groupsConflict": "A participant is already in a group. The list has been refreshed.",
-  "groupsError": "The groups could not be created.",
+  "groupsConflict": "A participant is already in a group or the mat has lost its referee. The list has been refreshed.",
+  "groupsError": "The group could not be created.",
   "ok": "OK",
   "ghostBadge": "Ghost",
   "matTitle": "Mat {number}",
   "matEmpty": "No groups on this mat yet.",
-  "matGroupHeader": "Group {number} · ages {category}",
-  "matRecommended": "Recommended next",
+  "matGroupHeader": "Group {number}, ages {category}",
+  "matRecommended": "Next match",
   "matInProgress": "In progress",
-  "matPending": "Pending",
+  "matPending": "Later",
+  "matYours": "Your mat",
+  "matToPlay": "{count} to play",
+  "@matToPlay": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "matOpenScoreboard": "Open the scoreboard",
+  "matBackToScoreboard": "Back to the scoreboard",
+  "matWatch": "Watch the match",
+  "matGroups": "Groups on this mat",
   "matFinished": "Finished",
   "matWaiting": "A fighter is in a match right now",
   "matNoneAvailable": "No match can start right now.",
   "versus": "vs",
-  "scoreboardTitle": "Mat {mat} · Group {group}",
+  "scoreboardTitle": "Mat {mat}, group {group}",
   "cornerRed": "Red",
   "cornerBlue": "Blue",
   "clockStart": "Start",
@@ -223,6 +215,10 @@
   "undo": "Undo",
   "timeline": "Timeline",
   "addPoint": "+1",
+  "addPointFor": "+1 {corner}",
+  "@addPointFor": {"placeholders": {"corner": {"type": "String"}}},
+  "sanctionsFor": "Warnings: {corner}",
+  "@sanctionsFor": {"placeholders": {"corner": {"type": "String"}}},
   "warningsCount": "Warnings: {count}",
   "oneHandCount": "One hand: {count}",
   "disqualified": "Disqualified",
@@ -256,7 +252,7 @@
   "standingsTotal": "{total} pts",
   "standingsDetail": "Attendance {attendance} · Matches {points} ({matches})",
   "matsEmpty": "No mats.",
-  "matSummary": "{groups} groups · {pending} pending matches",
+  "matSummary": "{groups, plural, =1{1 group} other{{groups} groups}} · {pending, plural, =1{1 pending match} other{{pending} pending matches}}",
   "matNoReferee": "No referee",
   "matEstimatedEnd": "Estimated end {time}",
   "matFighting": "Match in progress",
@@ -280,8 +276,6 @@
   "saveError": "Could not save.",
   "settingsName": "Event name",
   "settingsDate": "Date",
-  "settingsMaxGroups": "Groups per mat at once",
-  "settingsMaxGroupsHint": "1 = no multigroup",
   "settingsAddMat": "Add mat",
   "settingsRemoveMat": "Remove the last mat",
   "settingsReferee": "Referee",
@@ -299,6 +293,13 @@
   "tabParticipants": "Participants",
   "tabTeams": "Teams",
   "individualGroup": "Individual group",
+  "teamGroup": "Team group",
+  "matPickerLabel": "Mat",
+  "matAuto": "Automatic",
+  "matAutoOption": "The one free first",
+  "matAutoHint": "It is assigned automatically to the mat that will be free first.",
+  "matManualHint": "It goes to {mat}, picked by hand.",
+  "@matManualHint": {"placeholders": {"mat": {"type": "String"}}},
   "individualGroupHint": "For those left without a team: groups of 4 participants.",
   "categoryTeamCounts": "{participants} registered · {teams} teams · {grouped} in groups",
   "newTeamCount": "New team · {count}/{size}",
@@ -486,5 +487,31 @@
   "reviewApplied": "Applied: {applied} · Skipped: {skipped}",
   "reviewDiscarded": "Actions discarded.",
   "matsInReview": "{count, plural, =1{1 match under review} other{{count} matches under review}}",
-  "logoutPending": "{count, plural, =1{You have 1 action not sent yet; if you sign out it will be lost.} other{You have {count} actions not sent yet; if you sign out they will be lost.}}"
+  "logoutPending": "{count, plural, =1{You have 1 action not sent yet; if you sign out it will be lost.} other{You have {count} actions not sent yet; if you sign out they will be lost.}}",
+  "refusalNotStarted": "Start the clock before scoring.",
+  "undoWhat": "Undo: {what}",
+  "undoneWhat": "Undone: {what}",
+  "whatPoint": "+1 {corner}",
+  "whatWarning": "{corner} warning",
+  "whatOneHand": "{corner} one-hand warning",
+  "whatDisqualification": "{corner} disqualification",
+  "winner": "Winner",
+  "draw": "Draw",
+  "matLocked": "Cannot open yet",
+  "needsGuardian": "Guardian missing",
+  "settingsRemoveMatConfirm": "Mat {number} is removed; its referee is no longer assigned.",
+  "draftTitle": "New group",
+  "draftReady": "Complete",
+  "draftMissing": "{count} to go",
+  "@draftMissing": {"placeholders": {"count": {"type": "int"}}},
+  "draftSlot": "Slot {number}",
+  "@draftSlot": {"placeholders": {"number": {"type": "int"}}},
+  "ghostOf": "{name} (ghost)",
+  "@ghostOf": {"placeholders": {"name": {"type": "String"}}},
+  "settingsAppearance": "Appearance",
+  "settingsAppearanceHint": "Automatic follows the device's light or dark mode. It is saved on this device only.",
+  "themeSystem": "Automatic",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "refusalStale": "The match changed on another device. Check the scoreboard and press again."
 }

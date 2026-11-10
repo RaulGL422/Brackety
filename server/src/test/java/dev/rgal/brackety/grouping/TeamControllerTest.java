@@ -328,9 +328,9 @@ class TeamControllerTest extends EventApiTest {
 
     private void referee(UUID match, String type, String side) throws Exception {
         call(
-                        post("/api/v1/matches/" + match + "/events")
-                                .content("""
-                                {"type":"%s","side":%s,"reason":null}""".formatted(type, side == null ? "null" : "\"" + side + "\"")),
+                        post("/api/v1/matches/" + match + "/events").content("""
+                                {"type":"%s","side":%s,"reason":null,"knownEvents":%d}""".formatted(
+                                        type, side == null ? "null" : "\"" + side + "\"", knownEvents(match))),
                         "arbitro1")
                 .andExpect(status().isOk());
     }

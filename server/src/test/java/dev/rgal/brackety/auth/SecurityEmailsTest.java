@@ -122,7 +122,7 @@ class SecurityEmailsTest extends AuthIntegrationTest {
         emails.reset();
 
         clock.advance(Duration.ofSeconds(10));
-        assertThatThrownBy(() -> sessions.refresh(first.refreshToken()));
+        sessions.refresh(first.refreshToken());
         assertThat(emails.sent()).isEmpty();
 
         clock.advance(Duration.ofSeconds(1));

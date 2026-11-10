@@ -68,7 +68,7 @@ class EventPackageServiceTest extends EventApiTest {
         var file = json.writeValueAsBytes(exported);
         emptyDatabase();
 
-        var loaded = packages.export(packages.load(file), accountId("club1"));
+        var loaded = packages.export(packages.load(file).eventId(), accountId("club1"));
 
         assertThat(loaded.event()).isEqualTo(exported.event());
         assertThat(loaded.owner()).isEqualTo(exported.owner());
@@ -85,15 +85,28 @@ class EventPackageServiceTest extends EventApiTest {
     }
 
     @Test
-    void createsTheStaffAccountsVerifiedWithTheUsernameAsPassword() {
+    void createsTheStaffAccountsVerifiedWithRandomPasswords() {
         var file = exportFile();
         emptyDatabase();
 
-        packages.load(file);
+        var created = packages.load(file).newAccounts();
 
         assertThat(count("account")).isEqualTo(STAFF);
-        assertThat(auth.login("arbitro1", "arbitro1", "127.0.0.1").emailVerified())
+        assertThat(created).hasSize(STAFF);
+        var referee = created.stream()
+                .filter(a -> a.username().equals("arbitro1"))
+                .findFirst()
+                .orElseThrow();
+        assertThat(referee.roles()).isEqualTo("REFEREE");
+        assertThat(referee.mats()).isEqualTo("1");
+        assertThat(referee.password())
+                .hasSize(StaffPasswords.LENGTH)
+                .matches("[" + StaffPasswords.ALPHABET + "]+")
+                .doesNotContain("l", "1", "o", "0");
+        assertThat(auth.login("arbitro1", referee.password(), "127.0.0.1").emailVerified())
                 .isTrue();
+        assertThatThrownBy(() -> auth.login("arbitro1", "arbitro1", "127.0.0.1"));
+        assertThat(created).extracting(LoadedPackage.NewAccount::password).doesNotHaveDuplicates();
         assertThat(jdbc.sql("select organization_name from profile p join account a on a.id = p.account_id"
                                 + " where a.email = 'club1' and p.type = 'CLUB'")
                         .query(String.class)
@@ -107,10 +120,14 @@ class EventPackageServiceTest extends EventApiTest {
         emptyDatabase();
         auth.register(registration("ayudante1", ProfileType.HELPER, "es"));
 
-        packages.load(file);
+        var created = packages.load(file).newAccounts();
 
         assertThat(count("account")).isEqualTo(STAFF);
         assertThat(auth.login("ayudante1", PASSWORD, "127.0.0.1").accessToken()).isNotBlank();
+        assertThat(created)
+                .extracting(LoadedPackage.NewAccount::username)
+                .hasSize(STAFF - 1)
+                .doesNotContain("ayudante1");
     }
 
     @Test
@@ -165,7 +182,8 @@ class EventPackageServiceTest extends EventApiTest {
     @Test
     void theStartupLoaderLoadsTheFileOrStopsWithTheReason(@TempDir Path dir) throws Exception {
         var file = Files.write(dir.resolve("f1.brackety"), exportFile());
-        var loader = new EventPackageLoader(packages, file.toString());
+        var credentials = dir.resolve("credentials.txt");
+        var loader = new EventPackageLoader(packages, file.toString(), credentials.toString());
 
         assertThatThrownBy(loader::afterSingletonsInstantiated)
                 .isInstanceOf(IllegalStateException.class)
@@ -174,6 +192,28 @@ class EventPackageServiceTest extends EventApiTest {
         emptyDatabase();
         loader.afterSingletonsInstantiated();
         assertThat(count("participant")).isEqualTo(PARTICIPANTS);
+        var lines = Files.readAllLines(credentials);
+        assertThat(lines).hasSize(STAFF + 1).first().isEqualTo(EventPackageLoader.CREDENTIALS_HEADER);
+        var referee = lines.stream()
+                .filter(l -> l.startsWith("arbitro2;"))
+                .findFirst()
+                .orElseThrow()
+                .split(";");
+        assertThat(referee).hasSize(4);
+        assertThat(referee[1]).isEqualTo("REFEREE");
+        assertThat(referee[3]).isEqualTo("2");
+        assertThat(auth.login("arbitro2", referee[2], "127.0.0.1").accessToken())
+                .isNotBlank();
+    }
+
+    @Test
+    void theStartupLoaderNeedsTheCredentialsFile(@TempDir Path dir) throws Exception {
+        var file = Files.write(dir.resolve("f1.brackety"), exportFile());
+        emptyDatabase();
+
+        assertThatThrownBy(new EventPackageLoader(packages, file.toString(), " ")::afterSingletonsInstantiated)
+                .hasMessageContaining("BRACKETY_PACKAGE_CREDENTIALS is required");
+        assertThat(count("account")).isZero();
     }
 
     private record Case(Consumer<ObjectNode> change, String message) {}

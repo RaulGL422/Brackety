@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/board_finders.dart';
+
 void main() {
   const sizes = {
     'phone': Size(360, 800),
@@ -86,15 +88,146 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('Mat 2'), findsOneWidget);
-        expect(find.text('Group 3 · ages 7-8'), findsOneWidget);
-        expect(find.text('Recommended next'), findsOneWidget);
-        expect(find.text('Ana  vs  Carla'), findsOneWidget);
+        expect(find.text('Group 3, ages 7-8'), findsNWidgets(2));
+        expect(find.text('Next match'), findsOneWidget);
+        expect(find.text('2 to play'), findsOneWidget);
+        expect(matchTile('Ana', 'Carla'), findsOneWidget);
         expect(find.text('A fighter is in a match right now'), findsOneWidget);
         expect(find.text('4 - 15'), findsOneWidget);
         expect(tester.takeException(), isNull);
       },
     );
+
+    testWidgets(
+      'in progress and recommended stand apart and a waiting match is locked on $device',
+      (tester) async {
+        tester.view.physicalSize = size;
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        final live = MatBoard(
+          matNumber: 2,
+          groups: board.groups,
+          matches: [
+            match('m0', bea, carla, MatchStatus.inProgress),
+            ...board.matches,
+          ],
+          recommendedMatchId: 'm3',
+        );
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              offlineEnabledProvider.overrideWithValue(false),
+              matBoardProvider.overrideWith((ref, matId) async => live),
+            ],
+            child: MaterialApp(
+              theme: lightTheme(),
+              localizationsDelegates: const [
+                AppLocalizations.delegate,
+                ...coreLocalizationsDelegates,
+              ],
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: const MatBoardScreen(matId: 'mat2'),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final scheme = Theme.of(tester.element(find.byType(ListView)))
+            .colorScheme;
+        Finder card(Finder tile) =>
+            find.ancestor(of: tile, matching: find.byType(Card)).first;
+        ListTile tile(Finder tile) => tester.widget<ListTile>(tile);
+
+        final inProgress = card(matchTile('Bea', 'Carla'));
+        expect(
+          find.descendant(of: inProgress, matching: find.text('In progress')),
+          findsOneWidget,
+        );
+        expect(
+          find.descendant(
+            of: inProgress,
+            matching: find.text('Back to the scoreboard'),
+          ),
+          findsOneWidget,
+        );
+
+        final recommended = card(matchTile('Ana', 'Carla'));
+        expect(
+          find.descendant(of: recommended, matching: find.text('Next match')),
+          findsOneWidget,
+        );
+        expect(
+          find.descendant(
+            of: recommended,
+            matching: find.text('Open the scoreboard'),
+          ),
+          findsOneWidget,
+        );
+        // Next stands out by a thick ink frame, not by a colour a competitor may wear.
+        final frame =
+            tester.widget<Card>(recommended).shape! as RoundedRectangleBorder;
+        expect(frame.side.color, scheme.onSurface);
+        expect(frame.side.width, 3);
+
+        final waiting = matchTile('Carla', 'Diego · Ghost');
+        expect(tile(waiting).onTap, isNull);
+        expect(tile(waiting).enabled, isTrue);
+        expect(
+          find.descendant(
+            of: waiting,
+            matching: find.byIcon(Icons.lock_outline),
+          ),
+          findsOneWidget,
+        );
+        // The group is its number in ink: a colour could be taken for a competitor's.
+        final badge = tester.widget<Container>(
+          find
+              .ancestor(
+                of: find.descendant(of: waiting, matching: find.text('3')),
+                matching: find.byType(Container),
+              )
+              .first,
+        );
+        expect(
+          (badge.decoration! as BoxDecoration).color,
+          scheme.inverseSurface,
+        );
+        expect(tester.takeException(), isNull);
+      },
+    );
   }
+
+  testWidgets('the title says the mat while the board fails to load', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        retry: (_, _) => null,
+        overrides: [
+          offlineEnabledProvider.overrideWithValue(false),
+          matBoardProvider.overrideWith(
+            (ref, matId) async => throw Exception('down'),
+          ),
+        ],
+        child: MaterialApp(
+          theme: lightTheme(),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            ...coreLocalizationsDelegates,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const MatBoardScreen(matId: 'mat2', matNumber: 2),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    expect(find.text('Mat 2'), findsOneWidget);
+    expect(find.text('Retry'), findsOneWidget);
+  });
+
   testWidgets('the club can open a match that waits for a fighter', (
     tester,
   ) async {
@@ -118,12 +251,9 @@ void main() {
     await tester.pumpAndSettle();
 
     final waiting = tester.widget<ListTile>(
-      find.ancestor(
-        of: find.text('Carla  vs  Diego · Ghost'),
-        matching: find.byType(ListTile),
-      ),
+      matchTile('Carla', 'Diego · Ghost'),
     );
-    expect(waiting.enabled, isTrue);
+    expect(waiting.onTap, isNotNull);
   });
 
   test('a team fighter has no participant id and keeps its members', () {
@@ -187,7 +317,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Team 1  vs  Team 2'), findsOneWidget);
+      expect(matchTile('Team 1', 'Team 2'), findsOneWidget);
       expect(find.text('Team 4 · Ghost'), findsOneWidget);
       expect(find.text('A1, B1, C1'), findsOneWidget);
       expect(tester.takeException(), isNull);

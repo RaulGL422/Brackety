@@ -159,18 +159,8 @@
       }
     }
   },
-  "draftCount": "{count}/4",
-  "@draftCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "draftGhost": "Competidor fantasma",
   "draftGhostHint": "Elige al fantasma: combate pero no puntúa.",
-  "draftAddGroup": "Añadir grupo",
-  "draftRemoveGroup": "Quitar grupo",
   "createGroup": "{count, plural, =1{Crear grupo} other{Crear grupos}}",
   "@createGroup": {
     "placeholders": {
@@ -187,19 +177,8 @@
       }
     }
   },
-  "groupsCreatedBody": "{groups} → Tapiz {mat}",
-  "@groupsCreatedBody": {
-    "placeholders": {
-      "groups": {
-        "type": "String"
-      },
-      "mat": {
-        "type": "int"
-      }
-    }
-  },
-  "groupsConflict": "Algún alumno ya está en un grupo. La lista se ha actualizado.",
-  "groupsError": "No se han podido crear los grupos.",
+  "groupsConflict": "Algún alumno ya está en un grupo o el tapiz se ha quedado sin árbitro. La lista se ha actualizado.",
+  "groupsError": "No se ha podido crear el grupo.",
   "ok": "Aceptar",
   "ghostBadge": "Fantasma",
   "matTitle": "Tapiz {number}",
@@ -211,7 +190,7 @@
     }
   },
   "matEmpty": "Todavía no hay grupos en este tapiz.",
-  "matGroupHeader": "Grupo {number} · {category} años",
+  "matGroupHeader": "Grupo {number}, de {category} años",
   "@matGroupHeader": {
     "placeholders": {
       "number": {
@@ -222,14 +201,27 @@
       }
     }
   },
-  "matRecommended": "Siguiente recomendado",
+  "matRecommended": "Siguiente combate",
   "matInProgress": "En curso",
-  "matPending": "Pendientes",
+  "matPending": "Después",
+  "matYours": "Tu tapiz",
+  "matToPlay": "{count, plural, =1{1 por jugar} other{{count} por jugar}}",
+  "@matToPlay": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "matOpenScoreboard": "Abrir el marcador",
+  "matBackToScoreboard": "Volver al marcador",
+  "matWatch": "Ver el combate",
+  "matGroups": "Grupos en este tapiz",
   "matFinished": "Terminados",
   "matWaiting": "Un luchador está combatiendo ahora",
   "matNoneAvailable": "Ningún combate puede empezar ahora.",
   "versus": "vs",
-  "scoreboardTitle": "Tapiz {mat} · Grupo {group}",
+  "scoreboardTitle": "Tapiz {mat}, grupo {group}",
   "@scoreboardTitle": {
     "placeholders": {
       "mat": {
@@ -251,6 +243,10 @@
   "undo": "Deshacer",
   "timeline": "Línea de tiempo",
   "addPoint": "+1",
+  "addPointFor": "+1 {corner}",
+  "@addPointFor": {"placeholders": {"corner": {"type": "String"}}},
+  "sanctionsFor": "Avisos: {corner}",
+  "@sanctionsFor": {"placeholders": {"corner": {"type": "String"}}},
   "warningsCount": "Advertencias: {count}",
   "@warningsCount": {
     "placeholders": {
@@ -335,7 +331,7 @@
     }
   },
   "matsEmpty": "No hay tapices.",
-  "matSummary": "{groups} grupos · {pending} combates pendientes",
+  "matSummary": "{groups, plural, =1{1 grupo} other{{groups} grupos}} · {pending, plural, =1{1 combate pendiente} other{{pending} combates pendientes}}",
   "@matSummary": {
     "placeholders": {
       "groups": {
@@ -393,8 +389,6 @@
   "saveError": "No se ha podido guardar.",
   "settingsName": "Nombre del evento",
   "settingsDate": "Fecha",
-  "settingsMaxGroups": "Grupos por tapiz a la vez",
-  "settingsMaxGroupsHint": "1 = sin multigrupo",
   "settingsAddMat": "Añadir tapiz",
   "settingsRemoveMat": "Quitar el último tapiz",
   "settingsReferee": "Árbitro",
@@ -427,6 +421,13 @@
   "tabParticipants": "Alumnos",
   "tabTeams": "Equipos",
   "individualGroup": "Grupo individual",
+  "teamGroup": "Grupo por equipos",
+  "matPickerLabel": "Tapiz",
+  "matAuto": "Automático",
+  "matAutoOption": "El que antes quede libre",
+  "matAutoHint": "Se asignará automáticamente al tapiz que antes quede libre.",
+  "matManualHint": "Irá al {mat}, elegido a mano.",
+  "@matManualHint": {"placeholders": {"mat": {"type": "String"}}},
   "individualGroupHint": "Para quien se quede sin equipo: grupos de 4 alumnos.",
   "categoryTeamCounts": "{participants} inscritos · {teams} equipos · {grouped} en grupos",
   "@categoryTeamCounts": {"placeholders": {"participants": {"type": "int"}, "teams": {"type": "int"}, "grouped": {"type": "int"}}},
@@ -649,5 +650,38 @@
   "matsInReview": "{count, plural, =1{1 combate en revisión} other{{count} combates en revisión}}",
   "@matsInReview": {"placeholders": {"count": {"type": "int"}}},
   "logoutPending": "{count, plural, =1{Tienes 1 acción sin enviar; si sales se perderá.} other{Tienes {count} acciones sin enviar; si sales se perderán.}}",
-  "@logoutPending": {"placeholders": {"count": {"type": "int"}}}
+  "@logoutPending": {"placeholders": {"count": {"type": "int"}}},
+  "refusalNotStarted": "Inicia el tiempo antes de puntuar.",
+  "undoWhat": "Deshacer: {what}",
+  "@undoWhat": {"placeholders": {"what": {"type": "String"}}},
+  "undoneWhat": "Deshecho: {what}",
+  "@undoneWhat": {"placeholders": {"what": {"type": "String"}}},
+  "whatPoint": "+1 {corner}",
+  "@whatPoint": {"placeholders": {"corner": {"type": "String"}}},
+  "whatWarning": "advertencia {corner}",
+  "@whatWarning": {"placeholders": {"corner": {"type": "String"}}},
+  "whatOneHand": "una mano {corner}",
+  "@whatOneHand": {"placeholders": {"corner": {"type": "String"}}},
+  "whatDisqualification": "descalificación {corner}",
+  "@whatDisqualification": {"placeholders": {"corner": {"type": "String"}}},
+  "winner": "Ganador",
+  "draw": "Empate",
+  "matLocked": "No se puede abrir todavía",
+  "needsGuardian": "Falta tutor",
+  "settingsRemoveMatConfirm": "Se quita el Tapiz {number}; su árbitro deja de estar asignado.",
+  "@settingsRemoveMatConfirm": {"placeholders": {"number": {"type": "int"}}},
+  "draftTitle": "Grupo nuevo",
+  "draftReady": "Completo",
+  "draftMissing": "{count, plural, =1{Falta 1} other{Faltan {count}}}",
+  "@draftMissing": {"placeholders": {"count": {"type": "int"}}},
+  "draftSlot": "Hueco {number}",
+  "@draftSlot": {"placeholders": {"number": {"type": "int"}}},
+  "ghostOf": "{name} (fantasma)",
+  "@ghostOf": {"placeholders": {"name": {"type": "String"}}},
+  "settingsAppearance": "Apariencia",
+  "settingsAppearanceHint": "Automático sigue al modo claro u oscuro del dispositivo. Se guarda solo en este dispositivo.",
+  "themeSystem": "Automático",
+  "themeLight": "Claro",
+  "themeDark": "Oscuro",
+  "refusalStale": "El combate ha cambiado en otro dispositivo. Revisa el marcador y vuelve a pulsar."
 }

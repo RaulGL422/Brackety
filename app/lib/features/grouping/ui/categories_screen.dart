@@ -32,7 +32,8 @@ class CategoriesScreen extends ConsumerWidget {
                   separatorBuilder: (_, _) => const Divider(height: 1),
                   itemBuilder: (context, i) {
                     final c = categories[i];
-                    final done = c.grouped == c.participants;
+                    final done =
+                        c.participants > 0 && c.grouped == c.participants;
                     return ListTile(
                       title: Text(l10n.categoryAges(c.name)),
                       subtitle: Text(

@@ -236,14 +236,20 @@ class AuthControllerTest extends AuthIntegrationTest {
     }
 
     @Test
-    void reusedRefreshIsUnauthorized() throws Exception {
+    void aRepeatedRefreshGetsTheSamePairUntilTheGraceEndsAndThenIsUnauthorized() throws Exception {
         registerAna();
         var refresh = refreshTokenOf(login(null, "ana@example.test"));
         var body = "{\"refreshToken\":\"%s\"}".formatted(refresh);
-        mvc.perform(post("/api/v1/auth/refresh")
+        var issued = refreshTokenOf(mvc.perform(post("/api/v1/auth/refresh")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(body));
+                .content(body)));
 
+        mvc.perform(post("/api/v1/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.refreshToken").value(issued));
+        clock.advance(Duration.ofSeconds(11));
         mvc.perform(post("/api/v1/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))

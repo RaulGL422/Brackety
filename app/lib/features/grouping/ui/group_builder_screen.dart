@@ -1,63 +1,68 @@
 import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/async_view.dart';
-import '../../../core/group_colors.dart';
 import '../../../l10n/gen/app_localizations.dart';
-import '../../events/state/events_providers.dart';
 import '../data/grouping_models.dart';
 import '../state/group_draft.dart';
 import '../state/grouping_providers.dart';
 import 'create_groups.dart';
 import 'draft_panel.dart';
+import 'pick_mark.dart';
 
-/// A category's participants: pick 4 (or 3 and a ghost) per group and send them to a mat.
+/// A category's participants: pick 4 (or 3 and a ghost) and send them to a mat.
+/// Opened from a team category ([teamSize] set) for those left without a team, with a way back.
 class GroupBuilderScreen extends ConsumerStatefulWidget {
   const GroupBuilderScreen({
     super.key,
     required this.eventId,
     required this.categoryId,
     this.categoryName,
+    this.teamSize,
   });
 
   final String eventId;
   final String categoryId;
   final String? categoryName;
 
+  /// Set when opened from a team category.
+  final int? teamSize;
+
   @override
   ConsumerState<GroupBuilderScreen> createState() => _GroupBuilderScreenState();
 }
 
 class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
-  GroupDraft? _draft;
+  var _group = const DraftGroup();
+  String? _matId;
   var _sort = ParticipantSort.name;
   var _busy = false;
 
   CategoryKey get _key =>
       (eventId: widget.eventId, categoryId: widget.categoryId);
 
-  Future<void> _create(GroupDraft draft) async {
+  Future<void> _create() async {
     setState(() => _busy = true);
-    final created = await createGroups(
+    final created = await createGroup(
       context,
       ref,
       eventId: widget.eventId,
       categoryId: widget.categoryId,
-      draft: draft,
+      group: _group,
+      matId: _matId,
       refresh: _refresh,
     );
     if (!mounted) return;
     setState(() {
       _busy = false;
-      if (created) _draft = GroupDraft(maxGroups: draft.maxGroups);
+      if (created) {
+        _group = const DraftGroup();
+        _matId = null;
+      }
     });
   }
-
-  void _change(GroupDraft Function(GroupDraft) change, int maxGroups) =>
-      setState(
-        () => _draft = change(_draft ?? GroupDraft(maxGroups: maxGroups)),
-      );
 
   void _refresh() {
     ref.invalidate(categoryParticipantsProvider(_key));
@@ -67,15 +72,22 @@ class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final maxGroups =
-        ref.watch(myEventProvider(widget.eventId)).value?.maxGroupsPerMat ?? 1;
-    final draft = _draft ?? GroupDraft(maxGroups: maxGroups);
     final participants = ref.watch(categoryParticipantsProvider(_key));
     final panel = DraftPanel(
-      draft: draft,
+      eventId: widget.eventId,
+      group: _group,
+      matId: _matId,
       busy: _busy,
-      onChanged: (change) => _change(change, maxGroups),
-      onCreate: () => _create(draft),
+      onChanged: (change) => setState(() => _group = change(_group)),
+      onMatChanged: (id) => setState(() => _matId = id),
+      onCreate: _create,
+      labelOf: (id) {
+        final p = participants.value?.where((p) => p.id == id).firstOrNull;
+        if (p == null) return '';
+        return p.lastName.isEmpty
+            ? p.firstName
+            : '${p.firstName} ${p.lastName.characters.first}.';
+      },
     );
     final list = AsyncView(
       value: participants,
@@ -89,10 +101,12 @@ class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
             itemCount: sorted.length,
             itemBuilder: (context, i) => _ParticipantTile(
               participant: sorted[i],
-              draft: draft,
-              onTap: () => _change(
-                (d) => d.toggle(sorted[i].id, grouped: sorted[i].isTaken),
-                maxGroups,
+              group: _group,
+              onTap: () => setState(
+                () => _group = _group.toggle(
+                  sorted[i].id,
+                  grouped: sorted[i].isTaken,
+                ),
               ),
             ),
           ),
@@ -107,6 +121,24 @@ class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
               ? l10n.categoriesTitle
               : l10n.categoryAges(widget.categoryName!),
         ),
+        actions: [
+          if (widget.teamSize != null)
+            TextButton.icon(
+              icon: const Icon(Icons.groups_outlined),
+              label: Text(l10n.teamGroup),
+              // Replaces this screen, so back goes to the categories.
+              onPressed: () => context.pushReplacement(
+                Uri(
+                  path:
+                      '/events/${widget.eventId}/categories/${widget.categoryId}/teams',
+                  queryParameters: {
+                    'name': widget.categoryName ?? '',
+                    'size': '${widget.teamSize}',
+                  },
+                ).toString(),
+              ),
+            ),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(
             AppSizes.touchTarget + AppSpacing.m,
@@ -155,20 +187,19 @@ class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
 class _ParticipantTile extends StatelessWidget {
   const _ParticipantTile({
     required this.participant,
-    required this.draft,
+    required this.group,
     required this.onTap,
   });
 
   final CategoryParticipant participant;
-  final GroupDraft draft;
+  final DraftGroup group;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final p = participant;
-    final state = draft.stateOf(p.id, grouped: p.isTaken);
-    final draftIndex = draft.groupOf(p.id);
+    final state = group.stateOf(p.id, grouped: p.isTaken);
     final height = p.heightCm == null
         ? l10n.heightUnknown
         : l10n.heightCm(p.heightCm!);
@@ -176,7 +207,7 @@ class _ParticipantTile extends StatelessWidget {
     return ListTile(
       enabled: state != PickState.unavailable,
       onTap: onTap,
-      leading: _PickMark(state: state, draftIndex: draftIndex),
+      leading: PickMark(state: state, onTap: onTap),
       title: Text(p.fullName),
       subtitle: Text(
         [
@@ -189,33 +220,6 @@ class _ParticipantTile extends StatelessWidget {
       trailing: state == PickState.ghost
           ? Chip(label: Text(l10n.ghostBadge))
           : null,
-    );
-  }
-}
-
-/// Checkbox-like mark in the colour and number of the draft group the participant is in.
-class _PickMark extends StatelessWidget {
-  const _PickMark({required this.state, required this.draftIndex});
-
-  final PickState state;
-  final int? draftIndex;
-
-  @override
-  Widget build(BuildContext context) {
-    if (draftIndex == null) {
-      return Icon(
-        state == PickState.unavailable
-            ? Icons.block
-            : Icons.check_box_outline_blank,
-      );
-    }
-    final color = groupColor(draftIndex!);
-    return CircleAvatar(
-      backgroundColor: color.color,
-      foregroundColor: color.onColor,
-      child: state == PickState.ghost
-          ? const Icon(Icons.visibility_off_outlined)
-          : Text('${draftIndex! + 1}'),
     );
   }
 }

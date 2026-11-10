@@ -36,6 +36,7 @@ $ErrorActionPreference = "Stop"
 $PgPort = 15433
 $ApiPort = 8080
 $HotspotIp = "192.168.137.1"
+$HallSubnet = "192.168.137.0/24"
 $DbName = "brackety"
 $DbUser = "brackety"
 $KeptBackups = 20
@@ -52,6 +53,8 @@ $eventFile = Join-Path $data "event.env"
 # What the first start loaded: the package or the demo event. Without either, that start went wrong.
 $packageMark = Join-Path $data "package-loaded.txt"
 $demoMark = Join-Path $data "demo-loaded.txt"
+# Staff accounts the package created, with their random passwords (written by the API, never logged).
+$credentialsFile = Join-Path $data "credentials.txt"
 
 function Write-Step([string]$text) { Write-Host "-> $text" -ForegroundColor Cyan }
 function Write-Warn([string]$text) { Write-Host "AVISO: $text" -ForegroundColor Yellow }
@@ -74,11 +77,45 @@ function Read-EnvFile([string]$path) {
     return $values
 }
 
+# Data of minors: warns (never stops) if the disk of this folder is not encrypted.
+function Test-BitLocker {
+    $drive = Split-Path -Qualifier $here
+    $status = $null
+    try {
+        $status = "$((Get-BitLockerVolume -MountPoint $drive -ErrorAction Stop).ProtectionStatus)"
+    } catch {
+        # Without administrator rights Get-BitLockerVolume fails; the Explorer's property does not need them.
+        try {
+            $value = (New-Object -ComObject Shell.Application).NameSpace("$drive\").Self.ExtendedProperty("System.Volume.BitLockerProtection")
+            $status = switch ($value) { 1 { "On" } 2 { "Off" } default { $null } }
+        } catch {
+            $status = $null
+        }
+    }
+    if ($status -eq "On") { return }
+    if ($status -eq "Off") {
+        Write-Warn "El disco $drive no tiene BitLocker activo y aquí se guardan datos de menores: actívalo antes del evento."
+    } else {
+        Write-Warn "No se ha podido comprobar si el disco $drive tiene BitLocker; compruébalo a mano (datos de menores)."
+    }
+}
+
+# Only this Windows user (plus SYSTEM and Administrators) can open brackety-data: it holds data of minors,
+# the database keys and the staff passwords. Everything created inside inherits it.
+function Protect-DataFolder {
+    $me = [System.Security.Principal.WindowsIdentity]::GetCurrent().User.Value
+    & icacls.exe $data /inheritance:r /grant:r "*${me}:(OI)(CI)F" "*S-1-5-18:(OI)(CI)F" "*S-1-5-32-544:(OI)(CI)F" > $null
+    if ($LASTEXITCODE -ne 0) { Write-Warn "No se han podido restringir los permisos de brackety-data (icacls)." }
+}
+
 function Initialize-Data {
     foreach ($needed in @($java, $jar, "$pgBin\postgres.exe", "$webDir\index.html")) {
         if (-not (Test-Path $needed)) { throw "Falta $needed. Vuelve a generar la carpeta con build-event-bundle.ps1." }
     }
-    New-Item -ItemType Directory -Force -Path $data, (Join-Path $data "backups") | Out-Null
+    $firstStart = -not (Test-Path $data)
+    New-Item -ItemType Directory -Force -Path $data | Out-Null
+    if ($firstStart) { Protect-DataFolder }
+    New-Item -ItemType Directory -Force -Path (Join-Path $data "backups") | Out-Null
     if (-not (Test-Path $secretsFile)) {
         Set-Content -Path $secretsFile -Encoding ascii -Value @(
             "# Generado en el primer arranque. No lo compartas ni lo borres: sin él no se abre la BD.",
@@ -213,32 +250,47 @@ try {
     }
 }
 
+# Only the hotspot's network: another wifi the laptop joins (a hotel, the sports hall's) cannot reach the API.
+# Loopback is never filtered, so http://localhost keeps working.
+function Test-HallOnly($rule) {
+    $remote = @(($rule | Get-NetFirewallAddressFilter).RemoteAddress)
+    return $remote.Count -eq 1 -and $remote[0] -in @($HallSubnet, "192.168.137.0/255.255.255.0")
+}
+
 function Confirm-FirewallRule {
     $rules = Get-NetFirewallApplicationFilter -Program $java -ErrorAction SilentlyContinue |
         Get-NetFirewallRule -ErrorAction SilentlyContinue | Where-Object { $_.Enabled -eq "True" -and $_.Direction -eq "Inbound" }
     $blocked = $rules | Where-Object { $_.Action -eq "Block" }
-    if (($rules | Where-Object { $_.Action -eq "Allow" }) -and -not $blocked) { return }
+    $allowed = @($rules | Where-Object { $_.Action -eq "Allow" })
+    $open = @($allowed | Where-Object { -not (Test-HallOnly $_) })
+    if ($allowed.Count -gt 0 -and -not $blocked -and $open.Count -eq 0) { return }
+    $problem = if ($open.Count -gt 0) {
+        "La regla del firewall deja entrar al servidor desde cualquier red; hay que limitarla al punto de acceso ($HallSubnet)."
+    } else {
+        "Falta la regla del firewall para que los móviles lleguen al servidor (puerto $ApiPort, solo desde $HallSubnet)."
+    }
     if ([Console]::IsInputRedirected) {
-        Write-Warn "Falta la regla del firewall: los móviles no llegarán al servidor (arranca a mano una vez)."
+        Write-Warn "$problem Arranca a mano una vez para corregirla."
         return
     }
-    Write-Host "Falta la regla del firewall para que los móviles lleguen al servidor (puerto $ApiPort)."
-    $answer = Read-Host "¿Añadirla ahora? Windows pedirá permiso de administrador (S/n)"
+    Write-Host $problem
+    $answer = Read-Host "¿Corregirla ahora? Windows pedirá permiso de administrador (S/n)"
     if ($answer -match '^[nN]') {
-        Write-Warn "Sin la regla los móviles no llegarán al servidor; desde este portátil sí funciona."
+        Write-Warn "Sin corregirla los móviles pueden no llegar al servidor (o llegaría cualquiera); desde este portátil sí funciona."
         return
     }
-    # Windows' own "Java" block rules (a declined pop-up) win over any allow rule: they go first.
+    # Every inbound rule of this java.exe goes first: Windows' own "Java" block rules (a declined pop-up) win
+    # over any allow rule, and its allow rules (an accepted pop-up) open every port from any network.
     $ruleScript = @"
-Get-NetFirewallApplicationFilter -Program '$java' -ErrorAction SilentlyContinue | Get-NetFirewallRule | Where-Object { `$_.Direction -eq 'Inbound' -and `$_.Action -eq 'Block' } | Remove-NetFirewallRule
-New-NetFirewallRule -DisplayName 'Brackety pabellon (API $ApiPort)' -Direction Inbound -Action Allow -Program '$java' -Protocol TCP -LocalPort $ApiPort -Profile Private,Public | Out-Null
+Get-NetFirewallApplicationFilter -Program '$java' -ErrorAction SilentlyContinue | Get-NetFirewallRule | Where-Object { `$_.Direction -eq 'Inbound' } | Remove-NetFirewallRule
+New-NetFirewallRule -DisplayName 'Brackety pabellon (API $ApiPort)' -Direction Inbound -Action Allow -Program '$java' -Protocol TCP -LocalPort $ApiPort -RemoteAddress '$HallSubnet' -Profile Private,Public | Out-Null
 "@
     $encoded = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($ruleScript))
     try {
         Start-Process powershell.exe -Verb RunAs -Wait -WindowStyle Hidden -ArgumentList "-NoProfile -EncodedCommand $encoded"
-        Write-Step "Regla del firewall añadida."
+        Write-Step "Regla del firewall lista (puerto $ApiPort, solo desde $HallSubnet)."
     } catch {
-        Write-Warn "No se ha añadido la regla del firewall: los móviles no llegarán al servidor."
+        Write-Warn "No se ha corregido la regla del firewall: los móviles pueden no llegar al servidor."
     }
 }
 
@@ -309,19 +361,38 @@ function Set-ApiEnvironment([hashtable]$secrets, [string]$mode, [string]$package
     $env:JWT_SECRET = $secrets["JWT_SECRET"]
     $env:PUBLIC_BASE_URL = "http://${HotspotIp}:$ApiPort"
     $env:CORS_ALLOWED_ORIGINS = ""
+    # Phones without signal for a while keep their session; the refresh token still rotates.
+    $env:ACCESS_TTL = "12h"
+    # No proxy in front: Tomcat would trust X-Forwarded-For from any private IP, so a phone of the hotspot
+    # could pick its own IP and dodge the sign-in lockout and the rate limiter.
+    $env:SERVER_FORWARD_HEADERS_STRATEGY = "none"
     $env:WEB_DIR = $webDir
     $env:LEGAL_OWNER_NAME = $owner
     $env:PRIVACY_CONTACT_EMAIL = $privacy
     # Only the demo data folder creates demo accounts: a package brings its own and must not get a second event.
     $env:DEMO_ACCOUNTS_ENABLED = if ($mode -like "*demo") { "true" } else { "false" }
     $env:DEMO_EVENT_DATE = $day
-    if ($packageFile) { $env:BRACKETY_PACKAGE = $packageFile } else { Remove-Item Env:BRACKETY_PACKAGE -ErrorAction SilentlyContinue }
+    if ($packageFile) {
+        $env:BRACKETY_PACKAGE = $packageFile
+        $env:BRACKETY_PACKAGE_CREDENTIALS = $credentialsFile
+    } else {
+        Remove-Item Env:BRACKETY_PACKAGE, Env:BRACKETY_PACKAGE_CREDENTIALS -ErrorAction SilentlyContinue
+    }
     $env:LOGGING_FILE_NAME = Join-Path $data "api.log"
     foreach ($offline in @("RESEND_API_KEY", "GOOGLE_CLIENT_ID", "SUPERADMIN_EMAIL", "SUPERADMIN_PASSWORD_HASH",
             "CF_ACCESS_TEAM_DOMAIN", "CF_ACCESS_AUD", "ANTHROPIC_API_KEY")) {
         Remove-Item "env:$offline" -ErrorAction SilentlyContinue
     }
     if (-not $privacy) { Write-Warn "Sin PRIVACY_CONTACT_EMAIL (brackety-data\event.env) no se pueden publicar eventos." }
+}
+
+function Show-Credentials {
+    if (-not (Test-Path $credentialsFile)) { return }
+    Write-Host ""
+    Write-Host "Cuentas del staff creadas por el paquete (también en $credentialsFile):" -ForegroundColor Green
+    Get-Content $credentialsFile -Encoding UTF8 | ForEach-Object { Write-Host "  $_" }
+    Write-Warn "Reparte cada contraseña a mano solo a su dueño (no por grupos de mensajería)."
+    Write-Warn "Borra credentials.txt cuando acabe la fase."
 }
 
 function Wait-ApiReady([System.Diagnostics.Process]$api) {
@@ -372,6 +443,7 @@ if ($Backup) {
 if (Get-NetTCPConnection -LocalPort $ApiPort -State Listen -ErrorAction SilentlyContinue) {
     throw "El puerto $ApiPort ya está en uso (¿otro servidor de Brackety abierto?). Ciérralo y vuelve a arrancar."
 }
+Test-BitLocker
 if (-not $NoHotspot) { Enable-Hotspot }
 if (-not $NoFirewall) { Confirm-FirewallRule }
 
@@ -396,6 +468,7 @@ try {
     if ($mode -eq "new-package") {
         Set-Content -Path $packageMark -Encoding utf8 -Value @("Paquete: $(Split-Path $packageFile -Leaf)", "Cargado: $loaded")
         Write-Step "Paquete $(Split-Path $packageFile -Leaf) cargado."
+        Show-Credentials
     } elseif ($mode -eq "new-demo") {
         Set-Content -Path $demoMark -Encoding utf8 -Value @("Evento demo y cuentas demo", "Creado: $loaded")
     }
@@ -419,5 +492,6 @@ try {
         Write-Warn "No se ha podido guardar la copia: $($_.Exception.Message)"
     }
     Stop-Postgres
-    Remove-Item Env:PGPASSWORD, Env:DB_PASSWORD, Env:JWT_SECRET, Env:BRACKETY_PACKAGE -ErrorAction SilentlyContinue
+    Remove-Item Env:PGPASSWORD, Env:DB_PASSWORD, Env:JWT_SECRET, Env:BRACKETY_PACKAGE,
+        Env:BRACKETY_PACKAGE_CREDENTIALS -ErrorAction SilentlyContinue
 }

@@ -162,7 +162,4 @@ class MatBoard {
 
   /// From the device's cache: the server did not answer.
   final bool offline;
-
-  /// Position of the group on this mat, which picks its colour.
-  int groupIndex(String groupId) => groups.indexWhere((g) => g.id == groupId);
 }

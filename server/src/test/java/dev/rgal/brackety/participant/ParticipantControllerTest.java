@@ -26,7 +26,7 @@ class ParticipantControllerTest extends EventApiTest {
         call(post(participants()).content(ADULT), "club1")
                 .andExpect(jsonPath("$.categoryName").value("26+"));
 
-        call(get(participants()), "ayudante2")
+        call(get(participants()), "club1")
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].firstName").value("Ana"));
@@ -54,9 +54,11 @@ class ParticipantControllerTest extends EventApiTest {
     }
 
     @Test
-    void onlyTheClubWritesAndRefereesAndOutsidersCannotRead() throws Exception {
+    void onlyTheClubReadsAndWrites() throws Exception {
         var id = create();
 
+        // Birth dates and guardian consent: the helper's grouping screens read only their category's list.
+        call(get(participants()), "ayudante1").andExpect(status().isForbidden());
         call(post(participants()).content(ADULT), "ayudante1").andExpect(status().isForbidden());
         call(delete(participants() + "/" + id), "ayudante1").andExpect(status().isForbidden());
         call(get(participants()), "arbitro1").andExpect(status().isForbidden());
