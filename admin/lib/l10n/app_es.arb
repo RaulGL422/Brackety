@@ -209,5 +209,188 @@
         "type": "int"
       }
     }
+  },
+  "navEvents": "Eventos",
+  "eventsTitle": "Eventos",
+  "eventsEmpty": "Todavía no hay eventos.",
+  "eventColumnName": "Evento",
+  "eventColumnDate": "Fecha",
+  "eventColumnOwner": "Organizador",
+  "eventColumnMats": "Tapices",
+  "eventColumnEntries": "Inscritos",
+  "eventColumnGroups": "Grupos",
+  "eventColumnMatches": "Combates disputados",
+  "eventDate": "{date}",
+  "eventMatchesProgress": "{finished} de {total}",
+  "eventCounts": "{entries, plural, =1{1 inscrito} other{{entries} inscritos}}, {groups, plural, =1{1 grupo} other{{groups} grupos}}, {finished} de {total} combates disputados",
+  "eventsPageOf": "Página {page} de {pages}",
+  "eventsPrevious": "Anterior",
+  "eventsNext": "Siguiente",
+  "eventBack": "Volver a los eventos",
+  "eventEntries": "{count, plural, =1{1 inscrito} other{{count} inscritos}}",
+  "eventMats": "Tapices",
+  "eventMatNoReferee": "Tapiz {number}: sin árbitro",
+  "eventMatReferee": "Tapiz {number}: {referee}",
+  "eventGroups": "Grupos",
+  "eventNoGroups": "Todavía no hay grupos.",
+  "groupTitle": "Grupo {number}, {category}",
+  "groupMat": "Tapiz {number}",
+  "matchTeam": "Equipo {number}",
+  "matchPending": "Pendiente",
+  "matchInProgress": "En curso",
+  "matchFinished": "Terminado",
+  "matchInReview": "En revisión",
+  "matchReset": "Reiniciar",
+  "matchResetTitle": "¿Reiniciar el combate {order}?",
+  "matchResetBody": "Se borran todas sus acciones y vuelve a estar pendiente, como si no hubiera empezado. El árbitro lo verá al actualizarse su tablero.",
+  "matchResetDone": "Combate reiniciado.",
+  "groupDissolve": "Deshacer grupo",
+  "groupDissolveTitle": "¿Deshacer el grupo {number}?",
+  "groupDissolveBody": "Se borran el grupo y sus combates, también los ya disputados. Sus alumnos vuelven a estar sin grupo y el ayudante puede agruparlos otra vez.",
+  "groupDissolved": "Grupo {number} deshecho.",
+  "competitionClear": "Vaciar la competición",
+  "competitionClearTitle": "¿Vaciar la competición de {name}?",
+  "competitionClearBody": "Se borran todos los grupos, combates, puntuaciones y equipos. Se conservan la configuración, los tapices, los árbitros y los inscritos. No se puede deshacer.",
+  "competitionCleared": "Competición vaciada: {groups, plural, =1{1 grupo} other{{groups} grupos}} y {teams, plural, =1{1 equipo} other{{teams} equipos}} borrados.",
+  "reasonLabel": "Motivo",
+  "reasonHelper": "Queda guardado en la auditoría.",
+  "typeToConfirm": "Escribe «{name}» para confirmar",
+  "eventChanged": "El evento ha cambiado mientras tanto; se ha recargado.",
+  "@eventDate": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMd"
+      }
+    }
+  },
+  "@eventMatchesProgress": {
+    "placeholders": {
+      "finished": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "@eventCounts": {
+    "placeholders": {
+      "entries": {
+        "type": "int"
+      },
+      "groups": {
+        "type": "int"
+      },
+      "finished": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "@eventsPageOf": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      },
+      "pages": {
+        "type": "int"
+      }
+    }
+  },
+  "@eventEntries": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@eventMatNoReferee": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "@eventMatReferee": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "referee": {
+        "type": "String"
+      }
+    }
+  },
+  "@groupTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "@groupMat": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "@matchTeam": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "@matchResetTitle": {
+    "placeholders": {
+      "order": {
+        "type": "int"
+      }
+    }
+  },
+  "@groupDissolveTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "@groupDissolved": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "@competitionClearTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@competitionCleared": {
+    "placeholders": {
+      "groups": {
+        "type": "int"
+      },
+      "teams": {
+        "type": "int"
+      }
+    }
+  },
+  "@typeToConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }

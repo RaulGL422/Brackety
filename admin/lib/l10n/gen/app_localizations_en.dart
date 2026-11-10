@@ -406,4 +406,211 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get organizerNotFound =>
       'That organizer no longer exists or is no longer an organizer. List refreshed.';
+
+  @override
+  String get navEvents => 'Events';
+
+  @override
+  String get eventsTitle => 'Events';
+
+  @override
+  String get eventsEmpty => 'No events yet.';
+
+  @override
+  String get eventColumnName => 'Event';
+
+  @override
+  String get eventColumnDate => 'Date';
+
+  @override
+  String get eventColumnOwner => 'Organizer';
+
+  @override
+  String get eventColumnMats => 'Mats';
+
+  @override
+  String get eventColumnEntries => 'Entries';
+
+  @override
+  String get eventColumnGroups => 'Groups';
+
+  @override
+  String get eventColumnMatches => 'Matches fought';
+
+  @override
+  String eventDate(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return '$dateString';
+  }
+
+  @override
+  String eventMatchesProgress(int finished, int total) {
+    return '$finished of $total';
+  }
+
+  @override
+  String eventCounts(int entries, int groups, int finished, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      entries,
+      locale: localeName,
+      other: '$entries entries',
+      one: '1 entry',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      groups,
+      locale: localeName,
+      other: '$groups groups',
+      one: '1 group',
+    );
+    return '$_temp0, $_temp1, $finished of $total matches fought';
+  }
+
+  @override
+  String eventsPageOf(int page, int pages) {
+    return 'Page $page of $pages';
+  }
+
+  @override
+  String get eventsPrevious => 'Previous';
+
+  @override
+  String get eventsNext => 'Next';
+
+  @override
+  String get eventBack => 'Back to the events';
+
+  @override
+  String eventEntries(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count entries',
+      one: '1 entry',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get eventMats => 'Mats';
+
+  @override
+  String eventMatNoReferee(int number) {
+    return 'Mat $number: no referee';
+  }
+
+  @override
+  String eventMatReferee(int number, String referee) {
+    return 'Mat $number: $referee';
+  }
+
+  @override
+  String get eventGroups => 'Groups';
+
+  @override
+  String get eventNoGroups => 'No groups yet.';
+
+  @override
+  String groupTitle(int number, String category) {
+    return 'Group $number, $category';
+  }
+
+  @override
+  String groupMat(int number) {
+    return 'Mat $number';
+  }
+
+  @override
+  String matchTeam(int number) {
+    return 'Team $number';
+  }
+
+  @override
+  String get matchPending => 'Pending';
+
+  @override
+  String get matchInProgress => 'In progress';
+
+  @override
+  String get matchFinished => 'Finished';
+
+  @override
+  String get matchInReview => 'In review';
+
+  @override
+  String get matchReset => 'Restart';
+
+  @override
+  String matchResetTitle(int order) {
+    return 'Restart match $order?';
+  }
+
+  @override
+  String get matchResetBody =>
+      'All its actions are deleted and it is pending again, as if it had never started. The referee sees it when their board refreshes.';
+
+  @override
+  String get matchResetDone => 'Match restarted.';
+
+  @override
+  String get groupDissolve => 'Undo group';
+
+  @override
+  String groupDissolveTitle(int number) {
+    return 'Undo group $number?';
+  }
+
+  @override
+  String get groupDissolveBody =>
+      'The group and its matches are deleted, the fought ones too. Its members are without a group again and the helper can group them anew.';
+
+  @override
+  String groupDissolved(int number) {
+    return 'Group $number undone.';
+  }
+
+  @override
+  String get competitionClear => 'Clear the competition';
+
+  @override
+  String competitionClearTitle(String name) {
+    return 'Clear the competition of $name?';
+  }
+
+  @override
+  String get competitionClearBody =>
+      'Every group, match, score and team is deleted. The settings, mats, referees and entries stay. It cannot be undone.';
+
+  @override
+  String competitionCleared(int groups, int teams) {
+    String _temp0 = intl.Intl.pluralLogic(
+      groups,
+      locale: localeName,
+      other: '$groups groups',
+      one: '1 group',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      teams,
+      locale: localeName,
+      other: '$teams teams',
+      one: '1 team',
+    );
+    return 'Competition cleared: $_temp0 and $_temp1 deleted.';
+  }
+
+  @override
+  String get reasonLabel => 'Reason';
+
+  @override
+  String get reasonHelper => 'It is kept in the audit.';
+
+  @override
+  String typeToConfirm(String name) {
+    return 'Type \"$name\" to confirm';
+  }
+
+  @override
+  String get eventChanged =>
+      'The event changed meanwhile; it has been reloaded.';
 }

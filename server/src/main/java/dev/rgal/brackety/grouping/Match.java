@@ -142,6 +142,19 @@ public class Match {
         }
     }
 
+    /** Back to pending, as if never started: the superadmin restarts it (its actions go with it). */
+    public void reset() {
+        status = Status.PENDING;
+        redScore = 0;
+        blueScore = 0;
+        startedAt = null;
+        finishedAt = null;
+        elapsedMs = 0;
+        runningSince = null;
+        disqualifiedSide = null;
+        reviewReason = null;
+    }
+
     public String getReviewReason() {
         return reviewReason;
     }

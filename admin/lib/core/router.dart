@@ -9,6 +9,7 @@ import '../features/auth/ui/login_screen.dart';
 import '../features/auth/ui/logout_button.dart';
 import '../features/dashboard/ui/dashboard_screen.dart';
 import '../features/design_system/ui/design_system_screen.dart';
+import '../features/events/ui/events_screen.dart';
 import '../features/locks/ui/locks_screen.dart';
 import '../features/organizers/ui/organizers_screen.dart';
 import '../l10n/gen/app_localizations.dart';
@@ -42,6 +43,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         icon: Icons.dashboard_outlined,
         label: (context) => AppLocalizations.of(context).navDashboard,
         builder: (_) => const DashboardScreen(),
+      ),
+      AdaptiveTab(
+        path: '/events',
+        icon: Icons.event_note_outlined,
+        label: (context) => AppLocalizations.of(context).navEvents,
+        builder: (_) => const EventsScreen(),
       ),
       AdaptiveTab(
         path: '/locks',

@@ -36,6 +36,10 @@ public class FightGroup {
         return id;
     }
 
+    public UUID getEventId() {
+        return eventId;
+    }
+
     public UUID getCategoryId() {
         return categoryId;
     }
