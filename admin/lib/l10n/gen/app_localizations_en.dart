@@ -22,9 +22,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboardTitle => 'Superadmin dashboard';
 
   @override
-  String get dashboardSubtitle => 'Platform-wide management.';
-
-  @override
   String get navDesignSystem => 'Design';
 
   @override
@@ -613,4 +610,256 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get eventChanged =>
       'The event changed meanwhile; it has been reloaded.';
+
+  @override
+  String metricsAt(DateTime time) {
+    final intl.DateFormat timeDateFormat = intl.DateFormat.Hm(localeName);
+    final String timeString = timeDateFormat.format(time);
+
+    return 'Data as of $timeString';
+  }
+
+  @override
+  String get metricsUsers => 'Users';
+
+  @override
+  String get metricsActiveAccounts => 'Active accounts';
+
+  @override
+  String get metricsNewLast7Days => 'New in 7 days';
+
+  @override
+  String get metricsUnverified => 'Email not verified';
+
+  @override
+  String get metricsPendingDeletion => 'Awaiting deletion';
+
+  @override
+  String get metricsOrganizersPending => 'Organizers to validate';
+
+  @override
+  String get metricsActiveSessions => 'Open sessions';
+
+  @override
+  String get metricsActiveLocks => 'Active locks';
+
+  @override
+  String get metricsProfiles => 'Profiles';
+
+  @override
+  String get metricsClubs => 'Clubs';
+
+  @override
+  String get metricsEntities => 'External entities';
+
+  @override
+  String get metricsHelpers => 'Helpers';
+
+  @override
+  String get metricsStudents => 'Students';
+
+  @override
+  String get metricsExternals => 'Externals';
+
+  @override
+  String get metricsEvents => 'Events';
+
+  @override
+  String get metricsEventsTotal => 'Events';
+
+  @override
+  String get metricsUpcoming => 'Today or later';
+
+  @override
+  String get metricsEntries => 'Entries';
+
+  @override
+  String get metricsImports => 'Imports in 7 days';
+
+  @override
+  String get metricsImported => 'Imported in 7 days';
+
+  @override
+  String get metricsActivity => 'Activity';
+
+  @override
+  String get metricsMatchesFinished => 'Matches finished in 24 h';
+
+  @override
+  String get metricsScoreboardActions => 'Scoreboard actions in 24 h';
+
+  @override
+  String get metricsGroupsCreated => 'Groups created in 24 h';
+
+  @override
+  String get metricsInProgress => 'Matches in progress now';
+
+  @override
+  String get metricsInReview => 'Matches in review';
+
+  @override
+  String get metricsInReviewNote => 'The club has to review them';
+
+  @override
+  String get metricsServer => 'Server';
+
+  @override
+  String get metricsServerErrors => 'API 5xx errors';
+
+  @override
+  String metricsSince(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Since the start: $dateString';
+  }
+
+  @override
+  String get metricsServerErrorsNote => 'Check the API logs';
+
+  @override
+  String get navUsers => 'Users';
+
+  @override
+  String get usersTitle => 'Users';
+
+  @override
+  String get usersSearch => 'Search by email or organization';
+
+  @override
+  String get usersEmpty => 'No account matches.';
+
+  @override
+  String get userColumnEmail => 'Email';
+
+  @override
+  String get userColumnOrganization => 'Organization';
+
+  @override
+  String get userColumnProfiles => 'Profiles';
+
+  @override
+  String get userColumnCreated => 'Signed up';
+
+  @override
+  String get userColumnState => 'State';
+
+  @override
+  String get userProfileClub => 'Club';
+
+  @override
+  String get userProfileEntity => 'External entity';
+
+  @override
+  String get userProfileHelper => 'Helper';
+
+  @override
+  String get userProfileStudent => 'Student';
+
+  @override
+  String get userProfileExternal => 'External';
+
+  @override
+  String get userStateActive => 'Active';
+
+  @override
+  String get userStateUnverified => 'Email not verified';
+
+  @override
+  String get userStateSuspended => 'Suspended';
+
+  @override
+  String get userStateDeleted => 'Deleted, awaiting purge';
+
+  @override
+  String userDate(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return '$dateString';
+  }
+
+  @override
+  String get userBack => 'Back to the users';
+
+  @override
+  String get userSignInMethods => 'Sign-in';
+
+  @override
+  String get userPassword => 'Password';
+
+  @override
+  String get userLastSignIn => 'Last session';
+
+  @override
+  String get userNever => 'Never';
+
+  @override
+  String get userOwnedEvents => 'Own events';
+
+  @override
+  String get userStaffEvents => 'Events helping at';
+
+  @override
+  String get userSuspendedSince => 'Suspended since';
+
+  @override
+  String get userDeletesOn => 'Deleted for good on';
+
+  @override
+  String get userSuspend => 'Suspend';
+
+  @override
+  String userSuspendTitle(String email) {
+    return 'Suspend $email?';
+  }
+
+  @override
+  String get userSuspendBody =>
+      'All its sessions close at once and it cannot sign in until you lift the suspension. Its data and events stay.';
+
+  @override
+  String get userSuspended => 'Account suspended.';
+
+  @override
+  String get userUnsuspend => 'Lift the suspension';
+
+  @override
+  String userUnsuspendTitle(String email) {
+    return 'Lift the suspension of $email?';
+  }
+
+  @override
+  String get userUnsuspendBody => 'It can sign in again as before.';
+
+  @override
+  String get userUnsuspended => 'Suspension lifted.';
+
+  @override
+  String get userDelete => 'Delete the account';
+
+  @override
+  String userDeleteTitle(String email) {
+    return 'Delete the account $email?';
+  }
+
+  @override
+  String get userDeleteBody =>
+      'The same deletion the user can ask for: it is signed out, emailed, and deleted for good after 30 days. Until then it can restore it by signing in. An owner of events cannot be deleted.';
+
+  @override
+  String userDeleted(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Account deleted. It goes for good on $dateString.';
+  }
+
+  @override
+  String get userOwnsEvents =>
+      'This account owns events: hand them over or delete them first.';
+
+  @override
+  String get userChanged =>
+      'The account changed meanwhile; it has been reloaded.';
 }

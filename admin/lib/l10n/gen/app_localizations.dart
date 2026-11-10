@@ -122,12 +122,6 @@ abstract class AppLocalizations {
   /// **'Panel de superadmin'**
   String get dashboardTitle;
 
-  /// No description provided for @dashboardSubtitle.
-  ///
-  /// In es, this message translates to:
-  /// **'Gestión global de la plataforma.'**
-  String get dashboardSubtitle;
-
   /// No description provided for @navDesignSystem.
   ///
   /// In es, this message translates to:
@@ -1069,6 +1063,450 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'El evento ha cambiado mientras tanto; se ha recargado.'**
   String get eventChanged;
+
+  /// No description provided for @metricsAt.
+  ///
+  /// In es, this message translates to:
+  /// **'Datos de las {time}'**
+  String metricsAt(DateTime time);
+
+  /// No description provided for @metricsUsers.
+  ///
+  /// In es, this message translates to:
+  /// **'Usuarios'**
+  String get metricsUsers;
+
+  /// No description provided for @metricsActiveAccounts.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuentas activas'**
+  String get metricsActiveAccounts;
+
+  /// No description provided for @metricsNewLast7Days.
+  ///
+  /// In es, this message translates to:
+  /// **'Altas en 7 días'**
+  String get metricsNewLast7Days;
+
+  /// No description provided for @metricsUnverified.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin verificar el email'**
+  String get metricsUnverified;
+
+  /// No description provided for @metricsPendingDeletion.
+  ///
+  /// In es, this message translates to:
+  /// **'Pendientes de borrado'**
+  String get metricsPendingDeletion;
+
+  /// No description provided for @metricsOrganizersPending.
+  ///
+  /// In es, this message translates to:
+  /// **'Organizadores por validar'**
+  String get metricsOrganizersPending;
+
+  /// No description provided for @metricsActiveSessions.
+  ///
+  /// In es, this message translates to:
+  /// **'Sesiones abiertas'**
+  String get metricsActiveSessions;
+
+  /// No description provided for @metricsActiveLocks.
+  ///
+  /// In es, this message translates to:
+  /// **'Bloqueos activos'**
+  String get metricsActiveLocks;
+
+  /// No description provided for @metricsProfiles.
+  ///
+  /// In es, this message translates to:
+  /// **'Perfiles'**
+  String get metricsProfiles;
+
+  /// No description provided for @metricsClubs.
+  ///
+  /// In es, this message translates to:
+  /// **'Clubes'**
+  String get metricsClubs;
+
+  /// No description provided for @metricsEntities.
+  ///
+  /// In es, this message translates to:
+  /// **'Entidades externas'**
+  String get metricsEntities;
+
+  /// No description provided for @metricsHelpers.
+  ///
+  /// In es, this message translates to:
+  /// **'Ayudantes'**
+  String get metricsHelpers;
+
+  /// No description provided for @metricsStudents.
+  ///
+  /// In es, this message translates to:
+  /// **'Alumnos'**
+  String get metricsStudents;
+
+  /// No description provided for @metricsExternals.
+  ///
+  /// In es, this message translates to:
+  /// **'Externos'**
+  String get metricsExternals;
+
+  /// No description provided for @metricsEvents.
+  ///
+  /// In es, this message translates to:
+  /// **'Eventos'**
+  String get metricsEvents;
+
+  /// No description provided for @metricsEventsTotal.
+  ///
+  /// In es, this message translates to:
+  /// **'Eventos'**
+  String get metricsEventsTotal;
+
+  /// No description provided for @metricsUpcoming.
+  ///
+  /// In es, this message translates to:
+  /// **'Hoy o más adelante'**
+  String get metricsUpcoming;
+
+  /// No description provided for @metricsEntries.
+  ///
+  /// In es, this message translates to:
+  /// **'Inscritos'**
+  String get metricsEntries;
+
+  /// No description provided for @metricsImports.
+  ///
+  /// In es, this message translates to:
+  /// **'Importaciones en 7 días'**
+  String get metricsImports;
+
+  /// No description provided for @metricsImported.
+  ///
+  /// In es, this message translates to:
+  /// **'Importados en 7 días'**
+  String get metricsImported;
+
+  /// No description provided for @metricsActivity.
+  ///
+  /// In es, this message translates to:
+  /// **'Actividad'**
+  String get metricsActivity;
+
+  /// No description provided for @metricsMatchesFinished.
+  ///
+  /// In es, this message translates to:
+  /// **'Combates terminados en 24 h'**
+  String get metricsMatchesFinished;
+
+  /// No description provided for @metricsScoreboardActions.
+  ///
+  /// In es, this message translates to:
+  /// **'Acciones del marcador en 24 h'**
+  String get metricsScoreboardActions;
+
+  /// No description provided for @metricsGroupsCreated.
+  ///
+  /// In es, this message translates to:
+  /// **'Grupos creados en 24 h'**
+  String get metricsGroupsCreated;
+
+  /// No description provided for @metricsInProgress.
+  ///
+  /// In es, this message translates to:
+  /// **'Combates en curso ahora'**
+  String get metricsInProgress;
+
+  /// No description provided for @metricsInReview.
+  ///
+  /// In es, this message translates to:
+  /// **'Combates en revisión'**
+  String get metricsInReview;
+
+  /// No description provided for @metricsInReviewNote.
+  ///
+  /// In es, this message translates to:
+  /// **'El club tiene que revisarlos'**
+  String get metricsInReviewNote;
+
+  /// No description provided for @metricsServer.
+  ///
+  /// In es, this message translates to:
+  /// **'Servidor'**
+  String get metricsServer;
+
+  /// No description provided for @metricsServerErrors.
+  ///
+  /// In es, this message translates to:
+  /// **'Errores 5xx de la API'**
+  String get metricsServerErrors;
+
+  /// No description provided for @metricsSince.
+  ///
+  /// In es, this message translates to:
+  /// **'Desde el arranque: {date}'**
+  String metricsSince(DateTime date);
+
+  /// No description provided for @metricsServerErrorsNote.
+  ///
+  /// In es, this message translates to:
+  /// **'Mira los logs de la API'**
+  String get metricsServerErrorsNote;
+
+  /// No description provided for @navUsers.
+  ///
+  /// In es, this message translates to:
+  /// **'Usuarios'**
+  String get navUsers;
+
+  /// No description provided for @usersTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Usuarios'**
+  String get usersTitle;
+
+  /// No description provided for @usersSearch.
+  ///
+  /// In es, this message translates to:
+  /// **'Buscar por email u organización'**
+  String get usersSearch;
+
+  /// No description provided for @usersEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'Ninguna cuenta coincide.'**
+  String get usersEmpty;
+
+  /// No description provided for @userColumnEmail.
+  ///
+  /// In es, this message translates to:
+  /// **'Email'**
+  String get userColumnEmail;
+
+  /// No description provided for @userColumnOrganization.
+  ///
+  /// In es, this message translates to:
+  /// **'Organización'**
+  String get userColumnOrganization;
+
+  /// No description provided for @userColumnProfiles.
+  ///
+  /// In es, this message translates to:
+  /// **'Perfiles'**
+  String get userColumnProfiles;
+
+  /// No description provided for @userColumnCreated.
+  ///
+  /// In es, this message translates to:
+  /// **'Alta'**
+  String get userColumnCreated;
+
+  /// No description provided for @userColumnState.
+  ///
+  /// In es, this message translates to:
+  /// **'Estado'**
+  String get userColumnState;
+
+  /// No description provided for @userProfileClub.
+  ///
+  /// In es, this message translates to:
+  /// **'Club'**
+  String get userProfileClub;
+
+  /// No description provided for @userProfileEntity.
+  ///
+  /// In es, this message translates to:
+  /// **'Entidad externa'**
+  String get userProfileEntity;
+
+  /// No description provided for @userProfileHelper.
+  ///
+  /// In es, this message translates to:
+  /// **'Ayudante'**
+  String get userProfileHelper;
+
+  /// No description provided for @userProfileStudent.
+  ///
+  /// In es, this message translates to:
+  /// **'Alumno'**
+  String get userProfileStudent;
+
+  /// No description provided for @userProfileExternal.
+  ///
+  /// In es, this message translates to:
+  /// **'Externo'**
+  String get userProfileExternal;
+
+  /// No description provided for @userStateActive.
+  ///
+  /// In es, this message translates to:
+  /// **'Activa'**
+  String get userStateActive;
+
+  /// No description provided for @userStateUnverified.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin verificar el email'**
+  String get userStateUnverified;
+
+  /// No description provided for @userStateSuspended.
+  ///
+  /// In es, this message translates to:
+  /// **'Suspendida'**
+  String get userStateSuspended;
+
+  /// No description provided for @userStateDeleted.
+  ///
+  /// In es, this message translates to:
+  /// **'Borrada, pendiente de purga'**
+  String get userStateDeleted;
+
+  /// No description provided for @userDate.
+  ///
+  /// In es, this message translates to:
+  /// **'{date}'**
+  String userDate(DateTime date);
+
+  /// No description provided for @userBack.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver a los usuarios'**
+  String get userBack;
+
+  /// No description provided for @userSignInMethods.
+  ///
+  /// In es, this message translates to:
+  /// **'Acceso'**
+  String get userSignInMethods;
+
+  /// No description provided for @userPassword.
+  ///
+  /// In es, this message translates to:
+  /// **'Contraseña'**
+  String get userPassword;
+
+  /// No description provided for @userLastSignIn.
+  ///
+  /// In es, this message translates to:
+  /// **'Última sesión'**
+  String get userLastSignIn;
+
+  /// No description provided for @userNever.
+  ///
+  /// In es, this message translates to:
+  /// **'Nunca'**
+  String get userNever;
+
+  /// No description provided for @userOwnedEvents.
+  ///
+  /// In es, this message translates to:
+  /// **'Eventos propios'**
+  String get userOwnedEvents;
+
+  /// No description provided for @userStaffEvents.
+  ///
+  /// In es, this message translates to:
+  /// **'Eventos donde ayuda'**
+  String get userStaffEvents;
+
+  /// No description provided for @userSuspendedSince.
+  ///
+  /// In es, this message translates to:
+  /// **'Suspendida desde'**
+  String get userSuspendedSince;
+
+  /// No description provided for @userDeletesOn.
+  ///
+  /// In es, this message translates to:
+  /// **'Se borra del todo el'**
+  String get userDeletesOn;
+
+  /// No description provided for @userSuspend.
+  ///
+  /// In es, this message translates to:
+  /// **'Suspender'**
+  String get userSuspend;
+
+  /// No description provided for @userSuspendTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Suspender {email}?'**
+  String userSuspendTitle(String email);
+
+  /// No description provided for @userSuspendBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Se cierran todas sus sesiones al momento y no podrá entrar hasta que levantes la suspensión. Sus datos y sus eventos se conservan.'**
+  String get userSuspendBody;
+
+  /// No description provided for @userSuspended.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuenta suspendida.'**
+  String get userSuspended;
+
+  /// No description provided for @userUnsuspend.
+  ///
+  /// In es, this message translates to:
+  /// **'Levantar la suspensión'**
+  String get userUnsuspend;
+
+  /// No description provided for @userUnsuspendTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Levantar la suspensión de {email}?'**
+  String userUnsuspendTitle(String email);
+
+  /// No description provided for @userUnsuspendBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Podrá volver a entrar con sus datos de siempre.'**
+  String get userUnsuspendBody;
+
+  /// No description provided for @userUnsuspended.
+  ///
+  /// In es, this message translates to:
+  /// **'Suspensión levantada.'**
+  String get userUnsuspended;
+
+  /// No description provided for @userDelete.
+  ///
+  /// In es, this message translates to:
+  /// **'Borrar la cuenta'**
+  String get userDelete;
+
+  /// No description provided for @userDeleteTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Borrar la cuenta {email}?'**
+  String userDeleteTitle(String email);
+
+  /// No description provided for @userDeleteBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Es el mismo borrado que pide el usuario: se cierra su sesión, le llega un email y se borra del todo a los 30 días. Hasta entonces puede recuperarla entrando. Una cuenta dueña de eventos no se puede borrar.'**
+  String get userDeleteBody;
+
+  /// No description provided for @userDeleted.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuenta borrada. Se borra del todo el {date}.'**
+  String userDeleted(DateTime date);
+
+  /// No description provided for @userOwnsEvents.
+  ///
+  /// In es, this message translates to:
+  /// **'Esta cuenta es dueña de eventos: hay que traspasarlos o borrarlos antes.'**
+  String get userOwnsEvents;
+
+  /// No description provided for @userChanged.
+  ///
+  /// In es, this message translates to:
+  /// **'La cuenta ha cambiado mientras tanto; se ha recargado.'**
+  String get userChanged;
 }
 
 class _AppLocalizationsDelegate

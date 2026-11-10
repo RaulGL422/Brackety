@@ -44,6 +44,7 @@ public class Account {
     private Instant alreadyRegisteredSentAt;
     private Instant deletedAt;
     private Instant sessionsRevokedAt;
+    private Instant suspendedAt;
 
     protected Account() {}
 
@@ -114,10 +115,31 @@ public class Account {
     }
 
     // JWT times are whole seconds: a token issued in the same second as the revocation is a new one and is kept.
+    // A suspended account accepts none, however recent: the suspension cuts the second it was given in too.
     public boolean acceptsTokenIssuedAt(Instant issuedAt) {
         return isActive()
+                && !isSuspended()
                 && issuedAt != null
                 && (sessionsRevokedAt == null || !issuedAt.isBefore(sessionsRevokedAt.truncatedTo(ChronoUnit.SECONDS)));
+    }
+
+    /** Suspended by the superadmin: the data stays, but no session starts (SessionService). */
+    public boolean isSuspended() {
+        return suspendedAt != null;
+    }
+
+    public Instant getSuspendedAt() {
+        return suspendedAt;
+    }
+
+    public void suspend(Instant now) {
+        suspendedAt = now;
+        updatedAt = now;
+    }
+
+    public void unsuspend(Instant now) {
+        suspendedAt = null;
+        updatedAt = now;
     }
 
     public void markDeleted(Instant now) {

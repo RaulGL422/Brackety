@@ -2653,6 +2653,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'El combate ha cambiado en otro dispositivo. Revisa el marcador y vuelve a pulsar.'**
   String get refusalStale;
+
+  /// No description provided for @accountSuspended.
+  ///
+  /// In es, this message translates to:
+  /// **'Esta cuenta está suspendida. Si crees que es un error, escribe al contacto de privacidad que aparece en las páginas legales.'**
+  String get accountSuspended;
 }
 
 class _AppLocalizationsDelegate

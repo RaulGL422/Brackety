@@ -513,5 +513,6 @@
   "themeSystem": "Automatic",
   "themeLight": "Light",
   "themeDark": "Dark",
-  "refusalStale": "The match changed on another device. Check the scoreboard and press again."
+  "refusalStale": "The match changed on another device. Check the scoreboard and press again.",
+  "accountSuspended": "This account is suspended. If you think it is a mistake, write to the privacy contact on the legal pages."
 }

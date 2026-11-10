@@ -22,9 +22,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dashboardTitle => 'Panel de superadmin';
 
   @override
-  String get dashboardSubtitle => 'Gestión global de la plataforma.';
-
-  @override
   String get navDesignSystem => 'Diseño';
 
   @override
@@ -614,4 +611,257 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get eventChanged =>
       'El evento ha cambiado mientras tanto; se ha recargado.';
+
+  @override
+  String metricsAt(DateTime time) {
+    final intl.DateFormat timeDateFormat = intl.DateFormat.Hm(localeName);
+    final String timeString = timeDateFormat.format(time);
+
+    return 'Datos de las $timeString';
+  }
+
+  @override
+  String get metricsUsers => 'Usuarios';
+
+  @override
+  String get metricsActiveAccounts => 'Cuentas activas';
+
+  @override
+  String get metricsNewLast7Days => 'Altas en 7 días';
+
+  @override
+  String get metricsUnverified => 'Sin verificar el email';
+
+  @override
+  String get metricsPendingDeletion => 'Pendientes de borrado';
+
+  @override
+  String get metricsOrganizersPending => 'Organizadores por validar';
+
+  @override
+  String get metricsActiveSessions => 'Sesiones abiertas';
+
+  @override
+  String get metricsActiveLocks => 'Bloqueos activos';
+
+  @override
+  String get metricsProfiles => 'Perfiles';
+
+  @override
+  String get metricsClubs => 'Clubes';
+
+  @override
+  String get metricsEntities => 'Entidades externas';
+
+  @override
+  String get metricsHelpers => 'Ayudantes';
+
+  @override
+  String get metricsStudents => 'Alumnos';
+
+  @override
+  String get metricsExternals => 'Externos';
+
+  @override
+  String get metricsEvents => 'Eventos';
+
+  @override
+  String get metricsEventsTotal => 'Eventos';
+
+  @override
+  String get metricsUpcoming => 'Hoy o más adelante';
+
+  @override
+  String get metricsEntries => 'Inscritos';
+
+  @override
+  String get metricsImports => 'Importaciones en 7 días';
+
+  @override
+  String get metricsImported => 'Importados en 7 días';
+
+  @override
+  String get metricsActivity => 'Actividad';
+
+  @override
+  String get metricsMatchesFinished => 'Combates terminados en 24 h';
+
+  @override
+  String get metricsScoreboardActions => 'Acciones del marcador en 24 h';
+
+  @override
+  String get metricsGroupsCreated => 'Grupos creados en 24 h';
+
+  @override
+  String get metricsInProgress => 'Combates en curso ahora';
+
+  @override
+  String get metricsInReview => 'Combates en revisión';
+
+  @override
+  String get metricsInReviewNote => 'El club tiene que revisarlos';
+
+  @override
+  String get metricsServer => 'Servidor';
+
+  @override
+  String get metricsServerErrors => 'Errores 5xx de la API';
+
+  @override
+  String metricsSince(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Desde el arranque: $dateString';
+  }
+
+  @override
+  String get metricsServerErrorsNote => 'Mira los logs de la API';
+
+  @override
+  String get navUsers => 'Usuarios';
+
+  @override
+  String get usersTitle => 'Usuarios';
+
+  @override
+  String get usersSearch => 'Buscar por email u organización';
+
+  @override
+  String get usersEmpty => 'Ninguna cuenta coincide.';
+
+  @override
+  String get userColumnEmail => 'Email';
+
+  @override
+  String get userColumnOrganization => 'Organización';
+
+  @override
+  String get userColumnProfiles => 'Perfiles';
+
+  @override
+  String get userColumnCreated => 'Alta';
+
+  @override
+  String get userColumnState => 'Estado';
+
+  @override
+  String get userProfileClub => 'Club';
+
+  @override
+  String get userProfileEntity => 'Entidad externa';
+
+  @override
+  String get userProfileHelper => 'Ayudante';
+
+  @override
+  String get userProfileStudent => 'Alumno';
+
+  @override
+  String get userProfileExternal => 'Externo';
+
+  @override
+  String get userStateActive => 'Activa';
+
+  @override
+  String get userStateUnverified => 'Sin verificar el email';
+
+  @override
+  String get userStateSuspended => 'Suspendida';
+
+  @override
+  String get userStateDeleted => 'Borrada, pendiente de purga';
+
+  @override
+  String userDate(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return '$dateString';
+  }
+
+  @override
+  String get userBack => 'Volver a los usuarios';
+
+  @override
+  String get userSignInMethods => 'Acceso';
+
+  @override
+  String get userPassword => 'Contraseña';
+
+  @override
+  String get userLastSignIn => 'Última sesión';
+
+  @override
+  String get userNever => 'Nunca';
+
+  @override
+  String get userOwnedEvents => 'Eventos propios';
+
+  @override
+  String get userStaffEvents => 'Eventos donde ayuda';
+
+  @override
+  String get userSuspendedSince => 'Suspendida desde';
+
+  @override
+  String get userDeletesOn => 'Se borra del todo el';
+
+  @override
+  String get userSuspend => 'Suspender';
+
+  @override
+  String userSuspendTitle(String email) {
+    return '¿Suspender $email?';
+  }
+
+  @override
+  String get userSuspendBody =>
+      'Se cierran todas sus sesiones al momento y no podrá entrar hasta que levantes la suspensión. Sus datos y sus eventos se conservan.';
+
+  @override
+  String get userSuspended => 'Cuenta suspendida.';
+
+  @override
+  String get userUnsuspend => 'Levantar la suspensión';
+
+  @override
+  String userUnsuspendTitle(String email) {
+    return '¿Levantar la suspensión de $email?';
+  }
+
+  @override
+  String get userUnsuspendBody =>
+      'Podrá volver a entrar con sus datos de siempre.';
+
+  @override
+  String get userUnsuspended => 'Suspensión levantada.';
+
+  @override
+  String get userDelete => 'Borrar la cuenta';
+
+  @override
+  String userDeleteTitle(String email) {
+    return '¿Borrar la cuenta $email?';
+  }
+
+  @override
+  String get userDeleteBody =>
+      'Es el mismo borrado que pide el usuario: se cierra su sesión, le llega un email y se borra del todo a los 30 días. Hasta entonces puede recuperarla entrando. Una cuenta dueña de eventos no se puede borrar.';
+
+  @override
+  String userDeleted(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Cuenta borrada. Se borra del todo el $dateString.';
+  }
+
+  @override
+  String get userOwnsEvents =>
+      'Esta cuenta es dueña de eventos: hay que traspasarlos o borrarlos antes.';
+
+  @override
+  String get userChanged =>
+      'La cuenta ha cambiado mientras tanto; se ha recargado.';
 }

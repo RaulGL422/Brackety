@@ -7,6 +7,7 @@ import '../data/tax_id.dart';
 String apiErrorMessage(AppLocalizations l10n, ApiError error) {
   if (error.noResponse) return l10n.noServer;
   if (error.isLocked) return l10n.loginLocked(error.lockId!);
+  if (error.isSuspended) return l10n.accountSuspended;
   if (error.isRateLimited) {
     final wait = error.retryAfter;
     return wait == null

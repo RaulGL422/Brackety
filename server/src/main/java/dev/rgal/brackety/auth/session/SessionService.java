@@ -67,8 +67,15 @@ public class SessionService {
         this.accessTtl = accessTtl;
     }
 
-    @Transactional
+    /**
+     * Every sign-in ends here (password, Google, restore): a suspended account gets none. Its refusal must not mark
+     * the caller's transaction for rollback: the login keeps its failure counters (nothing is written before it).
+     */
+    @Transactional(noRollbackFor = AuthException.class)
     public Session start(Account account) {
+        if (account.isSuspended()) {
+            throw AuthException.suspended();
+        }
         return issue(account, UUID.randomUUID(), clock.instant());
     }
 

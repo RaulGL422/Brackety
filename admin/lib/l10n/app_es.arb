@@ -4,7 +4,6 @@
   "navDashboard": "Panel",
   "navConnection": "Conexión",
   "dashboardTitle": "Panel de superadmin",
-  "dashboardSubtitle": "Gestión global de la plataforma.",
   "navDesignSystem": "Diseño",
   "dsTitle": "Sistema de diseño",
   "dsIntro": "Solo en builds debug. Todo lo de abajo usa el tema real en el modo elegido.",
@@ -390,6 +389,133 @@
     "placeholders": {
       "name": {
         "type": "String"
+      }
+    }
+  },
+  "metricsAt": "Datos de las {time}",
+  "metricsUsers": "Usuarios",
+  "metricsActiveAccounts": "Cuentas activas",
+  "metricsNewLast7Days": "Altas en 7 días",
+  "metricsUnverified": "Sin verificar el email",
+  "metricsPendingDeletion": "Pendientes de borrado",
+  "metricsOrganizersPending": "Organizadores por validar",
+  "metricsActiveSessions": "Sesiones abiertas",
+  "metricsActiveLocks": "Bloqueos activos",
+  "metricsProfiles": "Perfiles",
+  "metricsClubs": "Clubes",
+  "metricsEntities": "Entidades externas",
+  "metricsHelpers": "Ayudantes",
+  "metricsStudents": "Alumnos",
+  "metricsExternals": "Externos",
+  "metricsEvents": "Eventos",
+  "metricsEventsTotal": "Eventos",
+  "metricsUpcoming": "Hoy o más adelante",
+  "metricsEntries": "Inscritos",
+  "metricsImports": "Importaciones en 7 días",
+  "metricsImported": "Importados en 7 días",
+  "metricsActivity": "Actividad",
+  "metricsMatchesFinished": "Combates terminados en 24 h",
+  "metricsScoreboardActions": "Acciones del marcador en 24 h",
+  "metricsGroupsCreated": "Grupos creados en 24 h",
+  "metricsInProgress": "Combates en curso ahora",
+  "metricsInReview": "Combates en revisión",
+  "metricsInReviewNote": "El club tiene que revisarlos",
+  "metricsServer": "Servidor",
+  "metricsServerErrors": "Errores 5xx de la API",
+  "metricsSince": "Desde el arranque: {date}",
+  "metricsServerErrorsNote": "Mira los logs de la API",
+  "@metricsAt": {
+    "placeholders": {
+      "time": {
+        "type": "DateTime",
+        "format": "Hm"
+      }
+    }
+  },
+  "@metricsSince": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMd"
+      }
+    }
+  },
+  "navUsers": "Usuarios",
+  "usersTitle": "Usuarios",
+  "usersSearch": "Buscar por email u organización",
+  "usersEmpty": "Ninguna cuenta coincide.",
+  "userColumnEmail": "Email",
+  "userColumnOrganization": "Organización",
+  "userColumnProfiles": "Perfiles",
+  "userColumnCreated": "Alta",
+  "userColumnState": "Estado",
+  "userProfileClub": "Club",
+  "userProfileEntity": "Entidad externa",
+  "userProfileHelper": "Ayudante",
+  "userProfileStudent": "Alumno",
+  "userProfileExternal": "Externo",
+  "userStateActive": "Activa",
+  "userStateUnverified": "Sin verificar el email",
+  "userStateSuspended": "Suspendida",
+  "userStateDeleted": "Borrada, pendiente de purga",
+  "userDate": "{date}",
+  "userBack": "Volver a los usuarios",
+  "userSignInMethods": "Acceso",
+  "userPassword": "Contraseña",
+  "userLastSignIn": "Última sesión",
+  "userNever": "Nunca",
+  "userOwnedEvents": "Eventos propios",
+  "userStaffEvents": "Eventos donde ayuda",
+  "userSuspendedSince": "Suspendida desde",
+  "userDeletesOn": "Se borra del todo el",
+  "userSuspend": "Suspender",
+  "userSuspendTitle": "¿Suspender {email}?",
+  "userSuspendBody": "Se cierran todas sus sesiones al momento y no podrá entrar hasta que levantes la suspensión. Sus datos y sus eventos se conservan.",
+  "userSuspended": "Cuenta suspendida.",
+  "userUnsuspend": "Levantar la suspensión",
+  "userUnsuspendTitle": "¿Levantar la suspensión de {email}?",
+  "userUnsuspendBody": "Podrá volver a entrar con sus datos de siempre.",
+  "userUnsuspended": "Suspensión levantada.",
+  "userDelete": "Borrar la cuenta",
+  "userDeleteTitle": "¿Borrar la cuenta {email}?",
+  "userDeleteBody": "Es el mismo borrado que pide el usuario: se cierra su sesión, le llega un email y se borra del todo a los 30 días. Hasta entonces puede recuperarla entrando. Una cuenta dueña de eventos no se puede borrar.",
+  "userDeleted": "Cuenta borrada. Se borra del todo el {date}.",
+  "userOwnsEvents": "Esta cuenta es dueña de eventos: hay que traspasarlos o borrarlos antes.",
+  "userChanged": "La cuenta ha cambiado mientras tanto; se ha recargado.",
+  "@userDate": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMd"
+      }
+    }
+  },
+  "@userSuspendTitle": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "@userUnsuspendTitle": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "@userDeleteTitle": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "@userDeleted": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMd"
       }
     }
   }
