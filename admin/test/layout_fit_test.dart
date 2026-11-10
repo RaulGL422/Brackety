@@ -49,8 +49,9 @@ void main() {
             tester.widget<NavigationBar>(bar).labelBehavior !=
             NavigationDestinationLabelBehavior.alwaysHide;
         if (shown) expectWholeLine(tester, labels);
-        // Debug builds add Diseño: five tabs leave 72 px, and "Organizadores" needs 82.
-        expect(shown, !spanish);
+        // Debug builds add Diseño: six tabs leave 60 px, and neither "Organizadores" (82) nor
+        // "Organizers" fit, so the bar shows icons only (their labels are the tooltips).
+        expect(shown, isFalse);
       },
     );
   }

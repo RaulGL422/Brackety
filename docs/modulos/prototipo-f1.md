@@ -108,13 +108,17 @@ Recomendado (empates, intercalado, fantasma ocupado), fin estimado, asignación 
 ## Despliegue en la Pi (paso 7)
 Pasos generales: `09-despliegue.md`. Aquí solo lo propio del prototipo.
 - Hostnames del túnel: `brackety.rgal.dev` → `http://web:80` y `brackety-api.rgal.dev` → `http://api:8080`. `brackety-admin.rgal.dev` → `http://admin:80` solo cuando haya Cloudflare Access (el prototipo no usa superadmin). Un solo nivel de subdominio: el SSL gratuito de Cloudflare no cubre `api.brackety.rgal.dev`.
-- Imágenes: release `v0.1.0` (PR `development` → `main` con merge commit y tag); el CI publica `ghcr.io/raulgl422/brackety-*` arm64. Las variables de repo `API_BASE_URL` y `ADMIN_API_BASE_URL` ya están puestas.
+- Imágenes: release `v0.3.0` (PR `release/v0.3.0` → `main` con merge commit y tag); el CI publica `ghcr.io/raulgl422/brackety-*` arm64. Las variables de repo `API_BASE_URL` y `ADMIN_API_BASE_URL` ya están puestas.
 - `.env` (además de lo obligatorio: `DB_USER`, `DB_PASSWORD`, `JWT_SECRET`, `CLOUDFLARE_TUNNEL_TOKEN`):
-  - `IMAGE_TAG=0.1.0`, `CORS_ALLOWED_ORIGINS=https://brackety.rgal.dev`, `PUBLIC_BASE_URL=https://brackety.rgal.dev`.
+  - `IMAGE_TAG=0.3.0`, `CORS_ALLOWED_ORIGINS=https://brackety.rgal.dev`, `PUBLIC_BASE_URL=https://brackety.rgal.dev`.
+  - `API_PORT=38080`, `WEB_PORT=38081`, `ADMIN_PORT=38082`: en la Pi de Raul 8080-8082 los usa otra app. El túnel no los usa (va por la red de Docker).
   - `API_BASE_URL=https://brackety-api.rgal.dev`, `ADMIN_API_BASE_URL=https://brackety-admin.rgal.dev`.
   - `DEMO_ACCOUNTS_ENABLED=true`, `DEMO_EVENT_DATE=2026-11-14`: crea las cuentas y el evento sin alumnos (los inscribe el club).
   - Vacías: Resend (emails al log), Google, superadmin y Cloudflare Access.
-- Sin SSD: `DB_DATA=pgdata` (volumen en la SD) y copia con `backup.sh` al acabar cada jornada. La SD puede corromperse con Postgres: pendiente de que Raul decida si basta (`pendientes.md`).
+- Sin SSD: `DB_DATA=pgdata` (volumen en la SD; aceptado por Raul para la F1). Copia al acabar cada jornada, bajada al PC:
+  - Pi: `docker compose exec -T db sh -c 'pg_dump -U "$POSTGRES_USER" -d brackety -Fc' > ~/brackety-$(date +%F).dump`.
+  - PC: `scp <usuario>@<pi>:~/brackety-<fecha>.dump .` (no `ssh … >` en PowerShell: estropea el binario).
+- Accesos de la Pi: clave de despliegue SSH de solo lectura (alias `github-brackety` en `~/.ssh/config`) y `docker login ghcr.io` con un token classic solo `read:packages`.
 - Ensayo: móvil y tablet con datos móviles (fuera de la wifi de casa), una cuenta por rol, un combate completo con campana y el CSV.
 
 ## Estado

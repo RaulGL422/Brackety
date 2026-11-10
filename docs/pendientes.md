@@ -5,7 +5,6 @@
 - [ ] Docker Desktop: solo hará falta para probar `deploy/` en Windows; tests y ejecución local no lo necesitan.
 
 ## Despliegue (infra-deploy)
-- [ ] Paquetes GHCR: hacerlos públicos o `docker login ghcr.io` en la Pi con un token de solo lectura (decidir).
 - [ ] Copia de los backups en la nube (doc 05): elegir proveedor barato; se añadiría con `rclone` al final de `backup.sh`.
 - [ ] Generar la clave age de backups y guardar la privada fuera de la Pi (`09-despliegue.md`).
 - [ ] Backup en Windows si llega a ser el servidor (hoy `backup.sh` es solo Linux).
@@ -40,7 +39,6 @@
   - Comprobar desde datos móviles la web y `https://brackety-api.rgal.dev/actuator/health`.
   - El pabellón no depende del túnel: va con el portátil (`modulos/servidor-local.md`).
 - [ ] Categorías reales de la Fase 1 (ahora ficticias: tramos del ranking, mixtas).
-- [ ] Base de datos de la fase en la SD (sin SSD) con copia diaria: ¿se acepta el riesgo o se compra antes el SSD?
 - [ ] Tras la fase: desactivar `DEMO_ACCOUNTS_ENABLED` y borrar las cuentas demo.
 - [ ] Wifi del pabellón: el punto de acceso de Windows no se activa sin Internet (probado por Raul el 2026-11-04) y la tarjeta AX200 no admite red hospedada. El bucle invertido no se deja elegir y el iPhone por USB no lo reconoce Windows (fallo de cable). Decidido por Raul: el portátil se conecta por wifi al punto de acceso del iPhone (cargando por cable) y lo comparte con el suyo (`192.168.137.1`). Probado el 2026-11-04: un móvil en el punto de acceso llega a la API en `192.168.137.1:8080` y sigue llegando con el iPhone sin datos. Quedan: el ahorro de energía del punto de acceso (lo apaga sin clientes) y el límite de 8 dispositivos.
 - [ ] Carpeta del pabellón (`servidor-local.md`), sin probar aún: encender el punto de acceso desde `start-event.ps1`, el aviso de UAC del firewall y arrancar en un portátil limpio (sin Java ni Visual C++ instalados).
@@ -61,7 +59,7 @@
 ## Bloquean el lanzamiento público
 - [ ] Firma release de Android (keystore propio en secretos de CI); ahora `app/android/app/build.gradle.kts` firma release con la clave debug de la plantilla.
 - [ ] Email de privacidad (`PRIVACY_CONTACT_EMAIL`, p. ej. `privacidad@rgal.dev`). Sin él, la API no deja publicar ni pasar de fase.
-- [ ] SSD USB/NVMe para la base de datos (la SD no es fiable).
+- [ ] SSD USB/NVMe para la base de datos (la SD no es fiable). La F1 va en la SD (Raul, 2026-11-10): después, copia, `DB_DATA` al SSD y restaurar.
 - [ ] Backups cifrados + prueba de restauración.
 - [ ] Revisión legal profesional de privacidad, términos y cookies.
 - [ ] Google Play: 12 testers × 14 días en pruebas cerradas (Raul tiene las personas).
@@ -102,3 +100,4 @@
 - 2026-10-28 · Android cmdline-tools instaladas; `flutter doctor` sin errores para Android y web.
 - 2026-10-28 · Graphify configurado a partir de ClipHive (`CLAUDE.md`, `.gitignore`).
 - 2026-11-09 · Marcador web: `knownEvents` obligatorio; dos pestañas a la vez ya no suman dos (409 `MATCH_STALE`).
+- 2026-11-10 · Pi desplegada con la v0.3.0 (`brackety.rgal.dev`); GHCR privado con token `read:packages` y clave de despliegue.

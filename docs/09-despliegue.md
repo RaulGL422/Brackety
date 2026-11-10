@@ -71,5 +71,7 @@ Carpeta portable con PostgreSQL, Java, API y web: cómo generarla y usarla en `m
 ## Problemas comunes
 - `Deploy failed`: `docker compose logs api --tail 100`.
 - `pull` denegado: falta `docker login ghcr.io` o el token caducó.
-- El túnel no conecta: token mal copiado o hostnames apuntando a `localhost` en vez de al nombre del servicio.
+- Túnel `Inactive` y `tunnel` en `Restarting` con "Provided Tunnel token is not valid": copiar solo lo que va tras `--token` (empieza por `eyJ`), sin espacios ni comillas.
+- Error 1033 en el navegador: el nombre apunta a un túnel no conectado (ver el anterior) o el CNAME es de otro túnel.
+- "no such host" en `logs tunnel`: la URL de la ruta debe ser el **servicio** del compose (`http://web:80`, `http://api:8080`), no el contenedor (`brackety-web`) ni `localhost`.
 - Importar responde "No se ha podido leer la lista": `docker compose logs api --tail 50 | grep -i "claude"`. Clave mal copiada o sin saldo en Anthropic; `docker compose exec api claude --version` comprueba que el CLI está.

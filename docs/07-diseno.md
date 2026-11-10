@@ -39,6 +39,7 @@ Sistema **neutro multideporte**: el color es de quien compite. La app se queda e
 - Cada pantalla abre con lo que toca hacer ahora: el siguiente combate, el grupo a medias.
 - El estado se dice con palabra e icono, nunca solo con color.
 - Datos en columnas con su etiqueta, no en frases unidas por puntos medios.
+- Vocabulario: los combates se **disputan**, no se "juegan" ("3 por disputar", "combates disputados").
 
 ## Público objetivo
 Familias, deportistas (niños y adultos), entrenadores, árbitros y mesa. Muchos usuarios no técnicos, uso en móvil, a veces al aire libre (luz fuerte, arena).
