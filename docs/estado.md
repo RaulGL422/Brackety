@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-Última actualización: 2026-11-06. Fase 0 cerrada; en curso: **auth** (pruebas) y la preparación de la Fase 1 (ver "Hasta la Fase 1").
+Última actualización: 2026-11-10. Fase 0 cerrada; en curso: **auth** (pruebas) y la preparación de la Fase 1 (ver "Hasta la Fase 1").
 
 | Módulo | Doc | Estado | Rama activa |
 |---|---|---|---|
@@ -39,7 +39,7 @@ Estados: pendiente · en curso · en pruebas · cerrado.
 |---|---|---|---|
 | sistema de diseño: tokens + página dev en admin | 07-diseno.md | cerrado (2026-10-30) | chore/design-system |
 | rediseño neutro multideporte (pedido de Raul) | 07-diseno.md | en pruebas: tema neutro claro y oscuro (fijable en Ajustes), Atkinson Hyperlegible Next + Saira Condensed, tablero del árbitro (grupos en tinta), marcador y crear grupo con huecos (#57); resto de pantallas en `pendientes.md` (2026-11-08) | feat/design-neutral-groups |
-| prototipo Fase 1 Yoseikan (uso real ≈ 2026-11-14) | modulos/prototipo-f1.md | en curso: back completo (pasos 1-3/7); front pasos 4-6/7 (login de `auth`, mis eventos, crear grupos; tablero del tapiz y marcador con campana; panel del club con puntuaciones, tapices, inscripciones, configuración y CSV). Probado a mano en Chrome (ayudante, árbitro y club). Paso 7 en curso: release `v0.1.0` fusionada y etiquetada (#36, 2026-11-04); falta desplegar en la Pi (`brackety.rgal.dev`) | – |
+| prototipo Fase 1 Yoseikan (uso real ≈ 2026-11-14) | modulos/prototipo-f1.md | en curso: back completo (pasos 1-3/7); front pasos 4-6/7 (login de `auth`, mis eventos, crear grupos; tablero del tapiz y marcador con campana; panel del club con puntuaciones, tapices, inscripciones, configuración y CSV). Probado a mano en Chrome (ayudante, árbitro y club). Paso 7 en curso: release `v0.1.0` fusionada y etiquetada (#36, 2026-11-04); release `v0.3.0` (#61) desplegada en la Pi el 2026-11-10 (`brackety.rgal.dev`, en la SD); falta el ensayo con varios dispositivos | – |
 | prototipo F1: categorías por equipos | modulos/prototipo-f1-equipos.md | en pruebas: pasos 8-11 hechos (back, ayudante, árbitro, club con categorías editables). Falta: prueba manual de Raul (2026-11-02) | feat/proto-f1-teams-club |
 | prototipo F1: importación masiva de alumnos | modulos/importacion-alumnos.md | en pruebas: pasos 1-3 hechos (back, pantallas, imagen con `claude`). Falta: DPA y clave de Anthropic, prueba en la Pi y prueba manual de Raul (2026-11-02) | feat/import-deploy |
 | servidor del pabellón (portátil Windows) y paquete del evento | modulos/servidor-local.md | en curso: pasos 1-3/4 hechos (APK con selector de servidor; 2026-11-05). Endurecido tras la revisión (`revision-f1.md`, servidor y pabellón): contraseñas aleatorias del paquete, sin puntuar antes de iniciar, refresh idempotente, acceso de 12 h, sin `X-Forwarded-For`, firewall solo del punto de acceso, bloqueo de evento al primer inicio, inscritos solo para el club, CSV, BitLocker e `icacls` (2026-11-06) | fix/f1-hardening-server |
