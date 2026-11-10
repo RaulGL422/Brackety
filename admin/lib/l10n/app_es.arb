@@ -4,7 +4,6 @@
   "navDashboard": "Panel",
   "navConnection": "Conexión",
   "dashboardTitle": "Panel de superadmin",
-  "dashboardSubtitle": "Gestión global de la plataforma.",
   "navDesignSystem": "Diseño",
   "dsTitle": "Sistema de diseño",
   "dsIntro": "Solo en builds debug. Todo lo de abajo usa el tema real en el modo elegido.",
@@ -390,6 +389,54 @@
     "placeholders": {
       "name": {
         "type": "String"
+      }
+    }
+  },
+  "metricsAt": "Datos de las {time}",
+  "metricsUsers": "Usuarios",
+  "metricsActiveAccounts": "Cuentas activas",
+  "metricsNewLast7Days": "Altas en 7 días",
+  "metricsUnverified": "Sin verificar el email",
+  "metricsPendingDeletion": "Pendientes de borrado",
+  "metricsOrganizersPending": "Organizadores por validar",
+  "metricsActiveSessions": "Sesiones abiertas",
+  "metricsActiveLocks": "Bloqueos activos",
+  "metricsProfiles": "Perfiles",
+  "metricsClubs": "Clubes",
+  "metricsEntities": "Entidades externas",
+  "metricsHelpers": "Ayudantes",
+  "metricsStudents": "Alumnos",
+  "metricsExternals": "Externos",
+  "metricsEvents": "Eventos",
+  "metricsEventsTotal": "Eventos",
+  "metricsUpcoming": "Hoy o más adelante",
+  "metricsEntries": "Inscritos",
+  "metricsImports": "Importaciones en 7 días",
+  "metricsImported": "Importados en 7 días",
+  "metricsActivity": "Actividad",
+  "metricsMatchesFinished": "Combates terminados en 24 h",
+  "metricsScoreboardActions": "Acciones del marcador en 24 h",
+  "metricsGroupsCreated": "Grupos creados en 24 h",
+  "metricsInProgress": "Combates en curso ahora",
+  "metricsInReview": "Combates en revisión",
+  "metricsInReviewNote": "El club tiene que revisarlos",
+  "metricsServer": "Servidor",
+  "metricsServerErrors": "Errores 5xx de la API",
+  "metricsSince": "Desde el arranque: {date}",
+  "metricsServerErrorsNote": "Mira los logs de la API",
+  "@metricsAt": {
+    "placeholders": {
+      "time": {
+        "type": "DateTime",
+        "format": "Hm"
+      }
+    }
+  },
+  "@metricsSince": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMd"
       }
     }
   }

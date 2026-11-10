@@ -22,9 +22,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboardTitle => 'Superadmin dashboard';
 
   @override
-  String get dashboardSubtitle => 'Platform-wide management.';
-
-  @override
   String get navDesignSystem => 'Design';
 
   @override
@@ -613,4 +610,110 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get eventChanged =>
       'The event changed meanwhile; it has been reloaded.';
+
+  @override
+  String metricsAt(DateTime time) {
+    final intl.DateFormat timeDateFormat = intl.DateFormat.Hm(localeName);
+    final String timeString = timeDateFormat.format(time);
+
+    return 'Data as of $timeString';
+  }
+
+  @override
+  String get metricsUsers => 'Users';
+
+  @override
+  String get metricsActiveAccounts => 'Active accounts';
+
+  @override
+  String get metricsNewLast7Days => 'New in 7 days';
+
+  @override
+  String get metricsUnverified => 'Email not verified';
+
+  @override
+  String get metricsPendingDeletion => 'Awaiting deletion';
+
+  @override
+  String get metricsOrganizersPending => 'Organizers to validate';
+
+  @override
+  String get metricsActiveSessions => 'Open sessions';
+
+  @override
+  String get metricsActiveLocks => 'Active locks';
+
+  @override
+  String get metricsProfiles => 'Profiles';
+
+  @override
+  String get metricsClubs => 'Clubs';
+
+  @override
+  String get metricsEntities => 'External entities';
+
+  @override
+  String get metricsHelpers => 'Helpers';
+
+  @override
+  String get metricsStudents => 'Students';
+
+  @override
+  String get metricsExternals => 'Externals';
+
+  @override
+  String get metricsEvents => 'Events';
+
+  @override
+  String get metricsEventsTotal => 'Events';
+
+  @override
+  String get metricsUpcoming => 'Today or later';
+
+  @override
+  String get metricsEntries => 'Entries';
+
+  @override
+  String get metricsImports => 'Imports in 7 days';
+
+  @override
+  String get metricsImported => 'Imported in 7 days';
+
+  @override
+  String get metricsActivity => 'Activity';
+
+  @override
+  String get metricsMatchesFinished => 'Matches finished in 24 h';
+
+  @override
+  String get metricsScoreboardActions => 'Scoreboard actions in 24 h';
+
+  @override
+  String get metricsGroupsCreated => 'Groups created in 24 h';
+
+  @override
+  String get metricsInProgress => 'Matches in progress now';
+
+  @override
+  String get metricsInReview => 'Matches in review';
+
+  @override
+  String get metricsInReviewNote => 'The club has to review them';
+
+  @override
+  String get metricsServer => 'Server';
+
+  @override
+  String get metricsServerErrors => 'API 5xx errors';
+
+  @override
+  String metricsSince(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Since the start: $dateString';
+  }
+
+  @override
+  String get metricsServerErrorsNote => 'Check the API logs';
 }

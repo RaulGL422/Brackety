@@ -122,12 +122,6 @@ abstract class AppLocalizations {
   /// **'Panel de superadmin'**
   String get dashboardTitle;
 
-  /// No description provided for @dashboardSubtitle.
-  ///
-  /// In es, this message translates to:
-  /// **'Gestión global de la plataforma.'**
-  String get dashboardSubtitle;
-
   /// No description provided for @navDesignSystem.
   ///
   /// In es, this message translates to:
@@ -1069,6 +1063,198 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'El evento ha cambiado mientras tanto; se ha recargado.'**
   String get eventChanged;
+
+  /// No description provided for @metricsAt.
+  ///
+  /// In es, this message translates to:
+  /// **'Datos de las {time}'**
+  String metricsAt(DateTime time);
+
+  /// No description provided for @metricsUsers.
+  ///
+  /// In es, this message translates to:
+  /// **'Usuarios'**
+  String get metricsUsers;
+
+  /// No description provided for @metricsActiveAccounts.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuentas activas'**
+  String get metricsActiveAccounts;
+
+  /// No description provided for @metricsNewLast7Days.
+  ///
+  /// In es, this message translates to:
+  /// **'Altas en 7 días'**
+  String get metricsNewLast7Days;
+
+  /// No description provided for @metricsUnverified.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin verificar el email'**
+  String get metricsUnverified;
+
+  /// No description provided for @metricsPendingDeletion.
+  ///
+  /// In es, this message translates to:
+  /// **'Pendientes de borrado'**
+  String get metricsPendingDeletion;
+
+  /// No description provided for @metricsOrganizersPending.
+  ///
+  /// In es, this message translates to:
+  /// **'Organizadores por validar'**
+  String get metricsOrganizersPending;
+
+  /// No description provided for @metricsActiveSessions.
+  ///
+  /// In es, this message translates to:
+  /// **'Sesiones abiertas'**
+  String get metricsActiveSessions;
+
+  /// No description provided for @metricsActiveLocks.
+  ///
+  /// In es, this message translates to:
+  /// **'Bloqueos activos'**
+  String get metricsActiveLocks;
+
+  /// No description provided for @metricsProfiles.
+  ///
+  /// In es, this message translates to:
+  /// **'Perfiles'**
+  String get metricsProfiles;
+
+  /// No description provided for @metricsClubs.
+  ///
+  /// In es, this message translates to:
+  /// **'Clubes'**
+  String get metricsClubs;
+
+  /// No description provided for @metricsEntities.
+  ///
+  /// In es, this message translates to:
+  /// **'Entidades externas'**
+  String get metricsEntities;
+
+  /// No description provided for @metricsHelpers.
+  ///
+  /// In es, this message translates to:
+  /// **'Ayudantes'**
+  String get metricsHelpers;
+
+  /// No description provided for @metricsStudents.
+  ///
+  /// In es, this message translates to:
+  /// **'Alumnos'**
+  String get metricsStudents;
+
+  /// No description provided for @metricsExternals.
+  ///
+  /// In es, this message translates to:
+  /// **'Externos'**
+  String get metricsExternals;
+
+  /// No description provided for @metricsEvents.
+  ///
+  /// In es, this message translates to:
+  /// **'Eventos'**
+  String get metricsEvents;
+
+  /// No description provided for @metricsEventsTotal.
+  ///
+  /// In es, this message translates to:
+  /// **'Eventos'**
+  String get metricsEventsTotal;
+
+  /// No description provided for @metricsUpcoming.
+  ///
+  /// In es, this message translates to:
+  /// **'Hoy o más adelante'**
+  String get metricsUpcoming;
+
+  /// No description provided for @metricsEntries.
+  ///
+  /// In es, this message translates to:
+  /// **'Inscritos'**
+  String get metricsEntries;
+
+  /// No description provided for @metricsImports.
+  ///
+  /// In es, this message translates to:
+  /// **'Importaciones en 7 días'**
+  String get metricsImports;
+
+  /// No description provided for @metricsImported.
+  ///
+  /// In es, this message translates to:
+  /// **'Importados en 7 días'**
+  String get metricsImported;
+
+  /// No description provided for @metricsActivity.
+  ///
+  /// In es, this message translates to:
+  /// **'Actividad'**
+  String get metricsActivity;
+
+  /// No description provided for @metricsMatchesFinished.
+  ///
+  /// In es, this message translates to:
+  /// **'Combates terminados en 24 h'**
+  String get metricsMatchesFinished;
+
+  /// No description provided for @metricsScoreboardActions.
+  ///
+  /// In es, this message translates to:
+  /// **'Acciones del marcador en 24 h'**
+  String get metricsScoreboardActions;
+
+  /// No description provided for @metricsGroupsCreated.
+  ///
+  /// In es, this message translates to:
+  /// **'Grupos creados en 24 h'**
+  String get metricsGroupsCreated;
+
+  /// No description provided for @metricsInProgress.
+  ///
+  /// In es, this message translates to:
+  /// **'Combates en curso ahora'**
+  String get metricsInProgress;
+
+  /// No description provided for @metricsInReview.
+  ///
+  /// In es, this message translates to:
+  /// **'Combates en revisión'**
+  String get metricsInReview;
+
+  /// No description provided for @metricsInReviewNote.
+  ///
+  /// In es, this message translates to:
+  /// **'El club tiene que revisarlos'**
+  String get metricsInReviewNote;
+
+  /// No description provided for @metricsServer.
+  ///
+  /// In es, this message translates to:
+  /// **'Servidor'**
+  String get metricsServer;
+
+  /// No description provided for @metricsServerErrors.
+  ///
+  /// In es, this message translates to:
+  /// **'Errores 5xx de la API'**
+  String get metricsServerErrors;
+
+  /// No description provided for @metricsSince.
+  ///
+  /// In es, this message translates to:
+  /// **'Desde el arranque: {date}'**
+  String metricsSince(DateTime date);
+
+  /// No description provided for @metricsServerErrorsNote.
+  ///
+  /// In es, this message translates to:
+  /// **'Mira los logs de la API'**
+  String get metricsServerErrorsNote;
 }
 
 class _AppLocalizationsDelegate
