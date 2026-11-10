@@ -15,7 +15,10 @@ class AdminAudit {
     enum Action {
         ADMIN_LOGIN,
         LOCK_REVOKED,
-        ORGANIZER_VALIDATED
+        ORGANIZER_VALIDATED,
+        MATCH_RESET,
+        GROUP_DISSOLVED,
+        COMPETITION_CLEARED
     }
 
     @Id
@@ -29,11 +32,19 @@ class AdminAudit {
 
     private String target;
 
+    /** Why: required for the event operations, null for the rest. */
+    private String reason;
+
     protected AdminAudit() {}
 
     AdminAudit(Action action, String target, Instant at) {
+        this(action, target, null, at);
+    }
+
+    AdminAudit(Action action, String target, String reason, Instant at) {
         this.action = action;
         this.target = target;
+        this.reason = reason;
         this.at = at;
     }
 }
