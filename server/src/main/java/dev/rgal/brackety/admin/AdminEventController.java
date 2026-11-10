@@ -4,6 +4,7 @@ import dev.rgal.brackety.admin.dto.AdminEventDtos.Cleared;
 import dev.rgal.brackety.admin.dto.AdminEventDtos.EventDetail;
 import dev.rgal.brackety.admin.dto.AdminEventDtos.EventPage;
 import dev.rgal.brackety.admin.dto.AdminEventDtos.ReasonRequest;
+import dev.rgal.brackety.admin.dto.AdminMetrics;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
@@ -22,9 +23,16 @@ import org.springframework.web.bind.annotation.RestController;
 class AdminEventController {
 
     private final AdminEventService events;
+    private final AdminMetricsService metrics;
 
-    AdminEventController(AdminEventService events) {
+    AdminEventController(AdminEventService events, AdminMetricsService metrics) {
         this.events = events;
+        this.metrics = metrics;
+    }
+
+    @GetMapping("/metrics")
+    AdminMetrics metrics() {
+        return metrics.read();
     }
 
     @GetMapping("/events")
