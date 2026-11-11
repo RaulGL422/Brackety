@@ -20,18 +20,26 @@ public class Participant {
     private UUID id;
 
     private UUID eventId;
+    private UUID personId;
     private String firstName;
     private String lastName;
     private LocalDate birthDate;
     private Integer heightCm;
     private boolean guardianConsent;
     private UUID categoryId;
+    private UUID organizationId;
     private Instant createdAt;
 
     protected Participant() {}
 
     public Participant(UUID eventId, Instant now) {
+        this(eventId, UUID.randomUUID(), now);
+    }
+
+    /** {@code personId}: the same person in another phase of the league, or a new one. */
+    public Participant(UUID eventId, UUID personId, Instant now) {
         this.eventId = eventId;
+        this.personId = personId;
         this.createdAt = now;
     }
 
@@ -41,6 +49,19 @@ public class Participant {
 
     public UUID getEventId() {
         return eventId;
+    }
+
+    /** The same person in every phase of a league: their points add up. */
+    public UUID getPersonId() {
+        return personId;
+    }
+
+    public UUID getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(UUID organizationId) {
+        this.organizationId = organizationId;
     }
 
     public String getFirstName() {

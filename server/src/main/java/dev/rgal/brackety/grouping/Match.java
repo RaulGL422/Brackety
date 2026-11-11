@@ -114,6 +114,11 @@ public class Match {
         return finishedAt;
     }
 
+    /** Clock time run so far (without the stretch since {@code runningSince}, if running). */
+    public long getElapsedMs() {
+        return elapsedMs;
+    }
+
     /** "RED", "BLUE" or null. */
     public String getDisqualifiedSide() {
         return disqualifiedSide;

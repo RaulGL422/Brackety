@@ -21,6 +21,8 @@ import dev.rgal.brackety.auth.session.SessionService;
 import dev.rgal.brackety.auth.session.SessionService.Session;
 import dev.rgal.brackety.event.Event;
 import dev.rgal.brackety.event.EventRepository;
+import dev.rgal.brackety.league.League;
+import dev.rgal.brackety.league.LeagueRepository;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -59,6 +61,9 @@ class AccountDeletionTest extends AuthIntegrationTest {
     EventRepository events;
 
     @Autowired
+    LeagueRepository leagues;
+
+    @Autowired
     DeletedAccountPurge purge;
 
     @Autowired
@@ -88,7 +93,7 @@ class AccountDeletionTest extends AuthIntegrationTest {
     @Test
     void anEventOwnerCannotDeleteTheAccount() throws Exception {
         var session = account(ANA);
-        events.save(Event.tambo(idOf(ANA), "Liga", LocalDate.of(2027, 4, 1), clock.instant()));
+        saveEvent(idOf(ANA));
         emails.reset();
 
         deleteAccount(session)
@@ -224,7 +229,7 @@ class AccountDeletionTest extends AuthIntegrationTest {
         clock.advance(Duration.ofSeconds(1));
         deleteAccountOf(BEA);
         // Only possible by hand: DELETE /me refuses an event owner.
-        events.save(Event.tambo(idOf(ANA), "Liga", LocalDate.of(2027, 4, 1), clock.instant()));
+        saveEvent(idOf(ANA));
 
         clock.advance(Duration.ofDays(30));
         purge.run();
@@ -324,5 +329,10 @@ class AccountDeletionTest extends AuthIntegrationTest {
                 .param(email)
                 .update();
         return auth.login(email, PASSWORD, IP);
+    }
+
+    private void saveEvent(UUID owner) {
+        var league = leagues.save(new League(owner, "Liga", clock.instant()));
+        events.save(Event.tambo(owner, league.getId(), "Liga", LocalDate.of(2027, 4, 1), clock.instant()));
     }
 }

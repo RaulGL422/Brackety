@@ -40,10 +40,9 @@ class EventPackageControllerTest extends EventApiTest {
 
     @Test
     void slugKeepsLettersAndDigits() {
-        assertThat(EventPackageController.slug("Liga Yoseikan · Fase 1 · Tambo"))
-                .isEqualTo("liga-yoseikan-fase-1-tambo");
-        assertThat(EventPackageController.slug("Campeonato Ñandú")).isEqualTo("campeonato-nandu");
-        assertThat(EventPackageController.slug("···")).isEqualTo("evento");
+        assertThat(EventPackageService.slug("Liga Yoseikan · Fase 1 · Tambo")).isEqualTo("liga-yoseikan-fase-1-tambo");
+        assertThat(EventPackageService.slug("Campeonato Ñandú")).isEqualTo("campeonato-nandu");
+        assertThat(EventPackageService.slug("···")).isEqualTo("evento");
     }
 
     private String url() {

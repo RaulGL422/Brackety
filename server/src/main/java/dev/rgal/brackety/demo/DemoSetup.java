@@ -4,12 +4,16 @@ import dev.rgal.brackety.auth.account.AccountRepository;
 import dev.rgal.brackety.event.Event;
 import dev.rgal.brackety.event.EventCategory;
 import dev.rgal.brackety.event.EventCategoryRepository;
+import dev.rgal.brackety.event.EventOrganization;
+import dev.rgal.brackety.event.EventOrganizationRepository;
 import dev.rgal.brackety.event.EventRepository;
 import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventStaff;
 import dev.rgal.brackety.event.EventStaffRepository;
 import dev.rgal.brackety.event.Mat;
 import dev.rgal.brackety.event.MatRepository;
+import dev.rgal.brackety.league.League;
+import dev.rgal.brackety.league.LeagueRepository;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
@@ -35,6 +39,8 @@ public class DemoSetup {
     // Fictional organization, with a CIF that only passes the check digit.
     private static final String DEMO_CLUB_NAME = "Club Demo Yoseikan";
     private static final String DEMO_CLUB_CIF = "G12345674";
+    // Fictional organizations taking part, so the club column has something to show.
+    public static final List<String> ORGANIZATIONS = List.of(DEMO_CLUB_NAME, "Escuela Yoseikan Sur");
     private static final List<String> GROUPERS = List.of("ayudante1", "ayudante2");
     private static final List<String> REFEREES = List.of("arbitro1", "arbitro2", "arbitro3", "arbitro4", "arbitro5");
 
@@ -59,6 +65,8 @@ public class DemoSetup {
     private final EventStaffRepository staff;
     private final MatRepository mats;
     private final EventCategoryRepository categories;
+    private final EventOrganizationRepository organizations;
+    private final LeagueRepository leagues;
     private final TransactionOperations transactions;
     private final Clock clock;
     private final boolean enabled;
@@ -72,6 +80,8 @@ public class DemoSetup {
             EventStaffRepository staff,
             MatRepository mats,
             EventCategoryRepository categories,
+            EventOrganizationRepository organizations,
+            LeagueRepository leagues,
             TransactionOperations transactions,
             Clock clock,
             @Value("${brackety.demo.enabled}") boolean enabled,
@@ -83,6 +93,8 @@ public class DemoSetup {
         this.staff = staff;
         this.mats = mats;
         this.categories = categories;
+        this.organizations = organizations;
+        this.leagues = leagues;
         this.transactions = transactions;
         this.clock = clock;
         this.enabled = enabled;
@@ -109,7 +121,9 @@ public class DemoSetup {
             var now = clock.instant();
             var club = demoAccounts.club(CLUB, DEMO_CLUB_NAME, DEMO_CLUB_CIF);
             var date = eventDate.isBlank() ? LocalDate.now(clock) : LocalDate.parse(eventDate);
-            var event = events.save(Event.tambo(club, "Liga Yoseikan 2027 · Fase 1 · Tambo", date, now));
+            var league = leagues.save(new League(club, "Liga Yoseikan 2027", now));
+            var event =
+                    events.save(Event.tambo(club, league.getId(), "Liga Yoseikan 2027 · Fase 1 · Tambo", date, now));
             staff.save(new EventStaff(event.getId(), club, EventRole.CLUB));
             for (var grouper : GROUPERS) {
                 staff.save(new EventStaff(event.getId(), demoAccounts.helper(grouper), EventRole.GROUPER));
@@ -121,6 +135,9 @@ public class DemoSetup {
             }
             for (var c : CATEGORIES) {
                 categories.save(new EventCategory(event.getId(), c.name(), c.minAge(), c.maxAge(), c.teamSize()));
+            }
+            for (var name : ORGANIZATIONS) {
+                organizations.save(new EventOrganization(event.getId(), name, null));
             }
             return event.getId();
         });

@@ -13,9 +13,11 @@ import java.util.UUID;
 /**
  * {@code matReferees} has one entry per mat, in mat order (mat 1 first): its size is the number of
  * mats and each entry is the referee's account id, or null for a mat without referee yet.
+ * {@code attendancePoints}: null keeps the current ones.
  */
 public record EventSettingsRequest(
         @NotBlank @Size(max = 120) String name,
         @NotNull LocalDate date,
         @Min(1) @Max(4) int maxGroupsPerMat,
-        @NotEmpty @Size(max = 20) List<UUID> matReferees) {}
+        @NotEmpty @Size(max = 20) List<UUID> matReferees,
+        @Min(0) @Max(100) Integer attendancePoints) {}

@@ -2,6 +2,7 @@ package dev.rgal.brackety.event;
 
 import jakarta.persistence.LockModeType;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,6 +12,8 @@ import org.springframework.data.jpa.repository.Query;
 public interface EventRepository extends JpaRepository<Event, UUID> {
 
     boolean existsByOwnerAccountId(UUID ownerAccountId);
+
+    List<Event> findByLeagueIdOrderByPhaseNumber(UUID leagueId);
 
     // Serializes group creation in one event: mat choice and group numbers need a stable view.
     @Lock(LockModeType.PESSIMISTIC_WRITE)

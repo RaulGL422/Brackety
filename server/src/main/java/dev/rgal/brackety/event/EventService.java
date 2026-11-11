@@ -25,6 +25,7 @@ public class EventService {
     private final EventStaffRepository staff;
     private final MatRepository mats;
     private final EventCategoryRepository categories;
+    private final EventOrganizationRepository organizations;
     private final AccountRepository accounts;
     private final EventAccess access;
 
@@ -33,12 +34,14 @@ public class EventService {
             EventStaffRepository staff,
             MatRepository mats,
             EventCategoryRepository categories,
+            EventOrganizationRepository organizations,
             AccountRepository accounts,
             EventAccess access) {
         this.events = events;
         this.staff = staff;
         this.mats = mats;
         this.categories = categories;
+        this.organizations = organizations;
         this.accounts = accounts;
         this.access = access;
     }
@@ -72,7 +75,9 @@ public class EventService {
                             rolesByEvent.get(event.getId()),
                             event.getMaxGroupsPerMat(),
                             mat.map(Mat::getId).orElse(null),
-                            mat.map(Mat::getNumber).orElse(null));
+                            mat.map(Mat::getNumber).orElse(null),
+                            event.getLeagueId(),
+                            event.getPhaseNumber());
                 })
                 .toList();
     }
@@ -107,7 +112,9 @@ public class EventService {
                 && events.hasGroupsOnMats(removed.stream().map(Mat::getId).toList())) {
             throw EventException.conflict("A mat with groups cannot be removed.");
         }
-        event.update(request.name().strip(), request.date(), request.maxGroupsPerMat());
+        var attendancePoints =
+                request.attendancePoints() != null ? request.attendancePoints() : event.getAttendancePoints();
+        event.update(request.name().strip(), request.date(), request.maxGroupsPerMat(), attendancePoints);
         for (int i = 0; i < request.matReferees().size(); i++) {
             var referee = request.matReferees().get(i);
             if (i < current.size()) {
@@ -137,7 +144,11 @@ public class EventService {
                 referees,
                 categories.findByEventIdOrderByMinAge(event.getId()).stream()
                         .map(CategoryResponse::of)
-                        .toList());
+                        .toList(),
+                EventOrganizationService.list(organizations, event.getId()),
+                event.getAttendancePoints(),
+                event.getPhaseNumber(),
+                event.getDiscipline().name());
     }
 
     private List<UUID> refereeIds(UUID eventId) {

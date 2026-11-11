@@ -52,6 +52,10 @@ public class FightGroup {
         return number;
     }
 
+    public UUID getCreatedBy() {
+        return createdBy;
+    }
+
     public Instant getCreatedAt() {
         return createdAt;
     }

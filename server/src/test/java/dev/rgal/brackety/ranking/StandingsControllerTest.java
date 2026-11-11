@@ -107,12 +107,12 @@ class StandingsControllerTest extends EventApiTest {
         var standings = call(get("/api/v1/events/" + eventId + "/export/standings.csv"), "club1")
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(new MediaType("text", "csv")))
-                .andExpect(header().string("Content-Disposition", "attachment; filename=\"clasificacion.csv\""))
+                .andExpect(header().string("Content-Disposition", "attachment; filename=\"clasificacion-fase.csv\""))
                 .andReturn()
                 .getResponse()
                 .getContentAsString(StandardCharsets.UTF_8);
-        assertThat(standings).startsWith(Csv.BOM + "Posición;Nombre;Apellidos;Edad;Categoría");
-        assertThat(standings).contains("1;Bea;Prueba;9;9-10;;10;15;25;1");
+        assertThat(standings).startsWith(Csv.BOM + "Posición;Nombre;Apellidos;Edad el día del evento;Club;Categoría");
+        assertThat(standings).contains("1;Bea;Prueba;9;;9-10;;10;15;25;1");
         assertThat(standings).contains("\"'=HYPERLINK(\"\"x\"\")\"");
 
         var matches = call(get("/api/v1/events/" + eventId + "/export/matches.csv"), "club1")
@@ -120,13 +120,15 @@ class StandingsControllerTest extends EventApiTest {
                 .getResponse()
                 .getContentAsString(StandardCharsets.UTF_8);
         assertThat(matches.lines()).hasSize(7);
-        assertThat(matches).contains("1;1;9-10;1;Ana Prueba;Bea Prueba;3;15;Fantasma Prueba;;finalizado;");
+        assertThat(matches)
+                .contains("1;9-10;1;1;Ana Prueba;;Bea Prueba;;3;15;Bea Prueba;Llegó a 15 puntos;Terminado;"
+                        + "Fantasma Prueba;10/03/2027;");
 
         var timeline = call(get("/api/v1/events/" + eventId + "/export/timeline.csv"), "club1")
                 .andReturn()
                 .getResponse()
                 .getContentAsString(StandardCharsets.UTF_8);
-        assertThat(timeline).contains(";STOP;;;;automático;");
+        assertThat(timeline).contains(";Parar reloj;;;;Automático;;No");
     }
 
     @Test

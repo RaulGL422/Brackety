@@ -9,6 +9,7 @@ import jakarta.validation.Validator;
 import java.time.Period;
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -28,6 +29,7 @@ final class EventPackageRules {
         checkOwner(p);
         checkStaff(p.staff());
         checkCategories(p.categories());
+        checkOrganizations(p.organizationsOrEmpty());
         checkMats(p);
         checkParticipants(p);
     }
@@ -71,6 +73,15 @@ final class EventPackageRules {
         }
     }
 
+    private static void checkOrganizations(List<EventPackage.OrganizationEntry> organizations) {
+        var names = new HashSet<String>();
+        for (int i = 0; i < organizations.size(); i++) {
+            if (!names.add(organizations.get(i).name().strip())) {
+                throw invalid("organizations[" + i + "].name: repeated");
+            }
+        }
+    }
+
     private static void checkMats(EventPackage p) {
         var numbers =
                 p.mats().stream().map(EventPackage.MatEntry::number).sorted().toList();
@@ -94,8 +105,18 @@ final class EventPackageRules {
 
     private static void checkParticipants(EventPackage p) {
         var categories = p.categories().stream().map(c -> c.name().strip()).collect(Collectors.toSet());
+        var organizations =
+                p.organizationsOrEmpty().stream().map(o -> o.name().strip()).collect(Collectors.toSet());
+        var persons = new HashSet<UUID>();
         for (int i = 0; i < p.participants().size(); i++) {
             var participant = p.participants().get(i);
+            if (participant.personId() != null && !persons.add(participant.personId())) {
+                throw invalid("participants[" + i + "].personId: repeated");
+            }
+            if (participant.organizationName() != null
+                    && !organizations.contains(participant.organizationName().strip())) {
+                throw invalid("participants[" + i + "].organizationName: not one of the package's organizations");
+            }
             if (participant.categoryName() != null && !categories.contains(participant.categoryName())) {
                 throw invalid("participants[" + i + "].categoryName: not one of the package's categories");
             }
