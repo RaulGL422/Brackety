@@ -1,3 +1,4 @@
+import 'package:brackety_core/brackety_core.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
@@ -33,7 +34,7 @@ Future<void> runAccountAction(
   Future<void> Function() action, {
   String? done,
 }) async {
-  final messenger = ScaffoldMessenger.of(context);
+  final toasts = Toasts.of(context);
   final l10n = AppLocalizations.of(context);
   String? message;
   try {
@@ -43,6 +44,6 @@ Future<void> runAccountAction(
     message = accountErrorMessage(l10n, e);
   }
   if (message != null) {
-    messenger.showSnackBar(SnackBar(content: Text(message)));
+    toasts.show(message);
   }
 }

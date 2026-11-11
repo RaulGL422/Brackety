@@ -60,6 +60,9 @@ class EventSettings {
     required this.matReferees,
     required this.referees,
     required this.categories,
+    required this.matchLength,
+    required this.pointsLimit,
+    this.organizations = const [],
   });
 
   factory EventSettings.fromJson(Map<String, dynamic> json) {
@@ -78,6 +81,12 @@ class EventSettings {
         for (final c in json['categories'] as List)
           EventCategory.fromJson(c as Map<String, dynamic>),
       ],
+      matchLength: Duration(seconds: json['matchSeconds'] as int),
+      pointsLimit: json['pointsLimit'] as int,
+      organizations: [
+        for (final o in json['organizations'] as List? ?? [])
+          Organization.fromJson(o as Map<String, dynamic>),
+      ],
     );
   }
 
@@ -90,6 +99,34 @@ class EventSettings {
   /// Accounts that can referee a mat in this event.
   final List<StaffMember> referees;
   final List<EventCategory> categories;
+  final Duration matchLength;
+
+  /// Points that end a match; a disqualification gives them to the rival.
+  final int pointsLimit;
+
+  /// The clubs taking part, in the order the club entered them.
+  final List<Organization> organizations;
+}
+
+/// A club taking part in the event; [id] is null until saved.
+class Organization {
+  const Organization({this.id, required this.name, this.shortName});
+
+  factory Organization.fromJson(Map<String, dynamic> json) => Organization(
+    id: json['id'] as String?,
+    name: json['name'] as String,
+    shortName: json['shortName'] as String?,
+  );
+
+  final String? id;
+  final String name;
+  final String? shortName;
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'shortName': shortName,
+  };
 }
 
 /// From this age on the day of the event no guardian has to agree.
@@ -106,6 +143,8 @@ class Participant {
     this.heightCm,
     this.categoryName,
     this.chosenCategoryId,
+    this.organizationId,
+    this.organizationName,
   });
 
   factory Participant.fromJson(Map<String, dynamic> json) => Participant(
@@ -118,6 +157,8 @@ class Participant {
     heightCm: json['heightCm'] as int?,
     categoryName: json['categoryName'] as String?,
     chosenCategoryId: json['chosenCategoryId'] as String?,
+    organizationId: json['organizationId'] as String?,
+    organizationName: json['organizationName'] as String?,
   );
 
   final String id;
@@ -135,6 +176,10 @@ class Participant {
 
   /// Set when a category was chosen for them instead of following their age.
   final String? chosenCategoryId;
+
+  /// Their club, if the event lists clubs.
+  final String? organizationId;
+  final String? organizationName;
 
   /// A minor on the day of the event whose guardian's agreement is not ticked.
   bool get needsGuardian => age < adultAge && !guardianConsent;
@@ -224,4 +269,29 @@ class MatOverview {
 
   /// Matches waiting for the club to apply or discard what a phone sent.
   final int matchesInReview;
+}
+
+/// What importing the hall's results brings. [alreadyImported]: the same results came before, nothing changes.
+class ResultsImport {
+  const ResultsImport({
+    required this.alreadyImported,
+    required this.newParticipants,
+    required this.groups,
+    required this.matches,
+    required this.actions,
+  });
+
+  factory ResultsImport.fromJson(Map<String, dynamic> json) => ResultsImport(
+    alreadyImported: json['alreadyImported'] as bool,
+    newParticipants: json['newParticipants'] as int,
+    groups: json['groups'] as int,
+    matches: json['matches'] as int,
+    actions: json['actions'] as int,
+  );
+
+  final bool alreadyImported;
+  final int newParticipants;
+  final int groups;
+  final int matches;
+  final int actions;
 }

@@ -13,12 +13,12 @@ class LanguageSection extends ConsumerWidget {
   final String locale;
 
   Future<void> _select(BuildContext context, WidgetRef ref, String code) async {
-    final messenger = ScaffoldMessenger.of(context);
+    final toasts = Toasts.of(context);
     final error = AppLocalizations.of(context).settingsLanguageError;
     try {
       await ref.read(accountProvider.notifier).setLocale(code);
     } on DioException {
-      messenger.showSnackBar(SnackBar(content: Text(error)));
+      toasts.show(error, kind: ToastKind.error);
     }
   }
 

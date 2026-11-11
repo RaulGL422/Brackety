@@ -84,6 +84,10 @@ class GroupingRepository {
     return Team.fromJson(response.data!);
   }
 
+  /// 409 once a match of the group has started.
+  Future<void> undoGroup(String eventId, String groupId) =>
+      _dio.delete<void>('/api/v1/events/$eventId/groups/$groupId');
+
   Future<void> deleteTeam(String eventId, String teamId) =>
       _dio.delete<void>('/api/v1/events/$eventId/teams/$teamId');
 }

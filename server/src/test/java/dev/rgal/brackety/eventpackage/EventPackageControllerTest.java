@@ -22,7 +22,7 @@ class EventPackageControllerTest extends EventApiTest {
                 .andExpect(header().string(
                                 "Content-Disposition",
                                 "attachment; filename=\"liga-yoseikan-2027-fase-1-tambo-2027-03-10.brackety\""))
-                .andExpect(jsonPath("$.schemaVersion").value(1))
+                .andExpect(jsonPath("$.schemaVersion").value(EventPackage.SCHEMA_VERSION))
                 .andExpect(jsonPath("$.event.date").value("2027-03-10"))
                 .andExpect(jsonPath("$.owner.username").value("club1"))
                 .andExpect(jsonPath("$.staff", hasSize(8)))
@@ -40,10 +40,9 @@ class EventPackageControllerTest extends EventApiTest {
 
     @Test
     void slugKeepsLettersAndDigits() {
-        assertThat(EventPackageController.slug("Liga Yoseikan · Fase 1 · Tambo"))
-                .isEqualTo("liga-yoseikan-fase-1-tambo");
-        assertThat(EventPackageController.slug("Campeonato Ñandú")).isEqualTo("campeonato-nandu");
-        assertThat(EventPackageController.slug("···")).isEqualTo("evento");
+        assertThat(EventPackageService.slug("Liga Yoseikan · Fase 1 · Tambo")).isEqualTo("liga-yoseikan-fase-1-tambo");
+        assertThat(EventPackageService.slug("Campeonato Ñandú")).isEqualTo("campeonato-nandu");
+        assertThat(EventPackageService.slug("···")).isEqualTo("evento");
     }
 
     private String url() {

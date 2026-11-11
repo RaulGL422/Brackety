@@ -1,6 +1,7 @@
 import 'package:brackety/core/keep_screen_on.dart';
 import 'package:brackety/features/mat/data/mat_board.dart';
-import 'package:brackety/features/offline/state/offline_sync.dart';
+import 'package:brackety/features/offline/data/local_match.dart';
+import 'package:brackety/features/offline/data/offline_op.dart';
 import 'package:brackety/features/scoreboard/data/match_view.dart';
 import 'package:brackety/features/scoreboard/data/scoreboard_repository.dart';
 import 'package:brackety/features/scoreboard/state/bell.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/match_fakes.dart';
+import '../../support/offline_fakes.dart';
 
 void main() {
   const sizes = {
@@ -27,6 +29,20 @@ void main() {
     }
   }
 
+  // A started match after [actions], as the server would send it: its timeline matches its score.
+  MatchView played(List<(MatchAction, Side?)> actions) =>
+      LocalMatch.project(matchView(status: MatchStatus.inProgress), [
+        for (final (i, (action, side)) in actions.indexed)
+          OfflineOp(
+            opId: 'op$i',
+            matchId: 'm1',
+            action: action,
+            side: side,
+            at: DateTime(2027, 3, 10, 10, 0, 5),
+            knownEvents: i + 1,
+          ),
+      ], DateTime(2027, 3, 10, 10, 0, 30)).view;
+
   Future<(FakeScoreboardRepository, FakeBell)> open(
     WidgetTester tester,
     MatchView view,
@@ -36,11 +52,12 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          offlineEnabledProvider.overrideWithValue(false),
+          ...quietQueueOverrides(),
           scoreboardRepositoryProvider.overrideWithValue(repository),
           bellProvider.overrideWithValue(bell),
         ],
         child: MaterialApp(
+          builder: (_, child) => ToastHost(child: child!),
           theme: lightTheme(),
           localizationsDelegates: const [
             AppLocalizations.delegate,
@@ -132,7 +149,7 @@ void main() {
     await tester.tap(find.text('Warning'));
     await settle(tester);
 
-    final confirm = find.widgetWithText(FilledButton, 'Confirm');
+    final confirm = find.widgetWithText(FilledButton, 'Give warning');
     expect(tester.widget<FilledButton>(confirm).onPressed, isNull);
     await tester.enterText(find.byType(TextField), 'Ataque de pique');
     await settle(tester);
@@ -154,12 +171,7 @@ void main() {
     addTearDown(tester.view.reset);
     final (repository, _) = await open(
       tester,
-      matchView(
-        status: MatchStatus.inProgress,
-        redPoints: 15,
-        endReason: EndReason.points,
-        canUndo: true,
-      ),
+      played([for (var i = 0; i < 15; i++) (MatchAction.point, Side.red)]),
     );
 
     expect(find.text('Ended on points'), findsOneWidget);
@@ -284,7 +296,7 @@ void main() {
         matchView(status: MatchStatus.inProgress, redPoints: 1, canUndo: true),
       );
 
-      final undo = undoButton('Undo: +1 Red');
+      final undo = undoButton('+1 Red · 0:05');
       expect(undo, findsOneWidget);
       expect(tester.getSize(undo).height, greaterThanOrEqualTo(48));
 
@@ -339,7 +351,7 @@ void main() {
       ),
     );
 
-    expect(find.text('Undo: Blue warning'), findsOneWidget);
+    expect(find.text('Blue warning · 0:30'), findsOneWidget);
 
     await tester.pumpWidget(const SizedBox());
   });
@@ -367,7 +379,7 @@ void main() {
     setSize(tester, sizes['phone']!);
     final (repository, _) = await open(
       tester,
-      matchView(status: MatchStatus.inProgress),
+      played([(MatchAction.stop, null)]),
     );
     Color? background(String label) => tester
         .widget<FilledButton>(
@@ -399,10 +411,13 @@ void main() {
 
     await tester.tap(find.byType(PopupMenuButton<MatchAction>).first);
     await settle(tester);
-    final item = tester.widget<Text>(find.text('Disqualification'));
-    final scheme = Theme.of(tester.element(find.text('Disqualification')))
-        .colorScheme;
-    expect(item.style?.color, scheme.error);
+    final label = find.text('Disqualification');
+    final item = tester.widget<ListTile>(
+      find.ancestor(of: label, matching: find.byType(ListTile)),
+    );
+    final scheme = Theme.of(tester.element(label)).colorScheme;
+    expect(item.textColor, scheme.error);
+    expect(item.iconColor, scheme.error);
 
     await tester.pumpWidget(const SizedBox());
   });

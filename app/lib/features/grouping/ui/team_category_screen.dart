@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/app_bar_action.dart';
 import '../../../core/async_view.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../data/grouping_models.dart';
@@ -13,6 +14,7 @@ import '../state/grouping_providers.dart';
 import 'create_groups.dart';
 import 'draft_panel.dart';
 import 'pick_mark.dart';
+import '../../../core/up_button.dart';
 
 /// A team category (docs/modulos/prototipo-f1-equipos.md): make teams from its participants, then
 /// group 4 teams (or 3 and a ghost team) and send them to a mat. "Individual group" opens the usual
@@ -39,11 +41,16 @@ class TeamCategoryScreen extends ConsumerWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
+          leading: UpButton(
+            label: l10n.categoriesTitle,
+            fallback: '/events/$eventId/categories',
+          ),
+          leadingWidth: UpButton.leadingWidth(context),
           title: Text(l10n.categoryAges(categoryName)),
           actions: [
-            TextButton.icon(
-              icon: const Icon(Icons.person_outline),
-              label: Text(l10n.individualGroup),
+            AppBarAction(
+              icon: Icons.person_outline,
+              label: l10n.individualGroup,
               // Replaces this screen, so back goes to the categories, not here.
               onPressed: () => context.pushReplacement(
                 '/events/$eventId/categories/$categoryId?teamSize=$teamSize',
@@ -101,7 +108,7 @@ class _TeamMakerState extends ConsumerState<_TeamMaker> {
 
   Future<void> _create() async {
     final l10n = AppLocalizations.of(context);
-    final messenger = ScaffoldMessenger.of(context);
+    final toasts = Toasts.of(context);
     final key = widget.categoryKey;
     setState(() => _busy = true);
     try {
@@ -109,15 +116,14 @@ class _TeamMakerState extends ConsumerState<_TeamMaker> {
           .read(groupingRepositoryProvider)
           .createTeam(key.eventId, key.categoryId, _picks);
       _picks = [];
-      messenger.showSnackBar(
-        SnackBar(content: Text(l10n.teamCreated(l10n.teamName(team.number)))),
-      );
+      toasts.show(l10n.teamCreated(l10n.teamName(team.number)));
       _refresh(ref, key);
     } on DioException catch (e) {
       final conflict = e.response?.statusCode == 409;
       if (conflict) _refresh(ref, key);
-      messenger.showSnackBar(
-        SnackBar(content: Text(conflict ? l10n.teamConflict : l10n.teamError)),
+      toasts.show(
+        conflict ? l10n.teamConflict : l10n.teamError,
+        kind: ToastKind.error,
       );
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -252,11 +258,13 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
 
   Future<void> _delete(Team team) async {
     final l10n = AppLocalizations.of(context);
-    final messenger = ScaffoldMessenger.of(context);
+    final toasts = Toasts.of(context);
     final name = l10n.teamName(team.number);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        actionsOverflowDirection: VerticalDirection.up,
+        actionsOverflowButtonSpacing: 8,
         title: Text(l10n.deleteTeam),
         content: Text(l10n.deleteTeamConfirm(name)),
         actions: [
@@ -277,7 +285,7 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
           .read(groupingRepositoryProvider)
           .deleteTeam(widget.categoryKey.eventId, team.id);
     } on DioException {
-      messenger.showSnackBar(SnackBar(content: Text(l10n.deleteTeamError)));
+      toasts.show(l10n.deleteTeamError, kind: ToastKind.error);
     }
     if (_group.contains(team.id)) setState(() => _group = _fresh());
     _refresh(ref, widget.categoryKey);
@@ -302,6 +310,16 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
                   (g) => g.toggle(all[i].id, grouped: all[i].isGrouped),
                 ),
                 onDelete: all[i].isGrouped ? null : () => _delete(all[i]),
+                onUndoGroup: all[i].canUndoGroup
+                    ? () => undoGroup(
+                        context,
+                        ref,
+                        eventId: key.eventId,
+                        groupId: all[i].groupId!,
+                        number: all[i].groupNumber!,
+                        refresh: () => _refresh(ref, key),
+                      )
+                    : null,
               ),
             ),
     );
@@ -329,12 +347,14 @@ class _TeamTile extends StatelessWidget {
     required this.group,
     required this.onTap,
     required this.onDelete,
+    this.onUndoGroup,
   });
 
   final Team team;
   final DraftGroup group;
   final VoidCallback onTap;
   final VoidCallback? onDelete;
+  final VoidCallback? onUndoGroup;
 
   @override
   Widget build(BuildContext context) {
@@ -352,13 +372,19 @@ class _TeamTile extends StatelessWidget {
             : names,
       ),
       isThreeLine: team.isGrouped,
-      trailing: onDelete == null
-          ? null
-          : IconButton(
+      trailing: onDelete != null
+          ? IconButton(
               tooltip: l10n.deleteTeam,
               icon: const Icon(Icons.delete_outline),
               onPressed: onDelete,
-            ),
+            )
+          : onUndoGroup != null
+          ? IconButton(
+              tooltip: l10n.undoGroupNumber(team.groupNumber!),
+              icon: const Icon(Icons.undo),
+              onPressed: onUndoGroup,
+            )
+          : null,
     );
   }
 }

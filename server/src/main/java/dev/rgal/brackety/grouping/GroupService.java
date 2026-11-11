@@ -41,6 +41,7 @@ class GroupService {
     private final EventService events;
     private final EventAccess access;
     private final MatSchedule schedule;
+    private final CompetitionCleanup cleanup;
     private final Clock clock;
 
     GroupService(
@@ -57,6 +58,7 @@ class GroupService {
             EventService events,
             EventAccess access,
             MatSchedule schedule,
+            CompetitionCleanup cleanup,
             Clock clock) {
         this.groups = groups;
         this.members = members;
@@ -71,6 +73,7 @@ class GroupService {
         this.events = events;
         this.access = access;
         this.schedule = schedule;
+        this.cleanup = cleanup;
         this.clock = clock;
     }
 
@@ -115,6 +118,7 @@ class GroupService {
         var teamNumbers = directory.teamNumbers(eventId);
         var matNumbers =
                 mats.findByEventIdOrderByNumber(eventId).stream().collect(Collectors.toMap(Mat::getId, Mat::getNumber));
+        var started = new HashSet<>(groups.startedIds(eventId));
         return roster.inCategory(event, category).stream()
                 .map(p -> {
                     var group = grouped.get(p.getId());
@@ -126,7 +130,9 @@ class GroupService {
                             event.ageOf(p.getBirthDate()),
                             group == null ? null : group.getNumber(),
                             group == null ? null : matNumbers.get(group.getMatId()),
-                            teamNumbers.get(p.getId()));
+                            teamNumbers.get(p.getId()),
+                            group == null ? null : group.getId(),
+                            group != null && started.contains(group.getId()));
                 })
                 .toList();
     }
@@ -147,12 +153,33 @@ class GroupService {
                 : chosenMat(event, request.matId());
         var number = groups.maxNumber(eventId);
         var numbers = new ArrayList<Integer>();
+        var ids = new ArrayList<UUID>();
         for (var group : request.groups()) {
             number++;
-            save(event, category, mat, number, accountId, group);
+            ids.add(save(event, category, mat, number, accountId, group));
             numbers.add(number);
         }
-        return new CreateGroupsResponse(mat.getId(), mat.getNumber(), numbers);
+        return new CreateGroupsResponse(mat.getId(), mat.getNumber(), numbers, ids);
+    }
+
+    /**
+     * The helper takes back a group while none of its matches has started: its members are free again.
+     * After that only the superadmin can dissolve it (it wipes the points).
+     */
+    @Transactional
+    void undo(UUID eventId, UUID groupId, UUID accountId) {
+        access.require(eventId, accountId, EventRole.CLUB, EventRole.GROUPER);
+        // Matches first, then the event: the same order as a match's first start, which locks both.
+        var groupMatches = matches.lockByGroupId(groupId);
+        var group = groups.findById(groupId)
+                .filter(g -> g.getEventId().equals(eventId))
+                .orElseThrow(EventException::notFound);
+        events.lock(eventId);
+        if (groupMatches.stream().anyMatch(m -> m.getStatus() != Match.Status.PENDING)) {
+            throw EventException.conflict(
+                    "GROUP_STARTED", "A match of this group has started: only the superadmin can undo it now.");
+        }
+        cleanup.dissolveGroup(group.getId());
     }
 
     private Mat chosenMat(Event event, UUID matId) {
@@ -244,7 +271,7 @@ class GroupService {
         }
     }
 
-    private void save(Event event, EventCategory category, Mat mat, int number, UUID accountId, GroupRequest request) {
+    private UUID save(Event event, EventCategory category, Mat mat, int number, UUID accountId, GroupRequest request) {
         var group = groups.save(
                 new FightGroup(event.getId(), category.getId(), mat.getId(), number, accountId, clock.instant()));
         var ofTeams = request.isOfTeams();
@@ -269,6 +296,7 @@ class GroupService {
                     order.get(pair.blue()),
                     ofTeams));
         }
+        return group.getId();
     }
 
     private UUID ghostTeam(Event event, EventCategory category, UUID accountId, GroupRequest request) {

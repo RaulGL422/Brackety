@@ -16,4 +16,9 @@ public interface MatchRepository extends JpaRepository<Match, UUID> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select m from Match m where m.id = :matchId")
     Optional<Match> lockById(UUID matchId);
+
+    // In id order, so two writers locking the same matches never wait on each other in a cycle.
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select m from Match m where m.groupId = :groupId order by m.id")
+    List<Match> lockByGroupId(UUID groupId);
 }

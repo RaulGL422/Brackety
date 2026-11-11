@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:brackety/features/club/data/club_models.dart';
 import 'package:brackety/features/club/state/club_providers.dart';
 import 'package:brackety/features/grouping/data/grouping_models.dart';
@@ -38,6 +39,10 @@ class FakeGroupingRepository implements GroupingRepository {
   final createdOnMat = <String?>[];
   final createdTeams = <List<String>>[];
   final deletedTeams = <String>[];
+  final undoneGroups = <String>[];
+
+  /// When set, undoing a group is refused with it (409: a match has started).
+  int? undoRefusal;
 
   @override
   Future<List<CategoryParticipant>> participants(
@@ -57,7 +62,11 @@ class FakeGroupingRepository implements GroupingRepository {
   }) async {
     created.add(group);
     createdOnMat.add(matId);
-    return const CreatedGroups(matNumber: 2, groupNumbers: [1]);
+    return const CreatedGroups(
+      matNumber: 2,
+      groupNumbers: [1],
+      groupIds: ['g1'],
+    );
   }
 
   @override
@@ -71,6 +80,20 @@ class FakeGroupingRepository implements GroupingRepository {
   ) async {
     createdTeams.add(participantIds);
     return Team(id: 'new', number: teamList.length + 1, members: const []);
+  }
+
+  @override
+  Future<void> undoGroup(String eventId, String groupId) async {
+    if (undoRefusal case final status?) {
+      throw DioException(
+        requestOptions: RequestOptions(),
+        response: Response(
+          requestOptions: RequestOptions(),
+          statusCode: status,
+        ),
+      );
+    }
+    undoneGroups.add(groupId);
   }
 
   @override

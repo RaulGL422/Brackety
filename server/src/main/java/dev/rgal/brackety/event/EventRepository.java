@@ -2,6 +2,7 @@ package dev.rgal.brackety.event;
 
 import jakarta.persistence.LockModeType;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,6 +12,8 @@ import org.springframework.data.jpa.repository.Query;
 public interface EventRepository extends JpaRepository<Event, UUID> {
 
     boolean existsByOwnerAccountId(UUID ownerAccountId);
+
+    List<Event> findByLeagueIdOrderByPhaseNumber(UUID leagueId);
 
     // Serializes group creation in one event: mat choice and group numbers need a stable view.
     @Lock(LockModeType.PESSIMISTIC_WRITE)
@@ -23,6 +26,16 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
                     + " or exists(select 1 from team where event_id = :eventId)",
             nativeQuery = true)
     boolean hasGroupsOrTeams(UUID eventId);
+
+    @Query(
+            value = "select exists(select 1 from fight_match where event_id = :eventId and status = :status)",
+            nativeQuery = true)
+    boolean hasMatchIn(UUID eventId, String status);
+
+    @Query(
+            value = "select exists(select 1 from fight_match where event_id = :eventId and status <> 'PENDING')",
+            nativeQuery = true)
+    boolean hasStartedMatches(UUID eventId);
 
     @Query(value = "select exists(select 1 from fight_group where mat_id in (:matIds))", nativeQuery = true)
     boolean hasGroupsOnMats(Collection<UUID> matIds);

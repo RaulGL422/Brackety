@@ -15,10 +15,34 @@ import '../data/club_repository.dart';
 import '../state/club_providers.dart';
 import 'categories_editor.dart';
 import 'club_panel_screen.dart';
+import 'organizations_editor.dart';
 
 const maxMats = 20;
 
-/// Event name and date, mats with their referee, and the categories.
+/// "3:00" for 3 minutes.
+String formatMatchLength(Duration length) =>
+    '${length.inMinutes}:${(length.inSeconds % 60).toString().padLeft(2, '0')}';
+
+/// "3:00", "3" (minutes) or "2:30" between 0:30 and 20:00 (the server's range), else null.
+Duration? parseMatchLength(String text) {
+  final match = RegExp(r'^\s*(\d{1,2})(?::(\d{2}))?\s*$').firstMatch(text);
+  if (match == null) return null;
+  final seconds = int.parse(match[2] ?? '0');
+  if (seconds > 59) return null;
+  final length = Duration(minutes: int.parse(match[1]!), seconds: seconds);
+  return length < const Duration(seconds: 30) ||
+          length > const Duration(minutes: 20)
+      ? null
+      : length;
+}
+
+int? parsePointsLimit(String text) {
+  final value = int.tryParse(text.trim());
+  return value == null || value < 1 || value > 99 ? null : value;
+}
+
+/// Event name and date, match length and points limit, mats with their referee, and the
+/// categories.
 /// Every change saves on its own; a refused one goes back to what the server has.
 class SettingsTab extends ConsumerWidget {
   const SettingsTab({super.key, required this.eventId});
@@ -51,6 +75,10 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
   late final _name = TextEditingController(text: _saved.name);
   late var _date = _saved.date;
   late var _matReferees = [..._saved.matReferees];
+  late final _length = TextEditingController(
+    text: formatMatchLength(_saved.matchLength),
+  );
+  late final _limit = TextEditingController(text: '${_saved.pointsLimit}');
   Timer? _nameTyping;
   var _saving = false;
   var _changedWhileSaving = false;
@@ -59,6 +87,8 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
   void dispose() {
     _nameTyping?.cancel();
     _name.dispose();
+    _length.dispose();
+    _limit.dispose();
     super.dispose();
   }
 
@@ -84,11 +114,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
             maxLength: 120,
             validator: (v) =>
                 v == null || v.trim().isEmpty ? l10n.fieldRequired : null,
-            // Saves once the club stops typing, not on every key.
-            onChanged: (_) {
-              _nameTyping?.cancel();
-              _nameTyping = Timer(const Duration(milliseconds: 800), _save);
-            },
+            onChanged: (_) => _typed(),
             onFieldSubmitted: (_) => _save(),
           ),
           InkWell(
@@ -100,6 +126,38 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
               ),
               child: Text(DateFormat.yMMMMd(locale).format(_date)),
             ),
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          Text(l10n.settingsMatchRules, style: text.titleMedium),
+          const SizedBox(height: AppSpacing.s),
+          TextFormField(
+            controller: _length,
+            decoration: InputDecoration(
+              labelText: l10n.settingsMatchLength,
+              helperText: l10n.settingsMatchLengthHint,
+              helperMaxLines: 3,
+            ),
+            keyboardType: TextInputType.datetime,
+            validator: (v) => parseMatchLength(v ?? '') == null
+                ? l10n.settingsMatchLengthInvalid
+                : null,
+            onChanged: (_) => _typed(),
+            onFieldSubmitted: (_) => _save(),
+          ),
+          const SizedBox(height: AppSpacing.m),
+          TextFormField(
+            controller: _limit,
+            decoration: InputDecoration(
+              labelText: l10n.settingsPointsLimit,
+              helperText: l10n.settingsPointsLimitHint,
+              helperMaxLines: 3,
+            ),
+            keyboardType: TextInputType.number,
+            validator: (v) => parsePointsLimit(v ?? '') == null
+                ? l10n.settingsPointsLimitInvalid
+                : null,
+            onChanged: (_) => _typed(),
+            onFieldSubmitted: (_) => _save(),
           ),
           const SizedBox(height: AppSpacing.xl),
           Text(l10n.clubMats, style: text.titleMedium),
@@ -146,6 +204,12 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
             eventId: widget.eventId,
             categories: settings.categories,
           ),
+          const SizedBox(height: AppSpacing.xl),
+          Text(l10n.organizationsTitle, style: text.titleMedium),
+          OrganizationsEditor(
+            eventId: widget.eventId,
+            organizations: settings.organizations,
+          ),
         ],
       ),
     );
@@ -172,17 +236,27 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
     if (picked != null && picked != _date) _change(() => _date = picked);
   }
 
+  // Saves once the club stops typing, not on every key.
+  void _typed() {
+    _nameTyping?.cancel();
+    _nameTyping = Timer(const Duration(milliseconds: 800), _save);
+  }
+
   /// One save at a time; changes made meanwhile go in the next one.
   Future<void> _save() async {
     _nameTyping?.cancel();
-    if (_name.text.trim().isEmpty) return;
+    final length = parseMatchLength(_length.text);
+    final limit = parsePointsLimit(_limit.text);
+    if (_name.text.trim().isEmpty || length == null || limit == null) return;
+    final rulesChanged =
+        length != _saved.matchLength || limit != _saved.pointsLimit;
     if (_saving) {
       _changedWhileSaving = true;
       return;
     }
     _saving = true;
     final l10n = AppLocalizations.of(context);
-    final messenger = ScaffoldMessenger.of(context);
+    final toasts = Toasts.of(context);
     try {
       do {
         _changedWhileSaving = false;
@@ -193,6 +267,8 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
               name: _name.text.trim(),
               date: _date,
               matReferees: [..._matReferees],
+              matchLength: length,
+              pointsLimit: limit,
             );
       } while (_changedWhileSaving && mounted);
       ref
@@ -200,15 +276,17 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
         ..invalidate(myEventsProvider)
         ..invalidate(matsOverviewProvider(widget.eventId))
         ..invalidate(participantsProvider(widget.eventId));
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(l10n.saved),
-          duration: const Duration(seconds: 1),
-        ),
+      toasts.show(
+        l10n.saved,
+        kind: ToastKind.success,
+        duration: const Duration(seconds: 1),
       );
     } on DioException catch (e) {
-      messenger.showSnackBar(
-        SnackBar(content: Text(saveErrorMessage(l10n, e))),
+      toasts.show(
+        rulesChanged && e.response?.statusCode == 409
+            ? l10n.settingsMatchRulesConflict
+            : saveErrorMessage(l10n, e),
+        kind: ToastKind.error,
       );
       if (mounted) _showSaved();
     } finally {
@@ -220,5 +298,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
     _name.text = _saved.name;
     _date = _saved.date;
     _matReferees = [..._saved.matReferees];
+    _length.text = formatMatchLength(_saved.matchLength);
+    _limit.text = '${_saved.pointsLimit}';
   });
 }

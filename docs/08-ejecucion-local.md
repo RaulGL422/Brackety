@@ -26,7 +26,8 @@ Cada escenario es una clase `Scenario` en `server/src/test/java/dev/rgal/bracket
 - Solo existe en el lanzador local (`server/src/test`); en producción ese endpoint no existe.
 
 ## Importación de alumnos local
-- Sin `ANTHROPIC_API_KEY` el botón de importar no aparece. `--brackety.import.local-cli=true` lo activa con el `claude` y la sesión de quien desarrolla: **solo con listas ficticias** (las condiciones de la suscripción no cubren datos de terceros).
+- Sin `ANTHROPIC_API_KEY` el botón de importar no aparece. `.\run-server.ps1 -LocalClaude` (o la run config `server · yoseikan-f1 + Claude local`, o `--brackety.import.local-cli=true`) lo activa con el `claude` y la sesión de quien desarrolla, con la suscripción y sin gastar API: **solo con listas ficticias** (las condiciones de la suscripción no cubren datos de terceros).
+- Solo en el lanzador local (perfil `local`, que no está en el jar de producción): en la Pi se ignora y avisa en el log. En ese modo `ANTHROPIC_API_KEY` no llega al `claude`, aunque exista en el entorno.
 - Modelo: `--brackety.import.model=…` (por defecto `claude-sonnet-5-5`).
 
 ## Superadmin local

@@ -11,22 +11,27 @@ CompetitorColor cornerColor(Side side) =>
 String cornerName(AppLocalizations l10n, Side side) =>
     side == Side.red ? l10n.cornerRed : l10n.cornerBlue;
 
-/// One fighter: big score, +1 and the warnings menu. Red and blue are fixed for this event.
-/// Every line but the score keeps to one line, so it fits with the text at 200 %.
+/// One fighter: big score, +1, −1 and the warnings menu. Red and blue are fixed for this
+/// event. Every line but the score keeps to one line, so it fits with the text at 200 %.
+/// [canRemove]: −1 is a correction, also once the time or the points ended the match.
 class CornerPanel extends StatelessWidget {
   const CornerPanel({
     super.key,
     required this.side,
     required this.corner,
     required this.enabled,
+    required this.canRemove,
     required this.onPoint,
+    required this.onRemovePoint,
     required this.onSanction,
   });
 
   final Side side;
   final Corner corner;
   final bool enabled;
+  final bool canRemove;
   final VoidCallback onPoint;
+  final VoidCallback onRemovePoint;
   final void Function(MatchAction action) onSanction;
 
   @override
@@ -57,14 +62,16 @@ class CornerPanel extends StatelessWidget {
                 ),
               ),
             ),
-            _Tally(corner: corner, style: onColor),
+            _Tally(corner: corner, style: onColor.copyWith(fontSize: 14)),
             const SizedBox(height: AppSpacing.s),
             _Buttons(
               side: side,
               corner: corner,
               color: color,
               enabled: enabled,
+              canRemove: canRemove,
               onPoint: onPoint,
+              onRemovePoint: onRemovePoint,
               onSanction: onSanction,
             ),
           ],
@@ -94,7 +101,11 @@ class _Header extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(cornerName(l10n, side), style: text.labelLarge?.merge(style)),
+        // Fixed at 14: the corner's height is shared with the score and the buttons.
+        Text(
+          cornerName(l10n, side),
+          style: text.labelLarge?.merge(style).copyWith(fontSize: 14),
+        ),
         Tooltip(
           message: name,
           // The text already gives the name to screen readers; the tooltip would repeat it.
@@ -148,7 +159,9 @@ class _Buttons extends StatelessWidget {
     required this.corner,
     required this.color,
     required this.enabled,
+    required this.canRemove,
     required this.onPoint,
+    required this.onRemovePoint,
     required this.onSanction,
   });
 
@@ -156,7 +169,9 @@ class _Buttons extends StatelessWidget {
   final Corner corner;
   final CompetitorColor color;
   final bool enabled;
+  final bool canRemove;
   final VoidCallback onPoint;
+  final VoidCallback onRemovePoint;
   final void Function(MatchAction action) onSanction;
 
   @override
@@ -179,6 +194,32 @@ class _Buttons extends StatelessWidget {
               l10n.addPoint,
               maxLines: 1,
               semanticsLabel: l10n.addPointFor(cornerLabel),
+            ),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.s),
+        // Outlined and narrower than +1, so it is not pressed instead of it.
+        Tooltip(
+          message: l10n.removePointFor(cornerLabel),
+          child: OutlinedButton(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: color.onColor,
+              disabledForegroundColor: color.onColor.withValues(alpha: 0.38),
+              side: BorderSide(
+                color: color.onColor.withValues(alpha: canRemove ? 1 : 0.38),
+                width: 2,
+              ),
+              minimumSize: const Size(
+                AppSizes.scoreTouchTarget,
+                AppSizes.scoreTouchTarget,
+              ),
+              padding: EdgeInsets.zero,
+              textStyle: Theme.of(context).textTheme.headlineSmall,
+            ),
+            onPressed: canRemove ? onRemovePoint : null,
+            child: Text(
+              l10n.removePoint,
+              semanticsLabel: l10n.removePointFor(cornerLabel),
             ),
           ),
         ),
@@ -207,18 +248,34 @@ class _Buttons extends StatelessWidget {
           itemBuilder: (_) => [
             PopupMenuItem(
               value: MatchAction.warning,
-              child: Text(l10n.actionWarning),
+              child: ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.flag_outlined),
+                title: Text(l10n.actionWarning),
+              ),
             ),
             if (corner.oneHandRule)
               PopupMenuItem(
                 value: MatchAction.oneHandWarning,
-                child: Text(l10n.actionOneHand),
+                child: ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.back_hand_outlined),
+                  title: Text(l10n.actionOneHand),
+                ),
               ),
+            const PopupMenuDivider(),
+            // Apart and in the error colour: it ends the match.
             PopupMenuItem(
               value: MatchAction.disqualification,
-              child: Text(
-                l10n.actionDisqualify,
-                style: TextStyle(color: scheme.error),
+              child: ListTile(
+                contentPadding: EdgeInsets.zero,
+                iconColor: scheme.error,
+                textColor: scheme.error,
+                leading: const Icon(Icons.block),
+                title: Text(
+                  l10n.actionDisqualify,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
               ),
             ),
           ],

@@ -45,7 +45,7 @@ void main() {
 
       test('buttons keep the minimum touch target', () {
         final size = theme.filledButtonTheme.style!.minimumSize!.resolve({});
-        expect(size!.height, AppSizes.touchTarget);
+        expect(size!.height, greaterThanOrEqualTo(AppSizes.touchTarget));
       });
     });
   }

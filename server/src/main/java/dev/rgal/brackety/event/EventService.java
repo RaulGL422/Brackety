@@ -25,6 +25,7 @@ public class EventService {
     private final EventStaffRepository staff;
     private final MatRepository mats;
     private final EventCategoryRepository categories;
+    private final EventOrganizationRepository organizations;
     private final AccountRepository accounts;
     private final EventAccess access;
 
@@ -33,12 +34,14 @@ public class EventService {
             EventStaffRepository staff,
             MatRepository mats,
             EventCategoryRepository categories,
+            EventOrganizationRepository organizations,
             AccountRepository accounts,
             EventAccess access) {
         this.events = events;
         this.staff = staff;
         this.mats = mats;
         this.categories = categories;
+        this.organizations = organizations;
         this.accounts = accounts;
         this.access = access;
     }
@@ -72,7 +75,9 @@ public class EventService {
                             rolesByEvent.get(event.getId()),
                             event.getMaxGroupsPerMat(),
                             mat.map(Mat::getId).orElse(null),
-                            mat.map(Mat::getNumber).orElse(null));
+                            mat.map(Mat::getNumber).orElse(null),
+                            event.getLeagueId(),
+                            event.getPhaseNumber());
                 })
                 .toList();
     }
@@ -86,7 +91,8 @@ public class EventService {
     @Transactional
     public EventSettingsResponse updateSettings(UUID eventId, UUID accountId, EventSettingsRequest request) {
         access.require(eventId, accountId, EventRole.CLUB);
-        var event = get(eventId);
+        // Locked like a match's first start: no match starts while the rules change.
+        var event = lock(eventId);
         var referees = refereeIds(eventId);
         var assigned = request.matReferees().stream().filter(Objects::nonNull).toList();
         if (!referees.containsAll(assigned)) {
@@ -99,6 +105,15 @@ public class EventService {
         if (!request.date().equals(event.getEventDate()) && events.hasGroupsOrTeams(eventId)) {
             throw EventException.conflict("The date cannot change once there are groups or teams.");
         }
+        var matchSeconds = request.matchSeconds() == null ? event.getMatchSeconds() : request.matchSeconds();
+        var pointsLimit = request.pointsLimit() == null ? event.getPointsLimit() : request.pointsLimit();
+        if (matchSeconds != event.getMatchSeconds() && events.hasMatchIn(eventId, "IN_PROGRESS")) {
+            throw EventException.conflict("The match length cannot change while a match is in progress.");
+        }
+        // A disqualification scores the limit for the rival: started matches keep the one they had.
+        if (pointsLimit != event.getPointsLimit() && events.hasStartedMatches(eventId)) {
+            throw EventException.conflict("The points limit cannot change once a match has started.");
+        }
         var current = mats.findByEventIdOrderByNumber(eventId);
         var removed = current.size() > request.matReferees().size()
                 ? current.subList(request.matReferees().size(), current.size())
@@ -107,7 +122,15 @@ public class EventService {
                 && events.hasGroupsOnMats(removed.stream().map(Mat::getId).toList())) {
             throw EventException.conflict("A mat with groups cannot be removed.");
         }
-        event.update(request.name().strip(), request.date(), request.maxGroupsPerMat());
+        var attendancePoints =
+                request.attendancePoints() != null ? request.attendancePoints() : event.getAttendancePoints();
+        event.update(
+                request.name().strip(),
+                request.date(),
+                request.maxGroupsPerMat(),
+                matchSeconds,
+                pointsLimit,
+                attendancePoints);
         for (int i = 0; i < request.matReferees().size(); i++) {
             var referee = request.matReferees().get(i);
             if (i < current.size()) {
@@ -137,7 +160,11 @@ public class EventService {
                 referees,
                 categories.findByEventIdOrderByMinAge(event.getId()).stream()
                         .map(CategoryResponse::of)
-                        .toList());
+                        .toList(),
+                EventOrganizationService.list(organizations, event.getId()),
+                event.getAttendancePoints(),
+                event.getPhaseNumber(),
+                event.getDiscipline().name());
     }
 
     private List<UUID> refereeIds(UUID eventId) {

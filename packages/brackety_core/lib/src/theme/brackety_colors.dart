@@ -13,6 +13,10 @@ class BracketyColors extends ThemeExtension<BracketyColors> {
     required this.onWarningContainer,
     required this.band,
     required this.onBand,
+    required this.action,
+    required this.onAction,
+    required this.actionContainer,
+    required this.onActionContainer,
   });
 
   factory BracketyColors.from(Brightness brightness) =>
@@ -29,6 +33,10 @@ class BracketyColors extends ThemeExtension<BracketyColors> {
     onWarningContainer: Color(0xFF3D2A00),
     band: Color(0xFF1A1A1A),
     onBand: Color(0xFFFFFFFF),
+    action: Color(0xFF4B2FC9),
+    onAction: Color(0xFFFFFFFF),
+    actionContainer: Color(0xFFECE8FB),
+    onActionContainer: Color(0xFF2A1878),
   );
 
   static const _dark = BracketyColors(
@@ -42,6 +50,10 @@ class BracketyColors extends ThemeExtension<BracketyColors> {
     onWarningContainer: Color(0xFFF6E7C2),
     band: Color(0xFF000000),
     onBand: Color(0xFFEDEDED),
+    action: Color(0xFFB7A8FF),
+    onAction: Color(0xFF1B0F5C),
+    actionContainer: Color(0xFF2E2370),
+    onActionContainer: Color(0xFFE4DEFF),
   );
 
   final Color success;
@@ -56,6 +68,13 @@ class BracketyColors extends ThemeExtension<BracketyColors> {
   /// The dark band of the headers that frame a location (the referee's mat).
   final Color band;
   final Color onBand;
+
+  /// The one colour of what can be pressed to move forward (main buttons, selected tab).
+  /// Ink stays for text and frames, so an action never looks like content.
+  final Color action;
+  final Color onAction;
+  final Color actionContainer;
+  final Color onActionContainer;
 
   static BracketyColors of(BuildContext context) {
     final theme = Theme.of(context);
@@ -75,6 +94,10 @@ class BracketyColors extends ThemeExtension<BracketyColors> {
     Color? onWarningContainer,
     Color? band,
     Color? onBand,
+    Color? action,
+    Color? onAction,
+    Color? actionContainer,
+    Color? onActionContainer,
   }) => BracketyColors(
     success: success ?? this.success,
     onSuccess: onSuccess ?? this.onSuccess,
@@ -86,6 +109,10 @@ class BracketyColors extends ThemeExtension<BracketyColors> {
     onWarningContainer: onWarningContainer ?? this.onWarningContainer,
     band: band ?? this.band,
     onBand: onBand ?? this.onBand,
+    action: action ?? this.action,
+    onAction: onAction ?? this.onAction,
+    actionContainer: actionContainer ?? this.actionContainer,
+    onActionContainer: onActionContainer ?? this.onActionContainer,
   );
 
   @override
@@ -118,6 +145,14 @@ class BracketyColors extends ThemeExtension<BracketyColors> {
       )!,
       band: Color.lerp(band, other.band, t)!,
       onBand: Color.lerp(onBand, other.onBand, t)!,
+      action: Color.lerp(action, other.action, t)!,
+      onAction: Color.lerp(onAction, other.onAction, t)!,
+      actionContainer: Color.lerp(actionContainer, other.actionContainer, t)!,
+      onActionContainer: Color.lerp(
+        onActionContainer,
+        other.onActionContainer,
+        t,
+      )!,
     );
   }
 }

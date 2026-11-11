@@ -49,6 +49,7 @@ class RejectedOp {
     private Side side;
 
     private String reason;
+    private Long deltaMs;
     private Instant at;
     private UUID actorAccountId;
 
@@ -72,6 +73,7 @@ class RejectedOp {
         this.type = action.type();
         this.side = action.side();
         this.reason = action.reason();
+        this.deltaMs = action.deltaMs();
         this.at = at;
         this.actorAccountId = action.actorAccountId();
         this.cause = cause;
@@ -85,7 +87,7 @@ class RejectedOp {
     }
 
     MatchWriter.Action action() {
-        return new MatchWriter.Action(type, side, reason, opId, actorAccountId);
+        return new MatchWriter.Action(type, side, reason, deltaMs, opId, actorAccountId);
     }
 
     UUID getOpId() {
@@ -102,6 +104,10 @@ class RejectedOp {
 
     String getReason() {
         return reason;
+    }
+
+    Long getDeltaMs() {
+        return deltaMs;
     }
 
     Instant getAt() {

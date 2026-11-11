@@ -6,15 +6,15 @@
     dist/cache). La carpeta resultante se copia a cualquier portátil Windows 10/11 x64 y se arranca con
     start-event.ps1, sin instalar nada. Detalle en docs/modulos/servidor-local.md.
     Si la carpeta ya tiene datos (brackety-data), se conservan: solo se reemplazan los programas.
-    Incluye la APK de Android (brackety.apk) para los móviles de árbitros y ayudantes.
-.PARAMETER NoApk
-    Salta el build de la APK (tarda varios minutos): la carpeta queda sin brackety.apk.
+    Los móviles usan la web del portátil (http://192.168.137.1:8080); la APK de Android solo con -Apk.
+.PARAMETER Apk
+    Añade brackety.apk (build de varios minutos). Por defecto no: en el pabellón se usa la web.
 .EXAMPLE
     .\deploy\local\build-event-bundle.ps1
 .EXAMPLE
-    .\deploy\local\build-event-bundle.ps1 -NoApk
+    .\deploy\local\build-event-bundle.ps1 -Apk
 #>
-param([switch]$NoApk)
+param([switch]$Apk)
 $ErrorActionPreference = "Stop"
 
 $PgVersion = "18.6-1"
@@ -41,7 +41,7 @@ $flutter = (Get-Command flutter -ErrorAction SilentlyContinue).Source
 if (-not $flutter) { $flutter = "C:\dev\flutter\bin\flutter.bat" }
 
 New-Item -ItemType Directory -Force -Path $bundle, $cache | Out-Null
-foreach ($old in @("api", "web", "jre", "pgsql", "brackety.apk", "start-event.ps1", "LEEME.txt")) {
+foreach ($old in @("api", "web", "admin", "jre", "pgsql", "brackety.apk", "start-event.ps1", "LEEME.txt")) {
     $path = Join-Path $bundle $old
     if (Test-Path $path) { Remove-Item -Recurse -Force $path }
 }
@@ -64,8 +64,19 @@ try {
 }
 Copy-Item -Recurse "$root\app\build\web" "$bundle\web"
 
-if ($NoApk) {
-    Write-Host "3/6 APK Android: saltada (-NoApk)"
+Write-Host "   Superadmin web en /admin/ (solo responde al propio portátil)"
+Push-Location "$root\admin"
+try {
+    Invoke-Checked "el build web del superadmin" {
+        & $flutter build web --release --no-web-resources-cdn --base-href /admin/ --dart-define-from-file=env/event-bundle.json
+    }
+} finally {
+    Pop-Location
+}
+Copy-Item -Recurse "$root\admin\build\web" "$bundle\admin"
+
+if (-not $Apk) {
+    Write-Host "3/6 APK Android: no se incluye (solo con -Apk; los móviles usan la web)"
 } else {
     Write-Host "3/6 APK Android: release con el pabellón como servidor por defecto"
     Push-Location "$root\app"

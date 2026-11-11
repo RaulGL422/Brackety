@@ -4,7 +4,8 @@ import java.util.UUID;
 
 /**
  * {@code groupNumber} and {@code matNumber} are null until the participant is in a group, directly
- * or through their team; {@code teamNumber} until they are in a team.
+ * or through their team; {@code teamNumber} until they are in a team. {@code groupId}: their group;
+ * {@code groupStarted}: a match of it has started, so the helper can no longer undo it.
  */
 public record CategoryParticipant(
         UUID id,
@@ -14,4 +15,6 @@ public record CategoryParticipant(
         int age,
         Integer groupNumber,
         Integer matNumber,
-        Integer teamNumber) {}
+        Integer teamNumber,
+        UUID groupId,
+        boolean groupStarted) {}

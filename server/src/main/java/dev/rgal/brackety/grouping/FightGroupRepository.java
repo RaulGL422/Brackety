@@ -15,6 +15,12 @@ public interface FightGroupRepository extends JpaRepository<FightGroup, UUID> {
     @Query("select coalesce(max(g.number), 0) from FightGroup g where g.eventId = :eventId")
     int maxNumber(UUID eventId);
 
+    /** Groups with a match started (in progress or finished): the helper can no longer undo them. */
+    @Query(
+            value = "select distinct group_id from fight_match where event_id = :eventId and status <> 'PENDING'",
+            nativeQuery = true)
+    List<UUID> startedIds(UUID eventId);
+
     // In the database, deleting a group takes its members, matches and their actions with it.
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("delete from FightGroup g where g.id = :groupId")

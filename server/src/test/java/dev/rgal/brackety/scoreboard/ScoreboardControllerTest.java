@@ -1,8 +1,10 @@
 package dev.rgal.brackety.scoreboard;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -27,7 +29,7 @@ class ScoreboardControllerTest extends ScoreboardApiTest {
         event(match, "POINT", "RED");
         event(match, "STOP")
                 .andExpect(jsonPath("$.running").value(false))
-                .andExpect(jsonPath("$.remainingMs").value(90_000))
+                .andExpect(jsonPath("$.remainingMs").value(150_000))
                 .andExpect(jsonPath("$.red.points").value(2));
         event(match, "FINISH").andExpect(status().isConflict());
 
@@ -159,6 +161,108 @@ class ScoreboardControllerTest extends ScoreboardApiTest {
         call(get(path(match)), "club1").andExpect(status().isOk());
         call(get(path(match)), "ayudante1").andExpect(status().isForbidden());
         call(get(path(match)), outsider(), PASSWORD).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void aPointTakenBackAndTheStoppedClockAdjustedAreUndoneLikeAnyAction() throws Exception {
+        var match = match(young, 0, 1);
+        event(match, "START");
+        event(match, "POINT", "RED");
+        event(match, "POINT", "RED");
+        event(match, "POINT_REMOVED", "RED").andExpect(jsonPath("$.red.points").value(1));
+        event(match, "POINT_REMOVED", "BLUE").andExpect(status().isConflict());
+        event(match, "POINT_REMOVED").andExpect(status().isBadRequest());
+        clock.advance(Duration.ofSeconds(30));
+
+        adjust(match, 10_000).andExpect(status().isConflict());
+        event(match, "STOP");
+        event(match, "CLOCK_ADJUST").andExpect(status().isBadRequest());
+        adjust(match, 10_000)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.remainingMs").value(160_000))
+                .andExpect(jsonPath("$.timeline[5].type").value("CLOCK_ADJUST"))
+                .andExpect(jsonPath("$.timeline[5].deltaMs").value(10_000))
+                .andExpect(jsonPath("$.timeline[5].clockMs").value(30_000));
+
+        event(match, "UNDO")
+                .andExpect(jsonPath("$.remainingMs").value(150_000))
+                .andExpect(jsonPath("$.timeline[5].undone").value(true));
+        event(match, "UNDO").andExpect(jsonPath("$.red.points").value(2));
+
+        var timeline = call(get("/api/v1/events/" + eventId + "/export/timeline.csv"), "club1")
+                .andReturn()
+                .getResponse()
+                .getContentAsString(java.nio.charset.StandardCharsets.UTF_8);
+        assertThat(timeline).contains(";Ajuste del reloj;;;añade 10 s;arbitro1;;Sí");
+        assertThat(timeline).contains(";Quitar punto;Rojo;");
+    }
+
+    @Test
+    void aDisqualificationScoresTheLimitForTheRivalUntilUndone() throws Exception {
+        var match = match(young, 0, 1);
+        event(match, "START");
+        event(match, "POINT", "BLUE");
+        event(match, "POINT", "RED");
+        event(match, "DISQUALIFICATION", "BLUE", "Golpe")
+                .andExpect(jsonPath("$.endReason").value("DISQUALIFICATION"))
+                .andExpect(jsonPath("$.red.points").value(15))
+                .andExpect(jsonPath("$.blue.points").value(0))
+                .andExpect(jsonPath("$.blue.disqualified").value(true));
+        assertThat(jdbc.sql("select red_score from fight_match where id = ?")
+                        .param(match)
+                        .query(Integer.class)
+                        .single())
+                .isEqualTo(15);
+
+        event(match, "UNDO")
+                .andExpect(jsonPath("$.endReason").doesNotExist())
+                .andExpect(jsonPath("$.red.points").value(1))
+                .andExpect(jsonPath("$.blue.points").value(1));
+    }
+
+    @Test
+    void theClubSetsLengthAndLimitButNotWhileAMatchIsInProgress() throws Exception {
+        call(get(settings()), "club1")
+                .andExpect(jsonPath("$.matchSeconds").value(180))
+                .andExpect(jsonPath("$.pointsLimit").value(15));
+        call(put(settings()).content(settingsJson(20, null)), "club1").andExpect(status().isBadRequest());
+        call(put(settings()).content(settingsJson(1201, null)), "club1").andExpect(status().isBadRequest());
+        call(put(settings()).content(settingsJson(150, 12)), "club1")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.matchSeconds").value(150))
+                .andExpect(jsonPath("$.pointsLimit").value(12));
+        var match = match(young, 0, 1);
+        call(get(path(match)), "arbitro1")
+                .andExpect(jsonPath("$.lengthSeconds").value(150))
+                .andExpect(jsonPath("$.pointsLimit").value(12));
+
+        event(match, "START");
+        call(put(settings()).content(settingsJson(120, null)), "club1").andExpect(status().isConflict());
+        call(put(settings()).content(settingsJson(null, 15)), "club1").andExpect(status().isConflict());
+        call(put(settings()).content(settingsJson(150, 12)), "club1").andExpect(status().isOk());
+
+        event(match, "DISQUALIFICATION", "RED", "Golpe");
+        event(match, "FINISH");
+        call(put(settings()).content(settingsJson(180, null)), "club1").andExpect(status().isOk());
+        call(put(settings()).content(settingsJson(null, 15)), "club1").andExpect(status().isConflict());
+    }
+
+    private String settings() {
+        return "/api/v1/events/" + eventId + "/settings";
+    }
+
+    private String settingsJson(Integer matchSeconds, Integer pointsLimit) {
+        var referees = java.util.stream.IntStream.rangeClosed(1, 5)
+                .mapToObj(i -> "\"" + accountId("arbitro" + i) + "\"")
+                .collect(java.util.stream.Collectors.joining(","));
+        return """
+                {"name":"Fase 1","date":"2027-03-10","maxGroupsPerMat":1,"matReferees":[%s],
+                 "matchSeconds":%s,"pointsLimit":%s}""".formatted(referees, matchSeconds, pointsLimit);
+    }
+
+    private ResultActions adjust(UUID match, long deltaMs) throws Exception {
+        return call(post(path(match) + "/events").content("""
+                        {"type":"CLOCK_ADJUST","deltaMs":%d,"knownEvents":%d}""".formatted(deltaMs, knownEvents(match))), "arbitro1");
     }
 
     private ResultActions event(UUID match, String type) throws Exception {

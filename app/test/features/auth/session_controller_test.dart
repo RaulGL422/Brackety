@@ -57,14 +57,35 @@ void main() {
       expect(state.expired, isTrue);
     });
 
-    test('the web without network is signed out', () async {
-      final api = FakeAuthApi(signedIn: true)..refreshError = networkError();
-      final container = containerFor(
-        api,
-        FakeRefreshTokenStore(inCookie: true),
-      );
+    test(
+      'the web without network and no session before is signed out',
+      () async {
+        final api = FakeAuthApi(signedIn: true)..refreshError = networkError();
+        final container = containerFor(
+          api,
+          FakeRefreshTokenStore(inCookie: true),
+        );
 
-      expect((await restore(container)).status, SessionStatus.signedOut);
+        expect((await restore(container)).status, SessionStatus.signedOut);
+      },
+    );
+
+    test('a reload without network keeps the session the web had, and the server renews it later', () async {
+      final api = FakeAuthApi(signedIn: true)..refreshError = networkError();
+      final store = FakeRefreshTokenStore(inCookie: true)..marked = true;
+      final container = containerFor(api, store);
+
+      final state = await restore(container);
+      expect(state.status, SessionStatus.signedIn);
+      expect(state.accessToken, isNull);
+
+      // The server is back: the cookie renews it without signing in again.
+      api.refreshError = null;
+      expect(
+        await container.read(sessionProvider.notifier).refresh(),
+        isNotNull,
+      );
+      expect(container.read(sessionProvider).accessToken, isNotNull);
     });
 
     test('Android without a stored token asks nothing', () async {

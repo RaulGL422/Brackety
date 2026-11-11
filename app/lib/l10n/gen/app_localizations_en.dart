@@ -391,13 +391,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get matRecommended => 'Next match';
+  String get matRecommended => 'Recommended match';
 
   @override
   String get matInProgress => 'In progress';
 
   @override
-  String get matPending => 'Later';
+  String get matPending => 'Other available matches';
 
   @override
   String get matYours => 'Your mat';
@@ -420,7 +420,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matGroups => 'Groups on this mat';
 
   @override
-  String get matFinished => 'Finished';
+  String get matFinished => 'Fought';
 
   @override
   String get matWaiting => 'A fighter is in a match right now';
@@ -503,14 +503,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String reasonTitle(String action, String fighter) {
-    return '$action · $fighter';
+    return '$action: $fighter';
   }
 
   @override
-  String get reasonLabel => 'Reason (required)';
+  String get reasonLabel => 'Reason';
 
   @override
-  String get reasonConfirm => 'Sure? It is recorded.';
+  String get reasonConfirm =>
+      'Write the reason. It stays in the match history.';
 
   @override
   String get confirm => 'Confirm';
@@ -552,6 +553,129 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tlRivalPoint => 'point to the rival';
+
+  @override
+  String get removePoint => '−1';
+
+  @override
+  String removePointFor(String corner) {
+    return 'Take a point from $corner';
+  }
+
+  @override
+  String whatPointRemoved(String corner) {
+    return '−1 $corner';
+  }
+
+  @override
+  String whatClockAdjust(String delta) {
+    return '$delta s on the clock';
+  }
+
+  @override
+  String clockAdjustBy(String delta) {
+    return '$delta s';
+  }
+
+  @override
+  String clockAdjustTooltip(String delta) {
+    return 'Adjust the clock $delta s';
+  }
+
+  @override
+  String get clockAdjustHint => 'Adjust the clock (stopped)';
+
+  @override
+  String get tlPointRemoved => 'Point taken back';
+
+  @override
+  String get tlClockAdjust => 'Clock adjusted';
+
+  @override
+  String get tlNextUndo => 'what Undo takes back next';
+
+  @override
+  String undoDetail(String what, String clock) {
+    return '$what · $clock';
+  }
+
+  @override
+  String get recentActions => 'Last actions';
+
+  @override
+  String get refusalNoPoints => 'There are no points to take back.';
+
+  @override
+  String get refusalClockRunning => 'Stop the clock before adjusting it.';
+
+  @override
+  String get refusalClockLimit => 'The clock cannot go further.';
+
+  @override
+  String get settingsMatchRules => 'Matches';
+
+  @override
+  String get settingsMatchLength => 'Match length (min:s)';
+
+  @override
+  String get settingsMatchLengthHint =>
+      'From 0:30 to 20:00. It does not change while a match is in progress.';
+
+  @override
+  String get settingsMatchLengthInvalid =>
+      'Type minutes and seconds between 0:30 and 20:00, for example 3:00.';
+
+  @override
+  String get settingsPointsLimit => 'Points that end the match';
+
+  @override
+  String get settingsPointsLimitHint =>
+      'The match ends when one fighter reaches them. A disqualification gives them to the rival. It does not change once a match has started.';
+
+  @override
+  String get settingsMatchRulesConflict =>
+      'It cannot change now: a match is in progress or has started.';
+
+  @override
+  String get settingsPointsLimitInvalid => 'Between 1 and 99.';
+
+  @override
+  String get matWaitingTitle => 'Waiting';
+
+  @override
+  String get matStartRecommended => 'Start this match';
+
+  @override
+  String get matRecommendedWhy =>
+      'Its fighters have rested the longest and none has just fought.';
+
+  @override
+  String get matAfterCurrent => 'When the match in progress ends.';
+
+  @override
+  String get undoGroup => 'Undo group';
+
+  @override
+  String undoGroupNumber(int number) {
+    return 'Undo Group $number';
+  }
+
+  @override
+  String undoGroupConfirm(int number) {
+    return 'Group $number and its matches are undone. Its participants go back to the list to be grouped again.';
+  }
+
+  @override
+  String undoGroupDone(int number) {
+    return 'Group $number undone';
+  }
+
+  @override
+  String get undoGroupStarted =>
+      'A match of this group has already started: only the administrator can undo it.';
+
+  @override
+  String get undoGroupError => 'The group could not be undone.';
 
   @override
   String get clubStandings => 'Scores';
@@ -710,7 +834,83 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exportTimeline => 'Timeline (CSV)';
 
   @override
-  String get exportEventPackage => 'Export event package';
+  String get organizationsTitle => 'Clubs taking part';
+
+  @override
+  String get organizationsEmpty =>
+      'No clubs yet. Add them to set the club of each participant.';
+
+  @override
+  String get organizationAdd => 'Add club';
+
+  @override
+  String get organizationEdit => 'Edit club';
+
+  @override
+  String get organizationRemove => 'Remove club';
+
+  @override
+  String get organizationName => 'Club name';
+
+  @override
+  String get organizationShortName => 'Short name (optional)';
+
+  @override
+  String get organizationLabel => 'Club';
+
+  @override
+  String get organizationNone => 'No club';
+
+  @override
+  String get organizationsConflict =>
+      'Not possible: that club has participants or another one has the same name.';
+
+  @override
+  String get exportParticipants => 'Participants (CSV)';
+
+  @override
+  String get exportFull => 'The whole event (.zip)';
+
+  @override
+  String get importResults => 'Import results from the sports hall';
+
+  @override
+  String get importResultsTitle => 'Import these results?';
+
+  @override
+  String importResultsBody(
+    int groups,
+    int matches,
+    int actions,
+    int participants,
+  ) {
+    return '$groups groups, $matches matches and $actions scoreboard actions will be added, and $participants participants who were not here. It cannot be undone.';
+  }
+
+  @override
+  String get importResultsConfirm => 'Import';
+
+  @override
+  String get importResultsDone => 'Results imported.';
+
+  @override
+  String get importResultsAlready =>
+      'These results were already imported: nothing changes.';
+
+  @override
+  String get importResultsOtherEvent =>
+      'The file is from another event (another name or date).';
+
+  @override
+  String get importResultsConflict =>
+      'This event already has groups of its own: results are only imported into an event without competition.';
+
+  @override
+  String get importResultsInvalid =>
+      'The file is not a Brackety export (.zip or .brackety) with results.';
+
+  @override
+  String get importResultsError => 'The results could not be imported.';
 
   @override
   String get exportError => 'Could not export.';
@@ -1356,11 +1556,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String get syncRejectedDismiss => 'Remove from the list';
 
   @override
+  String get syncExport => 'Export pending actions';
+
+  @override
+  String get syncExportBody =>
+      'If this device cannot connect again, give the file to the club: they import it from their panel and nothing is lost.';
+
+  @override
+  String get syncExportSave => 'Download CSV';
+
+  @override
+  String get importOps => 'Import actions from a device';
+
+  @override
+  String importOpsResult(
+    int applied,
+    int duplicates,
+    int inReview,
+    int skipped,
+  ) {
+    return 'Imported: $applied new · $duplicates already there · $inReview to review · $skipped refused';
+  }
+
+  @override
+  String get importOpsError =>
+      'Could not import: the file is not one of pending actions or is from another event.';
+
+  @override
   String get close => 'Close';
 
   @override
   String get matOfflineBoard =>
-      'Offline: board saved on the phone. No recommendation; you can start a pending match if none is in progress.';
+      'Offline: board saved on this device. No recommendation; you can start a pending match if none is in progress.';
 
   @override
   String get matInReview => 'Under the club\'s review';
@@ -1470,11 +1697,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get refusalNotStarted => 'Start the clock before scoring.';
 
   @override
-  String undoWhat(String what) {
-    return 'Undo: $what';
-  }
-
-  @override
   String undoneWhat(String what) {
     return 'Undone: $what';
   }
@@ -1554,10 +1776,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get themeDark => 'Dark';
 
   @override
-  String get refusalStale =>
-      'The match changed on another device. Check the scoreboard and press again.';
-
-  @override
   String get accountSuspended =>
       'This account is suspended. If you think it is a mistake, write to the privacy contact on the legal pages.';
+
+  @override
+  String backTo(String place) {
+    return 'Back to $place';
+  }
+
+  @override
+  String get reasonApplyWarning => 'Give warning';
+
+  @override
+  String get reasonApplyDisqualify => 'Disqualify';
+
+  @override
+  String get accountMenu => 'My account';
+
+  @override
+  String get back => 'Back';
 }

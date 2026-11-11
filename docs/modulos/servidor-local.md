@@ -21,15 +21,23 @@ Llevar el evento ya preparado (configuración e inscripciones) y arrancarlo en c
 - `-Reset` (servidor parado, confirma s/N): renombra `brackety-data` a `brackety-data.old-AAAAMMDD-HHmmss`, nunca borra. Con `-Package` o `-Demo` sigue con un primer arranque.
 - `ACCESS_TTL=12h`: un móvil sin red un rato no pierde la sesión (el refresh sigue rotando).
 - `SERVER_FORWARD_HEADERS_STRATEGY=none`: sin proxy delante, Tomcat no hace caso de `X-Forwarded-For` (con `native` confía en cualquier IP privada, también en los móviles del punto de acceso, que se saltarían el bloqueo por IP y el limitador). En la Pi se queda `native`: la API solo es accesible desde el propio host (`127.0.0.1`) y la red de Docker.
-- La cookie de refresco es `Secure`: en http solo `localhost` mantiene la sesión web al recargar. Los móviles usarán la APK (paso 3).
+- `REFRESH_COOKIE_SECURE=false` (solo aquí): en http una cookie `Secure` no vuelve y la web perdería la sesión al recargar. En la Pi y Docker sigue `true`.
 - Sin Internet: sin emails, sin Google, sin importación con Claude (los alumnos se importan antes, en la Pi o en local).
 
 ### Generar y usar la carpeta
-1. En el PC de desarrollo (Internet la primera vez; el zip de PostgreSQL queda en `dist/cache/`): `.\deploy\local\build-event-bundle.ps1 [-NoApk]`. Conserva `brackety-data/` si ya existe. Incluye `brackety.apk` salvo con `-NoApk` (el build tarda minutos).
+1. En el PC de desarrollo (Internet la primera vez; el zip de PostgreSQL queda en `dist/cache/`): `.\deploy\local\build-event-bundle.ps1 [-Apk]`. Conserva `brackety-data/` si ya existe. Sin APK por defecto (en el pabellón se usa la web); `-Apk` la añade (el build tarda minutos).
 2. Copiar `dist/brackety-event/` al disco del portátil.
-3. `powershell -ExecutionPolicy Bypass -File .\start-event.ps1 -Package f1.brackety | -Demo [-EventDate AAAA-MM-DD]` la primera vez; después sin ellos. Además `[-LegalOwnerName …] [-PrivacyContactEmail …] [-Backup] [-Reset]`. Resto en `LEEME.txt` de la carpeta.
+3. `powershell -ExecutionPolicy Bypass -File .\start-event.ps1 -Package f1.zip | -Demo [-EventDate AAAA-MM-DD]` la primera vez; después sin ellos. Además `[-LegalOwnerName …] [-PrivacyContactEmail …] [-Backup] [-Reset]`. Resto en `LEEME.txt` de la carpeta.
+
+### Superadmin en el portátil (2026-11-11)
+- Sin Cloudflare Access en el pabellón: `start-event.ps1` pone `ADMIN_LOCAL_ONLY=true` y la API de superadmin solo responde al propio portátil (`127.0.0.1`/`::1`); a los móviles, 403.
+- Web del superadmin en `http://localhost:8080/admin/` (`ADMIN_WEB_DIR`, build con `--base-href /admin/` en el paquete).
+- Primer arranque: contraseña aleatoria; el hash lo hace el propio jar (`java -jar brackety.jar --superadmin-hash`, mismo Argon2) y va a `secrets.env`; email y contraseña en `brackety-data/superadmin.txt`.
+- Sirve para reiniciar un combate o deshacer un grupo con puntos (como en la Pi).
 
 ### Paquete del evento
+- Desde 2026-11-11 el club exporta "Todo el evento (.zip)": CSV legibles en Excel (`;`, BOM, cabeceras en español, fechas dd/mm/aaaa, nombres en vez de ids), `evento.brackety` (esquema 2: liga, fase, organizaciones, ids de persona y resultados) y `LEEME.txt`. `-Package` acepta el `.zip` o el `.brackety`.
+- Vuelta a la Pi: en el panel del club, "Importar resultados del pabellón" con el `.zip` del portátil. Primero cuenta (prueba en seco) y pide confirmación; luego trae grupos, equipos, combates y línea de tiempo. Idempotente (repetir no cambia nada); 409 si es de otro evento o si el de la Pi ya tiene grupos propios.
 - Fichero `.brackety`, JSON UTF-8 con `schemaVersion: 1`, `exportedAt`, `event` (nombre, fecha, multigrupo, duración, límite de puntos, descanso entre combates, puntos por asistir), `owner` (usuario, organización y CIF), `staff` (usuario y rol, incluido el club), `categories` (nombre, edades, formato, tamaño de equipo), `mats` (número y usuario del árbitro o null) y `participants` (nombre, apellidos, nacimiento, estatura, consentimiento del tutor, categoría elegida o null).
 - Sin ids, grupos, equipos, combates, importaciones, contraseñas ni más datos de cuentas que los usuarios del staff.
 - Lo exporta el club del evento en cualquier momento (también con grupos, que no viajan).
@@ -42,7 +50,7 @@ Llevar el evento ya preparado (configuración e inscripciones) y arrancarlo en c
 - El fichero lleva datos de menores: se guarda solo en el portátil del evento y se borra después (ver Legal).
 
 ### Dispositivos
-- Árbitros y ayudantes usan la **APK Android** (el offline de la web exige https, ver `offline.md`).
+- Árbitros y ayudantes usan la **web** del portátil (desde 2026-11-11 la web tiene la misma cola offline, ver `offline.md`). La APK queda como opción.
 - La APK elige el servidor en el login: "Pabellón" (`http://192.168.137.1:8080`), "Internet" (`https://brackety-api.rgal.dev`) o "Otra URL" (http/https con host). Se recuerda en el dispositivo (almacén seguro, junto al refresh token).
 - Por defecto, el `API_BASE_URL` del build. Solo en el login: cambiarlo cierra la sesión guardada (sus tokens son del otro servidor) y las peticiones siguientes van al nuevo sin reiniciar. La web no lo muestra.
 - http sin cifrar solo hacia la IP del pabellón (`network_security_config.xml`); el resto, https. "Otra URL" con http a otra IP avisa de que no conectará. Los builds debug permiten http a cualquier IP (desarrollo local).
@@ -63,6 +71,7 @@ Sin tablas nuevas. Formato del paquete versionado (`schemaVersion`).
 ## API
 - `WEB_DIR` (`brackety.web-dir`): carpeta con la build web que sirve la propia API, sin login; un GET sin fichero que no sea `/api/**` ni `/actuator/**` devuelve `index.html`. Todo con `no-cache`. Vacía (Docker y producción, donde la sirve nginx) = la API no sirve web.
 - Web del paquete: `app/env/event-bundle.json` con `API_BASE_URL=same-origin` (la API es el origen de la página; solo web).
+- `GET /events/{id}/export/full` (.zip) y `POST /events/{id}/import/results?dryRun=` (cuerpo: el fichero), solo CLUB.
 - `GET /api/v1/events/{id}/export/package` (solo CLUB del evento, como los CSV): `application/json`, `Content-Disposition: attachment; filename="<nombre-en-slug>-<fecha>.brackety"`. El log solo lleva recuentos. CORS expone `Content-Disposition` para que la web use ese nombre.
 - Carga al arrancar con `BRACKETY_PACKAGE` (`brackety.package`, ruta del fichero), no por API.
 

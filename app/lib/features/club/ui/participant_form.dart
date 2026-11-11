@@ -11,6 +11,7 @@ import '../data/club_models.dart';
 import '../data/club_repository.dart';
 import '../state/club_providers.dart';
 import 'club_panel_screen.dart';
+import 'organizations_editor.dart';
 
 /// Age on [day], as the server counts it for categories.
 int ageOn(DateTime birthDate, DateTime day) {
@@ -55,6 +56,7 @@ class _ParticipantFormState extends ConsumerState<_ParticipantForm> {
   late DateTime? _birthDate = widget.participant?.birthDate;
   late bool _consent = widget.participant?.guardianConsent ?? false;
   late String? _categoryId = widget.participant?.chosenCategoryId;
+  late String? _organizationId = widget.participant?.organizationId;
   var _birthDateMissing = false;
   var _saving = false;
 
@@ -81,6 +83,8 @@ class _ParticipantFormState extends ConsumerState<_ParticipantForm> {
     String? required(String? v) =>
         v == null || v.trim().isEmpty ? l10n.fieldRequired : null;
     return AlertDialog(
+      actionsOverflowDirection: VerticalDirection.up,
+      actionsOverflowButtonSpacing: 8,
       title: Text(
         widget.participant == null ? l10n.participantAdd : l10n.participantEdit,
       ),
@@ -140,6 +144,11 @@ class _ParticipantFormState extends ConsumerState<_ParticipantForm> {
                   eventId: widget.eventId,
                   value: _categoryId,
                   onChanged: (id) => setState(() => _categoryId = id),
+                ),
+                OrganizationChoice(
+                  eventId: widget.eventId,
+                  value: _organizationId,
+                  onChanged: (id) => setState(() => _organizationId = id),
                 ),
                 if (_isMinor)
                   CheckboxListTile(
@@ -204,14 +213,14 @@ class _ParticipantFormState extends ConsumerState<_ParticipantForm> {
             heightCm: int.tryParse(_height.text.trim()),
             guardianConsent: _isMinor && _consent,
             categoryId: _categoryId,
+            organizationId: _organizationId,
           );
       ref.invalidate(participantsProvider(widget.eventId));
       if (mounted) Navigator.pop(context);
     } on DioException catch (e) {
       if (!mounted) return;
       setState(() => _saving = false);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(saveErrorMessage(l10n, e))));
+      Toasts.of(context).show(saveErrorMessage(l10n, e), kind: ToastKind.error);
     }
   }
 }

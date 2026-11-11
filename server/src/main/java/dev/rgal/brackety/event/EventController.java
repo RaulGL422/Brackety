@@ -6,7 +6,9 @@ import dev.rgal.brackety.event.dto.CategoriesRequest;
 import dev.rgal.brackety.event.dto.EventSettingsRequest;
 import dev.rgal.brackety.event.dto.EventSettingsResponse;
 import dev.rgal.brackety.event.dto.EventSettingsResponse.CategoryResponse;
+import dev.rgal.brackety.event.dto.EventSettingsResponse.OrganizationResponse;
 import dev.rgal.brackety.event.dto.MyEventResponse;
+import dev.rgal.brackety.event.dto.OrganizationsRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -26,10 +28,12 @@ class EventController {
 
     private final EventService events;
     private final EventCategoryService categories;
+    private final EventOrganizationService organizations;
 
-    EventController(EventService events, EventCategoryService categories) {
+    EventController(EventService events, EventCategoryService categories, EventOrganizationService organizations) {
         this.events = events;
         this.categories = categories;
+        this.organizations = organizations;
     }
 
     @GetMapping
@@ -56,5 +60,13 @@ class EventController {
             @Valid @RequestBody CategoriesRequest request,
             @AuthenticationPrincipal Jwt jwt) {
         return categories.update(eventId, CurrentAccount.id(jwt), request);
+    }
+
+    @PutMapping("/{eventId}/organizations")
+    List<OrganizationResponse> updateOrganizations(
+            @PathVariable UUID eventId,
+            @Valid @RequestBody OrganizationsRequest request,
+            @AuthenticationPrincipal Jwt jwt) {
+        return organizations.update(eventId, CurrentAccount.id(jwt), request);
     }
 }

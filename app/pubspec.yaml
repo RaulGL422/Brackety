@@ -1,7 +1,7 @@
 name: brackety
 description: Brackety app for Android and the public web.
 publish_to: 'none'
-version: 0.3.2+5
+version: 0.4.0+6
 
 environment:
   sdk: ^3.13.7
@@ -28,14 +28,16 @@ dependencies:
   uuid: 4.6.0
   wakelock_plus: 1.8.2
   web: 1.1.2
+  web_socket_channel: 3.0.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: 6.0.0
+  stream_channel: 2.1.4
 
 flutter:
   generate: true
   uses-material-design: true
   assets:
-    - assets/sounds/bell.wav
+    - assets/sounds/

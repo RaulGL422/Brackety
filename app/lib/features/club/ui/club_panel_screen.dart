@@ -5,13 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/download/file_download.dart';
+import '../../../core/upload/file_upload.dart';
+import '../../auth/ui/widgets/confirm_dialog.dart';
+import '../state/club_providers.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../events/state/events_providers.dart';
+import '../../offline/ui/import_ops_button.dart';
 import '../data/club_repository.dart';
 import 'mats_tab.dart';
 import 'participants_tab.dart';
 import 'settings_tab.dart';
 import 'standings_tab.dart';
+import '../../../core/up_button.dart';
 
 /// What the club sees of its event: live scores, mats, entries and settings.
 class ClubPanelScreen extends ConsumerStatefulWidget {
@@ -31,8 +36,15 @@ class _ClubPanelScreenState extends ConsumerState<ClubPanelScreen> {
     final l10n = AppLocalizations.of(context);
     final eventName = ref.watch(myEventProvider(widget.eventId)).value?.name;
     return AdaptiveScaffold(
+      leading: UpButton(label: l10n.eventsTitle, fallback: '/'),
+      leadingWidth: UpButton.leadingWidth(context),
       title: eventName ?? l10n.eventClubPanel,
-      actions: [if (kIsWeb) ClubExportMenu(eventId: widget.eventId)],
+      actions: [
+        if (kIsWeb) ...[
+          ImportOpsButton(eventId: widget.eventId),
+          ClubExportMenu(eventId: widget.eventId),
+        ],
+      ],
       destinations: [
         AdaptiveDestination(
           icon: Icons.leaderboard_outlined,
@@ -63,7 +75,11 @@ class _ClubPanelScreenState extends ConsumerState<ClubPanelScreen> {
   }
 }
 
-/// The CSVs and the event package, as downloads (web only for now, like the CSVs).
+/// Brings the hall's results into this event (the Pi after the phase): counts first, then confirms.
+const importResultsAction = 'import-results';
+
+/// The CSVs and the whole event as downloads, and the import of the hall's results (web only, like
+/// the CSVs).
 class ClubExportMenu extends ConsumerWidget {
   const ClubExportMenu({super.key, required this.eventId});
 
@@ -73,7 +89,7 @@ class ClubExportMenu extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     Future<void> export(EventExport export) async {
-      final messenger = ScaffoldMessenger.of(context);
+      final toasts = Toasts.of(context);
       try {
         final file = await ref
             .read(clubRepositoryProvider)
@@ -84,18 +100,24 @@ class ClubExportMenu extends ConsumerWidget {
           export.mimeType,
         );
       } on DioException {
-        messenger.showSnackBar(SnackBar(content: Text(l10n.exportError)));
+        toasts.show(l10n.exportError, kind: ToastKind.error);
       }
     }
 
-    return PopupMenuButton<EventExport>(
+    return PopupMenuButton<Object>(
       tooltip: l10n.exportMenu,
       icon: const Icon(Icons.download_outlined),
-      onSelected: export,
+      onSelected: (value) => value is EventExport
+          ? export(value)
+          : _importResults(context, ref, eventId),
       itemBuilder: (_) => [
         PopupMenuItem(
           value: EventExport.standings,
           child: Text(l10n.exportStandings),
+        ),
+        PopupMenuItem(
+          value: EventExport.participants,
+          child: Text(l10n.exportParticipants),
         ),
         PopupMenuItem(
           value: EventExport.matches,
@@ -107,11 +129,76 @@ class ClubExportMenu extends ConsumerWidget {
         ),
         const PopupMenuDivider(),
         PopupMenuItem(
-          value: EventExport.eventPackage,
-          child: Text(l10n.exportEventPackage),
+          value: EventExport.full,
+          child: ListTile(
+            leading: const Icon(Icons.folder_zip_outlined),
+            title: Text(l10n.exportFull),
+          ),
+        ),
+        PopupMenuItem(
+          value: importResultsAction,
+          child: ListTile(
+            leading: const Icon(Icons.upload_file_outlined),
+            title: Text(l10n.importResults),
+          ),
         ),
       ],
     );
+  }
+}
+
+Future<void> _importResults(
+  BuildContext context,
+  WidgetRef ref,
+  String eventId,
+) async {
+  final l10n = AppLocalizations.of(context);
+  final toasts = Toasts.of(context);
+  final picked = await ref.read(pickFilesProvider)(
+    accept: '.zip,.brackety',
+    multiple: false,
+  );
+  if (picked.isEmpty) return;
+  final repository = ref.read(clubRepositoryProvider);
+  try {
+    final counts = await repository.importResults(
+      eventId,
+      picked.single.bytes,
+      dryRun: true,
+    );
+    if (counts.alreadyImported) {
+      toasts.show(l10n.importResultsAlready);
+      return;
+    }
+    if (!context.mounted) return;
+    final confirmed = await confirmAction(
+      context,
+      title: l10n.importResultsTitle,
+      body: l10n.importResultsBody(
+        counts.groups,
+        counts.matches,
+        counts.actions,
+        counts.newParticipants,
+      ),
+      confirmLabel: l10n.importResultsConfirm,
+    );
+    if (!confirmed) return;
+    await repository.importResults(eventId, picked.single.bytes, dryRun: false);
+    ref
+      ..invalidate(standingsProvider(eventId))
+      ..invalidate(matsOverviewProvider(eventId))
+      ..invalidate(participantsProvider(eventId))
+      ..invalidate(eventSettingsProvider(eventId));
+    toasts.show(l10n.importResultsDone, kind: ToastKind.success);
+  } on DioException catch (e) {
+    final data = e.response?.data;
+    final code = data is Map ? data['code'] : null;
+    toasts.show(switch ((e.response?.statusCode, code)) {
+      (409, 'RESULTS_OTHER_EVENT') => l10n.importResultsOtherEvent,
+      (409, _) => l10n.importResultsConflict,
+      (400, _) => l10n.importResultsInvalid,
+      _ => l10n.importResultsError,
+    }, kind: ToastKind.error);
   }
 }
 

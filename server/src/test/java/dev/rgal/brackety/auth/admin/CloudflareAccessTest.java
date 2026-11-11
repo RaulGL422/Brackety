@@ -157,7 +157,7 @@ class CloudflareAccessTest {
             request.addHeader(CloudflareAccess.HEADER, assertion);
         }
         var response = new MockHttpServletResponse();
-        new CloudflareAccessFilter(access).doFilter(request, response, new MockFilterChain());
+        new CloudflareAccessFilter(access, false).doFilter(request, response, new MockFilterChain());
         return response;
     }
 

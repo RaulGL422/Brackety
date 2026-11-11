@@ -1,5 +1,7 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../../../core/storage/browser_storage.dart';
+
 /// Where the refresh token lives between app starts.
 abstract interface class RefreshTokenStore {
   /// True on the web: the browser keeps it in an httpOnly cookie and this store holds nothing.
@@ -10,10 +12,19 @@ abstract interface class RefreshTokenStore {
   Future<void> write(String token);
 
   Future<void> clear();
+
+  /// Whether the last run ended signed in, so a start without network keeps the session.
+  Future<bool> hasSession();
 }
 
+/// The web: the token is in a cookie no script can read. A mark in the browser's storage says
+/// one was set, so a reload while the server does not answer keeps the session (and its queue).
 class CookieRefreshTokenStore implements RefreshTokenStore {
-  const CookieRefreshTokenStore();
+  const CookieRefreshTokenStore([this._marks]);
+
+  static const _mark = 'brackety.session';
+
+  final KeyValueStorage? _marks;
 
   @override
   bool get inCookie => true;
@@ -22,10 +33,19 @@ class CookieRefreshTokenStore implements RefreshTokenStore {
   Future<String?> read() async => null;
 
   @override
-  Future<void> write(String token) async {}
+  Future<void> write(String token) async {
+    try {
+      _marks?.write(_mark, '1');
+    } catch (_) {
+      // Without the mark, a reload without network only signs out.
+    }
+  }
 
   @override
-  Future<void> clear() async {}
+  Future<void> clear() async => _marks?.remove(_mark);
+
+  @override
+  Future<bool> hasSession() async => _marks?.read(_mark) != null;
 }
 
 /// Android keystore-backed storage; never shared preferences.
@@ -46,4 +66,7 @@ class SecureRefreshTokenStore implements RefreshTokenStore {
 
   @override
   Future<void> clear() => _storage.delete(key: _key);
+
+  @override
+  Future<bool> hasSession() async => await read() != null;
 }

@@ -17,6 +17,7 @@ import 'settings/legal_section.dart';
 import 'settings/profiles_section.dart';
 import 'settings/sign_in_methods_section.dart';
 import 'widgets/form_message.dart';
+import '../../../core/up_button.dart';
 
 /// Account settings. They need the server (Offline rule): without it, an error and a retry.
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -41,7 +42,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final l10n = AppLocalizations.of(context);
     final account = ref.watch(accountProvider);
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.settingsTitle)),
+      appBar: AppBar(
+        leading: UpButton(label: l10n.eventsTitle, fallback: '/'),
+        leadingWidth: UpButton.leadingWidth(context),
+        title: Text(l10n.settingsTitle),
+      ),
       body: switch (account) {
         AsyncValue(isLoading: true, hasValue: false) ||
         AsyncValue(

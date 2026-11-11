@@ -394,13 +394,13 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get matRecommended => 'Siguiente combate';
+  String get matRecommended => 'Combate recomendado';
 
   @override
   String get matInProgress => 'En curso';
 
   @override
-  String get matPending => 'Después';
+  String get matPending => 'Otros combates disponibles';
 
   @override
   String get matYours => 'Tu tapiz';
@@ -429,7 +429,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get matGroups => 'Grupos en este tapiz';
 
   @override
-  String get matFinished => 'Terminados';
+  String get matFinished => 'Disputados';
 
   @override
   String get matWaiting => 'Un luchador está combatiendo ahora';
@@ -512,14 +512,15 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String reasonTitle(String action, String fighter) {
-    return '$action · $fighter';
+    return '$action: $fighter';
   }
 
   @override
-  String get reasonLabel => 'Motivo (obligatorio)';
+  String get reasonLabel => 'Motivo';
 
   @override
-  String get reasonConfirm => '¿Seguro? Queda registrado.';
+  String get reasonConfirm =>
+      'Escribe el motivo. Queda en el historial del combate.';
 
   @override
   String get confirm => 'Confirmar';
@@ -563,16 +564,139 @@ class AppLocalizationsEs extends AppLocalizations {
   String get tlRivalPoint => 'punto al rival';
 
   @override
-  String get clubStandings => 'Puntuaciones';
+  String get removePoint => '−1';
+
+  @override
+  String removePointFor(String corner) {
+    return 'Quitar un punto a $corner';
+  }
+
+  @override
+  String whatPointRemoved(String corner) {
+    return '−1 $corner';
+  }
+
+  @override
+  String whatClockAdjust(String delta) {
+    return '$delta s al reloj';
+  }
+
+  @override
+  String clockAdjustBy(String delta) {
+    return '$delta s';
+  }
+
+  @override
+  String clockAdjustTooltip(String delta) {
+    return 'Ajustar el reloj $delta s';
+  }
+
+  @override
+  String get clockAdjustHint => 'Ajustar el reloj (parado)';
+
+  @override
+  String get tlPointRemoved => 'Punto quitado';
+
+  @override
+  String get tlClockAdjust => 'Ajuste del reloj';
+
+  @override
+  String get tlNextUndo => 'lo siguiente que deshace Deshacer';
+
+  @override
+  String undoDetail(String what, String clock) {
+    return '$what · $clock';
+  }
+
+  @override
+  String get recentActions => 'Últimas acciones';
+
+  @override
+  String get refusalNoPoints => 'No tiene puntos que quitar.';
+
+  @override
+  String get refusalClockRunning => 'Para el reloj antes de ajustarlo.';
+
+  @override
+  String get refusalClockLimit => 'El reloj no puede ir más allá.';
+
+  @override
+  String get settingsMatchRules => 'Combates';
+
+  @override
+  String get settingsMatchLength => 'Duración del combate (min:s)';
+
+  @override
+  String get settingsMatchLengthHint =>
+      'De 0:30 a 20:00. No cambia con un combate en curso.';
+
+  @override
+  String get settingsMatchLengthInvalid =>
+      'Escribe minutos y segundos entre 0:30 y 20:00, por ejemplo 3:00.';
+
+  @override
+  String get settingsPointsLimit => 'Puntos para acabar el combate';
+
+  @override
+  String get settingsPointsLimitHint =>
+      'Al llegar uno, acaba. La descalificación da estos puntos al rival. No cambia una vez empezado un combate.';
+
+  @override
+  String get settingsMatchRulesConflict =>
+      'No se puede cambiar ahora: hay un combate en curso o ya empezado.';
+
+  @override
+  String get settingsPointsLimitInvalid => 'Entre 1 y 99.';
+
+  @override
+  String get matWaitingTitle => 'En espera';
+
+  @override
+  String get matStartRecommended => 'Empezar este combate';
+
+  @override
+  String get matRecommendedWhy =>
+      'Sus luchadores son los que más han descansado y ninguno acaba de combatir.';
+
+  @override
+  String get matAfterCurrent => 'Cuando acabe el combate en curso.';
+
+  @override
+  String get undoGroup => 'Deshacer grupo';
+
+  @override
+  String undoGroupNumber(int number) {
+    return 'Deshacer el Grupo $number';
+  }
+
+  @override
+  String undoGroupConfirm(int number) {
+    return 'Se deshace el Grupo $number y sus combates. Sus alumnos vuelven a la lista para agruparlos de nuevo.';
+  }
+
+  @override
+  String undoGroupDone(int number) {
+    return 'Grupo $number deshecho';
+  }
+
+  @override
+  String get undoGroupStarted =>
+      'Ya ha empezado un combate de este grupo: solo el administrador puede deshacerlo.';
+
+  @override
+  String get undoGroupError => 'No se ha podido deshacer el grupo.';
+
+  @override
+  String get clubStandings => 'Puntos';
 
   @override
   String get clubMats => 'Tapices';
 
   @override
-  String get clubParticipants => 'Inscripciones';
+  String get clubParticipants => 'Inscritos';
 
   @override
-  String get clubSettings => 'Configuración';
+  String get clubSettings => 'Ajustes';
 
   @override
   String get allCategories => 'Todas las categorías';
@@ -718,7 +842,83 @@ class AppLocalizationsEs extends AppLocalizations {
   String get exportTimeline => 'Línea de tiempo (CSV)';
 
   @override
-  String get exportEventPackage => 'Exportar paquete del evento';
+  String get organizationsTitle => 'Clubes participantes';
+
+  @override
+  String get organizationsEmpty =>
+      'Todavía no hay clubes. Añádelos para indicar el de cada inscrito.';
+
+  @override
+  String get organizationAdd => 'Añadir club';
+
+  @override
+  String get organizationEdit => 'Editar club';
+
+  @override
+  String get organizationRemove => 'Quitar club';
+
+  @override
+  String get organizationName => 'Nombre del club';
+
+  @override
+  String get organizationShortName => 'Abreviatura (opcional)';
+
+  @override
+  String get organizationLabel => 'Club';
+
+  @override
+  String get organizationNone => 'Sin club';
+
+  @override
+  String get organizationsConflict =>
+      'No se puede: ese club tiene inscritos o ya hay otro con el mismo nombre.';
+
+  @override
+  String get exportParticipants => 'Inscritos (CSV)';
+
+  @override
+  String get exportFull => 'Todo el evento (.zip)';
+
+  @override
+  String get importResults => 'Importar resultados del pabellón';
+
+  @override
+  String get importResultsTitle => '¿Importar estos resultados?';
+
+  @override
+  String importResultsBody(
+    int groups,
+    int matches,
+    int actions,
+    int participants,
+  ) {
+    return 'Se añadirán $groups grupos, $matches combates y $actions acciones del marcador, y $participants inscritos que aquí no estaban. No se puede deshacer.';
+  }
+
+  @override
+  String get importResultsConfirm => 'Importar';
+
+  @override
+  String get importResultsDone => 'Resultados importados.';
+
+  @override
+  String get importResultsAlready =>
+      'Estos resultados ya estaban importados: no cambia nada.';
+
+  @override
+  String get importResultsOtherEvent =>
+      'El fichero es de otro evento (otro nombre o fecha).';
+
+  @override
+  String get importResultsConflict =>
+      'Este evento ya tiene grupos propios: los resultados solo se importan en un evento sin competición.';
+
+  @override
+  String get importResultsInvalid =>
+      'El fichero no es una exportación de Brackety (.zip o .brackety) con resultados.';
+
+  @override
+  String get importResultsError => 'No se han podido importar los resultados.';
 
   @override
   String get exportError => 'No se ha podido exportar.';
@@ -1366,11 +1566,38 @@ class AppLocalizationsEs extends AppLocalizations {
   String get syncRejectedDismiss => 'Quitar de la lista';
 
   @override
+  String get syncExport => 'Exportar acciones pendientes';
+
+  @override
+  String get syncExportBody =>
+      'Si este dispositivo no vuelve a conectar, entrega el fichero al club: lo importa desde su panel y no se pierde nada.';
+
+  @override
+  String get syncExportSave => 'Descargar CSV';
+
+  @override
+  String get importOps => 'Importar acciones de un dispositivo';
+
+  @override
+  String importOpsResult(
+    int applied,
+    int duplicates,
+    int inReview,
+    int skipped,
+  ) {
+    return 'Importadas: $applied nuevas · $duplicates ya estaban · $inReview a revisión · $skipped rechazadas';
+  }
+
+  @override
+  String get importOpsError =>
+      'No se ha podido importar: el fichero no es de acciones pendientes o es de otro evento.';
+
+  @override
   String get close => 'Cerrar';
 
   @override
   String get matOfflineBoard =>
-      'Sin conexión: tablero guardado en el móvil. Sin recomendado; puedes empezar un pendiente si no hay otro en curso.';
+      'Sin conexión: tablero guardado en este dispositivo. Sin recomendado; puedes empezar un pendiente si no hay otro en curso.';
 
   @override
   String get matInReview => 'En revisión del club';
@@ -1480,11 +1707,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get refusalNotStarted => 'Inicia el tiempo antes de puntuar.';
 
   @override
-  String undoWhat(String what) {
-    return 'Deshacer: $what';
-  }
-
-  @override
   String undoneWhat(String what) {
     return 'Deshecho: $what';
   }
@@ -1570,10 +1792,23 @@ class AppLocalizationsEs extends AppLocalizations {
   String get themeDark => 'Oscuro';
 
   @override
-  String get refusalStale =>
-      'El combate ha cambiado en otro dispositivo. Revisa el marcador y vuelve a pulsar.';
-
-  @override
   String get accountSuspended =>
       'Esta cuenta está suspendida. Si crees que es un error, escribe al contacto de privacidad que aparece en las páginas legales.';
+
+  @override
+  String backTo(String place) {
+    return 'Volver a $place';
+  }
+
+  @override
+  String get reasonApplyWarning => 'Poner advertencia';
+
+  @override
+  String get reasonApplyDisqualify => 'Descalificar';
+
+  @override
+  String get accountMenu => 'Mi cuenta';
+
+  @override
+  String get back => 'Volver';
 }

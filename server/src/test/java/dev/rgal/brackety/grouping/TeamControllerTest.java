@@ -200,7 +200,8 @@ class TeamControllerTest extends EventApiTest {
                 .andReturn()
                 .getResponse()
                 .getContentAsString(StandardCharsets.UTF_8);
-        assertThat(csv).contains(";Equipo 1 (AlumnoA Prueba, AlumnoB Prueba, AlumnoC Prueba);Equipo 2 (");
+        // Each team with its members; the club column after each one is empty (no clubs here).
+        assertThat(csv).contains(";Equipo 1 (AlumnoA Prueba, AlumnoB Prueba, AlumnoC Prueba);;Equipo 2 (");
     }
 
     @Test
