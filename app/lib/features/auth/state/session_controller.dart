@@ -109,10 +109,13 @@ class SessionController extends Notifier<SessionState> {
 
   Future<void> _restore() async {
     await refresh();
+    if (!ref.mounted) return;
     if (state.status == SessionStatus.restoring) {
       // The server did not answer. A session from the last run stays (Offline rule): the next
       // request renews it, or the server's "no" ends it then.
-      state = await _store.hasSession()
+      final hasSession = await _store.hasSession();
+      if (!ref.mounted) return;
+      state = hasSession
           ? const SessionState(SessionStatus.signedIn)
           : SessionState.signedOut;
     }

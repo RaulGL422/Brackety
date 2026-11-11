@@ -60,10 +60,7 @@ void main() {
     );
     final controller = await load();
 
-    expect(
-      controller.remainingNow().inSeconds,
-      inInclusiveRange(89, 90),
-    );
+    expect(controller.remainingNow().inSeconds, inInclusiveRange(89, 90));
   });
 
   test('an action the rules refuse never leaves the device', () async {

@@ -44,16 +44,17 @@ DioException networkError() => DioException.connectionError(
 /// The provider overrides every app test needs: [api] instead of the server and a web-like
 /// cookie store, so the session restores itself when [FakeAuthApi.signedIn] is true. `/me`
 /// answers from [account] (a default one when not given). The live socket never answers
-/// unless a test brings its own ([FakeLiveServer]) after these.
+/// unless a test brings its own ([live], e.g. a [FakeLiveServer]).
 List<Override> sessionOverrides(
   FakeAuthApi api, {
   RefreshTokenStore store = const CookieRefreshTokenStore(),
   FakeAccountApi? account,
+  LiveSocketConnect? live,
 }) => [
   authApiProvider.overrideWithValue(api),
   refreshTokenStoreProvider.overrideWithValue(store),
   accountApiProvider.overrideWithValue(account ?? FakeAccountApi()),
-  liveSocketConnectProvider.overrideWithValue(silentLive),
+  liveSocketConnectProvider.overrideWithValue(live ?? silentLive),
 ];
 
 /// Server auth without a server. Sign-in works for [accounts] and when the password equals the

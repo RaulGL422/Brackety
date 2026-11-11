@@ -86,14 +86,21 @@ void main() {
     setUp(() {
       loads = 0;
       server = FakeLiveServer();
+    });
+
+    // Inside the test, not in setUp: the session's futures must run on the test's fake clock.
+    void start() {
       container = ProviderContainer(
         overrides: [
-          ...sessionOverrides(FakeAuthApi(signedIn: true)),
-          liveSocketConnectProvider.overrideWithValue(server.connect),
+          ...sessionOverrides(
+            FakeAuthApi(signedIn: true),
+            live: server.connect,
+          ),
         ],
       );
-      container.read(sessionProvider);
-    });
+      container.listen(sessionProvider, (_, _) {});
+      container.listen(provider, (_, _) {});
+    }
 
     Future<void> settle(WidgetTester tester) async {
       for (var i = 0; i < 5; i++) {
@@ -104,7 +111,7 @@ void main() {
     testWidgets('a change on the server reloads at once; a burst, once', (
       tester,
     ) async {
-      container.listen(provider, (_, _) {});
+      start();
       await settle(tester);
       // The first load and one more when the socket confirmed it follows the event.
       expect(loads, 2);
@@ -129,7 +136,7 @@ void main() {
     testWidgets(
       'with the socket down it polls slowly, and reloads once when it is back',
       (tester) async {
-        container.listen(provider, (_, _) {});
+        start();
         await settle(tester);
         expect(loads, 2);
 
@@ -153,7 +160,7 @@ void main() {
     testWidgets('an expired token gets a new one before reconnecting', (
       tester,
     ) async {
-      container.listen(provider, (_, _) {});
+      start();
       await settle(tester);
       final first = server.tokens.single;
 
@@ -171,7 +178,7 @@ void main() {
     testWidgets('in the background it stops; back in front it reloads', (
       tester,
     ) async {
-      container.listen(provider, (_, _) {});
+      start();
       await settle(tester);
       expect(loads, 2);
 

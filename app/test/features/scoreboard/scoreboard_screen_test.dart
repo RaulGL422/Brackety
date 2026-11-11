@@ -1,5 +1,7 @@
 import 'package:brackety/core/keep_screen_on.dart';
 import 'package:brackety/features/mat/data/mat_board.dart';
+import 'package:brackety/features/offline/data/local_match.dart';
+import 'package:brackety/features/offline/data/offline_op.dart';
 import 'package:brackety/features/scoreboard/data/match_view.dart';
 import 'package:brackety/features/scoreboard/data/scoreboard_repository.dart';
 import 'package:brackety/features/scoreboard/state/bell.dart';
@@ -26,6 +28,20 @@ void main() {
       await tester.pump(const Duration(milliseconds: 100));
     }
   }
+
+  // A started match after [actions], as the server would send it: its timeline matches its score.
+  MatchView played(List<(MatchAction, Side?)> actions) =>
+      LocalMatch.project(matchView(status: MatchStatus.inProgress), [
+        for (final (i, (action, side)) in actions.indexed)
+          OfflineOp(
+            opId: 'op$i',
+            matchId: 'm1',
+            action: action,
+            side: side,
+            at: DateTime(2027, 3, 10, 10, 0, 5),
+            knownEvents: i + 1,
+          ),
+      ], DateTime(2027, 3, 10, 10, 0, 30)).view;
 
   Future<(FakeScoreboardRepository, FakeBell)> open(
     WidgetTester tester,
@@ -155,12 +171,7 @@ void main() {
     addTearDown(tester.view.reset);
     final (repository, _) = await open(
       tester,
-      matchView(
-        status: MatchStatus.inProgress,
-        redPoints: 15,
-        endReason: EndReason.points,
-        canUndo: true,
-      ),
+      played([for (var i = 0; i < 15; i++) (MatchAction.point, Side.red)]),
     );
 
     expect(find.text('Ended on points'), findsOneWidget);
@@ -368,7 +379,7 @@ void main() {
     setSize(tester, sizes['phone']!);
     final (repository, _) = await open(
       tester,
-      matchView(status: MatchStatus.inProgress),
+      played([(MatchAction.stop, null)]),
     );
     Color? background(String label) => tester
         .widget<FilledButton>(
