@@ -186,7 +186,11 @@ void main() {
           if (repository != null)
             clubRepositoryProvider.overrideWithValue(repository),
           myEventsProvider.overrideWith((ref) async => [event]),
-          eventSettingsProvider.overrideWith((ref, _) async => settings),
+          eventSettingsProvider.overrideWith(
+            (ref, _) async => repository is FakeClubRepository
+                ? repository.current
+                : settings,
+          ),
           standingsProvider.overrideWith((ref, _) async => scores ?? standings),
           participantsProvider.overrideWith((ref, _) async => [minor]),
           matsOverviewProvider.overrideWith(

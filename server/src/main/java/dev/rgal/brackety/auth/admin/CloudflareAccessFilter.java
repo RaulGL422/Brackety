@@ -32,7 +32,8 @@ public class CloudflareAccessFilter extends OncePerRequestFilter {
             if (isLoopback(request.getRemoteAddr())) {
                 chain.doFilter(request, response);
             } else {
-                ProblemResponses.write(response, HttpStatus.FORBIDDEN, "The superadmin API only answers on this computer.");
+                ProblemResponses.write(
+                        response, HttpStatus.FORBIDDEN, "The superadmin API only answers on this computer.");
             }
             return;
         }

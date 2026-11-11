@@ -82,7 +82,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(new CloudflareAccessFilter(cloudflareAccess, localOnly), BearerTokenAuthenticationFilter.class)
+                .addFilterBefore(
+                        new CloudflareAccessFilter(cloudflareAccess, localOnly), BearerTokenAuthenticationFilter.class)
                 .authorizeHttpRequests(a -> a.requestMatchers(ADMIN_LOGIN_PATH)
                         .permitAll()
                         .anyRequest()

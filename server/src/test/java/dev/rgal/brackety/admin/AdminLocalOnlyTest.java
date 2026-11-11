@@ -23,7 +23,8 @@ class AdminLocalOnlyTest extends AdminApiTestBase {
         referee(match, "POINT", "RED", 1);
 
         local(post("/api/v1/admin/matches/" + match + "/reset")).andExpect(status().isNoContent());
-        assertThat(rows("select count(*) from match_event where match_id = ?", match)).isZero();
+        assertThat(rows("select count(*) from match_event where match_id = ?", match))
+                .isZero();
         referee(match, "START", null, 0);
 
         var group = jdbc.sql("select group_id from fight_match where id = ?")
@@ -31,7 +32,8 @@ class AdminLocalOnlyTest extends AdminApiTestBase {
                 .query(java.util.UUID.class)
                 .single();
         local(post("/api/v1/admin/groups/" + group + "/dissolve")).andExpect(status().isNoContent());
-        assertThat(rows("select count(*) from fight_match where group_id = ?", group)).isZero();
+        assertThat(rows("select count(*) from fight_match where group_id = ?", group))
+                .isZero();
         group("4-6", young);
     }
 

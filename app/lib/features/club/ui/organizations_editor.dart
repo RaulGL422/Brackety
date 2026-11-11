@@ -217,11 +217,16 @@ class OrganizationChoice extends ConsumerWidget {
       padding: const EdgeInsets.only(top: AppSpacing.s),
       child: DropdownButtonFormField<String?>(
         initialValue: organizations.any((o) => o.id == value) ? value : null,
+        // Club names can be long: they shrink with an ellipsis instead of overflowing.
+        isExpanded: true,
         decoration: InputDecoration(labelText: l10n.organizationLabel),
         items: [
           DropdownMenuItem(child: Text(l10n.organizationNone)),
           for (final o in organizations)
-            DropdownMenuItem(value: o.id, child: Text(o.name)),
+            DropdownMenuItem(
+              value: o.id,
+              child: Text(o.name, overflow: TextOverflow.ellipsis),
+            ),
         ],
         onChanged: onChanged,
       ),
