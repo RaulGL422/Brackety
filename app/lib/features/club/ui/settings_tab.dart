@@ -15,6 +15,7 @@ import '../data/club_repository.dart';
 import '../state/club_providers.dart';
 import 'categories_editor.dart';
 import 'club_panel_screen.dart';
+import 'organizations_editor.dart';
 
 const maxMats = 20;
 
@@ -145,6 +146,12 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
           CategoriesEditor(
             eventId: widget.eventId,
             categories: settings.categories,
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          Text(l10n.organizationsTitle, style: text.titleMedium),
+          OrganizationsEditor(
+            eventId: widget.eventId,
+            organizations: settings.organizations,
           ),
         ],
       ),

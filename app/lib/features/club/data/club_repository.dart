@@ -9,12 +9,14 @@ final clubRepositoryProvider = Provider<ClubRepository>(
   (ref) => ClubRepository(ref.watch(apiProvider)),
 );
 
-/// What the club can download: three CSVs and the event package (`.brackety`) for the sports hall server.
+/// What the club can download: CSVs for Excel and the whole event as a .zip (every CSV, a LEEME.txt and the
+/// package that loads the sports hall server or brings its results back).
 enum EventExport {
   standings('export/standings.csv', 'clasificacion.csv', 'text/csv'),
+  participants('export/participants.csv', 'inscritos.csv', 'text/csv'),
   matches('export/matches.csv', 'combates.csv', 'text/csv'),
   timeline('export/timeline.csv', 'linea-de-tiempo.csv', 'text/csv'),
-  eventPackage('export/package', 'evento.brackety', 'application/json');
+  full('export/full', 'evento.zip', 'application/zip');
 
   const EventExport(this.path, this.fallbackName, this.mimeType);
 
@@ -75,6 +77,23 @@ class ClubRepository {
     ];
   }
 
+  /// The whole list: clubs left out are removed (409 if one still has participants).
+  Future<List<Organization>> saveOrganizations(
+    String eventId,
+    List<Organization> organizations,
+  ) async {
+    final response = await _dio.put<List<dynamic>>(
+      '/api/v1/events/$eventId/organizations',
+      data: {
+        'organizations': [for (final o in organizations) o.toJson()],
+      },
+    );
+    return [
+      for (final o in response.data!)
+        Organization.fromJson(o as Map<String, dynamic>),
+    ];
+  }
+
   Future<List<Participant>> participants(String eventId) async {
     final response = await _dio.get<List<dynamic>>(
       '/api/v1/events/$eventId/participants',
@@ -95,6 +114,7 @@ class ClubRepository {
     required int? heightCm,
     required bool guardianConsent,
     String? categoryId,
+    String? organizationId,
   }) async {
     final data = {
       'firstName': firstName,
@@ -103,6 +123,7 @@ class ClubRepository {
       'heightCm': heightCm,
       'guardianConsent': guardianConsent,
       'categoryId': categoryId,
+      'organizationId': organizationId,
     };
     final path = '/api/v1/events/$eventId/participants';
     if (participantId == null) {
@@ -133,6 +154,24 @@ class ClubRepository {
       for (final json in response.data!)
         MatOverview.fromJson(json as Map<String, dynamic>),
     ];
+  }
+
+  /// The hall's results (its full export) into this event. [dryRun] only counts what would come in.
+  Future<ResultsImport> importResults(
+    String eventId,
+    List<int> file, {
+    required bool dryRun,
+  }) async {
+    final response = await _dio.post<Map<String, dynamic>>(
+      '/api/v1/events/$eventId/import/results',
+      queryParameters: {'dryRun': dryRun},
+      data: Stream.value(file),
+      options: Options(
+        contentType: 'application/octet-stream',
+        headers: {Headers.contentLengthHeader: file.length},
+      ),
+    );
+    return ResultsImport.fromJson(response.data!);
   }
 
   /// The file as the server sends it (CSVs: UTF-8 with BOM, `;`-separated), with the name it gives.

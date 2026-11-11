@@ -711,7 +711,83 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exportTimeline => 'Timeline (CSV)';
 
   @override
-  String get exportEventPackage => 'Export event package';
+  String get organizationsTitle => 'Clubs taking part';
+
+  @override
+  String get organizationsEmpty =>
+      'No clubs yet. Add them to set the club of each participant.';
+
+  @override
+  String get organizationAdd => 'Add club';
+
+  @override
+  String get organizationEdit => 'Edit club';
+
+  @override
+  String get organizationRemove => 'Remove club';
+
+  @override
+  String get organizationName => 'Club name';
+
+  @override
+  String get organizationShortName => 'Short name (optional)';
+
+  @override
+  String get organizationLabel => 'Club';
+
+  @override
+  String get organizationNone => 'No club';
+
+  @override
+  String get organizationsConflict =>
+      'Not possible: that club has participants or another one has the same name.';
+
+  @override
+  String get exportParticipants => 'Participants (CSV)';
+
+  @override
+  String get exportFull => 'The whole event (.zip)';
+
+  @override
+  String get importResults => 'Import results from the sports hall';
+
+  @override
+  String get importResultsTitle => 'Import these results?';
+
+  @override
+  String importResultsBody(
+    int groups,
+    int matches,
+    int actions,
+    int participants,
+  ) {
+    return '$groups groups, $matches matches and $actions scoreboard actions will be added, and $participants participants who were not here. It cannot be undone.';
+  }
+
+  @override
+  String get importResultsConfirm => 'Import';
+
+  @override
+  String get importResultsDone => 'Results imported.';
+
+  @override
+  String get importResultsAlready =>
+      'These results were already imported: nothing changes.';
+
+  @override
+  String get importResultsOtherEvent =>
+      'The file is from another event (another name or date).';
+
+  @override
+  String get importResultsConflict =>
+      'This event already has groups of its own: results are only imported into an event without competition.';
+
+  @override
+  String get importResultsInvalid =>
+      'The file is not a Brackety export (.zip or .brackety) with results.';
+
+  @override
+  String get importResultsError => 'The results could not be imported.';
 
   @override
   String get exportError => 'Could not export.';
