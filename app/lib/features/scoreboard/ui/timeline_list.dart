@@ -42,7 +42,8 @@ class TimelineList extends StatelessWidget {
         final next = nextUndo != null && e.id == nextUndo.id;
         final notes = [
           ?who,
-          if (e.delta case final delta?) l10n.clockAdjustBy(signedSeconds(delta)),
+          if (e.delta case final delta?)
+            l10n.clockAdjustBy(signedSeconds(delta)),
           ?e.reason,
           if (e.gaveRivalPoint) l10n.tlRivalPoint,
           if (e.automatic) l10n.tlAutomatic,

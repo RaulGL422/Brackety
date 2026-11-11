@@ -114,32 +114,33 @@ class _ClockBarState extends ConsumerState<ClockBar> {
       padding: const EdgeInsets.all(AppSpacing.m),
       child: LayoutBuilder(
         builder: (context, size) => Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        spacing: AppSpacing.s,
-        children: [
-          if (widget.clockHeight case final height?) ...[
-            SizedBox(height: height, child: clock),
-            ?adjust,
-            // Portrait: both buttons on one row, under the thumb, the same height.
-            IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                spacing: AppSpacing.s,
-                children: [
-                  Expanded(child: clockButton),
-                  Expanded(child: undo),
-                ],
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: AppSpacing.s,
+          children: [
+            if (widget.clockHeight case final height?) ...[
+              SizedBox(height: height, child: clock),
+              ?adjust,
+              // Portrait: both buttons on one row, under the thumb, the same height.
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  spacing: AppSpacing.s,
+                  children: [
+                    Expanded(child: clockButton),
+                    Expanded(child: undo),
+                  ],
+                ),
               ),
-            ),
-          ] else ...[
-            Expanded(child: clock),
-            ?adjust,
-            clockButton,
-            undo,
-            if (size.maxHeight >= _recentMinHeight) _RecentActions(view: view),
+            ] else ...[
+              Expanded(child: clock),
+              ?adjust,
+              clockButton,
+              undo,
+              if (size.maxHeight >= _recentMinHeight)
+                _RecentActions(view: view),
+            ],
           ],
-        ],
-      ),
+        ),
       ),
     );
   }
@@ -373,7 +374,10 @@ class _UndoButton extends StatelessWidget {
           Text(l10n.undo, style: text.titleMedium, maxLines: 1),
           if (target != null)
             Text(
-              l10n.undoDetail(undoTarget(l10n, target), clockText(target.clock)),
+              l10n.undoDetail(
+                undoTarget(l10n, target),
+                clockText(target.clock),
+              ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,

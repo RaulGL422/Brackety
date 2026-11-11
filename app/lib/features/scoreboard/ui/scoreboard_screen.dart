@@ -44,59 +44,59 @@ class ScoreboardScreen extends ConsumerWidget {
     return Listener(
       onPointerUp: (_) => ref.read(bellProvider).unlock(),
       child: KeepScreenOn(
-      child: Theme(
-        data: _scoreboardTheme,
-        child: Scaffold(
-          appBar: AppBar(
-            leading: UpButton(
-              label: view == null
-                  ? l10n.eventsTitle
-                  : l10n.matTitle(view.matNumber),
-              fallback: view == null
-                  ? '/'
-                  : '/mats/${view.matId}?number=${view.matNumber}',
-            ),
-            leadingWidth: UpButton.leadingWidth(context),
-            title: Text(
-              view == null
-                  ? ''
-                  : l10n.scoreboardTitle(view.matNumber, view.groupNumber),
-            ),
-            actions: [
-              if (view != null)
-                IconButton(
-                  tooltip: l10n.timeline,
-                  icon: const Icon(Icons.history),
-                  onPressed: () => _showTimeline(context, view),
-                ),
-            ],
-          ),
-          body: Column(
-            children: [
-              const SyncStatusBar(),
-              Expanded(
-                child: AsyncView(
-                  value: match,
-                  onRetry: () => ref.invalidate(provider),
-                  data: (view) => view.finished
-                      ? _Finished(view: view)
-                      : _Live(
-                          view: view,
-                          onAction: (action, {side}) =>
-                              _act(context, ref, view, action, side: side),
-                          onAdjust: (delta) => _send(
-                            context,
-                            ref,
-                            MatchAction.clockAdjust,
-                            delta: delta,
-                          ),
-                        ),
-                ),
+        child: Theme(
+          data: _scoreboardTheme,
+          child: Scaffold(
+            appBar: AppBar(
+              leading: UpButton(
+                label: view == null
+                    ? l10n.eventsTitle
+                    : l10n.matTitle(view.matNumber),
+                fallback: view == null
+                    ? '/'
+                    : '/mats/${view.matId}?number=${view.matNumber}',
               ),
-            ],
+              leadingWidth: UpButton.leadingWidth(context),
+              title: Text(
+                view == null
+                    ? ''
+                    : l10n.scoreboardTitle(view.matNumber, view.groupNumber),
+              ),
+              actions: [
+                if (view != null)
+                  IconButton(
+                    tooltip: l10n.timeline,
+                    icon: const Icon(Icons.history),
+                    onPressed: () => _showTimeline(context, view),
+                  ),
+              ],
+            ),
+            body: Column(
+              children: [
+                const SyncStatusBar(),
+                Expanded(
+                  child: AsyncView(
+                    value: match,
+                    onRetry: () => ref.invalidate(provider),
+                    data: (view) => view.finished
+                        ? _Finished(view: view)
+                        : _Live(
+                            view: view,
+                            onAction: (action, {side}) =>
+                                _act(context, ref, view, action, side: side),
+                            onAdjust: (delta) => _send(
+                              context,
+                              ref,
+                              MatchAction.clockAdjust,
+                              delta: delta,
+                            ),
+                          ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -192,8 +192,11 @@ class ScoreboardScreen extends ConsumerWidget {
       isScrollControlled: true,
       builder: (_) => DraggableScrollableSheet(
         expand: false,
-        builder: (_, controller) =>
-            TimelineList(view: view, controller: controller, markNextUndo: true),
+        builder: (_, controller) => TimelineList(
+          view: view,
+          controller: controller,
+          markNextUndo: true,
+        ),
       ),
     );
   }

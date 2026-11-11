@@ -198,7 +198,8 @@ class TimelineEntry {
   };
 }
 
-Duration? _duration(Object? ms) => ms is int ? Duration(milliseconds: ms) : null;
+Duration? _duration(Object? ms) =>
+    ms is int ? Duration(milliseconds: ms) : null;
 
 /// Why the first offline action of a match clashed (`review.reason` of the server).
 enum ReviewReason { knownEvents, rules, age, matBusy, fighterBusy, unknown }
