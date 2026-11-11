@@ -6,6 +6,7 @@ import 'package:brackety/features/club/data/club_repository.dart';
 import 'package:brackety/features/club/state/club_providers.dart';
 import 'package:brackety/core/upload/file_upload.dart';
 import 'package:brackety/features/club/ui/club_panel_screen.dart';
+import 'package:brackety/features/club/ui/settings_tab.dart';
 import 'package:brackety/features/club/ui/participant_form.dart';
 import 'package:brackety/features/events/data/my_event.dart';
 import 'package:brackety/features/events/state/events_providers.dart';
@@ -23,6 +24,7 @@ class FakeClubRepository extends Fake implements ClubRepository {
   EventSettings current;
   int? refuseWith;
   final savedMatReferees = <List<String?>>[];
+  final savedRules = <(Duration, int)>[];
   final savedCategories = <List<EventCategory>>[];
   final savedParticipantCategories = <String?>[];
   final savedParticipantOrganizations = <String?>[];
@@ -94,15 +96,20 @@ class FakeClubRepository extends Fake implements ClubRepository {
     required String name,
     required DateTime date,
     required List<String?> matReferees,
+    required Duration matchLength,
+    required int pointsLimit,
   }) async {
     _refuse();
     savedMatReferees.add(matReferees);
+    savedRules.add((matchLength, pointsLimit));
     return current = EventSettings(
       name: name,
       date: date,
       matReferees: matReferees,
       referees: current.referees,
       categories: current.categories,
+      matchLength: matchLength,
+      pointsLimit: pointsLimit,
       organizations: current.organizations,
     );
   }
@@ -127,6 +134,8 @@ void main() {
     date: DateTime(2026, 11, 14),
     matReferees: const ['r1', null],
     referees: const [StaffMember(id: 'r1', username: 'arbitro1')],
+    matchLength: const Duration(minutes: 3),
+    pointsLimit: 15,
     categories: const [
       EventCategory(id: 'c1', name: '4-7', minAge: 4, maxAge: 7),
       EventCategory(id: 'c2', name: '8-11', minAge: 8, maxAge: 11),
@@ -409,6 +418,8 @@ void main() {
         matReferees: settings.matReferees,
         referees: settings.referees,
         categories: settings.categories,
+        matchLength: settings.matchLength,
+        pointsLimit: settings.pointsLimit,
         organizations: const [
           Organization(id: 'o1', name: 'Club Yoseikan Sevilla'),
         ],
@@ -491,13 +502,82 @@ void main() {
     expect(find.text('Mat 3 · Referee'), findsNothing);
   });
 
+  testWidgets('the club sets the match length and the points limit', (
+    tester,
+  ) async {
+    final repository = FakeClubRepository(settings);
+    await pumpPanel(tester, const Size(800, 1280), repository: repository);
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+
+    final length = find.widgetWithText(TextFormField, 'Match length (min:s)');
+    final limit = find.widgetWithText(
+      TextFormField,
+      'Points that end the match',
+    );
+    expect(find.text('3:00'), findsOneWidget);
+
+    await tester.enterText(length, '25:00');
+    await tester.pump(const Duration(seconds: 1));
+    expect(find.textContaining('between 0:30 and 20:00'), findsOneWidget);
+    expect(repository.savedRules, isEmpty);
+
+    await tester.enterText(length, '2:30');
+    await tester.enterText(limit, '10');
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    expect(repository.savedRules.last, (
+      const Duration(minutes: 2, seconds: 30),
+      10,
+    ));
+  });
+
+  testWidgets('a match length refused by a started match says why', (
+    tester,
+  ) async {
+    final repository = FakeClubRepository(settings)..refuseWith = 409;
+    await pumpPanel(tester, const Size(800, 1280), repository: repository);
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Match length (min:s)'),
+      '4:00',
+    );
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('It cannot change now: a match is in progress or has started.'),
+      findsOneWidget,
+    );
+    expect(find.text('3:00'), findsOneWidget);
+  });
+
+  test('match lengths are read as minutes and seconds', () {
+    expect(parseMatchLength('3:00'), const Duration(minutes: 3));
+    expect(parseMatchLength('3'), const Duration(minutes: 3));
+    expect(parseMatchLength(' 0:30 '), const Duration(seconds: 30));
+    expect(parseMatchLength('20:00'), const Duration(minutes: 20));
+    for (final bad in ['0:29', '20:01', '3:60', '3:5', 'tres', '']) {
+      expect(parseMatchLength(bad), isNull, reason: bad);
+    }
+    expect(formatMatchLength(const Duration(minutes: 2, seconds: 5)), '2:05');
+  });
+
   Future<void> openCategories(WidgetTester tester) async {
     await tester.tap(find.text('Settings'));
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(
       find.text('Add category'),
       200,
-      scrollable: find.byType(Scrollable).last,
+      // The settings list, not the text fields' own scrollables.
+      scrollable: find
+          .descendant(
+            of: find.byType(ListView),
+            matching: find.byType(Scrollable),
+          )
+          .first,
     );
     await tester.pumpAndSettle();
   }

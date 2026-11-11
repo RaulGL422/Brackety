@@ -46,6 +46,8 @@ class ClubRepository {
     required String name,
     required DateTime date,
     required List<String?> matReferees,
+    required Duration matchLength,
+    required int pointsLimit,
   }) async {
     final response = await _dio.put<Map<String, dynamic>>(
       '/api/v1/events/$eventId/settings',
@@ -55,6 +57,8 @@ class ClubRepository {
         // No multigroup any more (docs/decisiones.md, 2026-11-07); the server still asks for it.
         'maxGroupsPerMat': 1,
         'matReferees': matReferees,
+        'matchSeconds': matchLength.inSeconds,
+        'pointsLimit': pointsLimit,
       },
     );
     return EventSettings.fromJson(response.data!);

@@ -5,8 +5,8 @@ import '../../../core/polling.dart';
 import '../data/club_models.dart';
 import '../data/club_repository.dart';
 
-/// Scores and mats change while the club watches; they refresh on their own.
-const liveRefresh = Duration(seconds: 5);
+/// Scores and mats change while the club watches: they follow the event on the live socket.
+Set<String> eventTopics(String eventId) => {'event:$eventId'};
 
 final eventSettingsProvider = FutureProvider.autoDispose
     .family<EventSettings, String>(
@@ -20,18 +20,18 @@ final participantsProvider = FutureProvider.autoDispose
 
 final standingsProvider = FutureProvider.autoDispose
     .family<List<StandingRow>, String>(
-      (ref, eventId) => reloadEvery(
+      (ref, eventId) => liveReload(
         ref,
-        liveRefresh,
+        eventTopics(eventId),
         () => ref.watch(clubRepositoryProvider).standings(eventId),
       ),
     );
 
 final matsOverviewProvider = FutureProvider.autoDispose
     .family<List<MatOverview>, String>(
-      (ref, eventId) => reloadEvery(
+      (ref, eventId) => liveReload(
         ref,
-        liveRefresh,
+        eventTopics(eventId),
         () => ref.watch(clubRepositoryProvider).mats(eventId),
       ),
     );

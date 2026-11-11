@@ -1,6 +1,6 @@
 import 'offline_store.dart';
 
-/// The web keeps nothing: it has no offline queue.
+/// Neither a device folder nor a browser: nothing is kept.
 OfflineStore deviceOfflineStore() => const _NoStore();
 
 class _NoStore implements OfflineStore {

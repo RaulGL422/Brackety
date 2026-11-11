@@ -76,6 +76,7 @@ class TeamService {
                 .collect(Collectors.toMap(FightGroup::getId, Function.identity()));
         var matNumbers =
                 mats.findByEventIdOrderByNumber(eventId).stream().collect(Collectors.toMap(Mat::getId, Mat::getNumber));
+        var started = new HashSet<>(groups.startedIds(eventId));
         return categoryTeams.stream()
                 .map(t -> {
                     var group = groupById.get(groupByTeam.get(t.getId()));
@@ -87,7 +88,9 @@ class TeamService {
                                     .map(p -> new Member(p.getId(), p.getFirstName(), p.getLastName()))
                                     .toList(),
                             group == null ? null : group.getNumber(),
-                            group == null ? null : matNumbers.get(group.getMatId()));
+                            group == null ? null : matNumbers.get(group.getMatId()),
+                            group == null ? null : group.getId(),
+                            group != null && started.contains(group.getId()));
                 })
                 .toList();
     }

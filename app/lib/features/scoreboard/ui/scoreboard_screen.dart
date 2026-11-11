@@ -11,6 +11,7 @@ import '../../mat/ui/fighter_text.dart';
 import '../../offline/ui/sync_status_bar.dart';
 import '../data/match_view.dart';
 import '../data/tambo_match.dart';
+import '../state/bell.dart';
 import '../state/match_controller.dart';
 import 'clock_bar.dart';
 import 'corner_panel.dart';
@@ -39,51 +40,61 @@ class ScoreboardScreen extends ConsumerWidget {
     final provider = matchControllerProvider(matchId);
     final match = ref.watch(provider);
     final view = match.value;
-    return KeepScreenOn(
-      child: Theme(
-        data: _scoreboardTheme,
-        child: Scaffold(
-          appBar: AppBar(
-            leading: UpButton(
-              label: view == null
-                  ? l10n.eventsTitle
-                  : l10n.matTitle(view.matNumber),
-              fallback: view == null
-                  ? '/'
-                  : '/mats/${view.matId}?number=${view.matNumber}',
-            ),
-            leadingWidth: UpButton.leadingWidth(context),
-            title: Text(
-              view == null
-                  ? ''
-                  : l10n.scoreboardTitle(view.matNumber, view.groupNumber),
-            ),
-            actions: [
-              if (view != null)
-                IconButton(
-                  tooltip: l10n.timeline,
-                  icon: const Icon(Icons.history),
-                  onPressed: () => _showTimeline(context, view),
-                ),
-            ],
-          ),
-          body: Column(
-            children: [
-              const SyncStatusBar(),
-              Expanded(
-                child: AsyncView(
-                  value: match,
-                  onRetry: () => ref.invalidate(provider),
-                  data: (view) => view.finished
-                      ? _Finished(view: view)
-                      : _Live(
-                          view: view,
-                          onAction: (action, {side}) =>
-                              _act(context, ref, view, action, side: side),
-                        ),
-                ),
+    // Any tap opens the browser's audio, so the bells that come later by themselves sound.
+    return Listener(
+      onPointerUp: (_) => ref.read(bellProvider).unlock(),
+      child: KeepScreenOn(
+        child: Theme(
+          data: _scoreboardTheme,
+          child: Scaffold(
+            appBar: AppBar(
+              leading: UpButton(
+                label: view == null
+                    ? l10n.eventsTitle
+                    : l10n.matTitle(view.matNumber),
+                fallback: view == null
+                    ? '/'
+                    : '/mats/${view.matId}?number=${view.matNumber}',
               ),
-            ],
+              leadingWidth: UpButton.leadingWidth(context),
+              title: Text(
+                view == null
+                    ? ''
+                    : l10n.scoreboardTitle(view.matNumber, view.groupNumber),
+              ),
+              actions: [
+                if (view != null)
+                  IconButton(
+                    tooltip: l10n.timeline,
+                    icon: const Icon(Icons.history),
+                    onPressed: () => _showTimeline(context, view),
+                  ),
+              ],
+            ),
+            body: Column(
+              children: [
+                const SyncStatusBar(),
+                Expanded(
+                  child: AsyncView(
+                    value: match,
+                    onRetry: () => ref.invalidate(provider),
+                    data: (view) => view.finished
+                        ? _Finished(view: view)
+                        : _Live(
+                            view: view,
+                            onAction: (action, {side}) =>
+                                _act(context, ref, view, action, side: side),
+                            onAdjust: (delta) => _send(
+                              context,
+                              ref,
+                              MatchAction.clockAdjust,
+                              delta: delta,
+                            ),
+                          ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -99,7 +110,9 @@ class ScoreboardScreen extends ConsumerWidget {
   }) async {
     final l10n = AppLocalizations.of(context);
     String? reason;
-    if (side != null && action != MatchAction.point) {
+    if (side != null &&
+        action != MatchAction.point &&
+        action != MatchAction.pointRemoved) {
       final label = switch (action) {
         MatchAction.oneHandWarning => l10n.actionOneHand,
         MatchAction.disqualification => l10n.actionDisqualify,
@@ -136,13 +149,14 @@ class ScoreboardScreen extends ConsumerWidget {
     MatchAction action, {
     Side? side,
     String? reason,
+    Duration? delta,
     TimelineEntry? undoing,
   }) async {
     final l10n = AppLocalizations.of(context);
     final toasts = Toasts.of(context);
     final refused = await ref
         .read(matchControllerProvider(matchId).notifier)
-        .send(action, side: side, reason: reason);
+        .send(action, side: side, reason: reason, delta: delta);
     if (refused != null) {
       toasts.show(_refusalText(l10n, refused), kind: ToastKind.error);
     } else if (undoing != null) {
@@ -155,7 +169,6 @@ class ScoreboardScreen extends ConsumerWidget {
 
   static String _refusalText(AppLocalizations l10n, ActionRefusal refusal) =>
       switch (refusal.local) {
-        null when refusal.stale => l10n.refusalStale,
         null => l10n.actionRefused(refusal.detail ?? ''),
         MatchRefusal.finished => l10n.refusalFinished,
         MatchRefusal.over => l10n.refusalOver,
@@ -167,6 +180,9 @@ class ScoreboardScreen extends ConsumerWidget {
         MatchRefusal.notForAge => l10n.refusalNotForAge,
         MatchRefusal.inReview => l10n.refusalInReview,
         MatchRefusal.matBusy => l10n.refusalMatBusy,
+        MatchRefusal.noPoints => l10n.refusalNoPoints,
+        MatchRefusal.clockRunning => l10n.refusalClockRunning,
+        MatchRefusal.clockLimit => l10n.refusalClockLimit,
       };
 
   void _showTimeline(BuildContext context, MatchView view) {
@@ -175,8 +191,11 @@ class ScoreboardScreen extends ConsumerWidget {
       isScrollControlled: true,
       builder: (_) => DraggableScrollableSheet(
         expand: false,
-        builder: (_, controller) =>
-            TimelineList(view: view, controller: controller),
+        builder: (_, controller) => TimelineList(
+          view: view,
+          controller: controller,
+          markNextUndo: true,
+        ),
       ),
     );
   }
@@ -185,10 +204,15 @@ class ScoreboardScreen extends ConsumerWidget {
 /// Portrait: the controls on top and the corners stacked. Landscape (wider than tall: phone
 /// on its side, tablet, desktop): red | controls | blue.
 class _Live extends StatelessWidget {
-  const _Live({required this.view, required this.onAction});
+  const _Live({
+    required this.view,
+    required this.onAction,
+    required this.onAdjust,
+  });
 
   final MatchView view;
   final void Function(MatchAction action, {Side? side}) onAction;
+  final void Function(Duration delta) onAdjust;
 
   /// Share of the height the clock takes in portrait.
   static const _clockShare = 0.16;
@@ -203,7 +227,14 @@ class _Live extends StatelessWidget {
         side: side,
         corner: view.corner(side),
         enabled: scoring,
+        // A correction: also once the time or the points ended it, not after a disqualification.
+        canRemove:
+            !locked &&
+            view.started &&
+            view.endReason != EndReason.disqualification &&
+            view.corner(side).points > 0,
         onPoint: () => onAction(MatchAction.point, side: side),
+        onRemovePoint: () => onAction(MatchAction.pointRemoved, side: side),
         onSanction: (action) => onAction(action, side: side),
       ),
     );
@@ -219,7 +250,11 @@ class _Live extends StatelessWidget {
                   children: [
                     corner(Side.red),
                     Expanded(
-                      child: ClockBar(view: view, onAction: onAction),
+                      child: ClockBar(
+                        view: view,
+                        onAction: onAction,
+                        onAdjust: onAdjust,
+                      ),
                     ),
                     corner(Side.blue),
                   ],
@@ -230,6 +265,7 @@ class _Live extends StatelessWidget {
                   ClockBar(
                     view: view,
                     onAction: onAction,
+                    onAdjust: onAdjust,
                     clockHeight: size.maxHeight * _clockShare,
                   ),
                   corner(Side.red),

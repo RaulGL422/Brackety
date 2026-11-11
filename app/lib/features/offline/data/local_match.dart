@@ -25,6 +25,7 @@ class LocalMatch {
             action: e.action,
             side: e.side,
             at: e.at,
+            delta: e.delta ?? Duration.zero,
           ),
     ];
     final timeline = [...server.timeline];
@@ -38,13 +39,22 @@ class LocalMatch {
       final at = lastAt != null && op.at.isBefore(lastAt) ? lastAt : op.at;
       final before = replay();
       // The server would put the match in review; the device just leaves it out.
-      if (before.refuse(op.action, at) != null) continue;
+      if (before.refuse(
+            op.action,
+            at,
+            side: op.side,
+            delta: op.delta ?? Duration.zero,
+          ) !=
+          null) {
+        continue;
+      }
       entries.add(
         TamboEntry(
           id: op.opId,
           action: op.action,
           side: op.side,
           at: at,
+          delta: op.delta ?? Duration.zero,
           target: op.action == MatchAction.undo
               ? before.lastUndoable!.id
               : null,
@@ -57,6 +67,7 @@ class LocalMatch {
           action: op.action,
           side: op.side,
           reason: op.reason,
+          delta: op.delta,
           at: at,
           clock: before.elapsedAt(at),
           automatic: false,
@@ -98,38 +109,49 @@ class LocalMatch {
           oneHandWarnings: state.oneHandWarnings(side),
           disqualified: state.disqualified == side,
         );
-    final view = MatchView(
-      id: server.id,
-      matId: server.matId,
-      matNumber: server.matNumber,
-      groupNumber: server.groupNumber,
-      status: state.finished
-          ? MatchStatus.finished
-          : timeline.length > server.timeline.length
-          ? MatchStatus.inProgress
-          : server.status,
-      length: server.length,
-      pointsLimit: server.pointsLimit,
-      remaining: state.remainingAt(now),
-      running: state.isRunning(now),
-      endReason: state.endReason(now),
-      red: corner(Side.red),
-      blue: corner(Side.blue),
-      timeline: [
-        for (final e in timeline)
-          e.id == null
-              ? e
-              : e.withFlags(
-                  undone: e.undone || undone.contains(e.id),
-                  gaveRivalPoint:
-                      e.gaveRivalPoint || state.gaveAutoPoint(e.id!),
-                ),
-      ],
-      serverTime: server.serverTime,
-      review:
-          server.review ?? (heldForReview ? const MatchReview.pending() : null),
-    );
+    final view = pending.isEmpty && !heldForReview
+        ? _serverAt(server, now)
+        : MatchView(
+            id: server.id,
+            matId: server.matId,
+            matNumber: server.matNumber,
+            groupNumber: server.groupNumber,
+            status: state.finished
+                ? MatchStatus.finished
+                : timeline.length > server.timeline.length
+                ? MatchStatus.inProgress
+                : server.status,
+            length: server.length,
+            pointsLimit: server.pointsLimit,
+            remaining: state.remainingAt(now),
+            running: state.isRunning(now),
+            endReason: state.endReason(now),
+            red: corner(Side.red),
+            blue: corner(Side.blue),
+            timeline: [
+              for (final e in timeline)
+                e.id == null
+                    ? e
+                    : e.withFlags(
+                        undone: e.undone || undone.contains(e.id),
+                        gaveRivalPoint:
+                            e.gaveRivalPoint || state.gaveAutoPoint(e.id!),
+                      ),
+            ],
+            serverTime: server.serverTime,
+            review:
+                server.review ??
+                (heldForReview ? const MatchReview.pending() : null),
+          );
     return LocalMatch._(view, state, lastAt);
+  }
+
+  // Nothing queued: the server's view is the truth, only its clock moves on since it was sent.
+  static MatchView _serverAt(MatchView server, DateTime now) {
+    final sent = server.serverTime;
+    if (!server.running || sent == null) return server;
+    final left = server.remaining - now.difference(sent);
+    return server.withRemaining(left.isNegative ? Duration.zero : left);
   }
 
   final MatchView view;
@@ -137,7 +159,12 @@ class LocalMatch {
   final DateTime? _lastAt;
 
   /// Why the referee cannot do [action] now, checked here before it goes into the queue.
-  MatchRefusal? refuse(MatchAction action, Side? side, DateTime now) {
+  MatchRefusal? refuse(
+    MatchAction action,
+    Side? side,
+    DateTime now, {
+    Duration delta = Duration.zero,
+  }) {
     if (view.review != null) return MatchRefusal.inReview;
     if (action == MatchAction.oneHandWarning &&
         side != null &&
@@ -148,6 +175,8 @@ class LocalMatch {
     return _state.refuse(
       action,
       lastAt != null && now.isBefore(lastAt) ? lastAt : now,
+      side: side,
+      delta: delta,
     );
   }
 }

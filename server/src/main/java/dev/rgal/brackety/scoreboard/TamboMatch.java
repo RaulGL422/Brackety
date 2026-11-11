@@ -24,10 +24,18 @@ final class TamboMatch {
 
     record Rules(Duration length, int pointsLimit) {}
 
-    /** {@code target}: for an UNDO, the event it undoes. */
-    record Entry(UUID id, MatchEventType type, Side side, Instant at, UUID target) {}
+    /** {@code target}: for an UNDO, the event it undoes. {@code deltaMs}: for a CLOCK_ADJUST, the time added. */
+    record Entry(UUID id, MatchEventType type, Side side, Instant at, UUID target, long deltaMs) {
 
-    /** Points include those given for the rival's one-hand warnings. */
+        Entry(UUID id, MatchEventType type, Side side, Instant at, UUID target) {
+            this(id, type, side, at, target, 0);
+        }
+    }
+
+    /**
+     * Points include those given for the rival's one-hand warnings. A disqualification is scored as the
+     * points limit for the rival and 0 for the disqualified fighter.
+     */
     record Corner(int points, int warnings, int oneHandWarnings) {}
 
     private static final class Tally {
@@ -81,6 +89,17 @@ final class TamboMatch {
                 tallies.get(e.side()).points++;
                 lastUndoable = e;
             }
+            case POINT_REMOVED -> {
+                var tally = tallies.get(e.side());
+                tally.points = Math.max(0, tally.points - 1);
+                lastUndoable = e;
+            }
+            case CLOCK_ADJUST -> {
+                // Only on a stopped clock; one that ran out of time stays stopped after the adjustment.
+                elapsed = adjusted(elapsedAt(e.at()), e.deltaMs());
+                runningSince = null;
+                lastUndoable = e;
+            }
             case WARNING -> {
                 tallies.get(e.side()).warnings++;
                 lastUndoable = e;
@@ -100,6 +119,21 @@ final class TamboMatch {
             case FINISH -> finished = true;
             case UNDO -> throw new IllegalArgumentException("UNDO entries are never applied");
         }
+    }
+
+    // Adding time to the clock takes it off the elapsed time, never below 0 nor beyond the match length.
+    private Duration adjusted(Duration elapsedNow, long deltaMs) {
+        var result = elapsedNow.minusMillis(deltaMs);
+        if (result.isNegative()) {
+            return Duration.ZERO;
+        }
+        return result.compareTo(rules.length()) > 0 ? rules.length() : result;
+    }
+
+    // An adjustment must change the clock and never leave it at 0: the time runs out only by running.
+    private boolean cannotAdjust(Instant now, long deltaMs) {
+        var result = adjusted(elapsedAt(now), deltaMs);
+        return result.equals(elapsedAt(now)) || result.equals(rules.length());
     }
 
     Duration elapsedAt(Instant now) {
@@ -128,7 +162,15 @@ final class TamboMatch {
 
     Corner corner(Side side) {
         var t = tallies.get(side);
-        return new Corner(t.points, t.warnings, t.oneHandWarnings);
+        return new Corner(points(side), t.warnings, t.oneHandWarnings);
+    }
+
+    // The points the fighter had stay in the tally, so undoing the disqualification gives them back.
+    private int points(Side side) {
+        if (disqualified != null) {
+            return disqualified == side ? 0 : rules.pointsLimit();
+        }
+        return tallies.get(side).points;
     }
 
     Side disqualified() {
@@ -153,15 +195,34 @@ final class TamboMatch {
 
     /** Why {@code type} cannot happen now, or empty if it can. Checks only the match itself. */
     Optional<String> refuse(MatchEventType type, Instant now) {
+        return refuse(type, null, 0, now);
+    }
+
+    /** {@code side}: for a point removed; {@code deltaMs}: for a clock adjustment. */
+    Optional<String> refuse(MatchEventType type, Side side, long deltaMs, Instant now) {
         if (finished) {
             return Optional.of("The match is finished.");
         }
-        var over = endReason(now).isPresent();
+        var end = endReason(now);
+        var over = end.isPresent();
         String reason = switch (type) {
             case START -> over ? "The match is over." : isRunning(now) ? "The clock is already running." : null;
             case STOP -> isRunning(now) ? null : "The clock is not running.";
             case POINT, WARNING, ONE_HAND_WARNING, DISQUALIFICATION ->
                 over ? "The match is over." : started ? null : NOT_STARTED;
+            // A correction: also once the time or the points ended the match, which it may reopen.
+            case POINT_REMOVED ->
+                !started
+                        ? NOT_STARTED
+                        : disqualified != null
+                                ? "The match is over."
+                                : side != null && tallies.get(side).points == 0 ? "No points to take back." : null;
+            case CLOCK_ADJUST ->
+                isRunning(now)
+                        ? "Stop the clock first."
+                        : end.filter(r -> r != EndReason.TIME).isPresent()
+                                ? "The match is over."
+                                : cannotAdjust(now, deltaMs) ? "The clock cannot go further." : null;
             case UNDO -> lastUndoable == null ? "Nothing to undo." : null;
             case FINISH -> over ? null : "The match is not over yet.";
         };

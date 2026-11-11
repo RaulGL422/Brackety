@@ -14,10 +14,9 @@ class BracketyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // From the start on Android: a queue left from the last run goes out, and sign-out clears it.
-    if (ref.watch(offlineEnabledProvider)) {
-      ref.listen(offlineSyncProvider, (_, _) {});
-    }
+    // From the start: a queue left from the last run (or the last page load) goes out, and
+    // sign-out clears it.
+    ref.listen(offlineSyncProvider, (_, _) {});
     return MaterialApp.router(
       onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
       theme: lightTheme(),

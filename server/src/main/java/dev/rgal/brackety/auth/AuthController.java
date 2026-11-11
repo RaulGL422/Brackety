@@ -19,6 +19,7 @@ import dev.rgal.brackety.auth.session.SessionService.Session;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.time.Duration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -46,6 +47,7 @@ class AuthController {
     private final PasswordResetService passwordReset;
     private final GoogleSignInService google;
     private final EmailChangeService emailChange;
+    private final boolean secureCookie;
 
     AuthController(
             AuthService auth,
@@ -53,13 +55,15 @@ class AuthController {
             EmailVerificationService verification,
             PasswordResetService passwordReset,
             GoogleSignInService google,
-            EmailChangeService emailChange) {
+            EmailChangeService emailChange,
+            @Value("${brackety.auth.refresh-cookie-secure}") boolean secureCookie) {
         this.auth = auth;
         this.sessions = sessions;
         this.verification = verification;
         this.passwordReset = passwordReset;
         this.google = google;
         this.emailChange = emailChange;
+        this.secureCookie = secureCookie;
     }
 
     @PostMapping("/register")
@@ -169,12 +173,12 @@ class AuthController {
         passwordReset.check(request.token());
     }
 
-    private static ResponseEntity<TokenResponse> respond(Session session, boolean web) {
+    private ResponseEntity<TokenResponse> respond(Session session, boolean web) {
         return withRefreshCookie(session, web).body(tokens(session, web));
     }
 
     // Web keeps the refresh token in an httpOnly cookie, out of reach of scripts; Android gets it in the body.
-    private static ResponseEntity.BodyBuilder withRefreshCookie(Session session, boolean web) {
+    private ResponseEntity.BodyBuilder withRefreshCookie(Session session, boolean web) {
         var response = ResponseEntity.ok();
         if (web) {
             response.header(HttpHeaders.SET_COOKIE, refreshCookie(session.refreshToken(), SessionService.REFRESH_TTL));
@@ -205,10 +209,10 @@ class AuthController {
         return body == null ? null : body.refreshToken();
     }
 
-    private static String refreshCookie(String value, Duration maxAge) {
+    private String refreshCookie(String value, Duration maxAge) {
         return ResponseCookie.from(REFRESH_COOKIE, value)
                 .httpOnly(true)
-                .secure(true)
+                .secure(secureCookie)
                 .sameSite("Strict")
                 .path(BASE_PATH)
                 .maxAge(maxAge)

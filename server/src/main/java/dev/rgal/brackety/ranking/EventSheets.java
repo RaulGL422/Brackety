@@ -422,7 +422,7 @@ class EventSheets {
                             SheetText.action(e.getType().name()),
                             SheetText.side(side),
                             fighter,
-                            e.getReason(),
+                            e.getDeltaMs() == null ? e.getReason() : SheetText.clockAdjust(e.getDeltaMs()),
                             e.isAutomatic() ? "Automático" : actors.get(e.getActorAccountId()),
                             e.getTargetEventId() == null
                                     ? null

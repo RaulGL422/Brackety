@@ -169,7 +169,7 @@ void main() {
       await pumpScreen(tester, size, const MatBoardScreen(matId: 'mat1'));
 
       expect(find.text('Offline · 1 action waiting'), findsOneWidget);
-      expect(find.textContaining('board saved on the phone'), findsOneWidget);
+      expect(find.textContaining('board saved on this device'), findsOneWidget);
       expect(find.text('Next match'), findsNothing);
       expect(find.text('In progress'), findsOneWidget);
       expect(find.text("Under the club's review"), findsOneWidget);
@@ -209,7 +209,8 @@ void main() {
           MatchAction.start,
           MatchAction.point,
         ]);
-        expect(find.text('Connected'), findsOneWidget);
+        // All sent: the bar goes away.
+        expect(find.textContaining('Offline'), findsNothing);
         expect(find.text('1'), findsOneWidget);
         expect(tester.takeException(), isNull);
       },

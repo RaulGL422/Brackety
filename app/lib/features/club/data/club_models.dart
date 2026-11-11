@@ -60,6 +60,8 @@ class EventSettings {
     required this.matReferees,
     required this.referees,
     required this.categories,
+    required this.matchLength,
+    required this.pointsLimit,
     this.organizations = const [],
   });
 
@@ -79,6 +81,8 @@ class EventSettings {
         for (final c in json['categories'] as List)
           EventCategory.fromJson(c as Map<String, dynamic>),
       ],
+      matchLength: Duration(seconds: json['matchSeconds'] as int),
+      pointsLimit: json['pointsLimit'] as int,
       organizations: [
         for (final o in json['organizations'] as List? ?? [])
           Organization.fromJson(o as Map<String, dynamic>),
@@ -95,6 +99,10 @@ class EventSettings {
   /// Accounts that can referee a mat in this event.
   final List<StaffMember> referees;
   final List<EventCategory> categories;
+  final Duration matchLength;
+
+  /// Points that end a match; a disqualification gives them to the rival.
+  final int pointsLimit;
 
   /// The clubs taking part, in the order the club entered them.
   final List<Organization> organizations;

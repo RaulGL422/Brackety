@@ -77,11 +77,24 @@ void main() {
           .push('/events/e1/categories/c1', extra: '7-8');
       await tester.pumpAndSettle();
 
+      // On a phone the list starts below the group's slots: Zoe is further down.
+      final list = find.byType(Scrollable).last;
+      Future<void> toTop() async {
+        await tester.drag(list, const Offset(0, 2000));
+        await tester.pumpAndSettle();
+      }
+
+      await tester.scrollUntilVisible(
+        find.text('Zoe Prueba'),
+        200,
+        scrollable: list,
+      );
       expect(find.text('Zoe Prueba'), findsOneWidget);
       expect(find.textContaining('Group 3 · Mat 2'), findsOneWidget);
 
       await tester.tap(find.text('Height'));
       await tester.pumpAndSettle();
+      await toTop();
       final names = tester
           .widgetList<Text>(find.textContaining(' Prueba'))
           .map((t) => t.data)
@@ -90,6 +103,12 @@ void main() {
 
       for (final name in ['Ana', 'Bea', 'Carla', 'Diego']) {
         // On a phone the group's slots leave room for a few rows: scroll to each one.
+        await toTop();
+        await tester.scrollUntilVisible(
+          find.text('$name Prueba'),
+          100,
+          scrollable: list,
+        );
         await tester.ensureVisible(find.text('$name Prueba'));
         await tester.pumpAndSettle();
         await tester.tap(find.text('$name Prueba'));
@@ -259,4 +278,108 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  Future<FakeGroupingRepository> openBuilder(
+    WidgetTester tester,
+    List<CategoryParticipant> list,
+  ) async {
+    tester.view.physicalSize = sizes['tablet']!;
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final repository = FakeGroupingRepository(list);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...sessionOverrides(FakeAuthApi(signedIn: true)),
+          groupingRepositoryProvider.overrideWithValue(repository),
+          fakeMatsOverride,
+          myEventsProvider.overrideWith((ref) async => []),
+        ],
+        child: const BracketyApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
+        .read(routerProvider)
+        .push('/events/e1/categories/c1');
+    await tester.pumpAndSettle();
+    return repository;
+  }
+
+  testWidgets('a group just made can be undone from its dialog', (
+    tester,
+  ) async {
+    final repository = await openBuilder(tester, participants);
+    for (final name in ['Ana', 'Bea', 'Carla', 'Diego']) {
+      await tester.tap(find.text('$name Prueba'));
+      await tester.pump();
+    }
+    await tester.tap(find.text('Create group'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.widgetWithText(TextButton, 'Undo group'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('go back to the list'), findsOneWidget);
+    await tester.tap(find.widgetWithText(FilledButton, 'Undo group'));
+    await tester.pumpAndSettle();
+
+    expect(repository.undoneGroups, ['g1']);
+    expect(find.text('Group 1 undone'), findsOneWidget);
+  });
+
+  testWidgets('a group can be undone until one of its matches starts', (
+    tester,
+  ) async {
+    const open = CategoryParticipant(
+      id: 'open',
+      firstName: 'Iker',
+      lastName: 'Prueba',
+      age: 7,
+      groupNumber: 4,
+      matNumber: 1,
+      groupId: 'g4',
+    );
+    const started = CategoryParticipant(
+      id: 'started',
+      firstName: 'Lola',
+      lastName: 'Prueba',
+      age: 7,
+      groupNumber: 5,
+      matNumber: 1,
+      groupId: 'g5',
+      groupStarted: true,
+    );
+    final repository = await openBuilder(tester, [open, started]);
+
+    expect(find.byTooltip('Undo Group 5'), findsNothing);
+    await tester.tap(find.byTooltip('Undo Group 4'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Undo group'));
+    await tester.pumpAndSettle();
+    expect(repository.undoneGroups, ['g4']);
+  });
+
+  testWidgets('a group whose match started meanwhile says who can undo it', (
+    tester,
+  ) async {
+    const open = CategoryParticipant(
+      id: 'open',
+      firstName: 'Iker',
+      lastName: 'Prueba',
+      age: 7,
+      groupNumber: 4,
+      matNumber: 1,
+      groupId: 'g4',
+    );
+    final repository = await openBuilder(tester, [open])
+      ..undoRefusal = 409;
+
+    await tester.tap(find.byTooltip('Undo Group 4'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Undo group'));
+    await tester.pumpAndSettle();
+
+    expect(repository.undoneGroups, isEmpty);
+    expect(find.textContaining('only the administrator'), findsOneWidget);
+  });
 }

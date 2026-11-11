@@ -49,15 +49,22 @@ final class SheetText {
         };
     }
 
+    /** A clock adjustment in words, not a sign: a cell starting with + or - is neutralised for spreadsheets. */
+    static String clockAdjust(long deltaMs) {
+        return (deltaMs > 0 ? "añade " : "quita ") + Math.abs(deltaMs) / 1000 + " s";
+    }
+
     /** Unknown types (added later to the scoreboard) keep their code. */
     static String action(String type) {
         return switch (type) {
             case "START" -> "Iniciar reloj";
             case "STOP" -> "Parar reloj";
             case "POINT" -> "Punto";
+            case "POINT_REMOVED" -> "Quitar punto";
             case "WARNING" -> "Advertencia";
             case "ONE_HAND_WARNING" -> "Advertencia por golpear con una mano";
             case "DISQUALIFICATION" -> "Descalificación";
+            case "CLOCK_ADJUST" -> "Ajuste del reloj";
             case "UNDO" -> "Deshacer";
             case "FINISH" -> "Finalizar combate";
             default -> type;

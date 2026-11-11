@@ -749,7 +749,7 @@ abstract class AppLocalizations {
   /// No description provided for @matRecommended.
   ///
   /// In es, this message translates to:
-  /// **'Siguiente combate'**
+  /// **'Combate recomendado'**
   String get matRecommended;
 
   /// No description provided for @matInProgress.
@@ -761,7 +761,7 @@ abstract class AppLocalizations {
   /// No description provided for @matPending.
   ///
   /// In es, this message translates to:
-  /// **'Después'**
+  /// **'Otros combates disponibles'**
   String get matPending;
 
   /// No description provided for @matYours.
@@ -803,7 +803,7 @@ abstract class AppLocalizations {
   /// No description provided for @matFinished.
   ///
   /// In es, this message translates to:
-  /// **'Terminados'**
+  /// **'Disputados'**
   String get matFinished;
 
   /// No description provided for @matWaiting.
@@ -1039,6 +1039,204 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'punto al rival'**
   String get tlRivalPoint;
+
+  /// No description provided for @removePoint.
+  ///
+  /// In es, this message translates to:
+  /// **'−1'**
+  String get removePoint;
+
+  /// No description provided for @removePointFor.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar un punto a {corner}'**
+  String removePointFor(String corner);
+
+  /// No description provided for @whatPointRemoved.
+  ///
+  /// In es, this message translates to:
+  /// **'−1 {corner}'**
+  String whatPointRemoved(String corner);
+
+  /// No description provided for @whatClockAdjust.
+  ///
+  /// In es, this message translates to:
+  /// **'{delta} s al reloj'**
+  String whatClockAdjust(String delta);
+
+  /// No description provided for @clockAdjustBy.
+  ///
+  /// In es, this message translates to:
+  /// **'{delta} s'**
+  String clockAdjustBy(String delta);
+
+  /// No description provided for @clockAdjustTooltip.
+  ///
+  /// In es, this message translates to:
+  /// **'Ajustar el reloj {delta} s'**
+  String clockAdjustTooltip(String delta);
+
+  /// No description provided for @clockAdjustHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Ajustar el reloj (parado)'**
+  String get clockAdjustHint;
+
+  /// No description provided for @tlPointRemoved.
+  ///
+  /// In es, this message translates to:
+  /// **'Punto quitado'**
+  String get tlPointRemoved;
+
+  /// No description provided for @tlClockAdjust.
+  ///
+  /// In es, this message translates to:
+  /// **'Ajuste del reloj'**
+  String get tlClockAdjust;
+
+  /// No description provided for @tlNextUndo.
+  ///
+  /// In es, this message translates to:
+  /// **'lo siguiente que deshace Deshacer'**
+  String get tlNextUndo;
+
+  /// No description provided for @undoDetail.
+  ///
+  /// In es, this message translates to:
+  /// **'{what} · {clock}'**
+  String undoDetail(String what, String clock);
+
+  /// No description provided for @recentActions.
+  ///
+  /// In es, this message translates to:
+  /// **'Últimas acciones'**
+  String get recentActions;
+
+  /// No description provided for @refusalNoPoints.
+  ///
+  /// In es, this message translates to:
+  /// **'No tiene puntos que quitar.'**
+  String get refusalNoPoints;
+
+  /// No description provided for @refusalClockRunning.
+  ///
+  /// In es, this message translates to:
+  /// **'Para el reloj antes de ajustarlo.'**
+  String get refusalClockRunning;
+
+  /// No description provided for @refusalClockLimit.
+  ///
+  /// In es, this message translates to:
+  /// **'El reloj no puede ir más allá.'**
+  String get refusalClockLimit;
+
+  /// No description provided for @settingsMatchRules.
+  ///
+  /// In es, this message translates to:
+  /// **'Combates'**
+  String get settingsMatchRules;
+
+  /// No description provided for @settingsMatchLength.
+  ///
+  /// In es, this message translates to:
+  /// **'Duración del combate (min:s)'**
+  String get settingsMatchLength;
+
+  /// No description provided for @settingsMatchLengthHint.
+  ///
+  /// In es, this message translates to:
+  /// **'De 0:30 a 20:00. No cambia con un combate en curso.'**
+  String get settingsMatchLengthHint;
+
+  /// No description provided for @settingsMatchLengthInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe minutos y segundos entre 0:30 y 20:00, por ejemplo 3:00.'**
+  String get settingsMatchLengthInvalid;
+
+  /// No description provided for @settingsPointsLimit.
+  ///
+  /// In es, this message translates to:
+  /// **'Puntos para acabar el combate'**
+  String get settingsPointsLimit;
+
+  /// No description provided for @settingsPointsLimitHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Al llegar uno, acaba. La descalificación da estos puntos al rival. No cambia una vez empezado un combate.'**
+  String get settingsPointsLimitHint;
+
+  /// No description provided for @settingsMatchRulesConflict.
+  ///
+  /// In es, this message translates to:
+  /// **'No se puede cambiar ahora: hay un combate en curso o ya empezado.'**
+  String get settingsMatchRulesConflict;
+
+  /// No description provided for @settingsPointsLimitInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'Entre 1 y 99.'**
+  String get settingsPointsLimitInvalid;
+
+  /// No description provided for @matWaitingTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'En espera'**
+  String get matWaitingTitle;
+
+  /// No description provided for @matStartRecommended.
+  ///
+  /// In es, this message translates to:
+  /// **'Empezar este combate'**
+  String get matStartRecommended;
+
+  /// No description provided for @matRecommendedWhy.
+  ///
+  /// In es, this message translates to:
+  /// **'Sus luchadores son los que más han descansado y ninguno acaba de combatir.'**
+  String get matRecommendedWhy;
+
+  /// No description provided for @matAfterCurrent.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuando acabe el combate en curso.'**
+  String get matAfterCurrent;
+
+  /// No description provided for @undoGroup.
+  ///
+  /// In es, this message translates to:
+  /// **'Deshacer grupo'**
+  String get undoGroup;
+
+  /// No description provided for @undoGroupNumber.
+  ///
+  /// In es, this message translates to:
+  /// **'Deshacer el Grupo {number}'**
+  String undoGroupNumber(int number);
+
+  /// No description provided for @undoGroupConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'Se deshace el Grupo {number} y sus combates. Sus alumnos vuelven a la lista para agruparlos de nuevo.'**
+  String undoGroupConfirm(int number);
+
+  /// No description provided for @undoGroupDone.
+  ///
+  /// In es, this message translates to:
+  /// **'Grupo {number} deshecho'**
+  String undoGroupDone(int number);
+
+  /// No description provided for @undoGroupStarted.
+  ///
+  /// In es, this message translates to:
+  /// **'Ya ha empezado un combate de este grupo: solo el administrador puede deshacerlo.'**
+  String get undoGroupStarted;
+
+  /// No description provided for @undoGroupError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se ha podido deshacer el grupo.'**
+  String get undoGroupError;
 
   /// No description provided for @clubStandings.
   ///
@@ -2479,6 +2677,47 @@ abstract class AppLocalizations {
   /// **'Quitar de la lista'**
   String get syncRejectedDismiss;
 
+  /// No description provided for @syncExport.
+  ///
+  /// In es, this message translates to:
+  /// **'Exportar acciones pendientes'**
+  String get syncExport;
+
+  /// No description provided for @syncExportBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Si este dispositivo no vuelve a conectar, entrega el fichero al club: lo importa desde su panel y no se pierde nada.'**
+  String get syncExportBody;
+
+  /// No description provided for @syncExportSave.
+  ///
+  /// In es, this message translates to:
+  /// **'Descargar CSV'**
+  String get syncExportSave;
+
+  /// No description provided for @importOps.
+  ///
+  /// In es, this message translates to:
+  /// **'Importar acciones de un dispositivo'**
+  String get importOps;
+
+  /// No description provided for @importOpsResult.
+  ///
+  /// In es, this message translates to:
+  /// **'Importadas: {applied} nuevas · {duplicates} ya estaban · {inReview} a revisión · {skipped} rechazadas'**
+  String importOpsResult(
+    int applied,
+    int duplicates,
+    int inReview,
+    int skipped,
+  );
+
+  /// No description provided for @importOpsError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se ha podido importar: el fichero no es de acciones pendientes o es de otro evento.'**
+  String get importOpsError;
+
   /// No description provided for @close.
   ///
   /// In es, this message translates to:
@@ -2488,7 +2727,7 @@ abstract class AppLocalizations {
   /// No description provided for @matOfflineBoard.
   ///
   /// In es, this message translates to:
-  /// **'Sin conexión: tablero guardado en el móvil. Sin recomendado; puedes empezar un pendiente si no hay otro en curso.'**
+  /// **'Sin conexión: tablero guardado en este dispositivo. Sin recomendado; puedes empezar un pendiente si no hay otro en curso.'**
   String get matOfflineBoard;
 
   /// No description provided for @matInReview.
@@ -2653,12 +2892,6 @@ abstract class AppLocalizations {
   /// **'Inicia el tiempo antes de puntuar.'**
   String get refusalNotStarted;
 
-  /// No description provided for @undoWhat.
-  ///
-  /// In es, this message translates to:
-  /// **'Deshacer: {what}'**
-  String undoWhat(String what);
-
   /// No description provided for @undoneWhat.
   ///
   /// In es, this message translates to:
@@ -2778,12 +3011,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Oscuro'**
   String get themeDark;
-
-  /// No description provided for @refusalStale.
-  ///
-  /// In es, this message translates to:
-  /// **'El combate ha cambiado en otro dispositivo. Revisa el marcador y vuelve a pulsar.'**
-  String get refusalStale;
 
   /// No description provided for @accountSuspended.
   ///

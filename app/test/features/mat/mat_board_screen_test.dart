@@ -1,7 +1,6 @@
 import 'package:brackety/features/mat/data/mat_board.dart';
 import 'package:brackety/features/mat/state/mat_providers.dart';
 import 'package:brackety/features/mat/ui/mat_board_screen.dart';
-import 'package:brackety/features/offline/state/offline_sync.dart';
 import 'package:brackety/l10n/gen/app_localizations.dart';
 import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/board_finders.dart';
+import '../../support/offline_fakes.dart';
 
 void main() {
   const sizes = {
@@ -71,8 +71,8 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              offlineEnabledProvider.overrideWithValue(false),
-              matBoardProvider.overrideWith((ref, matId) async => board),
+              ...quietQueueOverrides(),
+              cachedBoardProvider.overrideWith((ref, matId) async => board),
             ],
             child: MaterialApp(
               builder: (_, child) => ToastHost(child: child!),
@@ -93,11 +93,20 @@ void main() {
           find.text('Group 3, ages 7-8', skipOffstage: false),
           findsNWidgets(2),
         );
-        expect(find.text('Next match'), findsOneWidget);
+        expect(find.text('Recommended match'), findsOneWidget);
         expect(find.text('2 to play'), findsOneWidget);
         expect(matchTile('Ana', 'Carla'), findsOneWidget);
         expect(find.text('A fighter is in a match right now'), findsOneWidget);
         expect(find.text('4 - 15'), findsOneWidget);
+        // Nothing in progress: one big action and why this one.
+        expect(
+          find.widgetWithText(FilledButton, 'Start this match'),
+          findsOneWidget,
+        );
+        expect(find.textContaining('rested the longest'), findsOneWidget);
+        // The one that cannot start has its own section, apart from the others.
+        expect(find.text('Waiting'), findsOneWidget);
+        expect(find.text('Other available matches'), findsNothing);
         expect(tester.takeException(), isNull);
       },
     );
@@ -121,8 +130,8 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              offlineEnabledProvider.overrideWithValue(false),
-              matBoardProvider.overrideWith((ref, matId) async => live),
+              ...quietQueueOverrides(),
+              cachedBoardProvider.overrideWith((ref, matId) async => live),
             ],
             child: MaterialApp(
               builder: (_, child) => ToastHost(child: child!),
@@ -159,7 +168,17 @@ void main() {
 
         final recommended = card(matchTile('Ana', 'Carla'));
         expect(
-          find.descendant(of: recommended, matching: find.text('Next match')),
+          find.descendant(
+            of: recommended,
+            matching: find.text('When the match in progress ends.'),
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.descendant(
+            of: recommended,
+            matching: find.text('Recommended match'),
+          ),
           findsOneWidget,
         );
         expect(
@@ -176,6 +195,7 @@ void main() {
         expect(frame.side.width, 3);
 
         final waiting = matchTile('Carla', 'Diego · Ghost');
+        await tester.scrollUntilVisible(waiting, 200);
         expect(tile(waiting).onTap, isNull);
         expect(tile(waiting).enabled, isTrue);
         expect(
@@ -210,8 +230,8 @@ void main() {
       ProviderScope(
         retry: (_, _) => null,
         overrides: [
-          offlineEnabledProvider.overrideWithValue(false),
-          matBoardProvider.overrideWith(
+          ...quietQueueOverrides(),
+          cachedBoardProvider.overrideWith(
             (ref, matId) async => throw Exception('down'),
           ),
         ],
@@ -239,10 +259,7 @@ void main() {
   ) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [
-          offlineEnabledProvider.overrideWithValue(false),
-          matBoardProvider.overrideWith((ref, matId) async => board),
-        ],
+        overrides: [matBoardProvider.overrideWith((ref, matId) async => board)],
         child: MaterialApp(
           builder: (_, child) => ToastHost(child: child!),
           theme: lightTheme(),
@@ -308,8 +325,8 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            offlineEnabledProvider.overrideWithValue(false),
-            matBoardProvider.overrideWith((ref, matId) async => teamBoard),
+            ...quietQueueOverrides(),
+            cachedBoardProvider.overrideWith((ref, matId) async => teamBoard),
           ],
           child: MaterialApp(
             builder: (_, child) => ToastHost(child: child!),

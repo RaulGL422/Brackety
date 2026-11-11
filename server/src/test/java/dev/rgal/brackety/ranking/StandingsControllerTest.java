@@ -99,7 +99,14 @@ class StandingsControllerTest extends EventApiTest {
 
         call(get("/api/v1/events/" + eventId + "/standings"), "club1")
                 .andExpect(jsonPath("$[?(@.firstName == 'Ana')].matchPoints").value(3))
-                .andExpect(jsonPath("$[?(@.firstName == 'Ana')].matches").value(2));
+                .andExpect(jsonPath("$[?(@.firstName == 'Ana')].matches").value(2))
+                .andExpect(jsonPath("$[?(@.matches == 2 && @.firstName != 'Ana')].matchPoints")
+                        .value(4 + 15));
+        var matches = call(get("/api/v1/events/" + eventId + "/export/matches.csv"), "club1")
+                .andReturn()
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
+        assertThat(matches).contains(";0;15;Fantasma Prueba;Ana Prueba;finalizado;");
     }
 
     @Test

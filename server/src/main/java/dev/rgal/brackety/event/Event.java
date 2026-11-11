@@ -65,9 +65,12 @@ public class Event {
         this.createdAt = now;
     }
 
-    /** Liga Yoseikan tambo rules: 2 min per match, 15 points ends it, 10 points for attending. */
+    /**
+     * Liga Yoseikan tambo, Fase 1: 3 min per match (Raul, 2026-11-11; the manual says 2), 15 points end it,
+     * 10 points for attending. The club can change length and limit in the settings.
+     */
     public static Event tambo(UUID ownerAccountId, UUID leagueId, String name, LocalDate eventDate, Instant now) {
-        return new Event(ownerAccountId, leagueId, 1, Discipline.TAMBO, name, eventDate, 1, 120, 15, 30, 10, now);
+        return new Event(ownerAccountId, leagueId, 1, Discipline.TAMBO, name, eventDate, 1, 180, 15, 30, 10, now);
     }
 
     /** The next phase of the same league, with this one's match settings. */
@@ -162,10 +165,18 @@ public class Event {
         return Period.between(birthDate, eventDate).getYears();
     }
 
-    void update(String name, LocalDate eventDate, int maxGroupsPerMat, int attendancePoints) {
+    void update(
+            String name,
+            LocalDate eventDate,
+            int maxGroupsPerMat,
+            int matchSeconds,
+            int pointsLimit,
+            int attendancePoints) {
         this.name = name;
         this.eventDate = eventDate;
         this.maxGroupsPerMat = maxGroupsPerMat;
+        this.matchSeconds = matchSeconds;
+        this.pointsLimit = pointsLimit;
         this.attendancePoints = attendancePoints;
     }
 }

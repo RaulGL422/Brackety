@@ -120,7 +120,7 @@ class ScoreboardOfflineTest extends ScoreboardApiTest {
 
         assertThat(view.timeline()).extracting(TimelineEntry::at).containsExactly(t0, t0);
         assertThat(view.timeline().get(1).clockMs()).isZero();
-        assertThat(view.remainingMs()).isEqualTo(90_000);
+        assertThat(view.remainingMs()).isEqualTo(150_000);
     }
 
     @Test
@@ -131,7 +131,7 @@ class ScoreboardOfflineTest extends ScoreboardApiTest {
         var view = offline(MatchEventType.STOP, null, t0.plusSeconds(90), 2).view();
 
         assertThat(view.running()).isFalse();
-        assertThat(view.remainingMs()).isEqualTo(30_000);
+        assertThat(view.remainingMs()).isEqualTo(90_000);
         assertThat(view.timeline()).extracting(TimelineEntry::clockMs).containsExactly(0L, 30_000L, 90_000L);
         assertThat(startedAt()).isEqualTo(t0);
     }
@@ -140,7 +140,7 @@ class ScoreboardOfflineTest extends ScoreboardApiTest {
     void theTimeRunsOutAtTheActionsTime() {
         clock.advance(Duration.ofMinutes(10));
         offline(MatchEventType.START, null, t0, 0);
-        var finish = offline(MatchEventType.FINISH, null, t0.plusSeconds(150), 1);
+        var finish = offline(MatchEventType.FINISH, null, t0.plusSeconds(180), 1);
 
         assertThat(finish.view().status().name()).isEqualTo("FINISHED");
         assertThat(finish.view().endReason()).isEqualTo("TIME");
@@ -148,7 +148,7 @@ class ScoreboardOfflineTest extends ScoreboardApiTest {
                         .param(match)
                         .query(Instant.class)
                         .single())
-                .isEqualTo(t0.plusSeconds(150));
+                .isEqualTo(t0.plusSeconds(180));
     }
 
     @Test
@@ -307,7 +307,7 @@ class ScoreboardOfflineTest extends ScoreboardApiTest {
 
     private static MatchEventRequest request(MatchEventType type, Side side, UUID opId, Instant at, Integer known) {
         var reason = type == MatchEventType.DISQUALIFICATION || type == MatchEventType.WARNING ? "Motivo" : null;
-        return new MatchEventRequest(type, side, reason, opId, at, known);
+        return new MatchEventRequest(type, side, reason, opId, at, known, null);
     }
 
     private MatchView view() {

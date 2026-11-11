@@ -42,6 +42,8 @@ class CategoryParticipant {
     this.groupNumber,
     this.matNumber,
     this.teamNumber,
+    this.groupId,
+    this.groupStarted = false,
   });
 
   factory CategoryParticipant.fromJson(Map<String, dynamic> json) =>
@@ -54,6 +56,8 @@ class CategoryParticipant {
         groupNumber: json['groupNumber'] as int?,
         matNumber: json['matNumber'] as int?,
         teamNumber: json['teamNumber'] as int?,
+        groupId: json['groupId'] as String?,
+        groupStarted: json['groupStarted'] as bool? ?? false,
       );
 
   final String id;
@@ -69,6 +73,13 @@ class CategoryParticipant {
   /// Set once the participant is in a real team (not a ghost one).
   final int? teamNumber;
 
+  final String? groupId;
+
+  /// A match of their group has started: the helper can no longer undo it.
+  final bool groupStarted;
+
+  bool get canUndoGroup => groupId != null && !groupStarted;
+
   bool get isGrouped => groupNumber != null;
 
   /// Already competing for real somewhere: a group or a team.
@@ -78,15 +89,23 @@ class CategoryParticipant {
 }
 
 class CreatedGroups {
-  const CreatedGroups({required this.matNumber, required this.groupNumbers});
+  const CreatedGroups({
+    required this.matNumber,
+    required this.groupNumbers,
+    this.groupIds = const [],
+  });
 
   factory CreatedGroups.fromJson(Map<String, dynamic> json) => CreatedGroups(
     matNumber: json['matNumber'] as int,
     groupNumbers: [for (final n in json['groupNumbers'] as List) n as int],
+    groupIds: [for (final id in json['groupIds'] as List? ?? []) id as String],
   );
 
   final int matNumber;
   final List<int> groupNumbers;
+
+  /// In the order of [groupNumbers].
+  final List<String> groupIds;
 }
 
 /// "Equipo N" of a team category; [groupNumber] and [matNumber] are null until it is in a group.
@@ -97,6 +116,8 @@ class Team {
     required this.members,
     this.groupNumber,
     this.matNumber,
+    this.groupId,
+    this.groupStarted = false,
   });
 
   factory Team.fromJson(Map<String, dynamic> json) => Team(
@@ -111,6 +132,8 @@ class Team {
     ],
     groupNumber: json['groupNumber'] as int?,
     matNumber: json['matNumber'] as int?,
+    groupId: json['groupId'] as String?,
+    groupStarted: json['groupStarted'] as bool? ?? false,
   );
 
   final String id;
@@ -118,8 +141,12 @@ class Team {
   final List<TeamMember> members;
   final int? groupNumber;
   final int? matNumber;
+  final String? groupId;
+  final bool groupStarted;
 
   bool get isGrouped => groupNumber != null;
+
+  bool get canUndoGroup => groupId != null && !groupStarted;
 }
 
 class TeamMember {

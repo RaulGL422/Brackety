@@ -9,6 +9,18 @@ String undoTarget(AppLocalizations l10n, TimelineEntry entry) {
     MatchAction.warning => l10n.whatWarning(corner),
     MatchAction.oneHandWarning => l10n.whatOneHand(corner),
     MatchAction.disqualification => l10n.whatDisqualification(corner),
+    MatchAction.pointRemoved => l10n.whatPointRemoved(corner),
+    MatchAction.clockAdjust => l10n.whatClockAdjust(
+      signedSeconds(entry.delta ?? Duration.zero),
+    ),
     _ => l10n.whatPoint(corner),
   };
 }
+
+/// "+10" or "−1": the seconds a clock adjustment adds or takes.
+String signedSeconds(Duration delta) =>
+    '${delta.isNegative ? '−' : '+'}${delta.inSeconds.abs()}';
+
+/// Match clock as "m:ss".
+String clockText(Duration d) =>
+    '${d.inMinutes}:${(d.inSeconds % 60).toString().padLeft(2, '0')}';

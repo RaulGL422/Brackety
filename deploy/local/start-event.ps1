@@ -366,6 +366,8 @@ function Set-ApiEnvironment([hashtable]$secrets, [string]$mode, [string]$package
     $env:CORS_ALLOWED_ORIGINS = ""
     # Phones without signal for a while keep their session; the refresh token still rotates.
     $env:ACCESS_TTL = "12h"
+    # Plain http in the hall: a Secure refresh cookie never comes back and a page reload would lose the session.
+    $env:REFRESH_COOKIE_SECURE = "false"
     # No proxy in front: Tomcat would trust X-Forwarded-For from any private IP, so a phone of the hotspot
     # could pick its own IP and dodge the sign-in lockout and the rate limiter.
     $env:SERVER_FORWARD_HEADERS_STRATEGY = "none"
