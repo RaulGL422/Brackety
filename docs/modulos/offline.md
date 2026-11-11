@@ -94,7 +94,7 @@ Pedido por Raul el 2026-11-04 para la Fase 1. Desde el 2026-11-11 también (y so
 - Indicador (sin conexión / N pendientes / rechazadas) también en la web; con todo enviado no se muestra, para no quitar altura al marcador en el móvil.
 
 ### Rescate por CSV (2026-11-11)
-- Barra de estado del árbitro: botón "Exportar acciones pendientes" (con algo sin enviar). CSV con BOM y `;`: `brackety-offline-ops;1`, luego `opId;matchId;type;side;reason;at;knownEvents;actor` (`actor` = id de la cuenta que encoló).
+- Barra de estado del árbitro: botón "Exportar acciones pendientes" (con algo sin enviar). CSV con BOM y `;`: `brackety-offline-ops;2`, luego `opId;matchId;type;side;reason;at;knownEvents;actor;deltaMs` (`deltaMs`: ajuste de reloj; el servidor aún lee la versión 1) (`actor` = id de la cuenta que encoló).
 - Club (web): "Importar acciones de un dispositivo" en la barra del panel. `POST /api/v1/events/{id}/offline-ops/import` (cuerpo `text/csv`, solo CLUB): comprueba todo el fichero (versión, columnas, combates del evento) y luego aplica cada fila por el mismo camino que la cola, en su transacción. Responde `{applied, duplicates, inReview, skipped}`. Reimportar no cambia nada. Autor: el `actor` si es del staff, si no el club.
 
 ## Datos
