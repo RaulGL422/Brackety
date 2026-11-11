@@ -11,12 +11,15 @@ enum MatchRefusal {
   notRunning,
   nothingToUndo,
   notOver,
+  noPoints,
+  clockRunning,
+  clockLimit,
   notForAge,
   inReview,
   matBusy,
 }
 
-/// [target]: for an UNDO, the entry it undoes.
+/// [target]: for an UNDO, the entry it undoes. [delta]: for a CLOCK_ADJUST, the time added.
 class TamboEntry {
   const TamboEntry({
     required this.id,
@@ -24,6 +27,7 @@ class TamboEntry {
     required this.at,
     this.side,
     this.target,
+    this.delta = Duration.zero,
   });
 
   final String id;
@@ -31,6 +35,7 @@ class TamboEntry {
   final Side? side;
   final DateTime at;
   final String? target;
+  final Duration delta;
 }
 
 class _Tally {
@@ -84,6 +89,15 @@ class TamboMatch {
       case MatchAction.point:
         _tallies[e.side]!.points++;
         _lastUndoable = e;
+      case MatchAction.pointRemoved:
+        final tally = _tallies[e.side]!;
+        tally.points = tally.points > 0 ? tally.points - 1 : 0;
+        _lastUndoable = e;
+      case MatchAction.clockAdjust:
+        // Only on a stopped clock; one that ran out of time stays stopped after the adjustment.
+        _elapsed = _adjusted(elapsedAt(e.at), e.delta);
+        _runningSince = null;
+        _lastUndoable = e;
       case MatchAction.warning:
         _tallies[e.side]!.warnings++;
         _lastUndoable = e;
@@ -106,6 +120,19 @@ class TamboMatch {
 
   static Side _rival(Side side) => side == Side.red ? Side.blue : Side.red;
 
+  // Adding time takes it off the elapsed time, never below 0 nor beyond the match length.
+  Duration _adjusted(Duration elapsedNow, Duration delta) {
+    final result = elapsedNow - delta;
+    if (result.isNegative) return Duration.zero;
+    return result > length ? length : result;
+  }
+
+  // An adjustment must change the clock and never leave it at 0: the time runs out only by running.
+  bool _cannotAdjust(DateTime now, Duration delta) {
+    final result = _adjusted(elapsedAt(now), delta);
+    return result == elapsedAt(now) || result == length;
+  }
+
   Duration elapsedAt(DateTime now) {
     final since = _runningSince;
     final total = since == null ? _elapsed : _elapsed + now.difference(since);
@@ -126,7 +153,14 @@ class TamboMatch {
     return remainingAt(now) == Duration.zero ? EndReason.time : null;
   }
 
-  int points(Side side) => _tallies[side]!.points;
+  /// A disqualification scores the points limit for the rival and 0 for the disqualified
+  /// fighter; the tally stays, so undoing it gives the points back.
+  int points(Side side) {
+    final disqualified = _disqualified;
+    if (disqualified != null) return disqualified == side ? 0 : pointsLimit;
+    return _tallies[side]!.points;
+  }
+
   int warnings(Side side) => _tallies[side]!.warnings;
   int oneHandWarnings(Side side) => _tallies[side]!.oneHandWarnings;
   Side? get disqualified => _disqualified;
@@ -137,9 +171,16 @@ class TamboMatch {
       _autoPointWarnings.contains(oneHandWarningId);
 
   /// Why [action] cannot happen at [now], or null if it can. Checks only the match itself.
-  MatchRefusal? refuse(MatchAction action, DateTime now) {
+  /// [side]: for a point removed; [delta]: for a clock adjustment.
+  MatchRefusal? refuse(
+    MatchAction action,
+    DateTime now, {
+    Side? side,
+    Duration delta = Duration.zero,
+  }) {
     if (_finished) return MatchRefusal.finished;
-    final over = endReason(now) != null;
+    final end = endReason(now);
+    final over = end != null;
     return switch (action) {
       MatchAction.start =>
         over
@@ -156,6 +197,23 @@ class TamboMatch {
             ? MatchRefusal.over
             : !_started
             ? MatchRefusal.notStarted
+            : null,
+      // A correction: also once the time or the points ended the match, which it may reopen.
+      MatchAction.pointRemoved =>
+        !_started
+            ? MatchRefusal.notStarted
+            : _disqualified != null
+            ? MatchRefusal.over
+            : side != null && _tallies[side]!.points == 0
+            ? MatchRefusal.noPoints
+            : null,
+      MatchAction.clockAdjust =>
+        isRunning(now)
+            ? MatchRefusal.clockRunning
+            : end != null && end != EndReason.time
+            ? MatchRefusal.over
+            : _cannotAdjust(now, delta)
+            ? MatchRefusal.clockLimit
             : null,
       MatchAction.undo =>
         _lastUndoable == null ? MatchRefusal.nothingToUndo : null,

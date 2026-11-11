@@ -310,6 +310,16 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
                   (g) => g.toggle(all[i].id, grouped: all[i].isGrouped),
                 ),
                 onDelete: all[i].isGrouped ? null : () => _delete(all[i]),
+                onUndoGroup: all[i].canUndoGroup
+                    ? () => undoGroup(
+                        context,
+                        ref,
+                        eventId: key.eventId,
+                        groupId: all[i].groupId!,
+                        number: all[i].groupNumber!,
+                        refresh: () => _refresh(ref, key),
+                      )
+                    : null,
               ),
             ),
     );
@@ -337,12 +347,14 @@ class _TeamTile extends StatelessWidget {
     required this.group,
     required this.onTap,
     required this.onDelete,
+    this.onUndoGroup,
   });
 
   final Team team;
   final DraftGroup group;
   final VoidCallback onTap;
   final VoidCallback? onDelete;
+  final VoidCallback? onUndoGroup;
 
   @override
   Widget build(BuildContext context) {
@@ -360,13 +372,19 @@ class _TeamTile extends StatelessWidget {
             : names,
       ),
       isThreeLine: team.isGrouped,
-      trailing: onDelete == null
-          ? null
-          : IconButton(
+      trailing: onDelete != null
+          ? IconButton(
               tooltip: l10n.deleteTeam,
               icon: const Icon(Icons.delete_outline),
               onPressed: onDelete,
-            ),
+            )
+          : onUndoGroup != null
+          ? IconButton(
+              tooltip: l10n.undoGroupNumber(team.groupNumber!),
+              icon: const Icon(Icons.undo),
+              onPressed: onUndoGroup,
+            )
+          : null,
     );
   }
 }

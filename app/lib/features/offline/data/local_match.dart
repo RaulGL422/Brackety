@@ -25,6 +25,7 @@ class LocalMatch {
             action: e.action,
             side: e.side,
             at: e.at,
+            delta: e.delta ?? Duration.zero,
           ),
     ];
     final timeline = [...server.timeline];
@@ -38,13 +39,22 @@ class LocalMatch {
       final at = lastAt != null && op.at.isBefore(lastAt) ? lastAt : op.at;
       final before = replay();
       // The server would put the match in review; the device just leaves it out.
-      if (before.refuse(op.action, at) != null) continue;
+      if (before.refuse(
+            op.action,
+            at,
+            side: op.side,
+            delta: op.delta ?? Duration.zero,
+          ) !=
+          null) {
+        continue;
+      }
       entries.add(
         TamboEntry(
           id: op.opId,
           action: op.action,
           side: op.side,
           at: at,
+          delta: op.delta ?? Duration.zero,
           target: op.action == MatchAction.undo
               ? before.lastUndoable!.id
               : null,
@@ -57,6 +67,7 @@ class LocalMatch {
           action: op.action,
           side: op.side,
           reason: op.reason,
+          delta: op.delta,
           at: at,
           clock: before.elapsedAt(at),
           automatic: false,
@@ -148,7 +159,12 @@ class LocalMatch {
   final DateTime? _lastAt;
 
   /// Why the referee cannot do [action] now, checked here before it goes into the queue.
-  MatchRefusal? refuse(MatchAction action, Side? side, DateTime now) {
+  MatchRefusal? refuse(
+    MatchAction action,
+    Side? side,
+    DateTime now, {
+    Duration delta = Duration.zero,
+  }) {
     if (view.review != null) return MatchRefusal.inReview;
     if (action == MatchAction.oneHandWarning &&
         side != null &&
@@ -159,6 +175,8 @@ class LocalMatch {
     return _state.refuse(
       action,
       lastAt != null && now.isBefore(lastAt) ? lastAt : now,
+      side: side,
+      delta: delta,
     );
   }
 }

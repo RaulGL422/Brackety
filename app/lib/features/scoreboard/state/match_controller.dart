@@ -90,7 +90,7 @@ class MatchController extends AsyncNotifier<MatchView> {
   void timeUp() {
     if (_endRung) return;
     _endRung = true;
-    ref.read(bellProvider).ring();
+    ref.read(bellProvider).play(BellSound.end);
     _poller.pollNow();
   }
 
@@ -100,12 +100,13 @@ class MatchController extends AsyncNotifier<MatchView> {
     MatchAction action, {
     Side? side,
     String? reason,
+    Duration? delta,
   }) async {
     final local = _local();
     if (local == null) return const ActionRefusal.server('');
     final now = _sync.now();
     final refusal =
-        local.refuse(action, side, now) ??
+        local.refuse(action, side, now, delta: delta ?? Duration.zero) ??
         (action == MatchAction.start &&
                 local.view.status == MatchStatus.pending &&
                 _matBusy(local.view, now)
@@ -117,6 +118,7 @@ class MatchController extends AsyncNotifier<MatchView> {
       action,
       side: side,
       reason: reason,
+      delta: delta,
     );
     return queued ? null : const ActionRefusal.server('');
   }
@@ -148,9 +150,8 @@ class MatchController extends AsyncNotifier<MatchView> {
     if (previous != null) {
       final started = !previous.running && view.running;
       final ended = previous.endReason == null && view.endReason != null;
-      if (started || (ended && !_endRung)) {
-        ref.read(bellProvider).ring();
-      }
+      if (started) ref.read(bellProvider).play(BellSound.start);
+      if (ended && !_endRung) ref.read(bellProvider).play(BellSound.end);
     }
     if (view.endReason != null) {
       _endRung = true;

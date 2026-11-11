@@ -40,4 +40,4 @@ flutter:
   generate: true
   uses-material-design: true
   assets:
-    - assets/sounds/bell.wav
+    - assets/sounds/

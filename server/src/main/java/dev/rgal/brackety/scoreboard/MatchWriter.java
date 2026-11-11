@@ -24,8 +24,8 @@ class MatchWriter {
     static final int ONE_HAND_MIN_AGE = 4;
     static final int ONE_HAND_MAX_AGE = 7;
 
-    /** {@code opId}: the device's id, or null from the web. */
-    record Action(MatchEventType type, Side side, String reason, UUID opId, UUID actorAccountId) {}
+    /** {@code deltaMs}: only for a CLOCK_ADJUST. {@code opId}: the device's id, or null from the web. */
+    record Action(MatchEventType type, Side side, String reason, Long deltaMs, UUID opId, UUID actorAccountId) {}
 
     record Refusal(Cause cause, String detail) {}
 
@@ -74,7 +74,8 @@ class MatchWriter {
                 false,
                 now,
                 state.elapsedAt(now),
-                action.opId())));
+                action.opId(),
+                action.deltaMs())));
         stopIfOverAndSnapshot(match, event, history, action, now);
         return Optional.empty();
     }
@@ -108,7 +109,7 @@ class MatchWriter {
 
     private Optional<Refusal> refusal(
             Match match, Event event, TamboMatch state, Action action, Instant now, boolean checkOtherMats) {
-        var rules = state.refuse(action.type(), now);
+        var rules = state.refuse(action.type(), action.side(), action.deltaMs() == null ? 0 : action.deltaMs(), now);
         if (rules.isPresent()) {
             return Optional.of(new Refusal(Cause.RULES, rules.get()));
         }
@@ -163,6 +164,7 @@ class MatchWriter {
                     true,
                     now,
                     state.elapsedAt(now),
+                    null,
                     null)));
             state = replay(event, history);
         }

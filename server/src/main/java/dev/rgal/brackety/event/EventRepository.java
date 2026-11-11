@@ -24,6 +24,16 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
             nativeQuery = true)
     boolean hasGroupsOrTeams(UUID eventId);
 
+    @Query(
+            value = "select exists(select 1 from fight_match where event_id = :eventId and status = :status)",
+            nativeQuery = true)
+    boolean hasMatchIn(UUID eventId, String status);
+
+    @Query(
+            value = "select exists(select 1 from fight_match where event_id = :eventId and status <> 'PENDING')",
+            nativeQuery = true)
+    boolean hasStartedMatches(UUID eventId);
+
     @Query(value = "select exists(select 1 from fight_group where mat_id in (:matIds))", nativeQuery = true)
     boolean hasGroupsOnMats(Collection<UUID> matIds);
 }

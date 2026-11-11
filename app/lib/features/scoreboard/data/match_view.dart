@@ -16,14 +16,18 @@ enum MatchAction {
   start,
   stop,
   point,
+  pointRemoved,
   warning,
   oneHandWarning,
   disqualification,
+  clockAdjust,
   undo,
   finish;
 
   String get wire => switch (this) {
     oneHandWarning => 'ONE_HAND_WARNING',
+    pointRemoved => 'POINT_REMOVED',
+    clockAdjust => 'CLOCK_ADJUST',
     _ => name.toUpperCase(),
   };
 
@@ -122,6 +126,7 @@ class TimelineEntry {
     this.reason,
     this.actor,
     this.opId,
+    this.delta,
   });
 
   factory TimelineEntry.fromJson(Map<String, dynamic> json) => TimelineEntry(
@@ -136,6 +141,7 @@ class TimelineEntry {
     undone: json['undone'] as bool,
     gaveRivalPoint: json['gaveRivalPoint'] as bool,
     opId: json['opId'] as String?,
+    delta: _duration(json['deltaMs']),
   );
 
   /// The server's event id; for an action still in the device's queue, its `opId`.
@@ -155,6 +161,9 @@ class TimelineEntry {
   final bool undone;
   final bool gaveRivalPoint;
 
+  /// For a clock adjustment: the time added (negative: taken away).
+  final Duration? delta;
+
   TimelineEntry withFlags({
     required bool undone,
     required bool gaveRivalPoint,
@@ -170,6 +179,7 @@ class TimelineEntry {
     undone: undone,
     gaveRivalPoint: gaveRivalPoint,
     opId: opId,
+    delta: delta,
   );
 
   Map<String, dynamic> toJson() => {
@@ -184,8 +194,12 @@ class TimelineEntry {
     'undone': undone,
     'gaveRivalPoint': gaveRivalPoint,
     'opId': opId,
+    'deltaMs': delta?.inMilliseconds,
   };
 }
+
+Duration? _duration(Object? ms) =>
+    ms is int ? Duration(milliseconds: ms) : null;
 
 /// Why the first offline action of a match clashed (`review.reason` of the server).
 enum ReviewReason { knownEvents, rules, age, matBusy, fighterBusy, unknown }
@@ -209,6 +223,7 @@ class ReviewOp {
     this.side,
     this.reason,
     this.actor,
+    this.delta,
   });
 
   factory ReviewOp.fromJson(Map<String, dynamic> json) => ReviewOp(
@@ -220,6 +235,7 @@ class ReviewOp {
     at: DateTime.parse(json['at'] as String),
     receivedAt: DateTime.parse(json['receivedAt'] as String),
     cause: json['cause'] as String,
+    delta: _duration(json['deltaMs']),
   );
 
   final String opId;
@@ -230,6 +246,7 @@ class ReviewOp {
   final DateTime at;
   final DateTime receivedAt;
   final String cause;
+  final Duration? delta;
 
   Map<String, dynamic> toJson() => {
     'opId': opId,
@@ -240,6 +257,7 @@ class ReviewOp {
     'at': at.toUtc().toIso8601String(),
     'receivedAt': receivedAt.toUtc().toIso8601String(),
     'cause': cause,
+    'deltaMs': delta?.inMilliseconds,
   };
 }
 
@@ -419,7 +437,8 @@ class MatchView {
   /// The clock was started at least once: only then can anyone score.
   bool get started => timeline.any((e) => e.action == MatchAction.start);
 
-  /// What an undo would undo now: the last point, warning or disqualification in force.
+  /// What an undo would undo now: the last point (added or removed), warning,
+  /// disqualification or clock adjustment in force.
   TimelineEntry? get lastUndoable => finished
       ? null
       : timeline
@@ -428,9 +447,11 @@ class MatchView {
                   !e.undone &&
                   const {
                     MatchAction.point,
+                    MatchAction.pointRemoved,
                     MatchAction.warning,
                     MatchAction.oneHandWarning,
                     MatchAction.disqualification,
+                    MatchAction.clockAdjust,
                   }.contains(e.action),
             )
             .lastOrNull;

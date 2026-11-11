@@ -13,6 +13,7 @@ class OfflineOp {
     required this.knownEvents,
     this.side,
     this.reason,
+    this.delta,
     this.rejected = false,
     this.account,
   });
@@ -23,6 +24,10 @@ class OfflineOp {
     action: MatchAction.fromWire(json['type'] as String),
     side: sideFromJson(json['side']),
     reason: json['reason'] as String?,
+    delta: switch (json['deltaMs']) {
+      final int ms => Duration(milliseconds: ms),
+      _ => null,
+    },
     at: DateTime.parse(json['at'] as String),
     knownEvents: json['knownEvents'] as int,
     rejected: json['rejected'] as bool? ?? false,
@@ -34,6 +39,9 @@ class OfflineOp {
   final MatchAction action;
   final Side? side;
   final String? reason;
+
+  /// For a clock adjustment: the time added (negative: taken away).
+  final Duration? delta;
   final DateTime at;
   final int knownEvents;
   final bool rejected;
@@ -51,6 +59,7 @@ class OfflineOp {
         action: action,
         side: side,
         reason: reason,
+        delta: delta,
         at: at,
         knownEvents: knownEvents,
         rejected: rejected,
@@ -62,6 +71,7 @@ class OfflineOp {
     'type': action.wire,
     'side': sideToJson(side),
     'reason': reason,
+    'deltaMs': delta?.inMilliseconds,
     'opId': opId,
     'at': at.toUtc().toIso8601String(),
     'knownEvents': knownEvents,

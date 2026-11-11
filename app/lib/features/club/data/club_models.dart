@@ -60,6 +60,8 @@ class EventSettings {
     required this.matReferees,
     required this.referees,
     required this.categories,
+    required this.matchLength,
+    required this.pointsLimit,
   });
 
   factory EventSettings.fromJson(Map<String, dynamic> json) {
@@ -78,6 +80,8 @@ class EventSettings {
         for (final c in json['categories'] as List)
           EventCategory.fromJson(c as Map<String, dynamic>),
       ],
+      matchLength: Duration(seconds: json['matchSeconds'] as int),
+      pointsLimit: json['pointsLimit'] as int,
     );
   }
 
@@ -90,6 +94,10 @@ class EventSettings {
   /// Accounts that can referee a mat in this event.
   final List<StaffMember> referees;
   final List<EventCategory> categories;
+  final Duration matchLength;
+
+  /// Points that end a match; a disqualification gives them to the rival.
+  final int pointsLimit;
 }
 
 /// From this age on the day of the event no guardian has to agree.

@@ -1,9 +1,11 @@
 package dev.rgal.brackety.scoreboard;
 
+import static dev.rgal.brackety.scoreboard.MatchEventType.CLOCK_ADJUST;
 import static dev.rgal.brackety.scoreboard.MatchEventType.DISQUALIFICATION;
 import static dev.rgal.brackety.scoreboard.MatchEventType.FINISH;
 import static dev.rgal.brackety.scoreboard.MatchEventType.ONE_HAND_WARNING;
 import static dev.rgal.brackety.scoreboard.MatchEventType.POINT;
+import static dev.rgal.brackety.scoreboard.MatchEventType.POINT_REMOVED;
 import static dev.rgal.brackety.scoreboard.MatchEventType.START;
 import static dev.rgal.brackety.scoreboard.MatchEventType.STOP;
 import static dev.rgal.brackety.scoreboard.MatchEventType.UNDO;
@@ -163,6 +165,111 @@ class TamboMatchTest {
     }
 
     @Test
+    void aDisqualificationScoresTheLimitForTheRivalAndUndoingItGivesThePointsBack() {
+        add(START, null, 0);
+        add(POINT, RED, 1);
+        add(POINT, RED, 2);
+        add(POINT, BLUE, 3);
+        var dq = add(DISQUALIFICATION, RED, 4);
+
+        var match = replay();
+        assertThat(match.corner(RED).points()).isZero();
+        assertThat(match.corner(BLUE).points()).isEqualTo(15);
+
+        add(UNDO, null, 5, dq);
+        match = replay();
+        assertThat(match.corner(RED).points()).isEqualTo(2);
+        assertThat(match.corner(BLUE).points()).isOne();
+    }
+
+    @Test
+    void aPointRemovedNeverGoesBelowZeroAndUndoGivesItBack() {
+        add(START, null, 0);
+        assertThat(replay().refuse(POINT_REMOVED, RED, 0, at(1))).contains("No points to take back.");
+        add(POINT, RED, 1);
+        add(POINT, RED, 2);
+        var removed = add(POINT_REMOVED, RED, 3);
+
+        var match = replay();
+        assertThat(match.corner(RED).points()).isOne();
+        assertThat(match.lastUndoable()).map(Entry::id).contains(removed);
+
+        add(UNDO, null, 4, removed);
+        assertThat(replay().corner(RED).points()).isEqualTo(2);
+    }
+
+    @Test
+    void aPointCanBeTakenBackOnceTheTimeOrThePointsEndedTheMatchButNotAfterADisqualification() {
+        assertThat(replay().refuse(POINT_REMOVED, RED, 0, T0)).contains(TamboMatch.NOT_STARTED);
+        add(START, null, 0);
+        for (int i = 0; i < 15; i++) {
+            add(POINT, BLUE, i + 1);
+        }
+        add(STOP, null, 15);
+        assertThat(replay().refuse(POINT_REMOVED, BLUE, 0, at(16))).isEmpty();
+        add(POINT_REMOVED, BLUE, 16);
+        assertThat(replay().endReason(at(17))).isEmpty();
+        assertThat(replay().isRunning(at(17))).isFalse();
+
+        add(START, null, 20);
+        assertThat(replay().endReason(at(500))).contains(EndReason.TIME);
+        assertThat(replay().refuse(POINT_REMOVED, BLUE, 0, at(500))).isEmpty();
+
+        add(DISQUALIFICATION, RED, 21);
+        assertThat(replay().refuse(POINT_REMOVED, BLUE, 0, at(500))).contains("The match is over.");
+    }
+
+    @Test
+    void theStoppedClockIsAdjustedAndUndoTakesTheAdjustmentBack() {
+        add(START, null, 0);
+        add(STOP, null, 30);
+        assertThat(replay().remainingAt(at(40))).isEqualTo(Duration.ofSeconds(90));
+
+        var plus = adjust(10_000, 40);
+        assertThat(replay().remainingAt(at(41))).isEqualTo(Duration.ofSeconds(100));
+        assertThat(replay().lastUndoable()).map(Entry::id).contains(plus);
+        adjust(-1_000, 41);
+        assertThat(replay().remainingAt(at(42))).isEqualTo(Duration.ofSeconds(99));
+
+        add(START, null, 50);
+        assertThat(replay().remainingAt(at(60))).isEqualTo(Duration.ofSeconds(89));
+        assertThat(replay().refuse(CLOCK_ADJUST, null, 1_000, at(60))).contains("Stop the clock first.");
+        add(STOP, null, 60);
+
+        add(UNDO, null, 61, entries.get(3).id());
+        add(UNDO, null, 62, plus);
+        assertThat(replay().remainingAt(at(63))).isEqualTo(Duration.ofSeconds(80));
+    }
+
+    @Test
+    void theClockNeitherGoesBeyondTheMatchLengthNorDownToZeroByAnAdjustment() {
+        var match = replay();
+        assertThat(match.refuse(CLOCK_ADJUST, null, 10_000, T0)).contains("The clock cannot go further.");
+        assertThat(match.refuse(CLOCK_ADJUST, null, -120_000, T0)).contains("The clock cannot go further.");
+        assertThat(match.refuse(CLOCK_ADJUST, null, -10_000, T0)).isEmpty();
+
+        add(START, null, 0);
+        add(STOP, null, 5);
+        adjust(10_000, 6);
+        assertThat(replay().remainingAt(at(7))).isEqualTo(RULES.length());
+
+        add(START, null, 10);
+        assertThat(replay().endReason(at(500))).contains(EndReason.TIME);
+        assertThat(replay().refuse(CLOCK_ADJUST, null, 10_000, at(500))).isEmpty();
+        adjust(10_000, 500);
+        assertThat(replay().endReason(at(501))).isEmpty();
+        assertThat(replay().remainingAt(at(501))).isEqualTo(Duration.ofSeconds(10));
+    }
+
+    @Test
+    void noAdjustmentAfterPointsOrADisqualificationEndedTheMatch() {
+        add(START, null, 0);
+        add(DISQUALIFICATION, RED, 1);
+        add(STOP, null, 1);
+        assertThat(replay().refuse(CLOCK_ADJUST, null, 1_000, at(2))).contains("The match is over.");
+    }
+
+    @Test
     void stopNeedsARunningClock() {
         assertThat(replay().refuse(STOP, T0)).contains("The clock is not running.");
         assertThat(replay().isStarted()).isFalse();
@@ -175,6 +282,12 @@ class TamboMatchTest {
     private UUID add(MatchEventType type, Side side, int second, UUID target) {
         var id = UUID.randomUUID();
         entries.add(new Entry(id, type, side, at(second), target));
+        return id;
+    }
+
+    private UUID adjust(long deltaMs, int second) {
+        var id = UUID.randomUUID();
+        entries.add(new Entry(id, CLOCK_ADJUST, null, at(second), null, deltaMs));
         return id;
     }
 
