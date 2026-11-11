@@ -119,6 +119,7 @@ class FakeScoreboardRepository implements ScoreboardRepository {
     MatchAction action, {
     Side? side,
     String? reason,
+    Duration? delta,
     required int knownEvents,
   }) async {
     sent.add((action, side, reason));

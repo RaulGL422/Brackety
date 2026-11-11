@@ -503,14 +503,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String reasonTitle(String action, String fighter) {
-    return '$action · $fighter';
+    return '$action: $fighter';
   }
 
   @override
-  String get reasonLabel => 'Reason (required)';
+  String get reasonLabel => 'Reason';
 
   @override
-  String get reasonConfirm => 'Sure? It is recorded.';
+  String get reasonConfirm =>
+      'Write the reason. It stays in the match history.';
 
   @override
   String get confirm => 'Confirm';
@@ -630,6 +631,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsPointsLimitHint =>
       'The match ends when one fighter reaches them. A disqualification gives them to the rival. It does not change once a match has started.';
+
+  @override
+  String get settingsMatchRulesConflict =>
+      'It cannot change now: a match is in progress or has started.';
 
   @override
   String get settingsPointsLimitInvalid => 'Between 1 and 99.';
@@ -1589,11 +1594,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get refusalNotStarted => 'Start the clock before scoring.';
 
   @override
-  String undoWhat(String what) {
-    return 'Undo: $what';
-  }
-
-  @override
   String undoneWhat(String what) {
     return 'Undone: $what';
   }
@@ -1679,4 +1679,21 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get accountSuspended =>
       'This account is suspended. If you think it is a mistake, write to the privacy contact on the legal pages.';
+
+  @override
+  String backTo(String place) {
+    return 'Back to $place';
+  }
+
+  @override
+  String get reasonApplyWarning => 'Give warning';
+
+  @override
+  String get reasonApplyDisqualify => 'Disqualify';
+
+  @override
+  String get accountMenu => 'My account';
+
+  @override
+  String get back => 'Back';
 }

@@ -19,6 +19,7 @@ import 'final_score.dart';
 import 'reason_dialog.dart';
 import 'timeline_list.dart';
 import 'undo_text.dart';
+import '../../../core/up_button.dart';
 
 /// How long the "undone" message stays.
 const undoneNotice = Duration(seconds: 3);
@@ -47,6 +48,15 @@ class ScoreboardScreen extends ConsumerWidget {
         data: _scoreboardTheme,
         child: Scaffold(
           appBar: AppBar(
+            leading: UpButton(
+              label: view == null
+                  ? l10n.eventsTitle
+                  : l10n.matTitle(view.matNumber),
+              fallback: view == null
+                  ? '/'
+                  : '/mats/${view.matId}?number=${view.matNumber}',
+            ),
+            leadingWidth: UpButton.leadingWidth(context),
             title: Text(
               view == null
                   ? ''
@@ -111,6 +121,10 @@ class ScoreboardScreen extends ConsumerWidget {
       reason = await askReason(
         context,
         title: l10n.reasonTitle(label, view.corner(side).title(l10n)),
+        confirmLabel: action == MatchAction.disqualification
+            ? l10n.reasonApplyDisqualify
+            : l10n.reasonApplyWarning,
+        destructive: action == MatchAction.disqualification,
       );
       if (reason == null || !context.mounted) return;
     }
@@ -139,20 +153,16 @@ class ScoreboardScreen extends ConsumerWidget {
     TimelineEntry? undoing,
   }) async {
     final l10n = AppLocalizations.of(context);
-    final messenger = ScaffoldMessenger.of(context);
+    final toasts = Toasts.of(context);
     final refused = await ref
         .read(matchControllerProvider(matchId).notifier)
         .send(action, side: side, reason: reason, delta: delta);
     if (refused != null) {
-      messenger.showSnackBar(
-        SnackBar(content: Text(_refusalText(l10n, refused))),
-      );
+      toasts.show(_refusalText(l10n, refused), kind: ToastKind.error);
     } else if (undoing != null) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(l10n.undoneWhat(undoTarget(l10n, undoing))),
-          duration: undoneNotice,
-        ),
+      toasts.show(
+        l10n.undoneWhat(undoTarget(l10n, undoing)),
+        duration: undoneNotice,
       );
     }
   }

@@ -1,3 +1,4 @@
+import 'package:brackety_core/brackety_core.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
@@ -16,7 +17,7 @@ Future<void> runAction<T>(
   String? Function(AdminApiError error)? explain,
 }) async {
   final l10n = AppLocalizations.of(context);
-  final messenger = ScaffoldMessenger.of(context);
+  final toasts = Toasts.of(context);
   String? message;
   try {
     message = done(await action());
@@ -26,5 +27,5 @@ Future<void> runAction<T>(
         ? notFound
         : explain?.call(error) ?? actionErrorMessage(l10n, error);
   }
-  if (message != null) messenger.showSnackBar(SnackBar(content: Text(message)));
+  if (message != null) toasts.show(message);
 }

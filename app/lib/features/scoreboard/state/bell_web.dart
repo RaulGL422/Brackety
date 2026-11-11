@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:js_interop';
-import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:web/web.dart' as web;
@@ -73,5 +72,6 @@ class _WebBell implements PlatformBell {
   }
 
   @override
-  void dispose() => unawaited(_context.close().toDart.then((_) {}, onError: (_) {}));
+  void dispose() =>
+      unawaited(_context.close().toDart.then((_) {}, onError: (_) {}));
 }

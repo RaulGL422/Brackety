@@ -15,6 +15,7 @@ import '../data/import_models.dart';
 import '../data/import_repository.dart';
 import 'issue_text.dart';
 import 'row_dialog.dart';
+import '../../../core/up_button.dart';
 
 const _maxFiles = 10;
 
@@ -88,7 +89,7 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
 
   Future<void> _register() async {
     final l10n = AppLocalizations.of(context);
-    final messenger = ScaffoldMessenger.of(context);
+    final toasts = Toasts.of(context);
     final navigator = Navigator.of(context);
     await _run(() async {
       final result = await _repository.register(widget.eventId, [
@@ -96,35 +97,27 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
       ]);
       if (result.registered == 0) {
         setState(() => _rows = result.rows);
-        messenger.showSnackBar(
-          SnackBar(content: Text(l10n.importRegisterRefused)),
-        );
+        toasts.show(l10n.importRegisterRefused, kind: ToastKind.error);
         return;
       }
       ref.invalidate(participantsProvider(widget.eventId));
-      messenger.showSnackBar(
-        SnackBar(content: Text(l10n.importRegistered(result.registered))),
-      );
+      toasts.show(l10n.importRegistered(result.registered));
       navigator.pop();
     });
   }
 
   Future<void> _run(Future<void> Function() action) async {
     final l10n = AppLocalizations.of(context);
-    final messenger = ScaffoldMessenger.of(context);
+    final toasts = Toasts.of(context);
     setState(() => _busy = true);
     try {
       await action();
     } on DioException catch (e) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(switch (e.response?.statusCode) {
-            400 => l10n.importInvalidFiles(_maxFiles),
-            429 => l10n.importTooMany,
-            _ => l10n.importReadError,
-          }),
-        ),
-      );
+      toasts.show(switch (e.response?.statusCode) {
+        400 => l10n.importInvalidFiles(_maxFiles),
+        429 => l10n.importTooMany,
+        _ => l10n.importReadError,
+      }, kind: ToastKind.error);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -136,6 +129,11 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
     final rows = _rows;
     return Scaffold(
       appBar: AppBar(
+        leading: UpButton(
+          label: l10n.clubParticipants,
+          fallback: '/events/${widget.eventId}/club',
+        ),
+        leadingWidth: UpButton.leadingWidth(context),
         title: Text(l10n.importButton),
         bottom: _busy
             ? const PreferredSize(

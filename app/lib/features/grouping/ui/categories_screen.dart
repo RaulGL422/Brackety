@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/async_view.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../state/grouping_providers.dart';
+import '../../../core/up_button.dart';
 
 /// Categories with participants, youngest first (the server sends them in that order).
 class CategoriesScreen extends ConsumerWidget {
@@ -18,7 +19,11 @@ class CategoriesScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final provider = categoriesProvider(eventId);
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.categoriesTitle)),
+      appBar: AppBar(
+        leading: UpButton(label: l10n.eventsTitle, fallback: '/'),
+        leadingWidth: UpButton.leadingWidth(context),
+        title: Text(l10n.categoriesTitle),
+      ),
       body: AsyncView(
         value: ref.watch(provider),
         onRetry: () => ref.invalidate(provider),

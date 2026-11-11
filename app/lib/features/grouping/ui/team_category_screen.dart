@@ -13,6 +13,7 @@ import '../state/grouping_providers.dart';
 import 'create_groups.dart';
 import 'draft_panel.dart';
 import 'pick_mark.dart';
+import '../../../core/up_button.dart';
 
 /// A team category (docs/modulos/prototipo-f1-equipos.md): make teams from its participants, then
 /// group 4 teams (or 3 and a ghost team) and send them to a mat. "Individual group" opens the usual
@@ -39,6 +40,11 @@ class TeamCategoryScreen extends ConsumerWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
+          leading: UpButton(
+            label: l10n.categoriesTitle,
+            fallback: '/events/$eventId/categories',
+          ),
+          leadingWidth: UpButton.leadingWidth(context),
           title: Text(l10n.categoryAges(categoryName)),
           actions: [
             TextButton.icon(
@@ -101,7 +107,7 @@ class _TeamMakerState extends ConsumerState<_TeamMaker> {
 
   Future<void> _create() async {
     final l10n = AppLocalizations.of(context);
-    final messenger = ScaffoldMessenger.of(context);
+    final toasts = Toasts.of(context);
     final key = widget.categoryKey;
     setState(() => _busy = true);
     try {
@@ -109,15 +115,14 @@ class _TeamMakerState extends ConsumerState<_TeamMaker> {
           .read(groupingRepositoryProvider)
           .createTeam(key.eventId, key.categoryId, _picks);
       _picks = [];
-      messenger.showSnackBar(
-        SnackBar(content: Text(l10n.teamCreated(l10n.teamName(team.number)))),
-      );
+      toasts.show(l10n.teamCreated(l10n.teamName(team.number)));
       _refresh(ref, key);
     } on DioException catch (e) {
       final conflict = e.response?.statusCode == 409;
       if (conflict) _refresh(ref, key);
-      messenger.showSnackBar(
-        SnackBar(content: Text(conflict ? l10n.teamConflict : l10n.teamError)),
+      toasts.show(
+        conflict ? l10n.teamConflict : l10n.teamError,
+        kind: ToastKind.error,
       );
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -252,11 +257,13 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
 
   Future<void> _delete(Team team) async {
     final l10n = AppLocalizations.of(context);
-    final messenger = ScaffoldMessenger.of(context);
+    final toasts = Toasts.of(context);
     final name = l10n.teamName(team.number);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        actionsOverflowDirection: VerticalDirection.up,
+        actionsOverflowButtonSpacing: 8,
         title: Text(l10n.deleteTeam),
         content: Text(l10n.deleteTeamConfirm(name)),
         actions: [
@@ -277,7 +284,7 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
           .read(groupingRepositoryProvider)
           .deleteTeam(widget.categoryKey.eventId, team.id);
     } on DioException {
-      messenger.showSnackBar(SnackBar(content: Text(l10n.deleteTeamError)));
+      toasts.show(l10n.deleteTeamError, kind: ToastKind.error);
     }
     if (_group.contains(team.id)) setState(() => _group = _fresh());
     _refresh(ref, widget.categoryKey);

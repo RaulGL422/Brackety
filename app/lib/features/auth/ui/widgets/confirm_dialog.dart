@@ -42,6 +42,8 @@ class ConfirmDialog extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final title = this.title;
     return AlertDialog(
+      actionsOverflowDirection: VerticalDirection.up,
+      actionsOverflowButtonSpacing: 8,
       title: title == null ? null : Text(title),
       // Long bodies would stretch the dialog across wide windows.
       content: ConstrainedBox(

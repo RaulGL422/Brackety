@@ -6,5 +6,6 @@
   "connectionStatusError": "Cannot reach the server",
   "connectionServerToday": "Server date: {date}",
   "retry": "Retry",
-  "licenses": "Software licenses"
+  "licenses": "Software licenses",
+  "closeNotice": "Close notice"
 }
