@@ -24,8 +24,8 @@ final class OfflineOpsCsv {
     static final String VERSION = "2";
     static final List<String> COLUMNS_V1 =
             List.of("opId", "matchId", "type", "side", "reason", "at", "knownEvents", "actor");
-    static final List<String> COLUMNS = List.of(
-            "opId", "matchId", "type", "side", "reason", "at", "knownEvents", "actor", "deltaMs");
+    static final List<String> COLUMNS =
+            List.of("opId", "matchId", "type", "side", "reason", "at", "knownEvents", "actor", "deltaMs");
     static final int MAX_ROWS = 10_000;
 
     record Row(
@@ -45,7 +45,8 @@ final class OfflineOpsCsv {
     static List<Row> parse(String text) {
         var lines = records(text.startsWith("﻿") ? text.substring(1) : text);
         if (lines.size() < 2
-                || !(lines.get(0).equals(List.of(MAGIC, VERSION)) || lines.get(0).equals(List.of(MAGIC, "1")))) {
+                || !(lines.get(0).equals(List.of(MAGIC, VERSION))
+                        || lines.get(0).equals(List.of(MAGIC, "1")))) {
             throw EventException.invalid("Not a file of pending actions (version 1 or " + VERSION + ").");
         }
         var columns = lines.get(0).get(1).equals("1") ? COLUMNS_V1 : COLUMNS;

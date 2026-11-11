@@ -55,25 +55,19 @@ class OfflineImportControllerTest extends ScoreboardApiTest {
 
     @Test
     void aClockAdjustmentKeepsItsDeltaThroughTheFile() throws Exception {
-        var v2 = "﻿brackety-offline-ops;2
-opId;matchId;type;side;reason;at;knownEvents;actor;deltaMs
-";
+        var v2 = "﻿brackety-offline-ops;2\r\nopId;matchId;type;side;reason;at;knownEvents;actor;deltaMs\r\n";
         var csv = v2
-                + row(UUID.randomUUID(), "START", "", "", "09:00:00", 0).replace("
-", ";
-")
-                + row(UUID.randomUUID(), "STOP", "", "", "09:00:20", 1).replace("
-", ";
-")
-                + row(UUID.randomUUID(), "CLOCK_ADJUST", "", "", "09:00:25", 2).replace("
-", ";10000
-");
+                + v2Row(row(UUID.randomUUID(), "START", "", "", "09:00:00", 0), "")
+                + v2Row(row(UUID.randomUUID(), "STOP", "", "", "09:00:20", 1), "")
+                + v2Row(row(UUID.randomUUID(), "CLOCK_ADJUST", "", "", "09:00:25", 2), "-10000");
 
-        importAs("club1", csv).andExpect(status().isOk()).andExpect(jsonPath("$.applied").value(3));
+        importAs("club1", csv)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.applied").value(3));
 
         call(get(path(match)), "club1")
                 .andExpect(jsonPath("$.timeline[2].type").value("CLOCK_ADJUST"))
-                .andExpect(jsonPath("$.timeline[2].deltaMs").value(10000));
+                .andExpect(jsonPath("$.timeline[2].deltaMs").value(-10000));
     }
 
     @Test
@@ -123,6 +117,11 @@ opId;matchId;type;side;reason;at;knownEvents;actor;deltaMs
         importAs("ayudante1", csv).andExpect(status().isForbidden());
         importAs(outsider(), PASSWORD, csv).andExpect(status().isNotFound());
         mvc.perform(post(importPath()).contentType("text/csv").content(csv)).andExpect(status().isUnauthorized());
+    }
+
+    // A version 1 row with the deltaMs cell of version 2 at the end.
+    private static String v2Row(String v1Row, String deltaMs) {
+        return v1Row.replace("\r\n", ";" + deltaMs + "\r\n");
     }
 
     private String row(UUID opId, String type, String side, String reason, String time, int knownEvents) {
