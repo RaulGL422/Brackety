@@ -2,8 +2,7 @@ package dev.rgal.brackety.eventpackage;
 
 import dev.rgal.brackety.auth.RequiresVerifiedEmail;
 import dev.rgal.brackety.common.CurrentAccount;
-import java.text.Normalizer;
-import java.util.Locale;
+import dev.rgal.brackety.eventpackage.EventPackageService.ResultsImport;
 import java.util.UUID;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
@@ -13,6 +12,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -28,7 +30,8 @@ class EventPackageController {
     @GetMapping("/api/v1/events/{eventId}/export/package")
     ResponseEntity<EventPackage> export(@PathVariable UUID eventId, @AuthenticationPrincipal Jwt jwt) {
         var result = packages.export(eventId, CurrentAccount.id(jwt));
-        var filename = slug(result.event().name()) + "-" + result.event().date() + ".brackety";
+        var filename = EventPackageService.slug(result.event().name()) + "-"
+                + result.event().date() + ".brackety";
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .header(
@@ -40,13 +43,13 @@ class EventPackageController {
                 .body(result);
     }
 
-    /** "Liga Yoseikan · Fase 1" → "liga-yoseikan-fase-1". */
-    static String slug(String name) {
-        var slug = Normalizer.normalize(name, Normalizer.Form.NFD)
-                .replaceAll("\\p{M}", "")
-                .toLowerCase(Locale.ROOT)
-                .replaceAll("[^a-z0-9]+", "-")
-                .replaceAll("^-|-$", "");
-        return slug.isEmpty() ? "evento" : slug;
+    /** The body is the file as it is: the full export (.zip) or the package (.brackety). */
+    @PostMapping(path = "/api/v1/events/{eventId}/import/results", consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    ResultsImport importResults(
+            @PathVariable UUID eventId,
+            @RequestParam(defaultValue = "false") boolean dryRun,
+            @RequestBody byte[] file,
+            @AuthenticationPrincipal Jwt jwt) {
+        return packages.importResults(eventId, CurrentAccount.id(jwt), file, dryRun);
     }
 }

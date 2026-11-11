@@ -37,23 +37,41 @@ class WebAppConfig implements WebMvcConfigurer {
     private static final String INDEX = "index.html";
 
     private final String location;
+    // The superadmin web at /admin/ (hall laptop, built with --base-href /admin/); null when not set.
+    private final String adminLocation;
 
-    WebAppConfig(@Value("${brackety.web-dir}") String webDir) {
-        var dir = Path.of(webDir).toAbsolutePath().normalize();
+    WebAppConfig(@Value("${brackety.web-dir}") String webDir, @Value("${brackety.admin-web-dir:}") String adminWebDir) {
+        this.location = location(webDir, "WEB_DIR");
+        this.adminLocation = adminWebDir.isBlank() ? null : location(adminWebDir, "ADMIN_WEB_DIR");
+    }
+
+    private static String location(String folder, String variable) {
+        var dir = Path.of(folder).toAbsolutePath().normalize();
         if (!Files.isRegularFile(dir.resolve(INDEX))) {
-            throw new IllegalStateException("WEB_DIR has no " + INDEX + ": " + dir);
+            throw new IllegalStateException(variable + " has no " + INDEX + ": " + dir);
         }
         var uri = dir.toUri().toString();
-        this.location = uri.endsWith("/") ? uri : uri + "/";
+        return uri.endsWith("/") ? uri : uri + "/";
     }
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/").setViewName("forward:/" + INDEX);
+        if (adminLocation != null) {
+            registry.addRedirectViewController("/admin", "/admin/");
+            registry.addViewController("/admin/").setViewName("forward:/admin/" + INDEX);
+        }
     }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        if (adminLocation != null) {
+            registry.addResourceHandler("/admin/**")
+                    .addResourceLocations(adminLocation)
+                    .setCacheControl(CacheControl.noCache())
+                    .resourceChain(false)
+                    .addResolver(new AppShellResolver());
+        }
         // No-cache (revalidate) for every file, not only index.html: Flutter's file names carry no hash, a 304
         // on the hall's network is cheap and a stale build after an update is not.
         registry.addResourceHandler("/**")

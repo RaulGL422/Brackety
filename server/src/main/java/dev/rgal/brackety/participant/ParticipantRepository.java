@@ -1,5 +1,6 @@
 package dev.rgal.brackety.participant;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 public interface ParticipantRepository extends JpaRepository<Participant, UUID> {
 
     List<Participant> findByEventIdOrderByFirstNameAscLastNameAsc(UUID eventId);
+
+    List<Participant> findByEventIdIn(Collection<UUID> eventIds);
 
     // Native so this package does not depend on grouping, which depends on it.
     @Query(

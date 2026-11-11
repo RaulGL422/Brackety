@@ -23,4 +23,4 @@ Panel de fase, creación de grupos, asignación a tapiz, tabla por categoría, r
 Reinscripción, agrupación por categoría/estatura/peso, acumulación entre fases, asistencia, semilla.
 
 ## Estado
-Pendiente. Detalle fino cuando se construya el módulo.
+Servidor hecho (2026-11-11, `feat/league-phases`): liga con fases (cada evento es una fase; la F1 pasa a fase 1), nueva fase copiando configuración, reinscripción por persona, clasificación de liga (asistencia y puntos por fase) y podios por categoría. Pantallas pendientes: después de la F1 (decidido por Raul).

@@ -1496,11 +1496,142 @@ abstract class AppLocalizations {
   /// **'Línea de tiempo (CSV)'**
   String get exportTimeline;
 
-  /// No description provided for @exportEventPackage.
+  /// No description provided for @organizationsTitle.
   ///
   /// In es, this message translates to:
-  /// **'Exportar paquete del evento'**
-  String get exportEventPackage;
+  /// **'Clubes participantes'**
+  String get organizationsTitle;
+
+  /// No description provided for @organizationsEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no hay clubes. Añádelos para indicar el de cada inscrito.'**
+  String get organizationsEmpty;
+
+  /// No description provided for @organizationAdd.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir club'**
+  String get organizationAdd;
+
+  /// No description provided for @organizationEdit.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar club'**
+  String get organizationEdit;
+
+  /// No description provided for @organizationRemove.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar club'**
+  String get organizationRemove;
+
+  /// No description provided for @organizationName.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre del club'**
+  String get organizationName;
+
+  /// No description provided for @organizationShortName.
+  ///
+  /// In es, this message translates to:
+  /// **'Abreviatura (opcional)'**
+  String get organizationShortName;
+
+  /// No description provided for @organizationLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Club'**
+  String get organizationLabel;
+
+  /// No description provided for @organizationNone.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin club'**
+  String get organizationNone;
+
+  /// No description provided for @organizationsConflict.
+  ///
+  /// In es, this message translates to:
+  /// **'No se puede: ese club tiene inscritos o ya hay otro con el mismo nombre.'**
+  String get organizationsConflict;
+
+  /// No description provided for @exportParticipants.
+  ///
+  /// In es, this message translates to:
+  /// **'Inscritos (CSV)'**
+  String get exportParticipants;
+
+  /// No description provided for @exportFull.
+  ///
+  /// In es, this message translates to:
+  /// **'Todo el evento (.zip)'**
+  String get exportFull;
+
+  /// No description provided for @importResults.
+  ///
+  /// In es, this message translates to:
+  /// **'Importar resultados del pabellón'**
+  String get importResults;
+
+  /// No description provided for @importResultsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Importar estos resultados?'**
+  String get importResultsTitle;
+
+  /// No description provided for @importResultsBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Se añadirán {groups} grupos, {matches} combates y {actions} acciones del marcador, y {participants} inscritos que aquí no estaban. No se puede deshacer.'**
+  String importResultsBody(
+    int groups,
+    int matches,
+    int actions,
+    int participants,
+  );
+
+  /// No description provided for @importResultsConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'Importar'**
+  String get importResultsConfirm;
+
+  /// No description provided for @importResultsDone.
+  ///
+  /// In es, this message translates to:
+  /// **'Resultados importados.'**
+  String get importResultsDone;
+
+  /// No description provided for @importResultsAlready.
+  ///
+  /// In es, this message translates to:
+  /// **'Estos resultados ya estaban importados: no cambia nada.'**
+  String get importResultsAlready;
+
+  /// No description provided for @importResultsOtherEvent.
+  ///
+  /// In es, this message translates to:
+  /// **'El fichero es de otro evento (otro nombre o fecha).'**
+  String get importResultsOtherEvent;
+
+  /// No description provided for @importResultsConflict.
+  ///
+  /// In es, this message translates to:
+  /// **'Este evento ya tiene grupos propios: los resultados solo se importan en un evento sin competición.'**
+  String get importResultsConflict;
+
+  /// No description provided for @importResultsInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'El fichero no es una exportación de Brackety (.zip o .brackety) con resultados.'**
+  String get importResultsInvalid;
+
+  /// No description provided for @importResultsError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se han podido importar los resultados.'**
+  String get importResultsError;
 
   /// No description provided for @exportError.
   ///

@@ -78,12 +78,18 @@ public class SecurityConfig {
     @Bean
     @Order(1)
     SecurityFilterChain adminFilterChain(
-            HttpSecurity http, SecretKey jwtKey, Clock clock, CloudflareAccess cloudflareAccess) throws Exception {
+            HttpSecurity http,
+            SecretKey jwtKey,
+            Clock clock,
+            CloudflareAccess cloudflareAccess,
+            @Value("${brackety.admin.local-only:false}") boolean localOnly)
+            throws Exception {
         return http.securityMatcher(ADMIN_PATHS)
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(new CloudflareAccessFilter(cloudflareAccess), BearerTokenAuthenticationFilter.class)
+                .addFilterBefore(
+                        new CloudflareAccessFilter(cloudflareAccess, localOnly), BearerTokenAuthenticationFilter.class)
                 .authorizeHttpRequests(a -> a.requestMatchers(ADMIN_LOGIN_PATH)
                         .permitAll()
                         .anyRequest()
@@ -224,7 +230,11 @@ public class SecurityConfig {
 
     @Bean
     PasswordEncoder passwordEncoder() {
-        // Argon2id with the OWASP minimum: 19 MiB of memory, 2 iterations, 1 thread.
+        return argon2();
+    }
+
+    /** Argon2id with the OWASP minimum: 19 MiB of memory, 2 iterations, 1 thread. */
+    public static PasswordEncoder argon2() {
         return new Argon2PasswordEncoder(16, 32, 1, 19 * 1024, 2);
     }
 }

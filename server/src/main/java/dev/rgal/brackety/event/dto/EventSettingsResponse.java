@@ -2,6 +2,7 @@ package dev.rgal.brackety.event.dto;
 
 import dev.rgal.brackety.event.EventCategory;
 import dev.rgal.brackety.event.EventCategory.Format;
+import dev.rgal.brackety.event.EventOrganization;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -14,7 +15,18 @@ public record EventSettingsResponse(
         int pointsLimit,
         List<MatSettings> mats,
         List<StaffMember> referees,
-        List<CategoryResponse> categories) {
+        List<CategoryResponse> categories,
+        List<OrganizationResponse> organizations,
+        int attendancePoints,
+        int phaseNumber,
+        String discipline) {
+
+    public record OrganizationResponse(UUID id, String name, String shortName) {
+
+        public static OrganizationResponse of(EventOrganization o) {
+            return new OrganizationResponse(o.getId(), o.getName(), o.getShortName());
+        }
+    }
 
     public record MatSettings(UUID id, int number, UUID refereeId) {}
 

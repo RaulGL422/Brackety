@@ -93,7 +93,14 @@ class _ParticipantTile extends ConsumerWidget {
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
           Text(
-            '${l10n.participantAgeCategory(p.age, p.categoryName ?? l10n.noCategory)} · $height',
+            [
+              l10n.participantAgeCategory(
+                p.age,
+                p.categoryName ?? l10n.noCategory,
+              ),
+              height,
+              ?p.organizationName,
+            ].join(' · '),
           ),
           if (p.needsGuardian) const _NeedsGuardianChip(),
         ],
