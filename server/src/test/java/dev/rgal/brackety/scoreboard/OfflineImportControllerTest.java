@@ -54,6 +54,29 @@ class OfflineImportControllerTest extends ScoreboardApiTest {
     }
 
     @Test
+    void aClockAdjustmentKeepsItsDeltaThroughTheFile() throws Exception {
+        var v2 = "﻿brackety-offline-ops;2
+opId;matchId;type;side;reason;at;knownEvents;actor;deltaMs
+";
+        var csv = v2
+                + row(UUID.randomUUID(), "START", "", "", "09:00:00", 0).replace("
+", ";
+")
+                + row(UUID.randomUUID(), "STOP", "", "", "09:00:20", 1).replace("
+", ";
+")
+                + row(UUID.randomUUID(), "CLOCK_ADJUST", "", "", "09:00:25", 2).replace("
+", ";10000
+");
+
+        importAs("club1", csv).andExpect(status().isOk()).andExpect(jsonPath("$.applied").value(3));
+
+        call(get(path(match)), "club1")
+                .andExpect(jsonPath("$.timeline[2].type").value("CLOCK_ADJUST"))
+                .andExpect(jsonPath("$.timeline[2].deltaMs").value(10000));
+    }
+
+    @Test
     void anActionTheDeviceAlreadySentIsADuplicate() throws Exception {
         var sent = UUID.randomUUID();
         call(post(path(match) + "/events").content("""

@@ -12,16 +12,20 @@ import java.util.UUID;
  * the app (`offline_ops_csv.dart`); ';' separated, quotes as in RFC 4180:
  *
  * <pre>
- * brackety-offline-ops;1
- * opId;matchId;type;side;reason;at;knownEvents;actor
+ * brackety-offline-ops;2
+ * opId;matchId;type;side;reason;at;knownEvents;actor;deltaMs
  * </pre>
+ *
+ * Version 1 (before clock adjustments) has no {@code deltaMs} column and is still read.
  */
 final class OfflineOpsCsv {
 
     static final String MAGIC = "brackety-offline-ops";
-    static final String VERSION = "1";
-    static final List<String> COLUMNS =
+    static final String VERSION = "2";
+    static final List<String> COLUMNS_V1 =
             List.of("opId", "matchId", "type", "side", "reason", "at", "knownEvents", "actor");
+    static final List<String> COLUMNS = List.of(
+            "opId", "matchId", "type", "side", "reason", "at", "knownEvents", "actor", "deltaMs");
     static final int MAX_ROWS = 10_000;
 
     record Row(
@@ -33,16 +37,19 @@ final class OfflineOpsCsv {
             String reason,
             Instant at,
             int knownEvents,
-            UUID actor) {}
+            UUID actor,
+            Long deltaMs) {}
 
     private OfflineOpsCsv() {}
 
     static List<Row> parse(String text) {
         var lines = records(text.startsWith("﻿") ? text.substring(1) : text);
-        if (lines.size() < 2 || !lines.get(0).equals(List.of(MAGIC, VERSION))) {
-            throw EventException.invalid("Not a file of pending actions (version " + VERSION + ").");
+        if (lines.size() < 2
+                || !(lines.get(0).equals(List.of(MAGIC, VERSION)) || lines.get(0).equals(List.of(MAGIC, "1")))) {
+            throw EventException.invalid("Not a file of pending actions (version 1 or " + VERSION + ").");
         }
-        if (!lines.get(1).equals(COLUMNS)) {
+        var columns = lines.get(0).get(1).equals("1") ? COLUMNS_V1 : COLUMNS;
+        if (!lines.get(1).equals(columns)) {
             throw EventException.invalid("Unexpected columns: " + String.join(";", lines.get(1)));
         }
         if (lines.size() - 2 > MAX_ROWS) {
@@ -54,14 +61,14 @@ final class OfflineOpsCsv {
             if (cells.size() == 1 && cells.get(0).isBlank()) {
                 continue;
             }
-            rows.add(row(i + 1, cells));
+            rows.add(row(i + 1, cells, columns.size()));
         }
         return rows;
     }
 
-    private static Row row(int line, List<String> cells) {
-        if (cells.size() != COLUMNS.size()) {
-            throw invalid(line, "expected " + COLUMNS.size() + " columns");
+    private static Row row(int line, List<String> cells, int columns) {
+        if (cells.size() != columns) {
+            throw invalid(line, "expected " + columns + " columns");
         }
         try {
             return new Row(
@@ -73,7 +80,8 @@ final class OfflineOpsCsv {
                     cells.get(4).isEmpty() ? null : cells.get(4),
                     Instant.parse(cells.get(5)),
                     Integer.parseInt(cells.get(6)),
-                    cells.get(7).isEmpty() ? null : UUID.fromString(cells.get(7)));
+                    cells.get(7).isEmpty() ? null : UUID.fromString(cells.get(7)),
+                    columns < 9 || cells.get(8).isEmpty() ? null : Long.valueOf(cells.get(8)));
         } catch (IllegalArgumentException | DateTimeParseException e) {
             throw invalid(line, "a value is not valid");
         }

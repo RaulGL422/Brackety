@@ -5,8 +5,8 @@ import 'offline_op.dart';
 /// "Rescate"). Read by the server's `OfflineOpsCsv`: same header, version and columns.
 String offlineOpsCsv(List<OfflineOp> ops) {
   final lines = [
-    'brackety-offline-ops;1',
-    'opId;matchId;type;side;reason;at;knownEvents;actor',
+    'brackety-offline-ops;2',
+    'opId;matchId;type;side;reason;at;knownEvents;actor;deltaMs',
     for (final op in ops)
       [
         op.opId,
@@ -17,6 +17,7 @@ String offlineOpsCsv(List<OfflineOp> ops) {
         op.at.toUtc().toIso8601String(),
         op.knownEvents,
         op.account ?? '',
+        op.delta?.inMilliseconds ?? '',
       ].map((cell) => _cell('$cell')).join(';'),
   ];
   // A BOM so a spreadsheet opens accents right; CRLF as spreadsheets expect.
