@@ -8,7 +8,13 @@
   "noServer": "No hay conexión con el servidor.",
   "unexpectedError": "Algo ha ido mal. Inténtalo de nuevo.",
   "tooManyRequests": "Demasiadas peticiones. Espera {seconds} s y vuelve a intentarlo.",
-  "@tooManyRequests": {"placeholders": {"seconds": {"type": "int"}}},
+  "@tooManyRequests": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
   "tooManyRequestsWait": "Demasiadas peticiones. Espera un momento y vuelve a intentarlo.",
   "cancel": "Cancelar",
   "continueAction": "Continuar",
@@ -26,14 +32,26 @@
   "loginSubmit": "Entrar",
   "loginInvalid": "Email o contraseña incorrectos.",
   "loginLocked": "Cuenta bloqueada 15 minutos por demasiados intentos fallidos. Si necesitas ayuda, indica el código {lockId}.",
-  "@loginLocked": {"placeholders": {"lockId": {"type": "String"}}},
+  "@loginLocked": {
+    "placeholders": {
+      "lockId": {
+        "type": "String"
+      }
+    }
+  },
   "loginForgot": "¿Has olvidado la contraseña?",
   "loginNoAccount": "¿No tienes cuenta? Regístrate",
   "loginPasswordChanged": "Contraseña cambiada. Ya puedes entrar con la nueva.",
   "loginDemoAccounts": "Cuentas de prueba (solo en desarrollo)",
   "restoreTitle": "Cuenta pendiente de borrado",
   "restoreBody": "Tu cuenta se borrará el {date}. ¿Quieres recuperarla?",
-  "@restoreBody": {"placeholders": {"date": {"type": "String"}}},
+  "@restoreBody": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "restoreConfirm": "Recuperar cuenta",
   "restoreExpired": "Ha pasado demasiado tiempo. Vuelve a entrar para recuperar la cuenta.",
   "registerTitle": "Crear cuenta",
@@ -53,7 +71,16 @@
   "profileStudent": "Alumno",
   "profileStudentHint": "Deportista que compite con su club.",
   "registerAccept": "Acepto los {terms} y la {privacy}.",
-  "@registerAccept": {"placeholders": {"terms": {"type": "String"}, "privacy": {"type": "String"}}},
+  "@registerAccept": {
+    "placeholders": {
+      "terms": {
+        "type": "String"
+      },
+      "privacy": {
+        "type": "String"
+      }
+    }
+  },
   "registerAcceptRequired": "Debes aceptarlos para crear la cuenta.",
   "registerOrganizationName": "Nombre de la organización",
   "registerOrganizationNameLength": "Entre 2 y 200 caracteres.",
@@ -244,9 +271,21 @@
   "timeline": "Línea de tiempo",
   "addPoint": "+1",
   "addPointFor": "+1 {corner}",
-  "@addPointFor": {"placeholders": {"corner": {"type": "String"}}},
+  "@addPointFor": {
+    "placeholders": {
+      "corner": {
+        "type": "String"
+      }
+    }
+  },
   "sanctionsFor": "Avisos: {corner}",
-  "@sanctionsFor": {"placeholders": {"corner": {"type": "String"}}},
+  "@sanctionsFor": {
+    "placeholders": {
+      "corner": {
+        "type": "String"
+      }
+    }
+  },
   "warningsCount": "Advertencias: {count}",
   "@warningsCount": {
     "placeholders": {
@@ -267,7 +306,7 @@
   "actionWarning": "Advertencia",
   "actionOneHand": "Advertencia por golpear con una mano",
   "actionDisqualify": "Descalificación",
-  "reasonTitle": "{action} · {fighter}",
+  "reasonTitle": "{action}: {fighter}",
   "@reasonTitle": {
     "placeholders": {
       "action": {
@@ -278,8 +317,8 @@
       }
     }
   },
-  "reasonLabel": "Motivo (obligatorio)",
-  "reasonConfirm": "¿Seguro? Queda registrado.",
+  "reasonLabel": "Motivo",
+  "reasonConfirm": "Escribe el motivo. Queda en el historial del combate.",
   "confirm": "Confirmar",
   "endPoints": "Fin por puntos",
   "endTime": "Fin del tiempo",
@@ -300,10 +339,10 @@
   "tlAutomatic": "automático",
   "tlUndone": "deshecho",
   "tlRivalPoint": "punto al rival",
-  "clubStandings": "Puntuaciones",
+  "clubStandings": "Puntos",
   "clubMats": "Tapices",
-  "clubParticipants": "Inscripciones",
-  "clubSettings": "Configuración",
+  "clubParticipants": "Inscritos",
+  "clubSettings": "Ajustes",
   "allCategories": "Todas las categorías",
   "noCategory": "Sin categoría",
   "sortByPoints": "Puntos",
@@ -415,9 +454,21 @@
   "matchLive": "En curso",
   "matchNotStarted": "Sin empezar",
   "teamName": "Equipo {number}",
-  "@teamName": {"placeholders": {"number": {"type": "int"}}},
+  "@teamName": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
   "teamGhostName": "Equipo {number} (fantasma)",
-  "@teamGhostName": {"placeholders": {"number": {"type": "int"}}},
+  "@teamGhostName": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
   "tabParticipants": "Alumnos",
   "tabTeams": "Equipos",
   "individualGroup": "Grupo individual",
@@ -427,27 +478,81 @@
   "matAutoOption": "El que antes quede libre",
   "matAutoHint": "Se asignará automáticamente al tapiz que antes quede libre.",
   "matManualHint": "Irá al {mat}, elegido a mano.",
-  "@matManualHint": {"placeholders": {"mat": {"type": "String"}}},
+  "@matManualHint": {
+    "placeholders": {
+      "mat": {
+        "type": "String"
+      }
+    }
+  },
   "individualGroupHint": "Para quien se quede sin equipo: grupos de 4 alumnos.",
   "categoryTeamCounts": "{participants} inscritos · {teams} equipos · {grouped} en grupos",
-  "@categoryTeamCounts": {"placeholders": {"participants": {"type": "int"}, "teams": {"type": "int"}, "grouped": {"type": "int"}}},
+  "@categoryTeamCounts": {
+    "placeholders": {
+      "participants": {
+        "type": "int"
+      },
+      "teams": {
+        "type": "int"
+      },
+      "grouped": {
+        "type": "int"
+      }
+    }
+  },
   "newTeamCount": "Equipo nuevo · {count}/{size}",
-  "@newTeamCount": {"placeholders": {"count": {"type": "int"}, "size": {"type": "int"}}},
+  "@newTeamCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "size": {
+        "type": "int"
+      }
+    }
+  },
   "createTeam": "Crear equipo",
   "teamCreated": "Creado el {team}",
-  "@teamCreated": {"placeholders": {"team": {"type": "String"}}},
+  "@teamCreated": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
   "teamConflict": "Algún alumno ya está en un equipo o grupo. La lista se ha actualizado.",
   "teamError": "No se ha podido crear el equipo.",
   "teamsEmpty": "Todavía no hay equipos: créalos en Alumnos.",
   "deleteTeam": "Deshacer equipo",
   "deleteTeamConfirm": "¿Deshacer el {team}? Sus alumnos quedan libres.",
-  "@deleteTeamConfirm": {"placeholders": {"team": {"type": "String"}}},
+  "@deleteTeamConfirm": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
   "deleteTeamError": "No se ha podido deshacer el equipo.",
   "draftGhostTeam": "Equipo fantasma",
   "draftGhostTeamHint": "Elige {size} alumnos cualesquiera de la categoría: combaten pero no puntúan.",
-  "@draftGhostTeamHint": {"placeholders": {"size": {"type": "int"}}},
+  "@draftGhostTeamHint": {
+    "placeholders": {
+      "size": {
+        "type": "int"
+      }
+    }
+  },
   "pickGhostTeam": "Elegir alumnos · {count}/{size}",
-  "@pickGhostTeam": {"placeholders": {"count": {"type": "int"}, "size": {"type": "int"}}},
+  "@pickGhostTeam": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "size": {
+        "type": "int"
+      }
+    }
+  },
   "settingsTitle": "Ajustes de la cuenta",
   "settingsAccount": "Cuenta",
   "settingsEmailVerified": "Verificado",
@@ -456,7 +561,13 @@
   "changeEmailNew": "Email nuevo",
   "changeEmailSubmit": "Enviar enlace",
   "changeEmailSent": "Hemos enviado un email a {email}. Abre su enlace para terminar el cambio (caduca en 24 horas).",
-  "@changeEmailSent": {"placeholders": {"email": {"type": "String"}}},
+  "@changeEmailSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
   "settingsLanguage": "Idioma",
   "settingsLanguageHint": "También es el de los emails que te enviamos.",
   "languageSpanish": "Español",
@@ -466,12 +577,24 @@
   "profileValidated": "Validado",
   "profilePendingValidation": "Pendiente de validación",
   "profileTaxId": "CIF: {taxId}",
-  "@profileTaxId": {"placeholders": {"taxId": {"type": "String"}}},
+  "@profileTaxId": {
+    "placeholders": {
+      "taxId": {
+        "type": "String"
+      }
+    }
+  },
   "profileAdd": "Añadir perfil",
   "profileAdded": "Perfil añadido.",
   "profileRemove": "Quitar perfil",
   "profileRemoveConfirm": "¿Quitar el perfil {profile}?",
-  "@profileRemoveConfirm": {"placeholders": {"profile": {"type": "String"}}},
+  "@profileRemoveConfirm": {
+    "placeholders": {
+      "profile": {
+        "type": "String"
+      }
+    }
+  },
   "profileRemoved": "Perfil quitado.",
   "removeAction": "Quitar",
   "profileLast": "Tu cuenta necesita al menos un perfil.",
@@ -497,7 +620,13 @@
   "deleteAccountBody": "Se cerrarán todas tus sesiones. La cuenta, con sus perfiles y datos, se borrará definitivamente a los 30 días. Hasta entonces puedes recuperarla iniciando sesión.",
   "deleteOwnsEvents": "Eres responsable de eventos. Cédelos a otra persona o bórralos antes de borrar tu cuenta.",
   "loginAccountDeleted": "Tu cuenta se borrará el {date}. Inicia sesión antes para recuperarla.",
-  "@loginAccountDeleted": {"placeholders": {"date": {"type": "String"}}},
+  "@loginAccountDeleted": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "loginPasswordRemoved": "Contraseña quitada y sesiones cerradas. Ya solo puedes entrar con Google.",
   "reauthTitle": "Confirma que eres tú",
   "reauthBody": "Escribe tu contraseña para continuar.",
@@ -508,7 +637,13 @@
   "confirmEmailChangeDone": "Email cambiado. Se han cerrado todas las sesiones: inicia sesión con el email nuevo.",
   "categoryIndividual": "Individual",
   "categoryTeams": "Equipos de {size}",
-  "@categoryTeams": {"placeholders": {"size": {"type": "int"}}},
+  "@categoryTeams": {
+    "placeholders": {
+      "size": {
+        "type": "int"
+      }
+    }
+  },
   "categoryAdd": "Añadir categoría",
   "categoryEdit": "Editar categoría",
   "categoryRemove": "Quitar categoría",
@@ -518,12 +653,27 @@
   "categoryByTeams": "Por equipos",
   "categoryTeamSize": "Alumnos por equipo",
   "categoryGroupSize": "Grupos de {size}",
-  "@categoryGroupSize": {"placeholders": {"size": {"type": "int"}}},
+  "@categoryGroupSize": {
+    "placeholders": {
+      "size": {
+        "type": "int"
+      }
+    }
+  },
   "categoryAgesInvalid": "La edad mínima no puede ser mayor que la máxima.",
   "categoriesInUse": "Una categoría con grupos o equipos solo puede cambiar de nombre.",
   "categoriesInvalid": "Revisa las categorías: las edades no pueden solaparse.",
   "standingTeam": "{team} · {detail}",
-  "@standingTeam": {"placeholders": {"team": {"type": "String"}, "detail": {"type": "String"}}},
+  "@standingTeam": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      },
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
   "categoryAgeSuffix": "años",
   "categoryLabel": "Categoría",
   "categoryByAge": "Automática por edad",
@@ -540,13 +690,43 @@
   "importReadError": "No se ha podido leer la lista. Prueba con una foto más nítida o con un archivo.",
   "importTooMany": "Has leído muchas listas en la última hora. Prueba más tarde.",
   "importInvalidFiles": "Solo fotos (JPG, PNG, WebP), CSV, TXT o Excel: hasta {max} archivos de 10 MB.",
-  "@importInvalidFiles": {"placeholders": {"max": {"type": "int"}}},
+  "@importInvalidFiles": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
   "importSummary": "{total} alumnos · {errors} con errores · {warnings} para revisar",
-  "@importSummary": {"placeholders": {"total": {"type": "int"}, "errors": {"type": "int"}, "warnings": {"type": "int"}}},
+  "@importSummary": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      },
+      "errors": {
+        "type": "int"
+      },
+      "warnings": {
+        "type": "int"
+      }
+    }
+  },
   "importRegister": "{count, plural, =1{Inscribir 1 alumno} other{Inscribir {count} alumnos}}",
-  "@importRegister": {"placeholders": {"count": {"type": "int"}}},
+  "@importRegister": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "importRegistered": "{count, plural, =1{1 alumno inscrito} other{{count} alumnos inscritos}}",
-  "@importRegistered": {"placeholders": {"count": {"type": "int"}}},
+  "@importRegistered": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "importRegisterRefused": "No se ha inscrito nadie: revisa las filas marcadas.",
   "importAddRow": "Añadir alumno",
   "importEditRow": "Editar alumno",
@@ -554,33 +734,96 @@
   "importStartOver": "Volver a subir",
   "importEmpty": "La lista no tiene alumnos.",
   "importUseCategory": "Usar {name}",
-  "@importUseCategory": {"placeholders": {"name": {"type": "String"}}},
+  "@importUseCategory": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "fieldFirstName": "el nombre",
   "fieldLastName": "los apellidos",
   "fieldBirthDate": "la fecha de nacimiento",
   "fieldHeight": "la estatura",
   "fieldCategory": "la categoría",
   "issueMissing": "Falta {field}",
-  "@issueMissing": {"placeholders": {"field": {"type": "String"}}},
+  "@issueMissing": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
   "issueTooLong": "Demasiado largo: {field}",
-  "@issueTooLong": {"placeholders": {"field": {"type": "String"}}},
+  "@issueTooLong": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
   "issueInvalidDate": "Fecha no válida: {text}",
-  "@issueInvalidDate": {"placeholders": {"text": {"type": "String"}}},
+  "@issueInvalidDate": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
   "issueFutureDate": "La fecha de nacimiento tiene que ser anterior a hoy",
   "issueHeight": "Estatura {cm}: tiene que estar entre 50 y 250 cm",
-  "@issueHeight": {"placeholders": {"cm": {"type": "String"}}},
+  "@issueHeight": {
+    "placeholders": {
+      "cm": {
+        "type": "String"
+      }
+    }
+  },
   "issueNoCategory": "Ninguna categoría del evento es para {age} años",
-  "@issueNoCategory": {"placeholders": {"age": {"type": "String"}}},
+  "@issueNoCategory": {
+    "placeholders": {
+      "age": {
+        "type": "String"
+      }
+    }
+  },
   "issueUnknownCategory": "La categoría «{name}» no existe en el evento",
-  "@issueUnknownCategory": {"placeholders": {"name": {"type": "String"}}},
+  "@issueUnknownCategory": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "issueChosenCategoryGone": "La categoría elegida ya no existe",
   "issueCategoryMismatch": "Indica {written}, pero por su edad le corresponde {byAge}",
-  "@issueCategoryMismatch": {"placeholders": {"written": {"type": "String"}, "byAge": {"type": "String"}}},
+  "@issueCategoryMismatch": {
+    "placeholders": {
+      "written": {
+        "type": "String"
+      },
+      "byAge": {
+        "type": "String"
+      }
+    }
+  },
   "issueDuplicate": "Repetido en la lista (fila {row})",
-  "@issueDuplicate": {"placeholders": {"row": {"type": "String"}}},
+  "@issueDuplicate": {
+    "placeholders": {
+      "row": {
+        "type": "String"
+      }
+    }
+  },
   "issueAlreadyRegistered": "Ya está inscrito en el evento",
   "issueUnsure": "Revisa {field}: no se leyó con seguridad",
-  "@issueUnsure": {"placeholders": {"field": {"type": "String"}}},
+  "@issueUnsure": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
   "legalSection": "Legal",
   "legalPrivacy": "Política de privacidad",
   "legalTerms": "Términos de uso",
@@ -595,11 +838,29 @@
   "legalNotFound": "Esta página legal no existe.",
   "registerLegalOutdated": "Los términos de uso o la política de privacidad han cambiado. Revísalos y vuelve a aceptarlos.",
   "participantPrivacyNotice": "Los datos del alumno se tratan según la {privacy}.",
-  "@participantPrivacyNotice": {"placeholders": {"privacy": {"type": "String"}}},
+  "@participantPrivacyNotice": {
+    "placeholders": {
+      "privacy": {
+        "type": "String"
+      }
+    }
+  },
   "importPrivacyNotice": "Los datos de los alumnos se tratan según la {privacy}.",
-  "@importPrivacyNotice": {"placeholders": {"privacy": {"type": "String"}}},
+  "@importPrivacyNotice": {
+    "placeholders": {
+      "privacy": {
+        "type": "String"
+      }
+    }
+  },
   "serverCurrent": "Servidor: {name}",
-  "@serverCurrent": {"placeholders": {"name": {"type": "String"}}},
+  "@serverCurrent": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "serverChange": "Cambiar",
   "serverDialogTitle": "Elegir servidor",
   "serverHall": "Pabellón",
@@ -613,9 +874,21 @@
   "syncConnected": "Conectado",
   "syncOffline": "Sin conexión",
   "syncPending": "{count, plural, =1{1 acción pendiente} other{{count} acciones pendientes}}",
-  "@syncPending": {"placeholders": {"count": {"type": "int"}}},
+  "@syncPending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "syncRejected": "{count, plural, =1{1 acción rechazada} other{{count} acciones rechazadas}}",
-  "@syncRejected": {"placeholders": {"count": {"type": "int"}}},
+  "@syncRejected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "syncRejectedShow": "Ver",
   "syncRejectedTitle": "Acciones rechazadas",
   "syncRejectedBody": "El servidor no aceptó estas acciones y no cuentan en el combate. Avisa al club si hace falta.",
@@ -645,44 +918,137 @@
   "reviewApplyConfirm": "Se añaden las acciones del móvil en orden y con su hora. Las que las reglas no permitan se saltan.",
   "reviewDiscardConfirm": "Las acciones del móvil no cuentan en el combate. Quedan guardadas en el registro.",
   "reviewApplied": "Aplicadas: {applied} · Saltadas: {skipped}",
-  "@reviewApplied": {"placeholders": {"applied": {"type": "int"}, "skipped": {"type": "int"}}},
+  "@reviewApplied": {
+    "placeholders": {
+      "applied": {
+        "type": "int"
+      },
+      "skipped": {
+        "type": "int"
+      }
+    }
+  },
   "reviewDiscarded": "Acciones descartadas.",
   "matsInReview": "{count, plural, =1{1 combate en revisión} other{{count} combates en revisión}}",
-  "@matsInReview": {"placeholders": {"count": {"type": "int"}}},
+  "@matsInReview": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "logoutPending": "{count, plural, =1{Tienes 1 acción sin enviar; si sales se perderá.} other{Tienes {count} acciones sin enviar; si sales se perderán.}}",
-  "@logoutPending": {"placeholders": {"count": {"type": "int"}}},
+  "@logoutPending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "refusalNotStarted": "Inicia el tiempo antes de puntuar.",
   "undoWhat": "Deshacer: {what}",
-  "@undoWhat": {"placeholders": {"what": {"type": "String"}}},
+  "@undoWhat": {
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
   "undoneWhat": "Deshecho: {what}",
-  "@undoneWhat": {"placeholders": {"what": {"type": "String"}}},
+  "@undoneWhat": {
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
   "whatPoint": "+1 {corner}",
-  "@whatPoint": {"placeholders": {"corner": {"type": "String"}}},
+  "@whatPoint": {
+    "placeholders": {
+      "corner": {
+        "type": "String"
+      }
+    }
+  },
   "whatWarning": "advertencia {corner}",
-  "@whatWarning": {"placeholders": {"corner": {"type": "String"}}},
+  "@whatWarning": {
+    "placeholders": {
+      "corner": {
+        "type": "String"
+      }
+    }
+  },
   "whatOneHand": "una mano {corner}",
-  "@whatOneHand": {"placeholders": {"corner": {"type": "String"}}},
+  "@whatOneHand": {
+    "placeholders": {
+      "corner": {
+        "type": "String"
+      }
+    }
+  },
   "whatDisqualification": "descalificación {corner}",
-  "@whatDisqualification": {"placeholders": {"corner": {"type": "String"}}},
+  "@whatDisqualification": {
+    "placeholders": {
+      "corner": {
+        "type": "String"
+      }
+    }
+  },
   "winner": "Ganador",
   "draw": "Empate",
   "matLocked": "No se puede abrir todavía",
   "needsGuardian": "Falta tutor",
   "settingsRemoveMatConfirm": "Se quita el Tapiz {number}; su árbitro deja de estar asignado.",
-  "@settingsRemoveMatConfirm": {"placeholders": {"number": {"type": "int"}}},
+  "@settingsRemoveMatConfirm": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
   "draftTitle": "Grupo nuevo",
   "draftReady": "Completo",
   "draftMissing": "{count, plural, =1{Falta 1} other{Faltan {count}}}",
-  "@draftMissing": {"placeholders": {"count": {"type": "int"}}},
+  "@draftMissing": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "draftSlot": "Hueco {number}",
-  "@draftSlot": {"placeholders": {"number": {"type": "int"}}},
+  "@draftSlot": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
   "ghostOf": "{name} (fantasma)",
-  "@ghostOf": {"placeholders": {"name": {"type": "String"}}},
+  "@ghostOf": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "settingsAppearance": "Apariencia",
   "settingsAppearanceHint": "Automático sigue al modo claro u oscuro del dispositivo. Se guarda solo en este dispositivo.",
   "themeSystem": "Automático",
   "themeLight": "Claro",
   "themeDark": "Oscuro",
   "refusalStale": "El combate ha cambiado en otro dispositivo. Revisa el marcador y vuelve a pulsar.",
-  "accountSuspended": "Esta cuenta está suspendida. Si crees que es un error, escribe al contacto de privacidad que aparece en las páginas legales."
+  "accountSuspended": "Esta cuenta está suspendida. Si crees que es un error, escribe al contacto de privacidad que aparece en las páginas legales.",
+  "backTo": "Volver a {place}",
+  "@backTo": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "reasonApplyWarning": "Poner advertencia",
+  "reasonApplyDisqualify": "Descalificar",
+  "accountMenu": "Mi cuenta",
+  "back": "Volver"
 }

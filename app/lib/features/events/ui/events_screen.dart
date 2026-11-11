@@ -19,22 +19,9 @@ class EventsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.eventsTitle),
-        actions: [
-          IconButton(
-            tooltip: l10n.navConnection,
-            icon: const Icon(Icons.dns_outlined),
-            onPressed: () => context.push('/connection'),
-          ),
-          IconButton(
-            tooltip: l10n.settingsTitle,
-            icon: const Icon(Icons.account_circle_outlined),
-            onPressed: () => context.push('/settings'),
-          ),
-          IconButton(
-            tooltip: l10n.logout,
-            icon: const Icon(Icons.logout),
-            onPressed: () => confirmSignOut(context, ref),
-          ),
+        actions: const [
+          _AccountMenu(),
+          SizedBox(width: AppSpacing.s),
         ],
       ),
       body: AsyncView(
@@ -100,6 +87,74 @@ class _EventCard extends StatelessWidget {
                   ),
               ],
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+enum _AccountItem { settings, connection, signOut }
+
+/// One labelled button instead of three bare icons: people did not know what each one did.
+class _AccountMenu extends ConsumerWidget {
+  const _AccountMenu();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final error = Theme.of(context).colorScheme.error;
+    return PopupMenuButton<_AccountItem>(
+      tooltip: l10n.accountMenu,
+      onSelected: (item) => switch (item) {
+        _AccountItem.settings => context.push('/settings'),
+        _AccountItem.connection => context.push('/connection'),
+        _AccountItem.signOut => confirmSignOut(context, ref),
+      },
+      itemBuilder: (_) => [
+        PopupMenuItem(
+          value: _AccountItem.settings,
+          child: ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.settings_outlined),
+            title: Text(l10n.settingsTitle),
+          ),
+        ),
+        PopupMenuItem(
+          value: _AccountItem.connection,
+          child: ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.dns_outlined),
+            title: Text(l10n.navConnection),
+          ),
+        ),
+        const PopupMenuDivider(),
+        PopupMenuItem(
+          value: _AccountItem.signOut,
+          child: ListTile(
+            contentPadding: EdgeInsets.zero,
+            iconColor: error,
+            textColor: error,
+            leading: const Icon(Icons.logout),
+            title: Text(l10n.logout),
+          ),
+        ),
+      ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.m,
+          vertical: AppSpacing.s,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.account_circle_outlined),
+            const SizedBox(width: AppSpacing.xs),
+            Text(
+              l10n.accountMenu,
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
+            const Icon(Icons.arrow_drop_down),
           ],
         ),
       ),

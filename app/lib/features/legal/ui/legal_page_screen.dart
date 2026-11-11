@@ -10,6 +10,7 @@ import '../data/legal_repository.dart';
 import '../state/legal_providers.dart';
 import 'external_link.dart';
 import 'legal_links.dart';
+import '../../../core/up_button.dart';
 
 /// `/legal/<slug>`, open with or without a session, in the app's language.
 class LegalPageScreen extends StatelessWidget {
@@ -23,6 +24,8 @@ class LegalPageScreen extends StatelessWidget {
     final type = LegalDocumentType.fromSlug(slug);
     return Scaffold(
       appBar: AppBar(
+        leading: UpButton(label: l10n.back, fallback: '/', isPlace: false),
+        leadingWidth: UpButton.leadingWidth(context),
         title: Text(type == null ? l10n.legalSection : legalTitle(l10n, type)),
       ),
       body: type == null
