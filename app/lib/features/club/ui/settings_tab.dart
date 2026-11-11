@@ -182,7 +182,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
     }
     _saving = true;
     final l10n = AppLocalizations.of(context);
-    final messenger = ScaffoldMessenger.of(context);
+    final toasts = Toasts.of(context);
     try {
       do {
         _changedWhileSaving = false;
@@ -200,16 +200,13 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
         ..invalidate(myEventsProvider)
         ..invalidate(matsOverviewProvider(widget.eventId))
         ..invalidate(participantsProvider(widget.eventId));
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(l10n.saved),
-          duration: const Duration(seconds: 1),
-        ),
+      toasts.show(
+        l10n.saved,
+        kind: ToastKind.success,
+        duration: const Duration(seconds: 1),
       );
     } on DioException catch (e) {
-      messenger.showSnackBar(
-        SnackBar(content: Text(saveErrorMessage(l10n, e))),
-      );
+      toasts.show(saveErrorMessage(l10n, e), kind: ToastKind.error);
       if (mounted) _showSaved();
     } finally {
       _saving = false;

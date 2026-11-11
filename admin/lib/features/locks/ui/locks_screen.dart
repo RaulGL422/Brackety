@@ -59,7 +59,7 @@ class _LockList extends ConsumerWidget {
       confirmLabel: l10n.lockRevoke,
     );
     if (!confirmed || !context.mounted) return;
-    final messenger = ScaffoldMessenger.of(context);
+    final toasts = Toasts.of(context);
     String? message;
     try {
       final result = await ref.read(locksProvider.notifier).revoke(lock.lockId);
@@ -70,7 +70,7 @@ class _LockList extends ConsumerWidget {
       message = actionErrorMessage(l10n, AdminApiError.from(e));
     }
     if (message != null) {
-      messenger.showSnackBar(SnackBar(content: Text(message)));
+      toasts.show(message);
     }
   }
 

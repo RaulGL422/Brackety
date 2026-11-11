@@ -25,7 +25,8 @@ class BracketyApp extends ConsumerWidget {
       themeMode: ref.watch(themeModeProvider),
       routerConfig: ref.watch(routerProvider),
       locale: ref.watch(appLocaleProvider),
-      builder: (_, child) => VerificationBanner(child: child!),
+      builder: (_, child) =>
+          ToastHost(child: VerificationBanner(child: child!)),
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: const [
         AppLocalizations.delegate,

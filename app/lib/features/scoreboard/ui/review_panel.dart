@@ -103,22 +103,18 @@ class ReviewButtons extends ConsumerWidget {
       destructive: !apply,
     );
     if (!confirmed || !context.mounted) return;
-    final messenger = ScaffoldMessenger.of(context);
+    final toasts = Toasts.of(context);
     final outcome = await ref
         .read(matchReviewProvider(matchId).notifier)
         .resolve(decision);
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(switch (outcome) {
-          null => l10n.unexpectedError,
-          _ when !apply => l10n.reviewDiscarded,
-          ReviewOutcome(:final applied, :final skipped) => l10n.reviewApplied(
-            applied,
-            skipped,
-          ),
-        }),
+    toasts.show(switch (outcome) {
+      null => l10n.unexpectedError,
+      _ when !apply => l10n.reviewDiscarded,
+      ReviewOutcome(:final applied, :final skipped) => l10n.reviewApplied(
+        applied,
+        skipped,
       ),
-    );
+    }, kind: ToastKind.error);
   }
 }
 

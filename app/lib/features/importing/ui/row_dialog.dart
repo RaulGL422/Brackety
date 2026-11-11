@@ -56,6 +56,8 @@ class _RowDialogState extends State<_RowDialog> {
     String? required(String? v) =>
         v == null || v.trim().isEmpty ? l10n.fieldRequired : null;
     return AlertDialog(
+      actionsOverflowDirection: VerticalDirection.up,
+      actionsOverflowButtonSpacing: 8,
       title: Text(widget.row == null ? l10n.importAddRow : l10n.importEditRow),
       content: SizedBox(
         width: 400,
