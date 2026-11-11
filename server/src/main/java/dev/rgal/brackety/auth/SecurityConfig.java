@@ -72,12 +72,17 @@ public class SecurityConfig {
     @Bean
     @Order(1)
     SecurityFilterChain adminFilterChain(
-            HttpSecurity http, SecretKey jwtKey, Clock clock, CloudflareAccess cloudflareAccess) throws Exception {
+            HttpSecurity http,
+            SecretKey jwtKey,
+            Clock clock,
+            CloudflareAccess cloudflareAccess,
+            @Value("${brackety.admin.local-only:false}") boolean localOnly)
+            throws Exception {
         return http.securityMatcher(ADMIN_PATHS)
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(new CloudflareAccessFilter(cloudflareAccess), BearerTokenAuthenticationFilter.class)
+                .addFilterBefore(new CloudflareAccessFilter(cloudflareAccess, localOnly), BearerTokenAuthenticationFilter.class)
                 .authorizeHttpRequests(a -> a.requestMatchers(ADMIN_LOGIN_PATH)
                         .permitAll()
                         .anyRequest()
