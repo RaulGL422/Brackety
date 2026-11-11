@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.jayway.jsonpath.JsonPath;
 import dev.rgal.brackety.event.EventApiTest;
 import dev.rgal.brackety.participant.Participant;
 import dev.rgal.brackety.participant.ParticipantRepository;
@@ -155,7 +156,7 @@ class GroupControllerTest extends EventApiTest {
                 .andExpect(jsonPath("$", hasSize(5)))
                 .andExpect(jsonPath("$[0].referee").value("arbitro1"))
                 .andExpect(jsonPath("$[0].pendingMatches").value(6))
-                .andExpect(jsonPath("$[0].remainingSeconds").value(120 + 5 * 150))
+                .andExpect(jsonPath("$[0].remainingSeconds").value(180 + 5 * 210))
                 .andExpect(jsonPath("$[1].remainingSeconds").value(0));
     }
 
@@ -173,6 +174,41 @@ class GroupControllerTest extends EventApiTest {
                 .andExpect(status().isConflict());
         call(delete(event() + "/participants/" + sevens.get(0)), "club1").andExpect(status().isConflict());
         call(delete(event() + "/participants/" + sevens.get(9)), "club1").andExpect(status().isNoContent());
+    }
+
+    @Test
+    void theHelperUndoesAGroupUntilOneOfItsMatchesStarts() throws Exception {
+        var created = createGroups(group(0, 1, 2, 3))
+                .andExpect(jsonPath("$.groupIds", hasSize(1)))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        String groupId = JsonPath.read(created, "$.groupIds[0]");
+        call(get(event() + "/categories/" + categoryId("7-8") + "/participants"), "ayudante2")
+                .andExpect(jsonPath("$[?(@.firstName == 'Alumno0')].groupId").value(groupId))
+                .andExpect(
+                        jsonPath("$[?(@.firstName == 'Alumno0')].groupStarted").value(false));
+
+        call(delete(event() + "/groups/" + groupId), "arbitro1").andExpect(status().isForbidden());
+        call(delete(event() + "/groups/" + UUID.randomUUID()), "ayudante2").andExpect(status().isNotFound());
+        call(delete(event() + "/groups/" + groupId), "ayudante2").andExpect(status().isNoContent());
+        assertThat(count("fight_group")).isZero();
+        assertThat(count("fight_match")).isZero();
+        call(get(event() + "/categories"), "ayudante1")
+                .andExpect(jsonPath("$[0].grouped").value(0));
+
+        var again = createGroups(group(0, 1, 2, 3)).andReturn().getResponse().getContentAsString();
+        String secondId = JsonPath.read(again, "$.groupIds[0]");
+        call(post("/api/v1/matches/" + matchId(0, 1) + "/events").content("""
+                                {"type":"START","knownEvents":0}"""), "arbitro1")
+                .andExpect(status().isOk());
+        call(get(event() + "/categories/" + categoryId("7-8") + "/participants"), "ayudante1")
+                .andExpect(
+                        jsonPath("$[?(@.firstName == 'Alumno3')].groupStarted").value(true));
+        call(delete(event() + "/groups/" + secondId), "club1")
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("GROUP_STARTED"));
+        assertThat(count("fight_group")).isOne();
     }
 
     private UUID participant(String firstName, int age) {

@@ -56,6 +56,12 @@ class GroupController {
         return groups.create(eventId, CurrentAccount.id(jwt), request);
     }
 
+    @DeleteMapping("/groups/{groupId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void undoGroup(@PathVariable UUID eventId, @PathVariable UUID groupId, @AuthenticationPrincipal Jwt jwt) {
+        groups.undo(eventId, groupId, CurrentAccount.id(jwt));
+    }
+
     @GetMapping("/categories/{categoryId}/teams")
     List<TeamResponse> teams(
             @PathVariable UUID eventId, @PathVariable UUID categoryId, @AuthenticationPrincipal Jwt jwt) {

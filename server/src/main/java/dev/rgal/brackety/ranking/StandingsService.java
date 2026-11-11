@@ -254,7 +254,7 @@ class StandingsService {
                             e.getType().name(),
                             e.getSide() == null ? null : e.getSide().name(),
                             side,
-                            e.getReason(),
+                            e.getDeltaMs() == null ? e.getReason() : adjustText(e.getDeltaMs()),
                             e.isAutomatic() ? "automático" : actors.get(e.getActorAccountId()),
                             undone.contains(e.getId()) ? "sí" : "");
                 })
@@ -336,6 +336,11 @@ class StandingsService {
 
     private String time(Instant instant) {
         return instant == null ? null : TIME.format(instant.atZone(clock.getZone()));
+    }
+
+    // Words, not a sign: a cell starting with + or - would be neutralised for spreadsheets.
+    private static String adjustText(long deltaMs) {
+        return (deltaMs > 0 ? "añade " : "quita ") + Math.abs(deltaMs) / 1000 + " s";
     }
 
     private static String clockText(long clockMs) {

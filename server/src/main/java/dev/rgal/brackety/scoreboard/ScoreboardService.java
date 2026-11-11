@@ -50,6 +50,7 @@ class ScoreboardService {
 
     private static final Set<MatchEventType> NEED_SIDE = EnumSet.of(
             MatchEventType.POINT,
+            MatchEventType.POINT_REMOVED,
             MatchEventType.WARNING,
             MatchEventType.ONE_HAND_WARNING,
             MatchEventType.DISQUALIFICATION);
@@ -157,12 +158,21 @@ class ScoreboardService {
         if (NEED_REASON.contains(type) && reason.isEmpty()) {
             throw EventException.invalid("A warning or disqualification needs a reason.");
         }
+        var adjust = type == MatchEventType.CLOCK_ADJUST;
+        if (adjust && (request.deltaMs() == null || request.deltaMs() == 0)) {
+            throw EventException.invalid("A clock adjustment needs deltaMs.");
+        }
         // Two tabs pressing at once would otherwise both count: every action says what it saw.
         if (request.knownEvents() == null) {
             throw EventException.invalid("Every action needs knownEvents.");
         }
         return new MatchWriter.Action(
-                type, side, NEED_REASON.contains(type) ? reason : null, request.opId(), accountId);
+                type,
+                side,
+                NEED_REASON.contains(type) ? reason : null,
+                adjust ? request.deltaMs() : null,
+                request.opId(),
+                accountId);
     }
 
     // Online the referee sees the clash at once: refused, not sent to the club's review.
@@ -277,7 +287,8 @@ class ScoreboardService {
                         e.isAutomatic(),
                         undone.contains(e.getId()),
                         state.gaveAutoPoint(e.getId()),
-                        e.getOpId()))
+                        e.getOpId(),
+                        e.getDeltaMs()))
                 .toList();
     }
 
@@ -293,7 +304,8 @@ class ScoreboardService {
                                 actors.get(op.getActorAccountId()),
                                 op.getAt(),
                                 op.getCreatedAt(),
-                                op.getCause().name()))
+                                op.getCause().name(),
+                                op.getDeltaMs()))
                         .toList());
     }
 

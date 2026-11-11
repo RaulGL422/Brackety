@@ -36,6 +36,8 @@ public class MatchEvent {
     private long clockMs;
     /** The device's id for an action sent from the Android queue; null from the web. */
     private UUID opId;
+    /** For a CLOCK_ADJUST, the time added to the clock (negative: taken away); else null. */
+    private Long deltaMs;
 
     protected MatchEvent() {}
 
@@ -50,7 +52,8 @@ public class MatchEvent {
             boolean automatic,
             Instant at,
             Duration clock,
-            UUID opId) {
+            UUID opId,
+            Long deltaMs) {
         this.matchId = matchId;
         this.position = position;
         this.type = type;
@@ -62,6 +65,7 @@ public class MatchEvent {
         this.at = at;
         this.clockMs = clock.toMillis();
         this.opId = opId;
+        this.deltaMs = deltaMs;
     }
 
     public UUID getId() {
@@ -108,7 +112,11 @@ public class MatchEvent {
         return clockMs;
     }
 
+    public Long getDeltaMs() {
+        return deltaMs;
+    }
+
     TamboMatch.Entry toEntry() {
-        return new TamboMatch.Entry(id, type, side, at, targetEventId);
+        return new TamboMatch.Entry(id, type, side, at, targetEventId, deltaMs == null ? 0 : deltaMs);
     }
 }
