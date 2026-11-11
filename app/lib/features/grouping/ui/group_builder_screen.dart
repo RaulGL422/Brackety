@@ -103,6 +103,16 @@ class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
             itemBuilder: (context, i) => _ParticipantTile(
               participant: sorted[i],
               group: _group,
+              onUndoGroup: sorted[i].canUndoGroup
+                  ? () => undoGroup(
+                      context,
+                      ref,
+                      eventId: widget.eventId,
+                      groupId: sorted[i].groupId!,
+                      number: sorted[i].groupNumber!,
+                      refresh: _refresh,
+                    )
+                  : null,
               onTap: () => setState(
                 () => _group = _group.toggle(
                   sorted[i].id,
@@ -195,11 +205,13 @@ class _ParticipantTile extends StatelessWidget {
     required this.participant,
     required this.group,
     required this.onTap,
+    this.onUndoGroup,
   });
 
   final CategoryParticipant participant;
   final DraftGroup group;
   final VoidCallback onTap;
+  final VoidCallback? onUndoGroup;
 
   @override
   Widget build(BuildContext context) {
@@ -225,7 +237,13 @@ class _ParticipantTile extends StatelessWidget {
       ),
       trailing: state == PickState.ghost
           ? Chip(label: Text(l10n.ghostBadge))
-          : null,
+          : onUndoGroup == null
+          ? null
+          : IconButton(
+              tooltip: l10n.undoGroupNumber(p.groupNumber!),
+              icon: const Icon(Icons.undo),
+              onPressed: onUndoGroup,
+            ),
     );
   }
 }
