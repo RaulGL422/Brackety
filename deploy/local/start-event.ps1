@@ -5,7 +5,7 @@
     PostgreSQL y la API con la web, todo dentro de esta carpeta. Los datos viven en brackety-data\ y se
     conservan entre arranques. Al parar (Ctrl+C) guarda una copia de la BD en brackety-data\backups\.
     Móviles: http://192.168.137.1:8080 (punto de acceso de Windows). Este portátil: http://localhost:8080.
-    El primer arranque necesita el evento: -Package (el fichero .brackety que exporta el club) o -Demo.
+    El primer arranque necesita el evento: -Package (el .zip o el .brackety que exporta el club) o -Demo.
 .EXAMPLE
     .\start-event.ps1 -Package .\fase-1.brackety
     .\start-event.ps1
@@ -15,7 +15,7 @@
     .\start-event.ps1 -NoHotspot -NoFirewall
 #>
 param(
-    # Event package (.brackety) to load on the first start of an empty data folder.
+    # Event package (the club's full export .zip, or the .brackety) to load on the first start of an empty data folder.
     [string]$Package = "",
     # First start with the prototype's demo accounts and event instead of a package.
     [switch]$Demo,
@@ -48,6 +48,9 @@ $pgBin = Join-Path $here "pgsql\bin"
 $java = Join-Path $here "jre\bin\java.exe"
 $jar = Join-Path $here "api\brackety.jar"
 $webDir = Join-Path $here "web"
+# The superadmin web, served at /admin/ (only to this laptop).
+$adminWebDir = Join-Path $here "admin"
+$superadminFile = Join-Path $data "superadmin.txt"
 $secretsFile = Join-Path $data "secrets.env"
 $eventFile = Join-Path $data "event.env"
 # What the first start loaded: the package or the demo event. Without either, that start went wrong.
@@ -328,7 +331,7 @@ function Get-StartMode {
         return "new-package"
     }
     if ($Demo) { return "new-demo" }
-    throw ("Primer arranque: indica el evento con -Package <fichero .brackety> (el que exporta el club) " +
+    throw ("Primer arranque: indica el evento con -Package <fichero .zip o .brackety> (el que exporta el club) " +
         "o -Demo (evento de prueba con las cuentas demo).")
 }
 
@@ -379,11 +382,36 @@ function Set-ApiEnvironment([hashtable]$secrets, [string]$mode, [string]$package
         Remove-Item Env:BRACKETY_PACKAGE, Env:BRACKETY_PACKAGE_CREDENTIALS -ErrorAction SilentlyContinue
     }
     $env:LOGGING_FILE_NAME = Join-Path $data "api.log"
-    foreach ($offline in @("RESEND_API_KEY", "GOOGLE_CLIENT_ID", "SUPERADMIN_EMAIL", "SUPERADMIN_PASSWORD_HASH",
-            "CF_ACCESS_TEAM_DOMAIN", "CF_ACCESS_AUD", "ANTHROPIC_API_KEY")) {
+    foreach ($offline in @("RESEND_API_KEY", "GOOGLE_CLIENT_ID", "CF_ACCESS_TEAM_DOMAIN", "CF_ACCESS_AUD",
+            "ANTHROPIC_API_KEY")) {
         Remove-Item "env:$offline" -ErrorAction SilentlyContinue
     }
+    # No Cloudflare Access here: the superadmin API and web answer only this laptop (loopback).
+    $env:ADMIN_LOCAL_ONLY = "true"
+    $env:SUPERADMIN_EMAIL = $secrets["SUPERADMIN_EMAIL"]
+    $env:SUPERADMIN_PASSWORD_HASH = $secrets["SUPERADMIN_PASSWORD_HASH"]
+    if (Test-Path "$adminWebDir\index.html") {
+        $env:ADMIN_WEB_DIR = $adminWebDir
+    } else {
+        Remove-Item Env:ADMIN_WEB_DIR -ErrorAction SilentlyContinue
+    }
     if (-not $privacy) { Write-Warn "Sin PRIVACY_CONTACT_EMAIL (brackety-data\event.env) no se pueden publicar eventos." }
+}
+
+# First start: a random superadmin password for this laptop, hashed by the API's own encoder. Only the hash
+# stays in secrets.env; the password goes to superadmin.txt, like the staff passwords.
+function Initialize-Superadmin {
+    if ((Read-EnvFile $secretsFile)["SUPERADMIN_PASSWORD_HASH"]) { return }
+    $email = "superadmin@pabellon.local"
+    $password = (New-Secret).Substring(0, 20)
+    $hash = ($password | & $java -jar $jar --superadmin-hash | Select-Object -Last 1)
+    if ($LASTEXITCODE -ne 0 -or -not $hash) { throw "No se ha podido generar la contraseña del superadmin." }
+    Add-Content -Path $secretsFile -Encoding ascii -Value @("SUPERADMIN_EMAIL=$email", "SUPERADMIN_PASSWORD_HASH=$hash")
+    Set-Content -Path $superadminFile -Encoding utf8 -Value @(
+        "Superadmin de este portátil (solo funciona en http://localhost:$ApiPort/admin/):",
+        "  Email: $email",
+        "  Contraseña: $password")
+    Write-Step "Superadmin creado: datos en $superadminFile"
 }
 
 function Show-Credentials {
@@ -424,6 +452,7 @@ if ($Reset) {
 $mode = if ($Backup) { "" } else { Get-StartMode }
 
 Initialize-Data
+if (-not $Backup) { Initialize-Superadmin }
 $secrets = Read-EnvFile $secretsFile
 $env:PGPASSWORD = $secrets["DB_PASSWORD"]
 Initialize-Database $secrets["DB_PASSWORD"]
@@ -476,6 +505,9 @@ try {
     Write-Host "Brackety listo." -ForegroundColor Green
     Write-Host "  Móviles (wifi del punto de acceso): http://${HotspotIp}:$ApiPort"
     Write-Host "  Este portátil:                      http://localhost:$ApiPort"
+    if ($env:ADMIN_WEB_DIR) {
+        Write-Host "  Superadmin (solo este portátil):    http://localhost:$ApiPort/admin/ (cuenta en superadmin.txt)"
+    }
     Write-Host "  Datos: $data"
     Write-Host "  Para parar: Ctrl+C (guarda una copia de la base de datos al salir)."
     Write-Host ""

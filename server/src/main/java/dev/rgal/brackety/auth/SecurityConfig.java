@@ -223,7 +223,11 @@ public class SecurityConfig {
 
     @Bean
     PasswordEncoder passwordEncoder() {
-        // Argon2id with the OWASP minimum: 19 MiB of memory, 2 iterations, 1 thread.
+        return argon2();
+    }
+
+    /** Argon2id with the OWASP minimum: 19 MiB of memory, 2 iterations, 1 thread. */
+    public static PasswordEncoder argon2() {
         return new Argon2PasswordEncoder(16, 32, 1, 19 * 1024, 2);
     }
 }

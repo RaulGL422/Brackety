@@ -41,7 +41,7 @@ $flutter = (Get-Command flutter -ErrorAction SilentlyContinue).Source
 if (-not $flutter) { $flutter = "C:\dev\flutter\bin\flutter.bat" }
 
 New-Item -ItemType Directory -Force -Path $bundle, $cache | Out-Null
-foreach ($old in @("api", "web", "jre", "pgsql", "brackety.apk", "start-event.ps1", "LEEME.txt")) {
+foreach ($old in @("api", "web", "admin", "jre", "pgsql", "brackety.apk", "start-event.ps1", "LEEME.txt")) {
     $path = Join-Path $bundle $old
     if (Test-Path $path) { Remove-Item -Recurse -Force $path }
 }
@@ -63,6 +63,17 @@ try {
     Pop-Location
 }
 Copy-Item -Recurse "$root\app\build\web" "$bundle\web"
+
+Write-Host "   Superadmin web en /admin/ (solo responde al propio portátil)"
+Push-Location "$root\admin"
+try {
+    Invoke-Checked "el build web del superadmin" {
+        & $flutter build web --release --no-web-resources-cdn --base-href /admin/ --dart-define-from-file=env/event-bundle.json
+    }
+} finally {
+    Pop-Location
+}
+Copy-Item -Recurse "$root\admin\build\web" "$bundle\admin"
 
 if ($NoApk) {
     Write-Host "3/6 APK Android: saltada (-NoApk)"
