@@ -8,9 +8,7 @@ import '../state/offline_sync.dart';
 
 /// "Sign out" by hand: the account's actions not sent yet are lost, so it asks first.
 Future<void> confirmSignOut(BuildContext context, WidgetRef ref) async {
-  final pending = ref.read(offlineEnabledProvider)
-      ? ref.read(offlineSyncProvider).pendingCount
-      : 0;
+  final pending = ref.read(offlineSyncProvider).pendingCount;
   if (pending > 0) {
     final l10n = AppLocalizations.of(context);
     final confirmed = await confirmAction(

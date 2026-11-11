@@ -2348,6 +2348,47 @@ abstract class AppLocalizations {
   /// **'Quitar de la lista'**
   String get syncRejectedDismiss;
 
+  /// No description provided for @syncExport.
+  ///
+  /// In es, this message translates to:
+  /// **'Exportar acciones pendientes'**
+  String get syncExport;
+
+  /// No description provided for @syncExportBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Si este dispositivo no vuelve a conectar, entrega el fichero al club: lo importa desde su panel y no se pierde nada.'**
+  String get syncExportBody;
+
+  /// No description provided for @syncExportSave.
+  ///
+  /// In es, this message translates to:
+  /// **'Descargar CSV'**
+  String get syncExportSave;
+
+  /// No description provided for @importOps.
+  ///
+  /// In es, this message translates to:
+  /// **'Importar acciones de un dispositivo'**
+  String get importOps;
+
+  /// No description provided for @importOpsResult.
+  ///
+  /// In es, this message translates to:
+  /// **'Importadas: {applied} nuevas · {duplicates} ya estaban · {inReview} a revisión · {skipped} rechazadas'**
+  String importOpsResult(
+    int applied,
+    int duplicates,
+    int inReview,
+    int skipped,
+  );
+
+  /// No description provided for @importOpsError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se ha podido importar: el fichero no es de acciones pendientes o es de otro evento.'**
+  String get importOpsError;
+
   /// No description provided for @close.
   ///
   /// In es, this message translates to:
@@ -2357,7 +2398,7 @@ abstract class AppLocalizations {
   /// No description provided for @matOfflineBoard.
   ///
   /// In es, this message translates to:
-  /// **'Sin conexión: tablero guardado en el móvil. Sin recomendado; puedes empezar un pendiente si no hay otro en curso.'**
+  /// **'Sin conexión: tablero guardado en este dispositivo. Sin recomendado; puedes empezar un pendiente si no hay otro en curso.'**
   String get matOfflineBoard;
 
   /// No description provided for @matInReview.
@@ -2647,12 +2688,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Oscuro'**
   String get themeDark;
-
-  /// No description provided for @refusalStale.
-  ///
-  /// In es, this message translates to:
-  /// **'El combate ha cambiado en otro dispositivo. Revisa el marcador y vuelve a pulsar.'**
-  String get refusalStale;
 
   /// No description provided for @accountSuspended.
   ///

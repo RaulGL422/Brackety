@@ -1,20 +1,22 @@
-import 'dart:async';
-
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/polling.dart';
 import '../data/match_view.dart';
 import '../data/scoreboard_repository.dart';
 
-const _watchRefresh = Duration(seconds: 5);
+/// The live topic of one match's scoreboard.
+Set<String> matchTopics(String matchId) => {'match:$matchId'};
 
-/// A match as the club follows it: refreshed on its own, read only.
+/// A match as the club follows it: at once on every change (live socket), read only.
 final watchedMatchProvider = FutureProvider.autoDispose
-    .family<MatchView, String>((ref, matchId) {
-      final timer = Timer(_watchRefresh, ref.invalidateSelf);
-      ref.onDispose(timer.cancel);
-      return ref.watch(scoreboardRepositoryProvider).load(matchId);
-    });
+    .family<MatchView, String>(
+      (ref, matchId) => liveReload(
+        ref,
+        matchTopics(matchId),
+        () => ref.watch(scoreboardRepositoryProvider).load(matchId),
+      ),
+    );
 
 final matchReviewProvider = NotifierProvider.autoDispose
     .family<MatchReviewController, bool, String>(MatchReviewController.new);

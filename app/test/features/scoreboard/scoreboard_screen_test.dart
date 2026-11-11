@@ -1,6 +1,5 @@
 import 'package:brackety/core/keep_screen_on.dart';
 import 'package:brackety/features/mat/data/mat_board.dart';
-import 'package:brackety/features/offline/state/offline_sync.dart';
 import 'package:brackety/features/scoreboard/data/match_view.dart';
 import 'package:brackety/features/scoreboard/data/scoreboard_repository.dart';
 import 'package:brackety/features/scoreboard/state/bell.dart';
@@ -12,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/match_fakes.dart';
+import '../../support/offline_fakes.dart';
 
 void main() {
   const sizes = {
@@ -36,7 +36,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          offlineEnabledProvider.overrideWithValue(false),
+          ...quietQueueOverrides(),
           scoreboardRepositoryProvider.overrideWithValue(repository),
           bellProvider.overrideWithValue(bell),
         ],

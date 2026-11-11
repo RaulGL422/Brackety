@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/storage/browser_storage.dart';
 import '../data/account_api.dart';
 import '../data/auth_api.dart';
 import '../data/refresh_token_store.dart';
@@ -86,7 +87,7 @@ final accountApiProvider = Provider<AccountApi>(
 
 final refreshTokenStoreProvider = Provider<RefreshTokenStore>(
   (ref) => kIsWeb
-      ? const CookieRefreshTokenStore()
+      ? CookieRefreshTokenStore(ref.watch(browserStorageProvider))
       : const SecureRefreshTokenStore(),
 );
 
@@ -109,11 +110,11 @@ class SessionController extends Notifier<SessionState> {
   Future<void> _restore() async {
     await refresh();
     if (state.status == SessionStatus.restoring) {
-      // The server did not answer. A stored refresh token keeps the session (Offline rule);
-      // the web cannot tell whether its cookie is still there.
-      state = _store.inCookie
-          ? SessionState.signedOut
-          : const SessionState(SessionStatus.signedIn);
+      // The server did not answer. A session from the last run stays (Offline rule): the next
+      // request renews it, or the server's "no" ends it then.
+      state = await _store.hasSession()
+          ? const SessionState(SessionStatus.signedIn)
+          : SessionState.signedOut;
     }
   }
 
