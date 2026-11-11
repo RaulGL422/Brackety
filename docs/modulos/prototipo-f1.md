@@ -26,11 +26,12 @@ Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, f
 - Selecciona 4 alumnos (casilla marcada) → "Crear grupo".
 - Tapiz: desplegable a la derecha de "Crear grupo". Por defecto **Automático** = el de menor fin estimado (empate: número más bajo), con una línea que lo dice; o uno con árbitro elegido a mano (sin árbitro, deshabilitado). Vuelve a Automático tras crear. Popup con el tapiz asignado.
 - Alumno ya agrupado: fila deshabilitada, no desaparece.
+- Deshacer grupo (2026-11-11): desde el aviso tras crearlo o con el icono en un alumno o equipo agrupado, con confirmación, mientras ningún combate suyo haya empezado (`DELETE /events/{id}/groups/{groupId}`, ayudante o club; después 409 y solo el superadmin).
 - **Competidor fantasma**: casilla en el grupo; con 3 seleccionados se habilitan todos los de la categoría (también los ya agrupados, salvo los del mismo grupo) y se elige 1 fantasma. El fantasma combate pero no puntúa; mesa gestiona sus cruces.
 - Grupo = 4 reales, o 3 reales + 1 fantasma; ningún otro tamaño.
 
 ### Fin estimado de un tapiz
-- Restante = reloj del combate en curso + pendientes × (2:00 + 30 s); sin combate en curso, solo lo que quede de los 30 s tras el último.
+- Restante = reloj del combate en curso + pendientes × (duración + 30 s); sin combate en curso, solo lo que quede de los 30 s tras el último.
 - Fin = ahora + restante: si el tapiz está parado, el fin se retrasa solo.
 
 ### Árbitro (tapiz)
@@ -44,20 +45,21 @@ Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, f
   5. Empate: el grupo que lleva más sin combatir en el tapiz (así se intercalan: G1 1-2, G2 1-2, G1 3-4, G2 3-4…), luego nº de grupo y orden.
 
 ### Marcador Tambo
-- Rojo y azul fijos. Cronómetro 2:00 con iniciar/parar; tiempo restante visible. El reloj lo manda el servidor (eventos con hora).
-- Contador +1 por competidor y deshacer última acción.
+- Rojo y azul fijos. Cronómetro con la duración del evento (F1: 3:00) con iniciar/parar; tiempo restante visible. El reloj lo manda el servidor (eventos con hora).
+- Contador +1 y −1 (nunca por debajo de 0) por competidor y deshacer última acción.
+- Con el reloj parado, ajuste ±1 s y ±10 s (evento `CLOCK_ADJUST` con `deltaMs`; ni por debajo de 0 ni por encima de la duración).
 - Menú por competidor: advertencia, descalificación; en 4-7 años además "advertencia por golpear con una mano" (a la 2.ª, +1 al rival automático). Siempre popup de confirmación con motivo obligatorio.
-- 15 puntos o fin del tiempo → desaparece el reloj y aparece "Finalizar combate". Descalificación también finaliza.
-- Campana al iniciar el tiempo y al acabar (límite, tiempo o descalificación).
+- Límite de puntos o fin del tiempo → desaparece el reloj y aparece "Finalizar combate". Descalificación también finaliza y da el resultado límite–0 al rival (15-0); al deshacerla vuelven los puntos de antes.
+- Campana de ring: un golpe al iniciar, tres al acabar (límite, tiempo o descalificación) y carraca de madera a los 10 s.
 - Todo queda en la línea de tiempo (quién, qué, cuándo, tiempo de combate).
-- Estado = repetición de los eventos (`TamboMatch`); deshacer es un evento más que anula el último punto, aviso o descalificación.
+- Estado = repetición de los eventos (`TamboMatch`, mismo caso en Dart); deshacer es un evento más que anula el último punto, −1, ajuste de reloj, aviso o descalificación.
 - 15 puntos o descalificación paran el reloj con una parada automática registrada: al deshacer, sigue parado.
 - Antes del primer "Iniciar" no se puntúa: punto, advertencias y descalificación → 409 "The match has not started: press Start first." (con `opId`, choque `RULES`). Con el reloj ya iniciado y parado sí.
 - "Finalizar" solo con el combate acabado; después no se acepta nada. Un combate en curso por tapiz y ningún alumno en dos a la vez. El primer "Iniciar" de un combate bloquea la fila del evento hasta acabar (como crear grupos): dos tapices que empiezan a la vez con un alumno compartido no pasan los dos.
 - Escribe solo el árbitro del tapiz; el club ve el combate y su línea de tiempo.
 
 ### Puntuación global
-- Alumno = 10 por asistir (estar en un grupo como real) + lo que marca en cada combate (gane o no, hasta 15). Descalificado: 0 en ese combate.
+- Alumno = 10 por asistir (estar en un grupo como real) + lo que marca en cada combate (gane o no, hasta el límite). Descalificado: 0 en ese combate y su rival el límite.
 - Fantasma: no suma en ese grupo; su rival sí.
 
 ## Protecciones
@@ -79,21 +81,21 @@ Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, f
 ## Pantallas
 - Sesión y acceso: los de `auth` (`app/lib/features/auth/`, tarea 6); en debug, botones de acceso rápido a las cuentas demo.
 - Ayudante: categorías (con inscritos/agrupados) → alumnos por nombre o estatura → grupos en borrador con color y número (nunca rojo/azul) y casilla de fantasma → popup con el tapiz.
-- Árbitro: tablero del tapiz (sondeo 5 s; grupos con color y número; en curso con borde e icono de reproducción; recomendado en el color de acento; rojo y azul con punto de color en cada combate; pendientes que esperan con candado y motivo, sin abrirse; terminados) → marcador (sondeo 2 s, reloj contado en el dispositivo y resincronizado, +1, menú de avisos con motivo, deshacer, finalizar, línea de tiempo). Campana generada (`app/tool/make_bell.py`), una vez al iniciar y una al acabar.
+- Árbitro: tablero del tapiz (sondeo 5 s; grupos con color y número; en curso con borde e icono de reproducción; "Combate recomendado" arriba con su porqué y "Empezar este combate" (con uno en curso: "Cuando acabe el combate en curso"); luego "Otros combates disponibles", "En espera" con motivo y "Disputados"; rojo y azul con punto de color en cada combate; pendientes que esperan con candado y motivo, sin abrirse; terminados) → marcador (sondeo 2 s, reloj contado en el dispositivo y resincronizado, +1, menú de avisos con motivo, deshacer, finalizar, línea de tiempo). Sonidos generados (`app/tool/make_bell.py`); en la web con Web Audio, cargados al abrir y desbloqueados con el primer toque (antes a veces no sonaban por la política de autoplay).
 - Marcador (2026-11-06):
   - Vertical: reloj (16 % del alto), Iniciar o Finalizar (relleno) / Parar (con borde) y Deshacer arriba; rojo y azul debajo. Horizontal (más ancho que alto: móvil girado, tablet, escritorio): rojo | reloj y botones | azul.
   - Esquinas desactivadas hasta el primer Iniciar. Nombre en una línea (completo en tooltip y lector), número que llena el hueco; sin desbordes con texto al 200 %.
   - Reloj en color de aviso los últimos 10 s. Descalificación en color de error.
-  - Deshacer bajo los botones, 48 dp, dice qué deshace ("Deshacer: +1 Rojo"); sin diálogo y con un aviso de 3 s.
+  - Deshacer bajo los botones, 48 dp: "Deshacer" y debajo qué y a qué minuto ("+1 Rojo · 0:05"); la línea de tiempo marca lo que deshará. Sin diálogo y con un aviso de 3 s.
   - Finalizado: una fila por esquina con su color y puntos; el ganador con borde, copa y "Ganador" (o "Empate").
   - Pantalla siempre encendida con el tablero o el marcador abiertos (`wakelock_plus`; en web nada).
 - Sondeo (tablero, marcador, puntuaciones y tapices del club): el siguiente al acabar el anterior, nunca dos a la vez; en pausa con la app en segundo plano y sondeo inmediato al volver. La cola offline sigue enviando en segundo plano.
-- Club (`app/lib/features/club/`): panel con 4 secciones (barra inferior en móvil, raíl en tablet/escritorio). Puntuaciones (sondeo 5 s, filtro por categoría, orden por puntos o nombre). Tapices (árbitro, en curso/parado, grupos, pendientes, fin estimado solo si queda algo por jugar) → tablero en solo lectura → combate ("Tapiz N · Grupo M") con marcador y línea de tiempo, sin controles. Inscripciones: alta, edición y borrado; casilla del tutor obligatoria si es menor el día del evento; chip "Falta tutor" en la lista. Configuración: nombre, fecha, tapices con su árbitro (añadir/quitar el último, con confirmación), categorías solo lectura; cada cambio se guarda solo, sin botón (el nombre al dejar de escribir) y si el servidor lo rechaza vuelve el valor guardado. Exportar los 3 CSV desde la barra (solo web). Si hay grupos, el 409 se explica con un aviso.
+- Club (`app/lib/features/club/`): panel con 4 secciones (barra inferior en móvil, raíl en tablet/escritorio). Puntuaciones (sondeo 5 s, filtro por categoría, orden por puntos o nombre). Tapices (árbitro, en curso/parado, grupos, pendientes, fin estimado solo si queda algo por jugar) → tablero en solo lectura → combate ("Tapiz N · Grupo M") con marcador y línea de tiempo, sin controles. Inscripciones: alta, edición y borrado; casilla del tutor obligatoria si es menor el día del evento; chip "Falta tutor" en la lista. Configuración: nombre, fecha, duración (min:s, 0:30–20:00, no con un combate en curso) y límite de puntos (1–99, no tras empezar un combate), tapices con su árbitro (añadir/quitar el último, con confirmación), categorías solo lectura; cada cambio se guarda solo, sin botón (el nombre al dejar de escribir) y si el servidor lo rechaza vuelve el valor guardado. Exportar los 3 CSV desde la barra (solo web). Si hay grupos, el 409 se explica con un aviso.
 
 Login, inicio por rol, categorías → alumnos → crear grupos, tablero del tapiz, marcador, panel del club (config, inscripciones, puntuaciones, tapices, línea de tiempo, exportar). Responsive (`07-diseno.md`), textos i18n.
 
 ## Tests
-Recomendado (empates, intercalado, fantasma ocupado), fin estimado, asignación de tapiz, fantasma, puntuación global, reglas del marcador (15, tiempo, una mano 4-7, descalificación, deshacer), permisos por rol. Widget tests de marcador, crear grupos y panel del club en 3 tamaños.
+Recomendado (empates, intercalado, fantasma ocupado), fin estimado, asignación de tapiz, fantasma, puntuación global, reglas del marcador (límite, tiempo, una mano 4-7, descalificación 15-0, −1, ajuste de reloj, deshacer); simulaciones del recomendador y del tablero con semilla fija (1-3 grupos, equipos, fantasma, alumno ocupado en otro tapiz, grupo creado a mitad); deshacer grupo, permisos por rol. Widget tests de marcador, crear grupos y panel del club en 3 tamaños.
 
 ## Plan (PRs en serie hacia `development`)
 1. Back: evento, categorías, tapices, staff, inscripciones, cuentas demo.
