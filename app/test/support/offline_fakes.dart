@@ -43,7 +43,7 @@ class TestClock {
   void advance(Duration by) => now = now.add(by);
 }
 
-/// Android overrides: queue on, [store] and [clock] instead of the device, signed in.
+/// The queue with [store] and [clock] instead of the device, signed in.
 List<Override> offlineOverrides({
   required MemoryOfflineStore store,
   required TestClock clock,
@@ -51,10 +51,17 @@ List<Override> offlineOverrides({
   FakeAuthApi? auth,
 }) => [
   ...sessionOverrides(auth ?? FakeAuthApi(signedIn: true)),
-  offlineEnabledProvider.overrideWithValue(true),
   offlineStoreProvider.overrideWithValue(store),
   deviceClockProvider.overrideWithValue(() => clock.now),
   scoreboardRepositoryProvider.overrideWithValue(repository),
+];
+
+/// The referee's queue for screen tests that are not about it: signed in, kept in memory and
+/// with the device's clock on the demo event's day.
+List<Override> quietQueueOverrides() => [
+  ...sessionOverrides(FakeAuthApi(signedIn: true)),
+  offlineStoreProvider.overrideWithValue(MemoryOfflineStore()),
+  deviceClockProvider.overrideWithValue(() => DateTime(2027, 3, 10, 10, 0, 30)),
 ];
 
 /// [view] as the server computes it at [at], with [review] if given.
@@ -215,13 +222,8 @@ class FakeMatchServer implements ScoreboardRepository {
   }
 
   @override
-  Future<MatchView> send(
-    String matchId,
-    MatchAction action, {
-    Side? side,
-    String? reason,
-    required int knownEvents,
-  }) => throw UnimplementedError('Android sends through the queue');
+  Future<OfflineImportResult> importOps(String eventId, List<int> csv) =>
+      throw UnimplementedError();
 
   @override
   Future<ReviewOutcome> review(String matchId, ReviewDecision decision) async {

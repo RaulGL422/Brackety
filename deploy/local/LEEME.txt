@@ -36,14 +36,17 @@ ARRANCAR (las veces siguientes)
    - Móviles conectados al punto de acceso del portátil: http://192.168.137.1:8080
    - Este portátil: http://localhost:8080
 
-MÓVILES (APK ANDROID)
-- Árbitros y ayudantes usan la app de Android, no el navegador: brackety.apk en esta carpeta.
-- Instalar: copia brackety.apk al móvil (cable USB, Drive o WhatsApp) y ábrelo; Android pide permitir
-  "Instalar apps desconocidas" para la app con la que lo abres. O desde el PC con el móvil por USB
-  (depuración USB activada):  adb install -r brackety.apk
-- Al entrar, "Servidor" debe decir Pabellón (http://192.168.137.1:8080). Si no: "Cambiar" > Pabellón.
-  El móvil lo recuerda. Cambiar de servidor cierra la sesión guardada.
-- La app solo usa http sin cifrar con el pabellón; cualquier otra URL tiene que ser https.
+MÓVILES Y TABLETS (WEB)
+- Árbitros, ayudantes y club usan el navegador (Chrome) en http://192.168.137.1:8080, sin instalar nada.
+- La sesión se mantiene al recargar la página y al cerrar y abrir la pestaña.
+- Sin red, el árbitro sigue puntuando: las acciones se guardan en el navegador y se envían solas al volver
+  la red (barra "Sin conexión · N acciones pendientes"). No cierres sesión con acciones pendientes.
+- Si se apaga el portátil: vuelve a arrancar start-event.ps1; los móviles se reconectan solos, sin volver a
+  entrar, y envían lo pendiente.
+- Si un móvil no consigue reconectar: en su barra de estado, botón de descarga "Exportar acciones
+  pendientes" (CSV). El club lo sube en su panel con "Importar acciones de un dispositivo". Importarlo
+  dos veces no duplica nada.
+- La APK de Android (opcional) solo se genera con build-event-bundle.ps1 -Apk.
 
 PARAR
 - Ctrl+C en la ventana. Espera a que termine: guarda una copia de la base de datos y para PostgreSQL.

@@ -1,7 +1,6 @@
 import 'package:brackety/features/mat/data/mat_board.dart';
 import 'package:brackety/features/mat/state/mat_providers.dart';
 import 'package:brackety/features/mat/ui/mat_board_screen.dart';
-import 'package:brackety/features/offline/state/offline_sync.dart';
 import 'package:brackety/l10n/gen/app_localizations.dart';
 import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/board_finders.dart';
+import '../../support/offline_fakes.dart';
 
 void main() {
   const sizes = {
@@ -71,8 +71,8 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              offlineEnabledProvider.overrideWithValue(false),
-              matBoardProvider.overrideWith((ref, matId) async => board),
+              ...quietQueueOverrides(),
+              cachedBoardProvider.overrideWith((ref, matId) async => board),
             ],
             child: MaterialApp(
               builder: (_, child) => ToastHost(child: child!),
@@ -121,8 +121,8 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              offlineEnabledProvider.overrideWithValue(false),
-              matBoardProvider.overrideWith((ref, matId) async => live),
+              ...quietQueueOverrides(),
+              cachedBoardProvider.overrideWith((ref, matId) async => live),
             ],
             child: MaterialApp(
               builder: (_, child) => ToastHost(child: child!),
@@ -210,8 +210,8 @@ void main() {
       ProviderScope(
         retry: (_, _) => null,
         overrides: [
-          offlineEnabledProvider.overrideWithValue(false),
-          matBoardProvider.overrideWith(
+          ...quietQueueOverrides(),
+          cachedBoardProvider.overrideWith(
             (ref, matId) async => throw Exception('down'),
           ),
         ],
@@ -239,10 +239,7 @@ void main() {
   ) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [
-          offlineEnabledProvider.overrideWithValue(false),
-          matBoardProvider.overrideWith((ref, matId) async => board),
-        ],
+        overrides: [matBoardProvider.overrideWith((ref, matId) async => board)],
         child: MaterialApp(
           builder: (_, child) => ToastHost(child: child!),
           theme: lightTheme(),
@@ -308,8 +305,8 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            offlineEnabledProvider.overrideWithValue(false),
-            matBoardProvider.overrideWith((ref, matId) async => teamBoard),
+            ...quietQueueOverrides(),
+            cachedBoardProvider.overrideWith((ref, matId) async => teamBoard),
           ],
           child: MaterialApp(
             builder: (_, child) => ToastHost(child: child!),

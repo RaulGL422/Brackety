@@ -1357,11 +1357,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String get syncRejectedDismiss => 'Remove from the list';
 
   @override
+  String get syncExport => 'Export pending actions';
+
+  @override
+  String get syncExportBody =>
+      'If this device cannot connect again, give the file to the club: they import it from their panel and nothing is lost.';
+
+  @override
+  String get syncExportSave => 'Download CSV';
+
+  @override
+  String get importOps => 'Import actions from a device';
+
+  @override
+  String importOpsResult(
+    int applied,
+    int duplicates,
+    int inReview,
+    int skipped,
+  ) {
+    return 'Imported: $applied new · $duplicates already there · $inReview to review · $skipped refused';
+  }
+
+  @override
+  String get importOpsError =>
+      'Could not import: the file is not one of pending actions or is from another event.';
+
+  @override
   String get close => 'Close';
 
   @override
   String get matOfflineBoard =>
-      'Offline: board saved on the phone. No recommendation; you can start a pending match if none is in progress.';
+      'Offline: board saved on this device. No recommendation; you can start a pending match if none is in progress.';
 
   @override
   String get matInReview => 'Under the club\'s review';
@@ -1553,10 +1580,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get themeDark => 'Dark';
-
-  @override
-  String get refusalStale =>
-      'The match changed on another device. Check the scoreboard and press again.';
 
   @override
   String get accountSuspended =>

@@ -1367,11 +1367,38 @@ class AppLocalizationsEs extends AppLocalizations {
   String get syncRejectedDismiss => 'Quitar de la lista';
 
   @override
+  String get syncExport => 'Exportar acciones pendientes';
+
+  @override
+  String get syncExportBody =>
+      'Si este dispositivo no vuelve a conectar, entrega el fichero al club: lo importa desde su panel y no se pierde nada.';
+
+  @override
+  String get syncExportSave => 'Descargar CSV';
+
+  @override
+  String get importOps => 'Importar acciones de un dispositivo';
+
+  @override
+  String importOpsResult(
+    int applied,
+    int duplicates,
+    int inReview,
+    int skipped,
+  ) {
+    return 'Importadas: $applied nuevas · $duplicates ya estaban · $inReview a revisión · $skipped rechazadas';
+  }
+
+  @override
+  String get importOpsError =>
+      'No se ha podido importar: el fichero no es de acciones pendientes o es de otro evento.';
+
+  @override
   String get close => 'Cerrar';
 
   @override
   String get matOfflineBoard =>
-      'Sin conexión: tablero guardado en el móvil. Sin recomendado; puedes empezar un pendiente si no hay otro en curso.';
+      'Sin conexión: tablero guardado en este dispositivo. Sin recomendado; puedes empezar un pendiente si no hay otro en curso.';
 
   @override
   String get matInReview => 'En revisión del club';
@@ -1569,10 +1596,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get themeDark => 'Oscuro';
-
-  @override
-  String get refusalStale =>
-      'El combate ha cambiado en otro dispositivo. Revisa el marcador y vuelve a pulsar.';
 
   @override
   String get accountSuspended =>

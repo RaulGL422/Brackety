@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:brackety/core/live/live_connection.dart';
 import 'package:brackety/features/auth/data/account.dart';
 import 'package:brackety/features/auth/data/account_api.dart';
 import 'package:brackety/features/auth/data/auth_api.dart';
@@ -9,6 +10,8 @@ import 'package:brackety/features/auth/data/registration.dart';
 import 'package:brackety/features/auth/state/session_controller.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/misc.dart';
+
+import 'live_fakes.dart';
 
 /// A server answer with [status] and an optional problem+json [body].
 DioException httpError(
@@ -40,15 +43,18 @@ DioException networkError() => DioException.connectionError(
 
 /// The provider overrides every app test needs: [api] instead of the server and a web-like
 /// cookie store, so the session restores itself when [FakeAuthApi.signedIn] is true. `/me`
-/// answers from [account] (a default one when not given).
+/// answers from [account] (a default one when not given). The live socket never answers
+/// unless a test brings its own ([live], e.g. a [FakeLiveServer]).
 List<Override> sessionOverrides(
   FakeAuthApi api, {
   RefreshTokenStore store = const CookieRefreshTokenStore(),
   FakeAccountApi? account,
+  LiveSocketConnect? live,
 }) => [
   authApiProvider.overrideWithValue(api),
   refreshTokenStoreProvider.overrideWithValue(store),
   accountApiProvider.overrideWithValue(account ?? FakeAccountApi()),
+  liveSocketConnectProvider.overrideWithValue(live ?? silentLive),
 ];
 
 /// Server auth without a server. Sign-in works for [accounts] and when the password equals the
@@ -201,14 +207,26 @@ class FakeRefreshTokenStore implements RefreshTokenStore {
   @override
   final bool inCookie;
 
+  /// The web's mark of a session (see [CookieRefreshTokenStore]).
+  bool marked = false;
+
   @override
   Future<String?> read() async => token;
 
   @override
-  Future<void> write(String token) async => this.token = token;
+  Future<void> write(String token) async {
+    marked = true;
+    this.token = token;
+  }
 
   @override
-  Future<void> clear() async => token = null;
+  Future<void> clear() async {
+    marked = false;
+    token = null;
+  }
+
+  @override
+  Future<bool> hasSession() async => inCookie ? marked : token != null;
 }
 
 /// `/api/v1/me` without a server, starting from [account]. The password is [password]; each

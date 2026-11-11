@@ -138,6 +138,20 @@ class ScoreboardService {
         if (!isReferee(mat, accountId, roles)) {
             throw EventException.forbidden();
         }
+        return apply(match, mat, accountId, request);
+    }
+
+    /**
+     * An action rescued from a device's CSV (OfflineImportService): the club already checked, {@code actorId} is
+     * the referee who made it. Same path as the queue, so a known {@code opId} changes nothing.
+     */
+    @Transactional
+    Recorded recordImported(UUID matchId, UUID actorId, MatchEventRequest request) {
+        var match = matches.lockById(matchId).orElseThrow(EventException::notFound);
+        return apply(match, mat(match), actorId, request);
+    }
+
+    private Recorded apply(Match match, Mat mat, UUID accountId, MatchEventRequest request) {
         var event = events.get(mat.getEventId());
         var action = action(request, accountId);
         var serverNow = clock.instant();

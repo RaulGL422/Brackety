@@ -16,7 +16,7 @@ Que el ayudante siga trabajando sin internet y no se pierda ningún dato.
 - Datos personales en el dispositivo: mínimo, y sin fotos si no hay permiso.
 
 ## Adelanto F1 (marcador del árbitro)
-Pedido por Raul el 2026-11-04 para la Fase 1. Solo APK Android (la web por http no puede guardar offline).
+Pedido por Raul el 2026-11-04 para la Fase 1. Desde el 2026-11-11 también (y sobre todo) en la web: ver "Web (2026-11-11)".
 - Si se corta la red, el árbitro sigue con el combate en curso y puede empezar otros de su tapiz con lo último descargado.
 - Sin red no hay recomendado (no se sabe quién combate en otros tapices): lista de pendientes y aviso de "sin conexión".
 - Cada acción se guarda en el dispositivo con id único y reloj del combate; el reloj lo lleva el dispositivo mientras no hay red.
@@ -66,7 +66,6 @@ Pedido por Raul el 2026-11-04 para la Fase 1. Solo APK Android (la web por http 
 - El estado del combate = la última vista del servidor + las acciones pendientes, con las reglas del marcador repetidas en Dart (mismos casos que `TamboMatch`).
 - Caché en ficheros JSON del dispositivo (no drift para la F1): último tablero del tapiz, combates abiertos y cola. Al cerrar sesión, ver "Cierre de sesión" abajo.
 - Sin red, el tablero sale de la caché, sin recomendado y con aviso. Se puede empezar un pendiente si en el tapiz no hay otro en curso.
-- La web no cambia (sin cola ni caché).
 - Club: el combate en revisión se marca en Tapices. Al abrirlo muestra lo que traía el móvil (quién, qué, cuándo) y los botones Aplicar y Descartar, con confirmación.
 
 ### App (APK): cómo quedó (2026-11-05)
@@ -84,7 +83,19 @@ Pedido por Raul el 2026-11-04 para la Fase 1. Solo APK Android (la web por http 
   - Sesión caducada o rechazada por el servidor (refresh 400/401): se borran tablero y vistas (llevan nombres), pero la cola se queda guardada con la cuenta que la creó y sin enviarse.
   - Al volver a entrar esa misma cuenta, la cola se envía como siempre. Otra cuenta no la ve ni la envía; sigue guardada hasta que entre la suya o se salga a mano con ella.
 - En el móvil quedan solo nombres del tapiz y motivos de avisos.
-- Web: sin cola ni caché. Envía las acciones de una en una, cada una con `knownEvents` = el máximo visto en las respuestas (solo crece). Ante `MATCH_STALE` recarga el combate y avisa "El combate ha cambiado en otro dispositivo". Muestra el aviso de "en revisión" y bloquea los botones si el combate lo está.
+
+### Web (2026-11-11, pedido de Raul: el domingo solo web)
+- La web usa la misma cola que la APK (`opId`, `at`, `knownEvents`), estado optimista con `LocalMatch` y envío de una en una en segundo plano. Ya no hay camino directo ni `MATCH_STALE` en la app.
+- Guardado en `localStorage` (`brackety.offline.queue`, `.views`, `.board-<tapiz>`), un documento entero por clave. Sobrevive a recargar y a cerrar la pestaña.
+- Toques rápidos: se comprueban y encolan antes del primer `await`; la pantalla los muestra al momento.
+- Dos pestañas del mismo navegador comparten la cola: al guardar, cada una incorpora lo que la otra guardó (los `opId` repetidos el servidor los ignora).
+- Sesión: marca `brackety.session` junto a la cookie. Si al recargar el servidor no responde, la sesión sigue y la cola se envía cuando vuelve (el refresh por cookie renueva el token).
+- Sin nada en la cola se muestra la vista del servidor tal cual (solo corre su reloj desde `serverTime`); las reglas en Dart solo ponen encima lo pendiente.
+- Indicador (sin conexión / N pendientes / rechazadas) también en la web; con todo enviado no se muestra, para no quitar altura al marcador en el móvil.
+
+### Rescate por CSV (2026-11-11)
+- Barra de estado del árbitro: botón "Exportar acciones pendientes" (con algo sin enviar). CSV con BOM y `;`: `brackety-offline-ops;1`, luego `opId;matchId;type;side;reason;at;knownEvents;actor` (`actor` = id de la cuenta que encoló).
+- Club (web): "Importar acciones de un dispositivo" en la barra del panel. `POST /api/v1/events/{id}/offline-ops/import` (cuerpo `text/csv`, solo CLUB): comprueba todo el fichero (versión, columnas, combates del evento) y luego aplica cada fila por el mismo camino que la cola, en su transacción. Responde `{applied, duplicates, inReview, skipped}`. Reimportar no cambia nada. Autor: el `actor` si es del staff, si no el club.
 
 ## Datos
 `offline_op` (cliente), `import_log` (servidor), formato CSV versionado.
@@ -95,7 +106,8 @@ Estado de conexión, descarga previa, cola pendiente, exportar/importar CSV, res
 ## Tests
 Sin red → operaciones → sincronización; idempotencia; CSV round trip; choque de dos escritores; traspaso de tapiz.
 - Servidor F1 (`ScoreboardOfflineTest`, `ScoreboardReviewControllerTest`): con `opId` igual que sin él; reintentos sin duplicar (200 y 409); `at` recortado a ahora y subido a la última acción; combate jugado offline y fin por tiempo con los `at`; `knownEvents` distinto, alumno en otro tapiz y siguientes en revisión; web en revisión; web sin `knownEvents` (400) y dos pestañas a la vez (la segunda, 409 `MATCH_STALE`, `ScoreboardControllerTest`); paradas automáticas fuera de `knownEvents`; APPLY en orden saltando las que no valen y finalizando; DISCARD; permisos de `/review`, `serverTime`, `review`, tablero y códigos del problem+json.
-- App F1: `tambo_match_test` (los casos de `TamboMatchTest`); `local_match_test` (cola sobre la vista, parada automática, deshacer, `at` subido, tablero sin red); `offline_sync_test` (orden, sin red y envío al volver, reintento con el mismo `opId`, vista que ya trae una pendiente (sale de la cola, cuenta una vez y `knownEvents` correcto), desfase con `serverTime`, 409 a revisión, revisión resuelta, otro 4xx, sobrevive al reinicio, borrado al salir, ficheros atómicos); `offline_session_test` (sesión rechazada: cola guardada sin vistas, misma cuenta la envía, otra no la ve ni la borra al salir, salir a mano y cambio de servidor la borran, `queue.json` sin cuenta); `confirm_sign_out_test` en 3 tamaños (aviso al salir con pendientes); `offline_screens_test` en 3 tamaños (tablero sin red con indicador, marcador con pendientes, revisión del club); `match_controller_test` (web: dos acciones seguidas de una en una con su `knownEvents`; `MATCH_STALE` recarga).
+- App F1: `tambo_match_test` (los casos de `TamboMatchTest`); `local_match_test` (cola sobre la vista, parada automática, deshacer, `at` subido, tablero sin red); `offline_sync_test` (orden, sin red y envío al volver, reintento con el mismo `opId`, vista que ya trae una pendiente (sale de la cola, cuenta una vez y `knownEvents` correcto), desfase con `serverTime`, 409 a revisión, revisión resuelta, otro 4xx, sobrevive al reinicio, borrado al salir, ficheros atómicos); `offline_session_test` (sesión rechazada: cola guardada sin vistas, misma cuenta la envía, otra no la ve ni la borra al salir, salir a mano y cambio de servidor la borran, `queue.json` sin cuenta); `confirm_sign_out_test` en 3 tamaños (aviso al salir con pendientes); `offline_screens_test` en 3 tamaños (tablero sin red con indicador, marcador con pendientes, revisión del club); `match_controller_test` (5 puntos seguidos salen al momento y se envían en orden con su `knownEvents`).
 
 ## Estado
+Web con cola, sesión tras recarga y rescate CSV hechos (2026-11-11, `feat/realtime-offline-web`); tests de servidor y app en verde. Falta la prueba a mano en el portátil y en la Pi.
 Pendiente; adelanto F1 en pruebas (2026-11-05, rama `feat/offline-f1-scoreboard`): servidor y app hechos. Falta la prueba manual de Raul y un escenario de datos con un combate en revisión (es de `server/`, sin hacer). Prueba a mano: APK sin red (modo avión) en un combate y en el tablero; volver la red; choque con el mismo árbitro en la web escribiendo el combate mientras el móvil está sin red; Aplicar y Descartar desde el club.

@@ -396,6 +396,24 @@ class MatchView {
 
   Corner corner(Side side) => side == Side.red ? red : blue;
 
+  MatchView withRemaining(Duration remaining) => MatchView(
+    id: id,
+    matId: matId,
+    matNumber: matNumber,
+    groupNumber: groupNumber,
+    status: status,
+    length: length,
+    pointsLimit: pointsLimit,
+    remaining: remaining,
+    running: running,
+    endReason: endReason,
+    red: red,
+    blue: blue,
+    timeline: timeline,
+    serverTime: serverTime,
+    review: review,
+  );
+
   bool get finished => status == MatchStatus.finished;
 
   /// The clock was started at least once: only then can anyone score.
