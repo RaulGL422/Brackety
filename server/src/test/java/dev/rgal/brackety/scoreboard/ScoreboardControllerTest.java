@@ -193,8 +193,8 @@ class ScoreboardControllerTest extends ScoreboardApiTest {
                 .andReturn()
                 .getResponse()
                 .getContentAsString(java.nio.charset.StandardCharsets.UTF_8);
-        assertThat(timeline).contains(";CLOCK_ADJUST;;;añade 10 s;arbitro1;sí");
-        assertThat(timeline).contains(";POINT_REMOVED;RED;");
+        assertThat(timeline).contains(";Ajuste del reloj;;;añade 10 s;arbitro1;;Sí");
+        assertThat(timeline).contains(";Quitar punto;Rojo;");
     }
 
     @Test

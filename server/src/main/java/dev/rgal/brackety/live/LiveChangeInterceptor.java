@@ -4,7 +4,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Map;
 import java.util.Set;
-import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
 
@@ -14,7 +13,6 @@ import org.springframework.web.servlet.HandlerMapping;
  * runs: a dissolved group is gone afterwards. The services commit before the response, so a client that
  * fetches on the signal sees the change.
  */
-@Component
 class LiveChangeInterceptor implements HandlerInterceptor {
 
     private static final String TOPICS = LiveChangeInterceptor.class.getName() + ".topics";

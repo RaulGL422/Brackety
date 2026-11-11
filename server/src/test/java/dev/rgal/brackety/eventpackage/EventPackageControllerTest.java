@@ -22,7 +22,7 @@ class EventPackageControllerTest extends EventApiTest {
                 .andExpect(header().string(
                                 "Content-Disposition",
                                 "attachment; filename=\"liga-yoseikan-2027-fase-1-tambo-2027-03-10.brackety\""))
-                .andExpect(jsonPath("$.schemaVersion").value(1))
+                .andExpect(jsonPath("$.schemaVersion").value(EventPackage.SCHEMA_VERSION))
                 .andExpect(jsonPath("$.event.date").value("2027-03-10"))
                 .andExpect(jsonPath("$.owner.username").value("club1"))
                 .andExpect(jsonPath("$.staff", hasSize(8)))
