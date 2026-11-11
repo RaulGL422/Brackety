@@ -122,10 +122,12 @@ class _BoardList extends StatelessWidget {
     final recommended = board.matches
         .where((m) => m.id == board.recommendedMatchId)
         .firstOrNull;
-    final later = [
-      for (final m in byStatus[MatchStatus.pending]!)
-        if (m.id != board.recommendedMatchId) m,
-    ];
+    final others = byStatus[MatchStatus.pending]!
+        .where((m) => m.id != board.recommendedMatchId)
+        .toList();
+    final available = others.where((m) => m.available).toList();
+    final waiting = others.where((m) => !m.available).toList();
+    final busy = byStatus[MatchStatus.inProgress]!.isNotEmpty;
     Widget section(String title) => Padding(
       padding: const EdgeInsets.only(top: AppSpacing.xl, bottom: AppSpacing.s),
       child: Text(title, style: text.titleMedium),
@@ -158,10 +160,15 @@ class _BoardList extends StatelessWidget {
               board: board,
               match: recommended,
               readOnly: readOnly,
+              afterCurrent: busy,
             ),
-          if (later.isNotEmpty) ...[
+          if (available.isNotEmpty) ...[
             section(l10n.matPending),
-            _MatchList(board: board, matches: later, readOnly: readOnly),
+            _MatchList(board: board, matches: available, readOnly: readOnly),
+          ],
+          if (waiting.isNotEmpty) ...[
+            section(l10n.matWaitingTitle),
+            _MatchList(board: board, matches: waiting, readOnly: readOnly),
           ],
           if (byStatus[MatchStatus.finished]!.isNotEmpty) ...[
             section(l10n.matFinished),
@@ -215,12 +222,16 @@ class _FeaturedMatch extends StatelessWidget {
     required this.match,
     required this.readOnly,
     this.inProgress = false,
+    this.afterCurrent = false,
   });
 
   final MatBoard board;
   final BoardMatch match;
   final bool readOnly;
   final bool inProgress;
+
+  /// The recommended one while another is in progress: it is the next, not one to start now.
+  final bool afterCurrent;
 
   @override
   Widget build(BuildContext context) {
@@ -259,9 +270,11 @@ class _FeaturedMatch extends StatelessWidget {
                     color: onBand,
                     size: 20,
                   ),
-                  Text(
-                    inProgress ? l10n.matInProgress : l10n.matRecommended,
-                    style: text.titleSmall?.copyWith(color: onBand),
+                  Flexible(
+                    child: Text(
+                      inProgress ? l10n.matInProgress : l10n.matRecommended,
+                      style: text.titleSmall?.copyWith(color: onBand),
+                    ),
                   ),
                 ],
               ),
@@ -294,6 +307,13 @@ class _FeaturedMatch extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               spacing: AppSpacing.m,
               children: [
+                if (!inProgress)
+                  Text(
+                    afterCurrent
+                        ? l10n.matAfterCurrent
+                        : l10n.matRecommendedWhy,
+                    style: text.bodyMedium,
+                  ),
                 if (group != null)
                   Text(
                     match.inReview
@@ -313,7 +333,9 @@ class _FeaturedMatch extends StatelessWidget {
                         ? l10n.matWatch
                         : inProgress
                         ? l10n.matBackToScoreboard
-                        : l10n.matOpenScoreboard,
+                        : afterCurrent
+                        ? l10n.matOpenScoreboard
+                        : l10n.matStartRecommended,
                   ),
                 ),
               ],

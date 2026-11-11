@@ -285,7 +285,7 @@ void main() {
         matchView(status: MatchStatus.inProgress, redPoints: 1, canUndo: true),
       );
 
-      final undo = undoButton('Undo: +1 Red');
+      final undo = undoButton('+1 Red · 0:05');
       expect(undo, findsOneWidget);
       expect(tester.getSize(undo).height, greaterThanOrEqualTo(48));
 
@@ -340,7 +340,7 @@ void main() {
       ),
     );
 
-    expect(find.text('Undo: Blue warning'), findsOneWidget);
+    expect(find.text('Blue warning · 0:30'), findsOneWidget);
 
     await tester.pumpWidget(const SizedBox());
   });
