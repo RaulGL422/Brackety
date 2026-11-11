@@ -6,10 +6,16 @@ import 'package:brackety/features/scoreboard/state/bell.dart';
 import 'package:dio/dio.dart';
 
 class FakeBell implements Bell {
-  var rings = 0;
+  final played = <BellSound>[];
+  var unlocks = 0;
+
+  int get rings => played.length;
 
   @override
-  void ring() => rings++;
+  void play(BellSound sound) => played.add(sound);
+
+  @override
+  void unlock() => unlocks++;
 }
 
 Corner corner(String name, {int points = 0, bool oneHandRule = false}) =>

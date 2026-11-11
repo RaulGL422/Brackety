@@ -28,6 +28,7 @@ class ScoreboardRepository {
     MatchAction action, {
     Side? side,
     String? reason,
+    Duration? delta,
     required int knownEvents,
   }) async {
     final response = await _dio.post<Map<String, dynamic>>(
@@ -36,6 +37,7 @@ class ScoreboardRepository {
         'type': action.wire,
         'side': sideToJson(side),
         'reason': reason,
+        'deltaMs': ?delta?.inMilliseconds,
         'knownEvents': knownEvents,
       },
     );

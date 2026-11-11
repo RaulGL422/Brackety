@@ -274,6 +274,7 @@ class OfflineSync extends Notifier<OfflineState> {
     MatchAction action, {
     Side? side,
     String? reason,
+    Duration? delta,
   }) async {
     await ready;
     final view = ref.mounted ? state.views[matchId] : null;
@@ -284,6 +285,7 @@ class OfflineSync extends Notifier<OfflineState> {
       action: action,
       side: side,
       reason: reason,
+      delta: delta,
       at: now(),
       account: _account,
       knownEvents:

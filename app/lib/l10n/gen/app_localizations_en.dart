@@ -391,13 +391,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get matRecommended => 'Next match';
+  String get matRecommended => 'Recommended match';
 
   @override
   String get matInProgress => 'In progress';
 
   @override
-  String get matPending => 'Later';
+  String get matPending => 'Other available matches';
 
   @override
   String get matYours => 'Your mat';
@@ -420,7 +420,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matGroups => 'Groups on this mat';
 
   @override
-  String get matFinished => 'Finished';
+  String get matFinished => 'Fought';
 
   @override
   String get matWaiting => 'A fighter is in a match right now';
@@ -552,6 +552,125 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tlRivalPoint => 'point to the rival';
+
+  @override
+  String get removePoint => '−1';
+
+  @override
+  String removePointFor(String corner) {
+    return 'Take a point from $corner';
+  }
+
+  @override
+  String whatPointRemoved(String corner) {
+    return '−1 $corner';
+  }
+
+  @override
+  String whatClockAdjust(String delta) {
+    return '$delta s on the clock';
+  }
+
+  @override
+  String clockAdjustBy(String delta) {
+    return '$delta s';
+  }
+
+  @override
+  String clockAdjustTooltip(String delta) {
+    return 'Adjust the clock $delta s';
+  }
+
+  @override
+  String get clockAdjustHint => 'Adjust the clock (stopped)';
+
+  @override
+  String get tlPointRemoved => 'Point taken back';
+
+  @override
+  String get tlClockAdjust => 'Clock adjusted';
+
+  @override
+  String get tlNextUndo => 'what Undo takes back next';
+
+  @override
+  String undoDetail(String what, String clock) {
+    return '$what · $clock';
+  }
+
+  @override
+  String get recentActions => 'Last actions';
+
+  @override
+  String get refusalNoPoints => 'There are no points to take back.';
+
+  @override
+  String get refusalClockRunning => 'Stop the clock before adjusting it.';
+
+  @override
+  String get refusalClockLimit => 'The clock cannot go further.';
+
+  @override
+  String get settingsMatchRules => 'Matches';
+
+  @override
+  String get settingsMatchLength => 'Match length (min:s)';
+
+  @override
+  String get settingsMatchLengthHint =>
+      'From 0:30 to 20:00. It does not change while a match is in progress.';
+
+  @override
+  String get settingsMatchLengthInvalid =>
+      'Type minutes and seconds between 0:30 and 20:00, for example 3:00.';
+
+  @override
+  String get settingsPointsLimit => 'Points that end the match';
+
+  @override
+  String get settingsPointsLimitHint =>
+      'The match ends when one fighter reaches them. A disqualification gives them to the rival. It does not change once a match has started.';
+
+  @override
+  String get settingsPointsLimitInvalid => 'Between 1 and 99.';
+
+  @override
+  String get matWaitingTitle => 'Waiting';
+
+  @override
+  String get matStartRecommended => 'Start this match';
+
+  @override
+  String get matRecommendedWhy =>
+      'Its fighters have rested the longest and none has just fought.';
+
+  @override
+  String get matAfterCurrent => 'When the match in progress ends.';
+
+  @override
+  String get undoGroup => 'Undo group';
+
+  @override
+  String undoGroupNumber(int number) {
+    return 'Undo Group $number';
+  }
+
+  @override
+  String undoGroupConfirm(int number) {
+    return 'Group $number and its matches are undone. Its participants go back to the list to be grouped again.';
+  }
+
+  @override
+  String undoGroupDone(int number) {
+    return 'Group $number undone';
+  }
+
+  @override
+  String get undoGroupStarted =>
+      'A match of this group has already started: only the administrator can undo it.';
+
+  @override
+  String get undoGroupError => 'The group could not be undone.';
 
   @override
   String get clubStandings => 'Scores';
