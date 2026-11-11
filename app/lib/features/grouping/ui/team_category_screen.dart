@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/app_bar_action.dart';
 import '../../../core/async_view.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../data/grouping_models.dart';
@@ -47,9 +48,9 @@ class TeamCategoryScreen extends ConsumerWidget {
           leadingWidth: UpButton.leadingWidth(context),
           title: Text(l10n.categoryAges(categoryName)),
           actions: [
-            TextButton.icon(
-              icon: const Icon(Icons.person_outline),
-              label: Text(l10n.individualGroup),
+            AppBarAction(
+              icon: Icons.person_outline,
+              label: l10n.individualGroup,
               // Replaces this screen, so back goes to the categories, not here.
               onPressed: () => context.pushReplacement(
                 '/events/$eventId/categories/$categoryId?teamSize=$teamSize',
