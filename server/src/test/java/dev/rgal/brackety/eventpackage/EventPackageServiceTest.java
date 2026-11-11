@@ -143,10 +143,11 @@ class EventPackageServiceTest extends EventApiTest {
 
     @Test
     void refusesAnUnknownSchemaVersion() {
-        var file = edit(root -> root.put("schemaVersion", 2));
+        var unknown = EventPackage.SCHEMA_VERSION + 1;
+        var file = edit(root -> root.put("schemaVersion", unknown));
         emptyDatabase();
 
-        assertThatThrownBy(() -> packages.load(file)).hasMessageContaining("unknown schemaVersion 2");
+        assertThatThrownBy(() -> packages.load(file)).hasMessageContaining("unknown schemaVersion " + unknown);
     }
 
     @Test

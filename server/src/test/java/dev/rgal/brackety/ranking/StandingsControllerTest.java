@@ -106,7 +106,8 @@ class StandingsControllerTest extends EventApiTest {
                 .andReturn()
                 .getResponse()
                 .getContentAsString(StandardCharsets.UTF_8);
-        assertThat(matches).contains(";0;15;Fantasma Prueba;Ana Prueba;finalizado;");
+        assertThat(matches).contains(";Ana Prueba;;").contains(";0;15;");
+        assertThat(matches).contains(";Descalificación de Ana Prueba;Terminado;Fantasma Prueba;");
     }
 
     @Test
