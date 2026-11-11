@@ -59,7 +59,7 @@ class OfflineImportControllerTest extends ScoreboardApiTest {
         var csv = v2
                 + v2Row(row(UUID.randomUUID(), "START", "", "", "09:00:00", 0), "")
                 + v2Row(row(UUID.randomUUID(), "STOP", "", "", "09:00:20", 1), "")
-                + v2Row(row(UUID.randomUUID(), "CLOCK_ADJUST", "", "", "09:00:25", 2), "10000");
+                + v2Row(row(UUID.randomUUID(), "CLOCK_ADJUST", "", "", "09:00:25", 2), "-10000");
 
         importAs("club1", csv)
                 .andExpect(status().isOk())
@@ -67,7 +67,7 @@ class OfflineImportControllerTest extends ScoreboardApiTest {
 
         call(get(path(match)), "club1")
                 .andExpect(jsonPath("$.timeline[2].type").value("CLOCK_ADJUST"))
-                .andExpect(jsonPath("$.timeline[2].deltaMs").value(10000));
+                .andExpect(jsonPath("$.timeline[2].deltaMs").value(-10000));
     }
 
     @Test
