@@ -1,4 +1,6 @@
 import 'package:brackety/app.dart';
+import 'package:brackety/core/app_bar_action.dart';
+import 'package:brackety/core/up_button.dart';
 import 'package:brackety/core/router.dart';
 import 'package:brackety/features/events/state/events_providers.dart';
 import 'package:brackety/features/grouping/data/grouping_models.dart';
@@ -11,6 +13,9 @@ import '../../support/fakes.dart';
 import '../../support/grouping_fakes.dart';
 
 void main() {
+  Finder action(String label) =>
+      find.byWidgetPredicate((w) => w is AppBarAction && w.label == label);
+
   const sizes = {
     'phone': Size(360, 800),
     'tablet': Size(800, 1280),
@@ -75,7 +80,7 @@ void main() {
     ) async {
       final repository = await open(tester, size);
 
-      expect(find.text('Individual group'), findsOneWidget);
+      expect(action('Individual group'), findsOneWidget);
       expect(find.text('New team · 0/3'), findsOneWidget);
       // Ana is in team 1: she cannot be picked again.
       await tester.tap(find.text('Ana Prueba'));
@@ -155,19 +160,19 @@ void main() {
   ) async {
     await open(tester, sizes['phone']!);
 
-    await tester.tap(find.text('Individual group'));
+    await tester.tap(action('Individual group'));
     await tester.pumpAndSettle();
     expect(find.text('New team · 0/3'), findsNothing);
 
-    await tester.tap(find.text('Team group'));
+    await tester.tap(action('Team group'));
     await tester.pumpAndSettle();
     expect(find.text('New team · 0/3'), findsOneWidget);
 
     // The two screens replace each other: back leaves the category, not to the other one.
-    await tester.tap(find.byTooltip('Back'));
+    await tester.tap(find.byType(UpButton));
     await tester.pumpAndSettle();
-    expect(find.text('Team group'), findsNothing);
-    expect(find.text('Individual group'), findsNothing);
+    expect(action('Team group'), findsNothing);
+    expect(action('Individual group'), findsNothing);
   });
 
   testWidgets('a team without a group can be undone', (tester) async {

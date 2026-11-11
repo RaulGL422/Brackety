@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/app_bar_action.dart';
 import '../../../core/async_view.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../data/grouping_models.dart';
@@ -129,9 +130,9 @@ class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
         ),
         actions: [
           if (widget.teamSize != null)
-            TextButton.icon(
-              icon: const Icon(Icons.groups_outlined),
-              label: Text(l10n.teamGroup),
+            AppBarAction(
+              icon: Icons.groups_outlined,
+              label: l10n.teamGroup,
               // Replaces this screen, so back goes to the categories.
               onPressed: () => context.pushReplacement(
                 Uri(
