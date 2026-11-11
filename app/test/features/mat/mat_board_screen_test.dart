@@ -75,6 +75,7 @@ void main() {
               cachedBoardProvider.overrideWith((ref, matId) async => board),
             ],
             child: MaterialApp(
+              builder: (_, child) => ToastHost(child: child!),
               theme: lightTheme(),
               localizationsDelegates: const [
                 AppLocalizations.delegate,
@@ -88,7 +89,10 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('Mat 2'), findsOneWidget);
-        expect(find.text('Group 3, ages 7-8'), findsNWidgets(2));
+        expect(
+          find.text('Group 3, ages 7-8', skipOffstage: false),
+          findsNWidgets(2),
+        );
         expect(find.text('Next match'), findsOneWidget);
         expect(find.text('2 to play'), findsOneWidget);
         expect(matchTile('Ana', 'Carla'), findsOneWidget);
@@ -121,6 +125,7 @@ void main() {
               cachedBoardProvider.overrideWith((ref, matId) async => live),
             ],
             child: MaterialApp(
+              builder: (_, child) => ToastHost(child: child!),
               theme: lightTheme(),
               localizationsDelegates: const [
                 AppLocalizations.delegate,
@@ -211,6 +216,7 @@ void main() {
           ),
         ],
         child: MaterialApp(
+          builder: (_, child) => ToastHost(child: child!),
           theme: lightTheme(),
           localizationsDelegates: const [
             AppLocalizations.delegate,
@@ -235,6 +241,7 @@ void main() {
       ProviderScope(
         overrides: [matBoardProvider.overrideWith((ref, matId) async => board)],
         child: MaterialApp(
+          builder: (_, child) => ToastHost(child: child!),
           theme: lightTheme(),
           localizationsDelegates: const [
             AppLocalizations.delegate,
@@ -302,6 +309,7 @@ void main() {
             cachedBoardProvider.overrideWith((ref, matId) async => teamBoard),
           ],
           child: MaterialApp(
+            builder: (_, child) => ToastHost(child: child!),
             theme: lightTheme(),
             localizationsDelegates: const [
               AppLocalizations.delegate,

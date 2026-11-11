@@ -57,7 +57,7 @@ class CornerPanel extends StatelessWidget {
                 ),
               ),
             ),
-            _Tally(corner: corner, style: onColor),
+            _Tally(corner: corner, style: onColor.copyWith(fontSize: 14)),
             const SizedBox(height: AppSpacing.s),
             _Buttons(
               side: side,
@@ -94,7 +94,11 @@ class _Header extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(cornerName(l10n, side), style: text.labelLarge?.merge(style)),
+        // Fixed at 14: the corner's height is shared with the score and the buttons.
+        Text(
+          cornerName(l10n, side),
+          style: text.labelLarge?.merge(style).copyWith(fontSize: 14),
+        ),
         Tooltip(
           message: name,
           // The text already gives the name to screen readers; the tooltip would repeat it.
@@ -207,18 +211,34 @@ class _Buttons extends StatelessWidget {
           itemBuilder: (_) => [
             PopupMenuItem(
               value: MatchAction.warning,
-              child: Text(l10n.actionWarning),
+              child: ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.flag_outlined),
+                title: Text(l10n.actionWarning),
+              ),
             ),
             if (corner.oneHandRule)
               PopupMenuItem(
                 value: MatchAction.oneHandWarning,
-                child: Text(l10n.actionOneHand),
+                child: ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.back_hand_outlined),
+                  title: Text(l10n.actionOneHand),
+                ),
               ),
+            const PopupMenuDivider(),
+            // Apart and in the error colour: it ends the match.
             PopupMenuItem(
               value: MatchAction.disqualification,
-              child: Text(
-                l10n.actionDisqualify,
-                style: TextStyle(color: scheme.error),
+              child: ListTile(
+                contentPadding: EdgeInsets.zero,
+                iconColor: scheme.error,
+                textColor: scheme.error,
+                leading: const Icon(Icons.block),
+                title: Text(
+                  l10n.actionDisqualify,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
               ),
             ),
           ],

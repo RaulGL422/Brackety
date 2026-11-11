@@ -97,7 +97,9 @@ void main() {
   ) async {
     await pumpAuthApp(tester, auth);
 
-    await tester.tap(find.byTooltip('Account settings'));
+    await tester.tap(find.byTooltip('My account'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Account settings'));
     await tester.pumpAndSettle();
 
     expect(find.byType(SettingsScreen), findsOneWidget);
@@ -289,6 +291,8 @@ void main() {
         ),
       );
 
+      await tester.ensureVisible(find.byTooltip('Remove profile').last);
+      await tester.pumpAndSettle();
       await tester.tap(find.byTooltip('Remove profile').last);
       await tester.pumpAndSettle();
       await tapText(tester, 'Remove');

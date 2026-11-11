@@ -13,11 +13,14 @@ abstract final class AppRadius {
   static const double s = 4;
   static const double m = 6;
   static const double l = 8;
+  static const double xl = 12;
   static const double full = 999;
 }
 
 abstract final class AppSizes {
   static const double touchTarget = 48;
+  // Buttons a little taller than the minimum target: they are the place to press.
+  static const double buttonHeight = 52;
   // Scoreboard buttons are pressed in a hurry, one-handed, at arm's length.
   static const double scoreTouchTarget = 72;
   // Icons on those buttons: recognisable at a glance from the side of the mat.

@@ -13,6 +13,7 @@ import '../../scoreboard/data/match_view.dart';
 import '../data/mat_board.dart';
 import '../state/mat_providers.dart';
 import 'fighter_text.dart';
+import '../../../core/up_button.dart';
 
 /// The referee's mat: what to do now first (the match in progress, the next one), then
 /// what comes later, what is finished and the groups on it.
@@ -50,6 +51,8 @@ class MatBoardScreen extends ConsumerWidget {
     return KeepScreenOn(
       child: Scaffold(
         appBar: AppBar(
+          leading: UpButton(label: l10n.eventsTitle, fallback: '/'),
+          leadingWidth: UpButton.leadingWidth(context),
           backgroundColor: colors.band,
           foregroundColor: colors.onBand,
           shape: const Border(),

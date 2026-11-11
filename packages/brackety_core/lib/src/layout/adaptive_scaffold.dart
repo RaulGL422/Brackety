@@ -19,6 +19,8 @@ class AdaptiveScaffold extends StatelessWidget {
     required this.onSelected,
     required this.body,
     this.actions,
+    this.leading,
+    this.leadingWidth,
   });
 
   static const maxContentWidth = 1200.0;
@@ -32,6 +34,8 @@ class AdaptiveScaffold extends StatelessWidget {
   final ValueChanged<int> onSelected;
   final Widget body;
   final List<Widget>? actions;
+  final Widget? leading;
+  final double? leadingWidth;
 
   /// Whether every bottom-bar label fits on one line in its share of the width. If one does
   /// not, the bar shows icons only (the label stays as tooltip and for screen readers): a
@@ -67,7 +71,12 @@ class AdaptiveScaffold extends StatelessWidget {
 
     if (size == WindowSize.compact) {
       return Scaffold(
-        appBar: AppBar(title: Text(title), actions: actions),
+        appBar: AppBar(
+          leading: leading,
+          leadingWidth: leadingWidth,
+          title: Text(title),
+          actions: actions,
+        ),
         body: content,
         bottomNavigationBar: NavigationBar(
           labelBehavior: _labelsFit(context)
@@ -84,7 +93,12 @@ class AdaptiveScaffold extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(title), actions: actions),
+      appBar: AppBar(
+        leading: leading,
+        leadingWidth: leadingWidth,
+        title: Text(title),
+        actions: actions,
+      ),
       body: Row(
         children: [
           NavigationRail(

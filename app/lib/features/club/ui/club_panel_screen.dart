@@ -13,6 +13,7 @@ import 'mats_tab.dart';
 import 'participants_tab.dart';
 import 'settings_tab.dart';
 import 'standings_tab.dart';
+import '../../../core/up_button.dart';
 
 /// What the club sees of its event: live scores, mats, entries and settings.
 class ClubPanelScreen extends ConsumerStatefulWidget {
@@ -32,6 +33,8 @@ class _ClubPanelScreenState extends ConsumerState<ClubPanelScreen> {
     final l10n = AppLocalizations.of(context);
     final eventName = ref.watch(myEventProvider(widget.eventId)).value?.name;
     return AdaptiveScaffold(
+      leading: UpButton(label: l10n.eventsTitle, fallback: '/'),
+      leadingWidth: UpButton.leadingWidth(context),
       title: eventName ?? l10n.eventClubPanel,
       actions: [
         if (kIsWeb) ...[
@@ -79,7 +82,7 @@ class ClubExportMenu extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     Future<void> export(EventExport export) async {
-      final messenger = ScaffoldMessenger.of(context);
+      final toasts = Toasts.of(context);
       try {
         final file = await ref
             .read(clubRepositoryProvider)
@@ -90,7 +93,7 @@ class ClubExportMenu extends ConsumerWidget {
           export.mimeType,
         );
       } on DioException {
-        messenger.showSnackBar(SnackBar(content: Text(l10n.exportError)));
+        toasts.show(l10n.exportError, kind: ToastKind.error);
       }
     }
 

@@ -512,14 +512,15 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String reasonTitle(String action, String fighter) {
-    return '$action · $fighter';
+    return '$action: $fighter';
   }
 
   @override
-  String get reasonLabel => 'Motivo (obligatorio)';
+  String get reasonLabel => 'Motivo';
 
   @override
-  String get reasonConfirm => '¿Seguro? Queda registrado.';
+  String get reasonConfirm =>
+      'Escribe el motivo. Queda en el historial del combate.';
 
   @override
   String get confirm => 'Confirmar';
@@ -563,16 +564,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get tlRivalPoint => 'punto al rival';
 
   @override
-  String get clubStandings => 'Puntuaciones';
+  String get clubStandings => 'Puntos';
 
   @override
   String get clubMats => 'Tapices';
 
   @override
-  String get clubParticipants => 'Inscripciones';
+  String get clubParticipants => 'Inscritos';
 
   @override
-  String get clubSettings => 'Configuración';
+  String get clubSettings => 'Ajustes';
 
   @override
   String get allCategories => 'Todas las categorías';
@@ -1599,4 +1600,21 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get accountSuspended =>
       'Esta cuenta está suspendida. Si crees que es un error, escribe al contacto de privacidad que aparece en las páginas legales.';
+
+  @override
+  String backTo(String place) {
+    return 'Volver a $place';
+  }
+
+  @override
+  String get reasonApplyWarning => 'Poner advertencia';
+
+  @override
+  String get reasonApplyDisqualify => 'Descalificar';
+
+  @override
+  String get accountMenu => 'Mi cuenta';
+
+  @override
+  String get back => 'Volver';
 }

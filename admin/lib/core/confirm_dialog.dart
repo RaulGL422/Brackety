@@ -33,6 +33,8 @@ class ConfirmDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return AlertDialog(
+      actionsOverflowDirection: VerticalDirection.up,
+      actionsOverflowButtonSpacing: 8,
       title: Text(title),
       // Long bodies would stretch the dialog across wide windows.
       content: ConstrainedBox(

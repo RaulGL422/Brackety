@@ -140,6 +140,8 @@ class _RejectedDialog extends ConsumerWidget {
       Localizations.localeOf(context).toLanguageTag(),
     );
     return AlertDialog(
+      actionsOverflowDirection: VerticalDirection.up,
+      actionsOverflowButtonSpacing: 8,
       title: Text(l10n.syncRejectedTitle),
       content: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: AppSizes.formMaxWidth),

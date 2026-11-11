@@ -8,7 +8,13 @@
   "noServer": "Cannot reach the server.",
   "unexpectedError": "Something went wrong. Try again.",
   "tooManyRequests": "Too many requests. Wait {seconds} s and try again.",
-  "@tooManyRequests": {"placeholders": {"seconds": {"type": "int"}}},
+  "@tooManyRequests": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
   "tooManyRequestsWait": "Too many requests. Wait a moment and try again.",
   "cancel": "Cancel",
   "continueAction": "Continue",
@@ -26,14 +32,26 @@
   "loginSubmit": "Sign in",
   "loginInvalid": "Wrong email or password.",
   "loginLocked": "Account locked for 15 minutes after too many failed attempts. If you need help, quote the code {lockId}.",
-  "@loginLocked": {"placeholders": {"lockId": {"type": "String"}}},
+  "@loginLocked": {
+    "placeholders": {
+      "lockId": {
+        "type": "String"
+      }
+    }
+  },
   "loginForgot": "Forgot your password?",
   "loginNoAccount": "No account? Sign up",
   "loginPasswordChanged": "Password changed. You can sign in with the new one.",
   "loginDemoAccounts": "Test accounts (development only)",
   "restoreTitle": "Account pending deletion",
   "restoreBody": "Your account will be deleted on {date}. Do you want to restore it?",
-  "@restoreBody": {"placeholders": {"date": {"type": "String"}}},
+  "@restoreBody": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "restoreConfirm": "Restore account",
   "restoreExpired": "Too much time has passed. Sign in again to restore the account.",
   "registerTitle": "Create account",
@@ -216,18 +234,30 @@
   "timeline": "Timeline",
   "addPoint": "+1",
   "addPointFor": "+1 {corner}",
-  "@addPointFor": {"placeholders": {"corner": {"type": "String"}}},
+  "@addPointFor": {
+    "placeholders": {
+      "corner": {
+        "type": "String"
+      }
+    }
+  },
   "sanctionsFor": "Warnings: {corner}",
-  "@sanctionsFor": {"placeholders": {"corner": {"type": "String"}}},
+  "@sanctionsFor": {
+    "placeholders": {
+      "corner": {
+        "type": "String"
+      }
+    }
+  },
   "warningsCount": "Warnings: {count}",
   "oneHandCount": "One hand: {count}",
   "disqualified": "Disqualified",
   "actionWarning": "Warning",
   "actionOneHand": "Warning for hitting with one hand",
   "actionDisqualify": "Disqualification",
-  "reasonTitle": "{action} · {fighter}",
-  "reasonLabel": "Reason (required)",
-  "reasonConfirm": "Sure? It is recorded.",
+  "reasonTitle": "{action}: {fighter}",
+  "reasonLabel": "Reason",
+  "reasonConfirm": "Write the reason. It stays in the match history.",
   "confirm": "Confirm",
   "endPoints": "Ended on points",
   "endTime": "Time is up",
@@ -299,7 +329,13 @@
   "matAutoOption": "The one free first",
   "matAutoHint": "It is assigned automatically to the mat that will be free first.",
   "matManualHint": "It goes to {mat}, picked by hand.",
-  "@matManualHint": {"placeholders": {"mat": {"type": "String"}}},
+  "@matManualHint": {
+    "placeholders": {
+      "mat": {
+        "type": "String"
+      }
+    }
+  },
   "individualGroupHint": "For those left without a team: groups of 4 participants.",
   "categoryTeamCounts": "{participants} registered · {teams} teams · {grouped} in groups",
   "newTeamCount": "New team · {count}/{size}",
@@ -509,15 +545,45 @@
   "draftTitle": "New group",
   "draftReady": "Complete",
   "draftMissing": "{count} to go",
-  "@draftMissing": {"placeholders": {"count": {"type": "int"}}},
+  "@draftMissing": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "draftSlot": "Slot {number}",
-  "@draftSlot": {"placeholders": {"number": {"type": "int"}}},
+  "@draftSlot": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
   "ghostOf": "{name} (ghost)",
-  "@ghostOf": {"placeholders": {"name": {"type": "String"}}},
+  "@ghostOf": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "settingsAppearance": "Appearance",
   "settingsAppearanceHint": "Automatic follows the device's light or dark mode. It is saved on this device only.",
   "themeSystem": "Automatic",
   "themeLight": "Light",
   "themeDark": "Dark",
-  "accountSuspended": "This account is suspended. If you think it is a mistake, write to the privacy contact on the legal pages."
+  "accountSuspended": "This account is suspended. If you think it is a mistake, write to the privacy contact on the legal pages.",
+  "backTo": "Back to {place}",
+  "@backTo": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "reasonApplyWarning": "Give warning",
+  "reasonApplyDisqualify": "Disqualify",
+  "accountMenu": "My account",
+  "back": "Back"
 }
