@@ -21,11 +21,11 @@ Llevar el evento ya preparado (configuración e inscripciones) y arrancarlo en c
 - `-Reset` (servidor parado, confirma s/N): renombra `brackety-data` a `brackety-data.old-AAAAMMDD-HHmmss`, nunca borra. Con `-Package` o `-Demo` sigue con un primer arranque.
 - `ACCESS_TTL=12h`: un móvil sin red un rato no pierde la sesión (el refresh sigue rotando).
 - `SERVER_FORWARD_HEADERS_STRATEGY=none`: sin proxy delante, Tomcat no hace caso de `X-Forwarded-For` (con `native` confía en cualquier IP privada, también en los móviles del punto de acceso, que se saltarían el bloqueo por IP y el limitador). En la Pi se queda `native`: la API solo es accesible desde el propio host (`127.0.0.1`) y la red de Docker.
-- La cookie de refresco es `Secure`: en http solo `localhost` mantiene la sesión web al recargar. Los móviles usarán la APK (paso 3).
+- `REFRESH_COOKIE_SECURE=false` (solo aquí): en http una cookie `Secure` no vuelve y la web perdería la sesión al recargar. En la Pi y Docker sigue `true`.
 - Sin Internet: sin emails, sin Google, sin importación con Claude (los alumnos se importan antes, en la Pi o en local).
 
 ### Generar y usar la carpeta
-1. En el PC de desarrollo (Internet la primera vez; el zip de PostgreSQL queda en `dist/cache/`): `.\deploy\local\build-event-bundle.ps1 [-NoApk]`. Conserva `brackety-data/` si ya existe. Incluye `brackety.apk` salvo con `-NoApk` (el build tarda minutos).
+1. En el PC de desarrollo (Internet la primera vez; el zip de PostgreSQL queda en `dist/cache/`): `.\deploy\local\build-event-bundle.ps1 [-Apk]`. Conserva `brackety-data/` si ya existe. Sin APK por defecto (en el pabellón se usa la web); `-Apk` la añade (el build tarda minutos).
 2. Copiar `dist/brackety-event/` al disco del portátil.
 3. `powershell -ExecutionPolicy Bypass -File .\start-event.ps1 -Package f1.brackety | -Demo [-EventDate AAAA-MM-DD]` la primera vez; después sin ellos. Además `[-LegalOwnerName …] [-PrivacyContactEmail …] [-Backup] [-Reset]`. Resto en `LEEME.txt` de la carpeta.
 
@@ -42,7 +42,7 @@ Llevar el evento ya preparado (configuración e inscripciones) y arrancarlo en c
 - El fichero lleva datos de menores: se guarda solo en el portátil del evento y se borra después (ver Legal).
 
 ### Dispositivos
-- Árbitros y ayudantes usan la **APK Android** (el offline de la web exige https, ver `offline.md`).
+- Árbitros y ayudantes usan la **web** del portátil (desde 2026-11-11 la web tiene la misma cola offline, ver `offline.md`). La APK queda como opción.
 - La APK elige el servidor en el login: "Pabellón" (`http://192.168.137.1:8080`), "Internet" (`https://brackety-api.rgal.dev`) o "Otra URL" (http/https con host). Se recuerda en el dispositivo (almacén seguro, junto al refresh token).
 - Por defecto, el `API_BASE_URL` del build. Solo en el login: cambiarlo cierra la sesión guardada (sus tokens son del otro servidor) y las peticiones siguientes van al nuevo sin reiniciar. La web no lo muestra.
 - http sin cifrar solo hacia la IP del pabellón (`network_security_config.xml`); el resto, https. "Otra URL" con http a otra IP avisa de que no conectará. Los builds debug permiten http a cualquier IP (desarrollo local).

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,6 +10,14 @@ import 'match_view.dart';
 final scoreboardRepositoryProvider = Provider<ScoreboardRepository>(
   (ref) => ScoreboardRepository(ref.watch(apiProvider)),
 );
+
+/// What an import did: new, already on the server, sent to review, refused.
+typedef OfflineImportResult = ({
+  int applied,
+  int duplicates,
+  int inReview,
+  int skipped,
+});
 
 class ScoreboardRepository {
   ScoreboardRepository(this._dio);
@@ -21,36 +31,29 @@ class ScoreboardRepository {
     return MatchView.fromJson(response.data!);
   }
 
-  /// [knownEvents]: the match's non-automatic actions this screen had seen. If the server has
-  /// more (another tab or device wrote), it refuses with a 409 `MATCH_STALE`.
-  Future<MatchView> send(
-    String matchId,
-    MatchAction action, {
-    Side? side,
-    String? reason,
-    Duration? delta,
-    required int knownEvents,
-  }) async {
-    final response = await _dio.post<Map<String, dynamic>>(
-      '/api/v1/matches/$matchId/events',
-      data: {
-        'type': action.wire,
-        'side': sideToJson(side),
-        'reason': reason,
-        'deltaMs': ?delta?.inMilliseconds,
-        'knownEvents': knownEvents,
-      },
-    );
-    return MatchView.fromJson(response.data!);
-  }
-
-  /// An action from the Android queue: applied once, at its own time ([OfflineOp.toRequest]).
+  /// An action from the device's queue: applied once, at its own time ([OfflineOp.toRequest]).
   Future<MatchView> sendOp(OfflineOp op) async {
     final response = await _dio.post<Map<String, dynamic>>(
       '/api/v1/matches/${op.matchId}/events',
       data: op.toRequest(),
     );
     return MatchView.fromJson(response.data!);
+  }
+
+  /// The club imports the CSV a device exported with the actions it could not send.
+  Future<OfflineImportResult> importOps(String eventId, List<int> csv) async {
+    final response = await _dio.post<Map<String, dynamic>>(
+      '/api/v1/events/$eventId/offline-ops/import',
+      data: utf8.decode(csv, allowMalformed: true),
+      options: Options(contentType: 'text/csv; charset=utf-8'),
+    );
+    final json = response.data!;
+    return (
+      applied: json['applied'] as int,
+      duplicates: json['duplicates'] as int,
+      inReview: json['inReview'] as int,
+      skipped: json['skipped'] as int,
+    );
   }
 
   /// The club applies or discards the actions a device sent that clashed.

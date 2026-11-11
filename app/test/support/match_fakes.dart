@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:brackety/features/mat/data/mat_board.dart';
+import 'package:brackety/features/offline/data/local_match.dart';
 import 'package:brackety/features/offline/data/offline_op.dart';
 import 'package:brackety/features/scoreboard/data/match_view.dart';
 import 'package:brackety/features/scoreboard/data/scoreboard_repository.dart';
@@ -94,66 +97,51 @@ MatchView matchView({
   ],
 );
 
-/// Answers with [next] (or the current view) and records what was sent.
+/// The server for the referee's queue: answers each action with [next] (or, without one, the
+/// current view with the action applied by the device's own rules) and records what was sent.
 class FakeScoreboardRepository implements ScoreboardRepository {
   FakeScoreboardRepository(this.current);
 
   MatchView current;
   MatchView? next;
 
-  /// When set, the next action is refused with this reason, as the server does with a 409.
+  /// When set, the next action is refused with this reason (a 4xx that is not a review).
   String? refusal;
 
-  /// When set, an action whose `knownEvents` differs from [current]'s is refused as the server
-  /// does (409 `MATCH_STALE`), as if another tab or device had written.
-  bool checkKnownEvents = false;
   final sent = <(MatchAction, Side?, String?)>[];
   final knownSent = <int>[];
+
+  /// Each answer waits for this, when set: the test decides when the server answers.
+  Completer<void>? hold;
 
   @override
   Future<MatchView> load(String matchId) async => current;
 
   @override
-  Future<MatchView> send(
-    String matchId,
-    MatchAction action, {
-    Side? side,
-    String? reason,
-    Duration? delta,
-    required int knownEvents,
-  }) async {
-    sent.add((action, side, reason));
-    knownSent.add(knownEvents);
-    if (checkKnownEvents && knownEvents != current.knownEvents) {
+  Future<MatchView> sendOp(OfflineOp op) async {
+    sent.add((op.action, op.side, op.reason));
+    knownSent.add(op.knownEvents);
+    await hold?.future;
+    final refused = refusal;
+    if (refused != null) {
+      refusal = null;
       throw DioException(
         requestOptions: RequestOptions(),
         response: Response(
           requestOptions: RequestOptions(),
-          statusCode: 409,
-          data: {'code': 'MATCH_STALE', 'detail': 'The match changed.'},
+          statusCode: 400,
+          data: {'detail': refused},
         ),
       );
     }
-    if (refusal != null) {
-      throw DioException(
-        requestOptions: RequestOptions(),
-        response: Response(
-          requestOptions: RequestOptions(),
-          statusCode: 409,
-          data: {'detail': refusal},
-        ),
-      );
-    }
-    if (next != null) {
-      current = next!;
-      next = null;
-    }
+    current = next ?? LocalMatch.project(current, [op], op.at).view;
+    next = null;
     return current;
   }
 
   @override
-  Future<MatchView> sendOp(OfflineOp op) =>
-      throw UnimplementedError('the web has no queue');
+  Future<OfflineImportResult> importOps(String eventId, List<int> csv) =>
+      throw UnimplementedError();
 
   @override
   Future<ReviewOutcome> review(String matchId, ReviewDecision decision) =>

@@ -15,11 +15,6 @@ import '../data/local_match.dart';
 import '../data/offline_op.dart';
 import '../data/offline_store.dart';
 
-/// Only the Android app queues the referee's actions; the web sends them as always.
-final offlineEnabledProvider = Provider<bool>(
-  (ref) => ref.watch(serverSelectableProvider),
-);
-
 /// The device's clock, so tests can fix it.
 final deviceClockProvider = Provider<DateTime Function()>(
   (ref) => DateTime.now,
@@ -98,11 +93,16 @@ final offlineSyncProvider = NotifierProvider<OfflineSync, OfflineState>(
   OfflineSync.new,
 );
 
-/// The referee's queue (docs/modulos/offline.md, "App (APK)"): every action goes in with its
-/// id, time and `knownEvents`, and goes out to the server in order, one at a time.
+/// The referee's queue (docs/modulos/offline.md, "App"), on Android and on the web: every action
+/// goes in with its id, time and `knownEvents`, and goes out to the server in order, one at a
+/// time.
 class OfflineSync extends Notifier<OfflineState> {
   /// Done once the queue and views on the device are loaded.
   late Future<void> ready;
+  var _loaded = false;
+  // The actions in the stored queue as this instance last read or wrote it. Another tab of the
+  // same browser shares that queue: what is stored and not here came from it.
+  var _lastStored = <String>{};
   Timer? _retry;
   var _flushing = false;
   var _prefetching = false;
@@ -153,16 +153,16 @@ class OfflineSync extends Notifier<OfflineState> {
     final queue = await _store.read('queue');
     final saved = await _store.read('views');
     if (!ref.mounted) return;
+    _loaded = true;
     if (queue case {'session': final String account}) _account = account;
     if (saved case {'clockOffsetMs': final int ms}) {
       _clockOffset = Duration(milliseconds: ms);
     }
+    final stored = _storedOps(queue);
+    _lastStored = {for (final op in stored) op.opId};
     state = OfflineState(
       // Until the session says whose they are.
-      hidden: [
-        if (queue case {'ops': final List ops})
-          for (final op in ops) OfflineOp.fromJson(op as Map<String, dynamic>),
-      ],
+      hidden: stored,
       heldForReview: {
         if (queue case {'heldForReview': final List ids})
           for (final id in ids) id as String,
@@ -268,7 +268,8 @@ class OfflineSync extends Notifier<OfflineState> {
   }
 
   /// Puts a referee action in the queue and starts sending. False, and nothing queued, when
-  /// the device has no view of the match.
+  /// the device has no view of the match. Once loaded it is in the state before the first
+  /// await: taps in a row each count the one before.
   Future<bool> enqueue(
     String matchId,
     MatchAction action, {
@@ -276,7 +277,7 @@ class OfflineSync extends Notifier<OfflineState> {
     String? reason,
     Duration? delta,
   }) async {
-    await ready;
+    if (!_loaded) await ready;
     final view = ref.mounted ? state.views[matchId] : null;
     if (view == null) return false;
     final op = OfflineOp(
@@ -487,13 +488,64 @@ class OfflineSync extends Notifier<OfflineState> {
         : serverTime.difference(ref.read(deviceClockProvider)());
   }
 
-  Future<void> _saveQueue() => _save('queue', {
-    'session': _account,
-    'ops': [
-      for (final op in [...state.ops, ...state.hidden]) op.toJson(),
-    ],
-    'heldForReview': [...state.heldForReview],
-  });
+  Future<void> _saveQueue() async {
+    await _takeInOtherTabs();
+    if (!ref.mounted) return;
+    final all = [...state.ops, ...state.hidden];
+    _lastStored = {for (final op in all) op.opId};
+    await _save('queue', {
+      'session': _account,
+      'ops': [for (final op in all) op.toJson()],
+      'heldForReview': [...state.heldForReview],
+    });
+  }
+
+  /// Actions another tab stored since this one last looked: they join this queue (and go out
+  /// from here too; the server takes each `opId` once), so writing it never drops them.
+  Future<void> _takeInOtherTabs() async {
+    final Object? stored;
+    try {
+      stored = await _store.read('queue');
+    } on Exception {
+      return;
+    }
+    if (!ref.mounted) return;
+    final known = {
+      for (final op in [...state.ops, ...state.hidden]) op.opId,
+    };
+    final arrived = [
+      for (final op in _storedOps(stored))
+        if (!known.contains(op.opId) && !_lastStored.contains(op.opId)) op,
+    ];
+    if (arrived.isEmpty) return;
+    state = state.copyWith(
+      ops: [
+        ...state.ops,
+        for (final op in arrived)
+          if (_account != null && op.account == _account) op,
+      ],
+      hidden: [
+        ...state.hidden,
+        for (final op in arrived)
+          if (_account == null || op.account != _account) op,
+      ],
+    );
+    for (final id in {for (final op in arrived) op.matchId}) {
+      if (state.views[id] == null && _account != null) unawaited(_reload(id));
+    }
+    if (state.pendingCount > 0 && !_flushing) unawaited(flush());
+  }
+
+  static List<OfflineOp> _storedOps(Object? queue) => [
+    if (queue case {'ops': final List ops})
+      for (final op in ops) OfflineOp.fromJson(op as Map<String, dynamic>),
+  ];
+
+  /// Every action not sent yet, of any account, for the rescue CSV.
+  List<OfflineOp> get unsent => [
+    for (final op in [...state.ops, ...state.hidden])
+      if (!op.rejected) op,
+  ];
 
   Future<void> _saveViews() => _save('views', {
     'clockOffsetMs': _clockOffset.inMilliseconds,

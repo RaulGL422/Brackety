@@ -11,18 +11,19 @@ import '../../offline/state/offline_sync.dart';
 import '../../scoreboard/data/match_view.dart';
 import '../data/mat_board.dart';
 
-/// The board refreshes on its own: other mats finish matches that change what is available here.
-const boardRefresh = Duration(seconds: 5);
+/// The board follows its mat on the live socket: matches on other mats change what is
+/// available here too, so the server signals it for any change in the event.
+Set<String> boardTopics(String matId) => {'mat:$matId'};
 
 final matBoardProvider = FutureProvider.autoDispose.family<MatBoard, String>(
-  (ref, matId) => reloadEvery(ref, boardRefresh, () => _board(ref, matId)),
+  (ref, matId) => liveReload(ref, boardTopics(matId), () => _board(ref, matId)),
 );
 
-/// The referee's board on Android: from the server, kept on the device, and from there when
-/// the server does not answer ([MatBoard.offline]).
+/// The referee's board: from the server, kept on the device, and from there when the server
+/// does not answer ([MatBoard.offline]).
 final cachedBoardProvider = FutureProvider.autoDispose.family<MatBoard, String>(
   (ref, matId) =>
-      reloadEvery(ref, boardRefresh, () => _cachedBoard(ref, matId)),
+      liveReload(ref, boardTopics(matId), () => _cachedBoard(ref, matId)),
 );
 
 Future<MatBoard> _board(Ref ref, String matId) async {

@@ -77,11 +77,24 @@ void main() {
           .push('/events/e1/categories/c1', extra: '7-8');
       await tester.pumpAndSettle();
 
+      // On a phone the list starts below the group's slots: Zoe is further down.
+      final list = find.byType(Scrollable).last;
+      Future<void> toTop() async {
+        await tester.drag(list, const Offset(0, 2000));
+        await tester.pumpAndSettle();
+      }
+
+      await tester.scrollUntilVisible(
+        find.text('Zoe Prueba'),
+        200,
+        scrollable: list,
+      );
       expect(find.text('Zoe Prueba'), findsOneWidget);
       expect(find.textContaining('Group 3 · Mat 2'), findsOneWidget);
 
       await tester.tap(find.text('Height'));
       await tester.pumpAndSettle();
+      await toTop();
       final names = tester
           .widgetList<Text>(find.textContaining(' Prueba'))
           .map((t) => t.data)
@@ -90,6 +103,12 @@ void main() {
 
       for (final name in ['Ana', 'Bea', 'Carla', 'Diego']) {
         // On a phone the group's slots leave room for a few rows: scroll to each one.
+        await toTop();
+        await tester.scrollUntilVisible(
+          find.text('$name Prueba'),
+          100,
+          scrollable: list,
+        );
         await tester.ensureVisible(find.text('$name Prueba'));
         await tester.pumpAndSettle();
         await tester.tap(find.text('$name Prueba'));

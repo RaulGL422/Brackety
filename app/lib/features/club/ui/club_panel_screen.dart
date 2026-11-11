@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/download/file_download.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../events/state/events_providers.dart';
+import '../../offline/ui/import_ops_button.dart';
 import '../data/club_repository.dart';
 import 'mats_tab.dart';
 import 'participants_tab.dart';
@@ -35,7 +36,12 @@ class _ClubPanelScreenState extends ConsumerState<ClubPanelScreen> {
       leading: UpButton(label: l10n.eventsTitle, fallback: '/'),
       leadingWidth: UpButton.leadingWidth(context),
       title: eventName ?? l10n.eventClubPanel,
-      actions: [if (kIsWeb) ClubExportMenu(eventId: widget.eventId)],
+      actions: [
+        if (kIsWeb) ...[
+          ImportOpsButton(eventId: widget.eventId),
+          ClubExportMenu(eventId: widget.eventId),
+        ],
+      ],
       destinations: [
         AdaptiveDestination(
           icon: Icons.leaderboard_outlined,

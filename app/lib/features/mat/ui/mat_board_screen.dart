@@ -8,7 +8,6 @@ import 'package:go_router/go_router.dart';
 import '../../../core/async_view.dart';
 import '../../../core/keep_screen_on.dart';
 import '../../../l10n/gen/app_localizations.dart';
-import '../../offline/state/offline_sync.dart';
 import '../../offline/ui/sync_status_bar.dart';
 import '../../scoreboard/data/match_view.dart';
 import '../data/mat_board.dart';
@@ -19,7 +18,7 @@ import '../../../core/up_button.dart';
 /// The referee's mat: what to do now first (the match in progress, the next one), then
 /// what comes later, what is finished and the groups on it.
 /// With [readOnly] (the club) every match opens its timeline instead of the scoreboard.
-/// The Android referee gets it through the device's queue and cache ([localBoardProvider]).
+/// The referee gets it through the device's queue and cache ([localBoardProvider]).
 /// [matNumber] titles the screen before the board loads (or if it fails).
 class MatBoardScreen extends ConsumerWidget {
   const MatBoardScreen({
@@ -38,7 +37,7 @@ class MatBoardScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final colors = BracketyColors.of(context);
     final text = Theme.of(context).textTheme;
-    final queued = !readOnly && ref.watch(offlineEnabledProvider);
+    final queued = !readOnly;
     final provider = queued
         ? cachedBoardProvider(matId)
         : matBoardProvider(matId);

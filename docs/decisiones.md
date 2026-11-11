@@ -56,3 +56,5 @@ Las de octubre de 2026, en `decisiones-2026-10.md`.
 - 2026-11-10 · Importación en desarrollo con la suscripción de Claude (`-LocalClaude`), solo en el lanzador local y con listas ficticias; producción sigue con `ANTHROPIC_API_KEY` · pedido por Raul: las pruebas con datos de ejemplo no deben gastar API.
 - 2026-11-11 · Descalificación = límite de puntos para el rival y 0 para el descalificado; duración (F1: 3:00) y límite editables en Configuración, sin cambiar con un combate en curso (el límite, tras empezar uno) · pedido por Raul para la F1.
 - 2026-11-11 · El ayudante puede deshacer un grupo mientras ningún combate suyo haya empezado; después solo el superadmin · corregir errores al crear sin borrar puntos.
+- 2026-11-11 · Tiempo real con un WebSocket simple que solo avisa "esto cambió" (el cliente vuelve a pedir por REST), no STOMP; sondeo de respaldo cada 20 s · permisos y vistas en un solo sitio; un aviso perdido solo retrasa.
+- 2026-11-11 · En la F1 árbitros y ayudantes usan la web también en el pabellón, con la misma cola offline que la APK guardada en el navegador; el paquete ya no lleva APK por defecto · pedido por Raul: solo web, que es lo probado.

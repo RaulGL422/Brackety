@@ -109,38 +109,49 @@ class LocalMatch {
           oneHandWarnings: state.oneHandWarnings(side),
           disqualified: state.disqualified == side,
         );
-    final view = MatchView(
-      id: server.id,
-      matId: server.matId,
-      matNumber: server.matNumber,
-      groupNumber: server.groupNumber,
-      status: state.finished
-          ? MatchStatus.finished
-          : timeline.length > server.timeline.length
-          ? MatchStatus.inProgress
-          : server.status,
-      length: server.length,
-      pointsLimit: server.pointsLimit,
-      remaining: state.remainingAt(now),
-      running: state.isRunning(now),
-      endReason: state.endReason(now),
-      red: corner(Side.red),
-      blue: corner(Side.blue),
-      timeline: [
-        for (final e in timeline)
-          e.id == null
-              ? e
-              : e.withFlags(
-                  undone: e.undone || undone.contains(e.id),
-                  gaveRivalPoint:
-                      e.gaveRivalPoint || state.gaveAutoPoint(e.id!),
-                ),
-      ],
-      serverTime: server.serverTime,
-      review:
-          server.review ?? (heldForReview ? const MatchReview.pending() : null),
-    );
+    final view = pending.isEmpty && !heldForReview
+        ? _serverAt(server, now)
+        : MatchView(
+            id: server.id,
+            matId: server.matId,
+            matNumber: server.matNumber,
+            groupNumber: server.groupNumber,
+            status: state.finished
+                ? MatchStatus.finished
+                : timeline.length > server.timeline.length
+                ? MatchStatus.inProgress
+                : server.status,
+            length: server.length,
+            pointsLimit: server.pointsLimit,
+            remaining: state.remainingAt(now),
+            running: state.isRunning(now),
+            endReason: state.endReason(now),
+            red: corner(Side.red),
+            blue: corner(Side.blue),
+            timeline: [
+              for (final e in timeline)
+                e.id == null
+                    ? e
+                    : e.withFlags(
+                        undone: e.undone || undone.contains(e.id),
+                        gaveRivalPoint:
+                            e.gaveRivalPoint || state.gaveAutoPoint(e.id!),
+                      ),
+            ],
+            serverTime: server.serverTime,
+            review:
+                server.review ??
+                (heldForReview ? const MatchReview.pending() : null),
+          );
     return LocalMatch._(view, state, lastAt);
+  }
+
+  // Nothing queued: the server's view is the truth, only its clock moves on since it was sent.
+  static MatchView _serverAt(MatchView server, DateTime now) {
+    final sent = server.serverTime;
+    if (!server.running || sent == null) return server;
+    final left = server.remaining - now.difference(sent);
+    return server.withRemaining(left.isNegative ? Duration.zero : left);
   }
 
   final MatchView view;
