@@ -100,7 +100,7 @@ class _OrganizerList extends ConsumerWidget {
       confirmLabel: l10n.organizerValidate,
     );
     if (!confirmed || !context.mounted) return;
-    final messenger = ScaffoldMessenger.of(context);
+    final toasts = Toasts.of(context);
     String? message;
     try {
       final result = await ref
@@ -113,7 +113,7 @@ class _OrganizerList extends ConsumerWidget {
       message = actionErrorMessage(l10n, AdminApiError.from(e));
     }
     if (message != null) {
-      messenger.showSnackBar(SnackBar(content: Text(message)));
+      toasts.show(message);
     }
   }
 

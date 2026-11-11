@@ -81,6 +81,8 @@ class _ParticipantFormState extends ConsumerState<_ParticipantForm> {
     String? required(String? v) =>
         v == null || v.trim().isEmpty ? l10n.fieldRequired : null;
     return AlertDialog(
+      actionsOverflowDirection: VerticalDirection.up,
+      actionsOverflowButtonSpacing: 8,
       title: Text(
         widget.participant == null ? l10n.participantAdd : l10n.participantEdit,
       ),
@@ -210,8 +212,7 @@ class _ParticipantFormState extends ConsumerState<_ParticipantForm> {
     } on DioException catch (e) {
       if (!mounted) return;
       setState(() => _saving = false);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(saveErrorMessage(l10n, e))));
+      Toasts.of(context).show(saveErrorMessage(l10n, e), kind: ToastKind.error);
     }
   }
 }

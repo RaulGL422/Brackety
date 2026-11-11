@@ -38,7 +38,7 @@ class _CategoriesEditorState extends ConsumerState<CategoriesEditor> {
 
   Future<void> _save(List<EventCategory> next) async {
     final l10n = AppLocalizations.of(context);
-    final messenger = ScaffoldMessenger.of(context);
+    final toasts = Toasts.of(context);
     setState(() => _saving = true);
     try {
       final saved = await ref
@@ -49,22 +49,13 @@ class _CategoriesEditorState extends ConsumerState<CategoriesEditor> {
         ..invalidate(eventSettingsProvider(widget.eventId))
         ..invalidate(participantsProvider(widget.eventId))
         ..invalidate(categoriesProvider(widget.eventId));
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(l10n.saved),
-          duration: const Duration(seconds: 1),
-        ),
-      );
+      toasts.show(l10n.saved, duration: const Duration(seconds: 1));
     } on DioException catch (e) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(switch (e.response?.statusCode) {
-            409 => l10n.categoriesInUse,
-            400 => l10n.categoriesInvalid,
-            _ => l10n.saveError,
-          }),
-        ),
-      );
+      toasts.show(switch (e.response?.statusCode) {
+        409 => l10n.categoriesInUse,
+        400 => l10n.categoriesInvalid,
+        _ => l10n.saveError,
+      }, kind: ToastKind.error);
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -169,6 +160,8 @@ class _CategoryDialogState extends State<_CategoryDialog> {
     }
 
     return AlertDialog(
+      actionsOverflowDirection: VerticalDirection.up,
+      actionsOverflowButtonSpacing: 8,
       title: Text(
         widget.initial == null ? l10n.categoryAdd : l10n.categoryEdit,
       ),

@@ -11,6 +11,7 @@ import '../state/grouping_providers.dart';
 import 'create_groups.dart';
 import 'draft_panel.dart';
 import 'pick_mark.dart';
+import '../../../core/up_button.dart';
 
 /// A category's participants: pick 4 (or 3 and a ghost) and send them to a mat.
 /// Opened from a team category ([teamSize] set) for those left without a team, with a way back.
@@ -116,6 +117,11 @@ class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
     final wide = WindowSize.of(context) == WindowSize.expanded;
     return Scaffold(
       appBar: AppBar(
+        leading: UpButton(
+          label: l10n.categoriesTitle,
+          fallback: '/events/${widget.eventId}/categories',
+        ),
+        leadingWidth: UpButton.leadingWidth(context),
         title: Text(
           widget.categoryName == null
               ? l10n.categoriesTitle

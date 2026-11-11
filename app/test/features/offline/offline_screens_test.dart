@@ -74,6 +74,7 @@ void main() {
           ),
         ],
         child: MaterialApp(
+          builder: (_, child) => ToastHost(child: child!),
           theme: lightTheme(),
           localizationsDelegates: const [
             AppLocalizations.delegate,

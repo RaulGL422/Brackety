@@ -41,6 +41,7 @@ void main() {
           bellProvider.overrideWithValue(bell),
         ],
         child: MaterialApp(
+          builder: (_, child) => ToastHost(child: child!),
           theme: lightTheme(),
           localizationsDelegates: const [
             AppLocalizations.delegate,
@@ -132,7 +133,7 @@ void main() {
     await tester.tap(find.text('Warning'));
     await settle(tester);
 
-    final confirm = find.widgetWithText(FilledButton, 'Confirm');
+    final confirm = find.widgetWithText(FilledButton, 'Give warning');
     expect(tester.widget<FilledButton>(confirm).onPressed, isNull);
     await tester.enterText(find.byType(TextField), 'Ataque de pique');
     await settle(tester);
@@ -399,10 +400,13 @@ void main() {
 
     await tester.tap(find.byType(PopupMenuButton<MatchAction>).first);
     await settle(tester);
-    final item = tester.widget<Text>(find.text('Disqualification'));
-    final scheme = Theme.of(tester.element(find.text('Disqualification')))
-        .colorScheme;
-    expect(item.style?.color, scheme.error);
+    final label = find.text('Disqualification');
+    final item = tester.widget<ListTile>(
+      find.ancestor(of: label, matching: find.byType(ListTile)),
+    );
+    final scheme = Theme.of(tester.element(label)).colorScheme;
+    expect(item.textColor, scheme.error);
+    expect(item.iconColor, scheme.error);
 
     await tester.pumpWidget(const SizedBox());
   });

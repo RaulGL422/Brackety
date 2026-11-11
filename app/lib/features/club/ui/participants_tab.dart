@@ -109,10 +109,12 @@ class _ParticipantTile extends ConsumerWidget {
 
   Future<void> _delete(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context);
-    final messenger = ScaffoldMessenger.of(context);
+    final toasts = Toasts.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        actionsOverflowDirection: VerticalDirection.up,
+        actionsOverflowButtonSpacing: 8,
         title: Text(
           l10n.deleteParticipantTitle('${p.firstName} ${p.lastName}'),
         ),
@@ -133,9 +135,7 @@ class _ParticipantTile extends ConsumerWidget {
       await ref.read(clubRepositoryProvider).deleteParticipant(eventId, p.id);
       ref.invalidate(participantsProvider(eventId));
     } on DioException catch (e) {
-      messenger.showSnackBar(
-        SnackBar(content: Text(saveErrorMessage(l10n, e))),
-      );
+      toasts.show(saveErrorMessage(l10n, e), kind: ToastKind.error);
     }
   }
 }

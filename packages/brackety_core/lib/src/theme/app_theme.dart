@@ -38,15 +38,21 @@ ThemeData buildTheme(Brightness brightness) {
   final buttonShape = RoundedRectangleBorder(
     borderRadius: BorderRadius.circular(AppRadius.m),
   );
-  const buttonSize = Size(64, AppSizes.touchTarget);
+  const buttonSize = Size(64, AppSizes.buttonHeight);
   final buttonText = base.textTheme.labelLarge!.copyWith(
-    fontSize: 16,
-    fontWeight: FontWeight.w700,
+    fontSize: 17,
+    fontWeight: FontWeight.w800,
+  );
+  final colors = BracketyColors.from(brightness);
+  final text = _textTheme(base.textTheme);
+  final menuShape = RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(AppRadius.l),
+    side: BorderSide(color: scheme.outlineVariant),
   );
 
   return base.copyWith(
-    textTheme: _textTheme(base.textTheme),
-    extensions: [BracketyColors.from(brightness)],
+    textTheme: text,
+    extensions: [colors],
     appBarTheme: AppBarTheme(
       backgroundColor: scheme.surface,
       foregroundColor: scheme.onSurface,
@@ -57,6 +63,8 @@ ThemeData buildTheme(Brightness brightness) {
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
+        backgroundColor: colors.action,
+        foregroundColor: colors.onAction,
         minimumSize: buttonSize,
         shape: buttonShape,
         textStyle: buttonText,
@@ -72,10 +80,16 @@ ThemeData buildTheme(Brightness brightness) {
       ),
     ),
     textButtonTheme: TextButtonThemeData(
+      // A text button is the quiet way out (Cancelar, Volver): ink and underlined, so it
+      // reads as pressable without competing with the action.
       style: TextButton.styleFrom(
         minimumSize: buttonSize,
         shape: buttonShape,
-        textStyle: buttonText,
+        foregroundColor: scheme.onSurface,
+        textStyle: buttonText.copyWith(
+          fontWeight: FontWeight.w700,
+          decoration: TextDecoration.underline,
+        ),
       ),
     ),
     segmentedButtonTheme: SegmentedButtonThemeData(
@@ -116,23 +130,89 @@ ThemeData buildTheme(Brightness brightness) {
         borderRadius: BorderRadius.circular(AppRadius.s),
       ),
     ),
+    // Titles in the body font: the condensed display face is for numbers and big headers,
+    // in a dialog it looked squeezed.
     dialogTheme: DialogThemeData(
+      backgroundColor: scheme.surfaceContainerLowest,
+      insetPadding: const EdgeInsets.all(AppSpacing.l),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadius.l),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
       ),
+      titleTextStyle: text.titleLarge!.copyWith(
+        fontFamily: _bodyFont,
+        fontSize: 22,
+        fontWeight: FontWeight.w800,
+        height: 1.25,
+        color: scheme.onSurface,
+      ),
+      contentTextStyle: text.bodyLarge!.copyWith(
+        height: 1.5,
+        color: scheme.onSurface,
+      ),
+      actionsPadding: const EdgeInsets.fromLTRB(
+        AppSpacing.xl,
+        0,
+        AppSpacing.xl,
+        AppSpacing.l,
+      ),
+    ),
+    popupMenuTheme: PopupMenuThemeData(
+      color: scheme.surfaceContainerLowest,
+      surfaceTintColor: Colors.transparent,
+      elevation: 6,
+      shape: menuShape,
+      menuPadding: const EdgeInsets.symmetric(vertical: AppSpacing.s),
+      textStyle: text.bodyLarge!.copyWith(color: scheme.onSurface),
+      labelTextStyle: WidgetStatePropertyAll(
+        text.bodyLarge!.copyWith(color: scheme.onSurface),
+      ),
+      position: PopupMenuPosition.under,
+    ),
+    menuTheme: MenuThemeData(
+      style: MenuStyle(
+        backgroundColor: WidgetStatePropertyAll(scheme.surfaceContainerLowest),
+        surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
+        elevation: const WidgetStatePropertyAll(6),
+        shape: WidgetStatePropertyAll(menuShape),
+      ),
+    ),
+    menuButtonTheme: MenuButtonThemeData(
+      style: MenuItemButton.styleFrom(
+        minimumSize: const Size(0, AppSizes.buttonHeight),
+        textStyle: text.bodyLarge,
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.l),
+      ),
+    ),
+    tooltipTheme: TooltipThemeData(
+      textStyle: text.bodyMedium!.copyWith(color: scheme.onInverseSurface),
+      waitDuration: const Duration(milliseconds: 400),
     ),
     navigationBarTheme: NavigationBarThemeData(
       backgroundColor: scheme.surfaceContainerLowest,
-      indicatorColor: scheme.primaryContainer,
+      indicatorColor: colors.actionContainer,
       indicatorShape: buttonShape,
+      labelTextStyle: WidgetStateProperty.resolveWith(
+        // 13 px: four labels of a phone bar must fit in 90 px each, or the bar drops them.
+        (states) => text.labelMedium!.copyWith(
+          fontSize: 13,
+          fontWeight: states.contains(WidgetState.selected)
+              ? FontWeight.w800
+              : FontWeight.w500,
+        ),
+      ),
     ),
     navigationRailTheme: NavigationRailThemeData(
       backgroundColor: scheme.surfaceContainerLowest,
-      indicatorColor: scheme.primaryContainer,
+      indicatorColor: colors.actionContainer,
       indicatorShape: buttonShape,
+      selectedLabelTextStyle: text.labelLarge!.copyWith(
+        fontWeight: FontWeight.w800,
+      ),
+      unselectedLabelTextStyle: text.labelLarge,
     ),
     dividerTheme: DividerThemeData(color: scheme.outlineVariant, space: 1),
     snackBarTheme: const SnackBarThemeData(behavior: SnackBarBehavior.floating),
+    progressIndicatorTheme: ProgressIndicatorThemeData(color: colors.action),
   );
 }
 
@@ -218,7 +298,20 @@ TextTheme _textTheme(TextTheme base) {
     headlineMedium: display(base.headlineMedium!, FontWeight.w700),
     headlineSmall: display(base.headlineSmall!, FontWeight.w700),
     titleLarge: base.titleLarge!.copyWith(fontWeight: FontWeight.w700),
-    titleMedium: base.titleMedium!.copyWith(fontWeight: FontWeight.w700),
-    titleSmall: base.titleSmall!.copyWith(fontWeight: FontWeight.w700),
+    titleMedium: base.titleMedium!.copyWith(
+      fontSize: 18,
+      fontWeight: FontWeight.w700,
+    ),
+    titleSmall: base.titleSmall!.copyWith(
+      fontSize: 16,
+      fontWeight: FontWeight.w700,
+    ),
+    // One step bigger than Material: read at arm's length, standing, in a sports hall.
+    bodyLarge: base.bodyLarge!.copyWith(fontSize: 17),
+    bodyMedium: base.bodyMedium!.copyWith(fontSize: 16),
+    bodySmall: base.bodySmall!.copyWith(fontSize: 14),
+    labelLarge: base.labelLarge!.copyWith(fontSize: 16),
+    labelMedium: base.labelMedium!.copyWith(fontSize: 14),
+    labelSmall: base.labelSmall!.copyWith(fontSize: 13),
   );
 }

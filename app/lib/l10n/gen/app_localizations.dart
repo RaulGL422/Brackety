@@ -947,19 +947,19 @@ abstract class AppLocalizations {
   /// No description provided for @reasonTitle.
   ///
   /// In es, this message translates to:
-  /// **'{action} · {fighter}'**
+  /// **'{action}: {fighter}'**
   String reasonTitle(String action, String fighter);
 
   /// No description provided for @reasonLabel.
   ///
   /// In es, this message translates to:
-  /// **'Motivo (obligatorio)'**
+  /// **'Motivo'**
   String get reasonLabel;
 
   /// No description provided for @reasonConfirm.
   ///
   /// In es, this message translates to:
-  /// **'¿Seguro? Queda registrado.'**
+  /// **'Escribe el motivo. Queda en el historial del combate.'**
   String get reasonConfirm;
 
   /// No description provided for @confirm.
@@ -1043,7 +1043,7 @@ abstract class AppLocalizations {
   /// No description provided for @clubStandings.
   ///
   /// In es, this message translates to:
-  /// **'Puntuaciones'**
+  /// **'Puntos'**
   String get clubStandings;
 
   /// No description provided for @clubMats.
@@ -1055,13 +1055,13 @@ abstract class AppLocalizations {
   /// No description provided for @clubParticipants.
   ///
   /// In es, this message translates to:
-  /// **'Inscripciones'**
+  /// **'Inscritos'**
   String get clubParticipants;
 
   /// No description provided for @clubSettings.
   ///
   /// In es, this message translates to:
-  /// **'Configuración'**
+  /// **'Ajustes'**
   String get clubSettings;
 
   /// No description provided for @allCategories.
@@ -2659,6 +2659,36 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Esta cuenta está suspendida. Si crees que es un error, escribe al contacto de privacidad que aparece en las páginas legales.'**
   String get accountSuspended;
+
+  /// No description provided for @backTo.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver a {place}'**
+  String backTo(String place);
+
+  /// No description provided for @reasonApplyWarning.
+  ///
+  /// In es, this message translates to:
+  /// **'Poner advertencia'**
+  String get reasonApplyWarning;
+
+  /// No description provided for @reasonApplyDisqualify.
+  ///
+  /// In es, this message translates to:
+  /// **'Descalificar'**
+  String get reasonApplyDisqualify;
+
+  /// No description provided for @accountMenu.
+  ///
+  /// In es, this message translates to:
+  /// **'Mi cuenta'**
+  String get accountMenu;
+
+  /// No description provided for @back.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver'**
+  String get back;
 }
 
 class _AppLocalizationsDelegate

@@ -76,7 +76,9 @@ void main() {
         findsNothing,
       );
 
-      await tester.tap(find.byTooltip('Connection'));
+      await tester.tap(find.byTooltip('My account'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Connection'));
       await tester.pumpAndSettle();
       expect(find.text(apiBaseUrl), findsOneWidget);
       expect(find.text('Server date: March 10, 2027'), findsOneWidget);
@@ -128,7 +130,9 @@ void main() {
     await tester.pumpWidget(app(api));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byTooltip('Sign out'));
+    await tester.tap(find.byTooltip('My account'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Sign out'));
     await tester.pumpAndSettle();
 
     expect(find.widgetWithText(FilledButton, 'Sign in'), findsOneWidget);

@@ -34,4 +34,7 @@ class CoreLocalizationsEn extends CoreLocalizations {
 
   @override
   String get licenses => 'Software licenses';
+
+  @override
+  String get closeNotice => 'Close notice';
 }

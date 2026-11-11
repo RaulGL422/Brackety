@@ -139,6 +139,12 @@ abstract class CoreLocalizations {
   /// In es, this message translates to:
   /// **'Licencias de software'**
   String get licenses;
+
+  /// No description provided for @closeNotice.
+  ///
+  /// In es, this message translates to:
+  /// **'Cerrar aviso'**
+  String get closeNotice;
 }
 
 class _CoreLocalizationsDelegate

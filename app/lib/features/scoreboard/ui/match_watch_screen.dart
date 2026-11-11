@@ -10,6 +10,7 @@ import '../state/match_review.dart';
 import 'final_score.dart';
 import 'review_panel.dart';
 import 'timeline_list.dart';
+import '../../../core/up_button.dart';
 
 /// A match seen by the club: score and timeline, without controls. In review, what the phone
 /// sent and the buttons to apply or discard it.
@@ -25,6 +26,15 @@ class MatchWatchScreen extends ConsumerWidget {
     final match = ref.watch(provider);
     return Scaffold(
       appBar: AppBar(
+        leading: UpButton(
+          label: match.value == null
+              ? l10n.eventsTitle
+              : l10n.matTitle(match.value!.matNumber),
+          fallback: match.value == null
+              ? '/'
+              : '/club/mats/${match.value!.matId}?number=${match.value!.matNumber}',
+        ),
+        leadingWidth: UpButton.leadingWidth(context),
         title: Text(switch (match.value) {
           final view? => l10n.scoreboardTitle(view.matNumber, view.groupNumber),
           null => l10n.timeline,

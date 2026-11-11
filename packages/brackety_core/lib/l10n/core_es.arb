@@ -14,5 +14,6 @@
         "format": "yMMMMd"
       }
     }
-  }
+  },
+  "closeNotice": "Cerrar aviso"
 }

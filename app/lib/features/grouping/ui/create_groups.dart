@@ -20,7 +20,7 @@ Future<bool> createGroup(
   required VoidCallback refresh,
 }) async {
   final l10n = AppLocalizations.of(context);
-  final messenger = ScaffoldMessenger.of(context);
+  final toasts = Toasts.of(context);
   try {
     final created = await ref
         .read(groupingRepositoryProvider)
@@ -30,6 +30,8 @@ Future<bool> createGroup(
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
+        actionsOverflowDirection: VerticalDirection.up,
+        actionsOverflowButtonSpacing: 8,
         title: Text(l10n.groupsCreatedTitle(created.groupNumbers.length)),
         // An icon, not "→": the display font has no arrow.
         content: DefaultTextStyle.merge(
@@ -56,10 +58,9 @@ Future<bool> createGroup(
   } on DioException catch (e) {
     final conflict = e.response?.statusCode == 409;
     if (conflict) refresh();
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(conflict ? l10n.groupsConflict : l10n.groupsError),
-      ),
+    toasts.show(
+      conflict ? l10n.groupsConflict : l10n.groupsError,
+      kind: ToastKind.error,
     );
     return false;
   }
