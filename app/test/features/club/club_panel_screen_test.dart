@@ -25,6 +25,7 @@ class FakeClubRepository extends Fake implements ClubRepository {
   int? refuseWith;
   final savedMatReferees = <List<String?>>[];
   final savedRules = <(Duration, int)>[];
+  final savedAttendance = <int>[];
   final savedCategories = <List<EventCategory>>[];
   final savedParticipantCategories = <String?>[];
   final savedParticipantOrganizations = <String?>[];
@@ -98,10 +99,12 @@ class FakeClubRepository extends Fake implements ClubRepository {
     required List<String?> matReferees,
     required Duration matchLength,
     required int pointsLimit,
+    required int attendancePoints,
   }) async {
     _refuse();
     savedMatReferees.add(matReferees);
     savedRules.add((matchLength, pointsLimit));
+    savedAttendance.add(attendancePoints);
     return current = EventSettings(
       name: name,
       date: date,
@@ -110,6 +113,7 @@ class FakeClubRepository extends Fake implements ClubRepository {
       categories: current.categories,
       matchLength: matchLength,
       pointsLimit: pointsLimit,
+      attendancePoints: attendancePoints,
       organizations: current.organizations,
     );
   }
@@ -136,6 +140,7 @@ void main() {
     referees: const [StaffMember(id: 'r1', username: 'arbitro1')],
     matchLength: const Duration(minutes: 3),
     pointsLimit: 15,
+    attendancePoints: 10,
     categories: const [
       EventCategory(id: 'c1', name: '4-7', minAge: 4, maxAge: 7),
       EventCategory(id: 'c2', name: '8-11', minAge: 8, maxAge: 11),
@@ -389,6 +394,8 @@ void main() {
     );
     expect(find.textContaining('No clubs yet'), findsOneWidget);
 
+    await tester.ensureVisible(find.text('Add club'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Add club'));
     await tester.pumpAndSettle();
     await tester.enterText(
@@ -420,6 +427,7 @@ void main() {
         categories: settings.categories,
         matchLength: settings.matchLength,
         pointsLimit: settings.pointsLimit,
+        attendancePoints: settings.attendancePoints,
         organizations: const [
           Organization(id: 'o1', name: 'Club Yoseikan Sevilla'),
         ],
@@ -530,6 +538,27 @@ void main() {
       const Duration(minutes: 2, seconds: 30),
       10,
     ));
+  });
+
+  testWidgets('the club changes the attendance points of the phase', (
+    tester,
+  ) async {
+    final repository = FakeClubRepository(settings);
+    await pumpPanel(tester, const Size(360, 800), repository: repository);
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+
+    final attendance = find.widgetWithText(TextFormField, 'Attendance points');
+    await tester.ensureVisible(attendance);
+    await tester.enterText(attendance, '101');
+    await tester.pump(const Duration(seconds: 1));
+    expect(find.text('Between 0 and 100'), findsOneWidget);
+    expect(repository.savedAttendance, isEmpty);
+
+    await tester.enterText(attendance, '5');
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    expect(repository.savedAttendance.last, 5);
   });
 
   testWidgets('a match length refused by a started match says why', (

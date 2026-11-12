@@ -13,7 +13,7 @@
 | ayudantes-permisos | modulos/ayudantes-permisos.md | pendiente | – |
 | puntuacion | modulos/puntuacion.md | pendiente | – |
 | liga | modulos/liga.md | pendiente | – |
-| liga-fases | modulos/liga-fases.md | en pruebas: servidor (#75) y pantallas: mis eventos por liga, selector de fase, pestaña Liga (fases, nueva fase, clasificación acumulada con medallas, podios) y reinscripción de otras fases; falta la prueba a mano (2026-11-12) | feat/league-phases-front |
+| liga-fases | modulos/liga-fases.md | en pruebas: servidor (#75) y pantallas: mis eventos por liga, selector de fase, pestaña Liga (fases, nueva fase, clasificación acumulada con medallas, podios) y reinscripción de otras fases (#81); puntos por asistir en Configuración; falta la prueba a mano (2026-11-12) | feat/league-phases-attendance |
 | torneo | modulos/torneo.md | pendiente | – |
 | marcador-tapiz | modulos/marcador-tapiz.md | pendiente | – |
 | tiempo-real | modulos/tiempo-real.md | en pruebas: WebSocket de avisos "esto cambió" (marcador, tablero, Tapices, Puntuaciones) con sondeo de respaldo (2026-11-11) | feat/realtime-offline-web |

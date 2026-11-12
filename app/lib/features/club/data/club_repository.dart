@@ -53,6 +53,7 @@ class ClubRepository {
     required List<String?> matReferees,
     required Duration matchLength,
     required int pointsLimit,
+    required int attendancePoints,
   }) async {
     final response = await _dio.put<Map<String, dynamic>>(
       '/api/v1/events/$eventId/settings',
@@ -64,6 +65,7 @@ class ClubRepository {
         'matReferees': matReferees,
         'matchSeconds': matchLength.inSeconds,
         'pointsLimit': pointsLimit,
+        'attendancePoints': attendancePoints,
       },
     );
     return EventSettings.fromJson(response.data!);

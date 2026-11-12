@@ -1968,4 +1968,8 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get settingsAttendanceHint =>
+      'Every entry of this phase adds them to the league standings. Changing them recalculates the standings.';
 }

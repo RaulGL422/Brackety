@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
+import '../../club/ui/settings_tab.dart';
 import '../../events/state/events_providers.dart';
 import '../data/league_models.dart';
 import '../data/league_repository.dart';
@@ -126,12 +127,9 @@ class _NewPhaseDialogState extends ConsumerState<_NewPhaseDialog> {
                     labelText: l10n.leagueAttendancePoints,
                   ),
                   keyboardType: TextInputType.number,
-                  validator: (v) {
-                    final points = int.tryParse(v?.trim() ?? '');
-                    return points == null || points < 0 || points > 100
-                        ? l10n.leagueAttendanceInvalid
-                        : null;
-                  },
+                  validator: (v) => parseAttendancePoints(v ?? '') == null
+                      ? l10n.leagueAttendanceInvalid
+                      : null,
                 ),
               ],
             ),
@@ -175,7 +173,7 @@ class _NewPhaseDialogState extends ConsumerState<_NewPhaseDialog> {
             name: _name.text.trim(),
             date: _date,
             discipline: _discipline,
-            attendancePoints: int.parse(_attendance.text.trim()),
+            attendancePoints: parseAttendancePoints(_attendance.text)!,
           );
       ref
         ..invalidate(myEventsProvider)
