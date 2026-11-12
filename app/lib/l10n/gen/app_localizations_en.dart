@@ -1971,5 +1971,5 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsAttendanceHint =>
-      'Every entry of this phase adds them to the league standings. Changing them recalculates the standings.';
+      'Everyone competing in a group of this phase adds them to the standings. Changing them recalculates the standings.';
 }

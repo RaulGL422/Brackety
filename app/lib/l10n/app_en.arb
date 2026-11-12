@@ -693,5 +693,5 @@
   "reenrolGuardianConsent": "I have the consent of the guardians of the selected minors",
   "reenrolConfirm": "Enter ({count})",
   "reenrolDone": "{count, plural, =1{1 entered} other{{count} entered}}",
-  "settingsAttendanceHint": "Every entry of this phase adds them to the league standings. Changing them recalculates the standings."
+  "settingsAttendanceHint": "Everyone competing in a group of this phase adds them to the standings. Changing them recalculates the standings."
 }

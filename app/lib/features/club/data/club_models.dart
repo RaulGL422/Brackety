@@ -106,7 +106,7 @@ class EventSettings {
   /// Points that end a match; a disqualification gives them to the rival.
   final int pointsLimit;
 
-  /// Points every entry of this phase adds to the league standings.
+  /// Points everyone in a group of this phase adds to the standings.
   final int attendancePoints;
 
   /// The clubs taking part, in the order the club entered them.

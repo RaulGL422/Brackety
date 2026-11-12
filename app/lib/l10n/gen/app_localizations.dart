@@ -3315,7 +3315,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsAttendanceHint.
   ///
   /// In es, this message translates to:
-  /// **'Los suma a la clasificación de la liga cada inscrito de esta fase. Al cambiarlos se recalcula la clasificación.'**
+  /// **'Los suma a la clasificación quien compite en un grupo de esta fase. Al cambiarlos se recalcula la clasificación.'**
   String get settingsAttendanceHint;
 }
 

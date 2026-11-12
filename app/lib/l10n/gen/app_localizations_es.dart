@@ -1987,5 +1987,5 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settingsAttendanceHint =>
-      'Los suma a la clasificación de la liga cada inscrito de esta fase. Al cambiarlos se recalcula la clasificación.';
+      'Los suma a la clasificación quien compite en un grupo de esta fase. Al cambiarlos se recalcula la clasificación.';
 }
