@@ -85,7 +85,11 @@ class DraftPanel extends StatelessWidget {
                       group.ofTeams ? l10n.draftGhostTeam : l10n.draftGhost,
                     ),
                     selected: group.ghostMode,
-                    onSelected: (on) => onChanged((g) => g.setGhostMode(on)),
+                    // With 4 picked there is no room for a ghost: turning it on would make the 4th one
+                    // the ghost, and off again would drop them.
+                    onSelected: group.canToggleGhost
+                        ? (on) => onChanged((g) => g.setGhostMode(on))
+                        : null,
                   ),
                 ],
               ),

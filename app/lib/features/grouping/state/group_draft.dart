@@ -49,6 +49,9 @@ class DraftGroup {
 
   bool contains(String id) => members.contains(id) || ghost == id;
 
+  /// The ghost box can be ticked while there is room for a ghost (3 or fewer picked), and untick always.
+  bool get canToggleGhost => ghostMode || members.length < size;
+
   DraftGroup copyWith({
     List<String>? members,
     bool? ghostMode,

@@ -153,4 +153,16 @@ void main() {
     expect(left.ghost, isNull);
     expect(identical(draft.without({'x'}), draft), isTrue);
   });
+
+  test('with 4 picked the ghost box cannot be ticked', () {
+    var draft = const DraftGroup();
+    for (final id in ['a', 'b', 'c']) {
+      draft = draft.toggle(id, grouped: false);
+    }
+    expect(draft.canToggleGhost, isTrue);
+
+    draft = draft.toggle('d', grouped: false);
+    expect(draft.canToggleGhost, isFalse);
+    expect(draft.setGhostMode(true).canToggleGhost, isTrue);
+  });
 }
