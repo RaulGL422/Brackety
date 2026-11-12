@@ -8,7 +8,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/async_view.dart';
 import '../../../core/keep_screen_on.dart';
 import '../../../l10n/gen/app_localizations.dart';
-import '../../offline/ui/sync_status_bar.dart';
+import '../../offline/ui/sync_status_icon.dart';
 import '../../scoreboard/data/match_view.dart';
 import '../../scoreboard/ui/match_corrections.dart';
 import '../data/mat_board.dart';
@@ -78,6 +78,7 @@ class MatBoardScreen extends ConsumerWidget {
             ],
           ),
           actions: [
+            if (queued) const SyncStatusIcon(),
             if (toPlay != null && toPlay > 0)
               Padding(
                 padding: const EdgeInsets.only(right: AppSpacing.l),
@@ -90,7 +91,6 @@ class MatBoardScreen extends ConsumerWidget {
         ),
         body: Column(
           children: [
-            if (queued) const SyncStatusBar(),
             Expanded(
               child: AsyncView(
                 value: board,
@@ -247,7 +247,6 @@ class _FeaturedMatch extends ConsumerWidget {
         ? (scheme.inverseSurface, scheme.onInverseSurface)
         : (scheme.surfaceContainerLow, scheme.onSurface);
     final group = board.groups.where((g) => g.id == match.groupId).firstOrNull;
-    void open() => _open(context, match, readOnly);
     return Card(
       clipBehavior: Clip.antiAlias,
       shape: inProgress
@@ -285,6 +284,7 @@ class _FeaturedMatch extends ConsumerWidget {
             ),
           ),
           if (!inProgress) const Divider(),
+          // No onTap: only the button opens it; tapping the names opened it by surprise.
           ListTile(
             contentPadding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.l,
@@ -298,7 +298,6 @@ class _FeaturedMatch extends ConsumerWidget {
                 _CornerLine(side: Side.blue, fighter: match.blue, large: true),
               ],
             ),
-            onTap: open,
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(
@@ -323,7 +322,7 @@ class _FeaturedMatch extends ConsumerWidget {
                     ),
                   ),
                 FilledButton(
-                  onPressed: open,
+                  onPressed: () => _open(context, match, readOnly),
                   style: FilledButton.styleFrom(
                     minimumSize: const Size.fromHeight(56),
                   ),

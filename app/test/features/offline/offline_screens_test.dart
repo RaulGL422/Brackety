@@ -168,14 +168,21 @@ void main() {
 
       await pumpScreen(tester, size, const MatBoardScreen(matId: 'mat1'));
 
-      expect(find.text('Offline · 1 action waiting'), findsOneWidget);
+      expect(find.byTooltip('Offline · 1 action waiting'), findsOneWidget);
       expect(find.textContaining('board saved on this device'), findsOneWidget);
       expect(find.text('Next match'), findsNothing);
       expect(find.text('In progress'), findsOneWidget);
       expect(find.text("Under the club's review"), findsOneWidget);
       ListTile tile(String red, String blue) =>
           tester.widget<ListTile>(matchTile(red, blue));
-      expect(tile('Ana', 'Bea').onTap, isNotNull);
+      expect(
+        tester
+            .widget<FilledButton>(
+              find.widgetWithText(FilledButton, 'Back to the scoreboard'),
+            )
+            .onPressed,
+        isNotNull,
+      );
       // One match at a time on the mat, and none in review.
       expect(tile('Carla', 'Diana').onTap, isNull);
       expect(tile('Ana', 'Carla').onTap, isNull);
@@ -189,18 +196,18 @@ void main() {
         saved();
         await pumpScreen(tester, size, const ScoreboardScreen(matchId: 'm1'));
 
-        expect(find.text('Offline'), findsOneWidget);
+        expect(find.byTooltip('Offline'), findsOneWidget);
         await tester.tap(find.text('Start'));
         await settle(tester);
         await tester.tap(find.text('+1').first);
         await settle(tester);
 
-        expect(find.text('Offline · 2 actions waiting'), findsOneWidget);
+        expect(find.byTooltip('Offline · 2 actions waiting'), findsOneWidget);
         expect(find.text('Stop'), findsOneWidget);
         expect(find.text('1'), findsOneWidget);
         expect(server.received, isEmpty);
 
-        // The bar shares the clock's room: when it goes, no button moves under the thumb.
+        // The status is an app bar icon: when it goes, no button moves under the thumb.
         final plus = tester.getTopLeft(find.text('+1').first);
         final stop = tester.getTopLeft(find.text('Stop'));
 
@@ -213,8 +220,8 @@ void main() {
           MatchAction.start,
           MatchAction.point,
         ]);
-        // All sent: the bar goes away.
-        expect(find.textContaining('Offline'), findsNothing);
+        // All sent: the icon goes away.
+        expect(find.byIcon(Icons.cloud_off), findsNothing);
         expect(find.text('1'), findsOneWidget);
         expect(tester.getTopLeft(find.text('+1').first), plus);
         expect(tester.getTopLeft(find.text('Stop')), stop);

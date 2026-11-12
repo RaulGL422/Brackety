@@ -8,7 +8,7 @@ import '../../../core/keep_screen_on.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../mat/state/mat_providers.dart';
 import '../../mat/ui/fighter_text.dart';
-import '../../offline/ui/sync_status_bar.dart';
+import '../../offline/ui/sync_status_icon.dart';
 import '../data/match_view.dart';
 import '../data/tambo_match.dart';
 import '../state/bell.dart';
@@ -64,6 +64,7 @@ class ScoreboardScreen extends ConsumerWidget {
                     : l10n.scoreboardTitle(view.matNumber, view.groupNumber),
               ),
               actions: [
+                const SyncStatusIcon(),
                 if (view != null && view.started && !view.finished)
                   IconButton(
                     tooltip: l10n.cancelMatch,
@@ -80,9 +81,6 @@ class ScoreboardScreen extends ConsumerWidget {
             ),
             body: Column(
               children: [
-                // The finished view and errors still show it on top; the live scoreboard keeps it
-                // in the clock's room (see ClockBar.banner).
-                if (view == null || view.finished) const SyncStatusBar(),
                 Expanded(
                   child: AsyncView(
                     value: match,
@@ -267,7 +265,6 @@ class _Live extends StatelessWidget {
                         view: view,
                         onAction: onAction,
                         onAdjust: onAdjust,
-                        banner: const SyncStatusBar(),
                       ),
                     ),
                     corner(Side.blue),
@@ -281,7 +278,6 @@ class _Live extends StatelessWidget {
                     onAction: onAction,
                     onAdjust: onAdjust,
                     clockHeight: size.maxHeight * _clockShare,
-                    banner: const SyncStatusBar(),
                   ),
                   corner(Side.red),
                   corner(Side.blue),

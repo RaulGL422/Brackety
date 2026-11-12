@@ -111,6 +111,11 @@ void main() {
         );
         expect(find.text('2 to play'), findsOneWidget);
         expect(matchTile('Ana', 'Carla'), findsOneWidget);
+        // Only the button opens the recommended match, not its names.
+        expect(
+          tester.widget<ListTile>(matchTile('Ana', 'Carla')).onTap,
+          isNull,
+        );
         expect(find.text('A fighter is in a match right now'), findsOneWidget);
         expect(find.text('4 - 15'), findsOneWidget);
         // Nothing in progress: one big action and why this one.
@@ -168,6 +173,7 @@ void main() {
             find.ancestor(of: tile, matching: find.byType(Card)).first;
         ListTile tile(Finder tile) => tester.widget<ListTile>(tile);
 
+        expect(tile(matchTile('Bea', 'Carla')).onTap, isNull);
         final inProgress = card(matchTile('Bea', 'Carla'));
         expect(
           find.descendant(of: inProgress, matching: find.text('In progress')),

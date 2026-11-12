@@ -35,17 +35,12 @@ class ClockBar extends ConsumerStatefulWidget {
     required this.onAction,
     required this.onAdjust,
     this.clockHeight,
-    this.banner,
   });
 
   final MatchView view;
   final void Function(MatchAction action) onAction;
   final void Function(Duration delta) onAdjust;
   final double? clockHeight;
-
-  /// Shown over the clock, in the clock's own room: when it comes and goes (offline, actions
-  /// waiting) only the digits shrink, and no button moves under the referee's thumb.
-  final Widget? banner;
 
   @override
   ConsumerState<ClockBar> createState() => _ClockBarState();
@@ -123,16 +118,7 @@ class _ClockBarState extends ConsumerState<ClockBar> {
           spacing: AppSpacing.s,
           children: [
             if (widget.clockHeight case final height?) ...[
-              SizedBox(
-                height: height,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    ?widget.banner,
-                    Expanded(child: clock),
-                  ],
-                ),
-              ),
+              SizedBox(height: height, child: clock),
               ?adjust,
               // Portrait: both buttons on one row, under the thumb, the same height.
               IntrinsicHeight(
@@ -146,7 +132,6 @@ class _ClockBarState extends ConsumerState<ClockBar> {
                 ),
               ),
             ] else ...[
-              ?widget.banner,
               Expanded(child: clock),
               ?adjust,
               clockButton,
