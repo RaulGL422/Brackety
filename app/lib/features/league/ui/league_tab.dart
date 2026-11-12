@@ -1,5 +1,4 @@
 import 'package:brackety_core/brackety_core.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,9 +6,10 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/async_view.dart';
-import '../../../core/download/file_download.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../club/data/club_repository.dart';
+import '../../club/ui/export_download.dart';
+import '../../events/state/events_providers.dart';
 import '../data/league_models.dart';
 import '../state/league_providers.dart';
 import 'league_settings_dialog.dart';
@@ -78,16 +78,21 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _Phases extends StatelessWidget {
+class _Phases extends ConsumerWidget {
   const _Phases({required this.eventId, required this.league});
 
   final String eventId;
   final League league;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final locale = Localizations.localeOf(context).toLanguageTag();
+    // Only the phases this account runs as club can be opened.
+    final clubPhases = {
+      for (final p in ref.watch(clubPhasesProvider(eventId)).value ?? const [])
+        p.id,
+    };
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -131,7 +136,8 @@ class _Phases extends StatelessWidget {
             trailing: phase.eventId == eventId
                 ? Text(l10n.leagueCurrentPhase)
                 : const Icon(Icons.chevron_right),
-            onTap: phase.eventId == eventId
+            onTap:
+                phase.eventId == eventId || !clubPhases.contains(phase.eventId)
                 ? null
                 : () => context.go('/events/${phase.eventId}/club'),
           ),
@@ -166,6 +172,7 @@ class _StandingsState extends ConsumerState<_Standings> {
     final l10n = AppLocalizations.of(context);
     final provider = leagueStandingsProvider(widget.eventId);
     final categories = widget.league.categoryNames;
+    final category = categories.contains(_category) ? _category : null;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -181,7 +188,7 @@ class _StandingsState extends ConsumerState<_Standings> {
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               DropdownButton<String?>(
-                value: categories.contains(_category) ? _category : null,
+                value: category,
                 items: [
                   DropdownMenuItem(child: Text(l10n.allCategories)),
                   for (final c in categories)
@@ -194,7 +201,12 @@ class _StandingsState extends ConsumerState<_Standings> {
                 TextButton.icon(
                   icon: const Icon(Icons.download_outlined),
                   label: Text(l10n.leagueStandingsCsv),
-                  onPressed: _download,
+                  onPressed: () => downloadExport(
+                    context,
+                    ref,
+                    widget.eventId,
+                    EventExport.leagueStandings,
+                  ),
                 ),
             ],
           ),
@@ -205,7 +217,7 @@ class _StandingsState extends ConsumerState<_Standings> {
           data: (standings) {
             final rows = [
               for (final r in standings.rows)
-                if (_category == null || r.categoryName == _category) r,
+                if (category == null || r.categoryName == category) r,
             ];
             if (rows.isEmpty) {
               return Padding(
@@ -219,7 +231,7 @@ class _StandingsState extends ConsumerState<_Standings> {
                   _LeagueStandingTile(
                     row: r,
                     phaseNumbers: standings.phaseNumbers,
-                    showCategory: _category == null,
+                    showCategory: category == null,
                   ),
               ],
             );
@@ -227,23 +239,6 @@ class _StandingsState extends ConsumerState<_Standings> {
         ),
       ],
     );
-  }
-
-  Future<void> _download() async {
-    final l10n = AppLocalizations.of(context);
-    final toasts = Toasts.of(context);
-    try {
-      final file = await ref
-          .read(clubRepositoryProvider)
-          .export(widget.eventId, EventExport.leagueStandings);
-      await ref.read(saveFileProvider)(
-        file.name,
-        file.bytes,
-        EventExport.leagueStandings.mimeType,
-      );
-    } on DioException {
-      toasts.show(l10n.exportError, kind: ToastKind.error);
-    }
   }
 }
 

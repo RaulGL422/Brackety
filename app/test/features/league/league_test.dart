@@ -7,6 +7,7 @@ import 'package:brackety/features/league/data/league_models.dart';
 import 'package:brackety/features/league/data/league_repository.dart';
 import 'package:brackety/features/league/state/league_providers.dart';
 import 'package:brackety/features/league/ui/league_tab.dart';
+import 'package:brackety/features/league/ui/phase_switcher.dart';
 import 'package:brackety/features/league/ui/reenrol_dialog.dart';
 import 'package:brackety/l10n/gen/app_localizations.dart';
 import 'package:brackety_core/brackety_core.dart';
@@ -160,6 +161,29 @@ void main() {
       (event.leagueId, event.leagueName, event.phaseNumber),
       ('e9', 'Copa', 1),
     );
+  });
+
+  testWidgets('the phase switcher hides on a phase the account does not run', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      app(
+        const Scaffold(body: PhaseSwitcher(eventId: 'e3')),
+        overrides: [
+          myEventsProvider.overrideWith(
+            (ref) async => [
+              phase('e1', 1, {EventRole.club}),
+              phase('e2', 2, {EventRole.club}),
+              phase('e3', 3, {EventRole.referee}),
+            ],
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Phase'), findsNothing);
+    expect(tester.takeException(), isNull);
   });
 
   for (final MapEntry(key: device, value: size) in sizes.entries) {

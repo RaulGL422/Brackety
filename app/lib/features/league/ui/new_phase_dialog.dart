@@ -37,10 +37,15 @@ class _NewPhaseDialogState extends ConsumerState<_NewPhaseDialog> {
   late final _number = widget.league.phases.last.number + 1;
   late final _name = TextEditingController();
   final _attendance = TextEditingController(text: '10');
-  late DateTime _date = widget.league.phases.last.date.add(
-    const Duration(days: 28),
+  late DateTime _date = _fourWeeksAfter(widget.league.phases.last.date);
+  late var _discipline = Discipline.values.firstWhere(
+    widget.league.availableDisciplines.contains,
+    orElse: () => Discipline.tambo,
   );
-  var _discipline = Discipline.tambo;
+
+  // By calendar day, not by hours: adding 28 × 24 h lands a day early across a DST change.
+  static DateTime _fourWeeksAfter(DateTime d) =>
+      DateTime(d.year, d.month, d.day + 28);
   var _saving = false;
 
   @override

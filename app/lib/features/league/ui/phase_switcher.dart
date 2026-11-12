@@ -16,8 +16,8 @@ class PhaseSwitcher extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final phases = ref.watch(clubPhasesProvider(eventId)).value ?? const [];
-    if (phases.length < 2) return const SizedBox.shrink();
-    final current = phases.firstWhere((p) => p.id == eventId);
+    final current = phases.where((p) => p.id == eventId).firstOrNull;
+    if (phases.length < 2 || current == null) return const SizedBox.shrink();
     return PopupMenuButton<String>(
       tooltip: l10n.leagueSwitchPhase,
       initialValue: eventId,

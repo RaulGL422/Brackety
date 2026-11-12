@@ -148,8 +148,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/events/:eventId/club',
-        builder: (_, state) =>
-            ClubPanelScreen(eventId: state.pathParameters['eventId']!),
+        // Keyed by event so moving to another phase starts the panel afresh.
+        builder: (_, state) => ClubPanelScreen(
+          key: ValueKey(state.pathParameters['eventId']),
+          eventId: state.pathParameters['eventId']!,
+        ),
       ),
       GoRoute(
         path: '/club/mats/:matId',

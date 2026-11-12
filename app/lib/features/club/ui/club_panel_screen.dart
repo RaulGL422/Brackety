@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/download/file_download.dart';
 import '../../../core/upload/file_upload.dart';
 import '../../auth/ui/widgets/confirm_dialog.dart';
 import '../state/club_providers.dart';
@@ -14,6 +13,7 @@ import '../../league/ui/league_tab.dart';
 import '../../league/ui/phase_switcher.dart';
 import '../../offline/ui/import_ops_button.dart';
 import '../data/club_repository.dart';
+import 'export_download.dart';
 import 'mats_tab.dart';
 import 'participants_tab.dart';
 import 'settings_tab.dart';
@@ -96,27 +96,11 @@ class ClubExportMenu extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    Future<void> export(EventExport export) async {
-      final toasts = Toasts.of(context);
-      try {
-        final file = await ref
-            .read(clubRepositoryProvider)
-            .export(eventId, export);
-        await ref.read(saveFileProvider)(
-          file.name,
-          file.bytes,
-          export.mimeType,
-        );
-      } on DioException {
-        toasts.show(l10n.exportError, kind: ToastKind.error);
-      }
-    }
-
     return PopupMenuButton<Object>(
       tooltip: l10n.exportMenu,
       icon: const Icon(Icons.download_outlined),
       onSelected: (value) => value is EventExport
-          ? export(value)
+          ? downloadExport(context, ref, eventId, value)
           : _importResults(context, ref, eventId),
       itemBuilder: (_) => [
         PopupMenuItem(

@@ -37,12 +37,12 @@ List<List<MyEvent>> byLeague(List<MyEvent> events) {
 final clubPhasesProvider = FutureProvider.autoDispose
     .family<List<MyEvent>, String>((ref, eventId) async {
       final events = await ref.watch(myEventsProvider.future);
-      final event = events.firstWhere((e) => e.id == eventId);
-      return byLeague([
-            for (final e in events)
-              if (e.leagueId == event.leagueId &&
-                  e.roles.contains(EventRole.club))
-                e,
-          ]).firstOrNull ??
-          [event];
+      final leagueId = events
+          .where((e) => e.id == eventId)
+          .firstOrNull
+          ?.leagueId;
+      return [
+        for (final e in events)
+          if (e.leagueId == leagueId && e.roles.contains(EventRole.club)) e,
+      ]..sort((a, b) => a.phaseNumber.compareTo(b.phaseNumber));
     });
