@@ -38,6 +38,7 @@ class FakeGroupingRepository implements GroupingRepository {
   final created = <DraftGroup>[];
   final createdOnMat = <String?>[];
   final createdTeams = <List<String>>[];
+  final createdTeamGhosts = <List<String>>[];
   final deletedTeams = <String>[];
   final undoneGroups = <String>[];
 
@@ -76,9 +77,11 @@ class FakeGroupingRepository implements GroupingRepository {
   Future<Team> createTeam(
     String eventId,
     String categoryId,
-    List<String> participantIds,
-  ) async {
+    List<String> participantIds, {
+    List<String> ghostIds = const [],
+  }) async {
     createdTeams.add(participantIds);
+    createdTeamGhosts.add(ghostIds);
     return Team(id: 'new', number: teamList.length + 1, members: const []);
   }
 

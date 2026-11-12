@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/app_bar_action.dart';
 import '../../../core/async_view.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../auth/ui/widgets/confirm_dialog.dart';
 import '../data/grouping_models.dart';
 import '../data/grouping_repository.dart';
 import '../state/group_draft.dart';
@@ -82,7 +83,8 @@ void _refresh(WidgetRef ref, CategoryKey key) {
   ref.invalidate(categoriesProvider(key.eventId));
 }
 
-/// Pick [teamSize] free participants and make "Equipo N" with them.
+/// Pick [teamSize] participants and make "Equipo N" with them. Someone who already has a team or a
+/// group joins as a ghost: fights for the team but does not score for it.
 class _TeamMaker extends ConsumerStatefulWidget {
   const _TeamMaker({required this.categoryKey, required this.teamSize});
 
@@ -114,7 +116,12 @@ class _TeamMakerState extends ConsumerState<_TeamMaker> {
     try {
       final team = await ref
           .read(groupingRepositoryProvider)
-          .createTeam(key.eventId, key.categoryId, _picks);
+          .createTeam(
+            key.eventId,
+            key.categoryId,
+            _picks,
+            ghostIds: [..._ghosts],
+          );
       _picks = [];
       toasts.show(l10n.teamCreated(l10n.teamName(team.number)));
       _refresh(ref, key);
@@ -130,12 +137,26 @@ class _TeamMakerState extends ConsumerState<_TeamMaker> {
     }
   }
 
+  /// The picks who already compete elsewhere: they join as ghosts.
+  Set<String> get _ghosts {
+    final all =
+        ref.read(categoryParticipantsProvider(widget.categoryKey)).value ??
+        const <CategoryParticipant>[];
+    return {
+      for (final p in all)
+        if (p.isTaken && _picks.contains(p.id)) p.id,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final participants = ref.watch(
       categoryParticipantsProvider(widget.categoryKey),
     );
+    final ghosts = _ghosts;
+    final complete = _picks.length == widget.teamSize;
+    final allGhosts = _picks.isNotEmpty && ghosts.length == _picks.length;
     final list = AsyncView(
       value: participants,
       onRetry: () => _refresh(ref, widget.categoryKey),
@@ -151,10 +172,10 @@ class _TeamMakerState extends ConsumerState<_TeamMaker> {
               : _PersonTile(
                   participant: sorted[i - 1],
                   picked: _picks.contains(sorted[i - 1].id),
+                  ghost: ghosts.contains(sorted[i - 1].id),
                   enabled:
-                      !sorted[i - 1].isTaken &&
-                      (_picks.contains(sorted[i - 1].id) ||
-                          _picks.length < widget.teamSize),
+                      _picks.contains(sorted[i - 1].id) ||
+                      _picks.length < widget.teamSize,
                   onTap: () => _toggle(sorted[i - 1].id),
                 ),
         );
@@ -174,14 +195,17 @@ class _TeamMakerState extends ConsumerState<_TeamMaker> {
                 l10n.newTeamCount(_picks.length, widget.teamSize),
                 style: Theme.of(context).textTheme.titleMedium,
               ),
+              if (ghosts.isNotEmpty)
+                Text(
+                  allGhosts ? l10n.teamNeedsReal : l10n.teamGhostHint,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
               const SizedBox(height: AppSpacing.s),
               FilledButton(
                 style: FilledButton.styleFrom(
                   minimumSize: const Size.fromHeight(AppSizes.touchTarget),
                 ),
-                onPressed: _picks.length == widget.teamSize && !_busy
-                    ? _create
-                    : null,
+                onPressed: complete && !allGhosts && !_busy ? _create : null,
                 child: Text(l10n.createTeam),
               ),
             ],
@@ -215,6 +239,8 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
       setState(() => _group = change(_group));
 
   Future<void> _create() async {
+    if (!await _acceptOverlaps()) return;
+    if (!mounted) return;
     setState(() => _busy = true);
     final created = await createGroup(
       context,
@@ -233,6 +259,35 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
         _matId = null;
       }
     });
+  }
+
+  /// A participant in two teams of the group (a ghost member, say) would fight their own team: the
+  /// helper may still go on.
+  Future<bool> _acceptOverlaps() async {
+    final l10n = AppLocalizations.of(context);
+    final teams =
+        ref.read(categoryTeamsProvider(widget.categoryKey)).value ??
+        const <Team>[];
+    final chosen = [
+      for (final t in teams)
+        if (_group.members.contains(t.id)) t,
+    ];
+    final overlaps = overlappingMembers(chosen);
+    if (overlaps.isEmpty) return true;
+    final names = {
+      for (final t in chosen)
+        for (final m in t.members) m.participantId: m.fullName,
+    };
+    final lines = [
+      for (final MapEntry(:key, :value) in overlaps.entries)
+        l10n.teamOverlapLine(names[key]!, value.map(l10n.teamName).join(', ')),
+    ];
+    return confirmAction(
+      context,
+      title: l10n.teamOverlapTitle,
+      body: l10n.teamOverlapBody(lines.join('\n')),
+      confirmLabel: l10n.createAnyway,
+    );
   }
 
   Future<void> _pickGhostTeam(List<Team> teams) async {
@@ -378,7 +433,9 @@ class _TeamTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final state = group.stateOf(team.id, grouped: team.isGrouped);
-    final names = team.members.map((m) => m.fullName).join(', ');
+    final names = team.members
+        .map((m) => m.ghost ? l10n.ghostMemberName(m.fullName) : m.fullName)
+        .join(', ');
     return ListTile(
       enabled: state != PickState.unavailable,
       onTap: onTap,
@@ -508,12 +565,16 @@ class _PersonTile extends StatelessWidget {
     required this.picked,
     required this.enabled,
     required this.onTap,
+    this.ghost = false,
   });
 
   final CategoryParticipant participant;
   final bool picked;
   final bool enabled;
   final VoidCallback onTap;
+
+  /// Picked while competing elsewhere: joins the team as a ghost.
+  final bool ghost;
 
   @override
   Widget build(BuildContext context) {
@@ -536,8 +597,10 @@ class _PersonTile extends StatelessWidget {
           if (p.teamNumber != null) l10n.teamName(p.teamNumber!),
           if (p.isGrouped)
             l10n.participantGrouped(p.groupNumber!, p.matNumber!),
+          if (ghost) l10n.teamGhostMember,
         ].join(' · '),
       ),
+      trailing: ghost ? const Icon(Icons.blur_on) : null,
     );
   }
 }

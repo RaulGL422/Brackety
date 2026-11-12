@@ -41,6 +41,7 @@ Usuario único definido por variables de entorno + Cloudflare Access. Sin otro r
 - Admin, portada: una tarjeta por cifra en secciones (Usuarios, Perfiles, Eventos, Actividad, Servidor), con actualizar. Sin color salvo combates en revisión (aviso) y 5xx (error), siempre con icono y texto.
 - Admin, pestaña **Usuarios**: lista paginada con buscador (tabla o tarjetas) y la ficha de la cuenta con Suspender o Levantar la suspensión, y Borrar (escribiendo el email). El estado va con palabras.
 - Admin, pestaña **Eventos**: lista paginada (tabla en escritorio, tarjetas en móvil) y, al abrir uno, su detalle en la misma pestaña.
+- Detalle (2026-11-12): cada tapiz con su **orden previsto** (desplegable: hora estimada, grupo y combate en el orden en que el recomendador se los daría al árbitro si todo va según lo previsto; `MatPlanner` simula todos los tapices a la vez); cada grupo con sus integrantes (fantasma marcado) y los equipos con sus integrantes.
 - Cada operación pide el motivo; vaciar pide además escribir el nombre del evento. Al acabar recarga el detalle y la lista; un 404 recarga y avisa.
 
 ## Tests

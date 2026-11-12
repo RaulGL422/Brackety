@@ -80,7 +80,7 @@ Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, f
 
 ## Pantallas
 - Sesión y acceso: los de `auth` (`app/lib/features/auth/`, tarea 6); en debug, botones de acceso rápido a las cuentas demo.
-- Ayudante: categorías (con inscritos/agrupados) → alumnos por nombre o estatura → grupos en borrador con color y número (nunca rojo/azul) y casilla de fantasma → popup con el tapiz.
+- Ayudante: categorías (con inscritos/agrupados) → alumnos por nombre o estatura → grupos en borrador con color y número (nunca rojo/azul) y casilla de fantasma → popup con el tapiz. Listas en directo (aviso del evento): si otro ayudante o el superadmin agrupa a alguien del borrador, sale de él con un aviso con su nombre.
 - Árbitro: tablero del tapiz (sondeo 5 s; grupos con color y número; en curso con borde e icono de reproducción; "Combate recomendado" arriba con su porqué y "Empezar este combate" (con uno en curso: "Cuando acabe el combate en curso"); luego "Otros combates disponibles", "En espera" con motivo y "Disputados"; rojo y azul con punto de color en cada combate; pendientes que esperan con candado y motivo, sin abrirse; terminados) → marcador (sondeo 2 s, reloj contado en el dispositivo y resincronizado, +1, menú de avisos con motivo, deshacer, finalizar, línea de tiempo). Sonidos generados (`app/tool/make_bell.py`); en la web con Web Audio, cargados al abrir y desbloqueados con el primer toque (antes a veces no sonaban por la política de autoplay).
 - Marcador (2026-11-06):
   - Vertical: reloj (16 % del alto), Iniciar o Finalizar (relleno) / Parar (con borde) y Deshacer arriba; rojo y azul debajo. Horizontal (más ancho que alto: móvil girado, tablet, escritorio): rojo | reloj y botones | azul.

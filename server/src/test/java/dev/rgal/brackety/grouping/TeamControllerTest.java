@@ -205,6 +205,49 @@ class TeamControllerTest extends EventApiTest {
     }
 
     @Test
+    void aGhostMemberFillsATeamInWithoutScoringForIt() throws Exception {
+        var full = teams(3);
+        // 9 and 10 are only two: 0, already in team 1, fills the third place as a ghost.
+        var body = createTeam(new int[] {9, 10, 0}, 0)
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.members[0].ghost").value(false))
+                .andExpect(jsonPath("$.members[2].ghost").value(true))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        var filled = UUID.fromString(JsonPath.read(body, "$.id"));
+        createTeam(new int[] {11, 12, 13}, 11, 12, 13).andExpect(status().isBadRequest());
+        createTeam(new int[] {11, 12, 13}, 1).andExpect(status().isBadRequest());
+        // A real member must still be free: 1 is in team 1.
+        createTeam(new int[] {11, 12, 1}, 11).andExpect(status().isConflict());
+
+        // Team 1 and the filled team share 0: they may go in one group (the app warns first).
+        createGroups(teamGroup(List.of(full.get(0), full.get(1), full.get(2), filled), null))
+                .andExpect(status().isCreated());
+        var match = teamMatch(full.get(1), filled);
+        call(get("/api/v1/matches/" + match), "arbitro1")
+                .andExpect(jsonPath("$.blue.members[2]").value("AlumnoA Prueba (fantasma)"));
+        referee(match, "START", null);
+        points(match, "BLUE", 15);
+        referee(match, "FINISH", null);
+
+        call(get(event() + "/standings"), "club1")
+                .andExpect(jsonPath("$[?(@.participantId == '%s')].total".formatted(teens.get(9)))
+                        .value(25))
+                .andExpect(jsonPath("$[?(@.participantId == '%s')].teamNumber".formatted(teens.get(9)))
+                        .value(4))
+                // The ghost member: attendance and team number from team 1 only, nothing from the filled team.
+                .andExpect(jsonPath("$[?(@.participantId == '%s')].total".formatted(teens.get(0)))
+                        .value(10))
+                .andExpect(jsonPath("$[?(@.participantId == '%s')].matches".formatted(teens.get(0)))
+                        .value(0))
+                .andExpect(jsonPath("$[?(@.participantId == '%s')].teamNumber".formatted(teens.get(0)))
+                        .value(1));
+        call(get(event() + "/categories/" + category() + "/teams"), "ayudante2")
+                .andExpect(jsonPath("$[3].members[2].ghost").value(true));
+    }
+
+    @Test
     void theClubSetsCategoriesUntilTheyAreInUse() throws Exception {
         createTeam(0, 1, 2).andExpect(status().isCreated());
         var current = call(get(event() + "/settings"), "club1")
@@ -251,6 +294,15 @@ class TeamControllerTest extends EventApiTest {
 
     private ResultActions createTeam(int... positions) throws Exception {
         return call(post(event() + "/categories/" + category() + "/teams").content(members(positions)), "ayudante1");
+    }
+
+    /** A team of {@code members} where {@code ghosts} fill it in without scoring. */
+    private ResultActions createTeam(int[] members, int... ghosts) throws Exception {
+        return call(
+                post(event() + "/categories/" + category() + "/teams")
+                        .content("""
+                        {"participantIds":[%s],"ghostIds":[%s]}""".formatted(quoted(members), quoted(ghosts))),
+                "ayudante1");
     }
 
     private ResultActions createGroups(String group) throws Exception {

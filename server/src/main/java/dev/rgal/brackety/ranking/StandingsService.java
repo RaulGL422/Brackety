@@ -79,7 +79,7 @@ class StandingsService {
         var competitors = directory.of(eventId);
         var teamNumbers = directory.teamNumbers(eventId);
         var eventMembers = members.findByEventId(eventId);
-        var attending = competitors.participants(eventMembers.stream()
+        var attending = competitors.scorers(eventMembers.stream()
                 .filter(m -> !m.isGhost())
                 .map(GroupMember::getCompetitorId)
                 .toArray(UUID[]::new));
@@ -177,7 +177,7 @@ class StandingsService {
         if (fighter.id().equals(ghosts.get(m.getGroupId()))) {
             return;
         }
-        for (var participant : fighter.participantIds()) {
+        for (var participant : fighter.scorerIds()) {
             fought.merge(participant, 1, Integer::sum);
             if (!side.name().equals(m.getDisqualifiedSide())) {
                 points.merge(participant, score, Integer::sum);

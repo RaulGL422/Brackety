@@ -16,13 +16,18 @@ public record EventResults(
         @NotNull List<@NotNull @Valid GroupEntry> groups,
         @NotNull List<@NotNull @Valid MatchEntry> matches) {
 
+    /**
+     * {@code ghostMemberPersonIds}: members of a real team who fill it in without scoring for it; absent in files from
+     * before they existed.
+     */
     public record TeamEntry(
             int number,
             @NotNull String categoryName,
             boolean ghost,
             String createdBy,
             @NotNull Instant createdAt,
-            @NotNull List<@NotNull UUID> memberPersonIds) {}
+            @NotNull List<@NotNull UUID> memberPersonIds,
+            List<@NotNull UUID> ghostMemberPersonIds) {}
 
     public record GroupEntry(
             int number,

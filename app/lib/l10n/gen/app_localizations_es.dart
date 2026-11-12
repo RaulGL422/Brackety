@@ -1999,4 +1999,36 @@ class AppLocalizationsEs extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get teamGhostMember => 'entra como fantasma';
+
+  @override
+  String get teamGhostHint =>
+      'Quien ya tiene equipo o grupo entra como fantasma: combate, pero no puntúa por este equipo.';
+
+  @override
+  String get teamNeedsReal =>
+      'Hace falta al menos un integrante que no sea fantasma.';
+
+  @override
+  String ghostMemberName(String name) {
+    return '$name (fantasma)';
+  }
+
+  @override
+  String get teamOverlapTitle => 'Alumnos en dos equipos del grupo';
+
+  @override
+  String teamOverlapBody(String lines) {
+    return '$lines\n\nLes tocará combatir contra un equipo en el que también están. ¿Crear el grupo igualmente?';
+  }
+
+  @override
+  String teamOverlapLine(String name, String teams) {
+    return '$name: $teams';
+  }
+
+  @override
+  String get createAnyway => 'Crear igualmente';
 }

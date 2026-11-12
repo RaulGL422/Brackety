@@ -22,7 +22,8 @@ A partir de cierta edad, la categoría compite **por equipos de 3** en lugar de 
 ### Grupos de equipos (ayudante)
 - Lista de equipos de la categoría sin grupo → selecciona 4 → "Crear grupo", con el mismo desplegable de tapiz que en individual.
 - **Equipo fantasma**: casilla en el grupo; con 3 equipos seleccionados se eligen 3 alumnos cualesquiera de la categoría (también los que ya están en equipos o grupos, salvo los de los equipos de ese grupo). Forma "Equipo N (fantasma)": combate, no puntúa.
-- Grupo = 4 equipos reales, o 3 + 1 equipo fantasma. Los equipos reales son siempre de 3 reales (sin alumno fantasma dentro).
+- Grupo = 4 equipos reales, o 3 + 1 equipo fantasma.
+- **Alumno fantasma dentro de un equipo** (pedido de Raul, 2026-11-12): al crear un equipo, quien ya tiene equipo o grupo entra como fantasma: combate con ese equipo pero no puntúa por él (ni asistencia ni puntos). Al menos 1 integrante real. Si un alumno queda en dos equipos del mismo grupo, la app avisa antes de crearlo (no lo impide).
 - Tapiz: mismo criterio (menor fin estimado).
 
 ### Grupo individual dentro de una categoría por equipos
@@ -37,7 +38,7 @@ A partir de cierta edad, la categoría compite **por equipos de 3** en lugar de 
 
 ### Puntuación global
 - Cada miembro de un equipo real en un grupo: +10 por asistir + **los puntos de su equipo** en cada combate (descalificado: 0 en ese combate).
-- Equipo fantasma: no suma nada a sus alumnos; su rival sí.
+- Equipo fantasma: no suma nada a sus alumnos; su rival sí. Alumno fantasma de un equipo: no suma por ese equipo; los reales sí.
 - La clasificación sigue siendo por alumno; la fila indica su equipo.
 
 ## Protecciones
@@ -46,7 +47,7 @@ A partir de cierta edad, la categoría compite **por equipos de 3** en lugar de 
 
 ## Datos
 - `event_category` + `format`, `team_size`, `group_size` (migración con valores por defecto: las categorías existentes quedan `INDIVIDUAL`, 4).
-- `team` (evento, categoría, número único por evento, fantasma, autor, hora) y `team_member` (equipo, alumno, orden).
+- `team` (evento, categoría, número único por evento, fantasma, autor, hora) y `team_member` (equipo, alumno, orden, fantasma: todo el equipo fantasma o solo ese alumno). `POST …/teams` admite `ghostIds`; el paquete lleva `ghostMemberPersonIds`.
 - `group_member` + `team_id`: cada fila es un alumno **o** un equipo (check).
 - `fight_match` + `red_team_id`, `blue_team_id`: o alumnos o equipos (check).
 - La puntuación se calcula de los combates, no se guarda por alumno.

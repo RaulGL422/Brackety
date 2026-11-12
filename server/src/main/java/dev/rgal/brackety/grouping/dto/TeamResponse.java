@@ -16,5 +16,6 @@ public record TeamResponse(
         UUID groupId,
         boolean groupStarted) {
 
-    public record Member(UUID participantId, String firstName, String lastName) {}
+    /** {@code ghost}: fills the team in without scoring for it. */
+    public record Member(UUID participantId, String firstName, String lastName, boolean ghost) {}
 }

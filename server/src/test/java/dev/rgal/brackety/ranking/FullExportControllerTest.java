@@ -146,6 +146,44 @@ class FullExportControllerTest extends EventApiTest {
     }
 
     @Test
+    void aTeamsGhostMemberStaysAGhostAfterTheTrip() throws Exception {
+        var teens = new ArrayList<UUID>();
+        for (var name : List.of("Eva", "Fran", "Gema", "Hugo")) {
+            var p = new Participant(eventId, clock.instant());
+            p.update(name, "Prueba", LocalDate.of(2011, 6, 1), 160, true);
+            teens.add(participants.save(p).getId());
+        }
+        var teams = "/api/v1/events/" + eventId + "/categories/"
+                + jdbc.sql("select id from event_category where name = '15-16'")
+                        .query(UUID.class)
+                        .single()
+                + "/teams";
+        call(post(teams).content("""
+                                {"participantIds":["%s","%s","%s"]}""".formatted(teens.get(0), teens.get(1), teens.get(2))), "ayudante1")
+                .andExpect(status().isCreated());
+        // Hugo alone, filled in by Eva and Fran as ghosts.
+        call(
+                        post(teams).content("""
+                                {"participantIds":["%s","%s","%s"],"ghostIds":["%s","%s"]}""".formatted(
+                                        teens.get(3), teens.get(0), teens.get(1), teens.get(0), teens.get(1))),
+                        "ayudante1")
+                .andExpect(status().isCreated());
+        var zip = call(get("/api/v1/events/" + eventId + "/export/full"), "club1")
+                .andReturn()
+                .getResponse()
+                .getContentAsByteArray();
+        jdbc.sql("delete from fight_group where event_id = ?").param(eventId).update();
+        jdbc.sql("delete from team where event_id = ?").param(eventId).update();
+
+        importResults(zip, false).andExpect(status().isOk());
+
+        assertThat(jdbc.sql("""
+                        select p.first_name from team_member m join team t on t.id = m.team_id
+                        join participant p on p.id = m.participant_id
+                        where t.event_id = ? and m.ghost order by p.first_name""").param(eventId).query(String.class).list()).containsExactly("Eva", "Fran");
+    }
+
+    @Test
     void anEventWithCompetitionOfItsOwnOrAnotherEventsFileIsRefused() throws Exception {
         var zip = call(get("/api/v1/events/" + eventId + "/export/full"), "club1")
                 .andReturn()

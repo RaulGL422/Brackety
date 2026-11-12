@@ -1983,4 +1983,35 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get teamGhostMember => 'joins as a ghost';
+
+  @override
+  String get teamGhostHint =>
+      'Whoever already has a team or a group joins as a ghost: fights, but does not score for this team.';
+
+  @override
+  String get teamNeedsReal => 'At least one member must not be a ghost.';
+
+  @override
+  String ghostMemberName(String name) {
+    return '$name (ghost)';
+  }
+
+  @override
+  String get teamOverlapTitle => 'Participants in two teams of the group';
+
+  @override
+  String teamOverlapBody(String lines) {
+    return '$lines\n\nThey will fight a team they are also in. Create the group anyway?';
+  }
+
+  @override
+  String teamOverlapLine(String name, String teams) {
+    return '$name: $teams';
+  }
+
+  @override
+  String get createAnyway => 'Create anyway';
 }

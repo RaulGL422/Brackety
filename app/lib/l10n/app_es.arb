@@ -1255,5 +1255,16 @@
   },
   "settingsAttendanceHint": "Los suma a la clasificación quien compite en un grupo de esta fase. Al cambiarlos se recalcula la clasificación.",
   "draftTakenElsewhere": "{count, plural, =1{{names} ya está en otro grupo: se ha quitado del grupo nuevo.} other{{names} ya están en otro grupo: se han quitado del grupo nuevo.}}",
-  "@draftTakenElsewhere": {"placeholders": {"count": {"type": "int"}, "names": {"type": "String"}}}
+  "@draftTakenElsewhere": {"placeholders": {"count": {"type": "int"}, "names": {"type": "String"}}},
+  "teamGhostMember": "entra como fantasma",
+  "teamGhostHint": "Quien ya tiene equipo o grupo entra como fantasma: combate, pero no puntúa por este equipo.",
+  "teamNeedsReal": "Hace falta al menos un integrante que no sea fantasma.",
+  "ghostMemberName": "{name} (fantasma)",
+  "@ghostMemberName": {"placeholders": {"name": {"type": "String"}}},
+  "teamOverlapTitle": "Alumnos en dos equipos del grupo",
+  "teamOverlapBody": "{lines}\n\nLes tocará combatir contra un equipo en el que también están. ¿Crear el grupo igualmente?",
+  "@teamOverlapBody": {"placeholders": {"lines": {"type": "String"}}},
+  "teamOverlapLine": "{name}: {teams}",
+  "@teamOverlapLine": {"placeholders": {"name": {"type": "String"}, "teams": {"type": "String"}}},
+  "createAnyway": "Crear igualmente"
 }

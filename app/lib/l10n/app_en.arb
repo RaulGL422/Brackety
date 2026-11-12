@@ -694,5 +694,13 @@
   "reenrolConfirm": "Enter ({count})",
   "reenrolDone": "{count, plural, =1{1 entered} other{{count} entered}}",
   "settingsAttendanceHint": "Everyone competing in a group of this phase adds them to the standings. Changing them recalculates the standings.",
-  "draftTakenElsewhere": "{count, plural, =1{{names} is already in another group: taken out of the new group.} other{{names} are already in another group: taken out of the new group.}}"
+  "draftTakenElsewhere": "{count, plural, =1{{names} is already in another group: taken out of the new group.} other{{names} are already in another group: taken out of the new group.}}",
+  "teamGhostMember": "joins as a ghost",
+  "teamGhostHint": "Whoever already has a team or a group joins as a ghost: fights, but does not score for this team.",
+  "teamNeedsReal": "At least one member must not be a ghost.",
+  "ghostMemberName": "{name} (ghost)",
+  "teamOverlapTitle": "Participants in two teams of the group",
+  "teamOverlapBody": "{lines}\n\nThey will fight a team they are also in. Create the group anyway?",
+  "teamOverlapLine": "{name}: {teams}",
+  "createAnyway": "Create anyway"
 }
