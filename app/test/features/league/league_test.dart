@@ -253,7 +253,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Liga Yoseikan'), findsOneWidget);
-      expect(find.text('This phase'), findsOneWidget);
+      expect(find.text('This phase'), findsNothing);
       expect(find.textContaining('40 entries'), findsOneWidget);
       expect(find.text('Zoe Test'), findsOneWidget);
       expect(find.textContaining('P1: 30   P2: 15'), findsOneWidget);
