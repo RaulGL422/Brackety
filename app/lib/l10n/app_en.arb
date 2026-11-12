@@ -720,5 +720,7 @@
   "tlReopen": "Match reopened",
   "matOneAtATime": "A match is in progress: the next one can start when it ends.",
   "matQueued": "Pending",
-  "keepMatch": "Keep the match"
+  "keepMatch": "Keep the match",
+  "watchClockRunning": "Clock running",
+  "watchClockStopped": "Clock stopped"
 }

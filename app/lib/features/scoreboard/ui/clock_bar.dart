@@ -268,19 +268,19 @@ class _Clock extends StatelessWidget {
               _ => l10n.endTime,
             }, style: text.headlineMedium)
           : Text(
-              _format(left),
+              clockLabel(left),
               style: text.displayLarge?.copyWith(
                 color: ending ? BracketyColors.of(context).warning : null,
               ),
             ),
     );
   }
+}
 
-  // Seconds round up, so 0:00 only shows when the time is really over.
-  static String _format(Duration left) {
-    final seconds = (left.inMilliseconds / 1000).ceil();
-    return '${seconds ~/ 60}:${(seconds % 60).toString().padLeft(2, '0')}';
-  }
+/// "2:41". Seconds round up, so 0:00 only shows when the time is really over.
+String clockLabel(Duration left) {
+  final seconds = (left.inMilliseconds / 1000).ceil();
+  return '${seconds ~/ 60}:${(seconds % 60).toString().padLeft(2, '0')}';
 }
 
 /// Start, stop or finish, by icon and word and without state colours: the colours on the

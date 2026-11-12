@@ -1285,5 +1285,7 @@
   "tlReopen": "Combate reabierto",
   "matOneAtATime": "Hay un combate en curso: el siguiente se podrá empezar cuando acabe.",
   "matQueued": "Pendientes",
-  "keepMatch": "Seguir con el combate"
+  "keepMatch": "Seguir con el combate",
+  "watchClockRunning": "Reloj en marcha",
+  "watchClockStopped": "Reloj parado"
 }

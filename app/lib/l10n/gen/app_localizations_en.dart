@@ -2073,4 +2073,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get keepMatch => 'Keep the match';
+
+  @override
+  String get watchClockRunning => 'Clock running';
+
+  @override
+  String get watchClockStopped => 'Clock stopped';
 }

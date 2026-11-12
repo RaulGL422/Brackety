@@ -3479,6 +3479,18 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Seguir con el combate'**
   String get keepMatch;
+
+  /// No description provided for @watchClockRunning.
+  ///
+  /// In es, this message translates to:
+  /// **'Reloj en marcha'**
+  String get watchClockRunning;
+
+  /// No description provided for @watchClockStopped.
+  ///
+  /// In es, this message translates to:
+  /// **'Reloj parado'**
+  String get watchClockStopped;
 }
 
 class _AppLocalizationsDelegate

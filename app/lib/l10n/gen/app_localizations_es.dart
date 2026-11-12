@@ -2092,4 +2092,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get keepMatch => 'Seguir con el combate';
+
+  @override
+  String get watchClockRunning => 'Reloj en marcha';
+
+  @override
+  String get watchClockStopped => 'Reloj parado';
 }
