@@ -295,6 +295,24 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final key = widget.categoryKey;
+    // As with participants: a team another helper grouped (or deleted) leaves the draft at once.
+    ref.listen(categoryTeamsProvider(key), (_, next) {
+      final all = next.value;
+      if (_busy || all == null) return;
+      final present = {for (final t in all) t.id: t};
+      final gone = {
+        for (final id in _group.members)
+          if (present[id] == null || present[id]!.groupNumber != null)
+            id: present[id] == null ? '' : l10n.teamName(present[id]!.number),
+      };
+      if (gone.isEmpty) return;
+      setState(() => _group = _group.without(gone.keys.toSet()));
+      final names = gone.values.where((n) => n.isNotEmpty);
+      if (names.isNotEmpty) {
+        Toasts.of(context)
+            .show(l10n.draftTakenElsewhere(names.length, names.join(', ')));
+      }
+    });
     final teams = ref.watch(categoryTeamsProvider(key));
     final list = AsyncView(
       value: teams,

@@ -3317,6 +3317,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Los suma a la clasificación quien compite en un grupo de esta fase. Al cambiarlos se recalcula la clasificación.'**
   String get settingsAttendanceHint;
+
+  /// No description provided for @draftTakenElsewhere.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{{names} ya está en otro grupo: se ha quitado del grupo nuevo.} other{{names} ya están en otro grupo: se han quitado del grupo nuevo.}}'**
+  String draftTakenElsewhere(int count, String names);
 }
 
 class _AppLocalizationsDelegate

@@ -138,4 +138,19 @@ void main() {
       },
     );
   });
+
+  test('members someone else grouped leave the draft, with the ghost', () {
+    final draft = const DraftGroup()
+        .setGhostMode(true)
+        .toggle('a', grouped: false)
+        .toggle('b', grouped: false)
+        .toggle('c', grouped: false)
+        .toggle('g', grouped: true);
+
+    final left = draft.without({'b'});
+
+    expect(left.members, ['a', 'c']);
+    expect(left.ghost, isNull);
+    expect(identical(draft.without({'x'}), draft), isTrue);
+  });
 }

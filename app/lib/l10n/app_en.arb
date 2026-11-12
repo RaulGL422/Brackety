@@ -693,5 +693,6 @@
   "reenrolGuardianConsent": "I have the consent of the guardians of the selected minors",
   "reenrolConfirm": "Enter ({count})",
   "reenrolDone": "{count, plural, =1{1 entered} other{{count} entered}}",
-  "settingsAttendanceHint": "Everyone competing in a group of this phase adds them to the standings. Changing them recalculates the standings."
+  "settingsAttendanceHint": "Everyone competing in a group of this phase adds them to the standings. Changing them recalculates the standings.",
+  "draftTakenElsewhere": "{count, plural, =1{{names} is already in another group: taken out of the new group.} other{{names} are already in another group: taken out of the new group.}}"
 }

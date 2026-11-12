@@ -90,6 +90,17 @@ class DraftGroup {
     }
   }
 
+  /// Without the members in [taken] (someone else put them in a group meanwhile). The ghost and the
+  /// ghost team go too, as when a member is taken out by hand.
+  DraftGroup without(Set<String> taken) {
+    if (!members.any(taken.contains)) return this;
+    return copyWith(
+      members: [...members.where((id) => !taken.contains(id))],
+      ghost: () => null,
+      ghostTeam: const [],
+    );
+  }
+
   /// The participants of the ghost team, once its 3 teams are picked.
   DraftGroup setGhostTeam(List<String> ids) {
     final ready = ofTeams && ghostMode && members.length == size - 1;

@@ -1988,4 +1988,15 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get settingsAttendanceHint =>
       'Los suma a la clasificación quien compite en un grupo de esta fase. Al cambiarlos se recalcula la clasificación.';
+
+  @override
+  String draftTakenElsewhere(int count, String names) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$names ya están en otro grupo: se han quitado del grupo nuevo.',
+      one: '$names ya está en otro grupo: se ha quitado del grupo nuevo.',
+    );
+    return '$_temp0';
+  }
 }

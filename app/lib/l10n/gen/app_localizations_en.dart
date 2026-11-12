@@ -1972,4 +1972,15 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsAttendanceHint =>
       'Everyone competing in a group of this phase adds them to the standings. Changing them recalculates the standings.';
+
+  @override
+  String draftTakenElsewhere(int count, String names) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$names are already in another group: taken out of the new group.',
+      one: '$names is already in another group: taken out of the new group.',
+    );
+    return '$_temp0';
+  }
 }

@@ -1,28 +1,44 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/polling.dart';
+import '../../club/state/club_providers.dart';
 import '../data/grouping_models.dart';
 import '../data/grouping_repository.dart';
 
+// All live: another helper's group, or one the superadmin dissolves, shows at once. A helper who
+// sees old lists picks people who are already taken.
+
 final categoriesProvider = FutureProvider.autoDispose
     .family<List<CategorySummary>, String>(
-      (ref, eventId) =>
-          ref.watch(groupingRepositoryProvider).categories(eventId),
+      (ref, eventId) => liveReload(
+        ref,
+        eventTopics(eventId),
+        () => ref.watch(groupingRepositoryProvider).categories(eventId),
+      ),
     );
 
 typedef CategoryKey = ({String eventId, String categoryId});
 
 final categoryParticipantsProvider = FutureProvider.autoDispose
     .family<List<CategoryParticipant>, CategoryKey>(
-      (ref, key) => ref
-          .watch(groupingRepositoryProvider)
-          .participants(key.eventId, key.categoryId),
+      (ref, key) => liveReload(
+        ref,
+        eventTopics(key.eventId),
+        () => ref
+            .watch(groupingRepositoryProvider)
+            .participants(key.eventId, key.categoryId),
+      ),
     );
 
 final categoryTeamsProvider = FutureProvider.autoDispose
     .family<List<Team>, CategoryKey>(
-      (ref, key) => ref
-          .watch(groupingRepositoryProvider)
-          .teams(key.eventId, key.categoryId),
+      (ref, key) => liveReload(
+        ref,
+        eventTopics(key.eventId),
+        () => ref
+            .watch(groupingRepositoryProvider)
+            .teams(key.eventId, key.categoryId),
+      ),
     );
 
 enum ParticipantSort { name, height }

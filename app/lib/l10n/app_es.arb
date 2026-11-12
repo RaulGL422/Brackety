@@ -1253,5 +1253,7 @@
       }
     }
   },
-  "settingsAttendanceHint": "Los suma a la clasificación quien compite en un grupo de esta fase. Al cambiarlos se recalcula la clasificación."
+  "settingsAttendanceHint": "Los suma a la clasificación quien compite en un grupo de esta fase. Al cambiarlos se recalcula la clasificación.",
+  "draftTakenElsewhere": "{count, plural, =1{{names} ya está en otro grupo: se ha quitado del grupo nuevo.} other{{names} ya están en otro grupo: se han quitado del grupo nuevo.}}",
+  "@draftTakenElsewhere": {"placeholders": {"count": {"type": "int"}, "names": {"type": "String"}}}
 }
