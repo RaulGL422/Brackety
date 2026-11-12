@@ -689,7 +689,7 @@ abstract class AppLocalizations {
   /// No description provided for @draftGhostHint.
   ///
   /// In es, this message translates to:
-  /// **'Elige al fantasma: combate pero no puntúa.'**
+  /// **'Fantasmas (hasta 3): quien ya tiene grupo, o el 4.º que elijas. Combaten pero no puntúan.'**
   String get draftGhostHint;
 
   /// No description provided for @createGroup.
@@ -3335,12 +3335,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Quien ya tiene equipo o grupo entra como fantasma: combate, pero no puntúa por este equipo.'**
   String get teamGhostHint;
-
-  /// No description provided for @teamNeedsReal.
-  ///
-  /// In es, this message translates to:
-  /// **'Hace falta al menos un integrante que no sea fantasma.'**
-  String get teamNeedsReal;
 
   /// No description provided for @ghostMemberName.
   ///

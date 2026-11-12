@@ -28,7 +28,7 @@ Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, f
 - Alumno ya agrupado: fila deshabilitada, no desaparece.
 - Deshacer grupo (2026-11-11): desde el aviso tras crearlo o con el icono en un alumno o equipo agrupado, con confirmación, mientras ningún combate suyo haya empezado (`DELETE /events/{id}/groups/{groupId}`, ayudante o club; después 409 y solo el superadmin).
 - **Competidor fantasma**: casilla en el grupo; con 3 seleccionados se habilitan todos los de la categoría (también los ya agrupados, salvo los del mismo grupo) y se elige 1 fantasma. El fantasma combate pero no puntúa; mesa gestiona sus cruces.
-- Grupo = 4 reales, o 3 reales + 1 fantasma; ningún otro tamaño.
+- Grupo = 4 en total, de 1 a 4 reales y hasta 3 fantasmas (pedido de Raul, 2026-11-12). Con la casilla marcada, quien ya tiene grupo entra como fantasma, y también el 4.º elegido.
 
 ### Fin estimado de un tapiz
 - Restante = reloj del combate en curso + pendientes × (duración + 30 s); sin combate en curso, solo lo que quede de los 30 s tras el último.

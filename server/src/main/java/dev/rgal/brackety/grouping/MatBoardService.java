@@ -104,7 +104,8 @@ class MatBoardService {
         var groupMembers = members.findByGroupIdInOrderByPosition(groupById.keySet());
         var ghosts = groupMembers.stream()
                 .filter(GroupMember::isGhost)
-                .collect(Collectors.toMap(GroupMember::getGroupId, GroupMember::getCompetitorId));
+                .collect(Collectors.groupingBy(
+                        GroupMember::getGroupId, Collectors.mapping(GroupMember::getCompetitorId, Collectors.toSet())));
         var competitors = directory.of(event.getId());
         var categoryNames = categories.findByEventIdOrderByMinAge(event.getId()).stream()
                 .collect(Collectors.toMap(EventCategory::getId, EventCategory::getName));
@@ -159,8 +160,8 @@ class MatBoardService {
                 competitors.teamMembers());
         var recommended = MatchRecommender.recommend(candidates, context).orElse(null);
 
-        BiFunction<UUID, UUID, Fighter> fighter =
-                (groupId, id) -> fighter(competitors.get(id), id.equals(ghosts.get(groupId)));
+        BiFunction<UUID, UUID, Fighter> fighter = (groupId, id) -> fighter(
+                competitors.get(id), ghosts.getOrDefault(groupId, Set.of()).contains(id));
         return new MatBoardResponse(
                 matId,
                 mat.getNumber(),

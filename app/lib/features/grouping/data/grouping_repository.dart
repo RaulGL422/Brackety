@@ -54,7 +54,7 @@ class GroupingRepository {
                   'teamIds': group.members,
                   if (group.ghostMode) 'ghostTeam': group.ghostTeam,
                 }
-              : {'participantIds': group.members, 'ghostId': group.ghost},
+              : {'participantIds': group.members, 'ghostIds': group.ghosts},
         ],
         'matId': ?matId,
       },

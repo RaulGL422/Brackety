@@ -187,7 +187,7 @@
     }
   },
   "draftGhost": "Competidor fantasma",
-  "draftGhostHint": "Elige al fantasma: combate pero no puntúa.",
+  "draftGhostHint": "Fantasmas (hasta 3): quien ya tiene grupo, o el 4.º que elijas. Combaten pero no puntúan.",
   "createGroup": "{count, plural, =1{Crear grupo} other{Crear grupos}}",
   "@createGroup": {
     "placeholders": {
@@ -1258,7 +1258,6 @@
   "@draftTakenElsewhere": {"placeholders": {"count": {"type": "int"}, "names": {"type": "String"}}},
   "teamGhostMember": "entra como fantasma",
   "teamGhostHint": "Quien ya tiene equipo o grupo entra como fantasma: combate, pero no puntúa por este equipo.",
-  "teamNeedsReal": "Hace falta al menos un integrante que no sea fantasma.",
   "ghostMemberName": "{name} (fantasma)",
   "@ghostMemberName": {"placeholders": {"name": {"type": "String"}}},
   "teamOverlapTitle": "Alumnos en dos equipos del grupo",

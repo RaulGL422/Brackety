@@ -249,7 +249,7 @@ class MatBoardSimulationTest extends EventApiTest {
         var list = quoted(ids.stream().map(UUID::toString).toList());
         return ghost == null ? """
                 {"participantIds":[%s]}""".formatted(list) : """
-                {"participantIds":[%s],"ghostId":"%s"}""".formatted(list, ghost);
+                {"participantIds":[%s],"ghostIds":["%s"]}""".formatted(list, ghost);
     }
 
     private static String quoted(List<String> ids) {

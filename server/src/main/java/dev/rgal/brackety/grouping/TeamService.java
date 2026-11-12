@@ -117,8 +117,8 @@ class TeamService {
             throw EventException.invalid("A team is " + category.getTeamSize() + " different participants.");
         }
         var ghosts = request.ghostIds() == null ? Set.<UUID>of() : Set.copyOf(request.ghostIds());
-        if (!ids.containsAll(ghosts) || ghosts.size() == ids.size()) {
-            throw EventException.invalid("Ghost members are some of the team's members, and at least one is real.");
+        if (!ids.containsAll(ghosts)) {
+            throw EventException.invalid("Ghost members are members of the team.");
         }
         roster.requireAllIn(event, category, ids);
         // Ghost members may already compete elsewhere: they fill the team in without scoring for it.

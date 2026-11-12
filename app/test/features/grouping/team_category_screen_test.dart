@@ -86,11 +86,6 @@ void main() {
         await tester.tap(find.text('Ana Prueba'));
         await tester.pump();
         expect(find.text('New team · 1/3'), findsOneWidget);
-        // Alone she is not a team yet: someone real has to join.
-        expect(
-          find.text('At least one member must not be a ghost.'),
-          findsOneWidget,
-        );
 
         for (final name in ['Fede', 'Gema', 'Hugo']) {
           await tester.scrollUntilVisible(
@@ -166,25 +161,17 @@ void main() {
     });
   }
 
-  testWidgets('a team of ghosts only cannot be made', (tester) async {
-    await open(tester, sizes['tablet']!);
+  testWidgets('a team can be made of ghosts only', (tester) async {
+    final repository = await open(tester, sizes['tablet']!);
     for (final name in ['Ana', 'Bea', 'Diego']) {
       await tester.tap(find.text('$name Prueba'));
       await tester.pump();
     }
 
-    expect(
-      find.text('At least one member must not be a ghost.'),
-      findsOneWidget,
-    );
-    expect(
-      tester
-          .widget<FilledButton>(
-            find.widgetWithText(FilledButton, 'Create team'),
-          )
-          .onPressed,
-      isNull,
-    );
+    await tester.tap(find.widgetWithText(FilledButton, 'Create team'));
+    await tester.pumpAndSettle();
+
+    expect(repository.createdTeams.single, hasLength(3));
   });
 
   testWidgets('someone in two teams of the group is a warning, not a ban', (

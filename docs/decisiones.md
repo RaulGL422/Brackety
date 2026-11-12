@@ -62,3 +62,4 @@ Las de octubre de 2026, en `decisiones-2026-10.md`.
 - 2026-11-12 · El nombre de la persona detrás de cada cuenta del staff es por evento y lo pone el club · las cuentas del pabellón son genéricas (arbitro1…) y cambian de persona entre fases.
 - 2026-11-12 · Un equipo real puede llevar alumnos fantasma (ya en otro equipo o grupo): combaten pero no puntúan por él; dos equipos de un grupo que comparten alumno solo dan aviso · pedido por Raul para completar equipos con pocos alumnos.
 - 2026-11-11 · En la F1 árbitros y ayudantes usan la web también en el pabellón, con la misma cola offline que la APK guardada en el navegador; el paquete ya no lleva APK por defecto · pedido por Raul: solo web, que es lo probado.
+- 2026-11-12 · Sin límite de fantasmas: un grupo individual admite hasta 3 (al menos 1 real) y un equipo puede ser entero de fantasmas · pedido por Raul en la prueba in situ, para categorías con pocos alumnos.

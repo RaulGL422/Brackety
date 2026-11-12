@@ -42,7 +42,7 @@ class DraftPanel extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
-    final hint = group.choosingGhost
+    final hint = !group.ofTeams && group.ghostMode && !group.isComplete
         ? l10n.draftGhostHint
         : group.ofTeams && group.ghostMode
         ? l10n.draftGhostTeamHint(group.ghostTeamSize!)
@@ -148,11 +148,12 @@ class DraftPanel extends StatelessWidget {
   }
 
   String _status(AppLocalizations l10n) {
-    final ghostDone = group.ofTeams
-        ? group.ghostMode && group.ghostTeam.length == group.ghostTeamSize
-        : group.ghost != null;
-    final missing =
-        DraftGroup.size - group.members.length - (ghostDone ? 1 : 0);
+    final ghosts = group.ofTeams
+        ? (group.ghostMode && group.ghostTeam.length == group.ghostTeamSize
+              ? 1
+              : 0)
+        : group.ghosts.length;
+    final missing = DraftGroup.size - group.members.length - ghosts;
     return missing == 0 ? l10n.draftReady : l10n.draftMissing(missing);
   }
 }

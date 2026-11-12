@@ -340,7 +340,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get draftGhost => 'Ghost competitor';
 
   @override
-  String get draftGhostHint => 'Pick the ghost: fights but does not score.';
+  String get draftGhostHint =>
+      'Ghosts (up to 3): anyone already in a group, or your 4th pick. They fight but do not score.';
 
   @override
   String createGroup(int count) {
@@ -1990,9 +1991,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get teamGhostHint =>
       'Whoever already has a team or a group joins as a ghost: fights, but does not score for this team.';
-
-  @override
-  String get teamNeedsReal => 'At least one member must not be a ghost.';
 
   @override
   String ghostMemberName(String name) {

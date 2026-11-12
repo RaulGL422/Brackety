@@ -205,6 +205,19 @@ class TeamControllerTest extends EventApiTest {
     }
 
     @Test
+    void aTeamCanBeMadeOfGhostsOnly() throws Exception {
+        teams(1);
+        // 0, 1 and 2 are team 1: they fill a whole team in, which can be grouped like any other.
+        createTeam(new int[] {0, 1, 2}, 0, 1, 2)
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.number").value(2))
+                .andExpect(jsonPath("$.members[0].ghost").value(true))
+                .andExpect(jsonPath("$.members[2].ghost").value(true));
+        call(get(event() + "/categories/" + category() + "/teams"), "ayudante1")
+                .andExpect(jsonPath("$.length()").value(2));
+    }
+
+    @Test
     void aGhostMemberFillsATeamInWithoutScoringForIt() throws Exception {
         var full = teams(3);
         // 9 and 10 are only two: 0, already in team 1, fills the third place as a ghost.
@@ -216,7 +229,6 @@ class TeamControllerTest extends EventApiTest {
                 .getResponse()
                 .getContentAsString();
         var filled = UUID.fromString(JsonPath.read(body, "$.id"));
-        createTeam(new int[] {11, 12, 13}, 11, 12, 13).andExpect(status().isBadRequest());
         createTeam(new int[] {11, 12, 13}, 1).andExpect(status().isBadRequest());
         // A real member must still be free: 1 is in team 1.
         createTeam(new int[] {11, 12, 1}, 11).andExpect(status().isConflict());
