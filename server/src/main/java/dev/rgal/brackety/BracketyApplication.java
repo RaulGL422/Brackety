@@ -19,7 +19,10 @@ public class BracketyApplication {
     public static void main(String[] args) throws IOException {
         // The hall laptop's start-event.ps1 hashes its superadmin password with the same encoder.
         if (args.length == 1 && args[0].equals(SUPERADMIN_HASH)) {
-            var password = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8)).readLine();
+            var line = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8)).readLine();
+            // A console set to UTF-8 makes Windows PowerShell put a byte order mark before the piped text: hashed
+            // with it, the password written to superadmin.txt would never match.
+            var password = line == null ? null : line.replace("\uFEFF", "");
             if (password == null || password.isBlank()) {
                 System.err.println("No password on stdin.");
                 System.exit(1);

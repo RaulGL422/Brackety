@@ -3317,6 +3317,96 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Los suma a la clasificación quien compite en un grupo de esta fase. Al cambiarlos se recalcula la clasificación.'**
   String get settingsAttendanceHint;
+
+  /// No description provided for @draftTakenElsewhere.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{{names} ya está en otro grupo: se ha quitado del grupo nuevo.} other{{names} ya están en otro grupo: se han quitado del grupo nuevo.}}'**
+  String draftTakenElsewhere(int count, String names);
+
+  /// No description provided for @teamGhostMember.
+  ///
+  /// In es, this message translates to:
+  /// **'entra como fantasma'**
+  String get teamGhostMember;
+
+  /// No description provided for @teamGhostHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Quien ya tiene equipo o grupo entra como fantasma: combate, pero no puntúa por este equipo.'**
+  String get teamGhostHint;
+
+  /// No description provided for @teamNeedsReal.
+  ///
+  /// In es, this message translates to:
+  /// **'Hace falta al menos un integrante que no sea fantasma.'**
+  String get teamNeedsReal;
+
+  /// No description provided for @ghostMemberName.
+  ///
+  /// In es, this message translates to:
+  /// **'{name} (fantasma)'**
+  String ghostMemberName(String name);
+
+  /// No description provided for @teamOverlapTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Alumnos en dos equipos del grupo'**
+  String get teamOverlapTitle;
+
+  /// No description provided for @teamOverlapBody.
+  ///
+  /// In es, this message translates to:
+  /// **'{lines}\n\nLes tocará combatir contra un equipo en el que también están. ¿Crear el grupo igualmente?'**
+  String teamOverlapBody(String lines);
+
+  /// No description provided for @teamOverlapLine.
+  ///
+  /// In es, this message translates to:
+  /// **'{name}: {teams}'**
+  String teamOverlapLine(String name, String teams);
+
+  /// No description provided for @createAnyway.
+  ///
+  /// In es, this message translates to:
+  /// **'Crear igualmente'**
+  String get createAnyway;
+
+  /// No description provided for @groupCreatedBy.
+  ///
+  /// In es, this message translates to:
+  /// **'por {name}'**
+  String groupCreatedBy(String name);
+
+  /// No description provided for @staffTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Personal'**
+  String get staffTitle;
+
+  /// No description provided for @staffHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Quién está detrás de cada cuenta: se verá en los tapices y en quién ha hecho cada grupo.'**
+  String get staffHint;
+
+  /// No description provided for @staffNameHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre de la persona'**
+  String get staffNameHint;
+
+  /// No description provided for @staffReferee.
+  ///
+  /// In es, this message translates to:
+  /// **'árbitro'**
+  String get staffReferee;
+
+  /// No description provided for @staffHelper.
+  ///
+  /// In es, this message translates to:
+  /// **'ayudante'**
+  String get staffHelper;
 }
 
 class _AppLocalizationsDelegate

@@ -23,6 +23,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -66,7 +67,11 @@ class StandingsService {
         return rows(events.get(eventId));
     }
 
-    /** Best total first; equal totals share the position and go by name. No access check: callers do it. */
+    /**
+     * Best total first. Positions count within each category (as the league's): a podium is per category,
+     * a place among every age says nothing. Equal totals share the position and go by name. No access check:
+     * callers do it.
+     */
     List<StandingRow> rows(Event event) {
         var eventId = event.getId();
         var eventCategories = categories.findByEventIdOrderByMinAge(eventId);
@@ -74,7 +79,7 @@ class StandingsService {
         var competitors = directory.of(eventId);
         var teamNumbers = directory.teamNumbers(eventId);
         var eventMembers = members.findByEventId(eventId);
-        var attending = competitors.participants(eventMembers.stream()
+        var attending = competitors.scorers(eventMembers.stream()
                 .filter(m -> !m.isGhost())
                 .map(GroupMember::getCompetitorId)
                 .toArray(UUID[]::new));
@@ -113,9 +118,17 @@ class StandingsService {
                 .sorted(Comparator.comparingInt(StandingRow::total).reversed())
                 .toList();
         var ranked = new ArrayList<StandingRow>();
-        for (int i = 0; i < rows.size(); i++) {
-            var tied = i > 0 && rows.get(i - 1).total() == rows.get(i).total();
-            ranked.add(rows.get(i).withPosition(tied ? ranked.get(i - 1).position() : i + 1));
+        // Those without a category rank among themselves.
+        var lastInCategory = new HashMap<Optional<UUID>, StandingRow>();
+        var seenInCategory = new HashMap<Optional<UUID>, Integer>();
+        for (var row : rows) {
+            var category = Optional.ofNullable(row.categoryId());
+            var seen = seenInCategory.merge(category, 1, Integer::sum);
+            var previous = lastInCategory.get(category);
+            var tied = previous != null && previous.total() == row.total();
+            var placed = row.withPosition(tied ? previous.position() : seen);
+            lastInCategory.put(category, placed);
+            ranked.add(placed);
         }
         return ranked;
     }
@@ -164,7 +177,7 @@ class StandingsService {
         if (fighter.id().equals(ghosts.get(m.getGroupId()))) {
             return;
         }
-        for (var participant : fighter.participantIds()) {
+        for (var participant : fighter.scorerIds()) {
             fought.merge(participant, 1, Integer::sum);
             if (!side.name().equals(m.getDisqualifiedSide())) {
                 points.merge(participant, score, Integer::sum);

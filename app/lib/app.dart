@@ -6,6 +6,7 @@ import 'core/router.dart';
 import 'features/appearance/state/theme_mode_provider.dart';
 import 'features/auth/state/account_controller.dart';
 import 'features/auth/ui/verification_banner.dart';
+import 'features/offline/state/leave_guard.dart';
 import 'features/offline/state/offline_sync.dart';
 import 'l10n/gen/app_localizations.dart';
 
@@ -15,8 +16,11 @@ class BracketyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // From the start: a queue left from the last run (or the last page load) goes out, and
-    // sign-out clears it.
-    ref.listen(offlineSyncProvider, (_, _) {});
+    // sign-out clears it. While it has actions, the web asks before leaving the page.
+    ref.listen(
+      offlineSyncProvider.select((s) => s.pendingCount > 0),
+      (_, unsent) => guardLeaving(unsent),
+    );
     return MaterialApp.router(
       onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
       theme: lightTheme(),

@@ -72,14 +72,16 @@ class GroupingRepository {
     ];
   }
 
+  /// [ghostIds]: those of [participantIds] who fill the team in without scoring for it.
   Future<Team> createTeam(
     String eventId,
     String categoryId,
-    List<String> participantIds,
-  ) async {
+    List<String> participantIds, {
+    List<String> ghostIds = const [],
+  }) async {
     final response = await _dio.post<Map<String, dynamic>>(
       '/api/v1/events/$eventId/categories/$categoryId/teams',
-      data: {'participantIds': participantIds},
+      data: {'participantIds': participantIds, 'ghostIds': ghostIds},
     );
     return Team.fromJson(response.data!);
   }

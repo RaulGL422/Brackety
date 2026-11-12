@@ -2,17 +2,74 @@ import 'package:dio/dio.dart';
 
 enum AdminMatchStatus { pending, inProgress, finished }
 
-/// A participant's name, or a team ([teamNumber], no name).
+/// A team member; [ghost]: fills the team in but does not score for it.
+class AdminMember {
+  const AdminMember({required this.name, this.ghost = false});
+
+  factory AdminMember.fromJson(Map<String, dynamic> json) => AdminMember(
+    name: json['name'] as String,
+    ghost: json['ghost'] as bool? ?? false,
+  );
+
+  final String name;
+  final bool ghost;
+}
+
+/// A participant's name, or a team ([teamNumber], no name) with its [members]. [ghost]: fights in
+/// the group but does not score.
 class AdminSide {
-  const AdminSide({this.name, this.teamNumber});
+  const AdminSide({
+    this.name,
+    this.teamNumber,
+    this.ghost = false,
+    this.members = const [],
+  });
 
   factory AdminSide.fromJson(Map<String, dynamic> json) => AdminSide(
     name: json['name'] as String?,
     teamNumber: json['teamNumber'] as int?,
+    ghost: json['ghost'] as bool? ?? false,
+    members: [
+      for (final m in json['members'] as List? ?? const [])
+        AdminMember.fromJson(m as Map<String, dynamic>),
+    ],
   );
 
   final String? name;
   final int? teamNumber;
+  final bool ghost;
+  final List<AdminMember> members;
+}
+
+/// A pending match in the order the mat's referee would be offered it.
+class AdminPlannedMatch {
+  const AdminPlannedMatch({
+    required this.matchId,
+    required this.groupNumber,
+    required this.category,
+    required this.startsAt,
+    required this.red,
+    required this.blue,
+  });
+
+  factory AdminPlannedMatch.fromJson(Map<String, dynamic> json) =>
+      AdminPlannedMatch(
+        matchId: json['matchId'] as String,
+        groupNumber: json['groupNumber'] as int,
+        category: json['category'] as String,
+        startsAt: DateTime.parse(json['startsAt'] as String).toLocal(),
+        red: AdminSide.fromJson(json['red'] as Map<String, dynamic>),
+        blue: AdminSide.fromJson(json['blue'] as Map<String, dynamic>),
+      );
+
+  final String matchId;
+  final int groupNumber;
+  final String category;
+
+  /// Estimated: every match at its full time plus the changeover.
+  final DateTime startsAt;
+  final AdminSide red;
+  final AdminSide blue;
 }
 
 class AdminMatch {
@@ -61,6 +118,8 @@ class AdminGroup {
     required this.number,
     required this.category,
     required this.matNumber,
+    this.createdBy,
+    this.members = const [],
     required this.matches,
   });
 
@@ -69,6 +128,11 @@ class AdminGroup {
     number: json['number'] as int,
     category: json['category'] as String,
     matNumber: json['matNumber'] as int,
+    createdBy: json['createdBy'] as String?,
+    members: [
+      for (final m in json['members'] as List? ?? const [])
+        AdminSide.fromJson(m as Map<String, dynamic>),
+    ],
     matches: [
       for (final m in json['matches'] as List)
         AdminMatch.fromJson(m as Map<String, dynamic>),
@@ -79,16 +143,31 @@ class AdminGroup {
   final int number;
   final String category;
   final int matNumber;
+
+  /// Who made it ("Ana López (ayudante1)", or the sign-in alone).
+  final String? createdBy;
+
+  /// In group order, the ghost included.
+  final List<AdminSide> members;
   final List<AdminMatch> matches;
 }
 
 class AdminMat {
-  const AdminMat({required this.id, required this.number, this.referee});
+  const AdminMat({
+    required this.id,
+    required this.number,
+    this.referee,
+    this.plan = const [],
+  });
 
   factory AdminMat.fromJson(Map<String, dynamic> json) => AdminMat(
     id: json['id'] as String,
     number: json['number'] as int,
     referee: json['referee'] as String?,
+    plan: [
+      for (final p in json['plan'] as List? ?? const [])
+        AdminPlannedMatch.fromJson(p as Map<String, dynamic>),
+    ],
   );
 
   final String id;
@@ -96,6 +175,9 @@ class AdminMat {
 
   /// The referee's sign-in; null when the mat has none.
   final String? referee;
+
+  /// Its pending matches in the order they would come up if all goes as planned.
+  final List<AdminPlannedMatch> plan;
 }
 
 class AdminEventRow {

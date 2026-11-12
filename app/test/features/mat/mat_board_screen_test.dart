@@ -4,6 +4,7 @@ import 'package:brackety/features/mat/ui/mat_board_screen.dart';
 import 'package:brackety/l10n/gen/app_localizations.dart';
 import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -50,6 +51,7 @@ void main() {
         number: 3,
         categoryName: '7-8',
         members: [ana, bea, carla, ghost],
+        createdBy: 'Ana López (ayudante1)',
       ),
     ],
     matches: [
@@ -89,11 +91,24 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('Mat 2'), findsOneWidget);
+        // The number is what the referee checks: it shrinks, never gets cut.
+        expect(
+          tester.renderObject<RenderParagraph>(find.text('Mat 2')),
+          isA<RenderParagraph>().having(
+            (p) => p.didExceedMaxLines,
+            'cut',
+            isFalse,
+          ),
+        );
         expect(
           find.text('Group 3, ages 7-8', skipOffstage: false),
           findsNWidgets(2),
         );
         expect(find.text('Recommended match'), findsOneWidget);
+        expect(
+          find.text('by Ana López (ayudante1)', skipOffstage: false),
+          findsOneWidget,
+        );
         expect(find.text('2 to play'), findsOneWidget);
         expect(matchTile('Ana', 'Carla'), findsOneWidget);
         expect(find.text('A fighter is in a match right now'), findsOneWidget);

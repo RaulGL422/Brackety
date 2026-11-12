@@ -90,6 +90,20 @@ class StandingsControllerTest extends EventApiTest {
     }
 
     @Test
+    void positionsCountWithinEachCategory() throws Exception {
+        var younger = new Participant(eventId, clock.instant());
+        younger.update("Lia", "Prueba", LocalDate.of(2027, 3, 1).minusYears(5), 110, true);
+        participants.save(younger);
+
+        // Lia scores nothing but is alone in her category: first there, not fifth of everyone.
+        call(get("/api/v1/events/" + eventId + "/standings"), "club1")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.firstName == 'Lia')].position").value(1))
+                .andExpect(jsonPath("$[?(@.firstName == 'Bea')].position").value(1))
+                .andExpect(jsonPath("$[?(@.firstName == 'Zoe')].position").value(4));
+    }
+
+    @Test
     void aDisqualifiedFighterScoresNothingInThatMatch() throws Exception {
         var third = match(fighters.get(0), fighters.get(2));
         referee(third, "START", null, null);

@@ -4,6 +4,7 @@ import 'package:brackety/features/events/state/events_providers.dart';
 import 'package:brackety/features/grouping/data/grouping_models.dart';
 import 'package:brackety/features/grouping/data/grouping_repository.dart';
 import 'package:brackety/features/grouping/state/group_draft.dart';
+import 'package:brackety/features/grouping/state/grouping_providers.dart';
 import 'package:brackety/core/router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -131,6 +132,63 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  testWidgets(
+    'someone another helper groups meanwhile leaves the draft with a notice',
+    (tester) async {
+      tester.view.physicalSize = sizes['tablet']!;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final repository = FakeGroupingRepository([...participants]);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            ...sessionOverrides(FakeAuthApi(signedIn: true)),
+            groupingRepositoryProvider.overrideWithValue(repository),
+            fakeMatsOverride,
+            myEventsProvider.overrideWith((ref) async => []),
+          ],
+          child: const BracketyApp(),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(BracketyApp)),
+      );
+      container
+          .read(routerProvider)
+          .push('/events/e1/categories/c1', extra: '7-8');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Ana Prueba'));
+      await tester.tap(find.text('Bea Prueba'));
+      await tester.pump();
+
+      // Another helper puts Ana in group 5; the event's live signal reloads the list.
+      repository.list[0] = const CategoryParticipant(
+        id: 'p0',
+        firstName: 'Ana',
+        lastName: 'Prueba',
+        age: 7,
+        heightCm: 130,
+        groupNumber: 5,
+        matNumber: 1,
+      );
+      container.invalidate(
+        categoryParticipantsProvider((eventId: 'e1', categoryId: 'c1')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text(
+          'Ana Prueba is already in another group: taken out of the new group.',
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('Ana P.'), findsNothing);
+      expect(find.text('Bea P.'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets('with the ghost box, the fourth pick is a ghost', (tester) async {
     tester.view.physicalSize = sizes['tablet']!;

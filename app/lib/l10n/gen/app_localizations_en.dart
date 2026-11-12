@@ -1972,4 +1972,67 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsAttendanceHint =>
       'Everyone competing in a group of this phase adds them to the standings. Changing them recalculates the standings.';
+
+  @override
+  String draftTakenElsewhere(int count, String names) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$names are already in another group: taken out of the new group.',
+      one: '$names is already in another group: taken out of the new group.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get teamGhostMember => 'joins as a ghost';
+
+  @override
+  String get teamGhostHint =>
+      'Whoever already has a team or a group joins as a ghost: fights, but does not score for this team.';
+
+  @override
+  String get teamNeedsReal => 'At least one member must not be a ghost.';
+
+  @override
+  String ghostMemberName(String name) {
+    return '$name (ghost)';
+  }
+
+  @override
+  String get teamOverlapTitle => 'Participants in two teams of the group';
+
+  @override
+  String teamOverlapBody(String lines) {
+    return '$lines\n\nThey will fight a team they are also in. Create the group anyway?';
+  }
+
+  @override
+  String teamOverlapLine(String name, String teams) {
+    return '$name: $teams';
+  }
+
+  @override
+  String get createAnyway => 'Create anyway';
+
+  @override
+  String groupCreatedBy(String name) {
+    return 'by $name';
+  }
+
+  @override
+  String get staffTitle => 'Staff';
+
+  @override
+  String get staffHint =>
+      'Who is behind each account: shown on the mats and on who made each group.';
+
+  @override
+  String get staffNameHint => 'Person\'s name';
+
+  @override
+  String get staffReferee => 'referee';
+
+  @override
+  String get staffHelper => 'helper';
 }

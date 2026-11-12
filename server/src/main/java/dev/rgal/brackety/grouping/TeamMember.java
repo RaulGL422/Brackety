@@ -20,11 +20,12 @@ public class TeamMember {
 
     protected TeamMember() {}
 
-    TeamMember(Team team, UUID participantId, int position) {
+    /** {@code ghost}: fills a real team in without scoring for it; every member of a ghost team is one. */
+    TeamMember(Team team, UUID participantId, int position, boolean ghost) {
         this.teamId = team.getId();
         this.participantId = participantId;
         this.position = position;
-        this.ghost = team.isGhost();
+        this.ghost = team.isGhost() || ghost;
     }
 
     public UUID getTeamId() {

@@ -22,6 +22,7 @@ import dev.rgal.brackety.event.EventStaff;
 import dev.rgal.brackety.event.EventStaffRepository;
 import dev.rgal.brackety.event.Mat;
 import dev.rgal.brackety.event.MatRepository;
+import dev.rgal.brackety.event.StaffNames;
 import dev.rgal.brackety.eventpackage.EventPackage.Category;
 import dev.rgal.brackety.eventpackage.EventPackage.CategoryPodiumEntry;
 import dev.rgal.brackety.eventpackage.EventPackage.LeagueEntry;
@@ -92,6 +93,7 @@ public class EventPackageService {
     private final JsonMapper json;
     private final Validator validator;
     private final Clock clock;
+    private final StaffNames staffNames;
 
     EventPackageService(
             EventService eventService,
@@ -110,7 +112,8 @@ public class EventPackageService {
             EventResultsTransfer results,
             JsonMapper json,
             Validator validator,
-            Clock clock) {
+            Clock clock,
+            StaffNames staffNames) {
         this.eventService = eventService;
         this.access = access;
         this.events = events;
@@ -128,6 +131,7 @@ public class EventPackageService {
         this.json = json;
         this.validator = validator;
         this.clock = clock;
+        this.staffNames = staffNames;
     }
 
     /** "liga-yoseikan-fase-1-2027-03-10": a file name for the event's exports. */
@@ -194,7 +198,12 @@ public class EventPackageService {
                                 p.getPersonId(),
                                 organizationNames.get(p.getOrganizationId())))
                         .toList(),
-                results.export(eventId));
+                results.export(eventId),
+                staffNames.names(eventId).entrySet().stream()
+                        .filter(e -> usernames.containsKey(e.getKey()))
+                        .map(e -> new EventPackage.StaffName(usernames.get(e.getKey()), e.getValue()))
+                        .sorted(Comparator.comparing(EventPackage.StaffName::username))
+                        .toList());
         log.info(
                 "Event package exported: {} staff, {} categories, {} mats, {} participants, {}",
                 result.staff().size(),
@@ -251,6 +260,13 @@ public class EventPackageService {
         event = events.save(event);
         for (var member : p.staff()) {
             staff.save(new EventStaff(event.getId(), accountIds.get(member.username()), member.role()));
+        }
+        // The names go in by SQL: the event and its staff must be written first.
+        staff.flush();
+        for (var name : p.staffNamesOrEmpty()) {
+            if (accountIds.containsKey(name.username())) {
+                staffNames.put(event.getId(), accountIds.get(name.username()), name.name());
+            }
         }
         for (var mat : p.mats()) {
             mats.save(new Mat(event.getId(), mat.number(), accountIds.get(mat.refereeUsername())));

@@ -864,4 +864,37 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get userChanged =>
       'La cuenta ha cambiado mientras tanto; se ha recargado.';
+
+  @override
+  String teamWithMembers(int number, String members) {
+    return 'Equipo $number ($members)';
+  }
+
+  @override
+  String ghostName(String name) {
+    return '$name · fantasma';
+  }
+
+  @override
+  String get planEmpty => 'Nada pendiente';
+
+  @override
+  String planSummary(int count, String time) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count combates pendientes, el primero a las $time',
+      one: '1 combate pendiente, empieza a las $time',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get planHint =>
+      'Orden previsto de los combates recomendados si todo va según lo previsto (cada combate con su tiempo entero y el cambio). Las horas son estimadas.';
+
+  @override
+  String groupCreatedBy(String name) {
+    return 'Hecho por $name';
+  }
 }

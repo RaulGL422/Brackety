@@ -862,4 +862,37 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get userChanged =>
       'The account changed meanwhile; it has been reloaded.';
+
+  @override
+  String teamWithMembers(int number, String members) {
+    return 'Team $number ($members)';
+  }
+
+  @override
+  String ghostName(String name) {
+    return '$name · ghost';
+  }
+
+  @override
+  String get planEmpty => 'Nothing pending';
+
+  @override
+  String planSummary(int count, String time) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pending matches, the first at $time',
+      one: '1 pending match, starting at $time',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get planHint =>
+      'Expected order of the recommended matches if everything goes to plan (each match at its full time plus the changeover). Times are estimates.';
+
+  @override
+  String groupCreatedBy(String name) {
+    return 'Made by $name';
+  }
 }

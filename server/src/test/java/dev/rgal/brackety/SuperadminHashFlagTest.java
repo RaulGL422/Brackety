@@ -35,4 +35,17 @@ class SuperadminHashFlagTest {
         assertThat(hash).startsWith("$argon2id$");
         assertThat(SecurityConfig.argon2().matches("hall-password-123", hash)).isTrue();
     }
+
+    @Test
+    void ignoresTheByteOrderMarkWindowsPowerShellSendsFromAUtf8Console() throws Exception {
+        var printed = new ByteArrayOutputStream();
+        var piped = new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF, 'a', 'b', 'c', '1', '2', '3', '\r', '\n'};
+        System.setIn(new ByteArrayInputStream(piped));
+        System.setOut(new PrintStream(printed, true, StandardCharsets.UTF_8));
+
+        BracketyApplication.main(new String[] {BracketyApplication.SUPERADMIN_HASH});
+
+        var hash = printed.toString(StandardCharsets.UTF_8).strip();
+        assertThat(SecurityConfig.argon2().matches("abc123", hash)).isTrue();
+    }
 }

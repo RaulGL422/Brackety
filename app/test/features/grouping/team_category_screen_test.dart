@@ -75,40 +75,51 @@ void main() {
   }
 
   for (final MapEntry(key: device, value: size) in sizes.entries) {
-    testWidgets('a helper makes a team from free participants on $device', (
-      tester,
-    ) async {
-      final repository = await open(tester, size);
+    testWidgets(
+      'a helper makes a team, Ana from team 1 as a ghost, on $device',
+      (tester) async {
+        final repository = await open(tester, size);
 
-      expect(action('Individual group'), findsOneWidget);
-      expect(find.text('New team · 0/3'), findsOneWidget);
-      // Ana is in team 1: she cannot be picked again.
-      await tester.tap(find.text('Ana Prueba'));
-      await tester.pump();
-      expect(find.text('New team · 0/3'), findsOneWidget);
-
-      for (final name in ['Fede', 'Gema', 'Hugo', 'Iris']) {
-        await tester.scrollUntilVisible(
-          find.text('$name Prueba'),
-          100,
-          scrollable: find
-              .descendant(
-                of: find.byType(ListView),
-                matching: find.byType(Scrollable),
-              )
-              .first,
-        );
-        await tester.tap(find.text('$name Prueba'));
+        expect(action('Individual group'), findsOneWidget);
+        expect(find.text('New team · 0/3'), findsOneWidget);
+        // Ana is in team 1: she joins as a ghost (fights, does not score here).
+        await tester.tap(find.text('Ana Prueba'));
         await tester.pump();
-      }
-      expect(find.text('New team · 3/3'), findsOneWidget);
-      await tester.tap(find.text('Create team'));
-      await tester.pumpAndSettle();
+        expect(find.text('New team · 1/3'), findsOneWidget);
+        // Alone she is not a team yet: someone real has to join.
+        expect(
+          find.text('At least one member must not be a ghost.'),
+          findsOneWidget,
+        );
 
-      expect(repository.createdTeams.single, ['p9', 'p10', 'p11']);
-      expect(find.text('Team 4 created'), findsOneWidget);
-      expect(tester.takeException(), isNull);
-    });
+        for (final name in ['Fede', 'Gema', 'Hugo']) {
+          await tester.scrollUntilVisible(
+            find.text('$name Prueba'),
+            100,
+            scrollable: find
+                .descendant(
+                  of: find.byType(ListView),
+                  matching: find.byType(Scrollable),
+                )
+                .first,
+          );
+          await tester.tap(find.text('$name Prueba'));
+          await tester.pump();
+        }
+        expect(find.text('New team · 3/3'), findsOneWidget);
+        expect(
+          find.textContaining('does not score for this team'),
+          findsOneWidget,
+        );
+        await tester.tap(find.text('Create team'));
+        await tester.pumpAndSettle();
+
+        expect(repository.createdTeams.single, ['p0', 'p9', 'p10']);
+        expect(repository.createdTeamGhosts.single, ['p0']);
+        expect(find.text('Team 4 created'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
 
     testWidgets('three teams and a ghost team make a group on $device', (
       tester,
@@ -154,6 +165,93 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  testWidgets('a team of ghosts only cannot be made', (tester) async {
+    await open(tester, sizes['tablet']!);
+    for (final name in ['Ana', 'Bea', 'Diego']) {
+      await tester.tap(find.text('$name Prueba'));
+      await tester.pump();
+    }
+
+    expect(
+      find.text('At least one member must not be a ghost.'),
+      findsOneWidget,
+    );
+    expect(
+      tester
+          .widget<FilledButton>(
+            find.widgetWithText(FilledButton, 'Create team'),
+          )
+          .onPressed,
+      isNull,
+    );
+  });
+
+  testWidgets('someone in two teams of the group is a warning, not a ban', (
+    tester,
+  ) async {
+    tester.view.physicalSize = sizes['tablet']!;
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    // Team 4: Fede and Gema, filled in by Ana (real in team 1) as a ghost.
+    final repository = FakeGroupingRepository(
+      participants,
+      teamList: [
+        ...teams,
+        const Team(
+          id: 't4',
+          number: 4,
+          members: [
+            TeamMember(participantId: 'p9', fullName: 'Fede Prueba'),
+            TeamMember(participantId: 'p10', fullName: 'Gema Prueba'),
+            TeamMember(
+              participantId: 'p0',
+              fullName: 'Ana Prueba',
+              ghost: true,
+            ),
+          ],
+        ),
+      ],
+    );
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...sessionOverrides(FakeAuthApi(signedIn: true)),
+          groupingRepositoryProvider.overrideWithValue(repository),
+          fakeMatsOverride,
+          myEventsProvider.overrideWith((ref) async => []),
+        ],
+        child: const BracketyApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
+        .read(routerProvider)
+        .push('/events/e1/categories/c1/teams?name=15-16&size=3');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Teams'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Ana Prueba (ghost)'), findsOneWidget);
+    for (final team in ['Team 1', 'Team 2', 'Team 3', 'Team 4']) {
+      await tester.tap(find.text(team));
+      await tester.pump();
+    }
+
+    await tester.tap(find.text('Create group'));
+    await tester.pumpAndSettle();
+    expect(find.text('Participants in two teams of the group'), findsOneWidget);
+    expect(find.textContaining('Ana Prueba: Team 1, Team 4'), findsOneWidget);
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(repository.created, isEmpty);
+
+    await tester.tap(find.text('Create group'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Create anyway'));
+    await tester.pumpAndSettle();
+    expect(repository.created.single.members, ['t1', 't2', 't3', 't4']);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('the individual group leads back to the team group', (
     tester,

@@ -32,9 +32,19 @@ public record EventPackage(
         @Size(max = 100) List<@NotNull @Valid OrganizationEntry> organizations,
         @NotNull @Size(max = 20) List<@NotNull @Valid MatEntry> mats,
         @NotNull List<@NotNull @Valid ParticipantEntry> participants,
-        @Valid EventResults results) {
+        @Valid EventResults results,
+        @Size(max = 100) List<@NotNull @Valid StaffName> staffNames) {
 
     public static final int SCHEMA_VERSION = 2;
+
+    /** The person behind a staff account (set by the club); absent in files from before names existed. */
+    public record StaffName(
+            @NotBlank @Size(max = 254) String username,
+            @NotBlank @Size(max = 80) String name) {}
+
+    public List<StaffName> staffNamesOrEmpty() {
+        return staffNames == null ? List.of() : staffNames;
+    }
 
     public List<OrganizationEntry> organizationsOrEmpty() {
         return organizations == null ? List.of() : organizations;

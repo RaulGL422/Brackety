@@ -53,6 +53,7 @@ class BoardGroup {
     required this.number,
     required this.categoryName,
     required this.members,
+    this.createdBy,
   });
 
   factory BoardGroup.fromJson(Map<String, dynamic> json) => BoardGroup(
@@ -63,12 +64,16 @@ class BoardGroup {
       for (final m in json['members'] as List)
         Fighter.fromJson(m as Map<String, dynamic>),
     ],
+    createdBy: json['createdBy'] as String?,
   );
 
   final String id;
   final int number;
   final String categoryName;
   final List<Fighter> members;
+
+  /// Who made the group ("Ana López (ayudante1)", or the sign-in alone).
+  final String? createdBy;
 }
 
 class BoardMatch {

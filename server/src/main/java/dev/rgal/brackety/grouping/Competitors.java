@@ -32,6 +32,15 @@ public final class Competitors {
         return result;
     }
 
+    /** Those who score for each competitor: the participant, or a team's real members. */
+    public Set<UUID> scorers(UUID... ids) {
+        var result = new HashSet<UUID>();
+        for (var id : ids) {
+            result.addAll(byId.get(id).scorerIds());
+        }
+        return result;
+    }
+
     Map<UUID, Set<UUID>> teamMembers() {
         var result = new HashMap<UUID, Set<UUID>>();
         byId.values().stream()

@@ -6,6 +6,7 @@ import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.event.Mat;
 import dev.rgal.brackety.event.MatRepository;
+import dev.rgal.brackety.event.StaffNames;
 import dev.rgal.brackety.grouping.dto.CreateTeamRequest;
 import dev.rgal.brackety.grouping.dto.TeamResponse;
 import dev.rgal.brackety.grouping.dto.TeamResponse.Member;
@@ -14,6 +15,7 @@ import dev.rgal.brackety.participant.ParticipantRepository;
 import java.time.Clock;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -34,6 +36,7 @@ class TeamService {
     private final EventService events;
     private final EventAccess access;
     private final Clock clock;
+    private final StaffNames staffNames;
 
     TeamService(
             TeamRepository teams,
@@ -45,7 +48,8 @@ class TeamService {
             CategoryRoster roster,
             EventService events,
             EventAccess access,
-            Clock clock) {
+            Clock clock,
+            StaffNames staffNames) {
         this.teams = teams;
         this.teamMembers = teamMembers;
         this.groupMembers = groupMembers;
@@ -56,6 +60,7 @@ class TeamService {
         this.events = events;
         this.access = access;
         this.clock = clock;
+        this.staffNames = staffNames;
     }
 
     /** The category's real teams by number, with their group once they have one. */
@@ -77,6 +82,7 @@ class TeamService {
         var matNumbers =
                 mats.findByEventIdOrderByNumber(eventId).stream().collect(Collectors.toMap(Mat::getId, Mat::getNumber));
         var started = new HashSet<>(groups.startedIds(eventId));
+        var labels = staffNames.labels(eventId);
         return categoryTeams.stream()
                 .map(t -> {
                     var group = groupById.get(groupByTeam.get(t.getId()));
@@ -84,13 +90,16 @@ class TeamService {
                             t.getId(),
                             t.getNumber(),
                             membersByTeam.getOrDefault(t.getId(), List.of()).stream()
-                                    .map(m -> people.get(m.getParticipantId()))
-                                    .map(p -> new Member(p.getId(), p.getFirstName(), p.getLastName()))
+                                    .map(m -> {
+                                        var p = people.get(m.getParticipantId());
+                                        return new Member(p.getId(), p.getFirstName(), p.getLastName(), m.isGhost());
+                                    })
                                     .toList(),
                             group == null ? null : group.getNumber(),
                             group == null ? null : matNumbers.get(group.getMatId()),
                             group == null ? null : group.getId(),
-                            group != null && started.contains(group.getId()));
+                            group != null && started.contains(group.getId()),
+                            group == null ? null : labels.get(group.getCreatedBy()));
                 })
                 .toList();
     }
@@ -107,9 +116,14 @@ class TeamService {
         if (ids.size() != category.getTeamSize() || new HashSet<>(ids).size() != ids.size()) {
             throw EventException.invalid("A team is " + category.getTeamSize() + " different participants.");
         }
+        var ghosts = request.ghostIds() == null ? Set.<UUID>of() : Set.copyOf(request.ghostIds());
+        if (!ids.containsAll(ghosts) || ghosts.size() == ids.size()) {
+            throw EventException.invalid("Ghost members are some of the team's members, and at least one is real.");
+        }
         roster.requireAllIn(event, category, ids);
-        roster.requireFree(ids);
-        var team = save(eventId, categoryId, false, accountId, ids);
+        // Ghost members may already compete elsewhere: they fill the team in without scoring for it.
+        roster.requireFree(ids.stream().filter(id -> !ghosts.contains(id)).toList());
+        var team = save(eventId, categoryId, false, accountId, ids, ghosts);
         return list(eventId, categoryId, accountId).stream()
                 .filter(t -> t.id().equals(team.getId()))
                 .findFirst()
@@ -132,10 +146,21 @@ class TeamService {
 
     /** Also used for the ghost team of a group; the caller holds the event lock. */
     Team save(UUID eventId, UUID categoryId, boolean ghost, UUID accountId, List<UUID> participantIds) {
+        return save(eventId, categoryId, ghost, accountId, participantIds, Set.of());
+    }
+
+    private Team save(
+            UUID eventId,
+            UUID categoryId,
+            boolean ghost,
+            UUID accountId,
+            List<UUID> participantIds,
+            Set<UUID> ghostMembers) {
         var team = teams.save(
                 new Team(eventId, categoryId, teams.maxNumber(eventId) + 1, ghost, accountId, clock.instant()));
         for (int i = 0; i < participantIds.size(); i++) {
-            teamMembers.save(new TeamMember(team, participantIds.get(i), i));
+            var id = participantIds.get(i);
+            teamMembers.save(new TeamMember(team, id, i, ghostMembers.contains(id)));
         }
         return team;
     }

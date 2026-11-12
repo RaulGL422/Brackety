@@ -74,6 +74,20 @@ class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    // Another helper (or the superadmin) changed the groups: whoever got a group meanwhile leaves the
+    // draft now, not with a refusal on "Create". Not while this helper's own group is being sent.
+    ref.listen(categoryParticipantsProvider(_key), (_, next) {
+      if (_busy) return;
+      final taken = {
+        for (final p in next.value ?? const <CategoryParticipant>[])
+          if (p.isTaken && _group.members.contains(p.id)) p.id: p.fullName,
+      };
+      if (taken.isEmpty) return;
+      setState(() => _group = _group.without(taken.keys.toSet()));
+      Toasts.of(
+        context,
+      ).show(l10n.draftTakenElsewhere(taken.length, taken.values.join(', ')));
+    });
     final participants = ref.watch(categoryParticipantsProvider(_key));
     final panel = DraftPanel(
       eventId: widget.eventId,
@@ -234,6 +248,8 @@ class _ParticipantTile extends StatelessWidget {
           if (p.teamNumber != null) l10n.teamName(p.teamNumber!),
           if (p.isGrouped)
             l10n.participantGrouped(p.groupNumber!, p.matNumber!),
+          if (p.isGrouped && p.groupCreatedBy != null)
+            l10n.groupCreatedBy(p.groupCreatedBy!),
         ].join(' · '),
       ),
       trailing: state == PickState.ghost

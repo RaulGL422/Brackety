@@ -193,6 +193,8 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
                 // A new key when the value changes, so a refused change shows the saved referee again.
                 key: ValueKey('$i:$refereeId'),
                 initialValue: refereeId,
+                // A person's name next to the sign-in can be long: it is cut, never overflows a phone.
+                isExpanded: true,
                 decoration: InputDecoration(
                   labelText:
                       '${l10n.matTitle(i + 1)} · ${l10n.settingsReferee}',
@@ -200,7 +202,10 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
                 items: [
                   DropdownMenuItem(child: Text(l10n.matNoReferee)),
                   for (final r in settings.referees)
-                    DropdownMenuItem(value: r.id, child: Text(r.username)),
+                    DropdownMenuItem(
+                      value: r.id,
+                      child: Text(r.label, overflow: TextOverflow.ellipsis),
+                    ),
                 ],
                 onChanged: (id) => _change(() => _matReferees[i] = id),
               ),
@@ -223,6 +228,15 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
               ),
             ],
           ),
+          const SizedBox(height: AppSpacing.xl),
+          Text(l10n.staffTitle, style: text.titleMedium),
+          Text(l10n.staffHint, style: text.bodySmall),
+          for (final member in settings.staff)
+            _StaffNameField(
+              key: ValueKey(member.id),
+              eventId: widget.eventId,
+              member: member,
+            ),
           const SizedBox(height: AppSpacing.xl),
           Text(l10n.categoriesTitle, style: text.titleMedium),
           CategoriesEditor(
@@ -335,4 +349,82 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
     _limit.text = '${_saved.pointsLimit}';
     _attendance.text = '${_saved.attendancePoints}';
   });
+}
+
+/// The person behind one staff account; saved once the club stops typing, like the event's name.
+class _StaffNameField extends ConsumerStatefulWidget {
+  const _StaffNameField({
+    super.key,
+    required this.eventId,
+    required this.member,
+  });
+
+  final String eventId;
+  final StaffMember member;
+
+  @override
+  ConsumerState<_StaffNameField> createState() => _StaffNameFieldState();
+}
+
+class _StaffNameFieldState extends ConsumerState<_StaffNameField> {
+  late final _name = TextEditingController(
+    text: widget.member.personName ?? '',
+  );
+  late var _saved = widget.member.personName ?? '';
+  Timer? _typing;
+
+  @override
+  void dispose() {
+    _typing?.cancel();
+    _name.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    _typing?.cancel();
+    final name = _name.text.trim();
+    if (name == _saved) return;
+    final l10n = AppLocalizations.of(context);
+    final toasts = Toasts.of(context);
+    try {
+      await ref
+          .read(clubRepositoryProvider)
+          .saveStaffName(widget.eventId, widget.member.id, name);
+      _saved = name;
+      ref.invalidate(matsOverviewProvider(widget.eventId));
+      toasts.show(
+        l10n.saved,
+        kind: ToastKind.success,
+        duration: const Duration(seconds: 1),
+      );
+    } on DioException catch (e) {
+      toasts.show(saveErrorMessage(l10n, e), kind: ToastKind.error);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final roles = widget.member.roles
+        .map((r) => r == 'REFEREE' ? l10n.staffReferee : l10n.staffHelper)
+        .join(', ');
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.s),
+      child: TextField(
+        controller: _name,
+        maxLength: 80,
+        decoration: InputDecoration(
+          labelText: '${widget.member.username} · $roles',
+          hintText: l10n.staffNameHint,
+          counterText: '',
+        ),
+        textCapitalization: TextCapitalization.words,
+        onChanged: (_) {
+          _typing?.cancel();
+          _typing = Timer(const Duration(milliseconds: 800), _save);
+        },
+        onSubmitted: (_) => _save(),
+      ),
+    );
+  }
 }
