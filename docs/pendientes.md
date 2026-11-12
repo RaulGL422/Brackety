@@ -51,6 +51,7 @@
 - [ ] Refresh idempotente (`SessionService`): la caché vive en memoria y supone una sola instancia de la API (vale para el portátil y la Pi).
 - [ ] `docs/decisiones.md` está en 150 líneas: dividirlo antes de añadir más.
 
+- [ ] Pruebas F1 del 2026-11-12: decisiones abiertas en `pruebas-f1.md` (sección Abierto), sobre todo categorías con 3 inscritos.
 - [ ] Importación de alumnos: aceptar el DPA de Anthropic en su consola y confirmar el plazo de conservación de datos de la API (`modulos/importacion-alumnos.md`).
 
 ## Repositorio público

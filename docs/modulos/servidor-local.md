@@ -12,7 +12,8 @@ Llevar el evento ya preparado (configuración e inscripciones) y arrancarlo en c
 - `start-event.ps1` (PowerShell 7 o Windows PowerShell 5.1) arranca PostgreSQL solo en `127.0.0.1:15433` y la API en el puerto 8080 de todas las interfaces, con las variables de producción. La web sale de la propia API (mismo origen, sin CORS).
 - Datos en `brackety-data/` junto al script: `pgdata/`, `secrets.env` (contraseña de la BD y `JWT_SECRET`, aleatorios en el primer arranque), `event.env` (titular y email de privacidad, editable), `pg.log`, `api.log`, `backups/`.
 - Parar y volver a arrancar no pierde nada; solo se borra a mano.
-- Al parar (Ctrl+C o si la API se cae): copia `pg_dump -Fc` en `brackety-data/backups/` (se guardan 20) y para PostgreSQL. `-Backup`: solo la copia, con el servidor en marcha o parado.
+- Si la API se cae sola: copia y la vuelve a arrancar (hasta 3 veces en 10 min; sin recargar el paquete). Puertos solo en el script (`SERVER_PORT`).
+- Al parar (Ctrl+C o tras la 4.ª caída): copia `pg_dump -Fc` en `brackety-data/backups/` (se guardan 20) y para PostgreSQL. `-Backup`: solo la copia, con el servidor en marcha o parado.
 - Punto de acceso: si está apagado intenta encenderlo (necesita una conexión que compartir, p. ej. la wifi del iPhone); si falla, avisa y sigue. `-NoHotspot` lo salta.
 - Firewall: regla de entrada para `jre\bin\java.exe` (TCP 8080, privada y pública) solo desde `192.168.137.0/24` (el punto de acceso; otra wifi a la que se una el portátil no llega). Si falta, o hay una regla de entrada de ese `java.exe` abierta a cualquier red (p. ej. el aviso de Windows aceptado) o de bloqueo, pregunta y con un solo UAC borra las de ese programa y crea la buena. `localhost` no pasa por el firewall. `-NoFirewall` lo salta.
 - Muestra al arrancar la URL de los móviles (`http://192.168.137.1:8080`, IP fija del punto de acceso de Windows) y la del portátil (`http://localhost:8080`).

@@ -87,6 +87,7 @@ Pedido por Raul el 2026-11-04 para la Fase 1. Desde el 2026-11-11 también (y so
 ### Web (2026-11-11, pedido de Raul: el domingo solo web)
 - La web usa la misma cola que la APK (`opId`, `at`, `knownEvents`), estado optimista con `LocalMatch` y envío de una en una en segundo plano. Ya no hay camino directo ni `MATCH_STALE` en la app.
 - Guardado en `localStorage` (`brackety.offline.queue`, `.views`, `.board-<tapiz>`), un documento entero por clave. Sobrevive a recargar y a cerrar la pestaña.
+- Sin red, una página recargada no vuelve hasta que vuelve la red (http en el pabellón: sin service worker). Con acciones pendientes el navegador pregunta antes de recargar o cerrar; sin "deslizar para recargar" (`web/index.html`).
 - Toques rápidos: se comprueban y encolan antes del primer `await`; la pantalla los muestra al momento.
 - Dos pestañas del mismo navegador comparten la cola: al guardar, cada una incorpora lo que la otra guardó (los `opId` repetidos el servidor los ignora).
 - Sesión: marca `brackety.session` junto a la cookie. Si al recargar el servidor no responde, la sesión sigue y la cola se envía cuando vuelve (el refresh por cookie renueva el token).
