@@ -2014,4 +2014,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get createAnyway => 'Create anyway';
+
+  @override
+  String groupCreatedBy(String name) {
+    return 'by $name';
+  }
+
+  @override
+  String get staffTitle => 'Staff';
+
+  @override
+  String get staffHint =>
+      'Who is behind each account: shown on the mats and on who made each group.';
+
+  @override
+  String get staffNameHint => 'Person\'s name';
+
+  @override
+  String get staffReferee => 'referee';
+
+  @override
+  String get staffHelper => 'helper';
 }

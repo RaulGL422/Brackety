@@ -64,6 +64,9 @@ class EventPackageServiceTest extends EventApiTest {
 
     @Test
     void roundTripIntoAnEmptyDatabaseKeepsEverythingButIds() {
+        jdbc.sql("insert into event_staff_name (event_id, account_id, name) values (?, ?, 'Juan Pérez')")
+                .params(eventId, accountId("arbitro1"))
+                .update();
         var exported = packages.export(eventId, accountId("club1"));
         var file = json.writeValueAsBytes(exported);
         emptyDatabase();
@@ -73,6 +76,7 @@ class EventPackageServiceTest extends EventApiTest {
         assertThat(loaded.event()).isEqualTo(exported.event());
         assertThat(loaded.owner()).isEqualTo(exported.owner());
         assertThat(loaded.staff()).isEqualTo(exported.staff()).hasSize(STAFF);
+        assertThat(loaded.staffNames()).containsExactly(new EventPackage.StaffName("arbitro1", "Juan Pérez"));
         assertThat(loaded.categories()).isEqualTo(exported.categories()).hasSize(9);
         assertThat(loaded.categories()).filteredOn(c -> c.teamSize() != null).hasSize(4);
         assertThat(loaded.mats()).isEqualTo(exported.mats()).hasSize(5);

@@ -526,5 +526,7 @@
   "planEmpty": "Nada pendiente",
   "planSummary": "{count, plural, =1{1 combate pendiente, empieza a las {time}} other{{count} combates pendientes, el primero a las {time}}}",
   "@planSummary": {"placeholders": {"count": {"type": "int"}, "time": {"type": "String"}}},
-  "planHint": "Orden previsto de los combates recomendados si todo va según lo previsto (cada combate con su tiempo entero y el cambio). Las horas son estimadas."
+  "planHint": "Orden previsto de los combates recomendados si todo va según lo previsto (cada combate con su tiempo entero y el cambio). Las horas son estimadas.",
+  "groupCreatedBy": "Hecho por {name}",
+  "@groupCreatedBy": {"placeholders": {"name": {"type": "String"}}}
 }

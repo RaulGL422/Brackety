@@ -47,6 +47,7 @@ class AdminEventControllerTest extends AdminApiTestBase {
                 .andExpect(jsonPath("$.groups[0].matches[0].order").value(0))
                 .andExpect(jsonPath("$.groups[0].matches[0].status").value("PENDING"))
                 .andExpect(jsonPath("$.groups[0].matches[0].red.name").value("Peque0 Prueba"))
+                .andExpect(jsonPath("$.groups[0].createdBy").value("ayudante1"))
                 .andExpect(jsonPath("$.groups[0].members", hasSize(4)))
                 .andExpect(jsonPath("$.groups[0].members[0].name").value("Peque0 Prueba"))
                 .andExpect(jsonPath("$.groups[0].members[0].ghost").value(false))

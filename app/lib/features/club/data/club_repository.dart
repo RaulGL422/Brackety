@@ -71,6 +71,13 @@ class ClubRepository {
     return EventSettings.fromJson(response.data!);
   }
 
+  /// The person behind a staff account in this event; blank removes it.
+  Future<void> saveStaffName(String eventId, String accountId, String name) =>
+      _dio.put<void>(
+        '/api/v1/events/$eventId/staff/$accountId/name',
+        data: {'name': name},
+      );
+
   /// The event's whole category list: those left out are removed.
   Future<List<EventCategory>> saveCategories(
     String eventId,

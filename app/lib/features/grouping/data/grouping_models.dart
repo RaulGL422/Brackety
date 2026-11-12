@@ -44,6 +44,7 @@ class CategoryParticipant {
     this.teamNumber,
     this.groupId,
     this.groupStarted = false,
+    this.groupCreatedBy,
   });
 
   factory CategoryParticipant.fromJson(Map<String, dynamic> json) =>
@@ -58,6 +59,7 @@ class CategoryParticipant {
         teamNumber: json['teamNumber'] as int?,
         groupId: json['groupId'] as String?,
         groupStarted: json['groupStarted'] as bool? ?? false,
+        groupCreatedBy: json['groupCreatedBy'] as String?,
       );
 
   final String id;
@@ -72,6 +74,9 @@ class CategoryParticipant {
 
   /// Set once the participant is in a real team (not a ghost one).
   final int? teamNumber;
+
+  /// Who made their group ("Ana López (ayudante1)", or the sign-in alone).
+  final String? groupCreatedBy;
 
   final String? groupId;
 

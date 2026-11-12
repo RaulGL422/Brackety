@@ -30,7 +30,8 @@ public final class AdminEventDtos {
             UUID id, String name, LocalDate date, String ownerEmail, int entries, List<Mat> mats, List<Group> groups) {}
 
     /**
-     * {@code referee}: the referee's sign-in (email or username), null when the mat has none. {@code plan}: its
+     * {@code referee}: the referee ("Juan Pérez (arbitro1)", or the sign-in alone), null when the mat has none.
+     * {@code plan}: its
      * pending matches in the order the referee would be offered them if everything goes as planned.
      */
     public record Mat(UUID id, int number, String referee, List<PlannedMatch> plan) {}
@@ -38,8 +39,18 @@ public final class AdminEventDtos {
     /** {@code startsAt}: estimated, with every match at its full time plus the changeover. */
     public record PlannedMatch(UUID matchId, int groupNumber, String category, Instant startsAt, Side red, Side blue) {}
 
-    /** {@code members}: who is in the group, in order, the ghost included (marked). */
-    public record Group(UUID id, int number, String category, int matNumber, List<Side> members, List<Match> matches) {}
+    /**
+     * {@code members}: who is in the group, in order, the ghost included (marked). {@code createdBy}: who made it
+     * ("Ana López (ayudante1)", or the sign-in alone), null if that account is gone.
+     */
+    public record Group(
+            UUID id,
+            int number,
+            String category,
+            int matNumber,
+            String createdBy,
+            List<Side> members,
+            List<Match> matches) {}
 
     /** {@code status}: PENDING, IN_PROGRESS or FINISHED. */
     public record Match(

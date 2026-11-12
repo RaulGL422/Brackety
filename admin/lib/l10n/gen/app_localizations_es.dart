@@ -892,4 +892,9 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get planHint =>
       'Orden previsto de los combates recomendados si todo va según lo previsto (cada combate con su tiempo entero y el cambio). Las horas son estimadas.';
+
+  @override
+  String groupCreatedBy(String name) {
+    return 'Hecho por $name';
+  }
 }

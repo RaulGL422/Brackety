@@ -702,5 +702,11 @@
   "teamOverlapTitle": "Participants in two teams of the group",
   "teamOverlapBody": "{lines}\n\nThey will fight a team they are also in. Create the group anyway?",
   "teamOverlapLine": "{name}: {teams}",
-  "createAnyway": "Create anyway"
+  "createAnyway": "Create anyway",
+  "groupCreatedBy": "by {name}",
+  "staffTitle": "Staff",
+  "staffHint": "Who is behind each account: shown on the mats and on who made each group.",
+  "staffNameHint": "Person's name",
+  "staffReferee": "referee",
+  "staffHelper": "helper"
 }

@@ -28,6 +28,7 @@ public class EventService {
     private final EventCategoryRepository categories;
     private final EventOrganizationRepository organizations;
     private final AccountRepository accounts;
+    private final StaffNames staffNames;
     private final EventAccess access;
 
     EventService(
@@ -37,7 +38,9 @@ public class EventService {
             EventCategoryRepository categories,
             EventOrganizationRepository organizations,
             AccountRepository accounts,
-            EventAccess access) {
+            EventAccess access,
+            StaffNames staffNames) {
+        this.staffNames = staffNames;
         this.events = events;
         this.staff = staff;
         this.mats = mats;
@@ -147,9 +150,22 @@ public class EventService {
     }
 
     private EventSettingsResponse settings(Event event) {
-        var referees = accounts.findAllById(refereeIds(event.getId())).stream()
+        var names = staffNames.names(event.getId());
+        var rolesByAccount = staff.findByEventId(event.getId()).stream()
+                .collect(Collectors.groupingBy(
+                        EventStaff::getAccountId, Collectors.mapping(EventStaff::getRole, Collectors.toList())));
+        // Everyone but the club itself, by sign-in.
+        var people = accounts.findAllById(rolesByAccount.keySet()).stream()
+                .filter(a -> !rolesByAccount.get(a.getId()).contains(EventRole.CLUB))
                 .sorted(Comparator.comparing(Account::getEmail))
-                .map(a -> new StaffMember(a.getId(), a.getEmail()))
+                .map(a -> new StaffMember(
+                        a.getId(),
+                        a.getEmail(),
+                        names.get(a.getId()),
+                        rolesByAccount.get(a.getId()).stream().sorted().toList()))
+                .toList();
+        var referees = people.stream()
+                .filter(p -> p.roles().contains(EventRole.REFEREE))
                 .toList();
         return new EventSettingsResponse(
                 event.getName(),
@@ -161,6 +177,7 @@ public class EventService {
                         .map(m -> new MatSettings(m.getId(), m.getNumber(), m.getRefereeAccountId()))
                         .toList(),
                 referees,
+                people,
                 categories.findByEventIdOrderByMinAge(event.getId()).stream()
                         .map(CategoryResponse::of)
                         .toList(),

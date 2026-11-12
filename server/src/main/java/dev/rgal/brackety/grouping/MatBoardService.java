@@ -1,7 +1,5 @@
 package dev.rgal.brackety.grouping;
 
-import dev.rgal.brackety.auth.account.Account;
-import dev.rgal.brackety.auth.account.AccountRepository;
 import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventCategory;
 import dev.rgal.brackety.event.EventCategoryRepository;
@@ -10,6 +8,7 @@ import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.event.Mat;
 import dev.rgal.brackety.event.MatRepository;
+import dev.rgal.brackety.event.StaffNames;
 import dev.rgal.brackety.grouping.MatchRecommender.Candidate;
 import dev.rgal.brackety.grouping.dto.MatBoardResponse;
 import dev.rgal.brackety.grouping.dto.MatBoardResponse.BoardGroup;
@@ -23,7 +22,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiFunction;
@@ -41,11 +39,11 @@ class MatBoardService {
     private final MatchRepository matches;
     private final CompetitorDirectory directory;
     private final EventCategoryRepository categories;
-    private final AccountRepository accounts;
     private final EventService events;
     private final EventAccess access;
     private final MatSchedule schedule;
     private final Clock clock;
+    private final StaffNames staffNames;
 
     MatBoardService(
             MatRepository mats,
@@ -54,22 +52,22 @@ class MatBoardService {
             MatchRepository matches,
             CompetitorDirectory directory,
             EventCategoryRepository categories,
-            AccountRepository accounts,
             EventService events,
             EventAccess access,
             MatSchedule schedule,
-            Clock clock) {
+            Clock clock,
+            StaffNames staffNames) {
         this.mats = mats;
         this.groups = groups;
         this.members = members;
         this.matches = matches;
         this.directory = directory;
         this.categories = categories;
-        this.accounts = accounts;
         this.events = events;
         this.access = access;
         this.schedule = schedule;
         this.clock = clock;
+        this.staffNames = staffNames;
     }
 
     /** Every mat of the event with its load and estimated end. */
@@ -78,13 +76,7 @@ class MatBoardService {
         access.require(eventId, accountId, EventRole.CLUB, EventRole.GROUPER);
         var now = clock.instant();
         var states = schedule.states(events.get(eventId), now);
-        var referees = accounts
-                .findAllById(states.stream()
-                        .map(s -> s.mat().getRefereeAccountId())
-                        .filter(Objects::nonNull)
-                        .toList())
-                .stream()
-                .collect(Collectors.toMap(Account::getId, Account::getEmail));
+        var referees = staffNames.labels(eventId);
         return states.stream()
                 .map(s -> new MatOverview(
                         s.mat().getId(),
@@ -116,6 +108,7 @@ class MatBoardService {
         var competitors = directory.of(event.getId());
         var categoryNames = categories.findByEventIdOrderByMinAge(event.getId()).stream()
                 .collect(Collectors.toMap(EventCategory::getId, EventCategory::getName));
+        var labels = staffNames.labels(event.getId());
 
         var eventMatches = matches.findByEventId(event.getId());
         var busy = new HashSet<UUID>();
@@ -179,7 +172,8 @@ class MatBoardService {
                                 groupMembers.stream()
                                         .filter(m -> m.getGroupId().equals(g.getId()))
                                         .map(m -> fighter.apply(g.getId(), m.getCompetitorId()))
-                                        .toList()))
+                                        .toList(),
+                                labels.get(g.getCreatedBy())))
                         .toList(),
                 onMat.stream()
                         .map(m -> new BoardMatch(

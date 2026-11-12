@@ -51,6 +51,7 @@ void main() {
         number: 3,
         categoryName: '7-8',
         members: [ana, bea, carla, ghost],
+        createdBy: 'Ana López (ayudante1)',
       ),
     ],
     matches: [
@@ -104,6 +105,10 @@ void main() {
           findsNWidgets(2),
         );
         expect(find.text('Recommended match'), findsOneWidget);
+        expect(
+          find.text('by Ana López (ayudante1)', skipOffstage: false),
+          findsOneWidget,
+        );
         expect(find.text('2 to play'), findsOneWidget);
         expect(matchTile('Ana', 'Carla'), findsOneWidget);
         expect(find.text('A fighter is in a match right now'), findsOneWidget);

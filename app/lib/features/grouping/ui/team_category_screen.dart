@@ -597,6 +597,8 @@ class _PersonTile extends StatelessWidget {
           if (p.teamNumber != null) l10n.teamName(p.teamNumber!),
           if (p.isGrouped)
             l10n.participantGrouped(p.groupNumber!, p.matNumber!),
+          if (p.isGrouped && p.groupCreatedBy != null)
+            l10n.groupCreatedBy(p.groupCreatedBy!),
           if (ghost) l10n.teamGhostMember,
         ].join(' · '),
       ),

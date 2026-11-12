@@ -1266,5 +1266,12 @@
   "@teamOverlapBody": {"placeholders": {"lines": {"type": "String"}}},
   "teamOverlapLine": "{name}: {teams}",
   "@teamOverlapLine": {"placeholders": {"name": {"type": "String"}, "teams": {"type": "String"}}},
-  "createAnyway": "Crear igualmente"
+  "createAnyway": "Crear igualmente",
+  "groupCreatedBy": "por {name}",
+  "@groupCreatedBy": {"placeholders": {"name": {"type": "String"}}},
+  "staffTitle": "Personal",
+  "staffHint": "Quién está detrás de cada cuenta: se verá en los tapices y en quién ha hecho cada grupo.",
+  "staffNameHint": "Nombre de la persona",
+  "staffReferee": "árbitro",
+  "staffHelper": "ayudante"
 }

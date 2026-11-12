@@ -15,7 +15,8 @@ public record MatBoardResponse(
     public record Fighter(
             UUID participantId, String name, boolean ghost, UUID teamId, Integer teamNumber, List<String> members) {}
 
-    public record BoardGroup(UUID id, int number, String categoryName, List<Fighter> members) {}
+    /** {@code createdBy}: who made the group ("Ana López (ayudante1)", or the sign-in alone). */
+    public record BoardGroup(UUID id, int number, String categoryName, List<Fighter> members, String createdBy) {}
 
     /**
      * {@code available}: neither fighter is in a match in progress on any mat, and it is not in review.

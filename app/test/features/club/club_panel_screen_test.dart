@@ -22,6 +22,14 @@ class FakeClubRepository extends Fake implements ClubRepository {
   FakeClubRepository(this.current);
 
   EventSettings current;
+  final savedStaffNames = <(String, String)>[];
+
+  @override
+  Future<void> saveStaffName(
+    String eventId,
+    String accountId,
+    String name,
+  ) async => savedStaffNames.add((accountId, name));
   int? refuseWith;
   final savedMatReferees = <List<String?>>[];
   final savedRules = <(Duration, int)>[];
@@ -137,7 +145,23 @@ void main() {
     name: 'Fase 1',
     date: DateTime(2026, 11, 14),
     matReferees: const ['r1', null],
-    referees: const [StaffMember(id: 'r1', username: 'arbitro1')],
+    referees: const [
+      StaffMember(
+        id: 'r1',
+        username: 'arbitro1',
+        personName: 'Juan Pérez',
+        roles: ['REFEREE'],
+      ),
+    ],
+    staff: const [
+      StaffMember(id: 'h1', username: 'ayudante1', roles: ['GROUPER']),
+      StaffMember(
+        id: 'r1',
+        username: 'arbitro1',
+        personName: 'Juan Pérez',
+        roles: ['REFEREE'],
+      ),
+    ],
     matchLength: const Duration(minutes: 3),
     pointsLimit: 15,
     attendancePoints: 10,
@@ -468,6 +492,47 @@ void main() {
       ['r1', null, null],
     ]);
     expect(find.text('Saved'), findsOneWidget);
+  });
+
+  testWidgets('the club names the person behind each account', (tester) async {
+    final repository = FakeClubRepository(settings);
+    await pumpPanel(tester, const Size(360, 800), repository: repository);
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+
+    // The mat's referee shows with their name.
+    await tester.scrollUntilVisible(
+      find.text('Juan Pérez (arbitro1)'),
+      200,
+      scrollable: find
+          .descendant(
+            of: find.byType(ListView),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    expect(find.text('Juan Pérez (arbitro1)'), findsOneWidget);
+    final helper = find.widgetWithText(TextField, 'ayudante1 · helper');
+    await tester.scrollUntilVisible(
+      helper,
+      200,
+      scrollable: find
+          .descendant(
+            of: find.byType(ListView),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    await tester.enterText(helper, 'Ana López');
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+
+    expect(repository.savedStaffNames, [('h1', 'Ana López')]);
+    expect(
+      find.widgetWithText(TextField, 'arbitro1 · referee'),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('removing the last mat asks first', (tester) async {

@@ -2031,4 +2031,25 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get createAnyway => 'Crear igualmente';
+
+  @override
+  String groupCreatedBy(String name) {
+    return 'por $name';
+  }
+
+  @override
+  String get staffTitle => 'Personal';
+
+  @override
+  String get staffHint =>
+      'Quién está detrás de cada cuenta: se verá en los tapices y en quién ha hecho cada grupo.';
+
+  @override
+  String get staffNameHint => 'Nombre de la persona';
+
+  @override
+  String get staffReferee => 'árbitro';
+
+  @override
+  String get staffHelper => 'ayudante';
 }

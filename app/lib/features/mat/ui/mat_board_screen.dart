@@ -531,6 +531,11 @@ class _GroupCard extends StatelessWidget {
                 ),
               ],
             ),
+            if (group.createdBy != null)
+              Text(
+                l10n.groupCreatedBy(group.createdBy!),
+                style: text.bodySmall,
+              ),
             const SizedBox(height: AppSpacing.s),
             for (final m in group.members) ...[
               Text(m.label(l10n)),

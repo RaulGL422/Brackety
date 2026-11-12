@@ -12,6 +12,7 @@ import dev.rgal.brackety.admin.dto.AdminEventDtos.PlannedMatch;
 import dev.rgal.brackety.admin.dto.AdminEventDtos.Side;
 import dev.rgal.brackety.auth.admin.AdminAuditLog;
 import dev.rgal.brackety.event.EventException;
+import dev.rgal.brackety.event.StaffNames;
 import dev.rgal.brackety.grouping.CompetitionCleanup;
 import dev.rgal.brackety.grouping.MatPlanner;
 import dev.rgal.brackety.scoreboard.MatchReset;
@@ -79,13 +80,16 @@ class AdminEventService {
     private final CompetitionCleanup cleanup;
     private final AdminAuditLog audit;
     private final MatPlanner planner;
+    private final StaffNames staffNames;
 
     AdminEventService(
             JdbcClient jdbc,
             MatchReset matchReset,
             CompetitionCleanup cleanup,
             AdminAuditLog audit,
-            MatPlanner planner) {
+            MatPlanner planner,
+            StaffNames staffNames) {
+        this.staffNames = staffNames;
         this.jdbc = jdbc;
         this.matchReset = matchReset;
         this.cleanup = cleanup;
@@ -156,6 +160,7 @@ class AdminEventService {
 
     private List<Mat> mats(UUID eventId, List<Group> groups) {
         var plan = planner.plan(eventId);
+        var labels = staffNames.labels(eventId);
         var groupOf = new HashMap<UUID, Group>();
         var matchById = new HashMap<UUID, Match>();
         for (var g : groups) {
@@ -165,8 +170,7 @@ class AdminEventService {
             }
         }
         return jdbc.sql("""
-                        select m.id, m.number, a.email from mat m
-                        left join account a on a.id = m.referee_account_id
+                        select m.id, m.number, m.referee_account_id from mat m
                         where m.event_id = :eventId order by m.number""")
                 .param("eventId", eventId)
                 .query((rs, n) -> {
@@ -184,12 +188,14 @@ class AdminEventService {
                                         match.blue());
                             })
                             .toList();
-                    return new Mat(id, rs.getInt("number"), rs.getString("email"), planned);
+                    var referee = rs.getObject("referee_account_id", UUID.class);
+                    return new Mat(id, rs.getInt("number"), referee == null ? null : labels.get(referee), planned);
                 })
                 .list();
     }
 
     private List<Group> groups(UUID eventId) {
+        var labels = staffNames.labels(eventId);
         var teamMembers = new HashMap<UUID, List<Member>>();
         jdbc.sql(TEAM_MEMBERS).param("eventId", eventId).query(rs -> {
             teamMembers
@@ -207,7 +213,7 @@ class AdminEventService {
                         .collect(Collectors.groupingBy(
                                 GroupMatch::groupId, Collectors.mapping(GroupMatch::match, Collectors.toList())));
         return jdbc.sql("""
-                        select g.id, g.number, c.name as category, m.number as mat_number
+                        select g.id, g.number, c.name as category, m.number as mat_number, g.created_by
                         from fight_group g
                         join event_category c on c.id = g.category_id
                         join mat m on m.id = g.mat_id
@@ -220,6 +226,7 @@ class AdminEventService {
                             rs.getInt("number"),
                             rs.getString("category"),
                             rs.getInt("mat_number"),
+                            labels.get(rs.getObject("created_by", UUID.class)),
                             membersByGroup.getOrDefault(id, List.of()),
                             matchesByGroup.getOrDefault(id, List.of()));
                 })

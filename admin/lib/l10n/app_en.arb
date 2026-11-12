@@ -239,5 +239,6 @@
   "ghostName": "{name} · ghost",
   "planEmpty": "Nothing pending",
   "planSummary": "{count, plural, =1{1 pending match, starting at {time}} other{{count} pending matches, the first at {time}}}",
-  "planHint": "Expected order of the recommended matches if everything goes to plan (each match at its full time plus the changeover). Times are estimates."
+  "planHint": "Expected order of the recommended matches if everything goes to plan (each match at its full time plus the changeover). Times are estimates.",
+  "groupCreatedBy": "Made by {name}"
 }

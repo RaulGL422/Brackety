@@ -890,4 +890,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get planHint =>
       'Expected order of the recommended matches if everything goes to plan (each match at its full time plus the changeover). Times are estimates.';
+
+  @override
+  String groupCreatedBy(String name) {
+    return 'Made by $name';
+  }
 }

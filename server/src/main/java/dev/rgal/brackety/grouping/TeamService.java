@@ -6,6 +6,7 @@ import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.event.Mat;
 import dev.rgal.brackety.event.MatRepository;
+import dev.rgal.brackety.event.StaffNames;
 import dev.rgal.brackety.grouping.dto.CreateTeamRequest;
 import dev.rgal.brackety.grouping.dto.TeamResponse;
 import dev.rgal.brackety.grouping.dto.TeamResponse.Member;
@@ -35,6 +36,7 @@ class TeamService {
     private final EventService events;
     private final EventAccess access;
     private final Clock clock;
+    private final StaffNames staffNames;
 
     TeamService(
             TeamRepository teams,
@@ -46,7 +48,8 @@ class TeamService {
             CategoryRoster roster,
             EventService events,
             EventAccess access,
-            Clock clock) {
+            Clock clock,
+            StaffNames staffNames) {
         this.teams = teams;
         this.teamMembers = teamMembers;
         this.groupMembers = groupMembers;
@@ -57,6 +60,7 @@ class TeamService {
         this.events = events;
         this.access = access;
         this.clock = clock;
+        this.staffNames = staffNames;
     }
 
     /** The category's real teams by number, with their group once they have one. */
@@ -78,6 +82,7 @@ class TeamService {
         var matNumbers =
                 mats.findByEventIdOrderByNumber(eventId).stream().collect(Collectors.toMap(Mat::getId, Mat::getNumber));
         var started = new HashSet<>(groups.startedIds(eventId));
+        var labels = staffNames.labels(eventId);
         return categoryTeams.stream()
                 .map(t -> {
                     var group = groupById.get(groupByTeam.get(t.getId()));
@@ -93,7 +98,8 @@ class TeamService {
                             group == null ? null : group.getNumber(),
                             group == null ? null : matNumbers.get(group.getMatId()),
                             group == null ? null : group.getId(),
-                            group != null && started.contains(group.getId()));
+                            group != null && started.contains(group.getId()),
+                            group == null ? null : labels.get(group.getCreatedBy()));
                 })
                 .toList();
     }

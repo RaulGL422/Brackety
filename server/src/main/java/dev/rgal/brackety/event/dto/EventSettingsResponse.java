@@ -3,6 +3,7 @@ package dev.rgal.brackety.event.dto;
 import dev.rgal.brackety.event.EventCategory;
 import dev.rgal.brackety.event.EventCategory.Format;
 import dev.rgal.brackety.event.EventOrganization;
+import dev.rgal.brackety.event.EventRole;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -15,6 +16,7 @@ public record EventSettingsResponse(
         int pointsLimit,
         List<MatSettings> mats,
         List<StaffMember> referees,
+        List<StaffMember> staff,
         List<CategoryResponse> categories,
         List<OrganizationResponse> organizations,
         int attendancePoints,
@@ -30,7 +32,11 @@ public record EventSettingsResponse(
 
     public record MatSettings(UUID id, int number, UUID refereeId) {}
 
-    public record StaffMember(UUID id, String username) {}
+    /**
+     * {@code personName}: who is behind the account in this event, set by the club; null until then. {@code roles}:
+     * the account's roles in the event.
+     */
+    public record StaffMember(UUID id, String username, String personName, List<EventRole> roles) {}
 
     /** {@code teamSize} is null in an individual category. */
     public record CategoryResponse(

@@ -118,6 +118,7 @@ class AdminGroup {
     required this.number,
     required this.category,
     required this.matNumber,
+    this.createdBy,
     this.members = const [],
     required this.matches,
   });
@@ -127,6 +128,7 @@ class AdminGroup {
     number: json['number'] as int,
     category: json['category'] as String,
     matNumber: json['matNumber'] as int,
+    createdBy: json['createdBy'] as String?,
     members: [
       for (final m in json['members'] as List? ?? const [])
         AdminSide.fromJson(m as Map<String, dynamic>),
@@ -141,6 +143,9 @@ class AdminGroup {
   final int number;
   final String category;
   final int matNumber;
+
+  /// Who made it ("Ana López (ayudante1)", or the sign-in alone).
+  final String? createdBy;
 
   /// In group order, the ghost included.
   final List<AdminSide> members;

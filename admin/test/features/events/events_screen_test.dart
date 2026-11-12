@@ -20,6 +20,7 @@ class FakeEventsApi implements EventsApi {
     number: number,
     category: '4-6',
     matNumber: number,
+    createdBy: 'Ana López (ayudante1)',
     members: const [
       AdminSide(name: 'Leo Molina'),
       AdminSide(name: 'Noa Vázquez'),
@@ -173,6 +174,7 @@ void main() {
       expect(find.text('Mat 1: arbitro1'), findsOneWidget);
       expect(find.text('Mat 2: no referee'), findsOneWidget);
       expect(find.text('Group 1, 4-6'), findsOneWidget);
+      expect(find.text('Made by Ana López (ayudante1)'), findsWidgets);
       expect(find.text('Leo Molina'), findsWidgets);
       expect(find.text('Team 2 (Ana, Bea, Carla · ghost)'), findsWidgets);
       expect(find.text('Zoe Gil · ghost'), findsWidgets);

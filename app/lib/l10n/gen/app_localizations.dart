@@ -3371,6 +3371,42 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Crear igualmente'**
   String get createAnyway;
+
+  /// No description provided for @groupCreatedBy.
+  ///
+  /// In es, this message translates to:
+  /// **'por {name}'**
+  String groupCreatedBy(String name);
+
+  /// No description provided for @staffTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Personal'**
+  String get staffTitle;
+
+  /// No description provided for @staffHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Quién está detrás de cada cuenta: se verá en los tapices y en quién ha hecho cada grupo.'**
+  String get staffHint;
+
+  /// No description provided for @staffNameHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre de la persona'**
+  String get staffNameHint;
+
+  /// No description provided for @staffReferee.
+  ///
+  /// In es, this message translates to:
+  /// **'árbitro'**
+  String get staffReferee;
+
+  /// No description provided for @staffHelper.
+  ///
+  /// In es, this message translates to:
+  /// **'ayudante'**
+  String get staffHelper;
 }
 
 class _AppLocalizationsDelegate
