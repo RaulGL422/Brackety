@@ -11,6 +11,7 @@ enum MatchRefusal {
   notRunning,
   nothingToUndo,
   notOver,
+  notFinished,
   noPoints,
   clockRunning,
   clockLimit,
@@ -113,9 +114,29 @@ class TamboMatch {
         _lastUndoable = e;
       case MatchAction.finish:
         _finished = true;
+      case MatchAction.cancel:
+        _cancel();
+      case MatchAction.reopen:
+        _finished = false;
       case MatchAction.undo:
         throw ArgumentError('UNDO entries are never applied');
     }
+  }
+
+  // As if it had never started: nothing before it can be undone either.
+  void _cancel() {
+    for (final t in _tallies.values) {
+      t
+        ..points = 0
+        ..warnings = 0
+        ..oneHandWarnings = 0;
+    }
+    _autoPointWarnings.clear();
+    _elapsed = Duration.zero;
+    _runningSince = null;
+    _disqualified = null;
+    _started = false;
+    _lastUndoable = null;
   }
 
   static Side _rival(Side side) => side == Side.red ? Side.blue : Side.red;
@@ -178,7 +199,9 @@ class TamboMatch {
     Side? side,
     Duration delta = Duration.zero,
   }) {
-    if (_finished) return MatchRefusal.finished;
+    if (_finished) {
+      return action == MatchAction.reopen ? null : MatchRefusal.finished;
+    }
     final end = endReason(now);
     final over = end != null;
     return switch (action) {
@@ -218,6 +241,8 @@ class TamboMatch {
       MatchAction.undo =>
         _lastUndoable == null ? MatchRefusal.nothingToUndo : null,
       MatchAction.finish => over ? null : MatchRefusal.notOver,
+      MatchAction.cancel => _started ? null : MatchRefusal.notStarted,
+      MatchAction.reopen => MatchRefusal.notFinished,
     };
   }
 }

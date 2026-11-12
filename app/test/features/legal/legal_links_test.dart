@@ -27,7 +27,7 @@ void main() {
       await tapText(tester, 'Cookies');
       expect(find.widgetWithText(AppBar, 'Cookie policy'), findsOneWidget);
 
-      await tester.tap(find.byIcon(Icons.chevron_left));
+      await tester.tap(find.byIcon(Icons.arrow_back));
       await tester.pumpAndSettle();
       expect(find.text('No account? Sign up'), findsOneWidget);
       expect(tester.takeException(), isNull);

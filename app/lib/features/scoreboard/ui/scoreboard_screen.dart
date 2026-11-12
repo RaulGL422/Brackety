@@ -16,6 +16,7 @@ import '../state/match_controller.dart';
 import 'clock_bar.dart';
 import 'corner_panel.dart';
 import 'final_score.dart';
+import 'match_corrections.dart';
 import 'reason_dialog.dart';
 import 'timeline_list.dart';
 import 'undo_text.dart';
@@ -63,6 +64,12 @@ class ScoreboardScreen extends ConsumerWidget {
                     : l10n.scoreboardTitle(view.matNumber, view.groupNumber),
               ),
               actions: [
+                if (view != null && view.started && !view.finished)
+                  IconButton(
+                    tooltip: l10n.cancelMatch,
+                    icon: const Icon(Icons.block),
+                    onPressed: () => cancelMatch(context, ref, matchId),
+                  ),
                 if (view != null)
                   IconButton(
                     tooltip: l10n.timeline,
@@ -79,7 +86,10 @@ class ScoreboardScreen extends ConsumerWidget {
                     value: match,
                     onRetry: () => ref.invalidate(provider),
                     data: (view) => view.finished
-                        ? _Finished(view: view)
+                        ? _Finished(
+                            view: view,
+                            onReopen: () => reopenMatch(context, ref, matchId),
+                          )
                         : _Live(
                             view: view,
                             onAction: (action, {side}) =>
@@ -177,6 +187,7 @@ class ScoreboardScreen extends ConsumerWidget {
         MatchRefusal.notRunning => l10n.refusalNotRunning,
         MatchRefusal.nothingToUndo => l10n.refusalNothingToUndo,
         MatchRefusal.notOver => l10n.refusalNotOver,
+        MatchRefusal.notFinished => l10n.refusalNotFinished,
         MatchRefusal.notForAge => l10n.refusalNotForAge,
         MatchRefusal.inReview => l10n.refusalInReview,
         MatchRefusal.matBusy => l10n.refusalMatBusy,
@@ -310,9 +321,12 @@ class _ReviewBanner extends StatelessWidget {
 
 /// The result, then the timeline: side by side in landscape.
 class _Finished extends StatelessWidget {
-  const _Finished({required this.view});
+  const _Finished({required this.view, required this.onReopen});
 
   final MatchView view;
+
+  /// Always offered: the server says no while another match is on the mat.
+  final VoidCallback onReopen;
 
   @override
   Widget build(BuildContext context) {
@@ -335,6 +349,11 @@ class _Finished extends StatelessWidget {
             onPressed: () => context.canPop()
                 ? context.pop()
                 : context.go('/mats/${view.matId}'),
+          ),
+          OutlinedButton.icon(
+            icon: const Icon(Icons.lock_open),
+            label: Text(l10n.reopenMatch),
+            onPressed: onReopen,
           ),
         ],
       ),

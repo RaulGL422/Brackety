@@ -2052,4 +2052,38 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get staffHelper => 'ayudante';
+
+  @override
+  String get cancelMatch => 'Cancelar combate';
+
+  @override
+  String get cancelMatchTitle =>
+      'Cancelar el combate: vuelve a pendiente y todo a 0. ¿Por qué?';
+
+  @override
+  String get cancelMatchDone => 'Combate cancelado: vuelve a estar pendiente.';
+
+  @override
+  String get reopenMatch => 'Reabrir combate';
+
+  @override
+  String get reopenMatchTitle =>
+      'Reabrir el combate para corregirlo. ¿Por qué?';
+
+  @override
+  String get reopenMatchDone =>
+      'Combate reabierto: corrige y vuelve a finalizar.';
+
+  @override
+  String get refusalNotFinished => 'El combate no está finalizado.';
+
+  @override
+  String get tlCancel => 'Combate cancelado';
+
+  @override
+  String get tlReopen => 'Combate reabierto';
+
+  @override
+  String get matOneAtATime =>
+      'Hay un combate en curso: el siguiente se podrá empezar cuando acabe.';
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:js_interop';
+import 'dart:js_interop_unsafe';
 
 import 'package:flutter/services.dart';
 import 'package:web/web.dart' as web;
@@ -39,6 +40,7 @@ class _WebBell implements PlatformBell {
 
   @override
   void unlock() {
+    _playEvenWhenSilenced();
     if (_unlocked && _context.state == 'running') return;
     unawaited(_context.resume().toDart.then((_) {}, onError: (_) {}));
     // Safari also wants a sound started during the tap: a silent one.
@@ -63,6 +65,19 @@ class _WebBell implements PlatformBell {
         _start(buffer);
       }
     }, onError: (_) {});
+  }
+
+  /// Safari on iOS treats page sound as "ambient": the silent switch mutes it. Declared as playback
+  /// (Audio Session API, Safari 16.4+), the bells sound like a video's would. Other browsers lack
+  /// the property and keep their behaviour.
+  void _playEvenWhenSilenced() {
+    final session = web.window.navigator.getProperty<JSObject?>(
+      'audioSession'.toJS,
+    );
+    if (session != null &&
+        session.getProperty<JSString?>('type'.toJS)?.toDart != 'playback') {
+      session.setProperty('type'.toJS, 'playback'.toJS);
+    }
   }
 
   void _start(web.AudioBuffer buffer) {

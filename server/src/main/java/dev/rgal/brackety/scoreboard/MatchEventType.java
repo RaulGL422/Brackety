@@ -14,5 +14,12 @@ public enum MatchEventType {
     CLOCK_ADJUST,
     /** Cancels the last point, point removed, warning, disqualification or clock adjustment still in force. */
     UNDO,
-    FINISH
+    FINISH,
+    /**
+     * A match started by mistake goes back to pending, all at 0; the trail stays. Only started and not finished,
+     * with a reason.
+     */
+    CANCEL,
+    /** A finished match opens again to correct it, with what it had; with a reason and nothing else on the mat. */
+    REOPEN
 }

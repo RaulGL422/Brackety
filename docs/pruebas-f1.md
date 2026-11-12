@@ -46,5 +46,13 @@ Pruebas de Claude antes del 14-11, centradas en el portátil, el offline y las r
 - Bajar el reloj al mínimo con los botones deja una fracción de segundo: "Iniciar" lo acaba al momento (regla: el tiempo solo se agota corriendo).
 - El límite de 20 logins por minuto y por IP solo afectaría si muchos entran desde el mismo dispositivo.
 
-## Ronda 2
-Pendiente: tras la fusión, repetir todo con la carpeta regenerada.
+## Ronda 2 (tras #87, carpeta regenerada)
+- Repetido todo lo de la ronda 1 sobre la carpeta nueva: OK (jornada de 93 combates, clasificación, vuelta a la Pi y liga, protecciones, superadmin).
+- Nuevo: nombres del personal desde la Pi en el paquete, "Juan Pérez (arbitro1)" en Tapices, quién hizo cada grupo, orden previsto = recomendado actual de cada tapiz libre, fantasmas marcados en el superadmin: OK. El superadmin entra a la primera desde una consola UTF-8.
+- **Apagón** (pregunta de Raul): con un combate en marcha se mata todo de golpe (script, API y PostgreSQL) y se arranca con el comando normal. Datos intactos, `postmaster.pid` viejo detectado, token válido, reloj contado durante el corte, acciones guardadas en el móvil aplicadas en orden con su hora: OK.
+
+### Fallos y arreglos de la ronda 2
+1. Tras el apagón se perdían titular y email de privacidad (`-LegalOwnerName` / `-PrivacyContactEmail` solo valían para ese arranque): ahora se guardan en `event.env`.
+2. Con 4 elegidos, la casilla de fantasma convertía al 4.º en fantasma y al quitarla lo sacaba del grupo (Raul): bloqueada con 4.
+3. Peticiones de Raul en la ronda: número del marcador grande junto al nombre en móviles bajos; sin "recomendado" con un combate en curso; cancelar combate (tablero y marcador) y reabrir uno finalizado, con motivo y en la línea de tiempo; flecha de volver sin texto; campana con el iPhone en silencio (sesión de audio "playback", Safari 16.4+: **falta probarlo en un iPhone**).
+4. Desplegable de árbitro desbordado en 360 px con nombres largos (salió con los nombres del personal).

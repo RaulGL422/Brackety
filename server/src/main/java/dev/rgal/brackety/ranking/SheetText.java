@@ -67,6 +67,8 @@ final class SheetText {
             case "CLOCK_ADJUST" -> "Ajuste del reloj";
             case "UNDO" -> "Deshacer";
             case "FINISH" -> "Finalizar combate";
+            case "CANCEL" -> "Cancelar combate";
+            case "REOPEN" -> "Reabrir combate";
             default -> type;
         };
     }

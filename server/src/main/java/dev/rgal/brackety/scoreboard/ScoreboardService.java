@@ -54,8 +54,12 @@ class ScoreboardService {
             MatchEventType.WARNING,
             MatchEventType.ONE_HAND_WARNING,
             MatchEventType.DISQUALIFICATION);
-    private static final Set<MatchEventType> NEED_REASON =
-            EnumSet.of(MatchEventType.WARNING, MatchEventType.ONE_HAND_WARNING, MatchEventType.DISQUALIFICATION);
+    private static final Set<MatchEventType> NEED_REASON = EnumSet.of(
+            MatchEventType.WARNING,
+            MatchEventType.ONE_HAND_WARNING,
+            MatchEventType.DISQUALIFICATION,
+            MatchEventType.CANCEL,
+            MatchEventType.REOPEN);
 
     /** {@code conflictCode}: null when the action is applied (now or before), else the code of the 409. */
     record Recorded(MatchView view, String conflictCode) {}

@@ -3407,6 +3407,66 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'ayudante'**
   String get staffHelper;
+
+  /// No description provided for @cancelMatch.
+  ///
+  /// In es, this message translates to:
+  /// **'Cancelar combate'**
+  String get cancelMatch;
+
+  /// No description provided for @cancelMatchTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Cancelar el combate: vuelve a pendiente y todo a 0. ¿Por qué?'**
+  String get cancelMatchTitle;
+
+  /// No description provided for @cancelMatchDone.
+  ///
+  /// In es, this message translates to:
+  /// **'Combate cancelado: vuelve a estar pendiente.'**
+  String get cancelMatchDone;
+
+  /// No description provided for @reopenMatch.
+  ///
+  /// In es, this message translates to:
+  /// **'Reabrir combate'**
+  String get reopenMatch;
+
+  /// No description provided for @reopenMatchTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Reabrir el combate para corregirlo. ¿Por qué?'**
+  String get reopenMatchTitle;
+
+  /// No description provided for @reopenMatchDone.
+  ///
+  /// In es, this message translates to:
+  /// **'Combate reabierto: corrige y vuelve a finalizar.'**
+  String get reopenMatchDone;
+
+  /// No description provided for @refusalNotFinished.
+  ///
+  /// In es, this message translates to:
+  /// **'El combate no está finalizado.'**
+  String get refusalNotFinished;
+
+  /// No description provided for @tlCancel.
+  ///
+  /// In es, this message translates to:
+  /// **'Combate cancelado'**
+  String get tlCancel;
+
+  /// No description provided for @tlReopen.
+  ///
+  /// In es, this message translates to:
+  /// **'Combate reabierto'**
+  String get tlReopen;
+
+  /// No description provided for @matOneAtATime.
+  ///
+  /// In es, this message translates to:
+  /// **'Hay un combate en curso: el siguiente se podrá empezar cuando acabe.'**
+  String get matOneAtATime;
 }
 
 class _AppLocalizationsDelegate

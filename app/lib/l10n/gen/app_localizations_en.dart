@@ -2035,4 +2035,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get staffHelper => 'helper';
+
+  @override
+  String get cancelMatch => 'Cancel match';
+
+  @override
+  String get cancelMatchTitle =>
+      'Cancel the match: back to pending, all at 0. Why?';
+
+  @override
+  String get cancelMatchDone => 'Match cancelled: pending again.';
+
+  @override
+  String get reopenMatch => 'Reopen match';
+
+  @override
+  String get reopenMatchTitle => 'Reopen the match to correct it. Why?';
+
+  @override
+  String get reopenMatchDone => 'Match reopened: correct it and finish again.';
+
+  @override
+  String get refusalNotFinished => 'The match is not finished.';
+
+  @override
+  String get tlCancel => 'Match cancelled';
+
+  @override
+  String get tlReopen => 'Match reopened';
+
+  @override
+  String get matOneAtATime =>
+      'A match is in progress: the next one can start when it ends.';
 }

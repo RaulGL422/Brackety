@@ -117,8 +117,25 @@ final class TamboMatch {
                 lastUndoable = e;
             }
             case FINISH -> finished = true;
+            case CANCEL -> cancel();
+            case REOPEN -> finished = false;
             case UNDO -> throw new IllegalArgumentException("UNDO entries are never applied");
         }
+    }
+
+    // As if it had never started: nothing before it can be undone either.
+    private void cancel() {
+        tallies.values().forEach(t -> {
+            t.points = 0;
+            t.warnings = 0;
+            t.oneHandWarnings = 0;
+        });
+        autoPointWarnings.clear();
+        elapsed = Duration.ZERO;
+        runningSince = null;
+        disqualified = null;
+        started = false;
+        lastUndoable = null;
     }
 
     // Adding time to the clock takes it off the elapsed time, never below 0 nor beyond the match length.
@@ -201,7 +218,7 @@ final class TamboMatch {
     /** {@code side}: for a point removed; {@code deltaMs}: for a clock adjustment. */
     Optional<String> refuse(MatchEventType type, Side side, long deltaMs, Instant now) {
         if (finished) {
-            return Optional.of("The match is finished.");
+            return Optional.ofNullable(type == MatchEventType.REOPEN ? null : "The match is finished.");
         }
         var end = endReason(now);
         var over = end.isPresent();
@@ -225,6 +242,8 @@ final class TamboMatch {
                                 : cannotAdjust(now, deltaMs) ? "The clock cannot go further." : null;
             case UNDO -> lastUndoable == null ? "Nothing to undo." : null;
             case FINISH -> over ? null : "The match is not over yet.";
+            case CANCEL -> started ? null : NOT_STARTED;
+            case REOPEN -> "The match is not finished.";
         };
         return Optional.ofNullable(reason);
     }
