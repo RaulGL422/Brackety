@@ -65,9 +65,14 @@ class MatBoardScreen extends ConsumerWidget {
                   l10n.matYours,
                   style: text.bodyMedium?.copyWith(color: colors.onBand),
                 ),
-              Text(
-                number == null ? '' : l10n.matTitle(number),
-                style: text.displaySmall?.copyWith(color: colors.onBand),
+              // On a narrow phone the number must shrink, never be cut: it is what the referee checks.
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: AlignmentDirectional.centerStart,
+                child: Text(
+                  number == null ? '' : l10n.matTitle(number),
+                  style: text.displaySmall?.copyWith(color: colors.onBand),
+                ),
               ),
             ],
           ),
