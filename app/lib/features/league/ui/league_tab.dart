@@ -140,7 +140,7 @@ class _Phases extends ConsumerWidget {
             onTap:
                 phase.eventId == eventId || !clubPhases.contains(phase.eventId)
                 ? null
-                : () => context.go('/events/${phase.eventId}/club'),
+                : () => context.push('/events/${phase.eventId}/club'),
           ),
       ],
     );

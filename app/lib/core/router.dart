@@ -13,6 +13,7 @@ import '../features/auth/ui/reset_password_screen.dart';
 import '../features/auth/ui/settings_screen.dart';
 import '../features/auth/ui/verify_email_screen.dart';
 import '../features/club/ui/club_panel_screen.dart';
+import '../features/league/ui/league_screen.dart';
 import '../features/importing/ui/import_screen.dart';
 import '../features/events/ui/events_screen.dart';
 import '../features/grouping/ui/categories_screen.dart';
@@ -145,6 +146,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/events/:eventId/club/import',
         builder: (_, state) =>
             ImportScreen(eventId: state.pathParameters['eventId']!),
+      ),
+      GoRoute(
+        path: '/leagues/:eventId',
+        builder: (_, state) => LeagueScreen(
+          key: ValueKey(state.pathParameters['eventId']),
+          eventId: state.pathParameters['eventId']!,
+        ),
       ),
       GoRoute(
         path: '/events/:eventId/club',

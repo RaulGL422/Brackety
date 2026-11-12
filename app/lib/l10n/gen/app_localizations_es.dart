@@ -2164,4 +2164,37 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get recordOpen => 'Ver combates';
+
+  @override
+  String get openLeague => 'Abrir la liga';
+
+  @override
+  String podiumPreset(int gold, int silver, int bronze) {
+    return '$gold oro · $silver plata · $bronze bronces';
+  }
+
+  @override
+  String get podiumOther => 'Otro';
+
+  @override
+  String podiumAsGeneral(String podium) {
+    return 'Como el general ($podium)';
+  }
+
+  @override
+  String get podiumOwn => 'Propio';
+
+  @override
+  String podiumLess(String metal) {
+    return 'Uno menos: $metal';
+  }
+
+  @override
+  String podiumMore(String metal) {
+    return 'Uno más: $metal';
+  }
+
+  @override
+  String get leagueCategoryPodiumsHint =>
+      'Casi todas usan el general; elige \"Propio\" solo en las que den otras medallas.';
 }
