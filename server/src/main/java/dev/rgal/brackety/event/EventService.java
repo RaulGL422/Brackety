@@ -10,6 +10,7 @@ import dev.rgal.brackety.event.dto.EventSettingsResponse.StaffMember;
 import dev.rgal.brackety.event.dto.MyEventResponse;
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -62,6 +63,7 @@ public class EventService {
                         EventStaff::getEventId,
                         Collectors.mapping(
                                 EventStaff::getRole, Collectors.toCollection(() -> EnumSet.noneOf(EventRole.class)))));
+        var leagueNames = new HashMap<UUID, String>();
         return events.findAllById(rolesByEvent.keySet()).stream()
                 .sorted(Comparator.comparing(Event::getEventDate).reversed())
                 .map(event -> {
@@ -77,6 +79,7 @@ public class EventService {
                             mat.map(Mat::getId).orElse(null),
                             mat.map(Mat::getNumber).orElse(null),
                             event.getLeagueId(),
+                            leagueNames.computeIfAbsent(event.getLeagueId(), events::leagueName),
                             event.getPhaseNumber());
                 })
                 .toList();

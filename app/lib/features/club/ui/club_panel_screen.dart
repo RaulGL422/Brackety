@@ -4,21 +4,23 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/download/file_download.dart';
 import '../../../core/upload/file_upload.dart';
 import '../../auth/ui/widgets/confirm_dialog.dart';
 import '../state/club_providers.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../events/state/events_providers.dart';
+import '../../league/ui/league_tab.dart';
+import '../../league/ui/phase_switcher.dart';
 import '../../offline/ui/import_ops_button.dart';
 import '../data/club_repository.dart';
+import 'export_download.dart';
 import 'mats_tab.dart';
 import 'participants_tab.dart';
 import 'settings_tab.dart';
 import 'standings_tab.dart';
 import '../../../core/up_button.dart';
 
-/// What the club sees of its event: live scores, mats, entries and settings.
+/// What the club sees of a phase: live scores, mats, entries and settings; and its league.
 class ClubPanelScreen extends ConsumerStatefulWidget {
   const ClubPanelScreen({super.key, required this.eventId});
 
@@ -40,6 +42,7 @@ class _ClubPanelScreenState extends ConsumerState<ClubPanelScreen> {
       leadingWidth: UpButton.leadingWidth(context),
       title: eventName ?? l10n.eventClubPanel,
       actions: [
+        PhaseSwitcher(eventId: widget.eventId),
         if (kIsWeb) ...[
           ImportOpsButton(eventId: widget.eventId),
           ClubExportMenu(eventId: widget.eventId),
@@ -62,6 +65,10 @@ class _ClubPanelScreenState extends ConsumerState<ClubPanelScreen> {
           icon: Icons.settings_outlined,
           label: l10n.clubSettings,
         ),
+        AdaptiveDestination(
+          icon: Icons.emoji_events_outlined,
+          label: l10n.clubLeague,
+        ),
       ],
       selectedIndex: _tab,
       onSelected: (i) => setState(() => _tab = i),
@@ -69,7 +76,8 @@ class _ClubPanelScreenState extends ConsumerState<ClubPanelScreen> {
         0 => StandingsTab(eventId: widget.eventId),
         1 => MatsTab(eventId: widget.eventId),
         2 => ParticipantsTab(eventId: widget.eventId),
-        _ => SettingsTab(eventId: widget.eventId),
+        3 => SettingsTab(eventId: widget.eventId),
+        _ => LeagueTab(eventId: widget.eventId),
       },
     );
   }
@@ -88,27 +96,11 @@ class ClubExportMenu extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    Future<void> export(EventExport export) async {
-      final toasts = Toasts.of(context);
-      try {
-        final file = await ref
-            .read(clubRepositoryProvider)
-            .export(eventId, export);
-        await ref.read(saveFileProvider)(
-          file.name,
-          file.bytes,
-          export.mimeType,
-        );
-      } on DioException {
-        toasts.show(l10n.exportError, kind: ToastKind.error);
-      }
-    }
-
     return PopupMenuButton<Object>(
       tooltip: l10n.exportMenu,
       icon: const Icon(Icons.download_outlined),
       onSelected: (value) => value is EventExport
-          ? export(value)
+          ? downloadExport(context, ref, eventId, value)
           : _importResults(context, ref, eventId),
       itemBuilder: (_) => [
         PopupMenuItem(

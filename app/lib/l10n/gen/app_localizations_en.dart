@@ -1795,4 +1795,177 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get back => 'Back';
+
+  @override
+  String get clubLeague => 'League';
+
+  @override
+  String phaseNumber(int number) {
+    return 'Phase $number';
+  }
+
+  @override
+  String get leagueSwitchPhase => 'Switch phase';
+
+  @override
+  String leaguePodiumSummary(int firsts, int seconds, int thirds) {
+    return 'Podium: $firsts golds, $seconds silvers and $thirds bronzes per category';
+  }
+
+  @override
+  String get leagueEdit => 'Edit league';
+
+  @override
+  String get leaguePhases => 'Phases';
+
+  @override
+  String get leagueNewPhase => 'New phase';
+
+  @override
+  String leaguePhaseEntries(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count entries',
+      one: '1 entry',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get leagueCurrentPhase => 'This phase';
+
+  @override
+  String get disciplineTambo => 'Tambo';
+
+  @override
+  String get disciplineGround => 'Ground';
+
+  @override
+  String get disciplineThrows => 'Throws';
+
+  @override
+  String get disciplineTechnicalExpression => 'Technical expression';
+
+  @override
+  String disciplineSoon(String name) {
+    return '$name (coming soon)';
+  }
+
+  @override
+  String get leagueStandings => 'League standings';
+
+  @override
+  String get leagueStandingsCsv => 'Download CSV';
+
+  @override
+  String leaguePhasePoints(int number, String points) {
+    return 'P$number: $points';
+  }
+
+  @override
+  String get medalGold => 'Gold';
+
+  @override
+  String get medalSilver => 'Silver';
+
+  @override
+  String get medalBronze => 'Bronze';
+
+  @override
+  String leaguePhaseDefaultName(String league, int number) {
+    return '$league · Phase $number';
+  }
+
+  @override
+  String leagueNewPhaseTitle(int number) {
+    return 'New phase $number';
+  }
+
+  @override
+  String get leagueNewPhaseHint =>
+      'Mats with their referees, helpers, categories, clubs and scoreboard rules are copied from this phase. Entries start empty: you can then enter people from other phases.';
+
+  @override
+  String get leaguePhaseName => 'Phase name';
+
+  @override
+  String get leagueDiscipline => 'Discipline';
+
+  @override
+  String get leagueAttendancePoints => 'Attendance points';
+
+  @override
+  String get leagueAttendanceInvalid => 'Between 0 and 100';
+
+  @override
+  String get leagueNewPhaseCreate => 'Create phase';
+
+  @override
+  String leagueNewPhaseDone(int number) {
+    return 'Phase $number created';
+  }
+
+  @override
+  String get leagueName => 'League name';
+
+  @override
+  String get leaguePodium => 'General podium';
+
+  @override
+  String get leaguePodiumHint =>
+      'How many golds, silvers and bronzes each category gives on the final standings. Ties share the medal.';
+
+  @override
+  String get leagueCategoryPodiums => 'Categories with their own podium';
+
+  @override
+  String get leagueOwnPodium => 'Own podium';
+
+  @override
+  String get reenrolButton => 'Enter from other phases';
+
+  @override
+  String get reenrolTitle => 'Enter from other phases';
+
+  @override
+  String get reenrolEmpty =>
+      'Everyone from other phases is already entered in this one.';
+
+  @override
+  String get reenrolHint =>
+      'They are entered with their data from the latest phase; the category follows their age in this one.';
+
+  @override
+  String get reenrolSearch => 'Search by name, category or club';
+
+  @override
+  String reenrolSelectAll(int count) {
+    return 'Select all ($count)';
+  }
+
+  @override
+  String reenrolLastPhase(int number) {
+    return 'Latest: phase $number';
+  }
+
+  @override
+  String get reenrolGuardianConsent =>
+      'I have the consent of the guardians of the selected minors';
+
+  @override
+  String reenrolConfirm(int count) {
+    return 'Enter ($count)';
+  }
+
+  @override
+  String reenrolDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count entered',
+      one: '1 entered',
+    );
+    return '$_temp0';
+  }
 }

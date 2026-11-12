@@ -1811,4 +1811,177 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get back => 'Volver';
+
+  @override
+  String get clubLeague => 'Liga';
+
+  @override
+  String phaseNumber(int number) {
+    return 'Fase $number';
+  }
+
+  @override
+  String get leagueSwitchPhase => 'Cambiar de fase';
+
+  @override
+  String leaguePodiumSummary(int firsts, int seconds, int thirds) {
+    return 'Podio: $firsts oros, $seconds platas y $thirds bronces por categoría';
+  }
+
+  @override
+  String get leagueEdit => 'Editar liga';
+
+  @override
+  String get leaguePhases => 'Fases';
+
+  @override
+  String get leagueNewPhase => 'Nueva fase';
+
+  @override
+  String leaguePhaseEntries(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count inscritos',
+      one: '1 inscrito',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get leagueCurrentPhase => 'Esta fase';
+
+  @override
+  String get disciplineTambo => 'Tambo';
+
+  @override
+  String get disciplineGround => 'Suelo';
+
+  @override
+  String get disciplineThrows => 'Derribos';
+
+  @override
+  String get disciplineTechnicalExpression => 'Expresión técnica';
+
+  @override
+  String disciplineSoon(String name) {
+    return '$name (próximamente)';
+  }
+
+  @override
+  String get leagueStandings => 'Clasificación de la liga';
+
+  @override
+  String get leagueStandingsCsv => 'Descargar CSV';
+
+  @override
+  String leaguePhasePoints(int number, String points) {
+    return 'F$number: $points';
+  }
+
+  @override
+  String get medalGold => 'Oro';
+
+  @override
+  String get medalSilver => 'Plata';
+
+  @override
+  String get medalBronze => 'Bronce';
+
+  @override
+  String leaguePhaseDefaultName(String league, int number) {
+    return '$league · Fase $number';
+  }
+
+  @override
+  String leagueNewPhaseTitle(int number) {
+    return 'Nueva fase $number';
+  }
+
+  @override
+  String get leagueNewPhaseHint =>
+      'Se copian de esta fase los tapices con sus árbitros, los ayudantes, las categorías, los clubes y las reglas del marcador. Las inscripciones empiezan vacías: después puedes inscribir a los de otras fases.';
+
+  @override
+  String get leaguePhaseName => 'Nombre de la fase';
+
+  @override
+  String get leagueDiscipline => 'Modalidad';
+
+  @override
+  String get leagueAttendancePoints => 'Puntos por asistir';
+
+  @override
+  String get leagueAttendanceInvalid => 'Entre 0 y 100';
+
+  @override
+  String get leagueNewPhaseCreate => 'Crear fase';
+
+  @override
+  String leagueNewPhaseDone(int number) {
+    return 'Fase $number creada';
+  }
+
+  @override
+  String get leagueName => 'Nombre de la liga';
+
+  @override
+  String get leaguePodium => 'Podio general';
+
+  @override
+  String get leaguePodiumHint =>
+      'Cuántos oros, platas y bronces da cada categoría en la clasificación final. Los empates comparten medalla.';
+
+  @override
+  String get leagueCategoryPodiums => 'Categorías con podio propio';
+
+  @override
+  String get leagueOwnPodium => 'Podio propio';
+
+  @override
+  String get reenrolButton => 'Inscribir de otras fases';
+
+  @override
+  String get reenrolTitle => 'Inscribir de otras fases';
+
+  @override
+  String get reenrolEmpty =>
+      'Todos los de otras fases ya están inscritos en esta.';
+
+  @override
+  String get reenrolHint =>
+      'Se inscriben con sus datos de la última fase; la categoría sale de su edad en esta.';
+
+  @override
+  String get reenrolSearch => 'Buscar por nombre, categoría o club';
+
+  @override
+  String reenrolSelectAll(int count) {
+    return 'Seleccionar todos ($count)';
+  }
+
+  @override
+  String reenrolLastPhase(int number) {
+    return 'Última: fase $number';
+  }
+
+  @override
+  String get reenrolGuardianConsent =>
+      'Tengo el consentimiento de los tutores de los menores seleccionados';
+
+  @override
+  String reenrolConfirm(int count) {
+    return 'Inscribir ($count)';
+  }
+
+  @override
+  String reenrolDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count inscritos',
+      one: '1 inscrito',
+    );
+    return '$_temp0';
+  }
 }

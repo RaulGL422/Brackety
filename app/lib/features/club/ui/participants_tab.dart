@@ -8,7 +8,9 @@ import '../../../core/async_view.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
+import '../../events/state/events_providers.dart';
 import '../../importing/data/import_repository.dart';
+import '../../league/ui/reenrol_dialog.dart';
 import '../data/club_models.dart';
 import '../data/club_repository.dart';
 import '../state/club_providers.dart';
@@ -49,6 +51,14 @@ class ParticipantsTab extends ConsumerWidget {
                     label: Text(l10n.participantAdd),
                     onPressed: () => showParticipantForm(context, eventId),
                   ),
+                  if ((ref.watch(clubPhasesProvider(eventId)).value?.length ??
+                          0) >
+                      1)
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.group_add_outlined),
+                      label: Text(l10n.reenrolButton),
+                      onPressed: () => showReenrolDialog(context, eventId),
+                    ),
                   // Only when this server can read lists (it has an Anthropic key).
                   if (ref.watch(importAvailableProvider(eventId)).value ??
                       false)
