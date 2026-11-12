@@ -92,8 +92,7 @@ class _ClockBarState extends ConsumerState<ClockBar> {
     final left = ref
         .read(matchControllerProvider(view.id).notifier)
         .remainingNow();
-    final over =
-        view.endReason != null || (view.running && left == Duration.zero);
+    final over = matchOver(view, left);
     final clock = _Clock(view: view, left: left, over: over);
     final clockButton = _ClockButton(
       view: view,
@@ -276,6 +275,10 @@ class _Clock extends StatelessWidget {
     );
   }
 }
+
+/// Time or points ended it: only finishing is left.
+bool matchOver(MatchView view, Duration left) =>
+    view.endReason != null || (view.running && left == Duration.zero);
 
 /// "2:41". Seconds round up, so 0:00 only shows when the time is really over.
 String clockLabel(Duration left) {
