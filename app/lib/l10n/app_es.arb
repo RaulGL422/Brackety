@@ -1112,5 +1112,145 @@
   "reasonApplyWarning": "Poner advertencia",
   "reasonApplyDisqualify": "Descalificar",
   "accountMenu": "Mi cuenta",
-  "back": "Volver"
+  "back": "Volver",
+  "clubLeague": "Liga",
+  "phaseNumber": "Fase {number}",
+  "@phaseNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "leagueSwitchPhase": "Cambiar de fase",
+  "leaguePodiumSummary": "Podio: {firsts} oros, {seconds} platas y {thirds} bronces por categoría",
+  "@leaguePodiumSummary": {
+    "placeholders": {
+      "firsts": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      },
+      "thirds": {
+        "type": "int"
+      }
+    }
+  },
+  "leagueEdit": "Editar liga",
+  "leaguePhases": "Fases",
+  "leagueNewPhase": "Nueva fase",
+  "leaguePhaseEntries": "{count, plural, =1{1 inscrito} other{{count} inscritos}}",
+  "@leaguePhaseEntries": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leagueCurrentPhase": "Esta fase",
+  "disciplineTambo": "Tambo",
+  "disciplineGround": "Suelo",
+  "disciplineThrows": "Derribos",
+  "disciplineTechnicalExpression": "Expresión técnica",
+  "disciplineSoon": "{name} (próximamente)",
+  "@disciplineSoon": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "leagueStandings": "Clasificación de la liga",
+  "leagueStandingsCsv": "Descargar CSV",
+  "leaguePhasePoints": "F{number}: {points}",
+  "@leaguePhasePoints": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "points": {
+        "type": "String"
+      }
+    }
+  },
+  "medalGold": "Oro",
+  "medalSilver": "Plata",
+  "medalBronze": "Bronce",
+  "leaguePhaseDefaultName": "{league} · Fase {number}",
+  "@leaguePhaseDefaultName": {
+    "placeholders": {
+      "league": {
+        "type": "String"
+      },
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "leagueNewPhaseTitle": "Nueva fase {number}",
+  "@leagueNewPhaseTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "leagueNewPhaseHint": "Se copian de esta fase los tapices con sus árbitros, los ayudantes, las categorías, los clubes y las reglas del marcador. Las inscripciones empiezan vacías: después puedes inscribir a los de otras fases.",
+  "leaguePhaseName": "Nombre de la fase",
+  "leagueDiscipline": "Modalidad",
+  "leagueAttendancePoints": "Puntos por asistir",
+  "leagueAttendanceInvalid": "Entre 0 y 100",
+  "leagueNewPhaseCreate": "Crear fase",
+  "leagueNewPhaseDone": "Fase {number} creada",
+  "@leagueNewPhaseDone": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "leagueName": "Nombre de la liga",
+  "leaguePodium": "Podio general",
+  "leaguePodiumHint": "Cuántos oros, platas y bronces da cada categoría en la clasificación final. Los empates comparten medalla.",
+  "leagueCategoryPodiums": "Categorías con podio propio",
+  "leagueOwnPodium": "Podio propio",
+  "reenrolButton": "Inscribir de otras fases",
+  "reenrolTitle": "Inscribir de otras fases",
+  "reenrolEmpty": "Todos los de otras fases ya están inscritos en esta.",
+  "reenrolHint": "Se inscriben con sus datos de la última fase; la categoría sale de su edad en esta.",
+  "reenrolSearch": "Buscar por nombre, categoría o club",
+  "reenrolSelectAll": "Seleccionar todos ({count})",
+  "@reenrolSelectAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reenrolLastPhase": "Última: fase {number}",
+  "@reenrolLastPhase": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "reenrolGuardianConsent": "Tengo el consentimiento de los tutores de los menores seleccionados",
+  "reenrolConfirm": "Inscribir ({count})",
+  "@reenrolConfirm": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reenrolDone": "{count, plural, =1{1 inscrito} other{{count} inscritos}}",
+  "@reenrolDone": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

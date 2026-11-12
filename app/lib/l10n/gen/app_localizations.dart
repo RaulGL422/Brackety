@@ -3047,6 +3047,270 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Volver'**
   String get back;
+
+  /// No description provided for @clubLeague.
+  ///
+  /// In es, this message translates to:
+  /// **'Liga'**
+  String get clubLeague;
+
+  /// No description provided for @phaseNumber.
+  ///
+  /// In es, this message translates to:
+  /// **'Fase {number}'**
+  String phaseNumber(int number);
+
+  /// No description provided for @leagueSwitchPhase.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar de fase'**
+  String get leagueSwitchPhase;
+
+  /// No description provided for @leaguePodiumSummary.
+  ///
+  /// In es, this message translates to:
+  /// **'Podio: {firsts} oros, {seconds} platas y {thirds} bronces por categoría'**
+  String leaguePodiumSummary(int firsts, int seconds, int thirds);
+
+  /// No description provided for @leagueEdit.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar liga'**
+  String get leagueEdit;
+
+  /// No description provided for @leaguePhases.
+  ///
+  /// In es, this message translates to:
+  /// **'Fases'**
+  String get leaguePhases;
+
+  /// No description provided for @leagueNewPhase.
+  ///
+  /// In es, this message translates to:
+  /// **'Nueva fase'**
+  String get leagueNewPhase;
+
+  /// No description provided for @leaguePhaseEntries.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 inscrito} other{{count} inscritos}}'**
+  String leaguePhaseEntries(int count);
+
+  /// No description provided for @leagueCurrentPhase.
+  ///
+  /// In es, this message translates to:
+  /// **'Esta fase'**
+  String get leagueCurrentPhase;
+
+  /// No description provided for @disciplineTambo.
+  ///
+  /// In es, this message translates to:
+  /// **'Tambo'**
+  String get disciplineTambo;
+
+  /// No description provided for @disciplineGround.
+  ///
+  /// In es, this message translates to:
+  /// **'Suelo'**
+  String get disciplineGround;
+
+  /// No description provided for @disciplineThrows.
+  ///
+  /// In es, this message translates to:
+  /// **'Derribos'**
+  String get disciplineThrows;
+
+  /// No description provided for @disciplineTechnicalExpression.
+  ///
+  /// In es, this message translates to:
+  /// **'Expresión técnica'**
+  String get disciplineTechnicalExpression;
+
+  /// No description provided for @disciplineSoon.
+  ///
+  /// In es, this message translates to:
+  /// **'{name} (próximamente)'**
+  String disciplineSoon(String name);
+
+  /// No description provided for @leagueStandings.
+  ///
+  /// In es, this message translates to:
+  /// **'Clasificación de la liga'**
+  String get leagueStandings;
+
+  /// No description provided for @leagueStandingsCsv.
+  ///
+  /// In es, this message translates to:
+  /// **'Descargar CSV'**
+  String get leagueStandingsCsv;
+
+  /// No description provided for @leaguePhasePoints.
+  ///
+  /// In es, this message translates to:
+  /// **'F{number}: {points}'**
+  String leaguePhasePoints(int number, String points);
+
+  /// No description provided for @medalGold.
+  ///
+  /// In es, this message translates to:
+  /// **'Oro'**
+  String get medalGold;
+
+  /// No description provided for @medalSilver.
+  ///
+  /// In es, this message translates to:
+  /// **'Plata'**
+  String get medalSilver;
+
+  /// No description provided for @medalBronze.
+  ///
+  /// In es, this message translates to:
+  /// **'Bronce'**
+  String get medalBronze;
+
+  /// No description provided for @leaguePhaseDefaultName.
+  ///
+  /// In es, this message translates to:
+  /// **'{league} · Fase {number}'**
+  String leaguePhaseDefaultName(String league, int number);
+
+  /// No description provided for @leagueNewPhaseTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Nueva fase {number}'**
+  String leagueNewPhaseTitle(int number);
+
+  /// No description provided for @leagueNewPhaseHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Se copian de esta fase los tapices con sus árbitros, los ayudantes, las categorías, los clubes y las reglas del marcador. Las inscripciones empiezan vacías: después puedes inscribir a los de otras fases.'**
+  String get leagueNewPhaseHint;
+
+  /// No description provided for @leaguePhaseName.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre de la fase'**
+  String get leaguePhaseName;
+
+  /// No description provided for @leagueDiscipline.
+  ///
+  /// In es, this message translates to:
+  /// **'Modalidad'**
+  String get leagueDiscipline;
+
+  /// No description provided for @leagueAttendancePoints.
+  ///
+  /// In es, this message translates to:
+  /// **'Puntos por asistir'**
+  String get leagueAttendancePoints;
+
+  /// No description provided for @leagueAttendanceInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'Entre 0 y 100'**
+  String get leagueAttendanceInvalid;
+
+  /// No description provided for @leagueNewPhaseCreate.
+  ///
+  /// In es, this message translates to:
+  /// **'Crear fase'**
+  String get leagueNewPhaseCreate;
+
+  /// No description provided for @leagueNewPhaseDone.
+  ///
+  /// In es, this message translates to:
+  /// **'Fase {number} creada'**
+  String leagueNewPhaseDone(int number);
+
+  /// No description provided for @leagueName.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre de la liga'**
+  String get leagueName;
+
+  /// No description provided for @leaguePodium.
+  ///
+  /// In es, this message translates to:
+  /// **'Podio general'**
+  String get leaguePodium;
+
+  /// No description provided for @leaguePodiumHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuántos oros, platas y bronces da cada categoría en la clasificación final. Los empates comparten medalla.'**
+  String get leaguePodiumHint;
+
+  /// No description provided for @leagueCategoryPodiums.
+  ///
+  /// In es, this message translates to:
+  /// **'Categorías con podio propio'**
+  String get leagueCategoryPodiums;
+
+  /// No description provided for @leagueOwnPodium.
+  ///
+  /// In es, this message translates to:
+  /// **'Podio propio'**
+  String get leagueOwnPodium;
+
+  /// No description provided for @reenrolButton.
+  ///
+  /// In es, this message translates to:
+  /// **'Inscribir de otras fases'**
+  String get reenrolButton;
+
+  /// No description provided for @reenrolTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Inscribir de otras fases'**
+  String get reenrolTitle;
+
+  /// No description provided for @reenrolEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'Todos los de otras fases ya están inscritos en esta.'**
+  String get reenrolEmpty;
+
+  /// No description provided for @reenrolHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Se inscriben con sus datos de la última fase; la categoría sale de su edad en esta.'**
+  String get reenrolHint;
+
+  /// No description provided for @reenrolSearch.
+  ///
+  /// In es, this message translates to:
+  /// **'Buscar por nombre, categoría o club'**
+  String get reenrolSearch;
+
+  /// No description provided for @reenrolSelectAll.
+  ///
+  /// In es, this message translates to:
+  /// **'Seleccionar todos ({count})'**
+  String reenrolSelectAll(int count);
+
+  /// No description provided for @reenrolLastPhase.
+  ///
+  /// In es, this message translates to:
+  /// **'Última: fase {number}'**
+  String reenrolLastPhase(int number);
+
+  /// No description provided for @reenrolGuardianConsent.
+  ///
+  /// In es, this message translates to:
+  /// **'Tengo el consentimiento de los tutores de los menores seleccionados'**
+  String get reenrolGuardianConsent;
+
+  /// No description provided for @reenrolConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'Inscribir ({count})'**
+  String reenrolConfirm(int count);
+
+  /// No description provided for @reenrolDone.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 inscrito} other{{count} inscritos}}'**
+  String reenrolDone(int count);
 }
 
 class _AppLocalizationsDelegate

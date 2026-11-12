@@ -16,6 +16,11 @@ enum EventExport {
   participants('export/participants.csv', 'inscritos.csv', 'text/csv'),
   matches('export/matches.csv', 'combates.csv', 'text/csv'),
   timeline('export/timeline.csv', 'linea-de-tiempo.csv', 'text/csv'),
+  leagueStandings(
+    'export/league-standings.csv',
+    'clasificacion-liga.csv',
+    'text/csv',
+  ),
   full('export/full', 'evento.zip', 'application/zip');
 
   const EventExport(this.path, this.fallbackName, this.mimeType);

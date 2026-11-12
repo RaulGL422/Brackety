@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-Última actualización: 2026-11-10. Fase 0 cerrada; en curso: **auth** (pruebas) y la preparación de la Fase 1 (ver "Hasta la Fase 1").
+Última actualización: 2026-11-12. Fase 0 cerrada; en curso: **auth** (pruebas) y la preparación de la Fase 1 (ver "Hasta la Fase 1").
 
 | Módulo | Doc | Estado | Rama activa |
 |---|---|---|---|
@@ -13,7 +13,7 @@
 | ayudantes-permisos | modulos/ayudantes-permisos.md | pendiente | – |
 | puntuacion | modulos/puntuacion.md | pendiente | – |
 | liga | modulos/liga.md | pendiente | – |
-| liga-fases | modulos/liga-fases.md | pendiente | – |
+| liga-fases | modulos/liga-fases.md | en pruebas: servidor (#75) y pantallas: mis eventos por liga, selector de fase, pestaña Liga (fases, nueva fase, clasificación acumulada con medallas, podios) y reinscripción de otras fases; falta la prueba a mano (2026-11-12) | feat/league-phases-front |
 | torneo | modulos/torneo.md | pendiente | – |
 | marcador-tapiz | modulos/marcador-tapiz.md | pendiente | – |
 | tiempo-real | modulos/tiempo-real.md | en pruebas: WebSocket de avisos "esto cambió" (marcador, tablero, Tapices, Puntuaciones) con sondeo de respaldo (2026-11-11) | feat/realtime-offline-web |
