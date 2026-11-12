@@ -13,6 +13,7 @@ class UpButton extends StatelessWidget {
     required this.label,
     required this.fallback,
     this.isPlace = true,
+    this.onPressed,
   });
 
   final String label;
@@ -20,6 +21,9 @@ class UpButton extends StatelessWidget {
   /// False when [label] is just "Volver": then it is read as is, not "Volver a Volver".
   final bool isPlace;
   final String fallback;
+
+  /// Replaces the plain way back, for a screen that must do something before leaving.
+  final VoidCallback? onPressed;
 
   /// The AppBar's usual room for one icon.
   static double leadingWidth(BuildContext context) => kToolbarHeight;
@@ -39,7 +43,7 @@ class UpButton extends StatelessWidget {
     return IconButton(
       tooltip: where,
       icon: const Icon(Icons.arrow_back),
-      onPressed: () => go(context, fallback),
+      onPressed: onPressed ?? () => go(context, fallback),
     );
   }
 }

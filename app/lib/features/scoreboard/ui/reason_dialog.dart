@@ -1,3 +1,4 @@
+import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
@@ -52,9 +53,11 @@ class _ReasonDialogState extends State<_ReasonDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final reason = _reason.text.trim();
+    // Content scrolls and the two buttons share one row: with the keyboard up nothing overlaps
+    // the field, and each label has half the width.
     return AlertDialog(
-      actionsOverflowDirection: VerticalDirection.up,
-      actionsOverflowButtonSpacing: 8,
+      scrollable: true,
       title: Text(widget.title),
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -72,21 +75,36 @@ class _ReasonDialogState extends State<_ReasonDialog> {
         ],
       ),
       actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(widget.dismissLabel ?? l10n.cancel),
-        ),
-        FilledButton(
-          style: widget.destructive
-              ? FilledButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                  foregroundColor: Theme.of(context).colorScheme.onError,
-                )
-              : null,
-          onPressed: _reason.text.trim().isEmpty
-              ? null
-              : () => Navigator.of(context).pop(_reason.text.trim()),
-          child: Text(widget.confirmLabel ?? l10n.confirm),
+        Row(
+          spacing: AppSpacing.s,
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(
+                  widget.dismissLabel ?? l10n.cancel,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+            Expanded(
+              child: FilledButton(
+                style: widget.destructive
+                    ? FilledButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.error,
+                        foregroundColor: Theme.of(context).colorScheme.onError,
+                      )
+                    : null,
+                onPressed: reason.isEmpty
+                    ? null
+                    : () => Navigator.of(context).pop(reason),
+                child: Text(
+                  widget.confirmLabel ?? l10n.confirm,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );

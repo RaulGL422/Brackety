@@ -35,17 +35,12 @@ class ClockBar extends ConsumerStatefulWidget {
     required this.onAction,
     required this.onAdjust,
     this.clockHeight,
-    this.banner,
   });
 
   final MatchView view;
   final void Function(MatchAction action) onAction;
   final void Function(Duration delta) onAdjust;
   final double? clockHeight;
-
-  /// Shown over the clock, in the clock's own room: when it comes and goes (offline, actions
-  /// waiting) only the digits shrink, and no button moves under the referee's thumb.
-  final Widget? banner;
 
   @override
   ConsumerState<ClockBar> createState() => _ClockBarState();
@@ -97,8 +92,7 @@ class _ClockBarState extends ConsumerState<ClockBar> {
     final left = ref
         .read(matchControllerProvider(view.id).notifier)
         .remainingNow();
-    final over =
-        view.endReason != null || (view.running && left == Duration.zero);
+    final over = matchOver(view, left);
     final clock = _Clock(view: view, left: left, over: over);
     final clockButton = _ClockButton(
       view: view,
@@ -123,16 +117,7 @@ class _ClockBarState extends ConsumerState<ClockBar> {
           spacing: AppSpacing.s,
           children: [
             if (widget.clockHeight case final height?) ...[
-              SizedBox(
-                height: height,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    ?widget.banner,
-                    Expanded(child: clock),
-                  ],
-                ),
-              ),
+              SizedBox(height: height, child: clock),
               ?adjust,
               // Portrait: both buttons on one row, under the thumb, the same height.
               IntrinsicHeight(
@@ -146,7 +131,6 @@ class _ClockBarState extends ConsumerState<ClockBar> {
                 ),
               ),
             ] else ...[
-              ?widget.banner,
               Expanded(child: clock),
               ?adjust,
               clockButton,
@@ -291,6 +275,10 @@ class _Clock extends StatelessWidget {
     );
   }
 }
+
+/// Time or points ended it: only finishing is left.
+bool matchOver(MatchView view, Duration left) =>
+    view.endReason != null || (view.running && left == Duration.zero);
 
 /// "2:41". Seconds round up, so 0:00 only shows when the time is really over.
 String clockLabel(Duration left) {
