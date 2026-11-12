@@ -200,6 +200,10 @@ void main() {
         expect(find.text('1'), findsOneWidget);
         expect(server.received, isEmpty);
 
+        // The bar shares the clock's room: when it goes, no button moves under the thumb.
+        final plus = tester.getTopLeft(find.text('+1').first);
+        final stop = tester.getTopLeft(find.text('Stop'));
+
         server.down = false;
         // The next poll gets an answer, and the queue goes with it.
         await tester.pump(const Duration(seconds: 2));
@@ -212,6 +216,8 @@ void main() {
         // All sent: the bar goes away.
         expect(find.textContaining('Offline'), findsNothing);
         expect(find.text('1'), findsOneWidget);
+        expect(tester.getTopLeft(find.text('+1').first), plus);
+        expect(tester.getTopLeft(find.text('Stop')), stop);
         expect(tester.takeException(), isNull);
       },
     );
