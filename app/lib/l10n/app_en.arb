@@ -177,7 +177,7 @@
     }
   },
   "draftGhost": "Ghost competitor",
-  "draftGhostHint": "Pick the ghost: fights but does not score.",
+  "draftGhostHint": "Ghosts (up to 3): anyone already in a group, or your 4th pick. They fight but do not score.",
   "createGroup": "{count, plural, =1{Create group} other{Create groups}}",
   "@createGroup": {
     "placeholders": {
@@ -697,7 +697,6 @@
   "draftTakenElsewhere": "{count, plural, =1{{names} is already in another group: taken out of the new group.} other{{names} are already in another group: taken out of the new group.}}",
   "teamGhostMember": "joins as a ghost",
   "teamGhostHint": "Whoever already has a team or a group joins as a ghost: fights, but does not score for this team.",
-  "teamNeedsReal": "At least one member must not be a ghost.",
   "ghostMemberName": "{name} (ghost)",
   "teamOverlapTitle": "Participants in two teams of the group",
   "teamOverlapBody": "{lines}\n\nThey will fight a team they are also in. Create the group anyway?",

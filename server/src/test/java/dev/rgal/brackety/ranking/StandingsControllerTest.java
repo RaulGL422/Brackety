@@ -47,7 +47,7 @@ class StandingsControllerTest extends EventApiTest {
                 .single();
         var ids = fighters.stream().map(id -> "\"" + id + "\"").collect(Collectors.joining(","));
         call(post("/api/v1/events/" + eventId + "/groups").content("""
-                                {"categoryId":"%s","groups":[{"participantIds":[%s],"ghostId":"%s"}]}""".formatted(categoryId, ids, ghost)), "ayudante1")
+                                {"categoryId":"%s","groups":[{"participantIds":[%s],"ghostIds":["%s"]}]}""".formatted(categoryId, ids, ghost)), "ayudante1")
                 .andExpect(status().isCreated());
 
         // Ana 3 - Bea 15: both keep what they scored.

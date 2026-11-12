@@ -259,7 +259,7 @@ void main() {
 
     final DraftGroup group = repository.created.single;
     expect(group.members, ['p0', 'p1', 'p2']);
-    expect(group.ghost, 'grouped');
+    expect(group.ghosts, ['grouped']);
   });
 
   testWidgets('the slots fill as the helper picks and a tap empties one', (

@@ -67,7 +67,7 @@ class AdminEventControllerTest extends AdminApiTestBase {
         // Three of them and, as ghost, someone who already competes in group 2.
         call(
                         post("/api/v1/events/" + eventId + "/groups").content("""
-                                {"categoryId":"%s","groups":[{"participantIds":["%s","%s","%s"],"ghostId":"%s"}]}""".formatted(
+                                {"categoryId":"%s","groups":[{"participantIds":["%s","%s","%s"],"ghostIds":["%s"]}]}""".formatted(
                                         categoryId, more.get(0), more.get(1), more.get(2), older.get(0))),
                         "ayudante1")
                 .andExpect(status().isCreated());

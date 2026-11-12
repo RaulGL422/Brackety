@@ -15,15 +15,19 @@ public record CreateGroupsRequest(
         @NotNull UUID categoryId, @NotEmpty @Size(max = 4) List<@Valid @NotNull GroupRequest> groups, UUID matId) {
 
     /**
-     * A group of participants (4, or 3 plus {@code ghostId}) or, in a team category, of teams (4, or
+     * A group of 4 participants ({@code participantIds} plus up to 3 {@code ghostIds}) or, in a team category, of teams (4, or
      * 3 plus a ghost team made of the {@code ghostTeam} participants). The order given is the order
      * in the group.
      */
     public record GroupRequest(
             @Size(max = 4) List<@NotNull UUID> participantIds,
-            UUID ghostId,
+            @Size(max = 3) List<@NotNull UUID> ghostIds,
             @Size(max = 4) List<@NotNull UUID> teamIds,
             @Size(max = 5) List<@NotNull UUID> ghostTeam) {
+
+        public List<UUID> ghosts() {
+            return ghostIds == null ? List.of() : ghostIds;
+        }
 
         public boolean isOfTeams() {
             return teamIds != null && !teamIds.isEmpty();

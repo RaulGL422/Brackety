@@ -204,15 +204,16 @@ class GroupService {
         var involved = new HashSet<UUID>();
         for (var group : requested.stream().filter(g -> !g.isOfTeams()).toList()) {
             var ids = group.participantIds() == null ? List.<UUID>of() : group.participantIds();
-            checkShape(ids, group.ghostId() != null, "A group is 4 participants, or 3 and a ghost.");
-            if (ids.contains(group.ghostId())) {
+            var all = new ArrayList<>(ids);
+            all.addAll(group.ghosts());
+            if (ids.isEmpty() || all.size() != RoundRobin.GROUP_SIZE) {
+                throw EventException.invalid("A group is 4 participants; up to 3 of them can be ghosts.");
+            }
+            if (new HashSet<>(all).size() != all.size()) {
                 throw EventException.invalid("A participant appears twice in a group.");
             }
             real.addAll(ids);
-            involved.addAll(ids);
-            if (group.ghostId() != null) {
-                involved.add(group.ghostId());
-            }
+            involved.addAll(all);
         }
         if (real.isEmpty()) {
             return;
@@ -285,8 +286,8 @@ class GroupService {
         for (int i = 0; i < order.size(); i++) {
             members.save(new GroupMember(group.getId(), order.get(i), ofTeams, i, false));
         }
-        var ghost = ofTeams ? ghostTeam(event, category, accountId, request) : request.ghostId();
-        if (ghost != null) {
+        var ghosts = ofTeams ? ghostTeam(event, category, accountId, request) : request.ghosts();
+        for (var ghost : ghosts) {
             members.save(new GroupMember(group.getId(), ghost, ofTeams, order.size(), true));
             order.add(ghost);
         }
@@ -305,12 +306,12 @@ class GroupService {
         return group.getId();
     }
 
-    private UUID ghostTeam(Event event, EventCategory category, UUID accountId, GroupRequest request) {
+    private List<UUID> ghostTeam(Event event, EventCategory category, UUID accountId, GroupRequest request) {
         if (request.ghostTeam() == null || request.ghostTeam().isEmpty()) {
-            return null;
+            return List.of();
         }
-        return teamService
+        return List.of(teamService
                 .save(event.getId(), category.getId(), true, accountId, request.ghostTeam())
-                .getId();
+                .getId());
     }
 }

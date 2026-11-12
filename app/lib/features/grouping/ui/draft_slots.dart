@@ -39,7 +39,9 @@ class DraftSlots extends StatelessWidget {
         onTap: () => onChanged((g) => g.toggle(id, grouped: false)),
       );
     }
-    if (group.ghost case final ghost? when ghostSlot) {
+    final ghostIndex = i - group.members.length;
+    if (ghostIndex < group.ghosts.length) {
+      final ghost = group.ghosts[ghostIndex];
       return _Slot(
         label: l10n.ghostOf(labelOf(ghost)),
         ghost: true,

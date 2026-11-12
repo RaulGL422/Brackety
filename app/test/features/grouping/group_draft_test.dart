@@ -47,7 +47,7 @@ void main() {
       expect(draft.stateOf('a', grouped: false), PickState.member);
 
       draft = pick(draft, ['x'], grouped: {'x'});
-      expect(draft.ghost, 'x');
+      expect(draft.ghosts, ['x']);
       expect(draft.stateOf('x', grouped: true), PickState.ghost);
       expect(draft.isComplete, isTrue);
       expect(draft.stateOf('y', grouped: false), PickState.unavailable);
@@ -63,15 +63,15 @@ void main() {
     ]).setGhostMode(true);
 
     expect(draft.members, ['a', 'b', 'c']);
-    expect(draft.ghost, 'd');
+    expect(draft.ghosts, ['d']);
 
     draft = draft.setGhostMode(false);
     expect(draft.members, ['a', 'b', 'c']);
-    expect(draft.ghost, isNull);
+    expect(draft.ghosts, isEmpty);
     expect(draft.isComplete, isFalse);
   });
 
-  test('removing a member in ghost mode also clears the ghost', () {
+  test('removing a member in ghost mode keeps the ghost', () {
     var draft = pick(const DraftGroup().setGhostMode(true), [
       'a',
       'b',
@@ -82,7 +82,7 @@ void main() {
     draft = draft.toggle('b', grouped: false);
 
     expect(draft.members, ['a', 'c']);
-    expect(draft.ghost, isNull);
+    expect(draft.ghosts, ['x']);
   });
 
   group('groups of teams', () {
@@ -118,7 +118,7 @@ void main() {
       ]).setGhostMode(true);
 
       expect(draft.members, ['t1', 't2', 't3']);
-      expect(draft.ghost, isNull);
+      expect(draft.ghosts, isEmpty);
       expect(draft.choosingGhostTeam, isTrue);
       expect(draft.ofTeams, isTrue);
     });
@@ -139,7 +139,23 @@ void main() {
     );
   });
 
-  test('members someone else grouped leave the draft, with the ghost', () {
+  test(
+    'in ghost mode up to three already grouped join as ghosts, with one real',
+    () {
+      var draft = const DraftGroup().setGhostMode(true);
+      draft = pick(draft, ['x', 'y', 'z'], grouped: {'x', 'y', 'z'});
+
+      expect(draft.ghosts, ['x', 'y', 'z']);
+      expect(draft.isComplete, isFalse);
+      expect(draft.stateOf('w', grouped: true), PickState.unavailable);
+
+      draft = pick(draft, ['a']);
+      expect(draft.members, ['a']);
+      expect(draft.isComplete, isTrue);
+    },
+  );
+
+  test('members someone else grouped leave the draft, the ghost stays', () {
     final draft = const DraftGroup()
         .setGhostMode(true)
         .toggle('a', grouped: false)
@@ -150,7 +166,7 @@ void main() {
     final left = draft.without({'b'});
 
     expect(left.members, ['a', 'c']);
-    expect(left.ghost, isNull);
+    expect(left.ghosts, ['g']);
     expect(identical(draft.without({'x'}), draft), isTrue);
   });
 

@@ -23,7 +23,7 @@ A partir de cierta edad, la categoría compite **por equipos de 3** en lugar de 
 - Lista de equipos de la categoría sin grupo → selecciona 4 → "Crear grupo", con el mismo desplegable de tapiz que en individual.
 - **Equipo fantasma**: casilla en el grupo; con 3 equipos seleccionados se eligen 3 alumnos cualesquiera de la categoría (también los que ya están en equipos o grupos, salvo los de los equipos de ese grupo). Forma "Equipo N (fantasma)": combate, no puntúa.
 - Grupo = 4 equipos reales, o 3 + 1 equipo fantasma.
-- **Alumno fantasma dentro de un equipo** (pedido de Raul, 2026-11-12): al crear un equipo, quien ya tiene equipo o grupo entra como fantasma: combate con ese equipo pero no puntúa por él (ni asistencia ni puntos). Al menos 1 integrante real. Si un alumno queda en dos equipos del mismo grupo, la app avisa antes de crearlo (no lo impide).
+- **Alumno fantasma dentro de un equipo** (pedido de Raul, 2026-11-12): al crear un equipo, quien ya tiene equipo o grupo entra como fantasma: combate con ese equipo pero no puntúa por él (ni asistencia ni puntos). El equipo puede ser entero de fantasmas. Si un alumno queda en dos equipos del mismo grupo, la app avisa antes de crearlo (no lo impide).
 - Tapiz: mismo criterio (menor fin estimado).
 
 ### Grupo individual dentro de una categoría por equipos
@@ -55,7 +55,7 @@ A partir de cierta edad, la categoría compite **por equipos de 3** en lugar de 
 ## API
 - `PUT /events/{id}/categories` (club; lista completa, las que faltan se borran; sin solapes de edad; la config la devuelve `GET /settings`) · `GET /events/{id}/categories` (ayudante) añade formato, tamaño de equipo, alumnos en equipo y nº de equipos.
 - `GET|POST /events/{id}/categories/{cat}/teams` · `DELETE /teams/{id}` (sin grupo).
-- `POST /events/{id}/groups`: cada grupo lleva `participantIds` + `ghostId`, o `teamIds` + `ghostTeam` (ids de los alumnos del equipo fantasma).
+- `POST /events/{id}/groups`: cada grupo lleva `participantIds` + `ghostIds` (hasta 3), o `teamIds` + `ghostTeam` (ids de los alumnos del equipo fantasma).
 - Tablero y combate: cada lado añade `teamId`, `teamNumber` y `members`; en equipos `participantId` es null y `name` son los miembros. Clasificación: `teamNumber`. CSV: columna Equipo y "Equipo N (miembros)".
 - Código: `grouping/Team*`, `CategoryRoster` (quién está libre o agrupado), `CompetitorDirectory` (alumno o equipo → nombre y alumnos; lo usan tablero, recomendado, marcador y clasificación).
 

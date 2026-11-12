@@ -120,6 +120,24 @@ class GroupControllerTest extends EventApiTest {
     }
 
     @Test
+    void aGroupTakesUpToThreeGhostsButNeedsARealParticipant() throws Exception {
+        createGroups(group(0, 1, 2, 3)).andExpect(status().isCreated());
+
+        createGroups(ghostsGroup(ids(0, 1, 2), 4))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.matNumber").value(2));
+        call(get("/api/v1/mats/" + matId(2) + "/board"), "arbitro2")
+                .andExpect(jsonPath("$.groups[0].members[0].ghost").value(false))
+                .andExpect(jsonPath("$.groups[0].members[1].ghost").value(true))
+                .andExpect(jsonPath("$.groups[0].members[3].ghost").value(true));
+        assertThat(count("fight_match")).isEqualTo(12);
+
+        createGroups(ghostsGroup(ids(0, 1, 2, 3))).andExpect(status().isBadRequest());
+        createGroups(ghostsGroup(ids(0, 1, 2), 5, 6)).andExpect(status().isBadRequest());
+        createGroups(ghostsGroup(ids(0, 0), 5, 6)).andExpect(status().isBadRequest());
+    }
+
+    @Test
     void rejectsWrongSizesParticipantsAlreadyInAGroupAndReferees() throws Exception {
         createGroups(group(0, 1, 2, 3)).andExpect(status().isCreated());
 
@@ -238,7 +256,12 @@ class GroupControllerTest extends EventApiTest {
 
     private String ghostGroup(UUID ghost, int... positions) {
         return """
-                {"participantIds":[%s],"ghostId":"%s"}""".formatted(quoted(positions), ghost);
+                {"participantIds":[%s],"ghostIds":["%s"]}""".formatted(quoted(positions), ghost);
+    }
+
+    private String ghostsGroup(String[] ghosts, int... positions) {
+        return """
+                {"participantIds":[%s],"ghostIds":["%s"]}""".formatted(quoted(positions), String.join("\",\"", ghosts));
     }
 
     private String quoted(int... positions) {

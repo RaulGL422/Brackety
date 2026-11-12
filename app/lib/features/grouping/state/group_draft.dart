@@ -1,5 +1,5 @@
 /// The group a helper is putting together before sending it to a mat (docs/modulos/prototipo-f1.md):
-/// 4 participants, or 3 and a ghost.
+/// 4 participants, up to 3 of them ghosts.
 ///
 /// In a team category (docs/modulos/prototipo-f1-equipos.md) the members are teams and the ghost
 /// is a ghost team: [ghostTeamSize] participants picked from the category's list, not a team.
@@ -7,7 +7,7 @@ class DraftGroup {
   const DraftGroup({
     this.members = const [],
     this.ghostMode = false,
-    this.ghost,
+    this.ghosts = const [],
     this.ghostTeam = const [],
     this.ghostTeamSize,
   });
@@ -17,11 +17,11 @@ class DraftGroup {
   /// In selection order, which becomes the order in the group.
   final List<String> members;
 
-  /// The ghost box: the 4th member fights but does not score.
+  /// The ghost box: someone already in a group, or the 4th pick, fights but does not score.
   final bool ghostMode;
 
-  /// The ghost participant of a group of participants.
-  final String? ghost;
+  /// The ghost participants of a group of participants, in selection order.
+  final List<String> ghosts;
 
   /// The participants of the ghost team of a group of teams, in selection order.
   final List<String> ghostTeam;
@@ -33,21 +33,23 @@ class DraftGroup {
 
   bool get isComplete {
     if (!ghostMode) return members.length == size;
-    final ghostDone = ofTeams
-        ? ghostTeam.length == ghostTeamSize
-        : ghost != null;
-    return members.length == size - 1 && ghostDone;
+    if (ofTeams) {
+      return members.length == size - 1 && ghostTeam.length == ghostTeamSize;
+    }
+    return members.isNotEmpty &&
+        ghosts.isNotEmpty &&
+        members.length + ghosts.length == size;
   }
 
   /// With 3 participants picked in ghost mode, the next pick is the ghost.
   bool get choosingGhost =>
-      !ofTeams && ghostMode && members.length == size - 1 && ghost == null;
+      !ofTeams && ghostMode && members.length == size - 1 && ghosts.isEmpty;
 
   /// With 3 teams picked in ghost mode, the ghost team is still missing people.
   bool get choosingGhostTeam =>
       ofTeams && ghostMode && members.length == size - 1 && !isComplete;
 
-  bool contains(String id) => members.contains(id) || ghost == id;
+  bool contains(String id) => members.contains(id) || ghosts.contains(id);
 
   /// The ghost box can be ticked while there is room for a ghost (3 or fewer picked), and untick always.
   bool get canToggleGhost => ghostMode || members.length < size;
@@ -55,51 +57,56 @@ class DraftGroup {
   DraftGroup copyWith({
     List<String>? members,
     bool? ghostMode,
-    String? Function()? ghost,
+    List<String>? ghosts,
     List<String>? ghostTeam,
   }) => DraftGroup(
     members: members ?? this.members,
     ghostMode: ghostMode ?? this.ghostMode,
-    ghost: ghost == null ? this.ghost : ghost(),
+    ghosts: ghosts ?? this.ghosts,
     ghostTeam: ghostTeam ?? this.ghostTeam,
     ghostTeamSize: ghostTeamSize,
   );
 
   /// Where [id] stands; [grouped] = already in a group on the server.
   PickState stateOf(String id, {required bool grouped}) {
-    if (ghost == id) return PickState.ghost;
+    if (ghosts.contains(id)) return PickState.ghost;
     if (members.contains(id)) return PickState.member;
-    if (choosingGhost) return PickState.free;
-    final full = isComplete || (ghostMode && members.length == size - 1);
-    return grouped || full ? PickState.unavailable : PickState.free;
+    if (ofTeams) {
+      final full = isComplete || (ghostMode && members.length == size - 1);
+      return grouped || full ? PickState.unavailable : PickState.free;
+    }
+    if (members.length + ghosts.length == size) return PickState.unavailable;
+    if (_picksGhost(grouped)) {
+      return ghosts.length < size - 1 ? PickState.free : PickState.unavailable;
+    }
+    return grouped ? PickState.unavailable : PickState.free;
   }
+
+  /// In ghost mode, someone already in a group joins as a ghost, and so does the pick after 3 real ones.
+  bool _picksGhost(bool grouped) =>
+      !ofTeams && ghostMode && (grouped || members.length == size - 1);
 
   DraftGroup toggle(String id, {required bool grouped}) {
     switch (stateOf(id, grouped: grouped)) {
       case PickState.ghost:
-        return copyWith(ghost: () => null);
+        return copyWith(ghosts: [...ghosts]..remove(id));
       case PickState.member:
-        return copyWith(
-          members: [...members]..remove(id),
-          ghost: () => null,
-          ghostTeam: const [],
-        );
+        return copyWith(members: [...members]..remove(id), ghostTeam: const []);
       case PickState.free:
-        return choosingGhost
-            ? copyWith(ghost: () => id)
+        return _picksGhost(grouped)
+            ? copyWith(ghosts: [...ghosts, id])
             : copyWith(members: [...members, id]);
       case PickState.unavailable:
         return this;
     }
   }
 
-  /// Without the members in [taken] (someone else put them in a group meanwhile). The ghost and the
-  /// ghost team go too, as when a member is taken out by hand.
+  /// Without the members in [taken] (someone else put them in a group meanwhile). The ghost team
+  /// goes too, as when a member is taken out by hand.
   DraftGroup without(Set<String> taken) {
     if (!members.any(taken.contains)) return this;
     return copyWith(
       members: [...members.where((id) => !taken.contains(id))],
-      ghost: () => null,
       ghostTeam: const [],
     );
   }
@@ -113,17 +120,17 @@ class DraftGroup {
 
   DraftGroup setGhostMode(bool on) {
     var kept = members;
-    String? newGhost;
+    var newGhosts = const <String>[];
     // Turning it on with 4 picked: the last participant becomes the ghost; a 4th team is dropped,
     // since a ghost team is made of participants.
     if (on && kept.length == size) {
-      if (!ofTeams) newGhost = kept.last;
+      if (!ofTeams) newGhosts = [kept.last];
       kept = kept.sublist(0, size - 1);
     }
     return DraftGroup(
       members: kept,
       ghostMode: on,
-      ghost: newGhost,
+      ghosts: newGhosts,
       ghostTeamSize: ghostTeamSize,
     );
   }

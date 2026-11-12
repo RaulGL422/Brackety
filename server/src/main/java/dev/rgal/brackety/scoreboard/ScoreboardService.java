@@ -254,11 +254,10 @@ class ScoreboardService {
         var state = MatchWriter.replay(event, history);
         var group = groups.findById(match.getGroupId()).orElseThrow();
         var competitors = directory.of(match.getEventId());
-        var ghost = members.findByGroupIdInOrderByPosition(List.of(group.getId())).stream()
+        var ghosts = members.findByGroupIdInOrderByPosition(List.of(group.getId())).stream()
                 .filter(GroupMember::isGhost)
                 .map(GroupMember::getCompetitorId)
-                .findFirst()
-                .orElse(null);
+                .collect(Collectors.toSet());
         var pending = match.isInReview()
                 ? rejectedOps.findByMatchIdAndResolutionIsNullOrderByPosition(match.getId())
                 : List.<RejectedOp>of();
@@ -276,8 +275,8 @@ class ScoreboardService {
                 state.remainingAt(now).toMillis(),
                 state.isRunning(now),
                 state.endReason(now).map(Enum::name).orElse(null),
-                corner(event, state, Side.RED, competitors.get(match.getRedId()), ghost),
-                corner(event, state, Side.BLUE, competitors.get(match.getBlueId()), ghost),
+                corner(event, state, Side.RED, competitors.get(match.getRedId()), ghosts),
+                corner(event, state, Side.BLUE, competitors.get(match.getBlueId()), ghosts),
                 timeline(history, state, actors),
                 now,
                 match.isInReview() ? review(match, pending, actors) : null);
@@ -327,12 +326,12 @@ class ScoreboardService {
                         .toList());
     }
 
-    private Corner corner(Event event, TamboMatch state, Side side, Competitor fighter, UUID ghost) {
+    private Corner corner(Event event, TamboMatch state, Side side, Competitor fighter, Set<UUID> ghosts) {
         var tally = state.corner(side);
         return new Corner(
                 fighter.isTeam() ? null : fighter.id(),
                 fighter.isTeam() ? String.join(", ", fighter.memberNames()) : fighter.name(),
-                fighter.id().equals(ghost),
+                ghosts.contains(fighter.id()),
                 writer.oneHandRule(event, fighter),
                 tally.points(),
                 tally.warnings(),

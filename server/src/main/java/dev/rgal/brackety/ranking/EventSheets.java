@@ -335,7 +335,10 @@ class EventSheets {
                     var group = d.groups().get(m.getGroupId());
                     var red = d.competitors().get(m.getRedId());
                     var blue = d.competitors().get(m.getBlueId());
-                    var ghost = ghosts.get(m.getGroupId());
+                    var ghostNames = ghosts.getOrDefault(m.getGroupId(), Set.of()).stream()
+                            .map(d.competitors()::name)
+                            .sorted()
+                            .collect(Collectors.joining(", "));
                     return Arrays.<Object>asList(
                             group.getNumber(),
                             d.categoryNames().get(group.getCategoryId()),
@@ -350,7 +353,7 @@ class EventSheets {
                             winner(m, red, blue),
                             endReason(m, d.event().getPointsLimit(), red, blue),
                             SheetText.status(m.getStatus()),
-                            ghost == null ? null : d.competitors().name(ghost),
+                            ghostNames.isEmpty() ? null : ghostNames,
                             SheetText.date(m.getStartedAt(), zone),
                             SheetText.time(m.getStartedAt(), zone),
                             SheetText.time(m.getFinishedAt(), zone),

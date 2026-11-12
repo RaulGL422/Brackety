@@ -343,7 +343,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get draftGhost => 'Competidor fantasma';
 
   @override
-  String get draftGhostHint => 'Elige al fantasma: combate pero no puntúa.';
+  String get draftGhostHint =>
+      'Fantasmas (hasta 3): quien ya tiene grupo, o el 4.º que elijas. Combaten pero no puntúan.';
 
   @override
   String createGroup(int count) {
@@ -2006,10 +2007,6 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get teamGhostHint =>
       'Quien ya tiene equipo o grupo entra como fantasma: combate, pero no puntúa por este equipo.';
-
-  @override
-  String get teamNeedsReal =>
-      'Hace falta al menos un integrante que no sea fantasma.';
 
   @override
   String ghostMemberName(String name) {

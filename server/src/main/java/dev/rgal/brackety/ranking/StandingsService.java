@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -171,10 +172,10 @@ class StandingsService {
             Competitor fighter,
             Side side,
             int score,
-            Map<UUID, UUID> ghosts,
+            Map<UUID, Set<UUID>> ghosts,
             Map<UUID, Integer> points,
             Map<UUID, Integer> fought) {
-        if (fighter.id().equals(ghosts.get(m.getGroupId()))) {
+        if (ghosts.getOrDefault(m.getGroupId(), Set.of()).contains(fighter.id())) {
             return;
         }
         for (var participant : fighter.scorerIds()) {
@@ -185,9 +186,10 @@ class StandingsService {
         }
     }
 
-    static Map<UUID, UUID> ghostsByGroup(List<GroupMember> eventMembers) {
+    static Map<UUID, Set<UUID>> ghostsByGroup(List<GroupMember> eventMembers) {
         return eventMembers.stream()
                 .filter(GroupMember::isGhost)
-                .collect(Collectors.toMap(GroupMember::getGroupId, GroupMember::getCompetitorId));
+                .collect(Collectors.groupingBy(
+                        GroupMember::getGroupId, Collectors.mapping(GroupMember::getCompetitorId, Collectors.toSet())));
     }
 }

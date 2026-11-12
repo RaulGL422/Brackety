@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-Última actualización: 2026-11-12. Fase 0 cerrada; en curso: **auth** (pruebas) y la preparación de la Fase 1 (ver "Hasta la Fase 1").
+Última actualización: 2026-11-13. Fase 0 cerrada; en curso: **auth** (pruebas) y la preparación de la Fase 1 (ver "Hasta la Fase 1").
 
 | Módulo | Doc | Estado | Rama activa |
 |---|---|---|---|
@@ -50,6 +50,7 @@ Estados: pendiente · en curso · en pruebas · cerrado.
 | marcador F1: reglas y mesa (pedido de Raul, 2026-11-11) | modulos/prototipo-f1.md | en pruebas: descalificación 15-0, −1, ajuste de reloj, deshacer más claro, campana de ring y aviso de 10 s en la web, duración y límite en Configuración (F1 3:00), tablero con recomendado/en espera, deshacer grupo y simulaciones del recomendador; falta la prueba a mano (2026-11-11) | feat/scoreboard-f1-rules |
 | F1 solo web en el pabellón (pedido de Raul, 2026-11-11) | modulos/offline.md | en pruebas: la web usa la cola offline (guardada en el navegador, sobrevive a recargas), sesión que aguanta recargas en http del pabellón, rescate de acciones por CSV (exportar en el dispositivo, importar en el club), paquete sin APK por defecto; falta la prueba a mano en portátil y Pi (2026-11-11) | feat/realtime-offline-web |
 | pruebas F1: portátil, offline y reconexiones (pedido de Raul, 2026-11-12) | pruebas-f1.md | rondas 1 y 2 hechas (#87, #88): API, web sin red, caída de la API y apagón del portátil, vuelta a la Pi, liga; arreglos y peticiones de Raul incluidos. Estable para la F1; abierto en pruebas-f1.md (Pendiente antes del 14) | – |
+| F1: fantasmas sin límite (pedido de Raul, 2026-11-12) | modulos/prototipo-f1.md | en pruebas: grupo individual con hasta 3 fantasmas, equipos enteros de fantasmas, tablero, marcador, clasificación y CSV con varios fantasmas; falta la prueba a mano (2026-11-13) | feat/proto-f1-free-ghosts |
 | marcador web: doble pulsación (pedido de Raul) | modulos/offline.md | cerrado: `knownEvents` obligatorio, 409 `MATCH_STALE` en la web, envío de una en una; probado a mano por Raul con dos pestañas (#59, 2026-11-09) | – |
 
 ## Hasta la Fase 1 (14-11)

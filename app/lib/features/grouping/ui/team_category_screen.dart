@@ -156,7 +156,6 @@ class _TeamMakerState extends ConsumerState<_TeamMaker> {
     );
     final ghosts = _ghosts;
     final complete = _picks.length == widget.teamSize;
-    final allGhosts = _picks.isNotEmpty && ghosts.length == _picks.length;
     final list = AsyncView(
       value: participants,
       onRetry: () => _refresh(ref, widget.categoryKey),
@@ -197,7 +196,7 @@ class _TeamMakerState extends ConsumerState<_TeamMaker> {
               ),
               if (ghosts.isNotEmpty)
                 Text(
-                  allGhosts ? l10n.teamNeedsReal : l10n.teamGhostHint,
+                  l10n.teamGhostHint,
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               const SizedBox(height: AppSpacing.s),
@@ -205,7 +204,7 @@ class _TeamMakerState extends ConsumerState<_TeamMaker> {
                 style: FilledButton.styleFrom(
                   minimumSize: const Size.fromHeight(AppSizes.touchTarget),
                 ),
-                onPressed: complete && !allGhosts && !_busy ? _create : null,
+                onPressed: complete && !_busy ? _create : null,
                 child: Text(l10n.createTeam),
               ),
             ],
