@@ -113,7 +113,8 @@ class MatchWriter {
         if (rules.isPresent()) {
             return Optional.of(new Refusal(Cause.RULES, rules.get()));
         }
-        if (action.type() == MatchEventType.START && !state.isStarted()) {
+        // Reopening takes the mat and the fighters again, as a first start does.
+        if ((action.type() == MatchEventType.START && !state.isStarted()) || action.type() == MatchEventType.REOPEN) {
             var start = startRefusal(match, checkOtherMats);
             if (start.isPresent()) {
                 return start;
@@ -174,6 +175,7 @@ class MatchWriter {
                 state.elapsedAt(now),
                 state.isRunning(now) ? now : null,
                 state.disqualified() == null ? null : state.disqualified().name(),
+                state.isStarted(),
                 state.isFinished(),
                 now);
     }

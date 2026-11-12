@@ -127,7 +127,7 @@ void main() {
     );
 
     testWidgets(
-      'in progress and recommended stand apart and a waiting match is locked on $device',
+      'with a match in progress nothing is recommended and a waiting match is locked on $device',
       (tester) async {
         tester.view.physicalSize = size;
         tester.view.devicePixelRatio = 1;
@@ -181,33 +181,20 @@ void main() {
           findsOneWidget,
         );
 
-        final recommended = card(matchTile('Ana', 'Carla'));
         expect(
-          find.descendant(
-            of: recommended,
-            matching: find.text('When the match in progress ends.'),
+          find.descendant(of: inProgress, matching: find.text('Cancel match')),
+          findsOneWidget,
+        );
+        // One match at a time: nothing is put forward while it lasts; the next one is just listed.
+        expect(find.text('Recommended match'), findsNothing);
+        expect(
+          find.text(
+            'A match is in progress: the next one can start when it ends.',
           ),
           findsOneWidget,
         );
-        expect(
-          find.descendant(
-            of: recommended,
-            matching: find.text('Recommended match'),
-          ),
-          findsOneWidget,
-        );
-        expect(
-          find.descendant(
-            of: recommended,
-            matching: find.text('Open the scoreboard'),
-          ),
-          findsOneWidget,
-        );
-        // Next stands out by a thick ink frame, not by a colour a competitor may wear.
-        final frame =
-            tester.widget<Card>(recommended).shape! as RoundedRectangleBorder;
-        expect(frame.side.color, scheme.onSurface);
-        expect(frame.side.width, 3);
+        expect(matchTile('Ana', 'Carla'), findsOneWidget);
+        expect(scheme, isNotNull);
 
         final waiting = matchTile('Carla', 'Diego · Ghost');
         await tester.scrollUntilVisible(waiting, 200);

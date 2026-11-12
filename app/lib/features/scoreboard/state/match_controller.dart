@@ -107,8 +107,10 @@ class MatchController extends AsyncNotifier<MatchView> {
     final now = _sync.now();
     final refusal =
         local.refuse(action, side, now, delta: delta ?? Duration.zero) ??
-        (action == MatchAction.start &&
-                local.view.status == MatchStatus.pending &&
+        // A first start or a reopening takes the mat: not while another match is on it.
+        (((action == MatchAction.start &&
+                        local.view.status == MatchStatus.pending) ||
+                    action == MatchAction.reopen) &&
                 _matBusy(local.view, now)
             ? MatchRefusal.matBusy
             : null);

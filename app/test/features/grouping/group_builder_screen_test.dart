@@ -190,6 +190,43 @@ void main() {
     },
   );
 
+  testWidgets('with 4 picked the ghost box is locked and drops nobody', (
+    tester,
+  ) async {
+    tester.view.physicalSize = sizes['tablet']!;
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final repository = FakeGroupingRepository(participants);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...sessionOverrides(FakeAuthApi(signedIn: true)),
+          groupingRepositoryProvider.overrideWithValue(repository),
+          fakeMatsOverride,
+          myEventsProvider.overrideWith((ref) async => []),
+        ],
+        child: const BracketyApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
+        .read(routerProvider)
+        .push('/events/e1/categories/c1');
+    await tester.pumpAndSettle();
+    for (final name in ['Ana', 'Bea', 'Carla', 'Diego']) {
+      await tester.tap(find.text('$name Prueba'));
+      await tester.pump();
+    }
+
+    final ghostBox = find.widgetWithText(FilterChip, 'Ghost competitor');
+    expect(tester.widget<FilterChip>(ghostBox).onSelected, isNull);
+    await tester.tap(ghostBox, warnIfMissed: false);
+    await tester.tap(ghostBox, warnIfMissed: false);
+    await tester.pump();
+    expect(find.text('Diego P.'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('with the ghost box, the fourth pick is a ghost', (tester) async {
     tester.view.physicalSize = sizes['tablet']!;
     tester.view.devicePixelRatio = 1;

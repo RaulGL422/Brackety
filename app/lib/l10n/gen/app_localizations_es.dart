@@ -2052,4 +2052,116 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get staffHelper => 'ayudante';
+
+  @override
+  String get cancelMatch => 'Cancelar combate';
+
+  @override
+  String get cancelMatchTitle =>
+      'Cancelar el combate: vuelve a pendiente y todo a 0. ¿Por qué?';
+
+  @override
+  String get cancelMatchDone => 'Combate cancelado: vuelve a estar pendiente.';
+
+  @override
+  String get reopenMatch => 'Reabrir combate';
+
+  @override
+  String get reopenMatchTitle =>
+      'Reabrir el combate para corregirlo. ¿Por qué?';
+
+  @override
+  String get reopenMatchDone =>
+      'Combate reabierto: corrige y vuelve a finalizar.';
+
+  @override
+  String get refusalNotFinished => 'El combate no está finalizado.';
+
+  @override
+  String get tlCancel => 'Combate cancelado';
+
+  @override
+  String get tlReopen => 'Combate reabierto';
+
+  @override
+  String get matOneAtATime =>
+      'Hay un combate en curso: el siguiente se podrá empezar cuando acabe.';
+
+  @override
+  String get matQueued => 'Pendientes';
+
+  @override
+  String get keepMatch => 'Seguir con el combate';
+
+  @override
+  String get watchClockRunning => 'Reloj en marcha';
+
+  @override
+  String get watchClockStopped => 'Reloj parado';
+
+  @override
+  String placeInCategory(int place, String category, int age) {
+    return '$place.º en $category · $age años';
+  }
+
+  @override
+  String recordTotals(int attendance, int matches, int total) {
+    return 'Asistencia $attendance + combates $matches = $total puntos';
+  }
+
+  @override
+  String get recordNoMatches => 'Aún no está en ningún grupo.';
+
+  @override
+  String recordVs(String rival) {
+    return 'Contra $rival';
+  }
+
+  @override
+  String recordWhere(int mat, int group) {
+    return 'Tapiz $mat · Grupo $group';
+  }
+
+  @override
+  String get recordWon => 'Ganado';
+
+  @override
+  String get recordLost => 'Perdido';
+
+  @override
+  String get recordDraw => 'Empate';
+
+  @override
+  String get recordAsGhost => 'como fantasma (no puntúa)';
+
+  @override
+  String recordWarnings(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count advertencias',
+      one: '1 advertencia',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String recordOneHand(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count de una mano',
+      one: '1 de una mano',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get recordDisqualified => 'Descalificado';
+
+  @override
+  String get recordRivalDisqualified => 'Rival descalificado';
+
+  @override
+  String get recordOpen => 'Ver combates';
 }

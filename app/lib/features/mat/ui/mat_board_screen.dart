@@ -10,6 +10,7 @@ import '../../../core/keep_screen_on.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../offline/ui/sync_status_bar.dart';
 import '../../scoreboard/data/match_view.dart';
+import '../../scoreboard/ui/match_corrections.dart';
 import '../data/mat_board.dart';
 import '../state/mat_providers.dart';
 import 'fighter_text.dart';
@@ -126,12 +127,13 @@ class _BoardList extends StatelessWidget {
     final recommended = board.matches
         .where((m) => m.id == board.recommendedMatchId)
         .firstOrNull;
+    final busy = byStatus[MatchStatus.inProgress]!.isNotEmpty;
+    // With a match in progress nothing is put forward: one match at a time on a mat.
     final others = byStatus[MatchStatus.pending]!
-        .where((m) => m.id != board.recommendedMatchId)
+        .where((m) => busy || m.id != board.recommendedMatchId)
         .toList();
     final available = others.where((m) => m.available).toList();
     final waiting = others.where((m) => !m.available).toList();
-    final busy = byStatus[MatchStatus.inProgress]!.isNotEmpty;
     Widget section(String title) => Padding(
       padding: const EdgeInsets.only(top: AppSpacing.xl, bottom: AppSpacing.s),
       child: Text(title, style: text.titleMedium),
@@ -157,6 +159,8 @@ class _BoardList extends StatelessWidget {
             ),
           if (board.offline)
             const _OfflineNotice()
+          else if (busy)
+            Text(l10n.matOneAtATime)
           else if (recommended == null)
             Text(l10n.matNoneAvailable)
           else
@@ -164,10 +168,10 @@ class _BoardList extends StatelessWidget {
               board: board,
               match: recommended,
               readOnly: readOnly,
-              afterCurrent: busy,
             ),
           if (available.isNotEmpty) ...[
-            section(l10n.matPending),
+            // With a match in progress none of them can start yet: not "available".
+            section(busy ? l10n.matQueued : l10n.matPending),
             _MatchList(board: board, matches: available, readOnly: readOnly),
           ],
           if (waiting.isNotEmpty) ...[
@@ -220,13 +224,12 @@ class _OfflineNotice extends StatelessWidget {
 
 /// The match to act on: the one in progress (ink band) or the next one (gold band),
 /// with both fighters large and one clear button.
-class _FeaturedMatch extends StatelessWidget {
+class _FeaturedMatch extends ConsumerWidget {
   const _FeaturedMatch({
     required this.board,
     required this.match,
     required this.readOnly,
     this.inProgress = false,
-    this.afterCurrent = false,
   });
 
   final MatBoard board;
@@ -234,11 +237,8 @@ class _FeaturedMatch extends StatelessWidget {
   final bool readOnly;
   final bool inProgress;
 
-  /// The recommended one while another is in progress: it is the next, not one to start now.
-  final bool afterCurrent;
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
@@ -312,12 +312,7 @@ class _FeaturedMatch extends StatelessWidget {
               spacing: AppSpacing.m,
               children: [
                 if (!inProgress)
-                  Text(
-                    afterCurrent
-                        ? l10n.matAfterCurrent
-                        : l10n.matRecommendedWhy,
-                    style: text.bodyMedium,
-                  ),
+                  Text(l10n.matRecommendedWhy, style: text.bodyMedium),
                 if (group != null)
                   Text(
                     match.inReview
@@ -337,11 +332,15 @@ class _FeaturedMatch extends StatelessWidget {
                         ? l10n.matWatch
                         : inProgress
                         ? l10n.matBackToScoreboard
-                        : afterCurrent
-                        ? l10n.matOpenScoreboard
                         : l10n.matStartRecommended,
                   ),
                 ),
+                if (inProgress && !readOnly)
+                  OutlinedButton.icon(
+                    icon: const Icon(Icons.block),
+                    label: Text(l10n.cancelMatch),
+                    onPressed: () => cancelMatch(context, ref, match.id),
+                  ),
               ],
             ),
           ),

@@ -3407,6 +3407,174 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'ayudante'**
   String get staffHelper;
+
+  /// No description provided for @cancelMatch.
+  ///
+  /// In es, this message translates to:
+  /// **'Cancelar combate'**
+  String get cancelMatch;
+
+  /// No description provided for @cancelMatchTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Cancelar el combate: vuelve a pendiente y todo a 0. ¿Por qué?'**
+  String get cancelMatchTitle;
+
+  /// No description provided for @cancelMatchDone.
+  ///
+  /// In es, this message translates to:
+  /// **'Combate cancelado: vuelve a estar pendiente.'**
+  String get cancelMatchDone;
+
+  /// No description provided for @reopenMatch.
+  ///
+  /// In es, this message translates to:
+  /// **'Reabrir combate'**
+  String get reopenMatch;
+
+  /// No description provided for @reopenMatchTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Reabrir el combate para corregirlo. ¿Por qué?'**
+  String get reopenMatchTitle;
+
+  /// No description provided for @reopenMatchDone.
+  ///
+  /// In es, this message translates to:
+  /// **'Combate reabierto: corrige y vuelve a finalizar.'**
+  String get reopenMatchDone;
+
+  /// No description provided for @refusalNotFinished.
+  ///
+  /// In es, this message translates to:
+  /// **'El combate no está finalizado.'**
+  String get refusalNotFinished;
+
+  /// No description provided for @tlCancel.
+  ///
+  /// In es, this message translates to:
+  /// **'Combate cancelado'**
+  String get tlCancel;
+
+  /// No description provided for @tlReopen.
+  ///
+  /// In es, this message translates to:
+  /// **'Combate reabierto'**
+  String get tlReopen;
+
+  /// No description provided for @matOneAtATime.
+  ///
+  /// In es, this message translates to:
+  /// **'Hay un combate en curso: el siguiente se podrá empezar cuando acabe.'**
+  String get matOneAtATime;
+
+  /// No description provided for @matQueued.
+  ///
+  /// In es, this message translates to:
+  /// **'Pendientes'**
+  String get matQueued;
+
+  /// No description provided for @keepMatch.
+  ///
+  /// In es, this message translates to:
+  /// **'Seguir con el combate'**
+  String get keepMatch;
+
+  /// No description provided for @watchClockRunning.
+  ///
+  /// In es, this message translates to:
+  /// **'Reloj en marcha'**
+  String get watchClockRunning;
+
+  /// No description provided for @watchClockStopped.
+  ///
+  /// In es, this message translates to:
+  /// **'Reloj parado'**
+  String get watchClockStopped;
+
+  /// No description provided for @placeInCategory.
+  ///
+  /// In es, this message translates to:
+  /// **'{place}.º en {category} · {age} años'**
+  String placeInCategory(int place, String category, int age);
+
+  /// No description provided for @recordTotals.
+  ///
+  /// In es, this message translates to:
+  /// **'Asistencia {attendance} + combates {matches} = {total} puntos'**
+  String recordTotals(int attendance, int matches, int total);
+
+  /// No description provided for @recordNoMatches.
+  ///
+  /// In es, this message translates to:
+  /// **'Aún no está en ningún grupo.'**
+  String get recordNoMatches;
+
+  /// No description provided for @recordVs.
+  ///
+  /// In es, this message translates to:
+  /// **'Contra {rival}'**
+  String recordVs(String rival);
+
+  /// No description provided for @recordWhere.
+  ///
+  /// In es, this message translates to:
+  /// **'Tapiz {mat} · Grupo {group}'**
+  String recordWhere(int mat, int group);
+
+  /// No description provided for @recordWon.
+  ///
+  /// In es, this message translates to:
+  /// **'Ganado'**
+  String get recordWon;
+
+  /// No description provided for @recordLost.
+  ///
+  /// In es, this message translates to:
+  /// **'Perdido'**
+  String get recordLost;
+
+  /// No description provided for @recordDraw.
+  ///
+  /// In es, this message translates to:
+  /// **'Empate'**
+  String get recordDraw;
+
+  /// No description provided for @recordAsGhost.
+  ///
+  /// In es, this message translates to:
+  /// **'como fantasma (no puntúa)'**
+  String get recordAsGhost;
+
+  /// No description provided for @recordWarnings.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 advertencia} other{{count} advertencias}}'**
+  String recordWarnings(num count);
+
+  /// No description provided for @recordOneHand.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 de una mano} other{{count} de una mano}}'**
+  String recordOneHand(num count);
+
+  /// No description provided for @recordDisqualified.
+  ///
+  /// In es, this message translates to:
+  /// **'Descalificado'**
+  String get recordDisqualified;
+
+  /// No description provided for @recordRivalDisqualified.
+  ///
+  /// In es, this message translates to:
+  /// **'Rival descalificado'**
+  String get recordRivalDisqualified;
+
+  /// No description provided for @recordOpen.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver combates'**
+  String get recordOpen;
 }
 
 class _AppLocalizationsDelegate

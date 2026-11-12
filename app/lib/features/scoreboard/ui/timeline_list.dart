@@ -85,6 +85,8 @@ String actionLabel(AppLocalizations l10n, MatchAction action) =>
       MatchAction.disqualification => l10n.actionDisqualify,
       MatchAction.undo => l10n.tlUndo,
       MatchAction.finish => l10n.tlFinish,
+      MatchAction.cancel => l10n.tlCancel,
+      MatchAction.reopen => l10n.tlReopen,
     };
 
 String? sideLabel(AppLocalizations l10n, Side? side) => switch (side) {

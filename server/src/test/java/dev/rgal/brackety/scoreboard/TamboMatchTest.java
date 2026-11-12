@@ -130,7 +130,7 @@ class TamboMatchTest {
     }
 
     @Test
-    void aFinishedMatchRefusesEverything() {
+    void aFinishedMatchRefusesEverythingButReopening() {
         add(START, null, 0);
         add(DISQUALIFICATION, RED, 1);
         add(FINISH, null, 2);
@@ -138,7 +138,11 @@ class TamboMatchTest {
         var match = replay();
         assertThat(match.isFinished()).isTrue();
         for (var type : MatchEventType.values()) {
-            assertThat(match.refuse(type, at(3))).contains("The match is finished.");
+            if (type == MatchEventType.REOPEN) {
+                assertThat(match.refuse(type, at(3))).isEmpty();
+            } else {
+                assertThat(match.refuse(type, at(3))).contains("The match is finished.");
+            }
         }
     }
 

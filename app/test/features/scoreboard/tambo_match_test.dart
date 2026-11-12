@@ -144,7 +144,7 @@ void main() {
     expect(match.points(Side.red) + match.points(Side.blue), 0);
   });
 
-  test('a finished match refuses everything', () {
+  test('a finished match refuses everything but reopening', () {
     add(MatchAction.start, null, 0);
     add(MatchAction.disqualification, Side.red, 1);
     add(MatchAction.finish, null, 2);
@@ -152,8 +152,36 @@ void main() {
     final match = replay();
     expect(match.finished, isTrue);
     for (final action in MatchAction.values) {
-      expect(match.refuse(action, at(3)), MatchRefusal.finished);
+      expect(
+        match.refuse(action, at(3)),
+        action == MatchAction.reopen ? isNull : MatchRefusal.finished,
+      );
     }
+  });
+
+  test('reopening keeps the score; cancelling wipes it and needs a start', () {
+    add(MatchAction.start, null, 0);
+    add(MatchAction.point, Side.red, 1);
+    add(MatchAction.point, Side.red, 2);
+    add(MatchAction.stop, null, 3);
+    expect(
+      replay().refuse(MatchAction.reopen, at(4)),
+      MatchRefusal.notFinished,
+    );
+
+    add(MatchAction.cancel, null, 4);
+    final cancelled = replay();
+    expect(cancelled.started, isFalse);
+    expect(cancelled.points(Side.red), 0);
+    expect(
+      cancelled.refuse(MatchAction.undo, at(5)),
+      MatchRefusal.nothingToUndo,
+    );
+    expect(cancelled.refuse(MatchAction.point, at(5)), MatchRefusal.notStarted);
+    expect(
+      cancelled.refuse(MatchAction.cancel, at(5)),
+      MatchRefusal.notStarted,
+    );
   });
 
   test('stop needs a running clock', () {

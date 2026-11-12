@@ -367,6 +367,13 @@ function Set-ApiEnvironment([hashtable]$secrets, [string]$mode, [string]$package
     $legal = Read-EnvFile $eventFile
     $owner = if ($LegalOwnerName) { $LegalOwnerName } else { $legal["LEGAL_OWNER_NAME"] }
     $privacy = if ($PrivacyContactEmail) { $PrivacyContactEmail } else { $legal["PRIVACY_CONTACT_EMAIL"] }
+    # Kept for the next start: after a power cut the plain command must bring the same legal data back.
+    if ($LegalOwnerName -or $PrivacyContactEmail) {
+        Set-Content -Path $eventFile -Encoding utf8 -Value @(
+            "# Datos legales que muestra la web (páginas legales). Edita y vuelve a arrancar.",
+            "LEGAL_OWNER_NAME=$owner",
+            "PRIVACY_CONTACT_EMAIL=$privacy")
+    }
     $day = if ($EventDate) { $EventDate } else { Get-Date -Format "yyyy-MM-dd" }
     $null = [datetime]::ParseExact($day, "yyyy-MM-dd", $null)
 

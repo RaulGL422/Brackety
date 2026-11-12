@@ -131,6 +131,7 @@ public class Match {
             Duration elapsed,
             Instant runningSince,
             String disqualifiedSide,
+            boolean started,
             boolean finished,
             Instant now) {
         this.redScore = redScore;
@@ -138,13 +139,14 @@ public class Match {
         this.elapsedMs = elapsed.toMillis();
         this.runningSince = runningSince;
         this.disqualifiedSide = disqualifiedSide;
-        if (startedAt == null) {
+        // A cancelled match is pending again; a reopened one is in progress until it finishes again.
+        status = finished ? Status.FINISHED : started ? Status.IN_PROGRESS : Status.PENDING;
+        if (!started) {
+            startedAt = null;
+        } else if (startedAt == null) {
             startedAt = now;
         }
-        status = finished ? Status.FINISHED : Status.IN_PROGRESS;
-        if (finished) {
-            finishedAt = now;
-        }
+        finishedAt = finished ? (finishedAt == null ? now : finishedAt) : null;
     }
 
     /** Back to pending, as if never started: the superadmin restarts it (its actions go with it). */

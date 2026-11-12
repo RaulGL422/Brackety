@@ -22,7 +22,13 @@ enum MatchAction {
   disqualification,
   clockAdjust,
   undo,
-  finish;
+  finish,
+
+  /// Started by mistake: back to pending, all at 0 (with a reason; the trail stays).
+  cancel,
+
+  /// A finished match opens again to correct it (with a reason).
+  reopen;
 
   String get wire => switch (this) {
     oneHandWarning => 'ONE_HAND_WARNING',
@@ -434,14 +440,20 @@ class MatchView {
 
   bool get finished => status == MatchStatus.finished;
 
-  /// The clock was started at least once: only then can anyone score.
-  bool get started => timeline.any((e) => e.action == MatchAction.start);
+  /// What counts now: a cancel wipes the match, so only what came after the last one.
+  Iterable<TimelineEntry> get _sinceCancel {
+    final last = timeline.lastIndexWhere((e) => e.action == MatchAction.cancel);
+    return last < 0 ? timeline : timeline.skip(last + 1);
+  }
+
+  /// The clock was started at least once (since a cancel): only then can anyone score.
+  bool get started => _sinceCancel.any((e) => e.action == MatchAction.start);
 
   /// What an undo would undo now: the last point (added or removed), warning,
   /// disqualification or clock adjustment in force.
   TimelineEntry? get lastUndoable => finished
       ? null
-      : timeline
+      : _sinceCancel
             .where(
               (e) =>
                   !e.undone &&
