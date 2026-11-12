@@ -72,7 +72,7 @@ class StandingsService {
      * a place among every age says nothing. Equal totals share the position and go by name. No access check:
      * callers do it.
      */
-    List<StandingRow> rows(Event event) {
+    public List<StandingRow> rows(Event event) {
         var eventId = event.getId();
         var eventCategories = categories.findByEventIdOrderByMinAge(eventId);
         var organizationNames = ParticipantService.organizationNames(organizations, eventId);

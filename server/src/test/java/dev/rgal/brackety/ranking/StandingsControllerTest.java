@@ -90,6 +90,31 @@ class StandingsControllerTest extends EventApiTest {
     }
 
     @Test
+    void theClubOpensAParticipantAndSeesEveryMatchOfTheirs() throws Exception {
+        call(get("/api/v1/events/" + eventId + "/participants/" + fighters.get(0) + "/record"), "club1")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.standing.total").value(13))
+                .andExpect(jsonPath("$.matches", hasSize(3)))
+                .andExpect(
+                        jsonPath("$.matches[?(@.rival == 'Bea Prueba')].points").value(3))
+                .andExpect(jsonPath("$.matches[?(@.rival == 'Bea Prueba')].rivalPoints")
+                        .value(15))
+                .andExpect(
+                        jsonPath("$.matches[?(@.rival == 'Bea Prueba')].status").value("FINISHED"))
+                .andExpect(jsonPath("$.matches[?(@.rival == 'Bea Prueba')].asGhost")
+                        .value(false));
+        // The ghost's matches say so: they fight there and score nothing.
+        call(get("/api/v1/events/" + eventId + "/participants/" + ghost + "/record"), "club1")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.matches[0].asGhost").value(true))
+                .andExpect(jsonPath("$.standing.total").value(0));
+        call(get("/api/v1/events/" + eventId + "/participants/" + fighters.get(0) + "/record"), "ayudante1")
+                .andExpect(status().isForbidden());
+        call(get("/api/v1/events/" + eventId + "/participants/" + java.util.UUID.randomUUID() + "/record"), "club1")
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void positionsCountWithinEachCategory() throws Exception {
         var younger = new Participant(eventId, clock.instant());
         younger.update("Lia", "Prueba", LocalDate.of(2027, 3, 1).minusYears(5), 110, true);

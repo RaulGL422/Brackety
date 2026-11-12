@@ -7,6 +7,7 @@ import '../../../core/medal.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../data/club_models.dart';
 import '../state/club_providers.dart';
+import 'participant_record_sheet.dart';
 
 enum StandingsOrder { points, name }
 
@@ -91,7 +92,8 @@ class _StandingsTabState extends ConsumerState<StandingsTab> {
               : ListView.builder(
                   padding: const EdgeInsets.only(bottom: AppSpacing.xl),
                   itemCount: rows.length,
-                  itemBuilder: (context, i) => _StandingTile(row: rows[i]),
+                  itemBuilder: (context, i) =>
+                      _StandingTile(eventId: widget.eventId, row: rows[i]),
                 ),
         ),
       ],
@@ -100,8 +102,9 @@ class _StandingsTabState extends ConsumerState<StandingsTab> {
 }
 
 class _StandingTile extends StatelessWidget {
-  const _StandingTile({required this.row});
+  const _StandingTile({required this.eventId, required this.row});
 
+  final String eventId;
   final StandingRow row;
 
   @override
@@ -114,6 +117,12 @@ class _StandingTile extends StatelessWidget {
       row.age,
     );
     return ListTile(
+      onTap: () => showParticipantRecord(
+        context,
+        eventId: eventId,
+        participantId: row.participantId,
+        name: '${row.firstName} ${row.lastName}',
+      ),
       leading: PlaceBadge(place: row.position),
       title: Text('${row.firstName} ${row.lastName}'),
       subtitle: Text(

@@ -16,6 +16,7 @@ import '../data/club_repository.dart';
 import '../state/club_providers.dart';
 import 'club_panel_screen.dart';
 import 'participant_form.dart';
+import 'participant_record_sheet.dart';
 
 /// The students entered in the event, by name; add, edit or delete them.
 class ParticipantsTab extends ConsumerWidget {
@@ -116,10 +117,25 @@ class _ParticipantTile extends ConsumerWidget {
         ],
       ),
       onTap: () => showParticipantForm(context, eventId, participant: p),
-      trailing: IconButton(
-        tooltip: l10n.delete,
-        icon: const Icon(Icons.delete_outline),
-        onPressed: () => _delete(context, ref),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            tooltip: l10n.recordOpen,
+            icon: const Icon(Icons.sports_martial_arts),
+            onPressed: () => showParticipantRecord(
+              context,
+              eventId: eventId,
+              participantId: p.id,
+              name: '${p.firstName} ${p.lastName}',
+            ),
+          ),
+          IconButton(
+            tooltip: l10n.delete,
+            icon: const Icon(Icons.delete_outline),
+            onPressed: () => _delete(context, ref),
+          ),
+        ],
       ),
     );
   }

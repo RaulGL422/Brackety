@@ -1289,5 +1289,21 @@
   "watchClockRunning": "Reloj en marcha",
   "watchClockStopped": "Reloj parado",
   "placeInCategory": "{place}.º en {category} · {age} años",
-  "@placeInCategory": {"placeholders": {"place": {"type": "int"}, "category": {"type": "String"}, "age": {"type": "int"}}}
+  "@placeInCategory": {"placeholders": {"place": {"type": "int"}, "category": {"type": "String"}, "age": {"type": "int"}}},
+  "recordTotals": "Asistencia {attendance} + combates {matches} = {total} puntos",
+  "@recordTotals": {"placeholders": {"attendance": {"type": "int"}, "matches": {"type": "int"}, "total": {"type": "int"}}},
+  "recordNoMatches": "Aún no está en ningún grupo.",
+  "recordVs": "Contra {rival}",
+  "@recordVs": {"placeholders": {"rival": {"type": "String"}}},
+  "recordWhere": "Tapiz {mat} · Grupo {group}",
+  "@recordWhere": {"placeholders": {"mat": {"type": "int"}, "group": {"type": "int"}}},
+  "recordWon": "Ganado",
+  "recordLost": "Perdido",
+  "recordDraw": "Empate",
+  "recordAsGhost": "como fantasma (no puntúa)",
+  "recordWarnings": "{count, plural, =1{1 advertencia} other{{count} advertencias}}",
+  "recordOneHand": "{count, plural, =1{1 de una mano} other{{count} de una mano}}",
+  "recordDisqualified": "Descalificado",
+  "recordRivalDisqualified": "Rival descalificado",
+  "recordOpen": "Ver combates"
 }

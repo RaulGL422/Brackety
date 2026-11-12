@@ -723,5 +723,18 @@
   "keepMatch": "Keep the match",
   "watchClockRunning": "Clock running",
   "watchClockStopped": "Clock stopped",
-  "placeInCategory": "#{place} in {category} · {age} years"
+  "placeInCategory": "#{place} in {category} · {age} years",
+  "recordTotals": "Attendance {attendance} + matches {matches} = {total} points",
+  "recordNoMatches": "Not in a group yet.",
+  "recordVs": "Against {rival}",
+  "recordWhere": "Mat {mat} · Group {group}",
+  "recordWon": "Won",
+  "recordLost": "Lost",
+  "recordDraw": "Draw",
+  "recordAsGhost": "as a ghost (no score)",
+  "recordWarnings": "{count, plural, =1{1 warning} other{{count} warnings}}",
+  "recordOneHand": "{count, plural, =1{1 one-hand} other{{count} one-hand}}",
+  "recordDisqualified": "Disqualified",
+  "recordRivalDisqualified": "Rival disqualified",
+  "recordOpen": "See matches"
 }

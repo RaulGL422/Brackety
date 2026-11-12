@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:brackety/core/download/file_download.dart';
 import 'package:brackety/features/club/data/club_models.dart';
+import 'package:brackety/features/mat/data/mat_board.dart';
 import 'package:brackety/features/club/data/club_repository.dart';
 import 'package:brackety/features/club/state/club_providers.dart';
 import 'package:brackety/core/upload/file_upload.dart';
@@ -230,6 +231,46 @@ void main() {
                 : settings,
           ),
           standingsProvider.overrideWith((ref, _) async => scores ?? standings),
+          participantRecordProvider.overrideWith(
+            (ref, key) async => ParticipantRecord(
+              standing: (scores ?? standings).firstWhere(
+                (r) => r.participantId == key.participantId,
+              ),
+              matches: const [
+                RecordMatch(
+                  matchId: 'x1',
+                  matNumber: 2,
+                  groupNumber: 3,
+                  status: MatchStatus.finished,
+                  red: true,
+                  asGhost: false,
+                  rival: 'Bea Test',
+                  points: 3,
+                  rivalPoints: 15,
+                  warnings: 1,
+                  oneHandWarnings: 0,
+                  disqualified: false,
+                  rivalDisqualified: false,
+                  endReason: 'POINTS',
+                ),
+                RecordMatch(
+                  matchId: 'x2',
+                  matNumber: 2,
+                  groupNumber: 3,
+                  status: MatchStatus.pending,
+                  red: false,
+                  asGhost: true,
+                  rival: 'Ana Test',
+                  points: 0,
+                  rivalPoints: 0,
+                  warnings: 0,
+                  oneHandWarnings: 0,
+                  disqualified: false,
+                  rivalDisqualified: false,
+                ),
+              ],
+            ),
+          ),
           participantsProvider.overrideWith((ref, _) async => [minor]),
           matsOverviewProvider.overrideWith(
             (ref, _) async => [
@@ -305,6 +346,28 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Bea Test'), findsOneWidget);
       expect(find.text('Ana Test'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('the club opens a participant and sees each match on $device', (
+      tester,
+    ) async {
+      await pumpPanel(tester, size);
+
+      await tester.tap(find.text('Zoe Test'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('Attendance 10 + matches 30 = 40 points'),
+        findsOneWidget,
+      );
+      expect(find.text('Against Bea Test'), findsOneWidget);
+      expect(find.text('3 - 15'), findsOneWidget);
+      expect(
+        find.textContaining('Mat 2 · Group 3 · Lost · 1 warning'),
+        findsOneWidget,
+      );
+      expect(find.textContaining('as a ghost (no score)'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 

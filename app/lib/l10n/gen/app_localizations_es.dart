@@ -2103,4 +2103,65 @@ class AppLocalizationsEs extends AppLocalizations {
   String placeInCategory(int place, String category, int age) {
     return '$place.º en $category · $age años';
   }
+
+  @override
+  String recordTotals(int attendance, int matches, int total) {
+    return 'Asistencia $attendance + combates $matches = $total puntos';
+  }
+
+  @override
+  String get recordNoMatches => 'Aún no está en ningún grupo.';
+
+  @override
+  String recordVs(String rival) {
+    return 'Contra $rival';
+  }
+
+  @override
+  String recordWhere(int mat, int group) {
+    return 'Tapiz $mat · Grupo $group';
+  }
+
+  @override
+  String get recordWon => 'Ganado';
+
+  @override
+  String get recordLost => 'Perdido';
+
+  @override
+  String get recordDraw => 'Empate';
+
+  @override
+  String get recordAsGhost => 'como fantasma (no puntúa)';
+
+  @override
+  String recordWarnings(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count advertencias',
+      one: '1 advertencia',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String recordOneHand(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count de una mano',
+      one: '1 de una mano',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get recordDisqualified => 'Descalificado';
+
+  @override
+  String get recordRivalDisqualified => 'Rival descalificado';
+
+  @override
+  String get recordOpen => 'Ver combates';
 }

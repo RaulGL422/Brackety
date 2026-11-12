@@ -154,6 +154,13 @@ class ClubRepository {
   Future<void> deleteParticipant(String eventId, String participantId) =>
       _dio.delete<void>('/api/v1/events/$eventId/participants/$participantId');
 
+  Future<ParticipantRecord> record(String eventId, String participantId) async {
+    final response = await _dio.get<Map<String, dynamic>>(
+      '/api/v1/events/$eventId/participants/$participantId/record',
+    );
+    return ParticipantRecord.fromJson(response.data!);
+  }
+
   Future<List<StandingRow>> standings(String eventId) async {
     final response = await _dio.get<List<dynamic>>(
       '/api/v1/events/$eventId/standings',

@@ -3497,6 +3497,84 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'{place}.º en {category} · {age} años'**
   String placeInCategory(int place, String category, int age);
+
+  /// No description provided for @recordTotals.
+  ///
+  /// In es, this message translates to:
+  /// **'Asistencia {attendance} + combates {matches} = {total} puntos'**
+  String recordTotals(int attendance, int matches, int total);
+
+  /// No description provided for @recordNoMatches.
+  ///
+  /// In es, this message translates to:
+  /// **'Aún no está en ningún grupo.'**
+  String get recordNoMatches;
+
+  /// No description provided for @recordVs.
+  ///
+  /// In es, this message translates to:
+  /// **'Contra {rival}'**
+  String recordVs(String rival);
+
+  /// No description provided for @recordWhere.
+  ///
+  /// In es, this message translates to:
+  /// **'Tapiz {mat} · Grupo {group}'**
+  String recordWhere(int mat, int group);
+
+  /// No description provided for @recordWon.
+  ///
+  /// In es, this message translates to:
+  /// **'Ganado'**
+  String get recordWon;
+
+  /// No description provided for @recordLost.
+  ///
+  /// In es, this message translates to:
+  /// **'Perdido'**
+  String get recordLost;
+
+  /// No description provided for @recordDraw.
+  ///
+  /// In es, this message translates to:
+  /// **'Empate'**
+  String get recordDraw;
+
+  /// No description provided for @recordAsGhost.
+  ///
+  /// In es, this message translates to:
+  /// **'como fantasma (no puntúa)'**
+  String get recordAsGhost;
+
+  /// No description provided for @recordWarnings.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 advertencia} other{{count} advertencias}}'**
+  String recordWarnings(num count);
+
+  /// No description provided for @recordOneHand.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 de una mano} other{{count} de una mano}}'**
+  String recordOneHand(num count);
+
+  /// No description provided for @recordDisqualified.
+  ///
+  /// In es, this message translates to:
+  /// **'Descalificado'**
+  String get recordDisqualified;
+
+  /// No description provided for @recordRivalDisqualified.
+  ///
+  /// In es, this message translates to:
+  /// **'Rival descalificado'**
+  String get recordRivalDisqualified;
+
+  /// No description provided for @recordOpen.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver combates'**
+  String get recordOpen;
 }
 
 class _AppLocalizationsDelegate
