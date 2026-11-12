@@ -13,7 +13,7 @@
 | ayudantes-permisos | modulos/ayudantes-permisos.md | pendiente | – |
 | puntuacion | modulos/puntuacion.md | pendiente | – |
 | liga | modulos/liga.md | pendiente | – |
-| liga-fases | modulos/liga-fases.md | en pruebas: servidor (#75) y pantallas: mis eventos por liga, selector de fase, pestaña Liga (fases, nueva fase, clasificación acumulada con medallas, podios) y reinscripción de otras fases (#81); puntos por asistir en Configuración; falta la prueba a mano (2026-11-12) | feat/league-phases-attendance |
+| liga-fases | modulos/liga-fases.md | en pruebas: servidor (#75), pantallas y reinscripción (#81), puntos por asistir (#86); liga primero en el panel del club y podios de un toque en la PR #89; falta la prueba a mano (2026-11-12) | feat/league-first-dev |
 | torneo | modulos/torneo.md | pendiente | – |
 | marcador-tapiz | modulos/marcador-tapiz.md | pendiente | – |
 | tiempo-real | modulos/tiempo-real.md | en pruebas: WebSocket de avisos "esto cambió" (marcador, tablero, Tapices, Puntuaciones) con sondeo de respaldo (2026-11-11) | feat/realtime-offline-web |
@@ -49,7 +49,7 @@ Estados: pendiente · en curso · en pruebas · cerrado.
 | F1: superadmin en el portátil, export .zip, resultados a la Pi y clubes (pedido de Raul, 2026-11-11) | modulos/servidor-local.md | en pruebas: superadmin solo en el portátil, todo el evento en .zip con CSV legibles, importar resultados en la Pi, clubes participantes; servidor de liga, fases y podios hecho, sus pantallas después de la F1; falta la prueba a mano (2026-11-11) | feat/league-phases |
 | marcador F1: reglas y mesa (pedido de Raul, 2026-11-11) | modulos/prototipo-f1.md | en pruebas: descalificación 15-0, −1, ajuste de reloj, deshacer más claro, campana de ring y aviso de 10 s en la web, duración y límite en Configuración (F1 3:00), tablero con recomendado/en espera, deshacer grupo y simulaciones del recomendador; falta la prueba a mano (2026-11-11) | feat/scoreboard-f1-rules |
 | F1 solo web en el pabellón (pedido de Raul, 2026-11-11) | modulos/offline.md | en pruebas: la web usa la cola offline (guardada en el navegador, sobrevive a recargas), sesión que aguanta recargas en http del pabellón, rescate de acciones por CSV (exportar en el dispositivo, importar en el club), paquete sin APK por defecto; falta la prueba a mano en portátil y Pi (2026-11-11) | feat/realtime-offline-web |
-| pruebas F1: portátil, offline y reconexiones (pedido de Raul, 2026-11-12) | pruebas-f1.md | en curso: ronda 1 hecha (API, web sin red, caída de la API, vuelta a la Pi, liga); 6 arreglos; ronda 2 tras fusionar | test/f1-scenario-and-tests |
+| pruebas F1: portátil, offline y reconexiones (pedido de Raul, 2026-11-12) | pruebas-f1.md | rondas 1 y 2 hechas (#87, #88): API, web sin red, caída de la API y apagón del portátil, vuelta a la Pi, liga; arreglos y peticiones de Raul incluidos. Estable para la F1; abierto en pruebas-f1.md (Pendiente antes del 14) | – |
 | marcador web: doble pulsación (pedido de Raul) | modulos/offline.md | cerrado: `knownEvents` obligatorio, 409 `MATCH_STALE` en la web, envío de una en una; probado a mano por Raul con dos pestañas (#59, 2026-11-09) | – |
 
 ## Hasta la Fase 1 (14-11)
