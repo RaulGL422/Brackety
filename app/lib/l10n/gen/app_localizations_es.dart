@@ -2086,4 +2086,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get matOneAtATime =>
       'Hay un combate en curso: el siguiente se podrá empezar cuando acabe.';
+
+  @override
+  String get matQueued => 'Pendientes';
+
+  @override
+  String get keepMatch => 'Seguir con el combate';
 }

@@ -1283,5 +1283,7 @@
   "refusalNotFinished": "El combate no está finalizado.",
   "tlCancel": "Combate cancelado",
   "tlReopen": "Combate reabierto",
-  "matOneAtATime": "Hay un combate en curso: el siguiente se podrá empezar cuando acabe."
+  "matOneAtATime": "Hay un combate en curso: el siguiente se podrá empezar cuando acabe.",
+  "matQueued": "Pendientes",
+  "keepMatch": "Seguir con el combate"
 }

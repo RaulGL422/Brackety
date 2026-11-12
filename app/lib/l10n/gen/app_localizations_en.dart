@@ -2067,4 +2067,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get matOneAtATime =>
       'A match is in progress: the next one can start when it ends.';
+
+  @override
+  String get matQueued => 'Pending';
+
+  @override
+  String get keepMatch => 'Keep the match';
 }

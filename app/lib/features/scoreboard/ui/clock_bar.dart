@@ -340,11 +340,11 @@ class _ClockButton extends StatelessWidget {
         textStyle: Theme.of(context).textTheme.titleLarge,
       ),
       icon: Icon(icon),
-      label: Text(
-        label,
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-        textAlign: TextAlign.center,
+      // One word per line, shrunk only if a word still does not fit: wrapping by width broke
+      // "Finalizar" in the middle on a narrow phone, and one shrunk line was too small to read.
+      label: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(label.replaceFirst(' ', '\n'), textAlign: TextAlign.center),
       ),
       onPressed: locked ? null : () => onAction(action),
     );

@@ -30,6 +30,7 @@ Future<void> _correct(
     context,
     title: cancel ? l10n.cancelMatchTitle : l10n.reopenMatchTitle,
     confirmLabel: cancel ? l10n.cancelMatch : l10n.reopenMatch,
+    dismissLabel: cancel ? l10n.keepMatch : null,
     destructive: cancel,
   );
   if (reason == null || !context.mounted) return;

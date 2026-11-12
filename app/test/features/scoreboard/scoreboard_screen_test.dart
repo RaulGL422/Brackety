@@ -183,7 +183,7 @@ void main() {
     );
 
     repository.next = matchView(status: MatchStatus.finished, redPoints: 15);
-    await tester.tap(find.text('Finish match'));
+    await tester.tap(find.text('Finish\nmatch'));
     await settle(tester);
 
     expect(repository.sent.single.$1, MatchAction.finish);

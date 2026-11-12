@@ -718,5 +718,7 @@
   "refusalNotFinished": "The match is not finished.",
   "tlCancel": "Match cancelled",
   "tlReopen": "Match reopened",
-  "matOneAtATime": "A match is in progress: the next one can start when it ends."
+  "matOneAtATime": "A match is in progress: the next one can start when it ends.",
+  "matQueued": "Pending",
+  "keepMatch": "Keep the match"
 }

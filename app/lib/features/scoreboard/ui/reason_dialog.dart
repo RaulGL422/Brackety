@@ -7,6 +7,7 @@ Future<String?> askReason(
   BuildContext context, {
   required String title,
   String? confirmLabel,
+  String? dismissLabel,
   bool destructive = false,
 }) {
   return showDialog<String>(
@@ -14,6 +15,7 @@ Future<String?> askReason(
     builder: (_) => _ReasonDialog(
       title: title,
       confirmLabel: confirmLabel,
+      dismissLabel: dismissLabel,
       destructive: destructive,
     ),
   );
@@ -23,11 +25,15 @@ class _ReasonDialog extends StatefulWidget {
   const _ReasonDialog({
     required this.title,
     this.confirmLabel,
+    this.dismissLabel,
     this.destructive = false,
   });
 
   final String title;
   final String? confirmLabel;
+
+  /// When "Cancelar" would be read as the action itself (cancelling a match).
+  final String? dismissLabel;
   final bool destructive;
 
   @override
@@ -68,7 +74,7 @@ class _ReasonDialogState extends State<_ReasonDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text(l10n.cancel),
+          child: Text(widget.dismissLabel ?? l10n.cancel),
         ),
         FilledButton(
           style: widget.destructive

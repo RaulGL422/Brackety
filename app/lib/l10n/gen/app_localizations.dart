@@ -3467,6 +3467,18 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Hay un combate en curso: el siguiente se podrá empezar cuando acabe.'**
   String get matOneAtATime;
+
+  /// No description provided for @matQueued.
+  ///
+  /// In es, this message translates to:
+  /// **'Pendientes'**
+  String get matQueued;
+
+  /// No description provided for @keepMatch.
+  ///
+  /// In es, this message translates to:
+  /// **'Seguir con el combate'**
+  String get keepMatch;
 }
 
 class _AppLocalizationsDelegate

@@ -170,7 +170,8 @@ class _BoardList extends StatelessWidget {
               readOnly: readOnly,
             ),
           if (available.isNotEmpty) ...[
-            section(l10n.matPending),
+            // With a match in progress none of them can start yet: not "available".
+            section(busy ? l10n.matQueued : l10n.matPending),
             _MatchList(board: board, matches: available, readOnly: readOnly),
           ],
           if (waiting.isNotEmpty) ...[

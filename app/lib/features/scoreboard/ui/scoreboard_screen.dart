@@ -343,17 +343,33 @@ class _Finished extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           FinalScore(view: view),
-          FilledButton.icon(
-            icon: const Icon(Icons.arrow_back),
-            label: Text(l10n.backToMat),
-            onPressed: () => context.canPop()
-                ? context.pop()
-                : context.go('/mats/${view.matId}'),
-          ),
-          OutlinedButton.icon(
-            icon: const Icon(Icons.lock_open),
-            label: Text(l10n.reopenMatch),
-            onPressed: onReopen,
+          // Side by side: on a short phone a second row went under the timeline, out of sight.
+          Row(
+            spacing: AppSpacing.s,
+            children: [
+              Expanded(
+                child: FilledButton.icon(
+                  icon: const Icon(Icons.arrow_back),
+                  label: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(l10n.backToMat),
+                  ),
+                  onPressed: () => context.canPop()
+                      ? context.pop()
+                      : context.go('/mats/${view.matId}'),
+                ),
+              ),
+              Expanded(
+                child: OutlinedButton.icon(
+                  icon: const Icon(Icons.lock_open),
+                  label: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(l10n.reopenMatch),
+                  ),
+                  onPressed: onReopen,
+                ),
+              ),
+            ],
           ),
         ],
       ),
