@@ -181,7 +181,19 @@ function Start-Postgres {
         -ArgumentList "start -s -w -t 60 -D `"$pgData`" -l `"$logFile`""
     $null = $pgCtl.Handle
     $pgCtl.WaitForExit()
-    if ($pgCtl.ExitCode -ne 0) { throw "PostgreSQL no arranca: mira brackety-data\pg.log." }
+    if ($pgCtl.ExitCode -ne 0) {
+        if (Get-NetTCPConnection -LocalPort $PgPort -State Listen -ErrorAction SilentlyContinue) {
+            throw "PostgreSQL no arranca: el puerto $PgPort ya está en uso (¿otra copia de Brackety abierta?)."
+        }
+        throw "PostgreSQL no arranca: mira brackety-data\pg.log."
+    }
+}
+
+function Start-Api {
+    $process = Start-Process -FilePath $java -ArgumentList "-jar `"$jar`"" -WorkingDirectory $data -NoNewWindow -PassThru
+    # Reading the handle now keeps ExitCode available after the process ends.
+    $null = $process.Handle
+    return $process
 }
 
 function Stop-Postgres {
@@ -358,6 +370,7 @@ function Set-ApiEnvironment([hashtable]$secrets, [string]$mode, [string]$package
     $day = if ($EventDate) { $EventDate } else { Get-Date -Format "yyyy-MM-dd" }
     $null = [datetime]::ParseExact($day, "yyyy-MM-dd", $null)
 
+    $env:SERVER_PORT = "$ApiPort"
     $env:DB_URL = "jdbc:postgresql://127.0.0.1:$PgPort/$DbName"
     $env:DB_USER = $DbUser
     $env:DB_PASSWORD = $secrets["DB_PASSWORD"]
@@ -486,9 +499,7 @@ try {
     Set-ApiEnvironment $secrets $mode $packageFile
     $loading = if ($packageFile) { " y cargando el paquete $(Split-Path $packageFile -Leaf)" } else { "" }
     Write-Step "Arrancando la API$loading (puede tardar un minuto)"
-    $api = Start-Process -FilePath $java -ArgumentList "-jar `"$jar`"" -WorkingDirectory $data -NoNewWindow -PassThru
-    # Reading the handle now keeps ExitCode available after the process ends.
-    $null = $api.Handle
+    $api = Start-Api
     try {
         Wait-ApiReady $api
     } catch {
@@ -513,8 +524,25 @@ try {
     Write-Host "  Datos: $data"
     Write-Host "  Para parar: Ctrl+C (guarda una copia de la base de datos al salir)."
     Write-Host ""
-    while (-not $api.HasExited) { Start-Sleep -Milliseconds 500 }
-    Write-Warn "La API se ha parado (código $($api.ExitCode)): mira brackety-data\api.log."
+    # The package is in the database now: a restart must not try to load it again.
+    Remove-Item Env:BRACKETY_PACKAGE, Env:BRACKETY_PACKAGE_CREDENTIALS -ErrorAction SilentlyContinue
+    $crashes = @()
+    while ($true) {
+        while (-not $api.HasExited) { Start-Sleep -Milliseconds 500 }
+        Write-Warn "La API se ha parado (código $($api.ExitCode)): mira brackety-data\api.log."
+        # A crash mid-event must not leave the phones without server; one that keeps failing needs a person.
+        $crashes = @($crashes | Where-Object { $_ -gt (Get-Date).AddMinutes(-10) }) + (Get-Date)
+        if ($crashes.Count -gt 3) {
+            Write-Warn "Se ha parado $($crashes.Count) veces en 10 minutos: no se vuelve a arrancar sola."
+            break
+        }
+        if (-not (Test-PgRunning)) { Start-Postgres }
+        try { Invoke-Backup } catch { Write-Warn "No se ha podido guardar la copia: $($_.Exception.Message)" }
+        Write-Step "Volviendo a arrancar la API (los móviles conservan sus acciones sin enviar)"
+        $api = Start-Api
+        Wait-ApiReady $api
+        Write-Host "Brackety listo de nuevo." -ForegroundColor Green
+    }
 } finally {
     Write-Host "Cerrando: no cierres la ventana hasta que termine la copia."
     Stop-Api $api
