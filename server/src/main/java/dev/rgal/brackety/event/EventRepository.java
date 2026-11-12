@@ -37,6 +37,10 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
             nativeQuery = true)
     boolean hasStartedMatches(UUID eventId);
 
+    // Native so this package does not depend on league, which depends on it.
+    @Query(value = "select name from league where id = :leagueId", nativeQuery = true)
+    String leagueName(UUID leagueId);
+
     @Query(value = "select exists(select 1 from fight_group where mat_id in (:matIds))", nativeQuery = true)
     boolean hasGroupsOnMats(Collection<UUID> matIds);
 }

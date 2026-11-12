@@ -8,7 +8,7 @@ import java.util.UUID;
 /**
  * An event where the caller has a role; {@code matId} is set for a referee with a mat.
  * {@code maxGroupsPerMat}: how many groups a helper can send to a mat at once.
- * {@code leagueId} and {@code phaseNumber}: the league the event is a phase of.
+ * {@code leagueId}, {@code leagueName} and {@code phaseNumber}: the league the event is a phase of.
  */
 public record MyEventResponse(
         UUID id,
@@ -19,4 +19,5 @@ public record MyEventResponse(
         UUID matId,
         Integer matNumber,
         UUID leagueId,
+        String leagueName,
         int phaseNumber) {}
