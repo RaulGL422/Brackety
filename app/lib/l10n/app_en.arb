@@ -736,5 +736,13 @@
   "recordOneHand": "{count, plural, =1{1 one-hand} other{{count} one-hand}}",
   "recordDisqualified": "Disqualified",
   "recordRivalDisqualified": "Rival disqualified",
-  "recordOpen": "See matches"
+  "recordOpen": "See matches",
+  "openLeague": "Open the league",
+  "podiumPreset": "{gold} gold · {silver} silver · {bronze} bronze",
+  "podiumOther": "Other",
+  "podiumAsGeneral": "As the general one ({podium})",
+  "podiumOwn": "Its own",
+  "podiumLess": "One less: {metal}",
+  "podiumMore": "One more: {metal}",
+  "leagueCategoryPodiumsHint": "Most use the general one; pick \"Its own\" only where other medals are given."
 }

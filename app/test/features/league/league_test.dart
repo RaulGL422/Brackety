@@ -6,6 +6,7 @@ import 'package:brackety/features/events/ui/events_screen.dart';
 import 'package:brackety/features/league/data/league_models.dart';
 import 'package:brackety/features/league/data/league_repository.dart';
 import 'package:brackety/features/league/state/league_providers.dart';
+import 'package:brackety/features/league/ui/league_settings_dialog.dart';
 import 'package:brackety/features/league/ui/league_tab.dart';
 import 'package:brackety/features/league/ui/phase_switcher.dart';
 import 'package:brackety/features/league/ui/reenrol_dialog.dart';
@@ -17,7 +18,24 @@ import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class FakeLeagueRepository extends Fake implements LeagueRepository {
+  FakeLeagueRepository([this.saved]);
+
   final reenrolled = <(List<String>, bool)>[];
+  final League? saved;
+  Podium? savedPodium;
+  List<CategoryPodium>? savedCategoryPodiums;
+
+  @override
+  Future<League> save(
+    String eventId, {
+    required String name,
+    required Podium podium,
+    required List<CategoryPodium> categoryPodiums,
+  }) async {
+    savedPodium = podium;
+    savedCategoryPodiums = categoryPodiums;
+    return saved!;
+  }
 
   @override
   Future<int> reenrol(
@@ -212,7 +230,10 @@ void main() {
         tester.getTopLeft(find.text('Liga Yoseikan · Fase 1')).dy,
         lessThan(tester.getTopLeft(find.text('Liga Yoseikan · Fase 2')).dy),
       );
-      expect(find.text('Club panel'), findsNWidgets(2));
+      // The club enters the league, then its phases; a helper still sees their phase.
+      expect(find.text('Open the league'), findsOneWidget);
+      expect(find.text('Club panel'), findsNothing);
+      expect(find.text('Make groups'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
@@ -232,7 +253,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Liga Yoseikan'), findsOneWidget);
-      expect(find.text('This phase'), findsOneWidget);
+      expect(find.text('This phase'), findsNothing);
       expect(find.textContaining('40 entries'), findsOneWidget);
       expect(find.text('Zoe Test'), findsOneWidget);
       expect(find.textContaining('P1: 30   P2: 15'), findsOneWidget);
@@ -250,6 +271,66 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  testWidgets(
+    'podiums are set with one tap, and a category only when it differs',
+    (tester) async {
+      setSize(tester, sizes['phone']!);
+      final repository = FakeLeagueRepository(league);
+      await tester.pumpWidget(
+        app(
+          Scaffold(
+            body: Builder(
+              builder: (context) => TextButton(
+                onPressed: () => showLeagueSettings(context, 'e2', league),
+                child: const Text('open'),
+              ),
+            ),
+          ),
+          overrides: [leagueRepositoryProvider.overrideWithValue(repository)],
+        ),
+      );
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+
+      // The league's 2·2·3 is no usual one: "Other" with its counters.
+      expect(
+        tester
+            .widget<ChoiceChip>(find.widgetWithText(ChoiceChip, 'Other'))
+            .selected,
+        isTrue,
+      );
+      await tester.tap(find.text('1 gold · 1 silver · 2 bronze'));
+      await tester.pumpAndSettle();
+      expect(find.text('As the general one (1·1·2)'), findsNWidgets(2));
+
+      await tester.ensureVisible(find.text('As the general one (1·1·2)').first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('As the general one (1·1·2)').first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Its own').last);
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(
+        find.text('1 gold · 1 silver · 1 bronze').last,
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('1 gold · 1 silver · 1 bronze').last);
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Save'));
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      final general = repository.savedPodium!;
+      expect((general.firsts, general.seconds, general.thirds), (1, 1, 2));
+      final own = repository.savedCategoryPodiums!.single;
+      expect(own.categoryName, '4-7');
+      expect(
+        (own.podium.firsts, own.podium.seconds, own.podium.thirds),
+        (1, 1, 1),
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets('re-entering a minor needs the guardians consent', (
     tester,

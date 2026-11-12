@@ -9,7 +9,6 @@ import '../../auth/ui/widgets/confirm_dialog.dart';
 import '../state/club_providers.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../events/state/events_providers.dart';
-import '../../league/ui/league_tab.dart';
 import '../../league/ui/phase_switcher.dart';
 import '../../offline/ui/import_ops_button.dart';
 import '../data/club_repository.dart';
@@ -38,7 +37,11 @@ class _ClubPanelScreenState extends ConsumerState<ClubPanelScreen> {
     final l10n = AppLocalizations.of(context);
     final eventName = ref.watch(myEventProvider(widget.eventId)).value?.name;
     return AdaptiveScaffold(
-      leading: UpButton(label: l10n.eventsTitle, fallback: '/'),
+      // A phase is entered from its league: back goes there.
+      leading: UpButton(
+        label: l10n.clubLeague,
+        fallback: '/leagues/${widget.eventId}',
+      ),
       leadingWidth: UpButton.leadingWidth(context),
       title: eventName ?? l10n.eventClubPanel,
       actions: [
@@ -65,10 +68,6 @@ class _ClubPanelScreenState extends ConsumerState<ClubPanelScreen> {
           icon: Icons.settings_outlined,
           label: l10n.clubSettings,
         ),
-        AdaptiveDestination(
-          icon: Icons.emoji_events_outlined,
-          label: l10n.clubLeague,
-        ),
       ],
       selectedIndex: _tab,
       onSelected: (i) => setState(() => _tab = i),
@@ -76,8 +75,7 @@ class _ClubPanelScreenState extends ConsumerState<ClubPanelScreen> {
         0 => StandingsTab(eventId: widget.eventId),
         1 => MatsTab(eventId: widget.eventId),
         2 => ParticipantsTab(eventId: widget.eventId),
-        3 => SettingsTab(eventId: widget.eventId),
-        _ => LeagueTab(eventId: widget.eventId),
+        _ => SettingsTab(eventId: widget.eventId),
       },
     );
   }

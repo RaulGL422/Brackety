@@ -3575,6 +3575,54 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Ver combates'**
   String get recordOpen;
+
+  /// No description provided for @openLeague.
+  ///
+  /// In es, this message translates to:
+  /// **'Abrir la liga'**
+  String get openLeague;
+
+  /// No description provided for @podiumPreset.
+  ///
+  /// In es, this message translates to:
+  /// **'{gold, plural, =1{1 oro} other{{gold} oros}} · {silver, plural, =1{1 plata} other{{silver} platas}} · {bronze, plural, =1{1 bronce} other{{bronze} bronces}}'**
+  String podiumPreset(int gold, int silver, int bronze);
+
+  /// No description provided for @podiumOther.
+  ///
+  /// In es, this message translates to:
+  /// **'Otro'**
+  String get podiumOther;
+
+  /// No description provided for @podiumAsGeneral.
+  ///
+  /// In es, this message translates to:
+  /// **'Como el general ({podium})'**
+  String podiumAsGeneral(String podium);
+
+  /// No description provided for @podiumOwn.
+  ///
+  /// In es, this message translates to:
+  /// **'Propio'**
+  String get podiumOwn;
+
+  /// No description provided for @podiumLess.
+  ///
+  /// In es, this message translates to:
+  /// **'Uno menos: {metal}'**
+  String podiumLess(String metal);
+
+  /// No description provided for @podiumMore.
+  ///
+  /// In es, this message translates to:
+  /// **'Uno más: {metal}'**
+  String podiumMore(String metal);
+
+  /// No description provided for @leagueCategoryPodiumsHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Casi todas usan el general; elige \"Propio\" solo en las que den otras medallas.'**
+  String get leagueCategoryPodiumsHint;
 }
 
 class _AppLocalizationsDelegate

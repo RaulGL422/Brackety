@@ -2145,4 +2145,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recordOpen => 'See matches';
+
+  @override
+  String get openLeague => 'Open the league';
+
+  @override
+  String podiumPreset(int gold, int silver, int bronze) {
+    return '$gold gold · $silver silver · $bronze bronze';
+  }
+
+  @override
+  String get podiumOther => 'Other';
+
+  @override
+  String podiumAsGeneral(String podium) {
+    return 'As the general one ($podium)';
+  }
+
+  @override
+  String get podiumOwn => 'Its own';
+
+  @override
+  String podiumLess(String metal) {
+    return 'One less: $metal';
+  }
+
+  @override
+  String podiumMore(String metal) {
+    return 'One more: $metal';
+  }
+
+  @override
+  String get leagueCategoryPodiumsHint =>
+      'Most use the general one; pick \"Its own\" only where other medals are given.';
 }

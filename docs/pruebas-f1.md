@@ -56,3 +56,14 @@ Pruebas de Claude antes del 14-11, centradas en el portátil, el offline y las r
 2. Con 4 elegidos, la casilla de fantasma convertía al 4.º en fantasma y al quitarla lo sacaba del grupo (Raul): bloqueada con 4.
 3. Peticiones de Raul en la ronda: número del marcador grande junto al nombre en móviles bajos; sin "recomendado" con un combate en curso; cancelar combate (tablero y marcador) y reabrir uno finalizado, con motivo y en la línea de tiempo; flecha de volver sin texto; campana con el iPhone en silencio (sesión de audio "playback", Safari 16.4+: **falta probarlo en un iPhone**).
 4. Desplegable de árbitro desbordado en 360 px con nombres largos (salió con los nombres del personal).
+5. Más peticiones de Raul (#88): reloj en el modo espectador del club; oro, plata y bronce y "1.º en 9-10" en Puntuaciones; ficha del alumno con sus combates, avisos y descalificaciones. Liga primero y podios de un toque en la PR #89.
+
+## Estado tras #88 (2026-11-12)
+- Estable para la F1: servidor `verify`, app (404 tests) y admin en verde; CI de `development` en verde; probado en el navegador a 360×640.
+- La carpeta del portátil (`dist/brackety-event`) se regenera desde `development` con `deploy/local/build-event-bundle.ps1` y se copia al portátil sin tocar `brackety-data`.
+
+### Pendiente antes del 14
+- Raul: probar la campana con el iPhone en silencio y los móviles reales en el punto de acceso del portátil.
+- Decidir las categorías con 3 inscritos (sin fantasma posible) y cargar las categorías reales.
+- Conocido sin arreglar: tras recargar la web vuelve a "Mis eventos" (dos toques para volver al marcador); la barra "Sin conexión" desplaza el marcador al aparecer.
+

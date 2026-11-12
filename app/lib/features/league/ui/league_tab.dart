@@ -133,14 +133,13 @@ class _Phases extends ConsumerWidget {
                 l10n.leaguePhaseEntries(phase.participants),
               ].join(' · '),
             ),
-            selected: phase.eventId == eventId,
-            trailing: phase.eventId == eventId
-                ? Text(l10n.leagueCurrentPhase)
-                : const Icon(Icons.chevron_right),
-            onTap:
-                phase.eventId == eventId || !clubPhases.contains(phase.eventId)
-                ? null
-                : () => context.go('/events/${phase.eventId}/club'),
+            // The league's own screen: every phase the account runs opens its panel.
+            trailing: clubPhases.contains(phase.eventId)
+                ? const Icon(Icons.chevron_right)
+                : null,
+            onTap: clubPhases.contains(phase.eventId)
+                ? () => context.push('/events/${phase.eventId}/club')
+                : null,
           ),
       ],
     );

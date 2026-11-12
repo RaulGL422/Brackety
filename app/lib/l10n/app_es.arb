@@ -1305,5 +1305,17 @@
   "recordOneHand": "{count, plural, =1{1 de una mano} other{{count} de una mano}}",
   "recordDisqualified": "Descalificado",
   "recordRivalDisqualified": "Rival descalificado",
-  "recordOpen": "Ver combates"
+  "recordOpen": "Ver combates",
+  "openLeague": "Abrir la liga",
+  "podiumPreset": "{gold, plural, =1{1 oro} other{{gold} oros}} · {silver, plural, =1{1 plata} other{{silver} platas}} · {bronze, plural, =1{1 bronce} other{{bronze} bronces}}",
+  "@podiumPreset": {"placeholders": {"gold": {"type": "int"}, "silver": {"type": "int"}, "bronze": {"type": "int"}}},
+  "podiumOther": "Otro",
+  "podiumAsGeneral": "Como el general ({podium})",
+  "@podiumAsGeneral": {"placeholders": {"podium": {"type": "String"}}},
+  "podiumOwn": "Propio",
+  "podiumLess": "Uno menos: {metal}",
+  "@podiumLess": {"placeholders": {"metal": {"type": "String"}}},
+  "podiumMore": "Uno más: {metal}",
+  "@podiumMore": {"placeholders": {"metal": {"type": "String"}}},
+  "leagueCategoryPodiumsHint": "Casi todas usan el general; elige \"Propio\" solo en las que den otras medallas."
 }
