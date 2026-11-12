@@ -1,6 +1,7 @@
 import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import '../../../core/async_view.dart';
 import '../../../core/reason_dialog.dart';
@@ -94,20 +95,7 @@ class _Detail extends ConsumerWidget {
         const SizedBox(height: AppSpacing.l),
         Text(l10n.eventMats, style: text.titleMedium),
         const SizedBox(height: AppSpacing.s),
-        Wrap(
-          spacing: AppSpacing.s,
-          runSpacing: AppSpacing.s,
-          children: [
-            for (final mat in event.mats)
-              Chip(
-                label: Text(
-                  mat.referee == null
-                      ? l10n.eventMatNoReferee(mat.number)
-                      : l10n.eventMatReferee(mat.number, mat.referee!),
-                ),
-              ),
-          ],
-        ),
+        for (final mat in event.mats) _MatPlan(mat: mat),
         const SizedBox(height: AppSpacing.l),
         Text(l10n.eventGroups, style: text.titleMedium),
         const SizedBox(height: AppSpacing.s),
@@ -176,6 +164,19 @@ class _GroupCard extends ConsumerWidget {
                 ),
               ],
             ),
+            Wrap(
+              spacing: AppSpacing.s,
+              runSpacing: AppSpacing.xs,
+              children: [
+                for (final member in group.members)
+                  Chip(
+                    avatar: member.ghost
+                        ? const Icon(Icons.blur_on, size: 18)
+                        : null,
+                    label: Text(sideName(l10n, member)),
+                  ),
+              ],
+            ),
             const Divider(),
             for (final match in group.matches)
               _MatchRow(eventId: eventId, match: match),
@@ -215,7 +216,6 @@ class _MatchRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final text = Theme.of(context).textTheme;
-    String side(AdminSide s) => s.name ?? l10n.matchTeam(s.teamNumber ?? 0);
     final status = match.inReview
         ? l10n.matchInReview
         : switch (match.status) {
@@ -234,8 +234,14 @@ class _MatchRow extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _Corner(color: CompetitorColor.red, name: side(match.red)),
-              _Corner(color: CompetitorColor.blue, name: side(match.blue)),
+              _Corner(
+                color: CompetitorColor.red,
+                name: sideName(l10n, match.red),
+              ),
+              _Corner(
+                color: CompetitorColor.blue,
+                name: sideName(l10n, match.blue),
+              ),
             ],
           ),
         ),
@@ -295,6 +301,99 @@ class _MatchRow extends ConsumerWidget {
           .resetMatch(match.id, reason),
       done: (_) => l10n.matchResetDone,
       notFound: l10n.eventChanged,
+    );
+  }
+}
+
+/// "Ana Prueba", "Team 2 (Ana, Bea, Carla)"; a ghost (or ghost member) says so.
+String sideName(AppLocalizations l10n, AdminSide side) {
+  final name = side.name != null
+      ? side.name!
+      : side.members.isEmpty
+      ? l10n.matchTeam(side.teamNumber ?? 0)
+      : l10n.teamWithMembers(
+          side.teamNumber ?? 0,
+          side.members
+              .map((m) => m.ghost ? l10n.ghostName(m.name) : m.name)
+              .join(', '),
+        );
+  return side.ghost ? l10n.ghostName(name) : name;
+}
+
+/// A mat, its referee and, folded, the order its pending matches would come up in.
+class _MatPlan extends StatelessWidget {
+  const _MatPlan({required this.mat});
+
+  final AdminMat mat;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final locale = Localizations.localeOf(context).toLanguageTag();
+    final text = Theme.of(context).textTheme;
+    return Card(
+      child: ExpansionTile(
+        title: Text(
+          mat.referee == null
+              ? l10n.eventMatNoReferee(mat.number)
+              : l10n.eventMatReferee(mat.number, mat.referee!),
+        ),
+        subtitle: Text(
+          mat.plan.isEmpty
+              ? l10n.planEmpty
+              : l10n.planSummary(
+                  mat.plan.length,
+                  DateFormat.Hm(locale).format(mat.plan.first.startsAt),
+                ),
+        ),
+        childrenPadding: const EdgeInsets.fromLTRB(
+          AppSpacing.m,
+          0,
+          AppSpacing.m,
+          AppSpacing.m,
+        ),
+        expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (mat.plan.isNotEmpty) Text(l10n.planHint, style: text.bodySmall),
+          for (final (i, p) in mat.plan.indexed)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: AppSpacing.m,
+                children: [
+                  SizedBox(
+                    width: 28,
+                    child: Text('${i + 1}', style: text.titleSmall),
+                  ),
+                  SizedBox(
+                    width: 48,
+                    child: Text(DateFormat.Hm(locale).format(p.startsAt)),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.groupTitle(p.groupNumber, p.category),
+                          style: text.bodySmall,
+                        ),
+                        _Corner(
+                          color: CompetitorColor.red,
+                          name: sideName(l10n, p.red),
+                        ),
+                        _Corner(
+                          color: CompetitorColor.blue,
+                          name: sideName(l10n, p.blue),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

@@ -46,8 +46,40 @@ class AdminEventControllerTest extends AdminApiTestBase {
                 .andExpect(jsonPath("$.groups[0].matches", hasSize(6)))
                 .andExpect(jsonPath("$.groups[0].matches[0].order").value(0))
                 .andExpect(jsonPath("$.groups[0].matches[0].status").value("PENDING"))
-                .andExpect(jsonPath("$.groups[0].matches[0].red.name").value("Peque0 Prueba"));
+                .andExpect(jsonPath("$.groups[0].matches[0].red.name").value("Peque0 Prueba"))
+                .andExpect(jsonPath("$.groups[0].members", hasSize(4)))
+                .andExpect(jsonPath("$.groups[0].members[0].name").value("Peque0 Prueba"))
+                .andExpect(jsonPath("$.groups[0].members[0].ghost").value(false))
+                // Nothing played yet: every match of both groups is in some mat's planned order.
+                .andExpect(jsonPath("$.mats[*].plan[*]", hasSize(12)))
+                .andExpect(jsonPath("$.mats[0].plan[0].startsAt").exists())
+                .andExpect(jsonPath("$.mats[0].plan[0].red.name").exists());
         admin(get("/api/v1/admin/events/" + UUID.randomUUID())).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void theGhostShowsInItsGroupAndInItsMatches() throws Exception {
+        var more = participants(9, "Otro");
+        var categoryId = jdbc.sql("select id from event_category where name = '9-10'")
+                .query(UUID.class)
+                .single();
+        // Three of them and, as ghost, someone who already competes in group 2.
+        call(
+                        post("/api/v1/events/" + eventId + "/groups").content("""
+                                {"categoryId":"%s","groups":[{"participantIds":["%s","%s","%s"],"ghostId":"%s"}]}""".formatted(
+                                        categoryId, more.get(0), more.get(1), more.get(2), older.get(0))),
+                        "ayudante1")
+                .andExpect(status().isCreated());
+
+        admin(get("/api/v1/admin/events/" + eventId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.groups[2].members", hasSize(4)))
+                .andExpect(jsonPath("$.groups[2].members[3].name").value("Mayor0 Prueba"))
+                .andExpect(jsonPath("$.groups[2].members[3].ghost").value(true))
+                .andExpect(jsonPath("$.groups[2].members[0].ghost").value(false))
+                .andExpect(jsonPath("$.groups[2].matches[?(@.blue.name == 'Mayor0 Prueba')].blue.ghost", hasSize(3)))
+                .andExpect(jsonPath("$.groups[1].matches[?(@.red.name == 'Mayor0 Prueba')].red.ghost")
+                        .value(org.hamcrest.Matchers.everyItem(org.hamcrest.Matchers.is(false))));
     }
 
     @Test

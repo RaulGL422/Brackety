@@ -36,6 +36,9 @@ class MatBoardSimulationTest extends EventApiTest {
     @Autowired
     ParticipantRepository participants;
 
+    @Autowired
+    MatPlanner planner;
+
     private final Map<String, String> tokens = new HashMap<>();
 
     @Test
@@ -59,6 +62,41 @@ class MatBoardSimulationTest extends EventApiTest {
                         .query(Integer.class)
                         .single())
                 .isEqualTo(18);
+    }
+
+    @Test
+    void theRefereesPlayEachMatInThePlannedOrderWhenAllGoesToTime() throws Exception {
+        var first = participants(4, 7);
+        var second = participants(3, 7);
+        var third = participants(4, 8);
+        createGroup("7-8", individual(first, null), 1);
+        // The ghost fights on mat 1 too: mat 2 has to wait for him at times.
+        createGroup("7-8", individual(second, first.get(0)), 2);
+        createGroup("7-8", individual(third, null), 1);
+        var planned = planner.plan(eventId);
+        var plannedStarts =
+                planned.get(matId(1)).stream().map(MatPlanner.Planned::startsAt).toList();
+
+        var playedOnMat = new HashMap<Integer, List<String>>();
+        for (int round = 0; round < 40; round++) {
+            for (var id : playRound(List.of(1, 2))) {
+                var mat = jdbc.sql(
+                                "select m.number from fight_match f join mat m on m.id = f.mat_id where f.id = ?::uuid")
+                        .param(id)
+                        .query(Integer.class)
+                        .single();
+                playedOnMat.computeIfAbsent(mat, k -> new ArrayList<>()).add(id);
+            }
+        }
+
+        for (var mat : List.of(1, 2)) {
+            assertThat(playedOnMat.get(mat))
+                    .as("mat %d", mat)
+                    .containsExactlyElementsOf(planned.get(matId(mat)).stream()
+                            .map(p -> p.matchId().toString())
+                            .toList());
+        }
+        assertThat(plannedStarts).hasSize(12).isSorted();
     }
 
     @Test

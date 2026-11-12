@@ -1507,6 +1507,36 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'La cuenta ha cambiado mientras tanto; se ha recargado.'**
   String get userChanged;
+
+  /// No description provided for @teamWithMembers.
+  ///
+  /// In es, this message translates to:
+  /// **'Equipo {number} ({members})'**
+  String teamWithMembers(int number, String members);
+
+  /// No description provided for @ghostName.
+  ///
+  /// In es, this message translates to:
+  /// **'{name} · fantasma'**
+  String ghostName(String name);
+
+  /// No description provided for @planEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'Nada pendiente'**
+  String get planEmpty;
+
+  /// No description provided for @planSummary.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 combate pendiente, empieza a las {time}} other{{count} combates pendientes, el primero a las {time}}}'**
+  String planSummary(int count, String time);
+
+  /// No description provided for @planHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Orden previsto de los combates recomendados si todo va según lo previsto (cada combate con su tiempo entero y el cambio). Las horas son estimadas.'**
+  String get planHint;
 }
 
 class _AppLocalizationsDelegate

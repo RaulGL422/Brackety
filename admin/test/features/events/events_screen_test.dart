@@ -20,6 +20,12 @@ class FakeEventsApi implements EventsApi {
     number: number,
     category: '4-6',
     matNumber: number,
+    members: const [
+      AdminSide(name: 'Leo Molina'),
+      AdminSide(name: 'Noa Vázquez'),
+      AdminSide(name: 'Ana Ruiz'),
+      AdminSide(name: 'Zoe Gil', ghost: true),
+    ],
     matches: [
       AdminMatch(
         id: '$id-m1',
@@ -35,7 +41,14 @@ class FakeEventsApi implements EventsApi {
         id: '$id-m2',
         order: 1,
         status: AdminMatchStatus.pending,
-        red: const AdminSide(teamNumber: 2),
+        red: const AdminSide(
+          teamNumber: 2,
+          members: [
+            AdminMember(name: 'Ana'),
+            AdminMember(name: 'Bea'),
+            AdminMember(name: 'Carla', ghost: true),
+          ],
+        ),
         blue: const AdminSide(teamNumber: 5),
         redScore: 0,
         blueScore: 0,
@@ -74,9 +87,23 @@ class FakeEventsApi implements EventsApi {
     date: DateTime(2026, 11, 14),
     ownerEmail: 'club1',
     entries: 75,
-    mats: const [
-      AdminMat(id: 'm1', number: 1, referee: 'arbitro1'),
-      AdminMat(id: 'm2', number: 2),
+    mats: [
+      AdminMat(
+        id: 'm1',
+        number: 1,
+        referee: 'arbitro1',
+        plan: [
+          AdminPlannedMatch(
+            matchId: 'g1-m2',
+            groupNumber: 1,
+            category: '4-6',
+            startsAt: DateTime(2026, 11, 14, 9, 30),
+            red: const AdminSide(name: 'Leo Molina'),
+            blue: const AdminSide(name: 'Zoe Gil', ghost: true),
+          ),
+        ],
+      ),
+      const AdminMat(id: 'm2', number: 2),
     ],
     groups: groups,
   );
@@ -147,8 +174,17 @@ void main() {
       expect(find.text('Mat 2: no referee'), findsOneWidget);
       expect(find.text('Group 1, 4-6'), findsOneWidget);
       expect(find.text('Leo Molina'), findsWidgets);
-      expect(find.text('Team 2'), findsWidgets);
+      expect(find.text('Team 2 (Ana, Bea, Carla · ghost)'), findsWidgets);
+      expect(find.text('Zoe Gil · ghost'), findsWidgets);
+      expect(find.text('Nothing pending'), findsOneWidget);
       expect(find.text('15–3'), findsWidgets);
+      expect(find.text('1 pending match, starting at 09:30'), findsOneWidget);
+
+      // Mat 1 unfolds the order its referee would get the matches in.
+      await tester.tap(find.text('Mat 1: arbitro1'));
+      await tester.pumpAndSettle();
+      expect(find.text('09:30'), findsOneWidget);
+      expect(find.text('Zoe Gil · ghost'), findsWidgets);
       expect(tester.takeException(), isNull);
 
       await tester.tap(find.byTooltip('Back to the events'));
