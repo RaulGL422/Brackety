@@ -2170,7 +2170,25 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String podiumPreset(int gold, int silver, int bronze) {
-    return '$gold oro · $silver plata · $bronze bronces';
+    String _temp0 = intl.Intl.pluralLogic(
+      gold,
+      locale: localeName,
+      other: '$gold oros',
+      one: '1 oro',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      silver,
+      locale: localeName,
+      other: '$silver platas',
+      one: '1 plata',
+    );
+    String _temp2 = intl.Intl.pluralLogic(
+      bronze,
+      locale: localeName,
+      other: '$bronze bronces',
+      one: '1 bronce',
+    );
+    return '$_temp0 · $_temp1 · $_temp2';
   }
 
   @override

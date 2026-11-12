@@ -3585,7 +3585,7 @@ abstract class AppLocalizations {
   /// No description provided for @podiumPreset.
   ///
   /// In es, this message translates to:
-  /// **'{gold} oro · {silver} plata · {bronze} bronces'**
+  /// **'{gold, plural, =1{1 oro} other{{gold} oros}} · {silver, plural, =1{1 plata} other{{silver} platas}} · {bronze, plural, =1{1 bronce} other{{bronze} bronces}}'**
   String podiumPreset(int gold, int silver, int bronze);
 
   /// No description provided for @podiumOther.
