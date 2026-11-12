@@ -80,7 +80,9 @@ class ScoreboardScreen extends ConsumerWidget {
             ),
             body: Column(
               children: [
-                const SyncStatusBar(),
+                // The finished view and errors still show it on top; the live scoreboard keeps it
+                // in the clock's room (see ClockBar.banner).
+                if (view == null || view.finished) const SyncStatusBar(),
                 Expanded(
                   child: AsyncView(
                     value: match,
@@ -265,6 +267,7 @@ class _Live extends StatelessWidget {
                         view: view,
                         onAction: onAction,
                         onAdjust: onAdjust,
+                        banner: const SyncStatusBar(),
                       ),
                     ),
                     corner(Side.blue),
@@ -278,6 +281,7 @@ class _Live extends StatelessWidget {
                     onAction: onAction,
                     onAdjust: onAdjust,
                     clockHeight: size.maxHeight * _clockShare,
+                    banner: const SyncStatusBar(),
                   ),
                   corner(Side.red),
                   corner(Side.blue),

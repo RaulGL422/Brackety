@@ -37,7 +37,27 @@ const _anySession = {
 const _anySessionPrefix = '/legal/';
 const _signedOutOnly = {'/login', '/register', '/register/sent'};
 
+/// Where a reload or a link meant to go, kept through the session check (and the sign-in when it
+/// is needed): only a path of this app, never another site.
+String? _target(Uri uri) {
+  final from = uri.queryParameters['from'];
+  if (from == null || !from.startsWith('/') || from.startsWith('//')) {
+    return null;
+  }
+  return from;
+}
+
+/// [location] as the `from` of a detour, unless it is the app's home: nothing to come back to.
+String _via(String detour, Uri location) {
+  final at = location.toString();
+  return at == '/' ? detour : '$detour?from=${Uri.encodeQueryComponent(at)}';
+}
+
 final routerProvider = Provider<GoRouter>((ref) {
+  // On the web the address follows every screen, also those opened with push: a reload comes
+  // back to the same screen (a referee to the scoreboard), not to the start.
+  GoRouter.optionURLReflectsImperativeAPIs = true;
+
   // The router asks for the session on every navigation; this tells it when to ask again.
   final sessionChanged = ValueNotifier(0);
   ref.listen(
@@ -53,11 +73,18 @@ final routerProvider = Provider<GoRouter>((ref) {
         return null;
       }
       return switch (ref.read(sessionProvider).status) {
-        SessionStatus.restoring => at == '/loading' ? null : '/loading',
+        SessionStatus.restoring =>
+          at == '/loading' ? null : _via('/loading', state.uri),
         SessionStatus.signedOut =>
-          _signedOutOnly.contains(at) ? null : '/login',
+          _signedOutOnly.contains(at)
+              ? null
+              : at == '/loading'
+              ? _via('/login', Uri.parse(_target(state.uri) ?? '/'))
+              : _via('/login', state.uri),
         SessionStatus.signedIn =>
-          _signedOutOnly.contains(at) || at == '/loading' ? '/' : null,
+          _signedOutOnly.contains(at) || at == '/loading'
+              ? _target(state.uri) ?? '/'
+              : null,
       };
     },
     routes: [

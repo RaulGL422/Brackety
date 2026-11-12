@@ -41,8 +41,6 @@ Pruebas de Claude antes del 14-11, centradas en el portátil, el offline y las r
 
 ## Abierto (para Raul)
 - **Categorías con 3 inscritos** (17-19, 20-25, 26+ en el escenario) no pueden formar grupo: el fantasma debe ser un 4.º de la misma categoría. Hoy: el club cambia a alguien de categoría. ¿Basta para el 14?
-- Tras recargar, la web vuelve a "Mis eventos", no al marcador (la URL no cambia al navegar). Dos toques para volver; sin pérdida.
-- La barra "Sin conexión" empuja el marcador 40 px hacia abajo al aparecer.
 - Bajar el reloj al mínimo con los botones deja una fracción de segundo: "Iniciar" lo acaba al momento (regla: el tiempo solo se agota corriendo).
 - El límite de 20 logins por minuto y por IP solo afectaría si muchos entran desde el mismo dispositivo.
 
@@ -65,5 +63,5 @@ Pruebas de Claude antes del 14-11, centradas en el portátil, el offline y las r
 ### Pendiente antes del 14
 - Raul: probar la campana con el iPhone en silencio y los móviles reales en el punto de acceso del portátil.
 - Decidir las categorías con 3 inscritos (sin fantasma posible) y cargar las categorías reales.
-- Conocido sin arreglar: tras recargar la web vuelve a "Mis eventos" (dos toques para volver al marcador); la barra "Sin conexión" desplaza el marcador al aparecer.
+- Arreglado tras #89: recargar la web vuelve a la misma pantalla (también tras iniciar sesión); la barra "Sin conexión" va en la franja del reloj y ya no mueve los botones del marcador.
 
