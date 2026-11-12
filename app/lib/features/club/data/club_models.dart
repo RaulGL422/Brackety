@@ -62,6 +62,7 @@ class EventSettings {
     required this.categories,
     required this.matchLength,
     required this.pointsLimit,
+    required this.attendancePoints,
     this.organizations = const [],
   });
 
@@ -83,6 +84,7 @@ class EventSettings {
       ],
       matchLength: Duration(seconds: json['matchSeconds'] as int),
       pointsLimit: json['pointsLimit'] as int,
+      attendancePoints: json['attendancePoints'] as int,
       organizations: [
         for (final o in json['organizations'] as List? ?? [])
           Organization.fromJson(o as Map<String, dynamic>),
@@ -103,6 +105,9 @@ class EventSettings {
 
   /// Points that end a match; a disqualification gives them to the rival.
   final int pointsLimit;
+
+  /// Points everyone in a group of this phase adds to the standings.
+  final int attendancePoints;
 
   /// The clubs taking part, in the order the club entered them.
   final List<Organization> organizations;

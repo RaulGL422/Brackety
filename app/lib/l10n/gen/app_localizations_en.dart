@@ -1968,4 +1968,8 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get settingsAttendanceHint =>
+      'Everyone competing in a group of this phase adds them to the standings. Changing them recalculates the standings.';
 }

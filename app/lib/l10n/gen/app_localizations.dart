@@ -3311,6 +3311,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'{count, plural, =1{1 inscrito} other{{count} inscritos}}'**
   String reenrolDone(int count);
+
+  /// No description provided for @settingsAttendanceHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Los suma a la clasificación quien compite en un grupo de esta fase. Al cambiarlos se recalcula la clasificación.'**
+  String get settingsAttendanceHint;
 }
 
 class _AppLocalizationsDelegate

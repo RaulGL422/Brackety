@@ -20,10 +20,10 @@ Liga cuyo cada fase es un minievento (caso real: Liga Yoseikan, 4 fases).
 - Mis eventos: una tarjeta por liga con sus fases en orden; cada fase con sus botones (panel del club, grupos, mi tapiz).
 - Panel del club: selector de fase arriba (si hay más de una) y pestaña **Liga**: fases (fecha, modalidad, inscritos), "Nueva fase" (nombre, fecha, modalidad, puntos de asistencia), clasificación acumulada por categoría con puntos por fase y medallas, CSV (web), y editar nombre y podios (general y por categoría).
 - Inscripciones: "Inscribir de otras fases" (búsqueda, seleccionar todos, consentimiento de tutores si hay menores).
-- Puntuaciones, Tapices, Inscripciones y Configuración siguen siendo de la fase abierta.
+- Puntuaciones, Tapices, Inscripciones y Configuración siguen siendo de la fase abierta. En Configuración, los puntos por asistir de la fase (0-100; recalculan la clasificación de la liga).
 
 ## Tests
 Reinscripción, agrupación por categoría/estatura/peso, acumulación entre fases, asistencia, semilla.
 
 ## Estado
-Servidor hecho (2026-11-11, `feat/league-phases`): liga con fases (cada evento es una fase; la F1 pasa a fase 1), nueva fase copiando configuración, reinscripción por persona, clasificación de liga (asistencia y puntos por fase) y podios por categoría. Pantallas en pruebas (2026-11-12, `feat/league-phases-front`): mis eventos por liga, selector de fase, pestaña Liga y reinscripción; falta la prueba a mano.
+Servidor hecho (2026-11-11, `feat/league-phases`): liga con fases (cada evento es una fase; la F1 pasa a fase 1), nueva fase copiando configuración, reinscripción por persona, clasificación de liga (asistencia y puntos por fase) y podios por categoría. Pantallas en pruebas (2026-11-12, `feat/league-phases-front`): mis eventos por liga, selector de fase, pestaña Liga y reinscripción (#81); puntos por asistir editables en Configuración; falta la prueba a mano.

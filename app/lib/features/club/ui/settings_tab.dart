@@ -10,6 +10,7 @@ import '../../../core/async_view.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../auth/ui/widgets/confirm_dialog.dart';
 import '../../events/state/events_providers.dart';
+import '../../league/state/league_providers.dart';
 import '../data/club_models.dart';
 import '../data/club_repository.dart';
 import '../state/club_providers.dart';
@@ -41,7 +42,12 @@ int? parsePointsLimit(String text) {
   return value == null || value < 1 || value > 99 ? null : value;
 }
 
-/// Event name and date, match length and points limit, mats with their referee, and the
+int? parseAttendancePoints(String text) {
+  final value = int.tryParse(text.trim());
+  return value == null || value < 0 || value > 100 ? null : value;
+}
+
+/// Event name and date, match length, points limit and attendance points, mats with their referee, and the
 /// categories.
 /// Every change saves on its own; a refused one goes back to what the server has.
 class SettingsTab extends ConsumerWidget {
@@ -79,6 +85,9 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
     text: formatMatchLength(_saved.matchLength),
   );
   late final _limit = TextEditingController(text: '${_saved.pointsLimit}');
+  late final _attendance = TextEditingController(
+    text: '${_saved.attendancePoints}',
+  );
   Timer? _nameTyping;
   var _saving = false;
   var _changedWhileSaving = false;
@@ -89,6 +98,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
     _name.dispose();
     _length.dispose();
     _limit.dispose();
+    _attendance.dispose();
     super.dispose();
   }
 
@@ -155,6 +165,21 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
             keyboardType: TextInputType.number,
             validator: (v) => parsePointsLimit(v ?? '') == null
                 ? l10n.settingsPointsLimitInvalid
+                : null,
+            onChanged: (_) => _typed(),
+            onFieldSubmitted: (_) => _save(),
+          ),
+          const SizedBox(height: AppSpacing.m),
+          TextFormField(
+            controller: _attendance,
+            decoration: InputDecoration(
+              labelText: l10n.leagueAttendancePoints,
+              helperText: l10n.settingsAttendanceHint,
+              helperMaxLines: 3,
+            ),
+            keyboardType: TextInputType.number,
+            validator: (v) => parseAttendancePoints(v ?? '') == null
+                ? l10n.leagueAttendanceInvalid
                 : null,
             onChanged: (_) => _typed(),
             onFieldSubmitted: (_) => _save(),
@@ -247,7 +272,13 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
     _nameTyping?.cancel();
     final length = parseMatchLength(_length.text);
     final limit = parsePointsLimit(_limit.text);
-    if (_name.text.trim().isEmpty || length == null || limit == null) return;
+    final attendance = parseAttendancePoints(_attendance.text);
+    if (_name.text.trim().isEmpty ||
+        length == null ||
+        limit == null ||
+        attendance == null) {
+      return;
+    }
     final rulesChanged =
         length != _saved.matchLength || limit != _saved.pointsLimit;
     if (_saving) {
@@ -269,10 +300,12 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
               matReferees: [..._matReferees],
               matchLength: length,
               pointsLimit: limit,
+              attendancePoints: attendance,
             );
       } while (_changedWhileSaving && mounted);
       ref
         ..invalidate(eventSettingsProvider(widget.eventId))
+        ..invalidate(leagueStandingsProvider(widget.eventId))
         ..invalidate(myEventsProvider)
         ..invalidate(matsOverviewProvider(widget.eventId))
         ..invalidate(participantsProvider(widget.eventId));
@@ -300,5 +333,6 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
     _matReferees = [..._saved.matReferees];
     _length.text = formatMatchLength(_saved.matchLength);
     _limit.text = '${_saved.pointsLimit}';
+    _attendance.text = '${_saved.attendancePoints}';
   });
 }
