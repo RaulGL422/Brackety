@@ -50,8 +50,12 @@ class _LeagueCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final text = Theme.of(context).textTheme;
     final single = phases.length == 1;
+    final clubPhase = phases
+        .where((p) => p.roles.contains(EventRole.club))
+        .lastOrNull;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.l),
@@ -62,6 +66,15 @@ class _LeagueCard extends StatelessWidget {
               single ? phases.single.name : phases.first.leagueName,
               style: text.titleLarge,
             ),
+            // The club enters the league first and opens its phases from there.
+            if (clubPhase != null) ...[
+              const SizedBox(height: AppSpacing.m),
+              FilledButton.icon(
+                icon: const Icon(Icons.emoji_events_outlined),
+                label: Text(l10n.openLeague),
+                onPressed: () => context.push('/leagues/${clubPhase.id}'),
+              ),
+            ],
             for (final (i, phase) in phases.indexed) ...[
               if (i > 0) const Divider(height: AppSpacing.xl),
               const SizedBox(height: AppSpacing.xs),
@@ -109,12 +122,6 @@ class _PhaseRow extends StatelessWidget {
                 onPressed: () => context.push(
                   '/mats/${event.matId}?number=${event.matNumber}',
                 ),
-              ),
-            if (event.roles.contains(EventRole.club))
-              FilledButton.icon(
-                icon: const Icon(Icons.dashboard_outlined),
-                label: Text(l10n.eventClubPanel),
-                onPressed: () => context.push('/events/${event.id}/club'),
               ),
           ],
         ),

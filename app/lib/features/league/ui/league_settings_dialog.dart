@@ -75,38 +75,25 @@ class _LeagueSettingsDialogState extends ConsumerState<_LeagueSettingsDialog> {
                 Text(l10n.leaguePodium, style: text.titleSmall),
                 Text(l10n.leaguePodiumHint, style: text.bodySmall),
                 const SizedBox(height: AppSpacing.s),
-                _PodiumFields(
+                _PodiumPicker(
                   podium: _podium,
                   onChanged: (p) => setState(() => _podium = p),
                 ),
                 if (widget.league.categoryNames.isNotEmpty) ...[
                   const SizedBox(height: AppSpacing.l),
                   Text(l10n.leagueCategoryPodiums, style: text.titleSmall),
-                  for (final category in widget.league.categoryNames) ...[
-                    CheckboxListTile(
-                      contentPadding: EdgeInsets.zero,
-                      controlAffinity: ListTileControlAffinity.leading,
-                      title: Text(category),
-                      subtitle: Text(l10n.leagueOwnPodium),
-                      value: _own.containsKey(category),
-                      onChanged: (own) => setState(
-                        () => own!
-                            ? _own[category] = _podium
-                            : _own.remove(category),
+                  Text(l10n.leagueCategoryPodiumsHint, style: text.bodySmall),
+                  for (final category in widget.league.categoryNames)
+                    _CategoryPodium(
+                      category: category,
+                      general: _podium,
+                      own: _own[category],
+                      onChanged: (p) => setState(
+                        () => p == null
+                            ? _own.remove(category)
+                            : _own[category] = p,
                       ),
                     ),
-                    if (_own[category] case final podium?)
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          left: AppSpacing.xl,
-                          bottom: AppSpacing.s,
-                        ),
-                        child: _PodiumFields(
-                          podium: podium,
-                          onChanged: (p) => setState(() => _own[category] = p),
-                        ),
-                      ),
-                  ],
                 ],
               ],
             ),
@@ -155,50 +142,188 @@ class _LeagueSettingsDialogState extends ConsumerState<_LeagueSettingsDialog> {
   }
 }
 
-/// How many golds, silvers and bronzes, 0 to 10 each.
-class _PodiumFields extends StatelessWidget {
-  const _PodiumFields({required this.podium, required this.onChanged});
+/// The usual podiums, one tap each: 1 gold, 1 silver and 1 bronze, or 1·1·2 (two bronzes, as in
+/// martial arts).
+const _presets = [
+  Podium(firsts: 1, seconds: 1, thirds: 1),
+  Podium(firsts: 1, seconds: 1, thirds: 2),
+];
+
+bool _same(Podium a, Podium b) =>
+    a.firsts == b.firsts && a.seconds == b.seconds && a.thirds == b.thirds;
+
+String _short(Podium p) => '${p.firsts}·${p.seconds}·${p.thirds}';
+
+/// The usual podiums as chips, or "Other" with a counter per metal.
+class _PodiumPicker extends StatefulWidget {
+  const _PodiumPicker({
+    super.key,
+    required this.podium,
+    required this.onChanged,
+  });
 
   final Podium podium;
   final ValueChanged<Podium> onChanged;
 
   @override
+  State<_PodiumPicker> createState() => _PodiumPickerState();
+}
+
+class _PodiumPickerState extends State<_PodiumPicker> {
+  late var _other = !_presets.any((p) => _same(p, widget.podium));
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    Widget field(String label, int value, Podium Function(int) change) =>
-        SizedBox(
-          width: 120,
-          child: DropdownButtonFormField<int>(
-            initialValue: value,
-            decoration: InputDecoration(labelText: label),
-            items: [
-              for (var i = 0; i <= 10; i++)
-                DropdownMenuItem(value: i, child: Text('$i')),
-            ],
-            onChanged: (v) => onChanged(change(v!)),
-          ),
-        );
-    return Wrap(
-      spacing: AppSpacing.m,
-      runSpacing: AppSpacing.s,
+    final podium = widget.podium;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        field(
-          l10n.medalGold,
-          podium.firsts,
-          (v) =>
+        Wrap(
+          spacing: AppSpacing.s,
+          runSpacing: AppSpacing.s,
+          children: [
+            for (final preset in _presets)
+              ChoiceChip(
+                label: Text(
+                  l10n.podiumPreset(
+                    preset.firsts,
+                    preset.seconds,
+                    preset.thirds,
+                  ),
+                ),
+                selected: !_other && _same(preset, podium),
+                onSelected: (_) {
+                  setState(() => _other = false);
+                  widget.onChanged(preset);
+                },
+              ),
+            ChoiceChip(
+              label: Text(l10n.podiumOther),
+              selected: _other,
+              onSelected: (_) => setState(() => _other = true),
+            ),
+          ],
+        ),
+        if (_other) ...[
+          const SizedBox(height: AppSpacing.s),
+          _Counter(
+            label: l10n.medalGold,
+            value: podium.firsts,
+            onChanged: (v) => widget.onChanged(
               Podium(firsts: v, seconds: podium.seconds, thirds: podium.thirds),
-        ),
-        field(
-          l10n.medalSilver,
-          podium.seconds,
-          (v) =>
+            ),
+          ),
+          _Counter(
+            label: l10n.medalSilver,
+            value: podium.seconds,
+            onChanged: (v) => widget.onChanged(
               Podium(firsts: podium.firsts, seconds: v, thirds: podium.thirds),
-        ),
-        field(
-          l10n.medalBronze,
-          podium.thirds,
-          (v) =>
+            ),
+          ),
+          _Counter(
+            label: l10n.medalBronze,
+            value: podium.thirds,
+            onChanged: (v) => widget.onChanged(
               Podium(firsts: podium.firsts, seconds: podium.seconds, thirds: v),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// One category: the general podium (most of them) or its own, said at a glance.
+class _CategoryPodium extends StatelessWidget {
+  const _CategoryPodium({
+    required this.category,
+    required this.general,
+    required this.own,
+    required this.onChanged,
+  });
+
+  final String category;
+  final Podium general;
+  final Podium? own;
+
+  /// Null: back to the general one.
+  final ValueChanged<Podium?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final own = this.own;
+    // Name over the choice: side by side they did not fit a phone.
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const SizedBox(height: AppSpacing.s),
+        Text(category, style: Theme.of(context).textTheme.titleSmall),
+        DropdownButton<bool>(
+          isExpanded: true,
+          value: own != null,
+          items: [
+            DropdownMenuItem(
+              value: false,
+              child: Text(l10n.podiumAsGeneral(_short(general))),
+            ),
+            DropdownMenuItem(value: true, child: Text(l10n.podiumOwn)),
+          ],
+          onChanged: (custom) => onChanged(custom! ? general : null),
+        ),
+        if (own != null)
+          Padding(
+            padding: const EdgeInsets.only(
+              left: AppSpacing.l,
+              bottom: AppSpacing.s,
+            ),
+            child: _PodiumPicker(
+              key: ValueKey(category),
+              podium: own,
+              onChanged: onChanged,
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// − value + for one metal, 0 to 10.
+class _Counter extends StatelessWidget {
+  const _Counter({
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final String label;
+  final int value;
+  final ValueChanged<int> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Row(
+      children: [
+        Expanded(child: Text(label)),
+        IconButton(
+          tooltip: l10n.podiumLess(label),
+          icon: const Icon(Icons.remove_circle_outline),
+          onPressed: value > 0 ? () => onChanged(value - 1) : null,
+        ),
+        SizedBox(
+          width: 32,
+          child: Text(
+            '$value',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ),
+        IconButton(
+          tooltip: l10n.podiumMore(label),
+          icon: const Icon(Icons.add_circle_outline),
+          onPressed: value < 10 ? () => onChanged(value + 1) : null,
         ),
       ],
     );
