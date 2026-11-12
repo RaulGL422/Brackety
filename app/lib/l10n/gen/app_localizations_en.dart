@@ -2079,4 +2079,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get watchClockStopped => 'Clock stopped';
+
+  @override
+  String placeInCategory(int place, String category, int age) {
+    return '#$place in $category · $age years';
+  }
 }

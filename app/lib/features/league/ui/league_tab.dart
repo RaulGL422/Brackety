@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/async_view.dart';
+import '../../../core/medal.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../club/data/club_repository.dart';
 import '../../club/ui/export_download.dart';
@@ -271,7 +272,7 @@ class _LeagueStandingTile extends StatelessWidget {
           Flexible(child: Text('${row.firstName} ${row.lastName}')),
           if (medal != null) ...[
             const SizedBox(width: AppSpacing.s),
-            _Medal(medal: medal),
+            MedalIcon(medal: medal),
           ],
         ],
       ),
@@ -288,29 +289,6 @@ class _LeagueStandingTile extends StatelessWidget {
       trailing: Text(
         l10n.standingsTotal(row.total),
         style: Theme.of(context).textTheme.titleLarge,
-      ),
-    );
-  }
-}
-
-class _Medal extends StatelessWidget {
-  const _Medal({required this.medal});
-
-  final int medal;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final (label, color) = switch (medal) {
-      1 => (l10n.medalGold, const Color(0xFFC9A227)),
-      2 => (l10n.medalSilver, const Color(0xFF9EA4AA)),
-      _ => (l10n.medalBronze, const Color(0xFFB0703C)),
-    };
-    return Tooltip(
-      message: label,
-      child: Semantics(
-        label: label,
-        child: Icon(Icons.military_tech, color: color),
       ),
     );
   }

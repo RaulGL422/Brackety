@@ -3491,6 +3491,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Reloj parado'**
   String get watchClockStopped;
+
+  /// No description provided for @placeInCategory.
+  ///
+  /// In es, this message translates to:
+  /// **'{place}.º en {category} · {age} años'**
+  String placeInCategory(int place, String category, int age);
 }
 
 class _AppLocalizationsDelegate

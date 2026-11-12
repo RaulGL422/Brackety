@@ -722,5 +722,6 @@
   "matQueued": "Pending",
   "keepMatch": "Keep the match",
   "watchClockRunning": "Clock running",
-  "watchClockStopped": "Clock stopped"
+  "watchClockStopped": "Clock stopped",
+  "placeInCategory": "#{place} in {category} · {age} years"
 }

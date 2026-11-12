@@ -1287,5 +1287,7 @@
   "matQueued": "Pendientes",
   "keepMatch": "Seguir con el combate",
   "watchClockRunning": "Reloj en marcha",
-  "watchClockStopped": "Reloj parado"
+  "watchClockStopped": "Reloj parado",
+  "placeInCategory": "{place}.º en {category} · {age} años",
+  "@placeInCategory": {"placeholders": {"place": {"type": "int"}, "category": {"type": "String"}, "age": {"type": "int"}}}
 }

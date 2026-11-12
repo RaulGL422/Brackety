@@ -2098,4 +2098,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get watchClockStopped => 'Reloj parado';
+
+  @override
+  String placeInCategory(int place, String category, int age) {
+    return '$place.º en $category · $age años';
+  }
 }

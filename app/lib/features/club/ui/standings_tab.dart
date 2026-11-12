@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/async_view.dart';
+import '../../../core/medal.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../data/club_models.dart';
 import '../state/club_providers.dart';
@@ -106,15 +107,17 @@ class _StandingTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final ageCategory = l10n.participantAgeCategory(
-      row.age,
+    // The place is within the category, so the category is said once, with it.
+    final placeAge = l10n.placeInCategory(
+      row.position,
       row.categoryName ?? l10n.noCategory,
+      row.age,
     );
     return ListTile(
-      leading: CircleAvatar(child: Text('${row.position}')),
+      leading: PlaceBadge(place: row.position),
       title: Text('${row.firstName} ${row.lastName}'),
       subtitle: Text(
-        '${row.teamNumber == null ? ageCategory : l10n.standingTeam(l10n.teamName(row.teamNumber!), ageCategory)}\n'
+        '${row.teamNumber == null ? placeAge : l10n.standingTeam(l10n.teamName(row.teamNumber!), placeAge)}\n'
         '${l10n.standingsDetail(row.attendancePoints, row.matchPoints, row.matches)}',
       ),
       isThreeLine: true,

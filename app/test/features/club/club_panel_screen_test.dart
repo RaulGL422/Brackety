@@ -292,6 +292,8 @@ void main() {
 
       expect(find.text('Fase 1'), findsOneWidget);
       expect(top(tester, 'Zoe Test'), lessThan(top(tester, 'Ana Test')));
+      // The podium in metal, and in words too.
+      expect(find.byTooltip('Gold'), findsWidgets);
 
       await tester.tap(find.text('Name'));
       await tester.pumpAndSettle();
@@ -764,7 +766,10 @@ void main() {
       ],
     );
 
-    expect(find.textContaining('Team 2 · 15 years · 15-16'), findsOneWidget);
+    expect(
+      find.textContaining(RegExp(r'Team 2 · #\d+ in 15-16 · 15 years')),
+      findsOneWidget,
+    );
   });
 
   test('age counts whole years up to the day before the birthday', () {
