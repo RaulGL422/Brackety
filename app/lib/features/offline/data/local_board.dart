@@ -45,5 +45,6 @@ MatBoard localBoard(
     recommendedMatchId: board.offline ? null : recommended?.id,
     offline: board.offline,
     teamPool: board.teamPool,
+    eventId: board.eventId,
   );
 }

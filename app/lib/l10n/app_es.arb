@@ -1,4 +1,23 @@
 {
+  "cornerFightingNow": "Luchando en el tapiz {mat}",
+  "@cornerFightingNow": {"placeholders": {"mat": {"type": "int"}}},
+  "cornerFighting": "Luchando en el tapiz {mat} · libre hacia las {time}",
+  "@cornerFighting": {"placeholders": {"mat": {"type": "int"}, "time": {"type": "String"}}},
+  "cornerResting": "Descansando hasta las {time}",
+  "@cornerResting": {"placeholders": {"time": {"type": "String"}}},
+  "cornerPending": "{count, plural, =1{Le queda otro combate} other{Le quedan {count} combates}} en tapiz {mats}",
+  "@cornerPending": {"placeholders": {"count": {"type": "int"}, "mats": {"type": "String"}}},
+  "rulebookTitle": "Reglamento de la fase",
+  "rulebookHint": "El PDF con el reglamento completo. Los árbitros lo abren desde la pantalla de su tapiz, también en el portátil del pabellón (va dentro del paquete del evento).",
+  "rulebookNone": "Sin reglamento",
+  "rulebookUpload": "Subir PDF",
+  "rulebookReplace": "Cambiar PDF",
+  "rulebookOpen": "Ver reglamento",
+  "rulebookRemove": "Quitar",
+  "rulebookUploaded": "Reglamento subido",
+  "rulebookUploadError": "No se pudo subir: tiene que ser un PDF de hasta 10 MB.",
+  "rulebookRemoveError": "No se pudo quitar el reglamento.",
+  "rulebookOpenError": "No se pudo abrir el reglamento. Comprueba la conexión.",
   "@@locale": "es",
   "appTitle": "Brackety",
   "navConnection": "Conexión",
@@ -1181,17 +1200,20 @@
   },
   "leagueStandings": "Clasificación de la liga",
   "leagueStandingsCsv": "Descargar CSV",
-  "leaguePhasePoints": "F{number}: {points}",
+  "leaguePhasePoints": "Fase {number}: {total} ({attendance} por asistir + {matches} en combates)",
   "@leaguePhasePoints": {
     "placeholders": {
-      "number": {
-        "type": "int"
-      },
-      "points": {
-        "type": "String"
-      }
+      "number": {"type": "int"},
+      "total": {"type": "int"},
+      "attendance": {"type": "int"},
+      "matches": {"type": "int"}
     }
   },
+  "leaguePhaseAbsent": "Fase {number}: no inscrito",
+  "@leaguePhaseAbsent": {"placeholders": {"number": {"type": "int"}}},
+  "leagueNoPoints": "Sin puntos todavía: sin puesto",
+  "leagueCategoryHeader": "{category} · {count, plural, =1{1 persona} other{{count} personas}}",
+  "@leagueCategoryHeader": {"placeholders": {"category": {"type": "String"}, "count": {"type": "int"}}},
   "medalGold": "Oro",
   "medalSilver": "Plata",
   "medalBronze": "Bronce",

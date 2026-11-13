@@ -6,8 +6,11 @@ import dev.rgal.brackety.event.MatRepository;
 import dev.rgal.brackety.grouping.MatchDispatch.MatView;
 import dev.rgal.brackety.grouping.MatchRecommender.Candidate;
 import dev.rgal.brackety.grouping.MatchRecommender.Context;
+import dev.rgal.brackety.grouping.dto.MatBoardResponse.Corner;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -86,6 +89,32 @@ class MatFloor {
 
         Candidate candidate(Match m) {
             return MatFloor.candidate(m, groups.get(m.getGroupId()));
+        }
+
+        /** For one corner of a pending match: see {@link Corner}. */
+        Corner corner(Match m, UUID fighterId, Event event) {
+            var people = competitors.participants(fighterId);
+            Integer fightingOn = null;
+            var freeAt = context.readyAt(new Candidate(m.getId(), null, 0, 0, fighterId, fighterId));
+            var pendingMats = new ArrayList<Integer>();
+            for (var other : matches) {
+                if (other.getId().equals(m.getId())
+                        || Collections.disjoint(
+                                people, competitors.participants(other.getRedId(), other.getBlueId()))) {
+                    continue;
+                }
+                if (other.getStatus() == Match.Status.IN_PROGRESS) {
+                    fightingOn = matNumber(other.getMatId());
+                    var end = other.getStartedAt()
+                            .plusSeconds(event.matchSecondsFor(other.isTeamMatch()))
+                            .plus(context.minRest());
+                    freeAt = later(freeAt, end);
+                } else if (other.getStatus() == Match.Status.PENDING && other.getMatId() != null) {
+                    pendingMats.add(matNumber(other.getMatId()));
+                }
+            }
+            pendingMats.sort(Comparator.naturalOrder());
+            return new Corner(fightingOn, freeAt.isAfter(context.now()) ? freeAt : null, pendingMats);
         }
     }
 

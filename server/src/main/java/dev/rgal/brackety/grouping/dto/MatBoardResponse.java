@@ -16,7 +16,8 @@ public record MatBoardResponse(
         List<BoardGroup> groups,
         List<BoardMatch> matches,
         UUID recommendedMatchId,
-        boolean teamPool) {
+        boolean teamPool,
+        UUID eventId) {
 
     /**
      * A participant ({@code participantId}) or a team ({@code teamId}, {@code teamNumber}); {@code members}
@@ -49,5 +50,15 @@ public record MatBoardResponse(
             String waitReason,
             Instant readyAt,
             Integer otherMatNumber,
-            boolean pool) {}
+            boolean pool,
+            Corner redCorner,
+            Corner blueCorner) {}
+
+    /**
+     * Where a pending match's fighter (all of a team's people) is now, so the referee knows when to call them:
+     * {@code fightingOnMat} if one is fighting there, {@code freeAt} when all are free and rested (an estimate while
+     * fighting; null if they are already), {@code pendingMats} the mats where they still have other matches, one
+     * entry per match.
+     */
+    public record Corner(Integer fightingOnMat, Instant freeAt, List<Integer> pendingMats) {}
 }

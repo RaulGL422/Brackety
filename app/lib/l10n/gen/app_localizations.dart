@@ -98,6 +98,96 @@ abstract class AppLocalizations {
     Locale('es'),
   ];
 
+  /// No description provided for @cornerFightingNow.
+  ///
+  /// In es, this message translates to:
+  /// **'Luchando en el tapiz {mat}'**
+  String cornerFightingNow(int mat);
+
+  /// No description provided for @cornerFighting.
+  ///
+  /// In es, this message translates to:
+  /// **'Luchando en el tapiz {mat} · libre hacia las {time}'**
+  String cornerFighting(int mat, String time);
+
+  /// No description provided for @cornerResting.
+  ///
+  /// In es, this message translates to:
+  /// **'Descansando hasta las {time}'**
+  String cornerResting(String time);
+
+  /// No description provided for @cornerPending.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{Le queda otro combate} other{Le quedan {count} combates}} en tapiz {mats}'**
+  String cornerPending(int count, String mats);
+
+  /// No description provided for @rulebookTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Reglamento de la fase'**
+  String get rulebookTitle;
+
+  /// No description provided for @rulebookHint.
+  ///
+  /// In es, this message translates to:
+  /// **'El PDF con el reglamento completo. Los árbitros lo abren desde la pantalla de su tapiz, también en el portátil del pabellón (va dentro del paquete del evento).'**
+  String get rulebookHint;
+
+  /// No description provided for @rulebookNone.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin reglamento'**
+  String get rulebookNone;
+
+  /// No description provided for @rulebookUpload.
+  ///
+  /// In es, this message translates to:
+  /// **'Subir PDF'**
+  String get rulebookUpload;
+
+  /// No description provided for @rulebookReplace.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar PDF'**
+  String get rulebookReplace;
+
+  /// No description provided for @rulebookOpen.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver reglamento'**
+  String get rulebookOpen;
+
+  /// No description provided for @rulebookRemove.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar'**
+  String get rulebookRemove;
+
+  /// No description provided for @rulebookUploaded.
+  ///
+  /// In es, this message translates to:
+  /// **'Reglamento subido'**
+  String get rulebookUploaded;
+
+  /// No description provided for @rulebookUploadError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo subir: tiene que ser un PDF de hasta 10 MB.'**
+  String get rulebookUploadError;
+
+  /// No description provided for @rulebookRemoveError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo quitar el reglamento.'**
+  String get rulebookRemoveError;
+
+  /// No description provided for @rulebookOpenError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo abrir el reglamento. Comprueba la conexión.'**
+  String get rulebookOpenError;
+
   /// No description provided for @appTitle.
   ///
   /// In es, this message translates to:
@@ -3255,8 +3345,26 @@ abstract class AppLocalizations {
   /// No description provided for @leaguePhasePoints.
   ///
   /// In es, this message translates to:
-  /// **'F{number}: {points}'**
-  String leaguePhasePoints(int number, String points);
+  /// **'Fase {number}: {total} ({attendance} por asistir + {matches} en combates)'**
+  String leaguePhasePoints(int number, int total, int attendance, int matches);
+
+  /// No description provided for @leaguePhaseAbsent.
+  ///
+  /// In es, this message translates to:
+  /// **'Fase {number}: no inscrito'**
+  String leaguePhaseAbsent(int number);
+
+  /// No description provided for @leagueNoPoints.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin puntos todavía: sin puesto'**
+  String get leagueNoPoints;
+
+  /// No description provided for @leagueCategoryHeader.
+  ///
+  /// In es, this message translates to:
+  /// **'{category} · {count, plural, =1{1 persona} other{{count} personas}}'**
+  String leagueCategoryHeader(String category, int count);
 
   /// No description provided for @medalGold.
   ///

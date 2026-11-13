@@ -87,6 +87,33 @@ WaitReason? waitReasonFromJson(String? value) => switch (value) {
   _ => null,
 };
 
+/// Where a pending match's fighter (every person of a team) is now, so the referee knows when to
+/// call them: fighting on a mat, free at a time (an estimate while fighting; null if free now) and
+/// the mats where they still have other matches, one entry per match.
+class CornerState {
+  const CornerState({
+    this.fightingOnMat,
+    this.freeAt,
+    this.pendingMats = const [],
+  });
+
+  factory CornerState.fromJson(Map<String, dynamic> json) => CornerState(
+    fightingOnMat: json['fightingOnMat'] as int?,
+    freeAt: switch (json['freeAt']) {
+      final String at => DateTime.parse(at),
+      _ => null,
+    },
+    pendingMats: [for (final m in json['pendingMats'] as List? ?? []) m as int],
+  );
+
+  final int? fightingOnMat;
+  final DateTime? freeAt;
+  final List<int> pendingMats;
+}
+
+CornerState? _corner(Object? json) =>
+    json is Map<String, dynamic> ? CornerState.fromJson(json) : null;
+
 class BoardMatch {
   const BoardMatch({
     required this.id,
@@ -103,6 +130,8 @@ class BoardMatch {
     this.readyAt,
     this.otherMatNumber,
     this.pool = false,
+    this.redCorner,
+    this.blueCorner,
   });
 
   factory BoardMatch.fromJson(Map<String, dynamic> json) => BoardMatch(
@@ -123,6 +152,8 @@ class BoardMatch {
     },
     otherMatNumber: json['otherMatNumber'] as int?,
     pool: json['pool'] as bool? ?? false,
+    redCorner: _corner(json['redCorner']),
+    blueCorner: _corner(json['blueCorner']),
   );
 
   final String id;
@@ -152,6 +183,10 @@ class BoardMatch {
   /// A team match from the pool shared by the mats without individual matches.
   final bool pool;
 
+  /// Pending: where each fighter is now (null from an older server).
+  final CornerState? redCorner;
+  final CornerState? blueCorner;
+
   BoardMatch copyWith({
     MatchStatus? status,
     int? redScore,
@@ -173,6 +208,8 @@ class BoardMatch {
     readyAt: readyAt,
     otherMatNumber: otherMatNumber,
     pool: pool,
+    redCorner: redCorner,
+    blueCorner: blueCorner,
   );
 }
 
@@ -184,6 +221,7 @@ class MatBoard {
     this.recommendedMatchId,
     this.offline = false,
     this.teamPool = false,
+    this.eventId,
   });
 
   factory MatBoard.fromJson(Map<String, dynamic> json) => MatBoard(
@@ -198,6 +236,7 @@ class MatBoard {
     ],
     recommendedMatchId: json['recommendedMatchId'] as String?,
     teamPool: json['teamPool'] as bool? ?? false,
+    eventId: json['eventId'] as String?,
   );
 
   final int matNumber;
@@ -210,4 +249,7 @@ class MatBoard {
 
   /// No individual match is pending here: the mat takes team matches from the shared pool.
   final bool teamPool;
+
+  /// The phase: its rulebook opens from the mat. Null in a board cached before it was sent.
+  final String? eventId;
 }

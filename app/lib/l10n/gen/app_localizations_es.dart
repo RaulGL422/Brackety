@@ -10,6 +10,68 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
+  String cornerFightingNow(int mat) {
+    return 'Luchando en el tapiz $mat';
+  }
+
+  @override
+  String cornerFighting(int mat, String time) {
+    return 'Luchando en el tapiz $mat · libre hacia las $time';
+  }
+
+  @override
+  String cornerResting(String time) {
+    return 'Descansando hasta las $time';
+  }
+
+  @override
+  String cornerPending(int count, String mats) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Le quedan $count combates',
+      one: 'Le queda otro combate',
+    );
+    return '$_temp0 en tapiz $mats';
+  }
+
+  @override
+  String get rulebookTitle => 'Reglamento de la fase';
+
+  @override
+  String get rulebookHint =>
+      'El PDF con el reglamento completo. Los árbitros lo abren desde la pantalla de su tapiz, también en el portátil del pabellón (va dentro del paquete del evento).';
+
+  @override
+  String get rulebookNone => 'Sin reglamento';
+
+  @override
+  String get rulebookUpload => 'Subir PDF';
+
+  @override
+  String get rulebookReplace => 'Cambiar PDF';
+
+  @override
+  String get rulebookOpen => 'Ver reglamento';
+
+  @override
+  String get rulebookRemove => 'Quitar';
+
+  @override
+  String get rulebookUploaded => 'Reglamento subido';
+
+  @override
+  String get rulebookUploadError =>
+      'No se pudo subir: tiene que ser un PDF de hasta 10 MB.';
+
+  @override
+  String get rulebookRemoveError => 'No se pudo quitar el reglamento.';
+
+  @override
+  String get rulebookOpenError =>
+      'No se pudo abrir el reglamento. Comprueba la conexión.';
+
+  @override
   String get appTitle => 'Brackety';
 
   @override
@@ -1948,8 +2010,27 @@ class AppLocalizationsEs extends AppLocalizations {
   String get leagueStandingsCsv => 'Descargar CSV';
 
   @override
-  String leaguePhasePoints(int number, String points) {
-    return 'F$number: $points';
+  String leaguePhasePoints(int number, int total, int attendance, int matches) {
+    return 'Fase $number: $total ($attendance por asistir + $matches en combates)';
+  }
+
+  @override
+  String leaguePhaseAbsent(int number) {
+    return 'Fase $number: no inscrito';
+  }
+
+  @override
+  String get leagueNoPoints => 'Sin puntos todavía: sin puesto';
+
+  @override
+  String leagueCategoryHeader(String category, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count personas',
+      one: '1 persona',
+    );
+    return '$category · $_temp0';
   }
 
   @override

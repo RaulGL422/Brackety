@@ -70,3 +70,5 @@ Las de octubre de 2026, en `decisiones-2026-10.md`.
 - 2026-11-13 · Descanso mínimo por alumno entre combates en cualquier tapiz (30 s, configurable en la fase); hasta entonces el combate sale "Descansando" · pedido por Raul.
 - 2026-11-13 · Ayudantes sin red: listas guardadas en el dispositivo y equipos/grupos en cola que se envían al volver (si choca, se descarta y se avisa); sin red las pantallas leen lo guardado al instante y un sondeo ligero cada 3 s detecta la vuelta · pedido por Raul.
 - 2026-11-13 · La F1 usa 3 tapices con 3 árbitros: se configura en el evento (quitar tapices 4 y 5); la demo sigue con 5 · aviso de la organización.
+- 2026-11-13 · Reglamento en PDF por fase: lo sube el club en Configuración (hasta 10 MB), viaja en el paquete al portátil y el árbitro lo abre desde su tapiz con el visor del navegador (en el móvil, la app de PDF) · pedido por Raul.
+- 2026-11-13 · Clasificación de la liga: un apartado por categoría (los puestos cuentan dentro de cada una), sin puesto con 0 puntos y con el desglose asistencia + combates por fase · pedido por Raul.

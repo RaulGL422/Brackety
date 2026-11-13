@@ -10,6 +10,68 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String cornerFightingNow(int mat) {
+    return 'Fighting on mat $mat';
+  }
+
+  @override
+  String cornerFighting(int mat, String time) {
+    return 'Fighting on mat $mat · free around $time';
+  }
+
+  @override
+  String cornerResting(String time) {
+    return 'Resting until $time';
+  }
+
+  @override
+  String cornerPending(int count, String mats) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count more matches',
+      one: 'One more match',
+    );
+    return '$_temp0 on mat $mats';
+  }
+
+  @override
+  String get rulebookTitle => 'Phase rulebook';
+
+  @override
+  String get rulebookHint =>
+      'The PDF with the full rulebook. Referees open it from their mat screen, also on the sports hall laptop (it travels in the event package).';
+
+  @override
+  String get rulebookNone => 'No rulebook';
+
+  @override
+  String get rulebookUpload => 'Upload PDF';
+
+  @override
+  String get rulebookReplace => 'Replace PDF';
+
+  @override
+  String get rulebookOpen => 'Open rulebook';
+
+  @override
+  String get rulebookRemove => 'Remove';
+
+  @override
+  String get rulebookUploaded => 'Rulebook uploaded';
+
+  @override
+  String get rulebookUploadError =>
+      'Could not upload: it must be a PDF of up to 10 MB.';
+
+  @override
+  String get rulebookRemoveError => 'Could not remove the rulebook.';
+
+  @override
+  String get rulebookOpenError =>
+      'Could not open the rulebook. Check the connection.';
+
+  @override
   String get appTitle => 'Brackety';
 
   @override
@@ -1930,8 +1992,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get leagueStandingsCsv => 'Download CSV';
 
   @override
-  String leaguePhasePoints(int number, String points) {
-    return 'P$number: $points';
+  String leaguePhasePoints(int number, int total, int attendance, int matches) {
+    return 'Phase $number: $total ($attendance for attending + $matches in matches)';
+  }
+
+  @override
+  String leaguePhaseAbsent(int number) {
+    return 'Phase $number: not entered';
+  }
+
+  @override
+  String get leagueNoPoints => 'No points yet: no place';
+
+  @override
+  String leagueCategoryHeader(String category, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count people',
+      one: '1 person',
+    );
+    return '$category · $_temp0';
   }
 
   @override

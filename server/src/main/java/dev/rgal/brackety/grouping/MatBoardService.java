@@ -1,5 +1,6 @@
 package dev.rgal.brackety.grouping;
 
+import dev.rgal.brackety.event.Event;
 import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventCategory;
 import dev.rgal.brackety.event.EventCategoryRepository;
@@ -131,14 +132,18 @@ class MatBoardService {
                                         .toList(),
                                 labels.get(g.getCreatedBy())))
                         .toList(),
-                onMat.stream().map(m -> boardMatch(floor, matId, m, fighter)).toList(),
+                onMat.stream()
+                        .map(m -> boardMatch(event, floor, matId, m, fighter))
+                        .toList(),
                 recommended,
-                teamPool);
+                teamPool,
+                mat.getEventId());
     }
 
     private static BoardMatch boardMatch(
-            MatFloor.Floor floor, UUID matId, Match m, BiFunction<UUID, UUID, Fighter> fighter) {
-        var wait = m.getStatus() == Match.Status.PENDING ? floor.waitOf(m, matId) : null;
+            Event event, MatFloor.Floor floor, UUID matId, Match m, BiFunction<UUID, UUID, Fighter> fighter) {
+        var pending = m.getStatus() == Match.Status.PENDING;
+        var wait = pending ? floor.waitOf(m, matId) : null;
         return new BoardMatch(
                 m.getId(),
                 m.getGroupId(),
@@ -157,7 +162,9 @@ class MatBoardService {
                 wait == MatFloor.Wait.OTHER_MAT
                         ? floor.proposedTo(m).map(floor::matNumber).orElse(null)
                         : null,
-                m.getMatId() == null);
+                m.getMatId() == null,
+                pending ? floor.corner(m, m.getRedId(), event) : null,
+                pending ? floor.corner(m, m.getBlueId(), event) : null);
     }
 
     private static Fighter fighter(Competitor c, boolean ghost) {

@@ -2,6 +2,7 @@ package dev.rgal.brackety.grouping;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -163,7 +164,14 @@ class TeamControllerTest extends EventApiTest {
 
         call(get("/api/v1/mats/" + matId(2) + "/board"), "arbitro2")
                 .andExpect(jsonPath("$.matches[?(@.order == 1)].available", contains(false)))
-                .andExpect(jsonPath("$.matches[?(@.order == 0)].available", contains(true)));
+                .andExpect(jsonPath("$.matches[?(@.order == 0)].available", contains(true)))
+                // The referee sees where the ghost team is and when it will be free: 12 on mat 1 (1:00 + 30 s
+                // of rest), and 12 and 9 still have 4 matches there.
+                .andExpect(jsonPath("$.matches[?(@.order == 1)].*.fightingOnMat", hasItem(1)))
+                .andExpect(jsonPath(
+                        "$.matches[?(@.order == 1)].*.freeAt",
+                        hasItem(clock.instant().plusSeconds(90).toString())))
+                .andExpect(jsonPath("$.matches[?(@.order == 1)].*.pendingMats", hasItem(List.of(1, 1, 1, 1))));
     }
 
     @Test
