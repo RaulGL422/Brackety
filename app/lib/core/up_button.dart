@@ -3,15 +3,17 @@ import 'package:go_router/go_router.dart';
 
 import '../l10n/gen/app_localizations.dart';
 
-/// The way back, always visible and saying where it goes ("‹ Tapiz 1"). On the web a reload
-/// or a shared link opens a screen with nothing behind it: then it goes to [fallback] instead
-/// of disappearing, so nobody is left without a way out.
+/// The way back, always visible: an arrow, with where it goes in its tooltip and for screen
+/// readers ("Volver a Tapiz 1"). Only the arrow: a label took the room of the screen's title on
+/// small phones. On the web a reload or a shared link opens a screen with nothing behind it: then
+/// it goes to [fallback] instead of disappearing, so nobody is left without a way out.
 class UpButton extends StatelessWidget {
   const UpButton({
     super.key,
     required this.label,
     required this.fallback,
     this.isPlace = true,
+    this.onPressed,
   });
 
   final String label;
@@ -20,9 +22,11 @@ class UpButton extends StatelessWidget {
   final bool isPlace;
   final String fallback;
 
-  /// The AppBar room for the label: wide enough to read it, never more than a third of a phone.
-  static double leadingWidth(BuildContext context) =>
-      (MediaQuery.sizeOf(context).width * 0.4).clamp(96, 200);
+  /// Replaces the plain way back, for a screen that must do something before leaving.
+  final VoidCallback? onPressed;
+
+  /// The AppBar's usual room for one icon.
+  static double leadingWidth(BuildContext context) => kToolbarHeight;
 
   static void go(BuildContext context, String fallback) {
     final router = GoRouter.of(context);
@@ -35,33 +39,11 @@ class UpButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    // Inside an AppBar this is its foreground: also right on the dark band of the mat.
-    final color = IconTheme.of(context).color ?? theme.colorScheme.onSurface;
-    return Semantics(
-      button: true,
-      label: isPlace ? AppLocalizations.of(context).backTo(label) : label,
-      excludeSemantics: true,
-      child: InkWell(
-        onTap: () => go(context, fallback),
-        borderRadius: BorderRadius.circular(6),
-        child: Padding(
-          padding: const EdgeInsets.only(left: 4, right: 8),
-          child: Row(
-            children: [
-              Icon(Icons.chevron_left, size: 30, color: color),
-              Flexible(
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.titleSmall?.copyWith(color: color),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+    final where = isPlace ? AppLocalizations.of(context).backTo(label) : label;
+    return IconButton(
+      tooltip: where,
+      icon: const Icon(Icons.arrow_back),
+      onPressed: onPressed ?? () => go(context, fallback),
     );
   }
 }

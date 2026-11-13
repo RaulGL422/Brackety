@@ -11,12 +11,16 @@ enum MatchRefusal {
   notRunning,
   nothingToUndo,
   notOver,
+  notFinished,
   noPoints,
   clockRunning,
   clockLimit,
   notForAge,
   inReview,
   matBusy,
+
+  /// A fighter has not had the least rest since their last match.
+  resting,
 }
 
 /// [target]: for an UNDO, the entry it undoes. [delta]: for a CLOCK_ADJUST, the time added.
@@ -99,23 +103,40 @@ class TamboMatch {
         _runningSince = null;
         _lastUndoable = e;
       case MatchAction.warning:
-        _tallies[e.side]!.warnings++;
+        // Every second warning gives the rival a point; one-hand warnings count apart.
+        if (++_tallies[e.side]!.warnings % 2 == 0) _givePointToRival(e);
         _lastUndoable = e;
       case MatchAction.oneHandWarning:
-        // Every second one-hand warning gives the rival a point.
-        if (++_tallies[e.side]!.oneHandWarnings % 2 == 0) {
-          _tallies[_rival(e.side!)]!.points++;
-          _autoPointWarnings.add(e.id);
-        }
+        if (++_tallies[e.side]!.oneHandWarnings % 2 == 0) _givePointToRival(e);
         _lastUndoable = e;
       case MatchAction.disqualification:
         _disqualified = e.side;
         _lastUndoable = e;
       case MatchAction.finish:
         _finished = true;
+      case MatchAction.cancel:
+        _cancel();
+      case MatchAction.reopen:
+        _finished = false;
       case MatchAction.undo:
         throw ArgumentError('UNDO entries are never applied');
     }
+  }
+
+  // As if it had never started: nothing before it can be undone either.
+  void _cancel() {
+    for (final t in _tallies.values) {
+      t
+        ..points = 0
+        ..warnings = 0
+        ..oneHandWarnings = 0;
+    }
+    _autoPointWarnings.clear();
+    _elapsed = Duration.zero;
+    _runningSince = null;
+    _disqualified = null;
+    _started = false;
+    _lastUndoable = null;
   }
 
   static Side _rival(Side side) => side == Side.red ? Side.blue : Side.red;
@@ -145,20 +166,35 @@ class TamboMatch {
   bool isRunning(DateTime now) =>
       _runningSince != null && remainingAt(now) > Duration.zero;
 
+  void _givePointToRival(TamboEntry warning) {
+    _tallies[_rival(warning.side!)]!.points++;
+    _autoPointWarnings.add(warning.id);
+  }
+
+  /// [pointsLimit] 0: no limit (team matches).
+  bool get hasLimit => pointsLimit > 0;
+
   EndReason? endReason(DateTime now) {
     if (_disqualified != null) return EndReason.disqualification;
-    if (_tallies.values.any((t) => t.points >= pointsLimit)) {
+    if (hasLimit && _tallies.values.any((t) => t.points >= pointsLimit)) {
       return EndReason.points;
     }
     return remainingAt(now) == Duration.zero ? EndReason.time : null;
   }
 
-  /// A disqualification scores the points limit for the rival and 0 for the disqualified
-  /// fighter; the tally stays, so undoing it gives the points back.
+  /// What a disqualification gives the rival when there is no points limit, at least.
+  static const disqualificationPoints = 15;
+
+  /// A disqualification scores 0 for the disqualified fighter and the points limit for the
+  /// rival, or with no limit the rival's points but at least [disqualificationPoints]; the
+  /// tally stays, so undoing it gives the points back.
   int points(Side side) {
     final disqualified = _disqualified;
-    if (disqualified != null) return disqualified == side ? 0 : pointsLimit;
-    return _tallies[side]!.points;
+    if (disqualified == null) return _tallies[side]!.points;
+    if (disqualified == side) return 0;
+    if (hasLimit) return pointsLimit;
+    final own = _tallies[side]!.points;
+    return own > disqualificationPoints ? own : disqualificationPoints;
   }
 
   int warnings(Side side) => _tallies[side]!.warnings;
@@ -167,8 +203,10 @@ class TamboMatch {
   bool get started => _started;
   bool get finished => _finished;
   TamboEntry? get lastUndoable => _lastUndoable;
-  bool gaveAutoPoint(String oneHandWarningId) =>
-      _autoPointWarnings.contains(oneHandWarningId);
+
+  /// True for a warning (of either kind) that gave the rival a point.
+  bool gaveAutoPoint(String warningId) =>
+      _autoPointWarnings.contains(warningId);
 
   /// Why [action] cannot happen at [now], or null if it can. Checks only the match itself.
   /// [side]: for a point removed; [delta]: for a clock adjustment.
@@ -178,7 +216,9 @@ class TamboMatch {
     Side? side,
     Duration delta = Duration.zero,
   }) {
-    if (_finished) return MatchRefusal.finished;
+    if (_finished) {
+      return action == MatchAction.reopen ? null : MatchRefusal.finished;
+    }
     final end = endReason(now);
     final over = end != null;
     return switch (action) {
@@ -218,6 +258,8 @@ class TamboMatch {
       MatchAction.undo =>
         _lastUndoable == null ? MatchRefusal.nothingToUndo : null,
       MatchAction.finish => over ? null : MatchRefusal.notOver,
+      MatchAction.cancel => _started ? null : MatchRefusal.notStarted,
+      MatchAction.reopen => MatchRefusal.notFinished,
     };
   }
 }

@@ -9,7 +9,11 @@ class MyEvent {
     required this.roles,
     this.matId,
     this.matNumber,
-  });
+    String? leagueId,
+    String? leagueName,
+    this.phaseNumber = 1,
+  }) : leagueId = leagueId ?? id,
+       leagueName = leagueName ?? name;
 
   factory MyEvent.fromJson(Map<String, dynamic> json) => MyEvent(
     id: json['id'] as String,
@@ -21,6 +25,9 @@ class MyEvent {
     },
     matId: json['matId'] as String?,
     matNumber: json['matNumber'] as int?,
+    leagueId: json['leagueId'] as String?,
+    leagueName: json['leagueName'] as String?,
+    phaseNumber: json['phaseNumber'] as int? ?? 1,
   );
 
   final String id;
@@ -31,4 +38,9 @@ class MyEvent {
   /// The referee's mat, if any.
   final String? matId;
   final int? matNumber;
+
+  /// Each event is a phase of a league; one without league is phase 1 of its own.
+  final String leagueId;
+  final String leagueName;
+  final int phaseNumber;
 }

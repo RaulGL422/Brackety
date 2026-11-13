@@ -16,6 +16,11 @@ enum EventExport {
   participants('export/participants.csv', 'inscritos.csv', 'text/csv'),
   matches('export/matches.csv', 'combates.csv', 'text/csv'),
   timeline('export/timeline.csv', 'linea-de-tiempo.csv', 'text/csv'),
+  leagueStandings(
+    'export/league-standings.csv',
+    'clasificacion-liga.csv',
+    'text/csv',
+  ),
   full('export/full', 'evento.zip', 'application/zip');
 
   const EventExport(this.path, this.fallbackName, this.mimeType);
@@ -48,6 +53,10 @@ class ClubRepository {
     required List<String?> matReferees,
     required Duration matchLength,
     required int pointsLimit,
+    required int attendancePoints,
+    required Duration teamMatchLength,
+    required int teamPointsLimit,
+    required Duration minRest,
   }) async {
     final response = await _dio.put<Map<String, dynamic>>(
       '/api/v1/events/$eventId/settings',
@@ -59,10 +68,21 @@ class ClubRepository {
         'matReferees': matReferees,
         'matchSeconds': matchLength.inSeconds,
         'pointsLimit': pointsLimit,
+        'attendancePoints': attendancePoints,
+        'teamMatchSeconds': teamMatchLength.inSeconds,
+        'teamPointsLimit': teamPointsLimit,
+        'minRestSeconds': minRest.inSeconds,
       },
     );
     return EventSettings.fromJson(response.data!);
   }
+
+  /// The person behind a staff account in this event; blank removes it.
+  Future<void> saveStaffName(String eventId, String accountId, String name) =>
+      _dio.put<void>(
+        '/api/v1/events/$eventId/staff/$accountId/name',
+        data: {'name': name},
+      );
 
   /// The event's whole category list: those left out are removed.
   Future<List<EventCategory>> saveCategories(
@@ -139,6 +159,13 @@ class ClubRepository {
 
   Future<void> deleteParticipant(String eventId, String participantId) =>
       _dio.delete<void>('/api/v1/events/$eventId/participants/$participantId');
+
+  Future<ParticipantRecord> record(String eventId, String participantId) async {
+    final response = await _dio.get<Map<String, dynamic>>(
+      '/api/v1/events/$eventId/participants/$participantId/record',
+    );
+    return ParticipantRecord.fromJson(response.data!);
+  }
 
   Future<List<StandingRow>> standings(String eventId) async {
     final response = await _dio.get<List<dynamic>>(

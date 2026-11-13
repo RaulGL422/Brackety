@@ -29,6 +29,7 @@ class TamboMatchTest {
 
     private static final Instant T0 = Instant.parse("2027-03-10T09:00:00Z");
     private static final Rules RULES = new Rules(Duration.ofMinutes(2), 15);
+    private static final Rules TEAMS = new Rules(Duration.ofMinutes(3), 0);
 
     private final List<Entry> entries = new ArrayList<>();
 
@@ -96,6 +97,58 @@ class TamboMatchTest {
     }
 
     @Test
+    void everySecondWarningGivesTheRivalAPointApartFromOneHandWarnings() {
+        add(START, null, 0);
+        add(WARNING, RED, 5);
+        add(ONE_HAND_WARNING, RED, 6);
+        var second = add(WARNING, RED, 10);
+        add(WARNING, RED, 15);
+        var fourth = add(WARNING, RED, 20);
+
+        var match = replay();
+        assertThat(match.corner(RED)).isEqualTo(new Corner(0, 4, 1));
+        assertThat(match.corner(BLUE).points()).isEqualTo(2);
+        assertThat(match.gaveAutoPoint(second)).isTrue();
+        assertThat(match.gaveAutoPoint(fourth)).isTrue();
+
+        add(UNDO, null, 25, fourth);
+        assertThat(replay().corner(BLUE).points()).isOne();
+    }
+
+    @Test
+    void withNoPointsLimitOnlyTheTimeEndsAMatch() {
+        entries.add(new Entry(UUID.randomUUID(), START, null, at(0), null));
+        for (int i = 1; i <= 30; i++) {
+            add(POINT, RED, i);
+        }
+
+        var match = TamboMatch.replay(TEAMS, entries);
+        assertThat(match.corner(RED).points()).isEqualTo(30);
+        assertThat(match.endReason(at(31))).isEmpty();
+        assertThat(match.endReason(at(180))).contains(EndReason.TIME);
+    }
+
+    @Test
+    void withNoPointsLimitADisqualificationGivesTheRivalFifteenAtLeast() {
+        add(START, null, 0);
+        add(POINT, RED, 1);
+        add(POINT, RED, 2);
+        add(DISQUALIFICATION, BLUE, 3);
+        var match = TamboMatch.replay(TEAMS, entries);
+        assertThat(match.corner(RED).points()).isEqualTo(15);
+        assertThat(match.endReason(at(4))).contains(EndReason.DISQUALIFICATION);
+
+        entries.clear();
+        add(START, null, 0);
+        for (int i = 1; i <= 20; i++) {
+            add(POINT, RED, i);
+        }
+        add(DISQUALIFICATION, BLUE, 21);
+        assertThat(TamboMatch.replay(TEAMS, entries).corner(RED).points()).isEqualTo(20);
+        assertThat(TamboMatch.replay(TEAMS, entries).corner(BLUE).points()).isZero();
+    }
+
+    @Test
     void disqualificationEndsTheMatchUntilUndone() {
         add(START, null, 0);
         add(WARNING, BLUE, 3);
@@ -130,7 +183,7 @@ class TamboMatchTest {
     }
 
     @Test
-    void aFinishedMatchRefusesEverything() {
+    void aFinishedMatchRefusesEverythingButReopening() {
         add(START, null, 0);
         add(DISQUALIFICATION, RED, 1);
         add(FINISH, null, 2);
@@ -138,7 +191,11 @@ class TamboMatchTest {
         var match = replay();
         assertThat(match.isFinished()).isTrue();
         for (var type : MatchEventType.values()) {
-            assertThat(match.refuse(type, at(3))).contains("The match is finished.");
+            if (type == MatchEventType.REOPEN) {
+                assertThat(match.refuse(type, at(3))).isEmpty();
+            } else {
+                assertThat(match.refuse(type, at(3))).contains("The match is finished.");
+            }
         }
     }
 

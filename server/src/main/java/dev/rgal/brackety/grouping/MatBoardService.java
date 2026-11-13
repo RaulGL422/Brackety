@@ -1,7 +1,6 @@
 package dev.rgal.brackety.grouping;
 
-import dev.rgal.brackety.auth.account.Account;
-import dev.rgal.brackety.auth.account.AccountRepository;
+import dev.rgal.brackety.event.Event;
 import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventCategory;
 import dev.rgal.brackety.event.EventCategoryRepository;
@@ -10,20 +9,19 @@ import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.event.Mat;
 import dev.rgal.brackety.event.MatRepository;
-import dev.rgal.brackety.grouping.MatchRecommender.Candidate;
+import dev.rgal.brackety.event.StaffNames;
 import dev.rgal.brackety.grouping.dto.MatBoardResponse;
 import dev.rgal.brackety.grouping.dto.MatBoardResponse.BoardGroup;
 import dev.rgal.brackety.grouping.dto.MatBoardResponse.BoardMatch;
 import dev.rgal.brackety.grouping.dto.MatBoardResponse.Fighter;
+import dev.rgal.brackety.grouping.dto.MatBoardResponse.MatChoice;
 import dev.rgal.brackety.grouping.dto.MatOverview;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiFunction;
@@ -36,67 +34,89 @@ import org.springframework.transaction.annotation.Transactional;
 class MatBoardService {
 
     private final MatRepository mats;
-    private final FightGroupRepository groups;
     private final GroupMemberRepository members;
-    private final MatchRepository matches;
-    private final CompetitorDirectory directory;
+    private final MatFloor floor;
     private final EventCategoryRepository categories;
-    private final AccountRepository accounts;
     private final EventService events;
     private final EventAccess access;
     private final MatSchedule schedule;
     private final Clock clock;
+    private final StaffNames staffNames;
 
     MatBoardService(
             MatRepository mats,
-            FightGroupRepository groups,
             GroupMemberRepository members,
-            MatchRepository matches,
-            CompetitorDirectory directory,
+            MatFloor floor,
             EventCategoryRepository categories,
-            AccountRepository accounts,
             EventService events,
             EventAccess access,
             MatSchedule schedule,
-            Clock clock) {
+            Clock clock,
+            StaffNames staffNames) {
         this.mats = mats;
-        this.groups = groups;
         this.members = members;
-        this.matches = matches;
-        this.directory = directory;
+        this.floor = floor;
         this.categories = categories;
-        this.accounts = accounts;
         this.events = events;
         this.access = access;
         this.schedule = schedule;
         this.clock = clock;
+        this.staffNames = staffNames;
     }
 
-    /** Every mat of the event with its load and estimated end. */
+    /**
+     * Every mat of the event with its load and estimated end. Team matches of the pool count on the mat whose
+     * expected queue has them (as its board shows), and their groups too: before they start they have no mat.
+     */
     @Transactional(readOnly = true)
     List<MatOverview> overview(UUID eventId, UUID accountId) {
         access.require(eventId, accountId, EventRole.CLUB, EventRole.GROUPER);
         var now = clock.instant();
-        var states = schedule.states(events.get(eventId), now);
-        var referees = accounts
-                .findAllById(states.stream()
-                        .map(s -> s.mat().getRefereeAccountId())
-                        .filter(Objects::nonNull)
-                        .toList())
-                .stream()
-                .collect(Collectors.toMap(Account::getId, Account::getEmail));
+        var event = events.get(eventId);
+        var states = schedule.states(event, now);
+        var referees = staffNames.labels(eventId);
+        var floor = this.floor.load(event, now);
+        var plan = MatPlanner.simulate(event, floor, now);
+        var poolMatches = floor.matches().stream()
+                .filter(m -> m.getMatId() == null)
+                .collect(Collectors.toMap(Match::getId, Function.identity()));
         return states.stream()
-                .map(s -> new MatOverview(
-                        s.mat().getId(),
-                        s.mat().getNumber(),
-                        referees.get(s.mat().getRefereeAccountId()),
-                        s.groups(),
-                        s.pendingMatches(),
-                        s.matchInProgress(),
-                        s.matchesInReview(),
-                        s.remaining().toSeconds(),
-                        now.plus(s.remaining())))
+                .map(s -> {
+                    var planned = plan.getOrDefault(s.mat().getId(), List.of());
+                    var pool = planned.stream()
+                            .map(p -> poolMatches.get(p.matchId()))
+                            .filter(m -> m != null)
+                            .toList();
+                    var poolGroups = (int)
+                            pool.stream().map(Match::getGroupId).distinct().count();
+                    // With team matches of the pool, its queue ends when its last expected match does; never before
+                    // what
+                    // its own matches need.
+                    var remaining = pool.isEmpty()
+                            ? s.remaining()
+                            : max(
+                                    s.remaining(),
+                                    Duration.between(now, planned.getLast().startsAt())
+                                            .plus(MatFloor.slot(
+                                                    event,
+                                                    poolMatches.containsKey(
+                                                            planned.getLast().matchId()))));
+                    return new MatOverview(
+                            s.mat().getId(),
+                            s.mat().getNumber(),
+                            referees.get(s.mat().getRefereeAccountId()),
+                            s.groups() + poolGroups,
+                            s.pendingMatches() + pool.size(),
+                            s.matchInProgress(),
+                            s.matchesInReview(),
+                            remaining.toSeconds(),
+                            now.plus(remaining));
+                })
                 .toList();
+    }
+
+    private static Duration max(Duration a, Duration b) {
+        return a.compareTo(b) >= 0 ? a : b;
     }
 
     /** For the mat's referee and the club. */
@@ -107,67 +127,48 @@ class MatBoardService {
         var event = events.get(mat.getEventId());
         var now = clock.instant();
 
-        var matGroups = groups.findByMatIdOrderByNumber(matId);
+        var floor = this.floor.load(event, now);
+        var teamPool = floor.takesPool(matId);
+        // Each mat's own expected queue (Raul, 2026-11-13): its matches and the team matches it would take, in the
+        // order they would come up; recomputed on every change, so it moves only when reality does.
+        var plannedMat = new HashMap<UUID, UUID>();
+        var plannedAt = new HashMap<UUID, Instant>();
+        MatPlanner.simulate(event, floor, now)
+                .forEach((planMat, planned) -> planned.forEach(p -> {
+                    plannedMat.put(p.matchId(), planMat);
+                    plannedAt.put(p.matchId(), p.startsAt());
+                }));
+        var onMat = floor.matches().stream()
+                .filter(m -> matId.equals(m.getMatId())
+                        || (m.getMatId() == null
+                                && (matId.equals(plannedMat.get(m.getId()))
+                                        || (teamPool && !plannedMat.containsKey(m.getId())))))
+                .sorted(Comparator.comparing((Match m) -> plannedAt.getOrDefault(m.getId(), Instant.MAX))
+                        .thenComparingInt(
+                                m -> floor.groups().get(m.getGroupId()).getNumber())
+                        .thenComparingInt(Match::getOrderIndex))
+                .toList();
+        var shownGroups = onMat.stream().map(Match::getGroupId).collect(Collectors.toSet());
+        var matGroups = floor.groups().values().stream()
+                .filter(g -> matId.equals(g.getMatId()) || shownGroups.contains(g.getId()))
+                .sorted(Comparator.comparingInt(FightGroup::getNumber))
+                .toList();
         var groupById = matGroups.stream().collect(Collectors.toMap(FightGroup::getId, Function.identity()));
         var groupMembers = members.findByGroupIdInOrderByPosition(groupById.keySet());
         var ghosts = groupMembers.stream()
                 .filter(GroupMember::isGhost)
-                .collect(Collectors.toMap(GroupMember::getGroupId, GroupMember::getCompetitorId));
-        var competitors = directory.of(event.getId());
+                .collect(Collectors.groupingBy(
+                        GroupMember::getGroupId, Collectors.mapping(GroupMember::getCompetitorId, Collectors.toSet())));
+        var competitors = floor.competitors();
         var categoryNames = categories.findByEventIdOrderByMinAge(event.getId()).stream()
                 .collect(Collectors.toMap(EventCategory::getId, EventCategory::getName));
+        var labels = staffNames.labels(event.getId());
 
-        var eventMatches = matches.findByEventId(event.getId());
-        var busy = new HashSet<UUID>();
-        var lastFought = new HashMap<UUID, Instant>();
-        for (var m : eventMatches) {
-            var fighters = competitors.participants(m.getRedId(), m.getBlueId());
-            if (m.getStatus() == Match.Status.IN_PROGRESS) {
-                busy.addAll(fighters);
-            }
-            if (m.getFinishedAt() != null) {
-                fighters.forEach(p -> lastFought.merge(p, m.getFinishedAt(), this::later));
-            }
-        }
-        var onMat = eventMatches.stream()
-                .filter(m -> m.getMatId().equals(matId))
-                .sorted(Comparator.comparingInt(
-                                (Match m) -> groupById.get(m.getGroupId()).getNumber())
-                        .thenComparingInt(Match::getOrderIndex))
-                .toList();
-        var groupLastPlayed = new HashMap<UUID, Instant>();
-        onMat.stream()
-                .filter(m -> m.getFinishedAt() != null)
-                .forEach(m -> groupLastPlayed.merge(m.getGroupId(), m.getFinishedAt(), this::later));
-        Set<UUID> justFought = onMat.stream()
-                .filter(m -> m.getFinishedAt() != null)
-                .max(Comparator.comparing(Match::getFinishedAt))
-                .map(m -> competitors.participants(m.getRedId(), m.getBlueId()))
-                .orElse(Set.of());
+        var proposal = floor.proposals().get(matId);
+        var recommended = proposal == null ? null : proposal.matchId();
 
-        var candidates = onMat.stream()
-                .filter(m -> m.getStatus() == Match.Status.PENDING && !m.isInReview())
-                .map(m -> new Candidate(
-                        m.getId(),
-                        m.getGroupId(),
-                        groupById.get(m.getGroupId()).getNumber(),
-                        m.getOrderIndex(),
-                        m.getRedId(),
-                        m.getBlueId()))
-                .toList();
-        var context = new MatchRecommender.Context(
-                now,
-                Duration.ofSeconds(event.getMatchSeconds() + event.getChangeoverSeconds()),
-                lastFought,
-                matGroups.stream().collect(Collectors.toMap(FightGroup::getId, FightGroup::getCreatedAt)),
-                groupLastPlayed,
-                busy,
-                justFought,
-                competitors.teamMembers());
-        var recommended = MatchRecommender.recommend(candidates, context).orElse(null);
-
-        BiFunction<UUID, UUID, Fighter> fighter =
-                (groupId, id) -> fighter(competitors.get(id), id.equals(ghosts.get(groupId)));
+        BiFunction<UUID, UUID, Fighter> fighter = (groupId, id) -> fighter(
+                competitors.get(id), ghosts.getOrDefault(groupId, Set.of()).contains(id));
         return new MatBoardResponse(
                 matId,
                 mat.getNumber(),
@@ -179,26 +180,55 @@ class MatBoardService {
                                 groupMembers.stream()
                                         .filter(m -> m.getGroupId().equals(g.getId()))
                                         .map(m -> fighter.apply(g.getId(), m.getCompetitorId()))
-                                        .toList()))
+                                        .toList(),
+                                labels.get(g.getCreatedBy())))
                         .toList(),
                 onMat.stream()
-                        .map(m -> new BoardMatch(
-                                m.getId(),
-                                m.getGroupId(),
-                                groupById.get(m.getGroupId()).getNumber(),
-                                m.getOrderIndex(),
-                                fighter.apply(m.getGroupId(), m.getRedId()),
-                                fighter.apply(m.getGroupId(), m.getBlueId()),
-                                m.getStatus(),
-                                m.getRedScore(),
-                                m.getBlueScore(),
-                                m.getStatus() == Match.Status.PENDING
-                                        && !m.isInReview()
-                                        && competitors.participants(m.getRedId(), m.getBlueId()).stream()
-                                                .noneMatch(busy::contains),
-                                m.isInReview()))
+                        .map(m -> boardMatch(event, floor, matId, m, fighter, plannedAt.get(m.getId())))
                         .toList(),
-                recommended);
+                recommended,
+                teamPool,
+                mat.getEventId(),
+                floor.mats().stream()
+                        .map(x -> new MatChoice(x.getId(), x.getNumber(), x.getRefereeAccountId() != null))
+                        .toList());
+    }
+
+    private static BoardMatch boardMatch(
+            Event event,
+            MatFloor.Floor floor,
+            UUID matId,
+            Match m,
+            BiFunction<UUID, UUID, Fighter> fighter,
+            Instant plannedAt) {
+        var pending = m.getStatus() == Match.Status.PENDING;
+        var wait = pending ? floor.waitOf(m, matId) : null;
+        return new BoardMatch(
+                m.getId(),
+                m.getGroupId(),
+                floor.groups().get(m.getGroupId()).getNumber(),
+                m.getOrderIndex(),
+                fighter.apply(m.getGroupId(), m.getRedId()),
+                fighter.apply(m.getGroupId(), m.getBlueId()),
+                m.getStatus(),
+                m.getRedScore(),
+                m.getBlueScore(),
+                // Proposed to another mat (or someone in it) is only a hint: if that mat stalls, this one may take it.
+                m.getStatus() == Match.Status.PENDING
+                        && (wait == null || wait == MatFloor.Wait.OTHER_MAT || wait == MatFloor.Wait.RESERVED),
+                m.isInReview(),
+                wait == null ? null : wait.name(),
+                wait == MatFloor.Wait.RESTING ? floor.readyAt(m) : null,
+                switch (wait) {
+                    case OTHER_MAT -> floor.proposedTo(m).map(floor::matNumber).orElse(null);
+                    case RESERVED ->
+                        floor.reservedBy(m, matId).map(floor::matNumber).orElse(null);
+                    case null, default -> null;
+                },
+                m.getMatId() == null,
+                pending ? floor.corner(m, m.getRedId(), event) : null,
+                pending ? floor.corner(m, m.getBlueId(), event) : null,
+                pending ? plannedAt : null);
     }
 
     private static Fighter fighter(Competitor c, boolean ghost) {
@@ -220,9 +250,5 @@ class MatBoardService {
         if (!roles.contains(EventRole.CLUB) && !ownMat) {
             throw EventException.forbidden();
         }
-    }
-
-    private Instant later(Instant a, Instant b) {
-        return a.isAfter(b) ? a : b;
     }
 }

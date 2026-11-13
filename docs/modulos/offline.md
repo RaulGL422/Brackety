@@ -47,7 +47,7 @@ Pedido por Raul el 2026-11-04 para la Fase 1. Desde el 2026-11-11 también (y so
 - Petición: `{"type":"POINT","side":"RED","reason":null,"opId":"<uuid>","at":"2027-03-10T09:00:30Z","knownEvents":3}`. `at` en ISO-8601 UTC; sin `at` vale la hora del servidor. Sin `knownEvents` (o negativo): 400.
 - 409 en `application/problem+json` con `code`: `MATCH_CONFLICT` (primera) o `MATCH_IN_REVIEW` (siguientes, y la web con el combate en revisión).
 - Reintento de un `opId` rechazado: el mismo 409 y código, aunque el club ya lo haya revisado. Uno aplicado: 200.
-- Con `opId`, el aviso de una mano a quien no tiene 4-7 años también es choque (en la web sigue siendo 400).
+- Con `opId`, el aviso de una mano a quien no tiene 4-8 años también es choque (en la web sigue siendo 400).
 - Vista (`GET /matches/{id}`, `POST .../events`, `match` de `/review`):
   - `serverTime` (Instant); `remainingMs`, `running` y `endReason` están calculados a esa hora.
   - `review`: null o `{"reason","ops":[{"opId","type","side","reason","actor","at","receivedAt","cause"}]}`.
@@ -70,7 +70,7 @@ Pedido por Raul el 2026-11-04 para la Fase 1. Desde el 2026-11-11 también (y so
 
 ### App (APK): cómo quedó (2026-11-05)
 - Código: `app/lib/features/offline/` (cola, caché, indicador) y `scoreboard/data/tambo_match.dart` (reglas).
-- Antes de encolar, el móvil rechaza lo que el servidor mandaría a revisión: reglas, aviso de una mano fuera de 4-7, combate en revisión, otro combate en curso en el tapiz (según lo que sabe el móvil).
+- Antes de encolar, el móvil rechaza lo que el servidor mandaría a revisión: reglas, aviso de una mano fuera de 4-8, combate en revisión, otro combate en curso en el tapiz (según lo que sabe el móvil).
 - Con acciones pendientes de un combate, el sondeo no cambia su vista (podría traer ya alguna y `knownEvents` las contaría dos veces). Solo la cambia la respuesta de cada envío.
 - Una acción que ya está en el timeline del servidor (`opId`) sale de la cola. Si son las primeras de la cola, el sondeo sí acepta esa vista.
 - Otro 4xx (no 401): esa acción y las siguientes de su combate quedan "rechazadas", fuera del estado mostrado; el indicador las cuenta y deja verlas y quitarlas. No frenan a otros combates. 5xx y 401: reintento.
@@ -87,6 +87,7 @@ Pedido por Raul el 2026-11-04 para la Fase 1. Desde el 2026-11-11 también (y so
 ### Web (2026-11-11, pedido de Raul: el domingo solo web)
 - La web usa la misma cola que la APK (`opId`, `at`, `knownEvents`), estado optimista con `LocalMatch` y envío de una en una en segundo plano. Ya no hay camino directo ni `MATCH_STALE` en la app.
 - Guardado en `localStorage` (`brackety.offline.queue`, `.views`, `.board-<tapiz>`), un documento entero por clave. Sobrevive a recargar y a cerrar la pestaña.
+- Sin red, una página recargada no vuelve hasta que vuelve la red (http en el pabellón: sin service worker). Con acciones pendientes el navegador pregunta antes de recargar o cerrar; sin "deslizar para recargar" (`web/index.html`).
 - Toques rápidos: se comprueban y encolan antes del primer `await`; la pantalla los muestra al momento.
 - Dos pestañas del mismo navegador comparten la cola: al guardar, cada una incorpora lo que la otra guardó (los `opId` repetidos el servidor los ignora).
 - Sesión: marca `brackety.session` junto a la cookie. Si al recargar el servidor no responde, la sesión sigue y la cola se envía cuando vuelve (el refresh por cookie renueva el token).
@@ -94,7 +95,7 @@ Pedido por Raul el 2026-11-04 para la Fase 1. Desde el 2026-11-11 también (y so
 - Indicador (sin conexión / N pendientes / rechazadas) también en la web; con todo enviado no se muestra, para no quitar altura al marcador en el móvil.
 
 ### Rescate por CSV (2026-11-11)
-- Barra de estado del árbitro: botón "Exportar acciones pendientes" (con algo sin enviar). CSV con BOM y `;`: `brackety-offline-ops;2`, luego `opId;matchId;type;side;reason;at;knownEvents;actor;deltaMs` (`deltaMs`: ajuste de reloj; el servidor aún lee la versión 1) (`actor` = id de la cuenta que encoló).
+- Icono de estado del árbitro (barra superior; sale sin conexión, con rechazadas o si algo lleva 5 s sin llegar): su diálogo ofrece "Descargar CSV" (con algo sin enviar). CSV con BOM y `;`: `brackety-offline-ops;2`, luego `opId;matchId;type;side;reason;at;knownEvents;actor;deltaMs` (`deltaMs`: ajuste de reloj; el servidor aún lee la versión 1) (`actor` = id de la cuenta que encoló).
 - Club (web): "Importar acciones de un dispositivo" en la barra del panel. `POST /api/v1/events/{id}/offline-ops/import` (cuerpo `text/csv`, solo CLUB): comprueba todo el fichero (versión, columnas, combates del evento) y luego aplica cada fila por el mismo camino que la cola, en su transacción. Responde `{applied, duplicates, inReview, skipped}`. Reimportar no cambia nada. Autor: el `actor` si es del staff, si no el club.
 
 ## Datos
@@ -111,3 +112,8 @@ Sin red → operaciones → sincronización; idempotencia; CSV round trip; choqu
 ## Estado
 Web con cola, sesión tras recarga y rescate CSV hechos (2026-11-11, `feat/realtime-offline-web`); tests de servidor y app en verde. Falta la prueba a mano en el portátil y en la Pi.
 Pendiente; adelanto F1 en pruebas (2026-11-05, rama `feat/offline-f1-scoreboard`): servidor y app hechos. Falta la prueba manual de Raul y un escenario de datos con un combate en revisión (es de `server/`, sin hacer). Prueba a mano: APK sin red (modo avión) en un combate y en el tablero; volver la red; choque con el mismo árbitro en la web escribiendo el combate mientras el móvil está sin red; Aplicar y Descartar desde el club.
+
+## Ayudantes y lecturas sin red (2026-11-13, pedido de Raul)
+- Sin red las pantallas no esperan: el cliente sabe que no hay conexión y sirve lo guardado al instante; un sondeo ligero (`GET /api/v1/info` cada 3 s) detecta la vuelta y entonces se pide todo de nuevo.
+- Lecturas guardadas en el dispositivo (`OfflineGetCache`): mis eventos, categorías, alumnos y equipos de cada categoría, tapices, configuración, clasificación e inscritos. El tablero y los combates del árbitro siguen con su caché propia.
+- Equipos y grupos creados sin red van a una cola (`HelperQueue`, documento `helper-queue`): sus alumnos salen "Pendiente de enviar" y se envían en orden al volver. Si el servidor los rechaza (alguien ya agrupado por otro ayudante) se descartan y se avisa.

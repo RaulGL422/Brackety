@@ -27,69 +27,113 @@ class EventsScreen extends ConsumerWidget {
       body: AsyncView(
         value: ref.watch(myEventsProvider),
         onRetry: () => ref.invalidate(myEventsProvider),
-        data: (events) => events.isEmpty
-            ? Center(child: Text(l10n.eventsEmpty))
-            : ListView.builder(
-                padding: const EdgeInsets.all(AppSpacing.l),
-                itemCount: events.length,
-                itemBuilder: (context, i) => _EventCard(event: events[i]),
-              ),
+        data: (events) {
+          final leagues = byLeague(events);
+          return events.isEmpty
+              ? Center(child: Text(l10n.eventsEmpty))
+              : ListView.builder(
+                  padding: const EdgeInsets.all(AppSpacing.l),
+                  itemCount: leagues.length,
+                  itemBuilder: (context, i) => _LeagueCard(phases: leagues[i]),
+                );
+        },
       ),
     );
   }
 }
 
-class _EventCard extends StatelessWidget {
-  const _EventCard({required this.event});
+/// A league with its phases: each phase is an event with its own entries, mats and scores.
+class _LeagueCard extends StatelessWidget {
+  const _LeagueCard({required this.phases});
 
-  final MyEvent event;
+  final List<MyEvent> phases;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final locale = Localizations.localeOf(context).toLanguageTag();
     final text = Theme.of(context).textTheme;
+    final single = phases.length == 1;
+    final clubPhase = phases
+        .where((p) => p.roles.contains(EventRole.club))
+        .lastOrNull;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.l),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(event.name, style: text.titleLarge),
-            const SizedBox(height: AppSpacing.xs),
-            Text(DateFormat.yMMMMd(locale).format(event.date)),
-            const SizedBox(height: AppSpacing.m),
-            Wrap(
-              spacing: AppSpacing.s,
-              runSpacing: AppSpacing.s,
-              children: [
-                if (event.roles.contains(EventRole.grouper))
-                  FilledButton.icon(
-                    icon: const Icon(Icons.group_add_outlined),
-                    label: Text(l10n.eventMakeGroups),
-                    onPressed: () =>
-                        context.push('/events/${event.id}/categories'),
-                  ),
-                if (event.roles.contains(EventRole.referee) &&
-                    event.matNumber != null)
-                  FilledButton.icon(
-                    icon: const Icon(Icons.sports_martial_arts),
-                    label: Text(l10n.eventMyMat(event.matNumber!)),
-                    onPressed: () => context.push(
-                      '/mats/${event.matId}?number=${event.matNumber}',
-                    ),
-                  ),
-                if (event.roles.contains(EventRole.club))
-                  FilledButton.icon(
-                    icon: const Icon(Icons.dashboard_outlined),
-                    label: Text(l10n.eventClubPanel),
-                    onPressed: () => context.push('/events/${event.id}/club'),
-                  ),
-              ],
+            // The club sees the league first, so its name leads; a lone event is just its name.
+            Text(
+              clubPhase != null || !single
+                  ? phases.first.leagueName
+                  : phases.single.name,
+              style: text.titleLarge,
             ),
+            for (final (i, phase) in phases.indexed) ...[
+              if (i > 0) const Divider(height: AppSpacing.xl),
+              const SizedBox(height: AppSpacing.xs),
+              _PhaseRow(
+                event: phase,
+                showName: !single || phase.name != phase.leagueName,
+              ),
+            ],
+            // The club enters the league and opens its phases from there.
+            if (clubPhase != null) ...[
+              const SizedBox(height: AppSpacing.m),
+              FilledButton.icon(
+                icon: const Icon(Icons.emoji_events_outlined),
+                label: Text(l10n.openLeague),
+                onPressed: () => context.push('/leagues/${clubPhase.id}'),
+              ),
+            ],
           ],
         ),
       ),
+    );
+  }
+}
+
+class _PhaseRow extends StatelessWidget {
+  const _PhaseRow({required this.event, required this.showName});
+
+  final MyEvent event;
+  final bool showName;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final locale = Localizations.localeOf(context).toLanguageTag();
+    final text = Theme.of(context).textTheme;
+    final buttons = [
+      if (event.roles.contains(EventRole.grouper))
+        FilledButton.icon(
+          icon: const Icon(Icons.group_add_outlined),
+          label: Text(l10n.eventMakeGroups),
+          onPressed: () => context.push('/events/${event.id}/categories'),
+        ),
+      if (event.roles.contains(EventRole.referee) && event.matNumber != null)
+        FilledButton.icon(
+          icon: const Icon(Icons.sports_martial_arts),
+          label: Text(l10n.eventMyMat(event.matNumber!)),
+          onPressed: () =>
+              context.push('/mats/${event.matId}?number=${event.matNumber}'),
+        ),
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (showName) Text(event.name, style: text.titleMedium),
+        Text(DateFormat.yMMMMd(locale).format(event.date)),
+        // The club's way in is the league's button: a phase of theirs alone has none here.
+        if (buttons.isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.m),
+          Wrap(
+            spacing: AppSpacing.s,
+            runSpacing: AppSpacing.s,
+            children: buttons,
+          ),
+        ],
+      ],
     );
   }
 }

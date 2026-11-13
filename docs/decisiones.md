@@ -59,4 +59,22 @@ Las de octubre de 2026, en `decisiones-2026-10.md`.
 - 2026-11-11 · Descalificación = límite de puntos para el rival y 0 para el descalificado; duración (F1: 3:00) y límite editables en Configuración, sin cambiar con un combate en curso (el límite, tras empezar uno) · pedido por Raul para la F1.
 - 2026-11-11 · El ayudante puede deshacer un grupo mientras ningún combate suyo haya empezado; después solo el superadmin · corregir errores al crear sin borrar puntos.
 - 2026-11-11 · Tiempo real con un WebSocket simple que solo avisa "esto cambió" (el cliente vuelve a pedir por REST), no STOMP; sondeo de respaldo cada 20 s · permisos y vistas en un solo sitio; un aviso perdido solo retrasa.
+- 2026-11-12 · El nombre de la persona detrás de cada cuenta del staff es por evento y lo pone el club · las cuentas del pabellón son genéricas (arbitro1…) y cambian de persona entre fases.
+- 2026-11-12 · Un equipo real puede llevar alumnos fantasma (ya en otro equipo o grupo): combaten pero no puntúan por él; dos equipos de un grupo que comparten alumno solo dan aviso · pedido por Raul para completar equipos con pocos alumnos.
 - 2026-11-11 · En la F1 árbitros y ayudantes usan la web también en el pabellón, con la misma cola offline que la APK guardada en el navegador; el paquete ya no lleva APK por defecto · pedido por Raul: solo web, que es lo probado.
+- 2026-11-12 · Sin límite de fantasmas: un grupo individual admite hasta 3 (al menos 1 real) y un equipo puede ser entero de fantasmas · pedido por Raul en la prueba in situ, para categorías con pocos alumnos.
+- 2026-11-13 · "Fantasma" pasa a llamarse **Comodín** en textos y CSV (en código sigue `ghost`) · pedido por Raul tras la prueba in situ.
+- 2026-11-13 · Reglas por formato: individual 1:00 y 15 puntos; equipos 3:00 y sin límite (la descalificación da al rival 15 o sus puntos si lleva más); cada 2 advertencias, +1 al rival (aparte de las de una mano) · pedido por Raul para la F1.
+- 2026-11-13 · Equipos siempre de 2 o 3; un grupo de equipos lleva 1-4 reales y hasta 3 equipos comodín, nunca el mismo alumno en dos equipos del grupo (antes solo avisaba) · pedido por Raul.
+- 2026-11-13 · Los grupos de equipos no tienen tapiz: sus combates van a un bote común que se reparte entre los tapices sin individuales pendientes (dinámico; el que lleva más parado elige primero) y el combate toma el tapiz del árbitro que lo empieza · elegido por Raul: "dinámico".
+- 2026-11-13 · Descanso mínimo por alumno entre combates en cualquier tapiz (30 s, configurable en la fase); hasta entonces el combate sale "Descansando" · pedido por Raul.
+- 2026-11-13 · Ayudantes sin red: listas guardadas en el dispositivo y equipos/grupos en cola que se envían al volver (si choca, se descarta y se avisa); sin red las pantallas leen lo guardado al instante y un sondeo ligero cada 3 s detecta la vuelta · pedido por Raul.
+- 2026-11-13 · La F1 usa 3 tapices con 3 árbitros: se configura en el evento (quitar tapices 4 y 5); la demo sigue con 5 · aviso de la organización.
+- 2026-11-13 · Reglamento en PDF por fase: lo sube el club en Configuración (hasta 10 MB), viaja en el paquete al portátil y el árbitro lo abre desde su tapiz con el visor del navegador (en el móvil, la app de PDF) · pedido por Raul.
+- 2026-11-13 · Clasificación de la liga: un apartado por categoría (los puestos cuentan dentro de cada una), sin puesto con 0 puntos y con el desglose asistencia + combates por fase · pedido por Raul.
+- 2026-11-13 · El descanso mínimo se hace cumplir en el marcador y en el servidor (con red); sin red se acepta tal cual · Raul.
+- 2026-11-13 · Un tapiz con combates por jugar no puede quedarse sin árbitro · Raul.
+- 2026-11-13 · Panel de control en el club y el superadmin: mover grupos y combates pendientes, reordenar, cambiar alumnos de equipo (solo grupos sin empezar) y dejar empezar sin descanso · Raul ("tener yo el control de todo").
+- 2026-11-13 · Reparto de equipos: siguen en el bote común, que ya equilibra (el tapiz libre coge el siguiente); no se pre-asignan por tapiz · Raul.
+- 2026-11-13 · Cada tapiz enseña su orden previsto (recalculado con cada cambio, sin guardar un orden fijo); club, superadmin y árbitros pueden mover un combate pendiente a otro tapiz, también los de equipos · Raul.
+- 2026-11-13 · F1 real: 3 tapices; 5-8 individual y siempre a dos manos (aviso de una mano ampliado a 4-8 años); 9-12, 13-16 y 17+ por equipos (2 o 3); cuentas del portátil con usuario = contraseña; botón del superadmin para reiniciar el evento desde el paquete · Raul.

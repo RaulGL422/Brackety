@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-Última actualización: 2026-11-10. Fase 0 cerrada; en curso: **auth** (pruebas) y la preparación de la Fase 1 (ver "Hasta la Fase 1").
+Última actualización: 2026-11-13. Fase 0 cerrada; en curso: **auth** (pruebas) y la preparación de la Fase 1 (ver "Hasta la Fase 1").
 
 | Módulo | Doc | Estado | Rama activa |
 |---|---|---|---|
@@ -13,7 +13,7 @@
 | ayudantes-permisos | modulos/ayudantes-permisos.md | pendiente | – |
 | puntuacion | modulos/puntuacion.md | pendiente | – |
 | liga | modulos/liga.md | pendiente | – |
-| liga-fases | modulos/liga-fases.md | pendiente | – |
+| liga-fases | modulos/liga-fases.md | en pruebas: servidor (#75), pantallas y reinscripción (#81), puntos por asistir (#86); liga primero en el panel del club y podios de un toque en la PR #89; falta la prueba a mano (2026-11-12) | feat/league-first-dev |
 | torneo | modulos/torneo.md | pendiente | – |
 | marcador-tapiz | modulos/marcador-tapiz.md | pendiente | – |
 | tiempo-real | modulos/tiempo-real.md | en pruebas: WebSocket de avisos "esto cambió" (marcador, tablero, Tapices, Puntuaciones) con sondeo de respaldo (2026-11-11) | feat/realtime-offline-web |
@@ -49,6 +49,10 @@ Estados: pendiente · en curso · en pruebas · cerrado.
 | F1: superadmin en el portátil, export .zip, resultados a la Pi y clubes (pedido de Raul, 2026-11-11) | modulos/servidor-local.md | en pruebas: superadmin solo en el portátil, todo el evento en .zip con CSV legibles, importar resultados en la Pi, clubes participantes; servidor de liga, fases y podios hecho, sus pantallas después de la F1; falta la prueba a mano (2026-11-11) | feat/league-phases |
 | marcador F1: reglas y mesa (pedido de Raul, 2026-11-11) | modulos/prototipo-f1.md | en pruebas: descalificación 15-0, −1, ajuste de reloj, deshacer más claro, campana de ring y aviso de 10 s en la web, duración y límite en Configuración (F1 3:00), tablero con recomendado/en espera, deshacer grupo y simulaciones del recomendador; falta la prueba a mano (2026-11-11) | feat/scoreboard-f1-rules |
 | F1 solo web en el pabellón (pedido de Raul, 2026-11-11) | modulos/offline.md | en pruebas: la web usa la cola offline (guardada en el navegador, sobrevive a recargas), sesión que aguanta recargas en http del pabellón, rescate de acciones por CSV (exportar en el dispositivo, importar en el club), paquete sin APK por defecto; falta la prueba a mano en portátil y Pi (2026-11-11) | feat/realtime-offline-web |
+| pruebas F1: portátil, offline y reconexiones (pedido de Raul, 2026-11-12) | pruebas-f1.md | rondas 1 y 2 hechas (#87, #88): API, web sin red, caída de la API y apagón del portátil, vuelta a la Pi, liga; arreglos y peticiones de Raul incluidos. Estable para la F1; abierto en pruebas-f1.md (Pendiente antes del 14) | – |
+| F1: fantasmas sin límite (pedido de Raul, 2026-11-12) | modulos/prototipo-f1.md | en pruebas: grupo individual con hasta 3 fantasmas, equipos enteros de fantasmas, tablero, marcador, clasificación y CSV con varios fantasmas; falta la prueba a mano (2026-11-13) | feat/proto-f1-free-ghosts |
+| F1: feedback in situ (pedido de Raul, 2026-11-13) | modulos/prototipo-f1-equipos.md | en pruebas: Comodín en vez de fantasma; individual 1:00/15 y equipos 3:00 sin límite; +1 al rival cada 2 advertencias; descanso mínimo configurable; equipos de 2 o 3, hasta 3 equipos comodín y sin alumnos repetidos; bote de combates de equipos repartido entre tapices libres; ayudantes sin red (listas y cola); sin red las pantallas leen lo guardado al instante; advertencias y descalificaciones de la liga por alumno; reglamento PDF por fase en el tapiz; clasificación de liga por categoría; falta la prueba a mano (2026-11-13) | feat/f1-onsite-feedback |
+| F1: endurecer reparto y panel de control (pedido de Raul, 2026-11-13) | modulos/prototipo-f1.md | en pruebas: descanso obligatorio en marcador y servidor; tapiz con combates no queda sin árbitro; jornadas completas simuladas al azar por la API; panel de control en club y superadmin (mover grupos y combates, reordenar, cambiar alumnos de equipo, saltar el descanso, auditado); cola prevista por tapiz; comodines y equipos de otros grupos; avisos de la liga; aviso de una mano 4-8; reinicio del evento desde el paquete en el superadmin del portátil; probado a mano por Raul, escenario real de la F1 preparado (fuera del repo) | fix/f1-scheduling-hardening |
 | marcador web: doble pulsación (pedido de Raul) | modulos/offline.md | cerrado: `knownEvents` obligatorio, 409 `MATCH_STALE` en la web, envío de una en una; probado a mano por Raul con dos pestañas (#59, 2026-11-09) | – |
 
 ## Hasta la Fase 1 (14-11)

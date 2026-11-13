@@ -47,7 +47,7 @@ class StandingsControllerTest extends EventApiTest {
                 .single();
         var ids = fighters.stream().map(id -> "\"" + id + "\"").collect(Collectors.joining(","));
         call(post("/api/v1/events/" + eventId + "/groups").content("""
-                                {"categoryId":"%s","groups":[{"participantIds":[%s],"ghostId":"%s"}]}""".formatted(categoryId, ids, ghost)), "ayudante1")
+                                {"categoryId":"%s","groups":[{"participantIds":[%s],"ghostIds":["%s"]}]}""".formatted(categoryId, ids, ghost)), "ayudante1")
                 .andExpect(status().isCreated());
 
         // Ana 3 - Bea 15: both keep what they scored.
@@ -90,8 +90,49 @@ class StandingsControllerTest extends EventApiTest {
     }
 
     @Test
+    void theClubOpensAParticipantAndSeesEveryMatchOfTheirs() throws Exception {
+        call(get("/api/v1/events/" + eventId + "/participants/" + fighters.get(0) + "/record"), "club1")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.standing.total").value(13))
+                .andExpect(jsonPath("$.matches", hasSize(3)))
+                .andExpect(
+                        jsonPath("$.matches[?(@.rival == 'Bea Prueba')].points").value(3))
+                .andExpect(jsonPath("$.matches[?(@.rival == 'Bea Prueba')].rivalPoints")
+                        .value(15))
+                .andExpect(
+                        jsonPath("$.matches[?(@.rival == 'Bea Prueba')].status").value("FINISHED"))
+                .andExpect(jsonPath("$.matches[?(@.rival == 'Bea Prueba')].asGhost")
+                        .value(false));
+        // The ghost's matches say so: they fight there and score nothing.
+        call(get("/api/v1/events/" + eventId + "/participants/" + ghost + "/record"), "club1")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.matches[0].asGhost").value(true))
+                .andExpect(jsonPath("$.standing.total").value(0));
+        call(get("/api/v1/events/" + eventId + "/participants/" + fighters.get(0) + "/record"), "ayudante1")
+                .andExpect(status().isForbidden());
+        call(get("/api/v1/events/" + eventId + "/participants/" + java.util.UUID.randomUUID() + "/record"), "club1")
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void positionsCountWithinEachCategory() throws Exception {
+        var younger = new Participant(eventId, clock.instant());
+        younger.update("Lia", "Prueba", LocalDate.of(2027, 3, 1).minusYears(5), 110, true);
+        participants.save(younger);
+
+        // Lia scores nothing but is alone in her category: first there, not fifth of everyone.
+        call(get("/api/v1/events/" + eventId + "/standings"), "club1")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.firstName == 'Lia')].position").value(1))
+                .andExpect(jsonPath("$[?(@.firstName == 'Bea')].position").value(1))
+                .andExpect(jsonPath("$[?(@.firstName == 'Zoe')].position").value(4));
+    }
+
+    @Test
     void aDisqualifiedFighterScoresNothingInThatMatch() throws Exception {
         var third = match(fighters.get(0), fighters.get(2));
+        // Ana has just fought: the least rest first.
+        clock.advance(Duration.ofSeconds(30));
         referee(third, "START", null, null);
         referee(third, "POINT", "RED", null);
         referee(third, "DISQUALIFICATION", "RED", "Conducta antideportiva");

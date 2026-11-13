@@ -123,9 +123,9 @@ class MatchRecommenderSimulationTest {
 
     /** Many random events, each from its own seed so a failure can be replayed. */
     @ParameterizedTest
-    @ValueSource(ints = {1, 2, 3})
+    @ValueSource(ints = {1, 2, 3, 4})
     void randomEventsNeverDoubleBookAFighterNorStarveAGroupNorLeaveAMatchUnplayed(int mats) {
-        for (int seed = 0; seed < 150; seed++) {
+        for (int seed = 0; seed < 400; seed++) {
             var random = new Random(seed * 31L + mats);
             var event = SimulatedEvent.random(random, mats);
 
@@ -262,16 +262,18 @@ class MatchRecommenderSimulationTest {
         Optional<UUID> recommend(SimMat mat) {
             mat.release(now, groupCreated);
             return MatchRecommender.recommend(
-                    mat.pending,
-                    new Context(
-                            now,
-                            slot(),
-                            lastFought,
-                            groupCreated,
-                            mat.groupLastPlayed,
-                            busy,
-                            mat.justFought,
-                            teamMembers));
+                            mat.pending,
+                            new Context(
+                                    now,
+                                    slot(),
+                                    lastFought,
+                                    groupCreated,
+                                    mat.groupLastPlayed,
+                                    busy,
+                                    mat.justFought,
+                                    teamMembers,
+                                    Duration.ZERO))
+                    .map(Candidate::matchId);
         }
 
         /** Each free mat starts its recommended match; time jumps to the next end or new group. */

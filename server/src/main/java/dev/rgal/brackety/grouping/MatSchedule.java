@@ -35,9 +35,12 @@ class MatSchedule {
     }
 
     List<MatState> states(Event event, Instant now) {
-        var matchesByMat =
-                matches.findByEventId(event.getId()).stream().collect(Collectors.groupingBy(Match::getMatId));
+        // Team matches in the pool have no mat yet: they count where they run.
+        var matchesByMat = matches.findByEventId(event.getId()).stream()
+                .filter(m -> m.getMatId() != null)
+                .collect(Collectors.groupingBy(Match::getMatId));
         var groupsByMat = groups.findByEventId(event.getId()).stream()
+                .filter(g -> g.getMatId() != null)
                 .collect(Collectors.groupingBy(FightGroup::getMatId, Collectors.counting()));
         return mats.findByEventIdOrderByNumber(event.getId()).stream()
                 .map(mat -> state(
@@ -72,7 +75,8 @@ class MatSchedule {
                 .max(Comparator.naturalOrder());
         var remaining = MatEstimate.remaining(
                 pending,
-                current.map(m -> m.clockLeft(now, match)).orElse(null),
+                current.map(m -> m.clockLeft(now, Duration.ofSeconds(event.matchSecondsFor(m.isTeamMatch()))))
+                        .orElse(null),
                 lastFinished.map(f -> Duration.between(f, now)).orElse(null),
                 match,
                 Duration.ofSeconds(event.getChangeoverSeconds()));

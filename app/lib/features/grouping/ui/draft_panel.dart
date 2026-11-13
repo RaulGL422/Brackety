@@ -19,6 +19,7 @@ class DraftPanel extends StatelessWidget {
     required this.onCreate,
     required this.labelOf,
     this.onPickGhostTeam,
+    this.ghostTeamLabel,
   });
 
   final String eventId;
@@ -37,15 +38,20 @@ class DraftPanel extends StatelessWidget {
   /// Opens the ghost team picker; only for groups of teams.
   final VoidCallback? onPickGhostTeam;
 
+  /// Names a wildcard team in its slot.
+  final String Function(List<String> people)? ghostTeamLabel;
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
-    final hint = group.choosingGhost
+    final hint = !group.ofTeams && group.ghostMode && !group.isComplete
         ? l10n.draftGhostHint
         : group.ofTeams && group.ghostMode
-        ? l10n.draftGhostTeamHint(group.ghostTeamSize!)
+        ? l10n.draftGhostTeamPanelHint
+        : group.ofTeams
+        ? l10n.teamGroupPoolHint
         : null;
     return Material(
       color: scheme.surfaceContainerLowest,
@@ -85,11 +91,20 @@ class DraftPanel extends StatelessWidget {
                       group.ofTeams ? l10n.draftGhostTeam : l10n.draftGhost,
                     ),
                     selected: group.ghostMode,
-                    onSelected: (on) => onChanged((g) => g.setGhostMode(on)),
+                    // With 4 picked there is no room for a ghost: turning it on would make the 4th one
+                    // the ghost, and off again would drop them.
+                    onSelected: group.canToggleGhost
+                        ? (on) => onChanged((g) => g.setGhostMode(on))
+                        : null,
                   ),
                 ],
               ),
-              DraftSlots(group: group, labelOf: labelOf, onChanged: onChanged),
+              DraftSlots(
+                group: group,
+                labelOf: labelOf,
+                onChanged: onChanged,
+                ghostTeamLabel: ghostTeamLabel,
+              ),
               if (hint != null)
                 Text(
                   hint,
@@ -97,45 +112,48 @@ class DraftPanel extends StatelessWidget {
                     color: scheme.onSurfaceVariant,
                   ),
                 ),
-              if (group.ofTeams &&
-                  group.ghostMode &&
-                  group.members.length == DraftGroup.size - 1) ...[
+              if (group.canAddGhostTeam)
                 OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size.fromHeight(AppSizes.touchTarget),
                   ),
-                  icon: const Icon(Icons.visibility_off_outlined),
-                  label: Text(
-                    l10n.pickGhostTeam(
-                      group.ghostTeam.length,
-                      group.ghostTeamSize!,
-                    ),
-                  ),
+                  icon: const Icon(Icons.group_add_outlined),
+                  label: Text(l10n.formGhostTeam),
                   onPressed: onPickGhostTeam,
                 ),
-              ],
-              Row(
-                children: [
-                  Expanded(
-                    child: FilledButton(
-                      style: FilledButton.styleFrom(
-                        minimumSize: const Size.fromHeight(56),
+              // A group of teams has no mat: its matches go to the free mats.
+              if (group.ofTeams)
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(56),
+                  ),
+                  onPressed: group.isComplete && !busy ? onCreate : null,
+                  child: Text(l10n.createGroup(1)),
+                )
+              else ...[
+                Row(
+                  children: [
+                    Expanded(
+                      child: FilledButton(
+                        style: FilledButton.styleFrom(
+                          minimumSize: const Size.fromHeight(56),
+                        ),
+                        onPressed: group.isComplete && !busy ? onCreate : null,
+                        child: Text(l10n.createGroup(1)),
                       ),
-                      onPressed: group.isComplete && !busy ? onCreate : null,
-                      child: Text(l10n.createGroup(1)),
                     ),
-                  ),
-                  const SizedBox(width: AppSpacing.s),
-                  Expanded(
-                    child: MatPicker(
-                      eventId: eventId,
-                      matId: matId,
-                      onChanged: onMatChanged,
+                    const SizedBox(width: AppSpacing.s),
+                    Expanded(
+                      child: MatPicker(
+                        eventId: eventId,
+                        matId: matId,
+                        onChanged: onMatChanged,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              MatPickerHint(eventId: eventId, matId: matId),
+                  ],
+                ),
+                MatPickerHint(eventId: eventId, matId: matId),
+              ],
             ],
           ),
         ),
@@ -144,11 +162,10 @@ class DraftPanel extends StatelessWidget {
   }
 
   String _status(AppLocalizations l10n) {
-    final ghostDone = group.ofTeams
-        ? group.ghostMode && group.ghostTeam.length == group.ghostTeamSize
-        : group.ghost != null;
-    final missing =
-        DraftGroup.size - group.members.length - (ghostDone ? 1 : 0);
+    final ghosts = group.ofTeams
+        ? (group.ghostMode ? group.ghostTeams.length : 0)
+        : group.ghosts.length;
+    final missing = DraftGroup.size - group.members.length - ghosts;
     return missing == 0 ? l10n.draftReady : l10n.draftMissing(missing);
   }
 }

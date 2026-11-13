@@ -8,7 +8,7 @@ import '../../../core/keep_screen_on.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../mat/state/mat_providers.dart';
 import '../../mat/ui/fighter_text.dart';
-import '../../offline/ui/sync_status_bar.dart';
+import '../../offline/ui/sync_status_icon.dart';
 import '../data/match_view.dart';
 import '../data/tambo_match.dart';
 import '../state/bell.dart';
@@ -16,10 +16,12 @@ import '../state/match_controller.dart';
 import 'clock_bar.dart';
 import 'corner_panel.dart';
 import 'final_score.dart';
+import 'match_corrections.dart';
 import 'reason_dialog.dart';
 import 'timeline_list.dart';
 import 'undo_text.dart';
 import '../../../core/up_button.dart';
+import '../../mat/ui/mat_label.dart';
 
 /// How long the "undone" message stays.
 const undoneNotice = Duration(seconds: 3);
@@ -40,65 +42,111 @@ class ScoreboardScreen extends ConsumerWidget {
     final provider = matchControllerProvider(matchId);
     final match = ref.watch(provider);
     final view = match.value;
+    final fallback = view == null
+        ? '/'
+        : view.matId == null
+        ? '/'
+        : '/mats/${view.matId}?number=${view.matNumber}';
+    void leave() => _leave(context, ref, fallback);
     // Any tap opens the browser's audio, so the bells that come later by themselves sound.
     return Listener(
       onPointerUp: (_) => ref.read(bellProvider).unlock(),
-      child: KeepScreenOn(
-        child: Theme(
-          data: _scoreboardTheme,
-          child: Scaffold(
-            appBar: AppBar(
-              leading: UpButton(
-                label: view == null
-                    ? l10n.eventsTitle
-                    : l10n.matTitle(view.matNumber),
-                fallback: view == null
-                    ? '/'
-                    : '/mats/${view.matId}?number=${view.matNumber}',
-              ),
-              leadingWidth: UpButton.leadingWidth(context),
-              title: Text(
-                view == null
-                    ? ''
-                    : l10n.scoreboardTitle(view.matNumber, view.groupNumber),
-              ),
-              actions: [
-                if (view != null)
-                  IconButton(
-                    tooltip: l10n.timeline,
-                    icon: const Icon(Icons.history),
-                    onPressed: () => _showTimeline(context, view),
-                  ),
-              ],
-            ),
-            body: Column(
-              children: [
-                const SyncStatusBar(),
-                Expanded(
-                  child: AsyncView(
-                    value: match,
-                    onRetry: () => ref.invalidate(provider),
-                    data: (view) => view.finished
-                        ? _Finished(view: view)
-                        : _Live(
-                            view: view,
-                            onAction: (action, {side}) =>
-                                _act(context, ref, view, action, side: side),
-                            onAdjust: (delta) => _send(
-                              context,
-                              ref,
-                              MatchAction.clockAdjust,
-                              delta: delta,
-                            ),
-                          ),
-                  ),
+      // Leaving a match whose time is over finishes it, as the button does: going back by
+      // mistake must not leave it open on the mat.
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop) leave();
+        },
+        child: KeepScreenOn(
+          child: Theme(
+            data: _scoreboardTheme,
+            child: Scaffold(
+              appBar: AppBar(
+                leading: UpButton(
+                  label: view == null
+                      ? l10n.eventsTitle
+                      : matLabel(l10n, view.matNumber),
+                  fallback: fallback,
+                  onPressed: leave,
                 ),
-              ],
+                leadingWidth: UpButton.leadingWidth(context),
+                title: Text(
+                  view == null
+                      ? ''
+                      : l10n.scoreboardTitle(
+                          matLabel(l10n, view.matNumber),
+                          view.groupNumber,
+                        ),
+                ),
+                actions: [
+                  const SyncStatusIcon(),
+                  if (view != null && view.started && !view.finished)
+                    IconButton(
+                      tooltip: l10n.cancelMatch,
+                      icon: const Icon(Icons.block),
+                      onPressed: () => cancelMatch(context, ref, matchId),
+                    ),
+                  if (view != null)
+                    IconButton(
+                      tooltip: l10n.timeline,
+                      icon: const Icon(Icons.history),
+                      onPressed: () => _showTimeline(context, view),
+                    ),
+                ],
+              ),
+              body: Column(
+                children: [
+                  Expanded(
+                    child: AsyncView(
+                      value: match,
+                      onRetry: () => ref.invalidate(provider),
+                      data: (view) => view.finished
+                          ? _Finished(
+                              view: view,
+                              onReopen: () =>
+                                  reopenMatch(context, ref, matchId),
+                            )
+                          : _Live(
+                              view: view,
+                              onAction: (action, {side}) =>
+                                  _act(context, ref, view, action, side: side),
+                              onAdjust: (delta) => _send(
+                                context,
+                                ref,
+                                MatchAction.clockAdjust,
+                                delta: delta,
+                              ),
+                            ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _leave(
+    BuildContext context,
+    WidgetRef ref,
+    String fallback,
+  ) async {
+    final provider = matchControllerProvider(matchId);
+    final view = ref.read(provider).value;
+    if (view != null &&
+        !view.finished &&
+        view.review == null &&
+        matchOver(view, ref.read(provider.notifier).remainingNow())) {
+      await _act(context, ref, view, MatchAction.finish);
+      // Refused: stay, the toast says why.
+      if (!context.mounted || ref.read(provider).value?.finished != true) {
+        return;
+      }
+    }
+    UpButton.go(context, fallback);
   }
 
   Future<void> _act(
@@ -137,9 +185,9 @@ class ScoreboardScreen extends ConsumerWidget {
       undoing: action == MatchAction.undo ? view.lastUndoable : null,
     );
     // The match is over: the mat board must show the next recommendation.
-    if (action == MatchAction.finish) {
-      ref.invalidate(matBoardProvider(view.matId));
-      ref.invalidate(cachedBoardProvider(view.matId));
+    if (action == MatchAction.finish && view.matId != null) {
+      ref.invalidate(matBoardProvider(view.matId!));
+      ref.invalidate(cachedBoardProvider(view.matId!));
     }
   }
 
@@ -177,9 +225,11 @@ class ScoreboardScreen extends ConsumerWidget {
         MatchRefusal.notRunning => l10n.refusalNotRunning,
         MatchRefusal.nothingToUndo => l10n.refusalNothingToUndo,
         MatchRefusal.notOver => l10n.refusalNotOver,
+        MatchRefusal.notFinished => l10n.refusalNotFinished,
         MatchRefusal.notForAge => l10n.refusalNotForAge,
         MatchRefusal.inReview => l10n.refusalInReview,
         MatchRefusal.matBusy => l10n.refusalMatBusy,
+        MatchRefusal.resting => l10n.refusalResting,
         MatchRefusal.noPoints => l10n.refusalNoPoints,
         MatchRefusal.clockRunning => l10n.refusalClockRunning,
         MatchRefusal.clockLimit => l10n.refusalClockLimit,
@@ -310,9 +360,12 @@ class _ReviewBanner extends StatelessWidget {
 
 /// The result, then the timeline: side by side in landscape.
 class _Finished extends StatelessWidget {
-  const _Finished({required this.view});
+  const _Finished({required this.view, required this.onReopen});
 
   final MatchView view;
+
+  /// Always offered: the server says no while another match is on the mat.
+  final VoidCallback onReopen;
 
   @override
   Widget build(BuildContext context) {
@@ -329,12 +382,33 @@ class _Finished extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           FinalScore(view: view),
-          FilledButton.icon(
-            icon: const Icon(Icons.arrow_back),
-            label: Text(l10n.backToMat),
-            onPressed: () => context.canPop()
-                ? context.pop()
-                : context.go('/mats/${view.matId}'),
+          // Side by side: on a short phone a second row went under the timeline, out of sight.
+          Row(
+            spacing: AppSpacing.s,
+            children: [
+              Expanded(
+                child: FilledButton.icon(
+                  icon: const Icon(Icons.arrow_back),
+                  label: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(l10n.backToMat),
+                  ),
+                  onPressed: () => context.canPop()
+                      ? context.pop()
+                      : context.go('/mats/${view.matId}'),
+                ),
+              ),
+              Expanded(
+                child: OutlinedButton.icon(
+                  icon: const Icon(Icons.lock_open),
+                  label: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(l10n.reopenMatch),
+                  ),
+                  onPressed: onReopen,
+                ),
+              ),
+            ],
           ),
         ],
       ),

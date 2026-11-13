@@ -8,12 +8,15 @@ import '../../../core/async_view.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
+import '../../events/state/events_providers.dart';
 import '../../importing/data/import_repository.dart';
+import '../../league/ui/reenrol_dialog.dart';
 import '../data/club_models.dart';
 import '../data/club_repository.dart';
 import '../state/club_providers.dart';
 import 'club_panel_screen.dart';
 import 'participant_form.dart';
+import 'participant_record_sheet.dart';
 
 /// The students entered in the event, by name; add, edit or delete them.
 class ParticipantsTab extends ConsumerWidget {
@@ -49,6 +52,14 @@ class ParticipantsTab extends ConsumerWidget {
                     label: Text(l10n.participantAdd),
                     onPressed: () => showParticipantForm(context, eventId),
                   ),
+                  if ((ref.watch(clubPhasesProvider(eventId)).value?.length ??
+                          0) >
+                      1)
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.group_add_outlined),
+                      label: Text(l10n.reenrolButton),
+                      onPressed: () => showReenrolDialog(context, eventId),
+                    ),
                   // Only when this server can read lists (it has an Anthropic key).
                   if (ref.watch(importAvailableProvider(eventId)).value ??
                       false)
@@ -106,10 +117,25 @@ class _ParticipantTile extends ConsumerWidget {
         ],
       ),
       onTap: () => showParticipantForm(context, eventId, participant: p),
-      trailing: IconButton(
-        tooltip: l10n.delete,
-        icon: const Icon(Icons.delete_outline),
-        onPressed: () => _delete(context, ref),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            tooltip: l10n.recordOpen,
+            icon: const Icon(Icons.sports_martial_arts),
+            onPressed: () => showParticipantRecord(
+              context,
+              eventId: eventId,
+              participantId: p.id,
+              name: '${p.firstName} ${p.lastName}',
+            ),
+          ),
+          IconButton(
+            tooltip: l10n.delete,
+            icon: const Icon(Icons.delete_outline),
+            onPressed: () => _delete(context, ref),
+          ),
+        ],
       ),
     );
   }

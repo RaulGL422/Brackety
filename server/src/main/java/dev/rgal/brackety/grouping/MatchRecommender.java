@@ -3,26 +3,27 @@ package dev.rgal.brackety.grouping;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Predicate;
 import java.util.function.ToLongFunction;
 
 /**
  * Picks the match a referee should run next on a mat (docs/modulos/prototipo-f1.md):
  *
  * <ol>
- *   <li>never one with a fighter who is fighting right now on any mat (a ghost can be elsewhere);
- *       a team is busy when any of its members is;
+ *   <li>never one with a fighter who is fighting right now on any mat (a wildcard can be elsewhere), nor one with a
+ *       fighter who has not had the least rest since their last match; a team is busy or resting when any of its
+ *       members is;
  *   <li>if possible, nobody from the match that has just finished on this mat;
  *   <li>first the matches with most fighters who have not fought yet;
  *   <li>then the most combined rest of both fighters, where sums less than one match slot apart
  *       count as equal; a team rests as little as its least rested member;
- *   <li>among equals, the group that has gone longest without a match on this mat, so groups
- *       alternate; then group number and round-robin order.
+ *   <li>among equals, the group that has gone longest without a match, so groups alternate; then group number and
+ *       round-robin order.
  * </ol>
  */
 final class MatchRecommender {
@@ -32,12 +33,13 @@ final class MatchRecommender {
 
     /**
      * @param slot one match plus the changeover: rest sums closer than this are equal
-     * @param lastFought when each fighter last finished a match on any mat; absent = not fought yet
+     * @param lastFought when each person last finished a match on any mat; absent = not fought yet
      * @param groupCreated when each group was created: the rest of a fighter who has not fought yet
-     * @param groupLastPlayed when each group last finished a match on this mat; absent = never
-     * @param busy fighters in a match in progress on any mat
-     * @param justFought fighters of the last match finished on this mat
+     * @param groupLastPlayed when each group last finished a match; absent = never
+     * @param busy people in a match in progress on any mat (or proposed to another mat)
+     * @param justFought people of the last match finished on this mat
      * @param teamMembers the members of each team; every other id is a single participant
+     * @param minRest the least time between the end of a person's match and the start of their next one
      */
     record Context(
             Instant now,
@@ -47,14 +49,86 @@ final class MatchRecommender {
             Map<UUID, Instant> groupLastPlayed,
             Set<UUID> busy,
             Set<UUID> justFought,
-            Map<UUID, Set<UUID>> teamMembers) {
+            Map<UUID, Set<UUID>> teamMembers,
+            Duration minRest,
+            Set<UUID> restWaived) {
+
+        /** {@code restWaived}: matches the club let start without the least rest. */
+        Context(
+                Instant now,
+                Duration slot,
+                Map<UUID, Instant> lastFought,
+                Map<UUID, Instant> groupCreated,
+                Map<UUID, Instant> groupLastPlayed,
+                Set<UUID> busy,
+                Set<UUID> justFought,
+                Map<UUID, Set<UUID>> teamMembers,
+                Duration minRest) {
+            this(
+                    now,
+                    slot,
+                    lastFought,
+                    groupCreated,
+                    groupLastPlayed,
+                    busy,
+                    justFought,
+                    teamMembers,
+                    minRest,
+                    Set.of());
+        }
+
+        Context forMat(Duration slot, Set<UUID> justFought) {
+            return new Context(
+                    now,
+                    slot,
+                    lastFought,
+                    groupCreated,
+                    groupLastPlayed,
+                    busy,
+                    justFought,
+                    teamMembers,
+                    minRest,
+                    restWaived);
+        }
+
+        Context alsoBusy(Set<UUID> more) {
+            var all = new HashSet<>(busy);
+            all.addAll(more);
+            return new Context(
+                    now,
+                    slot,
+                    lastFought,
+                    groupCreated,
+                    groupLastPlayed,
+                    all,
+                    justFought,
+                    teamMembers,
+                    minRest,
+                    restWaived);
+        }
 
         boolean isFree(Candidate c) {
-            return none(c, busy::contains);
+            return people(c).stream().noneMatch(busy::contains);
         }
 
         boolean isRested(Candidate c) {
-            return none(c, justFought::contains);
+            return people(c).stream().noneMatch(justFought::contains);
+        }
+
+        /** When every person of the match has had the least rest: {@code Instant.MIN} if nobody has fought. */
+        Instant readyAt(Candidate c) {
+            if (restWaived.contains(c.matchId())) {
+                return Instant.MIN;
+            }
+            return people(c).stream()
+                    .filter(lastFought::containsKey)
+                    .map(p -> lastFought.get(p).plus(minRest))
+                    .max(Comparator.naturalOrder())
+                    .orElse(Instant.MIN);
+        }
+
+        boolean isReady(Candidate c) {
+            return !readyAt(c).isAfter(now);
         }
 
         int notFoughtYet(Candidate c) {
@@ -65,13 +139,15 @@ final class MatchRecommender {
             return rest(c.red(), c) + rest(c.blue(), c);
         }
 
-        private Set<UUID> people(UUID fighter) {
-            return teamMembers.getOrDefault(fighter, Set.of(fighter));
+        /** Everyone in the match: the participants, or the teams' members. */
+        Set<UUID> people(Candidate c) {
+            var all = new HashSet<>(people(c.red()));
+            all.addAll(people(c.blue()));
+            return all;
         }
 
-        private boolean none(Candidate c, Predicate<UUID> test) {
-            return people(c.red()).stream().noneMatch(test)
-                    && people(c.blue()).stream().noneMatch(test);
+        private Set<UUID> people(UUID fighter) {
+            return teamMembers.getOrDefault(fighter, Set.of(fighter));
         }
 
         private int notFought(UUID fighter) {
@@ -89,8 +165,9 @@ final class MatchRecommender {
 
     private MatchRecommender() {}
 
-    static Optional<UUID> recommend(List<Candidate> pending, Context ctx) {
-        var options = pending.stream().filter(ctx::isFree).toList();
+    static Optional<Candidate> recommend(List<Candidate> pending, Context ctx) {
+        var options =
+                pending.stream().filter(c -> ctx.isFree(c) && ctx.isReady(c)).toList();
         var rested = options.stream().filter(ctx::isRested).toList();
         if (!rested.isEmpty()) {
             options = rested;
@@ -102,8 +179,7 @@ final class MatchRecommender {
                                 c -> ctx.groupLastPlayed().get(c.groupId()),
                                 Comparator.nullsFirst(Comparator.naturalOrder()))
                         .thenComparingInt(Candidate::groupNumber)
-                        .thenComparingInt(Candidate::order))
-                .map(Candidate::matchId);
+                        .thenComparingInt(Candidate::order));
     }
 
     private static List<Candidate> keepMax(List<Candidate> options, ToLongFunction<Candidate> value, long tolerance) {

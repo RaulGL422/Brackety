@@ -5,8 +5,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import dev.rgal.brackety.auth.account.ProfileType;
 import dev.rgal.brackety.event.EventApiTest;
+import dev.rgal.brackety.event.RulebookService;
 import dev.rgal.brackety.participant.Participant;
 import dev.rgal.brackety.participant.ParticipantRepository;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -38,6 +40,9 @@ class EventPackageServiceTest extends EventApiTest {
     @Autowired
     JsonMapper json;
 
+    @Autowired
+    RulebookService rulebooks;
+
     @BeforeEach
     void yoseikanParticipantsAndOwnSettings() {
         var random = new Random(2027);
@@ -64,6 +69,10 @@ class EventPackageServiceTest extends EventApiTest {
 
     @Test
     void roundTripIntoAnEmptyDatabaseKeepsEverythingButIds() {
+        jdbc.sql("insert into event_staff_name (event_id, account_id, name) values (?, ?, 'Juan Pérez')")
+                .params(eventId, accountId("arbitro1"))
+                .update();
+        rulebooks.put(eventId, "Reglamento F1.pdf", "%PDF-1.7 tambo".getBytes(StandardCharsets.US_ASCII));
         var exported = packages.export(eventId, accountId("club1"));
         var file = json.writeValueAsBytes(exported);
         emptyDatabase();
@@ -73,6 +82,7 @@ class EventPackageServiceTest extends EventApiTest {
         assertThat(loaded.event()).isEqualTo(exported.event());
         assertThat(loaded.owner()).isEqualTo(exported.owner());
         assertThat(loaded.staff()).isEqualTo(exported.staff()).hasSize(STAFF);
+        assertThat(loaded.staffNames()).containsExactly(new EventPackage.StaffName("arbitro1", "Juan Pérez"));
         assertThat(loaded.categories()).isEqualTo(exported.categories()).hasSize(9);
         assertThat(loaded.categories()).filteredOn(c -> c.teamSize() != null).hasSize(4);
         assertThat(loaded.mats()).isEqualTo(exported.mats()).hasSize(5);
@@ -82,6 +92,9 @@ class EventPackageServiceTest extends EventApiTest {
                 .filteredOn(p -> "15-16".equals(p.categoryName()))
                 .hasSize(2);
         assertThat(count("event")).isOne();
+        // The referees on the laptop read the same rulebook.
+        assertThat(loaded.rulebook()).isEqualTo(exported.rulebook());
+        assertThat(loaded.rulebook().fileName()).isEqualTo("Reglamento F1.pdf");
     }
 
     @Test
@@ -112,6 +125,54 @@ class EventPackageServiceTest extends EventApiTest {
                         .query(String.class)
                         .single())
                 .isEqualTo("Club Demo Yoseikan");
+    }
+
+    @Test
+    void theStaffCanGetTheirUsernameAsPassword() {
+        var file = exportFile();
+        emptyDatabase();
+
+        var created = packages.load(file, true).newAccounts();
+
+        assertThat(created)
+                .hasSize(STAFF)
+                .allSatisfy(a -> assertThat(a.password()).isEqualTo(a.username()));
+        assertThat(auth.login("arbitro1", "arbitro1", "127.0.0.1").accessToken())
+                .isNotBlank();
+    }
+
+    @Test
+    void aResetWipesTheEventAndLoadsThePackageAgainKeepingTheAccounts(@TempDir Path dir) throws Exception {
+        var file = Files.write(dir.resolve("f1.brackety"), exportFile());
+        var reset = new EventPackageReset(packages, jdbc, file.toString());
+        var extra = new Participant(eventId, clock.instant());
+        extra.update("Nuevo", "Prueba", java.time.LocalDate.of(2020, 1, 1), 120, true);
+        participants.save(extra);
+        jdbc.sql("update event set name = 'Cambiado'").update();
+        var accountsBefore = count("account");
+
+        assertThat(reset.packageName()).contains("f1.brackety");
+        var newEvent = reset.reset();
+
+        assertThat(newEvent).isNotEqualTo(eventId);
+        assertThat(count("event")).isOne();
+        assertThat(count("league")).isOne();
+        assertThat(count("participant")).isEqualTo(PARTICIPANTS);
+        assertThat(jdbc.sql("select name from event").query(String.class).single())
+                .isNotEqualTo("Cambiado");
+        // Same accounts, same passwords.
+        assertThat(count("account")).isEqualTo(accountsBefore);
+        assertThat(auth.login("arbitro1", "arbitro1", "127.0.0.1").accessToken())
+                .isNotBlank();
+    }
+
+    @Test
+    void withoutAPackageThereIsNothingToResetTo() {
+        var reset = new EventPackageReset(packages, jdbc, "");
+
+        assertThat(reset.packageName()).isEmpty();
+        assertThatThrownBy(reset::reset).isInstanceOf(IllegalStateException.class);
+        assertThat(count("event")).isOne();
     }
 
     @Test
@@ -184,7 +245,7 @@ class EventPackageServiceTest extends EventApiTest {
     void theStartupLoaderLoadsTheFileOrStopsWithTheReason(@TempDir Path dir) throws Exception {
         var file = Files.write(dir.resolve("f1.brackety"), exportFile());
         var credentials = dir.resolve("credentials.txt");
-        var loader = new EventPackageLoader(packages, file.toString(), credentials.toString());
+        var loader = new EventPackageLoader(packages, file.toString(), credentials.toString(), false);
 
         assertThatThrownBy(loader::afterSingletonsInstantiated)
                 .isInstanceOf(IllegalStateException.class)
@@ -212,7 +273,7 @@ class EventPackageServiceTest extends EventApiTest {
         var file = Files.write(dir.resolve("f1.brackety"), exportFile());
         emptyDatabase();
 
-        assertThatThrownBy(new EventPackageLoader(packages, file.toString(), " ")::afterSingletonsInstantiated)
+        assertThatThrownBy(new EventPackageLoader(packages, file.toString(), " ", false)::afterSingletonsInstantiated)
                 .hasMessageContaining("BRACKETY_PACKAGE_CREDENTIALS is required");
         assertThat(count("account")).isZero();
     }

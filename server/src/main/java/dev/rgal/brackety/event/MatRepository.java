@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface MatRepository extends JpaRepository<Mat, UUID> {
 
     List<Mat> findByEventIdOrderByNumber(UUID eventId);
+
+    List<Mat> findByEventIdAndRefereeAccountIdOrderByNumber(UUID eventId, UUID refereeAccountId);
 }

@@ -12,10 +12,14 @@ class DraftSlots extends StatelessWidget {
     required this.group,
     required this.labelOf,
     required this.onChanged,
+    this.ghostTeamLabel,
   });
 
   final DraftGroup group;
   final String Function(String id) labelOf;
+
+  /// Names a wildcard team ("Equipo 7", or its people); null: just "Comodín".
+  final String Function(List<String> people)? ghostTeamLabel;
   final void Function(DraftGroup Function(DraftGroup group) change) onChanged;
 
   @override
@@ -39,17 +43,24 @@ class DraftSlots extends StatelessWidget {
         onTap: () => onChanged((g) => g.toggle(id, grouped: false)),
       );
     }
-    if (group.ghost case final ghost? when ghostSlot) {
+    final ghostIndex = i - group.members.length;
+    if (ghostIndex < group.ghosts.length) {
+      final ghost = group.ghosts[ghostIndex];
       return _Slot(
         label: l10n.ghostOf(labelOf(ghost)),
         ghost: true,
         onTap: () => onChanged((g) => g.toggle(ghost, grouped: false)),
       );
     }
-    if (ghostSlot &&
-        group.ofTeams &&
-        group.ghostTeam.length == group.ghostTeamSize) {
-      return _Slot(label: l10n.ghostBadge, ghost: true);
+    if (group.ofTeams && ghostIndex < group.ghostTeams.length) {
+      final team = group.ghostTeams[ghostIndex];
+      return _Slot(
+        label: ghostTeamLabel == null
+            ? l10n.ghostBadge
+            : l10n.ghostOf(ghostTeamLabel!(team)),
+        ghost: true,
+        onTap: () => onChanged((g) => g.removeGhostTeam(ghostIndex)),
+      );
     }
     return _Slot(
       label: ghostSlot ? l10n.ghostBadge : l10n.draftSlot(i + 1),

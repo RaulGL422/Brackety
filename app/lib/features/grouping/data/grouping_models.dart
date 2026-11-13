@@ -44,6 +44,8 @@ class CategoryParticipant {
     this.teamNumber,
     this.groupId,
     this.groupStarted = false,
+    this.groupCreatedBy,
+    this.queued = false,
   });
 
   factory CategoryParticipant.fromJson(Map<String, dynamic> json) =>
@@ -58,6 +60,7 @@ class CategoryParticipant {
         teamNumber: json['teamNumber'] as int?,
         groupId: json['groupId'] as String?,
         groupStarted: json['groupStarted'] as bool? ?? false,
+        groupCreatedBy: json['groupCreatedBy'] as String?,
       );
 
   final String id;
@@ -73,17 +76,38 @@ class CategoryParticipant {
   /// Set once the participant is in a real team (not a ghost one).
   final int? teamNumber;
 
+  /// Who made their group ("Ana López (ayudante1)", or the sign-in alone).
+  final String? groupCreatedBy;
+
   final String? groupId;
 
   /// A match of their group has started: the helper can no longer undo it.
   final bool groupStarted;
 
+  /// In a team or group made without network, not sent yet.
+  final bool queued;
+
   bool get canUndoGroup => groupId != null && !groupStarted;
 
   bool get isGrouped => groupNumber != null;
 
-  /// Already competing for real somewhere: a group or a team.
-  bool get isTaken => isGrouped || teamNumber != null;
+  /// Already competing for real somewhere: a group or a team (also one waiting to be sent).
+  bool get isTaken => isGrouped || teamNumber != null || queued;
+
+  CategoryParticipant asQueued() => CategoryParticipant(
+    id: id,
+    firstName: firstName,
+    lastName: lastName,
+    age: age,
+    heightCm: heightCm,
+    groupNumber: groupNumber,
+    matNumber: matNumber,
+    teamNumber: teamNumber,
+    groupId: groupId,
+    groupStarted: groupStarted,
+    groupCreatedBy: groupCreatedBy,
+    queued: true,
+  );
 
   String get fullName => '$firstName $lastName';
 }
@@ -96,12 +120,13 @@ class CreatedGroups {
   });
 
   factory CreatedGroups.fromJson(Map<String, dynamic> json) => CreatedGroups(
-    matNumber: json['matNumber'] as int,
+    matNumber: json['matNumber'] as int?,
     groupNumbers: [for (final n in json['groupNumbers'] as List) n as int],
     groupIds: [for (final id in json['groupIds'] as List? ?? []) id as String],
   );
 
-  final int matNumber;
+  /// Null for groups of teams: their matches go to the free mats.
+  final int? matNumber;
   final List<int> groupNumbers;
 
   /// In the order of [groupNumbers].
@@ -118,6 +143,7 @@ class Team {
     this.matNumber,
     this.groupId,
     this.groupStarted = false,
+    this.queued = false,
   });
 
   factory Team.fromJson(Map<String, dynamic> json) => Team(
@@ -128,6 +154,7 @@ class Team {
         TeamMember(
           participantId: (m as Map<String, dynamic>)['participantId'] as String,
           fullName: '${m['firstName']} ${m['lastName']}',
+          ghost: m['ghost'] as bool? ?? false,
         ),
     ],
     groupNumber: json['groupNumber'] as int?,
@@ -144,14 +171,53 @@ class Team {
   final String? groupId;
   final bool groupStarted;
 
+  /// In a group made without network, not sent yet.
+  final bool queued;
+
   bool get isGrouped => groupNumber != null;
 
+  /// In a group, or in one waiting to be sent.
+  bool get isTaken => isGrouped || queued;
+
   bool get canUndoGroup => groupId != null && !groupStarted;
+
+  Team asQueued() => Team(
+    id: id,
+    number: number,
+    members: members,
+    groupNumber: groupNumber,
+    matNumber: matNumber,
+    groupId: groupId,
+    groupStarted: groupStarted,
+    queued: true,
+  );
 }
 
 class TeamMember {
-  const TeamMember({required this.participantId, required this.fullName});
+  const TeamMember({
+    required this.participantId,
+    required this.fullName,
+    this.ghost = false,
+  });
 
   final String participantId;
   final String fullName;
+
+  /// Fills the team in (they compete elsewhere) without scoring for it.
+  final bool ghost;
+}
+
+/// Participants in more than one of [teams], with the numbers of the teams they are in. A team's
+/// ghost member may be in another team of the same group: allowed, but the helper should know.
+Map<String, List<int>> overlappingMembers(List<Team> teams) {
+  final teamsOf = <String, List<int>>{};
+  for (final t in teams) {
+    for (final m in t.members) {
+      (teamsOf[m.participantId] ??= []).add(t.number);
+    }
+  }
+  return {
+    for (final MapEntry(:key, :value) in teamsOf.entries)
+      if (value.length > 1) key: value,
+  };
 }

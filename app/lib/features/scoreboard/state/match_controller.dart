@@ -61,6 +61,11 @@ class MatchController extends AsyncNotifier<MatchView> {
       if (state.hasValue && local != null) _show(local.view);
     });
     await _sync.ready;
+    // Known to be offline: what the device keeps at once; the polls and the background check
+    // bring the server's view when it answers again.
+    if (!ref.read(offlineSyncProvider).connected && _local() != null) {
+      return _local()!.view;
+    }
     try {
       final view = await _repository.load(matchId);
       _sync.reportResponse();
@@ -105,12 +110,18 @@ class MatchController extends AsyncNotifier<MatchView> {
     final local = _local();
     if (local == null) return const ActionRefusal.server('');
     final now = _sync.now();
+    final firstStart =
+        action == MatchAction.start && local.view.status == MatchStatus.pending;
     final refusal =
         local.refuse(action, side, now, delta: delta ?? Duration.zero) ??
-        (action == MatchAction.start &&
-                local.view.status == MatchStatus.pending &&
+        // A first start or a reopening takes the mat: not while another match is on it.
+        ((firstStart || action == MatchAction.reopen) &&
                 _matBusy(local.view, now)
             ? MatchRefusal.matBusy
+            : null) ??
+        // The least rest since each fighter's last match, as the server last said.
+        (firstStart && (local.view.readyAt?.isAfter(now) ?? false)
+            ? MatchRefusal.resting
             : null);
     if (refusal != null) return ActionRefusal.local(refusal);
     final queued = await _sync.enqueue(

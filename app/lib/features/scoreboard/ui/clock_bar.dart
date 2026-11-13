@@ -92,8 +92,7 @@ class _ClockBarState extends ConsumerState<ClockBar> {
     final left = ref
         .read(matchControllerProvider(view.id).notifier)
         .remainingNow();
-    final over =
-        view.endReason != null || (view.running && left == Duration.zero);
+    final over = matchOver(view, left);
     final clock = _Clock(view: view, left: left, over: over);
     final clockButton = _ClockButton(
       view: view,
@@ -268,19 +267,23 @@ class _Clock extends StatelessWidget {
               _ => l10n.endTime,
             }, style: text.headlineMedium)
           : Text(
-              _format(left),
+              clockLabel(left),
               style: text.displayLarge?.copyWith(
                 color: ending ? BracketyColors.of(context).warning : null,
               ),
             ),
     );
   }
+}
 
-  // Seconds round up, so 0:00 only shows when the time is really over.
-  static String _format(Duration left) {
-    final seconds = (left.inMilliseconds / 1000).ceil();
-    return '${seconds ~/ 60}:${(seconds % 60).toString().padLeft(2, '0')}';
-  }
+/// Time or points ended it: only finishing is left.
+bool matchOver(MatchView view, Duration left) =>
+    view.endReason != null || (view.running && left == Duration.zero);
+
+/// "2:41". Seconds round up, so 0:00 only shows when the time is really over.
+String clockLabel(Duration left) {
+  final seconds = (left.inMilliseconds / 1000).ceil();
+  return '${seconds ~/ 60}:${(seconds % 60).toString().padLeft(2, '0')}';
 }
 
 /// Start, stop or finish, by icon and word and without state colours: the colours on the
@@ -340,11 +343,11 @@ class _ClockButton extends StatelessWidget {
         textStyle: Theme.of(context).textTheme.titleLarge,
       ),
       icon: Icon(icon),
-      label: Text(
-        label,
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-        textAlign: TextAlign.center,
+      // One word per line, shrunk only if a word still does not fit: wrapping by width broke
+      // "Finalizar" in the middle on a narrow phone, and one shrunk line was too small to read.
+      label: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(label.replaceFirst(' ', '\n'), textAlign: TextAlign.center),
       ),
       onPressed: locked ? null : () => onAction(action),
     );

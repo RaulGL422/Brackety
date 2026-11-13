@@ -1,4 +1,62 @@
 {
+  "draftGhostTeamPanelHint": "Equipos comodín (hasta 3): toca en la lista un equipo de otro grupo, o forma uno con alumnos sueltos. Combaten pero no puntúan.",
+  "teamJoinsAsWildcard": "Toca para que entre como equipo comodín",
+  "ghostTeamPageTitle": "Formar equipo comodín",
+  "ghostTeamSearch": "Buscar alumno",
+  "formGhostTeam": "Formar equipo comodín con alumnos sueltos",
+  "teamPickWildcards": "Elegir comodines",
+  "matReservedElsewhere": "Alguien de este combate lo espera ahora el tapiz {mat}",
+  "@matReservedElsewhere": {"placeholders": {"mat": {"type": "int"}}},
+  "matAfterIndividual": "Después de tu grupo individual",
+  "matPlannedAt": "Previsto hacia las {time}",
+  "@matPlannedAt": {"placeholders": {"time": {"type": "String"}}},
+  "controlMenu": "Cambiar",
+  "controlDone": "Hecho",
+  "controlError": "No se pudo hacer el cambio. Recarga y vuelve a intentarlo.",
+  "controlMatchInProgress": "Hay un combate de este grupo en curso: espera a que acabe.",
+  "controlMatchNotPending": "Ese combate ya ha empezado: no se puede cambiar.",
+  "controlMatWithoutReferee": "Ese tapiz no tiene árbitro.",
+  "controlOrderChanged": "Los combates han cambiado mientras tanto: recarga y vuelve a ordenarlos.",
+  "controlTeamSize": "Los equipos tienen que quedar de 2 o 3.",
+  "controlGroupStarted": "El grupo de esos equipos ya ha empezado: sus equipos ya no cambian.",
+  "controlSameFighter": "Esa persona ya lucha en el grupo del otro equipo (como comodín).",
+  "controlPickMat": "¿A qué tapiz?",
+  "controlNoOtherMat": "No hay otro tapiz con árbitro.",
+  "controlMatOption": "Tapiz {number} · {referee} · {pending, plural, =0{sin combates pendientes} =1{1 pendiente} other{{pending} pendientes}}",
+  "@controlMatOption": {"placeholders": {"number": {"type": "int"}, "referee": {"type": "String"}, "pending": {"type": "int"}}},
+  "controlMoveMatch": "Mover este combate a otro tapiz",
+  "controlWaiveRest": "Dejar empezar sin esperar el descanso",
+  "controlWaiveRestTitle": "¿Empezar sin el descanso mínimo?",
+  "controlWaiveRestBody": "{red} contra {blue} podrá empezar aunque alguien no haya descansado. Queda registrado quién lo permitió.",
+  "@controlWaiveRestBody": {"placeholders": {"red": {"type": "String"}, "blue": {"type": "String"}}},
+  "controlConfirm": "Sí, permitir",
+  "controlMoveGroup": "Mover el grupo a otro tapiz",
+  "controlReorder": "Cambiar el orden de los combates",
+  "controlReorderHint": "Arrastra para ordenar los combates pendientes. Los jugados no cambian.",
+  "controlMoveMember": "Mover un alumno a otro equipo",
+  "controlMoveMemberWho": "¿Quién se cambia?",
+  "controlMoveMemberTo": "¿A qué equipo?",
+  "settingsMatNeedsReferee": "Ese tapiz tiene combates por jugar: no puede quedarse sin árbitro. Pon otro árbitro o espera a que acaben.",
+  "refusalResting": "Todavía no: alguien de este combate no ha cumplido el descanso mínimo desde su último combate. Espera a que se desbloquee en el tablero.",
+  "cornerFightingNow": "Luchando en el tapiz {mat}",
+  "@cornerFightingNow": {"placeholders": {"mat": {"type": "int"}}},
+  "cornerFighting": "Luchando en el tapiz {mat} · libre hacia las {time}",
+  "@cornerFighting": {"placeholders": {"mat": {"type": "int"}, "time": {"type": "String"}}},
+  "cornerResting": "Descansando hasta las {time}",
+  "@cornerResting": {"placeholders": {"time": {"type": "String"}}},
+  "cornerPending": "{count, plural, =1{Le queda otro combate} other{Le quedan {count} combates}} en tapiz {mats}",
+  "@cornerPending": {"placeholders": {"count": {"type": "int"}, "mats": {"type": "String"}}},
+  "rulebookTitle": "Reglamento de la fase",
+  "rulebookHint": "El PDF con el reglamento completo. Los árbitros lo abren desde la pantalla de su tapiz, también en el portátil del pabellón (va dentro del paquete del evento).",
+  "rulebookNone": "Sin reglamento",
+  "rulebookUpload": "Subir PDF",
+  "rulebookReplace": "Cambiar PDF",
+  "rulebookOpen": "Ver reglamento",
+  "rulebookRemove": "Quitar",
+  "rulebookUploaded": "Reglamento subido",
+  "rulebookUploadError": "No se pudo subir: tiene que ser un PDF de hasta 10 MB.",
+  "rulebookRemoveError": "No se pudo quitar el reglamento.",
+  "rulebookOpenError": "No se pudo abrir el reglamento. Comprueba la conexión.",
   "@@locale": "es",
   "appTitle": "Brackety",
   "navConnection": "Conexión",
@@ -167,14 +225,14 @@
     }
   },
   "heightUnknown": "sin estatura",
-  "participantGrouped": "Grupo {group} · Tapiz {mat}",
+  "participantGrouped": "Grupo {group} · {mat}",
   "@participantGrouped": {
     "placeholders": {
       "group": {
         "type": "int"
       },
       "mat": {
-        "type": "int"
+        "type": "String"
       }
     }
   },
@@ -186,8 +244,8 @@
       }
     }
   },
-  "draftGhost": "Competidor fantasma",
-  "draftGhostHint": "Elige al fantasma: combate pero no puntúa.",
+  "draftGhost": "Comodín",
+  "draftGhostHint": "Comodines (hasta 3): quien ya tiene grupo, o el 4.º que elijas. Combaten pero no puntúan.",
   "createGroup": "{count, plural, =1{Crear grupo} other{Crear grupos}}",
   "@createGroup": {
     "placeholders": {
@@ -207,8 +265,20 @@
   "groupsConflict": "Algún alumno ya está en un grupo o el tapiz se ha quedado sin árbitro. La lista se ha actualizado.",
   "groupsError": "No se ha podido crear el grupo.",
   "ok": "Aceptar",
-  "ghostBadge": "Fantasma",
+  "ghostBadge": "Comodín",
   "matTitle": "Tapiz {number}",
+  "matPool": "Tapices libres",
+  "queuedOffline": "Sin conexión: {what} se enviará al volver la red. Mientras, sus alumnos salen como pendientes.",
+  "@queuedOffline": {"placeholders": {"what": {"type": "String"}}},
+  "queuedSent": "Enviado: {what}",
+  "@queuedSent": {"placeholders": {"what": {"type": "String"}}},
+  "queuedRefused": "No se pudo crear {what}: alguien ya estaba en otro grupo o equipo. Revisa la lista.",
+  "@queuedRefused": {"placeholders": {"what": {"type": "String"}}},
+  "queuedPending": "Pendiente de enviar (sin conexión)",
+  "queuedGroupLabel": "el grupo de {names}",
+  "@queuedGroupLabel": {"placeholders": {"names": {"type": "String"}}},
+  "queuedTeamLabel": "el equipo de {names}",
+  "@queuedTeamLabel": {"placeholders": {"names": {"type": "String"}}},
   "@matTitle": {
     "placeholders": {
       "number": {
@@ -246,13 +316,19 @@
   "matGroups": "Grupos en este tapiz",
   "matFinished": "Disputados",
   "matWaiting": "Un luchador está combatiendo ahora",
+  "matResting": "Descansando hasta las {time}",
+  "@matResting": {"placeholders": {"time": {"type": "String"}}},
+  "matProposedElsewhere": "Propuesto en el tapiz {number}",
+  "@matProposedElsewhere": {"placeholders": {"number": {"type": "int"}}},
+  "matPoolOffline": "Sin conexión: otro tapiz puede estar haciéndolo",
+  "matTeamPoolNotice": "Sin grupos individuales pendientes: este tapiz coge los combates de equipos del bote común, repartidos entre los tapices libres. Primero los que más han descansado.",
   "matNoneAvailable": "Ningún combate puede empezar ahora.",
   "versus": "vs",
-  "scoreboardTitle": "Tapiz {mat}, grupo {group}",
+  "scoreboardTitle": "{mat}, grupo {group}",
   "@scoreboardTitle": {
     "placeholders": {
       "mat": {
-        "type": "int"
+        "type": "String"
       },
       "group": {
         "type": "int"
@@ -361,10 +437,16 @@
   "refusalClockRunning": "Para el reloj antes de ajustarlo.",
   "refusalClockLimit": "El reloj no puede ir más allá.",
   "settingsMatchRules": "Combates",
-  "settingsMatchLength": "Duración del combate (min:s)",
+  "settingsMatchLength": "Individual: duración del combate (min:s)",
+  "settingsTeamMatchLength": "Equipos: duración del combate (min:s)",
+  "settingsTeamPointsLimit": "Equipos: puntos para acabar el combate",
+  "settingsTeamPointsLimitHint": "Vacío = sin límite: acaba por tiempo. Descalificar da al rival 15 puntos, o los suyos si lleva más.",
+  "settingsMinRest": "Descanso mínimo entre combates (segundos)",
+  "settingsMinRestHint": "Nadie empieza un combate sin este descanso desde el anterior, en cualquier tapiz. Hasta entonces el combate sale en espera.",
+  "settingsMinRestInvalid": "Entre 0 y 600 segundos.",
   "settingsMatchLengthHint": "De 0:30 a 20:00. No cambia con un combate en curso.",
   "settingsMatchLengthInvalid": "Escribe minutos y segundos entre 0:30 y 20:00, por ejemplo 3:00.",
-  "settingsPointsLimit": "Puntos para acabar el combate",
+  "settingsPointsLimit": "Individual: puntos para acabar el combate",
   "settingsPointsLimitHint": "Al llegar uno, acaba. La descalificación da estos puntos al rival. No cambia una vez empezado un combate.",
   "settingsMatchRulesConflict": "No se puede cambiar ahora: hay un combate en curso o ya empezado.",
   "settingsPointsLimitInvalid": "Entre 1 y 99.",
@@ -525,7 +607,7 @@
       }
     }
   },
-  "teamGhostName": "Equipo {number} (fantasma)",
+  "teamGhostName": "Equipo {number} (comodín)",
   "@teamGhostName": {
     "placeholders": {
       "number": {
@@ -597,8 +679,10 @@
     }
   },
   "deleteTeamError": "No se ha podido deshacer el equipo.",
-  "draftGhostTeam": "Equipo fantasma",
-  "draftGhostTeamHint": "Elige {size} alumnos cualesquiera de la categoría: combaten pero no puntúan.",
+  "draftGhostTeam": "Equipo comodín",
+  "draftGhostTeamHint": "Equipos comodín (hasta 3): de 2 o hasta {size} alumnos cualesquiera de la categoría que no estén ya en el grupo. Combaten pero no puntúan.",
+  "addGhostTeam": "Añadir equipo comodín",
+  "teamGroupPoolHint": "Sin tapiz: sus combates se reparten entre los tapices sin grupos individuales.",
   "@draftGhostTeamHint": {
     "placeholders": {
       "size": {
@@ -700,14 +784,7 @@
   "confirmEmailChangeTitle": "Cambio de email",
   "confirmEmailChangeDone": "Email cambiado. Se han cerrado todas las sesiones: inicia sesión con el email nuevo.",
   "categoryIndividual": "Individual",
-  "categoryTeams": "Equipos de {size}",
-  "@categoryTeams": {
-    "placeholders": {
-      "size": {
-        "type": "int"
-      }
-    }
-  },
+  "categoryTeams": "Equipos de 2 o 3",
   "categoryAdd": "Añadir categoría",
   "categoryEdit": "Editar categoría",
   "categoryRemove": "Quitar categoría",
@@ -715,7 +792,6 @@
   "categoryMinAge": "Desde",
   "categoryMaxAge": "Hasta",
   "categoryByTeams": "Por equipos",
-  "categoryTeamSize": "Alumnos por equipo",
   "categoryGroupSize": "Grupos de {size}",
   "@categoryGroupSize": {
     "placeholders": {
@@ -973,14 +1049,14 @@
   "refusalNotRunning": "El reloj no está en marcha.",
   "refusalNothingToUndo": "No hay nada que deshacer.",
   "refusalNotOver": "El combate todavía no ha acabado.",
-  "refusalNotForAge": "El aviso de una mano solo es para alumnos de 4 a 7 años.",
+  "refusalNotForAge": "El aviso de una mano solo es para alumnos de 4 a 8 años.",
   "refusalInReview": "El combate está en revisión del club.",
   "refusalMatBusy": "Hay otro combate en curso en este tapiz.",
   "reviewBannerReferee": "En revisión del club: este combate queda parado hasta que el club aplique o descarte las acciones de este móvil.",
   "reviewTitle": "Acciones del móvil en revisión",
   "reviewReasonKnownEvents": "Otro dispositivo escribió en el combate mientras el móvil estaba sin conexión.",
   "reviewReasonRules": "Las reglas del marcador no permitían una acción del móvil.",
-  "reviewReasonAge": "Aviso de una mano a quien no tiene de 4 a 7 años.",
+  "reviewReasonAge": "Aviso de una mano a quien no tiene de 4 a 8 años.",
   "reviewReasonMatBusy": "Había otro combate en curso en el tapiz.",
   "reviewReasonFighterBusy": "Un alumno estaba combatiendo en otro tapiz.",
   "reviewReasonUnknown": "Choque con el servidor.",
@@ -1087,7 +1163,7 @@
       }
     }
   },
-  "ghostOf": "{name} (fantasma)",
+  "ghostOf": "{name} (comodín)",
   "@ghostOf": {
     "placeholders": {
       "name": {
@@ -1112,5 +1188,211 @@
   "reasonApplyWarning": "Poner advertencia",
   "reasonApplyDisqualify": "Descalificar",
   "accountMenu": "Mi cuenta",
-  "back": "Volver"
+  "back": "Volver",
+  "clubLeague": "Liga",
+  "phaseNumber": "Fase {number}",
+  "@phaseNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "leagueSwitchPhase": "Cambiar de fase",
+  "leaguePodiumSummary": "Podio: {firsts} oros, {seconds} platas y {thirds} bronces por categoría",
+  "@leaguePodiumSummary": {
+    "placeholders": {
+      "firsts": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      },
+      "thirds": {
+        "type": "int"
+      }
+    }
+  },
+  "leagueEdit": "Editar liga",
+  "leaguePhases": "Fases",
+  "leagueNewPhase": "Nueva fase",
+  "leaguePhaseEntries": "{count, plural, =1{1 inscrito} other{{count} inscritos}}",
+  "@leaguePhaseEntries": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leagueCurrentPhase": "Esta fase",
+  "disciplineTambo": "Tambo",
+  "disciplineGround": "Suelo",
+  "disciplineThrows": "Derribos",
+  "disciplineTechnicalExpression": "Expresión técnica",
+  "disciplineSoon": "{name} (próximamente)",
+  "@disciplineSoon": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "leagueStandings": "Clasificación de la liga",
+  "leagueStandingsCsv": "Descargar CSV",
+  "leaguePhasePoints": "Fase {number}: {total} ({attendance} por asistir + {matches} en combates)",
+  "@leaguePhasePoints": {
+    "placeholders": {
+      "number": {"type": "int"},
+      "total": {"type": "int"},
+      "attendance": {"type": "int"},
+      "matches": {"type": "int"}
+    }
+  },
+  "leaguePhaseAbsent": "Fase {number}: no inscrito",
+  "@leaguePhaseAbsent": {"placeholders": {"number": {"type": "int"}}},
+  "leagueNoPoints": "Sin puntos todavía: sin puesto",
+  "leagueCategoryHeader": "{category} · {count, plural, =1{1 persona} other{{count} personas}}",
+  "@leagueCategoryHeader": {"placeholders": {"category": {"type": "String"}, "count": {"type": "int"}}},
+  "medalGold": "Oro",
+  "medalSilver": "Plata",
+  "medalBronze": "Bronce",
+  "leaguePhaseDefaultName": "{league} · Fase {number}",
+  "@leaguePhaseDefaultName": {
+    "placeholders": {
+      "league": {
+        "type": "String"
+      },
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "leagueNewPhaseTitle": "Nueva fase {number}",
+  "@leagueNewPhaseTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "leagueNewPhaseHint": "Se copian de esta fase los tapices con sus árbitros, los ayudantes, las categorías, los clubes y las reglas del marcador. Las inscripciones empiezan vacías: después puedes inscribir a los de otras fases.",
+  "leaguePhaseName": "Nombre de la fase",
+  "leagueDiscipline": "Modalidad",
+  "leagueAttendancePoints": "Puntos por asistir",
+  "leagueAttendanceInvalid": "Entre 0 y 100",
+  "leagueNewPhaseCreate": "Crear fase",
+  "leagueNewPhaseDone": "Fase {number} creada",
+  "@leagueNewPhaseDone": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "leagueName": "Nombre de la liga",
+  "leaguePodium": "Podio general",
+  "leaguePodiumHint": "Cuántos oros, platas y bronces da cada categoría en la clasificación final. Los empates comparten medalla.",
+  "leagueCategoryPodiums": "Categorías con podio propio",
+  "leagueOwnPodium": "Podio propio",
+  "reenrolButton": "Inscribir de otras fases",
+  "reenrolTitle": "Inscribir de otras fases",
+  "reenrolEmpty": "Todos los de otras fases ya están inscritos en esta.",
+  "reenrolHint": "Se inscriben con sus datos de la última fase; la categoría sale de su edad en esta.",
+  "reenrolSearch": "Buscar por nombre, categoría o club",
+  "reenrolSelectAll": "Seleccionar todos ({count})",
+  "@reenrolSelectAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reenrolLastPhase": "Última: fase {number}",
+  "@reenrolLastPhase": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "reenrolGuardianConsent": "Tengo el consentimiento de los tutores de los menores seleccionados",
+  "reenrolConfirm": "Inscribir ({count})",
+  "@reenrolConfirm": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reenrolDone": "{count, plural, =1{1 inscrito} other{{count} inscritos}}",
+  "@reenrolDone": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsAttendanceHint": "Los suma a la clasificación quien compite en un grupo de esta fase. Al cambiarlos se recalcula la clasificación.",
+  "draftTakenElsewhere": "{count, plural, =1{{names} ya está en otro grupo: se ha quitado del grupo nuevo.} other{{names} ya están en otro grupo: se han quitado del grupo nuevo.}}",
+  "@draftTakenElsewhere": {"placeholders": {"count": {"type": "int"}, "names": {"type": "String"}}},
+  "teamGhostMember": "entra como comodín",
+  "teamGhostHint": "Quien ya tiene equipo o grupo entra como comodín: combate, pero no puntúa por este equipo.",
+  "ghostMemberName": "{name} (comodín)",
+  "@ghostMemberName": {"placeholders": {"name": {"type": "String"}}},
+  "teamOverlapTitle": "No se puede: alumnos en dos equipos del grupo",
+  "teamOverlapLine": "{name}: {teams}",
+  "@teamOverlapLine": {"placeholders": {"name": {"type": "String"}, "teams": {"type": "String"}}},
+  "groupCreatedBy": "por {name}",
+  "@groupCreatedBy": {"placeholders": {"name": {"type": "String"}}},
+  "staffTitle": "Personal",
+  "staffHint": "Quién está detrás de cada cuenta: se verá en los tapices y en quién ha hecho cada grupo.",
+  "staffNameHint": "Nombre de la persona",
+  "staffReferee": "árbitro",
+  "staffHelper": "ayudante",
+  "cancelMatch": "Cancelar combate",
+  "cancelMatchTitle": "Cancelar el combate: vuelve a pendiente y todo a 0. ¿Por qué?",
+  "cancelMatchDone": "Combate cancelado: vuelve a estar pendiente.",
+  "reopenMatch": "Reabrir combate",
+  "reopenMatchTitle": "Reabrir el combate para corregirlo. ¿Por qué?",
+  "reopenMatchDone": "Combate reabierto: corrige y vuelve a finalizar.",
+  "refusalNotFinished": "El combate no está finalizado.",
+  "tlCancel": "Combate cancelado",
+  "tlReopen": "Combate reabierto",
+  "matOneAtATime": "Hay un combate en curso: el siguiente se podrá empezar cuando acabe.",
+  "matQueued": "Pendientes",
+  "keepMatch": "Seguir con el combate",
+  "watchClockRunning": "Reloj en marcha",
+  "watchClockStopped": "Reloj parado",
+  "placeInCategory": "{place}.º en {category} · {age} años",
+  "@placeInCategory": {"placeholders": {"place": {"type": "int"}, "category": {"type": "String"}, "age": {"type": "int"}}},
+  "recordTotals": "Asistencia {attendance} + combates {matches} = {total} puntos",
+  "@recordTotals": {"placeholders": {"attendance": {"type": "int"}, "matches": {"type": "int"}, "total": {"type": "int"}}},
+  "recordNoMatches": "Aún no está en ningún grupo.",
+  "recordVs": "Contra {rival}",
+  "@recordVs": {"placeholders": {"rival": {"type": "String"}}},
+  "recordWhere": "{mat} · Grupo {group}",
+  "@recordWhere": {"placeholders": {"mat": {"type": "String"}, "group": {"type": "int"}}},
+  "recordWon": "Ganado",
+  "recordLost": "Perdido",
+  "recordDraw": "Empate",
+  "recordAsGhost": "como comodín (no puntúa)",
+  "recordWarnings": "{count, plural, =1{1 advertencia} other{{count} advertencias}}",
+  "recordOneHand": "{count, plural, =1{1 de una mano} other{{count} de una mano}}",
+  "recordDisqualified": "Descalificado",
+  "leagueDisqualifications": "{count, plural, =1{1 descalificación} other{{count} descalificaciones}}",
+  "@leagueDisqualifications": {"placeholders": {"count": {"type": "int"}}},
+  "recordRivalDisqualified": "Rival descalificado",
+  "recordOpen": "Ver combates",
+  "openLeague": "Abrir la liga",
+  "podiumPreset": "{gold, plural, =1{1 oro} other{{gold} oros}} · {silver, plural, =1{1 plata} other{{silver} platas}} · {bronze, plural, =1{1 bronce} other{{bronze} bronces}}",
+  "@podiumPreset": {"placeholders": {"gold": {"type": "int"}, "silver": {"type": "int"}, "bronze": {"type": "int"}}},
+  "podiumOther": "Otro",
+  "podiumAsGeneral": "Como el general ({podium})",
+  "@podiumAsGeneral": {"placeholders": {"podium": {"type": "String"}}},
+  "podiumOwn": "Propio",
+  "podiumLess": "Uno menos: {metal}",
+  "@podiumLess": {"placeholders": {"metal": {"type": "String"}}},
+  "podiumMore": "Uno más: {metal}",
+  "@podiumMore": {"placeholders": {"metal": {"type": "String"}}},
+  "leagueCategoryPodiumsHint": "Casi todas usan el general; elige \"Propio\" solo en las que den otras medallas."
 }

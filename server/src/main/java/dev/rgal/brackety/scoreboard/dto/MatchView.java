@@ -11,12 +11,14 @@ import java.util.UUID;
  * A match as the scoreboard shows it. The client counts {@code remainingMs} down while
  * {@code running} and resyncs on every poll. {@code endReason}: POINTS, TIME, DISQUALIFICATION or null.
  * {@code serverTime}: the instant the view is computed at, so the device can correct its clock.
- * {@code review}: null unless an offline action clashed and the club has to review it.
+ * {@code review}: null unless an offline action clashed and the club has to review it. {@code matId} and
+ * {@code matNumber}: null for a team match in the pool, until a mat starts it. {@code readyAt}: a pending match whose
+ * fighters have not had the least rest yet, until when; the device refuses to start it before.
  */
 public record MatchView(
         UUID id,
         UUID matId,
-        int matNumber,
+        Integer matNumber,
         int groupNumber,
         Match.Status status,
         int lengthSeconds,
@@ -28,7 +30,8 @@ public record MatchView(
         Corner blue,
         List<TimelineEntry> timeline,
         Instant serverTime,
-        Review review) {
+        Review review,
+        Instant readyAt) {
 
     /**
      * A participant ({@code participantId}) or a team ({@code teamId}, {@code teamNumber}); {@code members}

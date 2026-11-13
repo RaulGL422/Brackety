@@ -46,6 +46,12 @@ public class Match {
     private String disqualifiedSide;
     /** Why an offline action clashed; while set, the match takes no actions until the club reviews it. */
     private String reviewReason;
+    /** Set when the club or the superadmin lets it start without the least rest. */
+    private UUID restWaivedBy;
+
+    private Instant restWaivedAt;
+    /** A team match sent to a mat by hand: it no longer goes back to the pool. */
+    private boolean pinned;
 
     protected Match() {}
 
@@ -77,12 +83,46 @@ public class Match {
         return groupId;
     }
 
+    /** Null for a team match waiting in the pool (MatchPool): it takes the mat whose referee starts it. */
     public UUID getMatId() {
         return matId;
     }
 
+    public void takeMat(UUID matId) {
+        this.matId = matId;
+    }
+
+    /**
+     * A pending match of a group without mat (of teams) goes back to the pool; any other keeps its mat, as does one
+     * sent to a mat by hand.
+     */
+    public void backToPoolIf(FightGroup group) {
+        if (group.getMatId() == null && status == Status.PENDING && !pinned) {
+            matId = null;
+        }
+    }
+
     public int getOrderIndex() {
         return orderIndex;
+    }
+
+    /** A pending individual match goes to another mat (the club's control panel). */
+    void moveTo(UUID matId) {
+        this.matId = matId;
+        this.pinned = true;
+    }
+
+    void order(int orderIndex) {
+        this.orderIndex = orderIndex;
+    }
+
+    public boolean isRestWaived() {
+        return restWaivedAt != null;
+    }
+
+    void waiveRest(UUID by, Instant at) {
+        this.restWaivedBy = by;
+        this.restWaivedAt = at;
     }
 
     /** The red participant's or team's id. */
@@ -92,6 +132,10 @@ public class Match {
 
     public UUID getBlueId() {
         return blueTeamId != null ? blueTeamId : blueParticipantId;
+    }
+
+    public boolean isTeamMatch() {
+        return redTeamId != null;
     }
 
     public Status getStatus() {
@@ -131,6 +175,7 @@ public class Match {
             Duration elapsed,
             Instant runningSince,
             String disqualifiedSide,
+            boolean started,
             boolean finished,
             Instant now) {
         this.redScore = redScore;
@@ -138,13 +183,14 @@ public class Match {
         this.elapsedMs = elapsed.toMillis();
         this.runningSince = runningSince;
         this.disqualifiedSide = disqualifiedSide;
-        if (startedAt == null) {
+        // A cancelled match is pending again; a reopened one is in progress until it finishes again.
+        status = finished ? Status.FINISHED : started ? Status.IN_PROGRESS : Status.PENDING;
+        if (!started) {
+            startedAt = null;
+        } else if (startedAt == null) {
             startedAt = now;
         }
-        status = finished ? Status.FINISHED : Status.IN_PROGRESS;
-        if (finished) {
-            finishedAt = now;
-        }
+        finishedAt = finished ? (finishedAt == null ? now : finishedAt) : null;
     }
 
     /** Back to pending, as if never started: the superadmin restarts it (its actions go with it). */

@@ -30,12 +30,23 @@ public class CompetitorDirectory {
         people.values()
                 .forEach(p -> byId.put(
                         p.getId(),
-                        new Competitor(p.getId(), fullName(p), null, List.of(p.getId()), List.of(fullName(p)))));
-        var membersByTeam = teamMembers.findByEventId(eventId).stream()
-                .collect(Collectors.groupingBy(
-                        TeamMember::getTeamId, Collectors.mapping(TeamMember::getParticipantId, Collectors.toList())));
+                        new Competitor(
+                                p.getId(),
+                                fullName(p),
+                                null,
+                                List.of(p.getId()),
+                                List.of(fullName(p)),
+                                List.of(p.getId()))));
+        var membersByTeam =
+                teamMembers.findByEventId(eventId).stream().collect(Collectors.groupingBy(TeamMember::getTeamId));
         for (var team : teams.findByEventId(eventId)) {
-            var ids = membersByTeam.getOrDefault(team.getId(), List.of());
+            var members = membersByTeam.getOrDefault(team.getId(), List.of());
+            var ids = members.stream().map(TeamMember::getParticipantId).toList();
+            // A ghost team never scores (its group skips it); in a real team only its real members do.
+            var scorers = members.stream()
+                    .filter(m -> team.isGhost() || !m.isGhost())
+                    .map(TeamMember::getParticipantId)
+                    .toList();
             byId.put(
                     team.getId(),
                     new Competitor(
@@ -43,7 +54,12 @@ public class CompetitorDirectory {
                             "Equipo " + team.getNumber(),
                             team.getNumber(),
                             ids,
-                            ids.stream().map(id -> fullName(people.get(id))).toList()));
+                            // Shown on the scoreboard and in the CSVs, Spanish like "Equipo N".
+                            members.stream()
+                                    .map(m -> fullName(people.get(m.getParticipantId()))
+                                            + (m.isGhost() && !team.isGhost() ? " (comodín)" : ""))
+                                    .toList(),
+                            scorers));
         }
         return new Competitors(byId);
     }

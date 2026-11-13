@@ -4,6 +4,7 @@ import 'package:brackety/features/mat/ui/mat_board_screen.dart';
 import 'package:brackety/l10n/gen/app_localizations.dart';
 import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -26,6 +27,8 @@ void main() {
     Fighter blue,
     MatchStatus status, {
     bool available = true,
+    CornerState? redCorner,
+    CornerState? blueCorner,
   }) => BoardMatch(
     id: id,
     groupId: 'g1',
@@ -36,6 +39,8 @@ void main() {
     redScore: status == MatchStatus.finished ? 4 : 0,
     blueScore: status == MatchStatus.finished ? 15 : 0,
     available: available,
+    redCorner: redCorner,
+    blueCorner: blueCorner,
   );
 
   final ana = fighter('Ana');
@@ -50,6 +55,7 @@ void main() {
         number: 3,
         categoryName: '7-8',
         members: [ana, bea, carla, ghost],
+        createdBy: 'Ana López (ayudante1)',
       ),
     ],
     matches: [
@@ -89,13 +95,31 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('Mat 2'), findsOneWidget);
+        // The number is what the referee checks: it shrinks, never gets cut.
+        expect(
+          tester.renderObject<RenderParagraph>(find.text('Mat 2')),
+          isA<RenderParagraph>().having(
+            (p) => p.didExceedMaxLines,
+            'cut',
+            isFalse,
+          ),
+        );
         expect(
           find.text('Group 3, ages 7-8', skipOffstage: false),
           findsNWidgets(2),
         );
         expect(find.text('Recommended match'), findsOneWidget);
+        expect(
+          find.text('by Ana López (ayudante1)', skipOffstage: false),
+          findsOneWidget,
+        );
         expect(find.text('2 to play'), findsOneWidget);
         expect(matchTile('Ana', 'Carla'), findsOneWidget);
+        // Only the button opens the recommended match, not its names.
+        expect(
+          tester.widget<ListTile>(matchTile('Ana', 'Carla')).onTap,
+          isNull,
+        );
         expect(find.text('A fighter is in a match right now'), findsOneWidget);
         expect(find.text('4 - 15'), findsOneWidget);
         // Nothing in progress: one big action and why this one.
@@ -112,7 +136,7 @@ void main() {
     );
 
     testWidgets(
-      'in progress and recommended stand apart and a waiting match is locked on $device',
+      'with a match in progress nothing is recommended and a waiting match is locked on $device',
       (tester) async {
         tester.view.physicalSize = size;
         tester.view.devicePixelRatio = 1;
@@ -153,6 +177,7 @@ void main() {
             find.ancestor(of: tile, matching: find.byType(Card)).first;
         ListTile tile(Finder tile) => tester.widget<ListTile>(tile);
 
+        expect(tile(matchTile('Bea', 'Carla')).onTap, isNull);
         final inProgress = card(matchTile('Bea', 'Carla'));
         expect(
           find.descendant(of: inProgress, matching: find.text('In progress')),
@@ -166,35 +191,22 @@ void main() {
           findsOneWidget,
         );
 
-        final recommended = card(matchTile('Ana', 'Carla'));
         expect(
-          find.descendant(
-            of: recommended,
-            matching: find.text('When the match in progress ends.'),
+          find.descendant(of: inProgress, matching: find.text('Cancel match')),
+          findsOneWidget,
+        );
+        // One match at a time: nothing is put forward while it lasts; the next one is just listed.
+        expect(find.text('Recommended match'), findsNothing);
+        expect(
+          find.text(
+            'A match is in progress: the next one can start when it ends.',
           ),
           findsOneWidget,
         );
-        expect(
-          find.descendant(
-            of: recommended,
-            matching: find.text('Recommended match'),
-          ),
-          findsOneWidget,
-        );
-        expect(
-          find.descendant(
-            of: recommended,
-            matching: find.text('Open the scoreboard'),
-          ),
-          findsOneWidget,
-        );
-        // Next stands out by a thick ink frame, not by a colour a competitor may wear.
-        final frame =
-            tester.widget<Card>(recommended).shape! as RoundedRectangleBorder;
-        expect(frame.side.color, scheme.onSurface);
-        expect(frame.side.width, 3);
+        expect(matchTile('Ana', 'Carla'), findsOneWidget);
+        expect(scheme, isNotNull);
 
-        final waiting = matchTile('Carla', 'Diego · Ghost');
+        final waiting = matchTile('Carla', 'Diego · Wildcard');
         await tester.scrollUntilVisible(waiting, 200);
         expect(tile(waiting).onTap, isNull);
         expect(tile(waiting).enabled, isTrue);
@@ -275,7 +287,7 @@ void main() {
     await tester.pumpAndSettle();
 
     final waiting = tester.widget<ListTile>(
-      matchTile('Carla', 'Diego · Ghost'),
+      matchTile('Carla', 'Diego · Wildcard'),
     );
     expect(waiting.onTap, isNotNull);
   });
@@ -318,7 +330,22 @@ void main() {
             members: teams,
           ),
         ],
-        matches: [match('m1', teams[0], teams[1], MatchStatus.pending)],
+        matches: [
+          match('m1', teams[0], teams[1], MatchStatus.pending),
+          // Team 3 still has two matches on mat 2; team 1 is fighting on mat 3.
+          match(
+            'm2',
+            teams[2],
+            teams[0],
+            MatchStatus.pending,
+            available: false,
+            redCorner: const CornerState(pendingMats: [2, 2]),
+            blueCorner: CornerState(
+              fightingOnMat: 3,
+              freeAt: DateTime.now().add(const Duration(minutes: 4)),
+            ),
+          ),
+        ],
         recommendedMatchId: 'm1',
       );
 
@@ -343,8 +370,19 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(matchTile('Team 1', 'Team 2'), findsOneWidget);
-      expect(find.text('Team 4 · Ghost'), findsOneWidget);
-      expect(find.text('A1, B1, C1'), findsOneWidget);
+      await tester.scrollUntilVisible(
+        find.text('Team 4 · Wildcard'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.text('Team 4 · Wildcard'), findsOneWidget);
+      // Each team with its people, to call them: in the group and in every match.
+      expect(find.text('A1, B1, C1'), findsNWidgets(3));
+      expect(find.text('2 more matches on mat 2'), findsOneWidget);
+      expect(
+        find.textContaining('Fighting on mat 3 · free around'),
+        findsOneWidget,
+      );
       expect(tester.takeException(), isNull);
     });
   }

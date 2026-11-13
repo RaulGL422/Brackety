@@ -75,42 +75,54 @@ void main() {
   }
 
   for (final MapEntry(key: device, value: size) in sizes.entries) {
-    testWidgets('a helper makes a team from free participants on $device', (
-      tester,
-    ) async {
-      final repository = await open(tester, size);
+    testWidgets(
+      'a helper makes a team, Ana from team 1 as a ghost, on $device',
+      (tester) async {
+        final repository = await open(tester, size);
 
-      expect(action('Individual group'), findsOneWidget);
-      expect(find.text('New team · 0/3'), findsOneWidget);
-      // Ana is in team 1: she cannot be picked again.
-      await tester.tap(find.text('Ana Prueba'));
-      await tester.pump();
-      expect(find.text('New team · 0/3'), findsOneWidget);
-
-      for (final name in ['Fede', 'Gema', 'Hugo', 'Iris']) {
-        await tester.scrollUntilVisible(
-          find.text('$name Prueba'),
-          100,
-          scrollable: find
-              .descendant(
-                of: find.byType(ListView),
-                matching: find.byType(Scrollable),
-              )
-              .first,
-        );
-        await tester.tap(find.text('$name Prueba'));
+        expect(action('Individual group'), findsOneWidget);
+        expect(find.text('New team · 0/3'), findsOneWidget);
+        // Ana is in team 1: locked until the helper chooses to pick wildcards.
+        await tester.tap(find.text('Ana Prueba'));
         await tester.pump();
-      }
-      expect(find.text('New team · 3/3'), findsOneWidget);
-      await tester.tap(find.text('Create team'));
-      await tester.pumpAndSettle();
+        expect(find.text('New team · 0/3'), findsOneWidget);
+        await tester.tap(find.text('Pick wildcards'));
+        await tester.pump();
+        // Now she joins as a wildcard (fights, does not score here).
+        await tester.tap(find.text('Ana Prueba'));
+        await tester.pump();
+        expect(find.text('New team · 1/3'), findsOneWidget);
 
-      expect(repository.createdTeams.single, ['p9', 'p10', 'p11']);
-      expect(find.text('Team 4 created'), findsOneWidget);
-      expect(tester.takeException(), isNull);
-    });
+        for (final name in ['Fede', 'Gema', 'Hugo']) {
+          await tester.scrollUntilVisible(
+            find.text('$name Prueba'),
+            100,
+            scrollable: find
+                .descendant(
+                  of: find.byType(ListView),
+                  matching: find.byType(Scrollable),
+                )
+                .first,
+          );
+          await tester.tap(find.text('$name Prueba'));
+          await tester.pump();
+        }
+        expect(find.text('New team · 3/3'), findsOneWidget);
+        expect(
+          find.textContaining('does not score for this team'),
+          findsOneWidget,
+        );
+        await tester.tap(find.text('Create team'));
+        await tester.pumpAndSettle();
 
-    testWidgets('three teams and a ghost team make a group on $device', (
+        expect(repository.createdTeams.single, ['p0', 'p9', 'p10']);
+        expect(repository.createdTeamGhosts.single, ['p0']);
+        expect(find.text('Team 4 created'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets('three teams and a wildcard team make a group on $device', (
       tester,
     ) async {
       final repository = await open(tester, size);
@@ -121,9 +133,11 @@ void main() {
         await tester.tap(find.text(team));
         await tester.pump();
       }
-      await tester.tap(find.text('Ghost team'));
+      await tester.tap(find.text('Wildcard team'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Pick participants · 0/3'));
+      await tester.tap(
+        find.text('Make a wildcard team with loose participants'),
+      );
       await tester.pumpAndSettle();
 
       // The group's own fighters are not offered for its ghost team.
@@ -141,12 +155,15 @@ void main() {
 
       final group = repository.created.single;
       expect(group.members, ['t1', 't2', 't3']);
-      expect(group.ghostTeam, ['p9', 'p10', 'p11']);
+      expect(group.ghostTeams, [
+        ['p9', 'p10', 'p11'],
+      ]);
       expect(find.text('Group 1'), findsWidgets);
+      // A group of teams has no mat: its matches go to the free mats.
       expect(
         find.descendant(
           of: find.byType(AlertDialog),
-          matching: find.text('Mat 2'),
+          matching: find.text('Free mats'),
         ),
         findsOneWidget,
       );
@@ -154,6 +171,151 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  testWidgets('a team of another group joins as a wildcard team with a tap', (
+    tester,
+  ) async {
+    tester.view.physicalSize = sizes['tablet']!;
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    // Team 4 (Fede, Gema, Hugo) already fights in group 2.
+    final repository = FakeGroupingRepository(
+      participants,
+      teamList: [
+        ...teams,
+        const Team(
+          id: 't4',
+          number: 4,
+          groupNumber: 2,
+          members: [
+            TeamMember(participantId: 'p9', fullName: 'Fede Prueba'),
+            TeamMember(participantId: 'p10', fullName: 'Gema Prueba'),
+            TeamMember(participantId: 'p11', fullName: 'Hugo Prueba'),
+          ],
+        ),
+      ],
+    );
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...sessionOverrides(FakeAuthApi(signedIn: true)),
+          groupingRepositoryProvider.overrideWithValue(repository),
+          fakeMatsOverride,
+          myEventsProvider.overrideWith((ref) async => []),
+        ],
+        child: const BracketyApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
+        .read(routerProvider)
+        .push('/events/e1/categories/c1/teams?name=15-16&size=3');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Teams'));
+    await tester.pumpAndSettle();
+
+    for (final team in ['Team 1', 'Team 2', 'Team 3']) {
+      await tester.tap(find.text(team));
+      await tester.pump();
+    }
+    // Without wildcard mode, team 4 stays out.
+    await tester.tap(find.text('Team 4'));
+    await tester.pump();
+    expect(find.textContaining('Tap to join as a wildcard team'), findsNothing);
+    await tester.tap(find.text('Wildcard team'));
+    await tester.pumpAndSettle();
+    expect(
+      find.textContaining('Tap to join as a wildcard team'),
+      findsOneWidget,
+    );
+    await tester.tap(find.text('Team 4'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Create group'));
+    await tester.pumpAndSettle();
+
+    final group = repository.created.single;
+    expect(group.members, ['t1', 't2', 't3']);
+    expect(group.ghostTeams, [
+      ['p9', 'p10', 'p11'],
+    ]);
+  });
+
+  testWidgets('a team can be made of ghosts only', (tester) async {
+    final repository = await open(tester, sizes['tablet']!);
+    await tester.tap(find.text('Pick wildcards'));
+    await tester.pump();
+    for (final name in ['Ana', 'Bea', 'Diego']) {
+      await tester.tap(find.text('$name Prueba'));
+      await tester.pump();
+    }
+
+    await tester.tap(find.widgetWithText(FilledButton, 'Create team'));
+    await tester.pumpAndSettle();
+
+    expect(repository.createdTeams.single, hasLength(3));
+  });
+
+  testWidgets('someone in two teams of the group cannot be grouped', (
+    tester,
+  ) async {
+    tester.view.physicalSize = sizes['tablet']!;
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    // Team 4: Fede and Gema, filled in by Ana (real in team 1) as a ghost.
+    final repository = FakeGroupingRepository(
+      participants,
+      teamList: [
+        ...teams,
+        const Team(
+          id: 't4',
+          number: 4,
+          members: [
+            TeamMember(participantId: 'p9', fullName: 'Fede Prueba'),
+            TeamMember(participantId: 'p10', fullName: 'Gema Prueba'),
+            TeamMember(
+              participantId: 'p0',
+              fullName: 'Ana Prueba',
+              ghost: true,
+            ),
+          ],
+        ),
+      ],
+    );
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...sessionOverrides(FakeAuthApi(signedIn: true)),
+          groupingRepositoryProvider.overrideWithValue(repository),
+          fakeMatsOverride,
+          myEventsProvider.overrideWith((ref) async => []),
+        ],
+        child: const BracketyApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
+        .read(routerProvider)
+        .push('/events/e1/categories/c1/teams?name=15-16&size=3');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Teams'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Ana Prueba (wildcard)'), findsOneWidget);
+    for (final team in ['Team 1', 'Team 2', 'Team 3', 'Team 4']) {
+      await tester.tap(find.text(team));
+      await tester.pump();
+    }
+
+    await tester.tap(find.text('Create group'));
+    await tester.pump();
+    expect(
+      find.textContaining('Not possible: participants in two teams'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('Ana Prueba: Team 1, Team 4'), findsOneWidget);
+    await tester.pumpAndSettle(const Duration(seconds: 5));
+    expect(repository.created, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('the individual group leads back to the team group', (
     tester,

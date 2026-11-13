@@ -1,29 +1,51 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/polling.dart';
+import '../../club/state/club_providers.dart';
 import '../data/grouping_models.dart';
 import '../data/grouping_repository.dart';
+import 'helper_queue.dart';
+
+// All live: another helper's group, or one the superadmin dissolves, shows at once. A helper who
+// sees old lists picks people who are already taken.
 
 final categoriesProvider = FutureProvider.autoDispose
     .family<List<CategorySummary>, String>(
-      (ref, eventId) =>
-          ref.watch(groupingRepositoryProvider).categories(eventId),
+      (ref, eventId) => liveReload(
+        ref,
+        eventTopics(eventId),
+        () => ref.watch(groupingRepositoryProvider).categories(eventId),
+      ),
     );
 
 typedef CategoryKey = ({String eventId, String categoryId});
 
+// Those in a team or group made without network show as taken until it is sent.
 final categoryParticipantsProvider = FutureProvider.autoDispose
-    .family<List<CategoryParticipant>, CategoryKey>(
-      (ref, key) => ref
-          .watch(groupingRepositoryProvider)
-          .participants(key.eventId, key.categoryId),
-    );
+    .family<List<CategoryParticipant>, CategoryKey>((ref, key) async {
+      final queued = ref.watch(helperQueueProvider.select((q) => q.people));
+      final all = await liveReload(
+        ref,
+        eventTopics(key.eventId),
+        () => ref
+            .watch(groupingRepositoryProvider)
+            .participants(key.eventId, key.categoryId),
+      );
+      return [for (final p in all) queued.contains(p.id) ? p.asQueued() : p];
+    });
 
 final categoryTeamsProvider = FutureProvider.autoDispose
-    .family<List<Team>, CategoryKey>(
-      (ref, key) => ref
-          .watch(groupingRepositoryProvider)
-          .teams(key.eventId, key.categoryId),
-    );
+    .family<List<Team>, CategoryKey>((ref, key) async {
+      final queued = ref.watch(helperQueueProvider.select((q) => q.teams));
+      final all = await liveReload(
+        ref,
+        eventTopics(key.eventId),
+        () => ref
+            .watch(groupingRepositoryProvider)
+            .teams(key.eventId, key.categoryId),
+      );
+      return [for (final t in all) queued.contains(t.id) ? t.asQueued() : t];
+    });
 
 enum ParticipantSort { name, height }
 

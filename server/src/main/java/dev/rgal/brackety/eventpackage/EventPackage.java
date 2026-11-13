@@ -32,9 +32,25 @@ public record EventPackage(
         @Size(max = 100) List<@NotNull @Valid OrganizationEntry> organizations,
         @NotNull @Size(max = 20) List<@NotNull @Valid MatEntry> mats,
         @NotNull List<@NotNull @Valid ParticipantEntry> participants,
-        @Valid EventResults results) {
+        @Valid EventResults results,
+        @Size(max = 100) List<@NotNull @Valid StaffName> staffNames,
+        @Valid RulebookEntry rulebook) {
 
     public static final int SCHEMA_VERSION = 2;
+
+    /** The phase's rulebook PDF, in base64; absent when it has none or in files from before rulebooks. */
+    public record RulebookEntry(
+            @NotBlank @Size(max = 200) String fileName,
+            @NotBlank String pdf) {}
+
+    /** The person behind a staff account (set by the club); absent in files from before names existed. */
+    public record StaffName(
+            @NotBlank @Size(max = 254) String username,
+            @NotBlank @Size(max = 80) String name) {}
+
+    public List<StaffName> staffNamesOrEmpty() {
+        return staffNames == null ? List.of() : staffNames;
+    }
 
     public List<OrganizationEntry> organizationsOrEmpty() {
         return organizations == null ? List.of() : organizations;
@@ -42,7 +58,7 @@ public record EventPackage(
 
     /**
      * {@code originId}: the event on the server it was first exported from (the club's server), so its results can
-     * go back there.
+     * go back there. The team rules and the rest are null in a package from before they existed: defaults then.
      */
     public record Settings(
             @NotBlank @Size(max = 120) String name,
@@ -52,7 +68,10 @@ public record EventPackage(
             @Min(1) int pointsLimit,
             @Min(0) int changeoverSeconds,
             @Min(0) int attendancePoints,
-            UUID originId) {}
+            UUID originId,
+            @Min(1) Integer teamMatchSeconds,
+            @Min(0) Integer teamPointsLimit,
+            @Min(0) Integer minRestSeconds) {}
 
     public record LeagueEntry(
             @NotBlank @Size(max = 120) String name,

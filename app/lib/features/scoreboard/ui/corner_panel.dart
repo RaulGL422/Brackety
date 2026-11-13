@@ -46,23 +46,68 @@ class CornerPanel extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _Header(side: side, corner: corner, style: onColor),
-            if (corner.membersLine != null)
-              Text(
-                corner.membersLine!,
-                style: text.bodySmall?.merge(onColor),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
             Expanded(
-              child: FittedBox(
-                child: Text(
-                  '${corner.points}',
-                  style: text.displayLarge?.merge(onColor),
-                ),
+              child: LayoutBuilder(
+                builder: (context, area) {
+                  final details = [
+                    _Header(side: side, corner: corner, style: onColor),
+                    if (corner.membersLine != null)
+                      Text(
+                        corner.membersLine!,
+                        style: text.bodySmall?.merge(onColor),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                  ];
+                  final tally = _Tally(
+                    corner: corner,
+                    style: onColor.copyWith(fontSize: 14),
+                  );
+                  final score = FittedBox(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      '${corner.points}',
+                      style: text.displayLarge
+                          ?.merge(onColor)
+                          .copyWith(height: 1),
+                    ),
+                  );
+                  // A phone held upright leaves the corner wide and low: the score beside the name
+                  // takes the whole height, instead of the thin strip between the name and the warnings.
+                  if (area.maxWidth > area.maxHeight * 1.2) {
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      spacing: AppSpacing.s,
+                      children: [
+                        Expanded(
+                          flex: 3,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [...details, const Spacer(), tally],
+                          ),
+                        ),
+                        Expanded(flex: 2, child: score),
+                      ],
+                    );
+                  }
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      ...details,
+                      Expanded(
+                        child: FittedBox(
+                          child: Text(
+                            '${corner.points}',
+                            style: text.displayLarge?.merge(onColor),
+                          ),
+                        ),
+                      ),
+                      tally,
+                    ],
+                  );
+                },
               ),
             ),
-            _Tally(corner: corner, style: onColor.copyWith(fontSize: 14)),
             const SizedBox(height: AppSpacing.s),
             _Buttons(
               side: side,

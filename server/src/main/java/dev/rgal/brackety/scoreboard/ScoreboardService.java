@@ -30,6 +30,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -45,6 +46,8 @@ class ScoreboardService {
     static final String MATCH_CONFLICT = "MATCH_CONFLICT";
     static final String MATCH_IN_REVIEW = "MATCH_IN_REVIEW";
     static final String MATCH_STALE = "MATCH_STALE";
+    static final String FIGHTER_RESTING = "FIGHTER_RESTING";
+    static final String MAT_HAS_INDIVIDUAL = "MAT_HAS_INDIVIDUAL";
 
     private static final Logger log = LoggerFactory.getLogger(ScoreboardService.class);
 
@@ -54,8 +57,12 @@ class ScoreboardService {
             MatchEventType.WARNING,
             MatchEventType.ONE_HAND_WARNING,
             MatchEventType.DISQUALIFICATION);
-    private static final Set<MatchEventType> NEED_REASON =
-            EnumSet.of(MatchEventType.WARNING, MatchEventType.ONE_HAND_WARNING, MatchEventType.DISQUALIFICATION);
+    private static final Set<MatchEventType> NEED_REASON = EnumSet.of(
+            MatchEventType.WARNING,
+            MatchEventType.ONE_HAND_WARNING,
+            MatchEventType.DISQUALIFICATION,
+            MatchEventType.CANCEL,
+            MatchEventType.REOPEN);
 
     /** {@code conflictCode}: null when the action is applied (now or before), else the code of the 409. */
     record Recorded(MatchView view, String conflictCode) {}
@@ -113,15 +120,18 @@ class ScoreboardService {
     @Transactional(readOnly = true)
     MatchView view(UUID matchId, UUID accountId) {
         var match = matches.findById(matchId).orElseThrow(EventException::notFound);
-        var mat = mat(match);
-        var roles = access.roles(mat.getEventId(), accountId);
+        var roles = access.roles(match.getEventId(), accountId);
         if (roles.isEmpty()) {
             throw EventException.notFound();
         }
-        if (!roles.contains(EventRole.CLUB) && !isReferee(mat, accountId, roles)) {
+        // A team match in the pool can go to any mat: every referee may open it.
+        var mat = matOrNull(match);
+        var allowed = roles.contains(EventRole.CLUB)
+                || (mat == null ? roles.contains(EventRole.REFEREE) : isReferee(mat, accountId, roles));
+        if (!allowed) {
             throw EventException.forbidden();
         }
-        return view(match, mat, events.get(mat.getEventId()), clock.instant());
+        return view(match, mat, events.get(match.getEventId()), clock.instant());
     }
 
     /**
@@ -131,15 +141,21 @@ class ScoreboardService {
     @Transactional
     Recorded record(UUID matchId, UUID accountId, MatchEventRequest request) {
         var match = matches.lockById(matchId).orElseThrow(EventException::notFound);
-        var mat = mat(match);
-        var roles = access.roles(mat.getEventId(), accountId);
+        var roles = access.roles(match.getEventId(), accountId);
         if (roles.isEmpty()) {
             throw EventException.notFound();
         }
-        if (!isReferee(mat, accountId, roles)) {
+        var mat = match.getMatId() == null ? refereeMatOf(match, accountId).orElse(null) : mat(match);
+        if (mat == null || !isReferee(mat, accountId, roles)) {
             throw EventException.forbidden();
         }
         return apply(match, mat, accountId, request);
+    }
+
+    /** The mat a team match from the pool goes to: the one of the referee who starts it. */
+    Optional<Mat> refereeMatOf(Match match, UUID accountId) {
+        return mats.findByEventIdAndRefereeAccountIdOrderByNumber(match.getEventId(), accountId).stream()
+                .findFirst();
     }
 
     /**
@@ -149,16 +165,34 @@ class ScoreboardService {
     @Transactional
     Recorded recordImported(UUID matchId, UUID actorId, MatchEventRequest request) {
         var match = matches.lockById(matchId).orElseThrow(EventException::notFound);
-        return apply(match, mat(match), actorId, request);
+        var mat = match.getMatId() == null
+                ? refereeMatOf(match, actorId)
+                        .orElseThrow(() -> EventException.conflict("The referee of this action has no mat now."))
+                : mat(match);
+        return apply(match, mat, actorId, request);
     }
 
     private Recorded apply(Match match, Mat mat, UUID accountId, MatchEventRequest request) {
         var event = events.get(mat.getEventId());
         var action = action(request, accountId);
         var serverNow = clock.instant();
+        // Online, a mat with individual matches to play does not take one from the pool: they go first (Raul,
+        // 2026-11-13). Without network the device already started it: accepted as it is.
+        if (request.opId() == null
+                && request.type() == MatchEventType.START
+                && match.getMatId() == null
+                && matches.findByEventId(match.getEventId()).stream()
+                        .anyMatch(m -> mat.getId().equals(m.getMatId())
+                                && m.getStatus() == Match.Status.PENDING
+                                && !m.isInReview())) {
+            throw EventException.conflict(MAT_HAS_INDIVIDUAL, "This mat has individual matches to play first.");
+        }
+        // A pool match is on this mat while it runs; refused or cancelled, it goes back to the pool.
+        match.takeMat(mat.getId());
         var conflict = request.opId() == null
                 ? recordOnline(match, event, action, request.knownEvents(), serverNow)
                 : recordOffline(match, event, action, request, serverNow);
+        match.backToPoolIf(groups.findById(match.getGroupId()).orElseThrow());
         return new Recorded(conflict == null ? view(match, mat, event, serverNow) : null, conflict);
     }
 
@@ -199,10 +233,12 @@ class ScoreboardService {
             throw EventException.conflict(
                     MATCH_STALE, "The match changed on another device: check the scoreboard and try again.");
         }
-        writer.append(match, event, history, action, now, true).ifPresent(refusal -> {
-            throw refusal.cause() == Cause.AGE
-                    ? EventException.invalid(refusal.detail())
-                    : EventException.conflict(refusal.detail());
+        writer.append(match, event, history, action, now, true, true).ifPresent(refusal -> {
+            throw switch (refusal.cause()) {
+                case AGE -> EventException.invalid(refusal.detail());
+                case FIGHTER_RESTING -> EventException.conflict(FIGHTER_RESTING, refusal.detail());
+                default -> EventException.conflict(refusal.detail());
+            };
         });
         return null;
     }
@@ -225,7 +261,7 @@ class ScoreboardService {
         if (request.knownEvents() != MatchWriter.knownEvents(history)) {
             return reject(match, action, now, Cause.KNOWN_EVENTS, serverNow);
         }
-        return writer.append(match, event, history, action, now, true)
+        return writer.append(match, event, history, action, now, true, false)
                 .map(refusal -> reject(match, action, now, refusal.cause(), serverNow))
                 .orElse(null);
     }
@@ -247,14 +283,13 @@ class ScoreboardService {
 
     MatchView view(Match match, Mat mat, Event event, Instant now) {
         var history = matchEvents.findByMatchIdOrderByPosition(match.getId());
-        var state = MatchWriter.replay(event, history);
+        var state = MatchWriter.replay(event, match, history);
         var group = groups.findById(match.getGroupId()).orElseThrow();
         var competitors = directory.of(match.getEventId());
-        var ghost = members.findByGroupIdInOrderByPosition(List.of(group.getId())).stream()
+        var ghosts = members.findByGroupIdInOrderByPosition(List.of(group.getId())).stream()
                 .filter(GroupMember::isGhost)
                 .map(GroupMember::getCompetitorId)
-                .findFirst()
-                .orElse(null);
+                .collect(Collectors.toSet());
         var pending = match.isInReview()
                 ? rejectedOps.findByMatchIdAndResolutionIsNullOrderByPosition(match.getId())
                 : List.<RejectedOp>of();
@@ -263,20 +298,23 @@ class ScoreboardService {
                 pending.stream().map(RejectedOp::getActorAccountId)));
         return new MatchView(
                 match.getId(),
-                mat.getId(),
-                mat.getNumber(),
+                mat == null ? null : mat.getId(),
+                mat == null ? null : mat.getNumber(),
                 group.getNumber(),
                 match.getStatus(),
-                event.getMatchSeconds(),
-                event.getPointsLimit(),
+                event.matchSecondsFor(match.isTeamMatch()),
+                event.pointsLimitFor(match.isTeamMatch()),
                 state.remainingAt(now).toMillis(),
                 state.isRunning(now),
                 state.endReason(now).map(Enum::name).orElse(null),
-                corner(event, state, Side.RED, competitors.get(match.getRedId()), ghost),
-                corner(event, state, Side.BLUE, competitors.get(match.getBlueId()), ghost),
+                corner(event, state, Side.RED, competitors.get(match.getRedId()), ghosts),
+                corner(event, state, Side.BLUE, competitors.get(match.getBlueId()), ghosts),
                 timeline(history, state, actors),
                 now,
-                match.isInReview() ? review(match, pending, actors) : null);
+                match.isInReview() ? review(match, pending, actors) : null,
+                match.getStatus() == Match.Status.PENDING
+                        ? writer.restedAt(match, event).filter(now::isBefore).orElse(null)
+                        : null);
     }
 
     private Map<UUID, String> actors(Stream<UUID> ids) {
@@ -323,12 +361,12 @@ class ScoreboardService {
                         .toList());
     }
 
-    private Corner corner(Event event, TamboMatch state, Side side, Competitor fighter, UUID ghost) {
+    private Corner corner(Event event, TamboMatch state, Side side, Competitor fighter, Set<UUID> ghosts) {
         var tally = state.corner(side);
         return new Corner(
                 fighter.isTeam() ? null : fighter.id(),
                 fighter.isTeam() ? String.join(", ", fighter.memberNames()) : fighter.name(),
-                fighter.id().equals(ghost),
+                ghosts.contains(fighter.id()),
                 writer.oneHandRule(event, fighter),
                 tally.points(),
                 tally.warnings(),
@@ -341,6 +379,11 @@ class ScoreboardService {
 
     private static boolean isReferee(Mat mat, UUID accountId, Set<EventRole> roles) {
         return roles.contains(EventRole.REFEREE) && accountId.equals(mat.getRefereeAccountId());
+    }
+
+    /** Null for a team match in the pool. */
+    Mat matOrNull(Match match) {
+        return match.getMatId() == null ? null : mat(match);
     }
 
     Mat mat(Match match) {

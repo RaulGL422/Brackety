@@ -10,6 +10,198 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get draftGhostTeamPanelHint =>
+      'Wildcard teams (up to 3): tap a team of another group in the list, or make one with loose participants. They fight but do not score.';
+
+  @override
+  String get teamJoinsAsWildcard => 'Tap to join as a wildcard team';
+
+  @override
+  String get ghostTeamPageTitle => 'Make a wildcard team';
+
+  @override
+  String get ghostTeamSearch => 'Search a participant';
+
+  @override
+  String get formGhostTeam => 'Make a wildcard team with loose participants';
+
+  @override
+  String get teamPickWildcards => 'Pick wildcards';
+
+  @override
+  String matReservedElsewhere(int mat) {
+    return 'Someone in this match is expected on mat $mat now';
+  }
+
+  @override
+  String get matAfterIndividual => 'After your individual group';
+
+  @override
+  String matPlannedAt(String time) {
+    return 'Expected around $time';
+  }
+
+  @override
+  String get controlMenu => 'Change';
+
+  @override
+  String get controlDone => 'Done';
+
+  @override
+  String get controlError =>
+      'The change could not be made. Reload and try again.';
+
+  @override
+  String get controlMatchInProgress =>
+      'A match of this group is in progress: wait until it ends.';
+
+  @override
+  String get controlMatchNotPending =>
+      'That match has started: it cannot change.';
+
+  @override
+  String get controlMatWithoutReferee => 'That mat has no referee.';
+
+  @override
+  String get controlOrderChanged =>
+      'The matches changed meanwhile: reload and order them again.';
+
+  @override
+  String get controlTeamSize => 'Teams must stay of 2 or 3.';
+
+  @override
+  String get controlGroupStarted =>
+      'The group of those teams has started: its teams no longer change.';
+
+  @override
+  String get controlSameFighter =>
+      'That person already fights in the other team\'s group (as a wildcard).';
+
+  @override
+  String get controlPickMat => 'To which mat?';
+
+  @override
+  String get controlNoOtherMat => 'No other mat has a referee.';
+
+  @override
+  String controlMatOption(int number, String referee, int pending) {
+    String _temp0 = intl.Intl.pluralLogic(
+      pending,
+      locale: localeName,
+      other: '$pending pending',
+      one: '1 pending',
+      zero: 'nothing pending',
+    );
+    return 'Mat $number · $referee · $_temp0';
+  }
+
+  @override
+  String get controlMoveMatch => 'Move this match to another mat';
+
+  @override
+  String get controlWaiveRest => 'Let it start without waiting for the rest';
+
+  @override
+  String get controlWaiveRestTitle => 'Start without the least rest?';
+
+  @override
+  String controlWaiveRestBody(String red, String blue) {
+    return '$red against $blue may start although someone has not rested. Who allowed it is recorded.';
+  }
+
+  @override
+  String get controlConfirm => 'Yes, allow';
+
+  @override
+  String get controlMoveGroup => 'Move the group to another mat';
+
+  @override
+  String get controlReorder => 'Change the order of the matches';
+
+  @override
+  String get controlReorderHint =>
+      'Drag to order the pending matches. The played ones do not change.';
+
+  @override
+  String get controlMoveMember => 'Move a participant to another team';
+
+  @override
+  String get controlMoveMemberWho => 'Who changes?';
+
+  @override
+  String get controlMoveMemberTo => 'To which team?';
+
+  @override
+  String get settingsMatNeedsReferee =>
+      'That mat has matches to play: it cannot be left without a referee. Assign another referee or wait until they finish.';
+
+  @override
+  String get refusalResting =>
+      'Not yet: someone in this match has not had the least rest since their last match. Wait until the board unlocks it.';
+
+  @override
+  String cornerFightingNow(int mat) {
+    return 'Fighting on mat $mat';
+  }
+
+  @override
+  String cornerFighting(int mat, String time) {
+    return 'Fighting on mat $mat · free around $time';
+  }
+
+  @override
+  String cornerResting(String time) {
+    return 'Resting until $time';
+  }
+
+  @override
+  String cornerPending(int count, String mats) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count more matches',
+      one: 'One more match',
+    );
+    return '$_temp0 on mat $mats';
+  }
+
+  @override
+  String get rulebookTitle => 'Phase rulebook';
+
+  @override
+  String get rulebookHint =>
+      'The PDF with the full rulebook. Referees open it from their mat screen, also on the sports hall laptop (it travels in the event package).';
+
+  @override
+  String get rulebookNone => 'No rulebook';
+
+  @override
+  String get rulebookUpload => 'Upload PDF';
+
+  @override
+  String get rulebookReplace => 'Replace PDF';
+
+  @override
+  String get rulebookOpen => 'Open rulebook';
+
+  @override
+  String get rulebookRemove => 'Remove';
+
+  @override
+  String get rulebookUploaded => 'Rulebook uploaded';
+
+  @override
+  String get rulebookUploadError =>
+      'Could not upload: it must be a PDF of up to 10 MB.';
+
+  @override
+  String get rulebookRemoveError => 'Could not remove the rulebook.';
+
+  @override
+  String get rulebookOpenError =>
+      'Could not open the rulebook. Check the connection.';
+
+  @override
   String get appTitle => 'Brackety';
 
   @override
@@ -327,8 +519,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get heightUnknown => 'no height';
 
   @override
-  String participantGrouped(int group, int mat) {
-    return 'Group $group · Mat $mat';
+  String participantGrouped(int group, String mat) {
+    return 'Group $group · $mat';
   }
 
   @override
@@ -337,10 +529,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get draftGhost => 'Ghost competitor';
+  String get draftGhost => 'Wildcard';
 
   @override
-  String get draftGhostHint => 'Pick the ghost: fights but does not score.';
+  String get draftGhostHint =>
+      'Wildcards (up to 3): anyone already in a group, or your 4th pick. They fight but do not score.';
 
   @override
   String createGroup(int count) {
@@ -375,11 +568,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ok => 'OK';
 
   @override
-  String get ghostBadge => 'Ghost';
+  String get ghostBadge => 'Wildcard';
 
   @override
   String matTitle(int number) {
     return 'Mat $number';
+  }
+
+  @override
+  String get matPool => 'Free mats';
+
+  @override
+  String queuedOffline(String what) {
+    return 'Offline: $what will be sent when the network is back. Meanwhile its participants show as pending.';
+  }
+
+  @override
+  String queuedSent(String what) {
+    return 'Sent: $what';
+  }
+
+  @override
+  String queuedRefused(String what) {
+    return '$what could not be created: someone was already in another group or team. Check the list.';
+  }
+
+  @override
+  String get queuedPending => 'Waiting to be sent (offline)';
+
+  @override
+  String queuedGroupLabel(String names) {
+    return 'the group of $names';
+  }
+
+  @override
+  String queuedTeamLabel(String names) {
+    return 'the team of $names';
   }
 
   @override
@@ -426,14 +650,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matWaiting => 'A fighter is in a match right now';
 
   @override
+  String matResting(String time) {
+    return 'Resting until $time';
+  }
+
+  @override
+  String matProposedElsewhere(int number) {
+    return 'Proposed to mat $number';
+  }
+
+  @override
+  String get matPoolOffline => 'Offline: another mat may be running it';
+
+  @override
+  String get matTeamPoolNotice =>
+      'No individual groups pending: this mat takes team matches from the shared pool, spread over the free mats. The most rested go first.';
+
+  @override
   String get matNoneAvailable => 'No match can start right now.';
 
   @override
   String get versus => 'vs';
 
   @override
-  String scoreboardTitle(int mat, int group) {
-    return 'Mat $mat, group $group';
+  String scoreboardTitle(String mat, int group) {
+    return '$mat, group $group';
   }
 
   @override
@@ -615,7 +856,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsMatchRules => 'Matches';
 
   @override
-  String get settingsMatchLength => 'Match length (min:s)';
+  String get settingsMatchLength => 'Individual: match length (min:s)';
+
+  @override
+  String get settingsTeamMatchLength => 'Teams: match length (min:s)';
+
+  @override
+  String get settingsTeamPointsLimit => 'Teams: points that end the match';
+
+  @override
+  String get settingsTeamPointsLimitHint =>
+      'Empty = no limit: the time ends it. A disqualification gives the rival 15 points, or theirs if higher.';
+
+  @override
+  String get settingsMinRest => 'Least rest between matches (seconds)';
+
+  @override
+  String get settingsMinRestHint =>
+      'Nobody starts a match without this rest since their last one, on any mat. Until then the match waits.';
+
+  @override
+  String get settingsMinRestInvalid => 'Between 0 and 600 seconds.';
 
   @override
   String get settingsMatchLengthHint =>
@@ -626,7 +887,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Type minutes and seconds between 0:30 and 20:00, for example 3:00.';
 
   @override
-  String get settingsPointsLimit => 'Points that end the match';
+  String get settingsPointsLimit => 'Individual: points that end the match';
 
   @override
   String get settingsPointsLimitHint =>
@@ -928,7 +1189,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String teamGhostName(int number) {
-    return 'Team $number (ghost)';
+    return 'Team $number (wildcard)';
   }
 
   @override
@@ -1005,12 +1266,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteTeamError => 'The team could not be undone.';
 
   @override
-  String get draftGhostTeam => 'Ghost team';
+  String get draftGhostTeam => 'Wildcard team';
 
   @override
   String draftGhostTeamHint(int size) {
-    return 'Pick any $size participants of the category: they fight but do not score.';
+    return 'Wildcard teams (up to 3): 2 to $size participants of the category not in the group yet. They fight but do not score.';
   }
+
+  @override
+  String get addGhostTeam => 'Add wildcard team';
+
+  @override
+  String get teamGroupPoolHint =>
+      'No mat: its matches are spread over the mats without individual groups.';
 
   @override
   String pickGhostTeam(int count, int size) {
@@ -1203,9 +1471,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get categoryIndividual => 'Individual';
 
   @override
-  String categoryTeams(int size) {
-    return 'Teams of $size';
-  }
+  String get categoryTeams => 'Teams of 2 or 3';
 
   @override
   String get categoryAdd => 'Add category';
@@ -1227,9 +1493,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get categoryByTeams => 'By teams';
-
-  @override
-  String get categoryTeamSize => 'Participants per team';
 
   @override
   String categoryGroupSize(int size) {
@@ -1612,7 +1875,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get refusalNotForAge =>
-      'The one-hand warning is only for fighters aged 4 to 7.';
+      'The one-hand warning is only for fighters aged 4 to 8.';
 
   @override
   String get refusalInReview => 'The match is under the club\'s review.';
@@ -1636,7 +1899,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'The scoreboard rules did not allow one of the phone\'s actions.';
 
   @override
-  String get reviewReasonAge => 'One-hand warning to someone not aged 4 to 7.';
+  String get reviewReasonAge => 'One-hand warning to someone not aged 4 to 8.';
 
   @override
   String get reviewReasonMatBusy => 'Another match was in progress on the mat.';
@@ -1756,7 +2019,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String ghostOf(String name) {
-    return '$name (ghost)';
+    return '$name (wildcard)';
   }
 
   @override
@@ -1795,4 +2058,407 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get back => 'Back';
+
+  @override
+  String get clubLeague => 'League';
+
+  @override
+  String phaseNumber(int number) {
+    return 'Phase $number';
+  }
+
+  @override
+  String get leagueSwitchPhase => 'Switch phase';
+
+  @override
+  String leaguePodiumSummary(int firsts, int seconds, int thirds) {
+    return 'Podium: $firsts golds, $seconds silvers and $thirds bronzes per category';
+  }
+
+  @override
+  String get leagueEdit => 'Edit league';
+
+  @override
+  String get leaguePhases => 'Phases';
+
+  @override
+  String get leagueNewPhase => 'New phase';
+
+  @override
+  String leaguePhaseEntries(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count entries',
+      one: '1 entry',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get leagueCurrentPhase => 'This phase';
+
+  @override
+  String get disciplineTambo => 'Tambo';
+
+  @override
+  String get disciplineGround => 'Ground';
+
+  @override
+  String get disciplineThrows => 'Throws';
+
+  @override
+  String get disciplineTechnicalExpression => 'Technical expression';
+
+  @override
+  String disciplineSoon(String name) {
+    return '$name (coming soon)';
+  }
+
+  @override
+  String get leagueStandings => 'League standings';
+
+  @override
+  String get leagueStandingsCsv => 'Download CSV';
+
+  @override
+  String leaguePhasePoints(int number, int total, int attendance, int matches) {
+    return 'Phase $number: $total ($attendance for attending + $matches in matches)';
+  }
+
+  @override
+  String leaguePhaseAbsent(int number) {
+    return 'Phase $number: not entered';
+  }
+
+  @override
+  String get leagueNoPoints => 'No points yet: no place';
+
+  @override
+  String leagueCategoryHeader(String category, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count people',
+      one: '1 person',
+    );
+    return '$category · $_temp0';
+  }
+
+  @override
+  String get medalGold => 'Gold';
+
+  @override
+  String get medalSilver => 'Silver';
+
+  @override
+  String get medalBronze => 'Bronze';
+
+  @override
+  String leaguePhaseDefaultName(String league, int number) {
+    return '$league · Phase $number';
+  }
+
+  @override
+  String leagueNewPhaseTitle(int number) {
+    return 'New phase $number';
+  }
+
+  @override
+  String get leagueNewPhaseHint =>
+      'Mats with their referees, helpers, categories, clubs and scoreboard rules are copied from this phase. Entries start empty: you can then enter people from other phases.';
+
+  @override
+  String get leaguePhaseName => 'Phase name';
+
+  @override
+  String get leagueDiscipline => 'Discipline';
+
+  @override
+  String get leagueAttendancePoints => 'Attendance points';
+
+  @override
+  String get leagueAttendanceInvalid => 'Between 0 and 100';
+
+  @override
+  String get leagueNewPhaseCreate => 'Create phase';
+
+  @override
+  String leagueNewPhaseDone(int number) {
+    return 'Phase $number created';
+  }
+
+  @override
+  String get leagueName => 'League name';
+
+  @override
+  String get leaguePodium => 'General podium';
+
+  @override
+  String get leaguePodiumHint =>
+      'How many golds, silvers and bronzes each category gives on the final standings. Ties share the medal.';
+
+  @override
+  String get leagueCategoryPodiums => 'Categories with their own podium';
+
+  @override
+  String get leagueOwnPodium => 'Own podium';
+
+  @override
+  String get reenrolButton => 'Enter from other phases';
+
+  @override
+  String get reenrolTitle => 'Enter from other phases';
+
+  @override
+  String get reenrolEmpty =>
+      'Everyone from other phases is already entered in this one.';
+
+  @override
+  String get reenrolHint =>
+      'They are entered with their data from the latest phase; the category follows their age in this one.';
+
+  @override
+  String get reenrolSearch => 'Search by name, category or club';
+
+  @override
+  String reenrolSelectAll(int count) {
+    return 'Select all ($count)';
+  }
+
+  @override
+  String reenrolLastPhase(int number) {
+    return 'Latest: phase $number';
+  }
+
+  @override
+  String get reenrolGuardianConsent =>
+      'I have the consent of the guardians of the selected minors';
+
+  @override
+  String reenrolConfirm(int count) {
+    return 'Enter ($count)';
+  }
+
+  @override
+  String reenrolDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count entered',
+      one: '1 entered',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settingsAttendanceHint =>
+      'Everyone competing in a group of this phase adds them to the standings. Changing them recalculates the standings.';
+
+  @override
+  String draftTakenElsewhere(int count, String names) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$names are already in another group: taken out of the new group.',
+      one: '$names is already in another group: taken out of the new group.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get teamGhostMember => 'joins as a wildcard';
+
+  @override
+  String get teamGhostHint =>
+      'Whoever already has a team or a group joins as a wildcard: fights, but does not score for this team.';
+
+  @override
+  String ghostMemberName(String name) {
+    return '$name (wildcard)';
+  }
+
+  @override
+  String get teamOverlapTitle =>
+      'Not possible: participants in two teams of the group';
+
+  @override
+  String teamOverlapLine(String name, String teams) {
+    return '$name: $teams';
+  }
+
+  @override
+  String groupCreatedBy(String name) {
+    return 'by $name';
+  }
+
+  @override
+  String get staffTitle => 'Staff';
+
+  @override
+  String get staffHint =>
+      'Who is behind each account: shown on the mats and on who made each group.';
+
+  @override
+  String get staffNameHint => 'Person\'s name';
+
+  @override
+  String get staffReferee => 'referee';
+
+  @override
+  String get staffHelper => 'helper';
+
+  @override
+  String get cancelMatch => 'Cancel match';
+
+  @override
+  String get cancelMatchTitle =>
+      'Cancel the match: back to pending, all at 0. Why?';
+
+  @override
+  String get cancelMatchDone => 'Match cancelled: pending again.';
+
+  @override
+  String get reopenMatch => 'Reopen match';
+
+  @override
+  String get reopenMatchTitle => 'Reopen the match to correct it. Why?';
+
+  @override
+  String get reopenMatchDone => 'Match reopened: correct it and finish again.';
+
+  @override
+  String get refusalNotFinished => 'The match is not finished.';
+
+  @override
+  String get tlCancel => 'Match cancelled';
+
+  @override
+  String get tlReopen => 'Match reopened';
+
+  @override
+  String get matOneAtATime =>
+      'A match is in progress: the next one can start when it ends.';
+
+  @override
+  String get matQueued => 'Pending';
+
+  @override
+  String get keepMatch => 'Keep the match';
+
+  @override
+  String get watchClockRunning => 'Clock running';
+
+  @override
+  String get watchClockStopped => 'Clock stopped';
+
+  @override
+  String placeInCategory(int place, String category, int age) {
+    return '#$place in $category · $age years';
+  }
+
+  @override
+  String recordTotals(int attendance, int matches, int total) {
+    return 'Attendance $attendance + matches $matches = $total points';
+  }
+
+  @override
+  String get recordNoMatches => 'Not in a group yet.';
+
+  @override
+  String recordVs(String rival) {
+    return 'Against $rival';
+  }
+
+  @override
+  String recordWhere(String mat, int group) {
+    return '$mat · Group $group';
+  }
+
+  @override
+  String get recordWon => 'Won';
+
+  @override
+  String get recordLost => 'Lost';
+
+  @override
+  String get recordDraw => 'Draw';
+
+  @override
+  String get recordAsGhost => 'as a wildcard (no score)';
+
+  @override
+  String recordWarnings(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count warnings',
+      one: '1 warning',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String recordOneHand(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count one-hand',
+      one: '1 one-hand',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get recordDisqualified => 'Disqualified';
+
+  @override
+  String leagueDisqualifications(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count disqualifications',
+      one: '1 disqualification',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get recordRivalDisqualified => 'Rival disqualified';
+
+  @override
+  String get recordOpen => 'See matches';
+
+  @override
+  String get openLeague => 'Open the league';
+
+  @override
+  String podiumPreset(int gold, int silver, int bronze) {
+    return '$gold gold · $silver silver · $bronze bronze';
+  }
+
+  @override
+  String get podiumOther => 'Other';
+
+  @override
+  String podiumAsGeneral(String podium) {
+    return 'As the general one ($podium)';
+  }
+
+  @override
+  String get podiumOwn => 'Its own';
+
+  @override
+  String podiumLess(String metal) {
+    return 'One less: $metal';
+  }
+
+  @override
+  String podiumMore(String metal) {
+    return 'One more: $metal';
+  }
+
+  @override
+  String get leagueCategoryPodiumsHint =>
+      'Most use the general one; pick \"Its own\" only where other medals are given.';
 }

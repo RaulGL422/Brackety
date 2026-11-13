@@ -116,13 +116,15 @@ class LocalMatch {
             matId: server.matId,
             matNumber: server.matNumber,
             groupNumber: server.groupNumber,
+            // A cancelled match is pending again; a reopened one in progress.
             status: state.finished
                 ? MatchStatus.finished
-                : timeline.length > server.timeline.length
+                : state.started
                 ? MatchStatus.inProgress
-                : server.status,
+                : MatchStatus.pending,
             length: server.length,
             pointsLimit: server.pointsLimit,
+            readyAt: server.readyAt,
             remaining: state.remainingAt(now),
             running: state.isRunning(now),
             endReason: state.endReason(now),

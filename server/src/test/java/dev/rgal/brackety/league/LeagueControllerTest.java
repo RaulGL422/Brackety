@@ -149,6 +149,10 @@ class LeagueControllerTest extends EventApiTest {
                 .andExpect(jsonPath("$.rows[0].total").value(12))
                 .andExpect(jsonPath("$.rows[0].medal").value(1))
                 .andExpect(jsonPath("$.rows[0].phases[1]").value(nullValue()))
+                // Ana's record opens from phase 1, the latest she is in; Bea's from phase 2.
+                .andExpect(jsonPath("$.rows[0].eventId").value(eventId.toString()))
+                .andExpect(jsonPath("$.rows[0].participantId").value(kids.get(0).toString()))
+                .andExpect(jsonPath("$.rows[1].eventId").value(phase2.toString()))
                 .andExpect(jsonPath("$.rows[1].firstName").value("Bea"))
                 .andExpect(jsonPath("$.rows[1].phases[1].attendancePoints").value(0))
                 .andExpect(jsonPath("$.rows[1].medal").value(2))

@@ -48,6 +48,10 @@ public class FightGroup {
         return matId;
     }
 
+    void moveTo(UUID matId) {
+        this.matId = matId;
+    }
+
     public int getNumber() {
         return number;
     }

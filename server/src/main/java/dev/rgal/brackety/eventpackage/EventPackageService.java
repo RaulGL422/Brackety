@@ -22,6 +22,8 @@ import dev.rgal.brackety.event.EventStaff;
 import dev.rgal.brackety.event.EventStaffRepository;
 import dev.rgal.brackety.event.Mat;
 import dev.rgal.brackety.event.MatRepository;
+import dev.rgal.brackety.event.RulebookService;
+import dev.rgal.brackety.event.StaffNames;
 import dev.rgal.brackety.eventpackage.EventPackage.Category;
 import dev.rgal.brackety.eventpackage.EventPackage.CategoryPodiumEntry;
 import dev.rgal.brackety.eventpackage.EventPackage.LeagueEntry;
@@ -43,6 +45,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.text.Normalizer;
 import java.time.Clock;
+import java.util.Base64;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -92,6 +95,8 @@ public class EventPackageService {
     private final JsonMapper json;
     private final Validator validator;
     private final Clock clock;
+    private final StaffNames staffNames;
+    private final RulebookService rulebooks;
 
     EventPackageService(
             EventService eventService,
@@ -110,7 +115,9 @@ public class EventPackageService {
             EventResultsTransfer results,
             JsonMapper json,
             Validator validator,
-            Clock clock) {
+            Clock clock,
+            StaffNames staffNames,
+            RulebookService rulebooks) {
         this.eventService = eventService;
         this.access = access;
         this.events = events;
@@ -128,6 +135,8 @@ public class EventPackageService {
         this.json = json;
         this.validator = validator;
         this.clock = clock;
+        this.staffNames = staffNames;
+        this.rulebooks = rulebooks;
     }
 
     /** "liga-yoseikan-fase-1-2027-03-10": a file name for the event's exports. */
@@ -194,7 +203,17 @@ public class EventPackageService {
                                 p.getPersonId(),
                                 organizationNames.get(p.getOrganizationId())))
                         .toList(),
-                results.export(eventId));
+                results.export(eventId),
+                staffNames.names(eventId).entrySet().stream()
+                        .filter(e -> usernames.containsKey(e.getKey()))
+                        .map(e -> new EventPackage.StaffName(usernames.get(e.getKey()), e.getValue()))
+                        .sorted(Comparator.comparing(EventPackage.StaffName::username))
+                        .toList(),
+                rulebooks
+                        .find(eventId)
+                        .map(r -> new EventPackage.RulebookEntry(
+                                r.getFileName(), Base64.getEncoder().encodeToString(r.getContent())))
+                        .orElse(null));
         log.info(
                 "Event package exported: {} staff, {} categories, {} mats, {} participants, {}",
                 result.staff().size(),
@@ -208,6 +227,15 @@ public class EventPackageService {
     /** All or nothing; refused if the database already has an event. Results in the package load too. */
     @Transactional
     public LoadedPackage load(byte[] content) {
+        return load(content, false);
+    }
+
+    /**
+     * {@code usernamePasswords}: the staff accounts it creates get their username as password, like the demo ones
+     * (a risk Raul accepted for the F1 laptop); otherwise a random one. Existing accounts keep theirs.
+     */
+    @Transactional
+    public LoadedPackage load(byte[] content, boolean usernamePasswords) {
         var p = parse(content);
         if (events.count() > 0) {
             throw new InvalidEventPackageException(
@@ -215,7 +243,7 @@ public class EventPackageService {
         }
         EventPackageRules.check(p, validator);
         var passwords = new HashMap<String, String>();
-        var accountIds = createAccounts(p, passwords);
+        var accountIds = createAccounts(p, passwords, usernamePasswords);
         var settings = p.event();
         var ownerId = accountIds.get(EventPackageRules.username(p.owner().username()));
         var leagueEntry = p.league();
@@ -247,10 +275,21 @@ public class EventPackageService {
                 settings.changeoverSeconds(),
                 settings.attendancePoints(),
                 clock.instant());
+        event.withTeamRules(
+                Objects.requireNonNullElse(settings.teamMatchSeconds(), event.getTeamMatchSeconds()),
+                Objects.requireNonNullElse(settings.teamPointsLimit(), event.getTeamPointsLimit()),
+                Objects.requireNonNullElse(settings.minRestSeconds(), event.getMinRestSeconds()));
         event.setOriginEventId(settings.originId());
         event = events.save(event);
         for (var member : p.staff()) {
             staff.save(new EventStaff(event.getId(), accountIds.get(member.username()), member.role()));
+        }
+        // The names go in by SQL: the event and its staff must be written first.
+        staff.flush();
+        for (var name : p.staffNamesOrEmpty()) {
+            if (accountIds.containsKey(name.username())) {
+                staffNames.put(event.getId(), accountIds.get(name.username()), name.name());
+            }
         }
         for (var mat : p.mats()) {
             mats.save(new Mat(event.getId(), mat.number(), accountIds.get(mat.refereeUsername())));
@@ -269,6 +308,15 @@ public class EventPackageService {
         }
         for (var entry : p.participants()) {
             participants.save(newParticipant(event.getId(), entry, categoryIds, organizationIds));
+        }
+        if (p.rulebook() != null) {
+            byte[] pdf;
+            try {
+                pdf = Base64.getDecoder().decode(p.rulebook().pdf());
+            } catch (IllegalArgumentException e) {
+                throw EventException.invalid("The rulebook in the file is damaged.");
+            }
+            rulebooks.put(event.getId(), p.rulebook().fileName(), pdf);
         }
         if (p.results() != null && !p.results().isEmpty()) {
             participants.flush();
@@ -531,7 +579,7 @@ public class EventPackageService {
      * Usernames → account ids; the owner gets a club profile, everyone else a helper one. Accounts that already exist
      * keep their password; the new ones get a random one, added to {@code passwords}.
      */
-    private Map<String, UUID> createAccounts(EventPackage p, Map<String, String> passwords) {
+    private Map<String, UUID> createAccounts(EventPackage p, Map<String, String> passwords, boolean usernamePasswords) {
         var owner = EventPackageRules.username(p.owner().username());
         var ids = new HashMap<String, UUID>();
         ids.put(
@@ -541,11 +589,13 @@ public class EventPackageService {
                                 owner,
                                 blankToNull(p.owner().organizationName()),
                                 Cif.normalize(p.owner().taxId()),
-                                newPassword(owner, passwords))));
+                                newPassword(owner, passwords, usernamePasswords))));
         for (var member : p.staff()) {
             var username = member.username();
             ids.computeIfAbsent(
-                    username, u -> existing(u).orElseGet(() -> demoAccounts.helper(u, newPassword(u, passwords))));
+                    username,
+                    u -> existing(u)
+                            .orElseGet(() -> demoAccounts.helper(u, newPassword(u, passwords, usernamePasswords))));
         }
         return ids;
     }
@@ -554,8 +604,8 @@ public class EventPackageService {
         return accounts.findByEmail(username).map(Account::getId);
     }
 
-    private static String newPassword(String username, Map<String, String> passwords) {
-        var password = StaffPasswords.next();
+    private static String newPassword(String username, Map<String, String> passwords, boolean usernamePasswords) {
+        var password = usernamePasswords ? username : StaffPasswords.next();
         passwords.put(username, password);
         return password;
     }
@@ -573,7 +623,10 @@ public class EventPackageService {
                 event.getPointsLimit(),
                 event.getChangeoverSeconds(),
                 event.getAttendancePoints(),
-                Objects.requireNonNullElse(event.getOriginEventId(), event.getId()));
+                Objects.requireNonNullElse(event.getOriginEventId(), event.getId()),
+                event.getTeamMatchSeconds(),
+                event.getTeamPointsLimit(),
+                event.getMinRestSeconds());
     }
 
     private LeagueEntry league(Event event) {

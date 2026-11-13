@@ -1,13 +1,30 @@
+import '../../mat/data/mat_board.dart';
+
+/// A helper or referee account of the event; [personName]: who is behind it, set by the club.
 class StaffMember {
-  const StaffMember({required this.id, required this.username});
+  const StaffMember({
+    required this.id,
+    required this.username,
+    this.personName,
+    this.roles = const [],
+  });
 
   factory StaffMember.fromJson(Map<String, dynamic> json) => StaffMember(
     id: json['id'] as String,
     username: json['username'] as String,
+    personName: json['personName'] as String?,
+    roles: [for (final r in json['roles'] as List? ?? const []) r as String],
   );
 
   final String id;
   final String username;
+  final String? personName;
+
+  /// GROUPER and/or REFEREE.
+  final List<String> roles;
+
+  /// "Juan Pérez (arbitro1)", or the sign-in alone; as the server labels them.
+  String get label => personName == null ? username : '$personName ($username)';
 }
 
 /// An age band of the event; [teamSize] is null when it competes individually.
@@ -59,10 +76,15 @@ class EventSettings {
     required this.date,
     required this.matReferees,
     required this.referees,
+    this.staff = const [],
     required this.categories,
     required this.matchLength,
     required this.pointsLimit,
+    required this.attendancePoints,
     this.organizations = const [],
+    this.teamMatchLength = const Duration(minutes: 3),
+    this.teamPointsLimit = 0,
+    this.minRest = const Duration(seconds: 30),
   });
 
   factory EventSettings.fromJson(Map<String, dynamic> json) {
@@ -77,16 +99,26 @@ class EventSettings {
         for (final r in json['referees'] as List)
           StaffMember.fromJson(r as Map<String, dynamic>),
       ],
+      staff: [
+        for (final s in json['staff'] as List? ?? const [])
+          StaffMember.fromJson(s as Map<String, dynamic>),
+      ],
       categories: [
         for (final c in json['categories'] as List)
           EventCategory.fromJson(c as Map<String, dynamic>),
       ],
       matchLength: Duration(seconds: json['matchSeconds'] as int),
       pointsLimit: json['pointsLimit'] as int,
+      attendancePoints: json['attendancePoints'] as int,
       organizations: [
         for (final o in json['organizations'] as List? ?? [])
           Organization.fromJson(o as Map<String, dynamic>),
       ],
+      teamMatchLength: Duration(
+        seconds: json['teamMatchSeconds'] as int? ?? 180,
+      ),
+      teamPointsLimit: json['teamPointsLimit'] as int? ?? 0,
+      minRest: Duration(seconds: json['minRestSeconds'] as int? ?? 30),
     );
   }
 
@@ -98,11 +130,24 @@ class EventSettings {
 
   /// Accounts that can referee a mat in this event.
   final List<StaffMember> referees;
+
+  /// Every helper and referee, with the person behind each account.
+  final List<StaffMember> staff;
   final List<EventCategory> categories;
   final Duration matchLength;
 
   /// Points that end a match; a disqualification gives them to the rival.
   final int pointsLimit;
+
+  /// Points everyone in a group of this phase adds to the standings.
+  final int attendancePoints;
+
+  /// Team matches have their own length and points limit (0 = no limit).
+  final Duration teamMatchLength;
+  final int teamPointsLimit;
+
+  /// The least rest of a fighter between two matches, on any mat.
+  final Duration minRest;
 
   /// The clubs taking part, in the order the club entered them.
   final List<Organization> organizations;
@@ -294,4 +339,85 @@ class ResultsImport {
   final int groups;
   final int matches;
   final int actions;
+}
+
+/// One participant's day: their standing row and every match they fight (with their team or as a
+/// ghost too), as the club opens it.
+class ParticipantRecord {
+  const ParticipantRecord({required this.standing, required this.matches});
+
+  factory ParticipantRecord.fromJson(Map<String, dynamic> json) =>
+      ParticipantRecord(
+        standing: StandingRow.fromJson(
+          json['standing'] as Map<String, dynamic>,
+        ),
+        matches: [
+          for (final m in json['matches'] as List)
+            RecordMatch.fromJson(m as Map<String, dynamic>),
+        ],
+      );
+
+  final StandingRow standing;
+  final List<RecordMatch> matches;
+}
+
+/// [red]: they fight in red. [asGhost]: they (or their team) only fill the group in.
+class RecordMatch {
+  const RecordMatch({
+    required this.matchId,
+    required this.matNumber,
+    required this.groupNumber,
+    required this.status,
+    required this.red,
+    required this.asGhost,
+    this.team,
+    required this.rival,
+    required this.points,
+    required this.rivalPoints,
+    required this.warnings,
+    required this.oneHandWarnings,
+    required this.disqualified,
+    required this.rivalDisqualified,
+    this.endReason,
+  });
+
+  factory RecordMatch.fromJson(Map<String, dynamic> json) => RecordMatch(
+    matchId: json['matchId'] as String,
+    matNumber: json['matNumber'] as int?,
+    groupNumber: json['groupNumber'] as int,
+    status: switch (json['status']) {
+      'IN_PROGRESS' => MatchStatus.inProgress,
+      'FINISHED' => MatchStatus.finished,
+      _ => MatchStatus.pending,
+    },
+    red: json['side'] == 'RED',
+    asGhost: json['asGhost'] as bool,
+    team: json['team'] as int?,
+    rival: json['rival'] as String,
+    points: json['points'] as int,
+    rivalPoints: json['rivalPoints'] as int,
+    warnings: json['warnings'] as int,
+    oneHandWarnings: json['oneHandWarnings'] as int,
+    disqualified: json['disqualified'] as bool,
+    rivalDisqualified: json['rivalDisqualified'] as bool,
+    endReason: json['endReason'] as String?,
+  );
+
+  final String matchId;
+
+  /// Null for a team match not started yet.
+  final int? matNumber;
+  final int groupNumber;
+  final MatchStatus status;
+  final bool red;
+  final bool asGhost;
+  final int? team;
+  final String rival;
+  final int points;
+  final int rivalPoints;
+  final int warnings;
+  final int oneHandWarnings;
+  final bool disqualified;
+  final bool rivalDisqualified;
+  final String? endReason;
 }

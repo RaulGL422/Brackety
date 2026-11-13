@@ -17,3 +17,8 @@ typedef SaveFile = Future<void> Function(
 
 /// The platform's way to hand a file to the user, as a provider so tests can catch it.
 final saveFileProvider = Provider<SaveFile>((ref) => platform.saveFile);
+
+typedef OpenPdf = Future<void> Function(String name, Future<List<int>> bytes);
+
+/// Shows a PDF the platform's way, as a provider so tests can catch it.
+final openPdfProvider = Provider<OpenPdf>((ref) => platform.openPdf);

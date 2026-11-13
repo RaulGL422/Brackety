@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:brackety/core/download/file_download.dart';
 import 'package:brackety/features/club/data/club_models.dart';
+import 'package:brackety/features/mat/data/mat_board.dart';
 import 'package:brackety/features/club/data/club_repository.dart';
 import 'package:brackety/features/club/state/club_providers.dart';
 import 'package:brackety/core/upload/file_upload.dart';
@@ -22,9 +23,18 @@ class FakeClubRepository extends Fake implements ClubRepository {
   FakeClubRepository(this.current);
 
   EventSettings current;
+  final savedStaffNames = <(String, String)>[];
+
+  @override
+  Future<void> saveStaffName(
+    String eventId,
+    String accountId,
+    String name,
+  ) async => savedStaffNames.add((accountId, name));
   int? refuseWith;
   final savedMatReferees = <List<String?>>[];
   final savedRules = <(Duration, int)>[];
+  final savedAttendance = <int>[];
   final savedCategories = <List<EventCategory>>[];
   final savedParticipantCategories = <String?>[];
   final savedParticipantOrganizations = <String?>[];
@@ -98,10 +108,15 @@ class FakeClubRepository extends Fake implements ClubRepository {
     required List<String?> matReferees,
     required Duration matchLength,
     required int pointsLimit,
+    required int attendancePoints,
+    required Duration teamMatchLength,
+    required int teamPointsLimit,
+    required Duration minRest,
   }) async {
     _refuse();
     savedMatReferees.add(matReferees);
     savedRules.add((matchLength, pointsLimit));
+    savedAttendance.add(attendancePoints);
     return current = EventSettings(
       name: name,
       date: date,
@@ -110,7 +125,11 @@ class FakeClubRepository extends Fake implements ClubRepository {
       categories: current.categories,
       matchLength: matchLength,
       pointsLimit: pointsLimit,
+      attendancePoints: attendancePoints,
       organizations: current.organizations,
+      teamMatchLength: teamMatchLength,
+      teamPointsLimit: teamPointsLimit,
+      minRest: minRest,
     );
   }
 }
@@ -130,12 +149,31 @@ void main() {
   );
 
   final settings = EventSettings(
+    // Team matches of 4:00, so the individual 3:00 is the only one on screen.
+    teamMatchLength: const Duration(minutes: 4),
     name: 'Fase 1',
     date: DateTime(2026, 11, 14),
     matReferees: const ['r1', null],
-    referees: const [StaffMember(id: 'r1', username: 'arbitro1')],
+    referees: const [
+      StaffMember(
+        id: 'r1',
+        username: 'arbitro1',
+        personName: 'Juan Pérez',
+        roles: ['REFEREE'],
+      ),
+    ],
+    staff: const [
+      StaffMember(id: 'h1', username: 'ayudante1', roles: ['GROUPER']),
+      StaffMember(
+        id: 'r1',
+        username: 'arbitro1',
+        personName: 'Juan Pérez',
+        roles: ['REFEREE'],
+      ),
+    ],
     matchLength: const Duration(minutes: 3),
     pointsLimit: 15,
+    attendancePoints: 10,
     categories: const [
       EventCategory(id: 'c1', name: '4-7', minAge: 4, maxAge: 7),
       EventCategory(id: 'c2', name: '8-11', minAge: 8, maxAge: 11),
@@ -201,6 +239,46 @@ void main() {
                 : settings,
           ),
           standingsProvider.overrideWith((ref, _) async => scores ?? standings),
+          participantRecordProvider.overrideWith(
+            (ref, key) async => ParticipantRecord(
+              standing: (scores ?? standings).firstWhere(
+                (r) => r.participantId == key.participantId,
+              ),
+              matches: const [
+                RecordMatch(
+                  matchId: 'x1',
+                  matNumber: 2,
+                  groupNumber: 3,
+                  status: MatchStatus.finished,
+                  red: true,
+                  asGhost: false,
+                  rival: 'Bea Test',
+                  points: 3,
+                  rivalPoints: 15,
+                  warnings: 1,
+                  oneHandWarnings: 0,
+                  disqualified: false,
+                  rivalDisqualified: false,
+                  endReason: 'POINTS',
+                ),
+                RecordMatch(
+                  matchId: 'x2',
+                  matNumber: 2,
+                  groupNumber: 3,
+                  status: MatchStatus.pending,
+                  red: false,
+                  asGhost: true,
+                  rival: 'Ana Test',
+                  points: 0,
+                  rivalPoints: 0,
+                  warnings: 0,
+                  oneHandWarnings: 0,
+                  disqualified: false,
+                  rivalDisqualified: false,
+                ),
+              ],
+            ),
+          ),
           participantsProvider.overrideWith((ref, _) async => [minor]),
           matsOverviewProvider.overrideWith(
             (ref, _) async => [
@@ -263,6 +341,8 @@ void main() {
 
       expect(find.text('Fase 1'), findsOneWidget);
       expect(top(tester, 'Zoe Test'), lessThan(top(tester, 'Ana Test')));
+      // The podium in metal, and in words too.
+      expect(find.byTooltip('Gold'), findsWidgets);
 
       await tester.tap(find.text('Name'));
       await tester.pumpAndSettle();
@@ -274,6 +354,28 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Bea Test'), findsOneWidget);
       expect(find.text('Ana Test'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('the club opens a participant and sees each match on $device', (
+      tester,
+    ) async {
+      await pumpPanel(tester, size);
+
+      await tester.tap(find.text('Zoe Test'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('Attendance 10 + matches 30 = 40 points'),
+        findsOneWidget,
+      );
+      expect(find.text('Against Bea Test'), findsOneWidget);
+      expect(find.text('3 - 15'), findsOneWidget);
+      expect(
+        find.textContaining('Mat 2 · Group 3 · Lost · 1 warning'),
+        findsOneWidget,
+      );
+      expect(find.textContaining('as a wildcard (no score)'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
@@ -389,6 +491,8 @@ void main() {
     );
     expect(find.textContaining('No clubs yet'), findsOneWidget);
 
+    await tester.ensureVisible(find.text('Add club'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Add club'));
     await tester.pumpAndSettle();
     await tester.enterText(
@@ -420,6 +524,7 @@ void main() {
         categories: settings.categories,
         matchLength: settings.matchLength,
         pointsLimit: settings.pointsLimit,
+        attendancePoints: settings.attendancePoints,
         organizations: const [
           Organization(id: 'o1', name: 'Club Yoseikan Sevilla'),
         ],
@@ -460,6 +565,47 @@ void main() {
       ['r1', null, null],
     ]);
     expect(find.text('Saved'), findsOneWidget);
+  });
+
+  testWidgets('the club names the person behind each account', (tester) async {
+    final repository = FakeClubRepository(settings);
+    await pumpPanel(tester, const Size(360, 800), repository: repository);
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+
+    // The mat's referee shows with their name.
+    await tester.scrollUntilVisible(
+      find.text('Juan Pérez (arbitro1)'),
+      200,
+      scrollable: find
+          .descendant(
+            of: find.byType(ListView),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    expect(find.text('Juan Pérez (arbitro1)'), findsOneWidget);
+    final helper = find.widgetWithText(TextField, 'ayudante1 · helper');
+    await tester.scrollUntilVisible(
+      helper,
+      200,
+      scrollable: find
+          .descendant(
+            of: find.byType(ListView),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    await tester.enterText(helper, 'Ana López');
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+
+    expect(repository.savedStaffNames, [('h1', 'Ana López')]);
+    expect(
+      find.widgetWithText(TextField, 'arbitro1 · referee'),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('removing the last mat asks first', (tester) async {
@@ -510,10 +656,13 @@ void main() {
     await tester.tap(find.text('Settings'));
     await tester.pumpAndSettle();
 
-    final length = find.widgetWithText(TextFormField, 'Match length (min:s)');
+    final length = find.widgetWithText(
+      TextFormField,
+      'Individual: match length (min:s)',
+    );
     final limit = find.widgetWithText(
       TextFormField,
-      'Points that end the match',
+      'Individual: points that end the match',
     );
     expect(find.text('3:00'), findsOneWidget);
 
@@ -532,6 +681,37 @@ void main() {
     ));
   });
 
+  testWidgets('the club changes the attendance points of the phase', (
+    tester,
+  ) async {
+    final repository = FakeClubRepository(settings);
+    await pumpPanel(tester, const Size(360, 800), repository: repository);
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+
+    // Below the match rules: the list builds it once scrolled to.
+    final attendance = find.widgetWithText(TextFormField, 'Attendance points');
+    await tester.scrollUntilVisible(
+      attendance,
+      200,
+      scrollable: find
+          .descendant(
+            of: find.byType(ListView),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    await tester.enterText(attendance, '101');
+    await tester.pump(const Duration(seconds: 1));
+    expect(find.text('Between 0 and 100'), findsOneWidget);
+    expect(repository.savedAttendance, isEmpty);
+
+    await tester.enterText(attendance, '5');
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    expect(repository.savedAttendance.last, 5);
+  });
+
   testWidgets('a match length refused by a started match says why', (
     tester,
   ) async {
@@ -541,7 +721,7 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.enterText(
-      find.widgetWithText(TextFormField, 'Match length (min:s)'),
+      find.widgetWithText(TextFormField, 'Individual: match length (min:s)'),
       '4:00',
     );
     await tester.pump(const Duration(seconds: 1));
@@ -588,7 +768,7 @@ void main() {
       await pumpPanel(tester, size, repository: repository);
       await openCategories(tester);
 
-      expect(find.text('Teams of 3 · Groups of 4'), findsOneWidget);
+      expect(find.text('Teams of 2 or 3 · Groups of 4'), findsOneWidget);
       expect(find.text('Individual · Groups of 4'), findsNWidgets(2));
       await tester.tap(find.text('Add category'));
       await tester.pumpAndSettle();
@@ -645,7 +825,7 @@ void main() {
       find.text('A category with groups or teams can only change its name.'),
       findsOneWidget,
     );
-    expect(find.text('Teams of 3 · Groups of 4'), findsOneWidget);
+    expect(find.text('Teams of 2 or 3 · Groups of 4'), findsOneWidget);
   });
 
   testWidgets('a team member shows their team in the scores', (tester) async {
@@ -670,7 +850,10 @@ void main() {
       ],
     );
 
-    expect(find.textContaining('Team 2 · 15 years · 15-16'), findsOneWidget);
+    expect(
+      find.textContaining(RegExp(r'Team 2 · #\d+ in 15-16 · 15 years')),
+      findsOneWidget,
+    );
   });
 
   test('age counts whole years up to the day before the birthday', () {

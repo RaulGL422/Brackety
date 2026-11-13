@@ -49,13 +49,20 @@ class EventResultsTransfer {
         });
         var teamNumbers = new HashMap<UUID, Integer>();
         var teamMembers = new HashMap<UUID, List<UUID>>();
-        jdbc.sql("select m.team_id, m.participant_id from team_member m join team t on t.id = m.team_id"
-                        + " where t.event_id = ? order by m.team_id, m.position")
+        var ghostMembers = new HashMap<UUID, List<UUID>>();
+        jdbc.sql("select m.team_id, m.participant_id, m.ghost and not t.ghost as ghost_member from team_member m"
+                        + " join team t on t.id = m.team_id where t.event_id = ? order by m.team_id, m.position")
                 .param(eventId)
                 .query(rs -> {
+                    var person = persons.get(uuid(rs, "participant_id"));
                     teamMembers
                             .computeIfAbsent(uuid(rs, "team_id"), k -> new ArrayList<>())
-                            .add(persons.get(uuid(rs, "participant_id")));
+                            .add(person);
+                    if (rs.getBoolean("ghost_member")) {
+                        ghostMembers
+                                .computeIfAbsent(uuid(rs, "team_id"), k -> new ArrayList<>())
+                                .add(person);
+                    }
                 });
         var teams = jdbc.sql("select * from team where event_id = ? order by number")
                 .param(eventId)
@@ -67,7 +74,8 @@ class EventResultsTransfer {
                             rs.getBoolean("ghost"),
                             usernames.get(uuid(rs, "created_by")),
                             instant(rs, "created_at"),
-                            teamMembers.getOrDefault(uuid(rs, "id"), List.of()));
+                            teamMembers.getOrDefault(uuid(rs, "id"), List.of()),
+                            ghostMembers.getOrDefault(uuid(rs, "id"), List.of()));
                 })
                 .list();
         var groupMembers = new HashMap<UUID, List<MemberEntry>>();
@@ -188,15 +196,17 @@ class EventResultsTransfer {
                             accounts.get(t.createdBy()),
                             timestamp(t.createdAt()))
                     .update();
+            var ghostMembers = t.ghostMemberPersonIds() == null ? List.<UUID>of() : t.ghostMemberPersonIds();
             for (int i = 0; i < t.memberPersonIds().size(); i++) {
+                var person = t.memberPersonIds().get(i);
                 jdbc.sql("insert into team_member (id, team_id, participant_id, position, ghost)"
                                 + " values (?, ?, ?, ?, ?)")
                         .params(
                                 UUID.randomUUID(),
                                 id,
-                                required(participants, t.memberPersonIds().get(i), "team member"),
+                                required(participants, person, "team member"),
                                 i,
-                                t.ghost())
+                                t.ghost() || ghostMembers.contains(person))
                         .update();
             }
         }
@@ -210,7 +220,7 @@ class EventResultsTransfer {
                             id,
                             eventId,
                             required(categories, g.categoryName(), "group category"),
-                            required(mats, g.matNumber(), "group mat"),
+                            g.matNumber() == null ? null : required(mats, g.matNumber(), "group mat"),
                             g.number(),
                             accounts.get(g.createdBy()),
                             timestamp(g.createdAt()))
@@ -238,7 +248,7 @@ class EventResultsTransfer {
                             id,
                             eventId,
                             required(groups, m.groupNumber(), "match group"),
-                            required(mats, m.matNumber(), "match mat"),
+                            m.matNumber() == null ? null : required(mats, m.matNumber(), "match mat"),
                             m.orderIndex(),
                             person(participants, m.red()),
                             person(participants, m.blue()),

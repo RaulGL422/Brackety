@@ -410,7 +410,7 @@ void main() {
       expect(find.widgetWithText(AppBar, title), findsOneWidget);
       expect(legal.texts.last.$2, 'en');
 
-      await tester.tap(find.byIcon(Icons.chevron_left));
+      await tester.tap(find.byIcon(Icons.arrow_back));
       await tester.pumpAndSettle();
       expect(find.text('ana@example.com'), findsOneWidget);
       expect(accepted(tester), isFalse);

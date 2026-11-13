@@ -10,6 +10,7 @@ import dev.rgal.brackety.event.dto.EventSettingsResponse.StaffMember;
 import dev.rgal.brackety.event.dto.MyEventResponse;
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -27,6 +28,7 @@ public class EventService {
     private final EventCategoryRepository categories;
     private final EventOrganizationRepository organizations;
     private final AccountRepository accounts;
+    private final StaffNames staffNames;
     private final EventAccess access;
 
     EventService(
@@ -36,7 +38,9 @@ public class EventService {
             EventCategoryRepository categories,
             EventOrganizationRepository organizations,
             AccountRepository accounts,
-            EventAccess access) {
+            EventAccess access,
+            StaffNames staffNames) {
+        this.staffNames = staffNames;
         this.events = events;
         this.staff = staff;
         this.mats = mats;
@@ -62,6 +66,7 @@ public class EventService {
                         EventStaff::getEventId,
                         Collectors.mapping(
                                 EventStaff::getRole, Collectors.toCollection(() -> EnumSet.noneOf(EventRole.class)))));
+        var leagueNames = new HashMap<UUID, String>();
         return events.findAllById(rolesByEvent.keySet()).stream()
                 .sorted(Comparator.comparing(Event::getEventDate).reversed())
                 .map(event -> {
@@ -77,6 +82,7 @@ public class EventService {
                             mat.map(Mat::getId).orElse(null),
                             mat.map(Mat::getNumber).orElse(null),
                             event.getLeagueId(),
+                            leagueNames.computeIfAbsent(event.getLeagueId(), events::leagueName),
                             event.getPhaseNumber());
                 })
                 .toList();
@@ -107,11 +113,18 @@ public class EventService {
         }
         var matchSeconds = request.matchSeconds() == null ? event.getMatchSeconds() : request.matchSeconds();
         var pointsLimit = request.pointsLimit() == null ? event.getPointsLimit() : request.pointsLimit();
-        if (matchSeconds != event.getMatchSeconds() && events.hasMatchIn(eventId, "IN_PROGRESS")) {
+        var teamMatchSeconds =
+                request.teamMatchSeconds() == null ? event.getTeamMatchSeconds() : request.teamMatchSeconds();
+        var teamPointsLimit =
+                request.teamPointsLimit() == null ? event.getTeamPointsLimit() : request.teamPointsLimit();
+        var minRestSeconds = request.minRestSeconds() == null ? event.getMinRestSeconds() : request.minRestSeconds();
+        if ((matchSeconds != event.getMatchSeconds() || teamMatchSeconds != event.getTeamMatchSeconds())
+                && events.hasMatchIn(eventId, "IN_PROGRESS")) {
             throw EventException.conflict("The match length cannot change while a match is in progress.");
         }
         // A disqualification scores the limit for the rival: started matches keep the one they had.
-        if (pointsLimit != event.getPointsLimit() && events.hasStartedMatches(eventId)) {
+        if ((pointsLimit != event.getPointsLimit() || teamPointsLimit != event.getTeamPointsLimit())
+                && events.hasStartedMatches(eventId)) {
             throw EventException.conflict("The points limit cannot change once a match has started.");
         }
         var current = mats.findByEventIdOrderByNumber(eventId);
@@ -122,6 +135,16 @@ public class EventService {
                 && events.hasGroupsOnMats(removed.stream().map(Mat::getId).toList())) {
             throw EventException.conflict("A mat with groups cannot be removed.");
         }
+        // Nobody would ever play the matches of a mat left without its referee (Raul, 2026-11-13).
+        for (int i = 0; i < Math.min(current.size(), request.matReferees().size()); i++) {
+            var mat = current.get(i);
+            if (request.matReferees().get(i) == null
+                    && mat.getRefereeAccountId() != null
+                    && events.hasMatchesToPlayOn(mat.getId())) {
+                throw EventException.conflict(
+                        "MAT_HAS_MATCHES", "Mat " + mat.getNumber() + " has matches to play: it needs its referee.");
+            }
+        }
         var attendancePoints =
                 request.attendancePoints() != null ? request.attendancePoints() : event.getAttendancePoints();
         event.update(
@@ -130,7 +153,10 @@ public class EventService {
                 request.maxGroupsPerMat(),
                 matchSeconds,
                 pointsLimit,
-                attendancePoints);
+                attendancePoints,
+                teamMatchSeconds,
+                teamPointsLimit,
+                minRestSeconds);
         for (int i = 0; i < request.matReferees().size(); i++) {
             var referee = request.matReferees().get(i);
             if (i < current.size()) {
@@ -144,9 +170,22 @@ public class EventService {
     }
 
     private EventSettingsResponse settings(Event event) {
-        var referees = accounts.findAllById(refereeIds(event.getId())).stream()
+        var names = staffNames.names(event.getId());
+        var rolesByAccount = staff.findByEventId(event.getId()).stream()
+                .collect(Collectors.groupingBy(
+                        EventStaff::getAccountId, Collectors.mapping(EventStaff::getRole, Collectors.toList())));
+        // Everyone but the club itself, by sign-in.
+        var people = accounts.findAllById(rolesByAccount.keySet()).stream()
+                .filter(a -> !rolesByAccount.get(a.getId()).contains(EventRole.CLUB))
                 .sorted(Comparator.comparing(Account::getEmail))
-                .map(a -> new StaffMember(a.getId(), a.getEmail()))
+                .map(a -> new StaffMember(
+                        a.getId(),
+                        a.getEmail(),
+                        names.get(a.getId()),
+                        rolesByAccount.get(a.getId()).stream().sorted().toList()))
+                .toList();
+        var referees = people.stream()
+                .filter(p -> p.roles().contains(EventRole.REFEREE))
                 .toList();
         return new EventSettingsResponse(
                 event.getName(),
@@ -158,13 +197,17 @@ public class EventService {
                         .map(m -> new MatSettings(m.getId(), m.getNumber(), m.getRefereeAccountId()))
                         .toList(),
                 referees,
+                people,
                 categories.findByEventIdOrderByMinAge(event.getId()).stream()
                         .map(CategoryResponse::of)
                         .toList(),
                 EventOrganizationService.list(organizations, event.getId()),
                 event.getAttendancePoints(),
                 event.getPhaseNumber(),
-                event.getDiscipline().name());
+                event.getDiscipline().name(),
+                event.getTeamMatchSeconds(),
+                event.getTeamPointsLimit(),
+                event.getMinRestSeconds());
     }
 
     private List<UUID> refereeIds(UUID eventId) {

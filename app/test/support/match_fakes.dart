@@ -59,6 +59,7 @@ MatchView matchView({
   Corner? blue,
   MatchReview? review,
   bool? started,
+  DateTime? readyAt,
 }) => MatchView(
   id: 'm1',
   matId: 'mat1',
@@ -71,6 +72,7 @@ MatchView matchView({
   running: running,
   endReason: endReason,
   review: review,
+  readyAt: readyAt,
   red: red ?? corner('Ana Prueba', points: redPoints, oneHandRule: true),
   blue: blue ?? corner('Bea Prueba'),
   timeline: [

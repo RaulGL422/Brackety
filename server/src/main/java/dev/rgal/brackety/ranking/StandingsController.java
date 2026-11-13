@@ -3,6 +3,7 @@ package dev.rgal.brackety.ranking;
 import dev.rgal.brackety.auth.RequiresVerifiedEmail;
 import dev.rgal.brackety.common.CurrentAccount;
 import dev.rgal.brackety.ranking.dto.LeagueStandings;
+import dev.rgal.brackety.ranking.dto.ParticipantRecord;
 import dev.rgal.brackety.ranking.dto.StandingRow;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -30,16 +31,26 @@ class StandingsController {
     private final LeagueStandingsService leagueStandings;
     private final EventSheets sheets;
     private final FullExportService fullExport;
+    private final ParticipantRecordService records;
 
     StandingsController(
             StandingsService standings,
             LeagueStandingsService leagueStandings,
             EventSheets sheets,
-            FullExportService fullExport) {
+            FullExportService fullExport,
+            ParticipantRecordService records) {
+        this.records = records;
         this.standings = standings;
         this.leagueStandings = leagueStandings;
         this.sheets = sheets;
         this.fullExport = fullExport;
+    }
+
+    /** One participant's standing and matches, for the club. */
+    @GetMapping("/participants/{participantId}/record")
+    ParticipantRecord record(
+            @PathVariable UUID eventId, @PathVariable UUID participantId, @AuthenticationPrincipal Jwt jwt) {
+        return records.record(eventId, participantId, CurrentAccount.id(jwt));
     }
 
     @GetMapping("/standings")

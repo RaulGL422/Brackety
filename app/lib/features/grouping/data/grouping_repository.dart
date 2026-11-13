@@ -37,7 +37,8 @@ class GroupingRepository {
     ];
   }
 
-  /// Without [matId] the server picks the mat that will be free first.
+  /// Without [matId] the server picks the mat that will be free first; a group of teams has no
+  /// mat (its matches go to the free mats).
   Future<CreatedGroups> create(
     String eventId,
     String categoryId,
@@ -45,22 +46,33 @@ class GroupingRepository {
     String? matId,
   }) async {
     final response = await _dio.post<Map<String, dynamic>>(
-      '/api/v1/events/$eventId/groups',
-      data: {
-        'categoryId': categoryId,
-        'groups': [
-          group.ofTeams
-              ? {
-                  'teamIds': group.members,
-                  if (group.ghostMode) 'ghostTeam': group.ghostTeam,
-                }
-              : {'participantIds': group.members, 'ghostId': group.ghost},
-        ],
-        'matId': ?matId,
-      },
+      groupsPath(eventId),
+      data: groupBody(categoryId, group, matId: matId),
     );
     return CreatedGroups.fromJson(response.data!);
   }
+
+  static String groupsPath(String eventId) => '/api/v1/events/$eventId/groups';
+
+  static Map<String, dynamic> groupBody(
+    String categoryId,
+    DraftGroup group, {
+    String? matId,
+  }) => {
+    'categoryId': categoryId,
+    'groups': [
+      group.ofTeams
+          ? {
+              'teamIds': group.members,
+              if (group.ghostMode) 'ghostTeams': group.ghostTeams,
+            }
+          : {'participantIds': group.members, 'ghostIds': group.ghosts},
+    ],
+    if (!group.ofTeams) 'matId': ?matId,
+  };
+
+  static String teamsPath(String eventId, String categoryId) =>
+      '/api/v1/events/$eventId/categories/$categoryId/teams';
 
   Future<List<Team>> teams(String eventId, String categoryId) async {
     final response = await _dio.get<List<dynamic>>(
@@ -72,14 +84,16 @@ class GroupingRepository {
     ];
   }
 
+  /// [ghostIds]: those of [participantIds] who fill the team in without scoring for it.
   Future<Team> createTeam(
     String eventId,
     String categoryId,
-    List<String> participantIds,
-  ) async {
+    List<String> participantIds, {
+    List<String> ghostIds = const [],
+  }) async {
     final response = await _dio.post<Map<String, dynamic>>(
-      '/api/v1/events/$eventId/categories/$categoryId/teams',
-      data: {'participantIds': participantIds},
+      teamsPath(eventId, categoryId),
+      data: {'participantIds': participantIds, 'ghostIds': ghostIds},
     );
     return Team.fromJson(response.data!);
   }

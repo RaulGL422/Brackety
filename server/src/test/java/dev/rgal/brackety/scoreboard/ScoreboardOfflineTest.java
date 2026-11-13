@@ -45,8 +45,10 @@ class ScoreboardOfflineTest extends ScoreboardApiTest {
     UUID match;
     Instant t0;
 
+    // These cases were written for 3-minute matches: the demo's individual length is 1 minute now.
     @BeforeEach
     void pickMatch() {
+        jdbc.sql("update event set match_seconds = 180").update();
         match = match(young, 0, 1);
         t0 = clock.instant();
     }

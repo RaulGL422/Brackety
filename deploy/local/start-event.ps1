@@ -8,6 +8,7 @@
     El primer arranque necesita el evento: -Package (el .zip o el .brackety que exporta el club) o -Demo.
 .EXAMPLE
     .\start-event.ps1 -Package .\fase-1.brackety
+    .\start-event.ps1 -Package .\fase-1.brackety -UsernamePasswords
     .\start-event.ps1
     .\start-event.ps1 -Demo -EventDate 2026-11-14
     .\start-event.ps1 -Backup
@@ -19,6 +20,8 @@ param(
     [string]$Package = "",
     # First start with the prototype's demo accounts and event instead of a package.
     [switch]$Demo,
+    # With -Package: the staff accounts it creates get their username as password (risk accepted for the F1).
+    [switch]$UsernamePasswords,
     # Day of the demo event (age categories), AAAA-MM-DD; empty = today. Only used when the accounts are created.
     [string]$EventDate = "",
     [string]$LegalOwnerName = "",
@@ -181,7 +184,19 @@ function Start-Postgres {
         -ArgumentList "start -s -w -t 60 -D `"$pgData`" -l `"$logFile`""
     $null = $pgCtl.Handle
     $pgCtl.WaitForExit()
-    if ($pgCtl.ExitCode -ne 0) { throw "PostgreSQL no arranca: mira brackety-data\pg.log." }
+    if ($pgCtl.ExitCode -ne 0) {
+        if (Get-NetTCPConnection -LocalPort $PgPort -State Listen -ErrorAction SilentlyContinue) {
+            throw "PostgreSQL no arranca: el puerto $PgPort ya está en uso (¿otra copia de Brackety abierta?)."
+        }
+        throw "PostgreSQL no arranca: mira brackety-data\pg.log."
+    }
+}
+
+function Start-Api {
+    $process = Start-Process -FilePath $java -ArgumentList "-jar `"$jar`"" -WorkingDirectory $data -NoNewWindow -PassThru
+    # Reading the handle now keeps ExitCode available after the process ends.
+    $null = $process.Handle
+    return $process
 }
 
 function Stop-Postgres {
@@ -342,6 +357,16 @@ function Copy-Package {
     return $target
 }
 
+# The package of the first start, from package-loaded.txt ("Paquete: <file>"); empty if it is not there.
+function Get-LoadedPackage {
+    if (-not (Test-Path $packageMark)) { return "" }
+    $line = Get-Content $packageMark -Encoding UTF8 | Where-Object { $_ -like "Paquete: *" } | Select-Object -First 1
+    if (-not $line) { return "" }
+    $file = Join-Path $data $line.Substring("Paquete: ".Length).Trim()
+    if (Test-Path $file -PathType Leaf) { return $file }
+    return ""
+}
+
 function Show-PackageError {
     $log = Join-Path $data "api.log"
     $reason = if (Test-Path $log) {
@@ -355,9 +380,17 @@ function Set-ApiEnvironment([hashtable]$secrets, [string]$mode, [string]$package
     $legal = Read-EnvFile $eventFile
     $owner = if ($LegalOwnerName) { $LegalOwnerName } else { $legal["LEGAL_OWNER_NAME"] }
     $privacy = if ($PrivacyContactEmail) { $PrivacyContactEmail } else { $legal["PRIVACY_CONTACT_EMAIL"] }
+    # Kept for the next start: after a power cut the plain command must bring the same legal data back.
+    if ($LegalOwnerName -or $PrivacyContactEmail) {
+        Set-Content -Path $eventFile -Encoding utf8 -Value @(
+            "# Datos legales que muestra la web (páginas legales). Edita y vuelve a arrancar.",
+            "LEGAL_OWNER_NAME=$owner",
+            "PRIVACY_CONTACT_EMAIL=$privacy")
+    }
     $day = if ($EventDate) { $EventDate } else { Get-Date -Format "yyyy-MM-dd" }
     $null = [datetime]::ParseExact($day, "yyyy-MM-dd", $null)
 
+    $env:SERVER_PORT = "$ApiPort"
     $env:DB_URL = "jdbc:postgresql://127.0.0.1:$PgPort/$DbName"
     $env:DB_USER = $DbUser
     $env:DB_PASSWORD = $secrets["DB_PASSWORD"]
@@ -382,6 +415,14 @@ function Set-ApiEnvironment([hashtable]$secrets, [string]$mode, [string]$package
         $env:BRACKETY_PACKAGE_CREDENTIALS = $credentialsFile
     } else {
         Remove-Item Env:BRACKETY_PACKAGE, Env:BRACKETY_PACKAGE_CREDENTIALS -ErrorAction SilentlyContinue
+    }
+    $env:BRACKETY_PACKAGE_USERNAME_PASSWORDS = if ($UsernamePasswords) { "true" } else { "false" }
+    # The superadmin can start the event again from the package it was loaded from (kept in brackety-data).
+    $resetPackage = if ($packageFile) { $packageFile } else { Get-LoadedPackage }
+    if ($resetPackage) {
+        $env:BRACKETY_RESET_PACKAGE = $resetPackage
+    } else {
+        Remove-Item Env:BRACKETY_RESET_PACKAGE -ErrorAction SilentlyContinue
     }
     $env:LOGGING_FILE_NAME = Join-Path $data "api.log"
     foreach ($offline in @("RESEND_API_KEY", "GOOGLE_CLIENT_ID", "CF_ACCESS_TEAM_DOMAIN", "CF_ACCESS_AUD",
@@ -486,9 +527,7 @@ try {
     Set-ApiEnvironment $secrets $mode $packageFile
     $loading = if ($packageFile) { " y cargando el paquete $(Split-Path $packageFile -Leaf)" } else { "" }
     Write-Step "Arrancando la API$loading (puede tardar un minuto)"
-    $api = Start-Process -FilePath $java -ArgumentList "-jar `"$jar`"" -WorkingDirectory $data -NoNewWindow -PassThru
-    # Reading the handle now keeps ExitCode available after the process ends.
-    $null = $api.Handle
+    $api = Start-Api
     try {
         Wait-ApiReady $api
     } catch {
@@ -513,8 +552,25 @@ try {
     Write-Host "  Datos: $data"
     Write-Host "  Para parar: Ctrl+C (guarda una copia de la base de datos al salir)."
     Write-Host ""
-    while (-not $api.HasExited) { Start-Sleep -Milliseconds 500 }
-    Write-Warn "La API se ha parado (código $($api.ExitCode)): mira brackety-data\api.log."
+    # The package is in the database now: a restart must not try to load it again.
+    Remove-Item Env:BRACKETY_PACKAGE, Env:BRACKETY_PACKAGE_CREDENTIALS -ErrorAction SilentlyContinue
+    $crashes = @()
+    while ($true) {
+        while (-not $api.HasExited) { Start-Sleep -Milliseconds 500 }
+        Write-Warn "La API se ha parado (código $($api.ExitCode)): mira brackety-data\api.log."
+        # A crash mid-event must not leave the phones without server; one that keeps failing needs a person.
+        $crashes = @($crashes | Where-Object { $_ -gt (Get-Date).AddMinutes(-10) }) + (Get-Date)
+        if ($crashes.Count -gt 3) {
+            Write-Warn "Se ha parado $($crashes.Count) veces en 10 minutos: no se vuelve a arrancar sola."
+            break
+        }
+        if (-not (Test-PgRunning)) { Start-Postgres }
+        try { Invoke-Backup } catch { Write-Warn "No se ha podido guardar la copia: $($_.Exception.Message)" }
+        Write-Step "Volviendo a arrancar la API (los móviles conservan sus acciones sin enviar)"
+        $api = Start-Api
+        Wait-ApiReady $api
+        Write-Host "Brackety listo de nuevo." -ForegroundColor Green
+    }
 } finally {
     Write-Host "Cerrando: no cierres la ventana hasta que termine la copia."
     Stop-Api $api
@@ -527,5 +583,5 @@ try {
     }
     Stop-Postgres
     Remove-Item Env:PGPASSWORD, Env:DB_PASSWORD, Env:JWT_SECRET, Env:BRACKETY_PACKAGE,
-        Env:BRACKETY_PACKAGE_CREDENTIALS -ErrorAction SilentlyContinue
+        Env:BRACKETY_PACKAGE_CREDENTIALS, Env:BRACKETY_RESET_PACKAGE -ErrorAction SilentlyContinue
 }

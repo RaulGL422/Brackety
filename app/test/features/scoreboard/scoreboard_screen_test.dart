@@ -10,6 +10,7 @@ import 'package:brackety/l10n/gen/app_localizations.dart';
 import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/match_fakes.dart';
@@ -127,7 +128,7 @@ void main() {
 
       expect(find.text('Team 1'), findsOneWidget);
       expect(find.text('Ana P, Bea P, Carla P'), findsOneWidget);
-      expect(find.text('Team 4 · Ghost'), findsOneWidget);
+      expect(find.text('Team 4 · Wildcard'), findsOneWidget);
       expect(tester.takeException(), isNull);
 
       await tester.pumpWidget(const SizedBox());
@@ -183,11 +184,62 @@ void main() {
     );
 
     repository.next = matchView(status: MatchStatus.finished, redPoints: 15);
-    await tester.tap(find.text('Finish match'));
+    await tester.tap(find.text('Finish\nmatch'));
     await settle(tester);
 
     expect(repository.sent.single.$1, MatchAction.finish);
     expect(find.text('Match finished'), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('going back from a match that is over finishes it', (
+    tester,
+  ) async {
+    tester.view.physicalSize = sizes['phone']!;
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final repository = FakeScoreboardRepository(
+      played([for (var i = 0; i < 15; i++) (MatchAction.point, Side.red)]),
+    );
+    final router = GoRouter(
+      initialLocation: '/matches/m1',
+      routes: [
+        GoRoute(
+          path: '/matches/:id',
+          builder: (_, _) => const ScoreboardScreen(matchId: 'm1'),
+        ),
+        GoRoute(path: '/mats/:id', builder: (_, _) => const Text('board')),
+      ],
+    );
+    addTearDown(router.dispose);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...quietQueueOverrides(),
+          scoreboardRepositoryProvider.overrideWithValue(repository),
+          bellProvider.overrideWithValue(FakeBell()),
+        ],
+        child: MaterialApp.router(
+          routerConfig: router,
+          builder: (_, child) => ToastHost(child: child!),
+          theme: lightTheme(),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            ...coreLocalizationsDelegates,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
+      ),
+    );
+    await settle(tester);
+
+    repository.next = matchView(status: MatchStatus.finished, redPoints: 15);
+    await tester.tap(find.byIcon(Icons.arrow_back));
+    await settle(tester);
+
+    expect(repository.sent.single.$1, MatchAction.finish);
+    expect(find.text('board'), findsOneWidget);
 
     await tester.pumpWidget(const SizedBox());
   });

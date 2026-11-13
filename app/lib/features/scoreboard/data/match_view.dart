@@ -22,7 +22,13 @@ enum MatchAction {
   disqualification,
   clockAdjust,
   undo,
-  finish;
+  finish,
+
+  /// Started by mistake: back to pending, all at 0 (with a reason; the trail stays).
+  cancel,
+
+  /// A finished match opens again to correct it (with a reason).
+  reopen;
 
   String get wire => switch (this) {
     oneHandWarning => 'ONE_HAND_WARNING',
@@ -73,7 +79,7 @@ class Corner implements FighterInfo {
   @override
   final List<String> members;
 
-  /// Aged 4 to 7 (for a team, someone in it): the one-hand warning applies.
+  /// Aged 4 to 8 (for a team, someone in it): the one-hand warning applies.
   final bool oneHandRule;
   final int points;
   final int warnings;
@@ -312,8 +318,8 @@ class ReviewOutcome {
 class MatchView {
   const MatchView({
     required this.id,
-    required this.matId,
-    required this.matNumber,
+    this.matId,
+    this.matNumber,
     required this.groupNumber,
     required this.status,
     required this.length,
@@ -326,12 +332,13 @@ class MatchView {
     this.endReason,
     this.serverTime,
     this.review,
+    this.readyAt,
   });
 
   factory MatchView.fromJson(Map<String, dynamic> json) => MatchView(
     id: json['id'] as String,
-    matId: json['matId'] as String,
-    matNumber: json['matNumber'] as int,
+    matId: json['matId'] as String?,
+    matNumber: json['matNumber'] as int?,
     groupNumber: json['groupNumber'] as int,
     status: matchStatusFromJson(json['status'] as String),
     length: Duration(seconds: json['lengthSeconds'] as int),
@@ -356,6 +363,10 @@ class MatchView {
     },
     review: switch (json['review']) {
       final Map<String, dynamic> review => MatchReview.fromJson(review),
+      _ => null,
+    },
+    readyAt: switch (json['readyAt']) {
+      final String at => DateTime.parse(at),
       _ => null,
     },
   );
@@ -385,11 +396,16 @@ class MatchView {
     'timeline': [for (final e in timeline) e.toJson()],
     'serverTime': serverTime?.toUtc().toIso8601String(),
     'review': review?.toJson(),
+    'readyAt': readyAt?.toUtc().toIso8601String(),
   };
 
   final String id;
-  final String matId;
-  final int matNumber;
+
+  /// Null for a team match in the pool, until a mat starts it.
+  final String? matId;
+
+  /// Null for a team match in the pool, until a mat starts it.
+  final int? matNumber;
   final int groupNumber;
   final MatchStatus status;
   final Duration length;
@@ -408,6 +424,9 @@ class MatchView {
 
   /// Set while the club has to review what a device sent: nothing more is accepted.
   final MatchReview? review;
+
+  /// Pending and a fighter has not had the least rest yet: it cannot start before this.
+  final DateTime? readyAt;
 
   /// What the device counts in `knownEvents`: the automatic stops are left out.
   int get knownEvents => timeline.where((e) => !e.automatic).length;
@@ -430,18 +449,25 @@ class MatchView {
     timeline: timeline,
     serverTime: serverTime,
     review: review,
+    readyAt: readyAt,
   );
 
   bool get finished => status == MatchStatus.finished;
 
-  /// The clock was started at least once: only then can anyone score.
-  bool get started => timeline.any((e) => e.action == MatchAction.start);
+  /// What counts now: a cancel wipes the match, so only what came after the last one.
+  Iterable<TimelineEntry> get _sinceCancel {
+    final last = timeline.lastIndexWhere((e) => e.action == MatchAction.cancel);
+    return last < 0 ? timeline : timeline.skip(last + 1);
+  }
+
+  /// The clock was started at least once (since a cancel): only then can anyone score.
+  bool get started => _sinceCancel.any((e) => e.action == MatchAction.start);
 
   /// What an undo would undo now: the last point (added or removed), warning,
   /// disqualification or clock adjustment in force.
   TimelineEntry? get lastUndoable => finished
       ? null
-      : timeline
+      : _sinceCancel
             .where(
               (e) =>
                   !e.undone &&

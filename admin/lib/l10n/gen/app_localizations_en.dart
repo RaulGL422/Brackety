@@ -10,6 +10,127 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get eventReset => 'Start the event again from the package';
+
+  @override
+  String get eventResetTitle => 'Start the event again?';
+
+  @override
+  String eventResetBody(String package, String word) {
+    return 'Everything done is deleted (groups, teams, matches, scores, setting changes and added entries) and $package is loaded again. Accounts and passwords stay. Everyone will have to reload the page. It cannot be undone: type $word to confirm.';
+  }
+
+  @override
+  String get eventResetDone => 'Event started again from the package.';
+
+  @override
+  String get controlSave => 'Save';
+
+  @override
+  String get controlMenu => 'Change';
+
+  @override
+  String get controlDone => 'Done';
+
+  @override
+  String get controlMatchInProgress =>
+      'A match of this group is in progress: wait until it ends.';
+
+  @override
+  String get controlMatchNotPending =>
+      'That match has started: it cannot change.';
+
+  @override
+  String get controlMatWithoutReferee => 'That mat has no referee.';
+
+  @override
+  String get controlOrderChanged =>
+      'The matches changed meanwhile: reload and order them again.';
+
+  @override
+  String get controlTeamSize => 'Teams must stay of 2 or 3.';
+
+  @override
+  String get controlGroupStarted =>
+      'The group of those teams has started: its teams no longer change.';
+
+  @override
+  String get controlSameFighter =>
+      'That person already fights in the other team\'s group (as a wildcard).';
+
+  @override
+  String get controlPickMat => 'To which mat?';
+
+  @override
+  String get controlNoOtherMat => 'No other mat has a referee.';
+
+  @override
+  String controlMatOption(int number, String referee, int pending) {
+    String _temp0 = intl.Intl.pluralLogic(
+      pending,
+      locale: localeName,
+      other: '$pending pending',
+      one: '1 pending',
+      zero: 'nothing pending',
+    );
+    return 'Mat $number · $referee · $_temp0';
+  }
+
+  @override
+  String get controlMoveMatch => 'Move this match to another mat';
+
+  @override
+  String get controlWaiveRest => 'Let it start without waiting for the rest';
+
+  @override
+  String get controlWaiveRestTitle => 'Start without the least rest?';
+
+  @override
+  String controlWaiveRestBody(String red, String blue) {
+    return '$red against $blue may start although someone has not rested. It is recorded.';
+  }
+
+  @override
+  String get controlConfirm => 'Yes, allow';
+
+  @override
+  String get controlMoveGroup => 'Move the group to another mat';
+
+  @override
+  String get controlReorder => 'Change the order';
+
+  @override
+  String get controlReorderHint =>
+      'Drag to order the pending matches. The played ones do not change.';
+
+  @override
+  String get controlTeams => 'Teams';
+
+  @override
+  String controlTeamTitle(int number, String category) {
+    return 'Team $number · $category';
+  }
+
+  @override
+  String controlTeamInGroup(int number) {
+    return 'in group $number, not started';
+  }
+
+  @override
+  String controlTeamGroupStarted(int number) {
+    return 'group $number started: it no longer changes';
+  }
+
+  @override
+  String get controlMoveMember => 'Move a participant to another team';
+
+  @override
+  String get controlMoveMemberWho => 'Who changes?';
+
+  @override
+  String get controlMoveMemberTo => 'To which team?';
+
+  @override
   String get appTitle => 'Brackety Admin';
 
   @override
@@ -519,6 +640,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get groupPool => 'Teams: free mats';
+
+  @override
   String matchTeam(int number) {
     return 'Team $number';
   }
@@ -862,4 +986,37 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get userChanged =>
       'The account changed meanwhile; it has been reloaded.';
+
+  @override
+  String teamWithMembers(int number, String members) {
+    return 'Team $number ($members)';
+  }
+
+  @override
+  String ghostName(String name) {
+    return '$name · wildcard';
+  }
+
+  @override
+  String get planEmpty => 'Nothing pending';
+
+  @override
+  String planSummary(int count, String time) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pending matches, the first at $time',
+      one: '1 pending match, starting at $time',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get planHint =>
+      'Expected order of the recommended matches if everything goes to plan (each match at its full time plus the changeover). Times are estimates.';
+
+  @override
+  String groupCreatedBy(String name) {
+    return 'Made by $name';
+  }
 }

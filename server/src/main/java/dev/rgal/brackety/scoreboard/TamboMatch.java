@@ -22,7 +22,16 @@ final class TamboMatch {
         DISQUALIFICATION
     }
 
-    record Rules(Duration length, int pointsLimit) {}
+    /** {@code pointsLimit}: 0 = no limit (team matches). */
+    record Rules(Duration length, int pointsLimit) {
+
+        boolean hasLimit() {
+            return pointsLimit > 0;
+        }
+    }
+
+    /** What a disqualification gives the rival when there is no points limit, at least. */
+    static final int DISQUALIFICATION_POINTS = 15;
 
     /** {@code target}: for an UNDO, the event it undoes. {@code deltaMs}: for a CLOCK_ADJUST, the time added. */
     record Entry(UUID id, MatchEventType type, Side side, Instant at, UUID target, long deltaMs) {
@@ -33,8 +42,9 @@ final class TamboMatch {
     }
 
     /**
-     * Points include those given for the rival's one-hand warnings. A disqualification is scored as the
-     * points limit for the rival and 0 for the disqualified fighter.
+     * Points include those given for the rival's warnings (every second one, and every second one-hand warning). A
+     * disqualification is scored as 0 for the disqualified fighter and the points limit for the rival, or, with no
+     * limit, the rival's points but at least {@value #DISQUALIFICATION_POINTS}.
      */
     record Corner(int points, int warnings, int oneHandWarnings) {}
 
@@ -101,14 +111,15 @@ final class TamboMatch {
                 lastUndoable = e;
             }
             case WARNING -> {
-                tallies.get(e.side()).warnings++;
+                // Every second warning gives the rival a point (Raul, 2026-11-13); one-hand warnings count apart.
+                if (++tallies.get(e.side()).warnings % 2 == 0) {
+                    givePointToRival(e);
+                }
                 lastUndoable = e;
             }
             case ONE_HAND_WARNING -> {
-                // Every second one-hand warning gives the rival a point.
                 if (++tallies.get(e.side()).oneHandWarnings % 2 == 0) {
-                    tallies.get(e.side().opponent()).points++;
-                    autoPointWarnings.add(e.id());
+                    givePointToRival(e);
                 }
                 lastUndoable = e;
             }
@@ -117,8 +128,30 @@ final class TamboMatch {
                 lastUndoable = e;
             }
             case FINISH -> finished = true;
+            case CANCEL -> cancel();
+            case REOPEN -> finished = false;
             case UNDO -> throw new IllegalArgumentException("UNDO entries are never applied");
         }
+    }
+
+    private void givePointToRival(Entry warning) {
+        tallies.get(warning.side().opponent()).points++;
+        autoPointWarnings.add(warning.id());
+    }
+
+    // As if it had never started: nothing before it can be undone either.
+    private void cancel() {
+        tallies.values().forEach(t -> {
+            t.points = 0;
+            t.warnings = 0;
+            t.oneHandWarnings = 0;
+        });
+        autoPointWarnings.clear();
+        elapsed = Duration.ZERO;
+        runningSince = null;
+        disqualified = null;
+        started = false;
+        lastUndoable = null;
     }
 
     // Adding time to the clock takes it off the elapsed time, never below 0 nor beyond the match length.
@@ -154,7 +187,7 @@ final class TamboMatch {
         if (disqualified != null) {
             return Optional.of(EndReason.DISQUALIFICATION);
         }
-        if (tallies.values().stream().anyMatch(t -> t.points >= rules.pointsLimit())) {
+        if (rules.hasLimit() && tallies.values().stream().anyMatch(t -> t.points >= rules.pointsLimit())) {
             return Optional.of(EndReason.POINTS);
         }
         return remainingAt(now).isZero() ? Optional.of(EndReason.TIME) : Optional.empty();
@@ -168,7 +201,10 @@ final class TamboMatch {
     // The points the fighter had stay in the tally, so undoing the disqualification gives them back.
     private int points(Side side) {
         if (disqualified != null) {
-            return disqualified == side ? 0 : rules.pointsLimit();
+            if (disqualified == side) {
+                return 0;
+            }
+            return rules.hasLimit() ? rules.pointsLimit() : Math.max(tallies.get(side).points, DISQUALIFICATION_POINTS);
         }
         return tallies.get(side).points;
     }
@@ -189,8 +225,9 @@ final class TamboMatch {
         return Optional.ofNullable(lastUndoable);
     }
 
-    boolean gaveAutoPoint(UUID oneHandWarningId) {
-        return autoPointWarnings.contains(oneHandWarningId);
+    /** True for a warning (of either kind) that gave the rival a point. */
+    boolean gaveAutoPoint(UUID warningId) {
+        return autoPointWarnings.contains(warningId);
     }
 
     /** Why {@code type} cannot happen now, or empty if it can. Checks only the match itself. */
@@ -201,7 +238,7 @@ final class TamboMatch {
     /** {@code side}: for a point removed; {@code deltaMs}: for a clock adjustment. */
     Optional<String> refuse(MatchEventType type, Side side, long deltaMs, Instant now) {
         if (finished) {
-            return Optional.of("The match is finished.");
+            return Optional.ofNullable(type == MatchEventType.REOPEN ? null : "The match is finished.");
         }
         var end = endReason(now);
         var over = end.isPresent();
@@ -225,6 +262,8 @@ final class TamboMatch {
                                 : cannotAdjust(now, deltaMs) ? "The clock cannot go further." : null;
             case UNDO -> lastUndoable == null ? "Nothing to undo." : null;
             case FINISH -> over ? null : "The match is not over yet.";
+            case CANCEL -> started ? null : NOT_STARTED;
+            case REOPEN -> "The match is not finished.";
         };
         return Optional.ofNullable(reason);
     }

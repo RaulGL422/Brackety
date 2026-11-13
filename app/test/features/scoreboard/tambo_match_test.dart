@@ -144,7 +144,7 @@ void main() {
     expect(match.points(Side.red) + match.points(Side.blue), 0);
   });
 
-  test('a finished match refuses everything', () {
+  test('a finished match refuses everything but reopening', () {
     add(MatchAction.start, null, 0);
     add(MatchAction.disqualification, Side.red, 1);
     add(MatchAction.finish, null, 2);
@@ -152,12 +152,79 @@ void main() {
     final match = replay();
     expect(match.finished, isTrue);
     for (final action in MatchAction.values) {
-      expect(match.refuse(action, at(3)), MatchRefusal.finished);
+      expect(
+        match.refuse(action, at(3)),
+        action == MatchAction.reopen ? isNull : MatchRefusal.finished,
+      );
     }
+  });
+
+  test('reopening keeps the score; cancelling wipes it and needs a start', () {
+    add(MatchAction.start, null, 0);
+    add(MatchAction.point, Side.red, 1);
+    add(MatchAction.point, Side.red, 2);
+    add(MatchAction.stop, null, 3);
+    expect(
+      replay().refuse(MatchAction.reopen, at(4)),
+      MatchRefusal.notFinished,
+    );
+
+    add(MatchAction.cancel, null, 4);
+    final cancelled = replay();
+    expect(cancelled.started, isFalse);
+    expect(cancelled.points(Side.red), 0);
+    expect(
+      cancelled.refuse(MatchAction.undo, at(5)),
+      MatchRefusal.nothingToUndo,
+    );
+    expect(cancelled.refuse(MatchAction.point, at(5)), MatchRefusal.notStarted);
+    expect(
+      cancelled.refuse(MatchAction.cancel, at(5)),
+      MatchRefusal.notStarted,
+    );
   });
 
   test('stop needs a running clock', () {
     expect(replay().refuse(MatchAction.stop, t0), MatchRefusal.notRunning);
     expect(replay().started, isFalse);
+  });
+
+  test(
+    'every second warning gives the rival a point, apart from one-hand ones',
+    () {
+      add(MatchAction.start, null, 0);
+      add(MatchAction.warning, Side.red, 5);
+      add(MatchAction.oneHandWarning, Side.red, 6);
+      final second = add(MatchAction.warning, Side.red, 10);
+      final match = replay();
+      expect(match.points(Side.blue), 1);
+      expect(match.warnings(Side.red), 2);
+      expect(match.gaveAutoPoint(second), isTrue);
+      add(MatchAction.undo, null, 12, second);
+      expect(replay().points(Side.blue), 0);
+    },
+  );
+
+  test('with no points limit only the time ends it; a disqualification gives 15 at least', () {
+    TamboMatch teams() => TamboMatch.replay(
+      length: const Duration(minutes: 3),
+      pointsLimit: 0,
+      entries: entries,
+    );
+    add(MatchAction.start, null, 0);
+    for (var i = 1; i <= 20; i++) {
+      add(MatchAction.point, Side.red, i);
+    }
+    expect(teams().endReason(at(21)), isNull);
+    expect(teams().endReason(at(180)), EndReason.time);
+    add(MatchAction.disqualification, Side.blue, 22);
+    expect(teams().points(Side.red), 20);
+    expect(teams().points(Side.blue), 0);
+
+    entries = [];
+    add(MatchAction.start, null, 0);
+    add(MatchAction.point, Side.red, 1);
+    add(MatchAction.disqualification, Side.blue, 2);
+    expect(teams().points(Side.red), 15);
   });
 }

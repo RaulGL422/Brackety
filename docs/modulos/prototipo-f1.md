@@ -6,7 +6,7 @@ Usar Brackety en la **Fase 1 real** (≈ 2026-11-14): inscripciones, grupos, tap
 Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, fotos, Android nativo (se usa la web en móvil/tablet), varias fases.
 
 ## Cuentas (riesgo aceptado por Raul)
-- Usuario = contraseña, sin email real: `club1`; `ayudante1`, `ayudante2`; `arbitro1`…`arbitro5`.
+- Usuario = contraseña, sin email real: `club1`; `ayudante1`, `ayudante2`; `arbitro1`…`arbitro5` (la F1 usa 3 tapices: se quitan el 4 y el 5 en Configuración).
 - Solo se crean si `DEMO_ACCOUNTS_ENABLED=true`; ya verificadas. El bloqueo por intentos y el limitador siguen activos.
 - Se borran tras la fase (pendiente: quitar la variable y purgar).
 
@@ -27,8 +27,8 @@ Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, f
 - Tapiz: desplegable a la derecha de "Crear grupo". Por defecto **Automático** = el de menor fin estimado (empate: número más bajo), con una línea que lo dice; o uno con árbitro elegido a mano (sin árbitro, deshabilitado). Vuelve a Automático tras crear. Popup con el tapiz asignado.
 - Alumno ya agrupado: fila deshabilitada, no desaparece.
 - Deshacer grupo (2026-11-11): desde el aviso tras crearlo o con el icono en un alumno o equipo agrupado, con confirmación, mientras ningún combate suyo haya empezado (`DELETE /events/{id}/groups/{groupId}`, ayudante o club; después 409 y solo el superadmin).
-- **Competidor fantasma**: casilla en el grupo; con 3 seleccionados se habilitan todos los de la categoría (también los ya agrupados, salvo los del mismo grupo) y se elige 1 fantasma. El fantasma combate pero no puntúa; mesa gestiona sus cruces.
-- Grupo = 4 reales, o 3 reales + 1 fantasma; ningún otro tamaño.
+- **Comodín** (antes "fantasma", 2026-11-13): casilla en el grupo; con 3 seleccionados se habilitan todos los de la categoría (también los ya agrupados, salvo los del mismo grupo) y se elige 1 comodín. El comodín combate pero no puntúa; mesa gestiona sus cruces.
+- Grupo = 4 en total, de 1 a 4 reales y hasta 3 fantasmas (pedido de Raul, 2026-11-12). Con la casilla marcada, quien ya tiene grupo entra como fantasma, y también el 4.º elegido.
 
 ### Fin estimado de un tapiz
 - Restante = reloj del combate en curso + pendientes × (duración + 30 s); sin combate en curso, solo lo que quede de los 30 s tras el último.
@@ -38,7 +38,7 @@ Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, f
 - Solo su tapiz. Ve sus grupos, los combates disponibles y el **recomendado**.
 - Orden del grupo = orden en que el ayudante seleccionó (fantasma al final). Nórdico de 4: 1-2, 3-4, 1-3, 2-4, 1-4, 2-3 (rojo el primero).
 - Recomendado (`MatchRecommender`), por pasos:
-  1. Fuera los combates con alguien combatiendo ahora en cualquier tapiz (fantasma ocupado: se ve, no está disponible).
+  1. Fuera los combates con alguien combatiendo ahora en cualquier tapiz (comodín ocupado: se ve, no está disponible) o sin el **descanso mínimo** desde su último combate en cualquier tapiz (30 s por defecto, "Descanso mínimo" en Configuración; sale "Descansando hasta las …").
   2. Si hay alternativa, fuera los que repiten alumno del combate recién acabado en el tapiz.
   3. Primero los que tienen más alumnos sin combatir todavía.
   4. Mayor suma de descanso de los dos (desde su último combate o desde que se creó el grupo); sumas a menos de un hueco (2:00 + 30 s) cuentan como iguales.
@@ -48,7 +48,8 @@ Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, f
 - Rojo y azul fijos. Cronómetro con la duración del evento (F1: 3:00) con iniciar/parar; tiempo restante visible. El reloj lo manda el servidor (eventos con hora).
 - Contador +1 y −1 (nunca por debajo de 0) por competidor y deshacer última acción.
 - Con el reloj parado, ajuste ±1 s y ±10 s (evento `CLOCK_ADJUST` con `deltaMs`; ni por debajo de 0 ni por encima de la duración).
-- Menú por competidor: advertencia, descalificación; en 4-7 años además "advertencia por golpear con una mano" (a la 2.ª, +1 al rival automático). Siempre popup de confirmación con motivo obligatorio.
+- Menú por competidor: advertencia, descalificación; en 4-8 años (F1: la categoría 5-8, siempre a dos manos; 2026-11-13) además "advertencia por golpear con una mano". Cada 2.ª advertencia y cada 2.ª de una mano (contadas aparte) dan +1 al rival automático (2026-11-13). Siempre popup de confirmación con motivo obligatorio.
+- Duración y límite por formato (2026-11-13): individual 1:00 y 15; equipos 3:00 y sin límite (0). Sin límite, la descalificación da al rival 15 o sus puntos si lleva más.
 - Límite de puntos o fin del tiempo → desaparece el reloj y aparece "Finalizar combate". Descalificación también finaliza y da el resultado límite–0 al rival (15-0); al deshacerla vuelven los puntos de antes.
 - Campana de ring: un golpe al iniciar, tres al acabar (límite, tiempo o descalificación) y carraca de madera a los 10 s.
 - Todo queda en la línea de tiempo (quién, qué, cuándo, tiempo de combate).
@@ -65,6 +66,14 @@ Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, f
 ## Protecciones
 - Con grupos: no cambia la fecha del evento ni el nacimiento de un alumno agrupado (cambiarían categorías); no se quita un tapiz con grupos ni se borra un alumno agrupado (409).
 - Crear grupos bloquea la fila del evento: dos ayudantes a la vez no eligen tapiz con datos viejos. Un alumno solo es real en un grupo (índice único en BD).
+- Descanso mínimo (2026-11-13): el marcador no deja empezar antes (`readyAt` en la vista del combate) y el servidor rechaza el START con red (409 `FIGHTER_RESTING`). Sin red se acepta tal cual al sincronizar (decisión de Raul).
+- Un tapiz con combates por jugar no se queda sin árbitro en Configuración (409 `MAT_HAS_MATCHES`); a uno sin árbitro no se le asigna grupo.
+
+### Panel de control (club y superadmin, 2026-11-13)
+- Orden previsto por tapiz: el tablero enseña la cola de ese tapiz (sus combates y los de equipos que cogería), en el orden y a la hora que saldrían según `MatPlanner`; se recalcula con cada cambio. Un combate de equipos movido a mano queda fijado en ese tapiz (`pinned`) y no vuelve al bote.
+- Árbitro: puede mover a otro tapiz con árbitro un combate pendiente de su cola (`POST /matches/{id}/move`; necesita red).
+- Club: menú "Cambiar" en el tablero de solo lectura de cada tapiz (combate pendiente, también de equipos: mover a otro tapiz, dejar empezar sin descanso; grupo individual: mover con sus pendientes, cambiar el orden) y botón de cambiar alumno de equipo en la pestaña Equipos. Superadmin: lo mismo en el detalle del evento, auditado (`CONTROL_CHANGE`).
+- Límites (servidor, `MatchControlService`): solo combates sin empezar; un grupo no se mueve con un combate en curso; solo a tapices con árbitro; el orden nombra todos los pendientes; alumnos de equipo solo si el grupo de ninguno de los dos equipos ha empezado, equipos de 2 o 3 y sin repetir persona en el grupo. Quién dejó saltar el descanso queda en el combate.
 
 ## Datos
 `event` (tapices, multigrupo, duración, límite), `event_category`, `mat` (árbitro), `event_staff` (cuenta, rol `CLUB`/`GROUPER`/`REFEREE`), `participant`, `fight_group`, `group_member` (orden, fantasma), `fight_match`, `match_event` (tipo, lado, motivo, autor, hora, reloj).
@@ -80,8 +89,9 @@ Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, f
 
 ## Pantallas
 - Sesión y acceso: los de `auth` (`app/lib/features/auth/`, tarea 6); en debug, botones de acceso rápido a las cuentas demo.
-- Ayudante: categorías (con inscritos/agrupados) → alumnos por nombre o estatura → grupos en borrador con color y número (nunca rojo/azul) y casilla de fantasma → popup con el tapiz.
+- Ayudante: categorías (con inscritos/agrupados) → alumnos por nombre o estatura → grupos en borrador con color y número (nunca rojo/azul) y casilla de fantasma → popup con el tapiz. Listas en directo (aviso del evento): si otro ayudante o el superadmin agrupa a alguien del borrador, sale de él con un aviso con su nombre.
 - Árbitro: tablero del tapiz (sondeo 5 s; grupos con color y número; en curso con borde e icono de reproducción; "Combate recomendado" arriba con su porqué y "Empezar este combate" (con uno en curso: "Cuando acabe el combate en curso"); luego "Otros combates disponibles", "En espera" con motivo y "Disputados"; rojo y azul con punto de color en cada combate; pendientes que esperan con candado y motivo, sin abrirse; terminados) → marcador (sondeo 2 s, reloj contado en el dispositivo y resincronizado, +1, menú de avisos con motivo, deshacer, finalizar, línea de tiempo). Sonidos generados (`app/tool/make_bell.py`); en la web con Web Audio, cargados al abrir y desbloqueados con el primer toque (antes a veces no sonaban por la política de autoplay).
+- Correcciones (2026-11-12, pedido de Raul): **Cancelar combate** (empezado y sin finalizar; en el tablero junto a "Volver al marcador" y en la barra del marcador) vuelve a pendiente con todo a 0; **Reabrir combate** (finalizado, siempre visible; solo con el tapiz libre y sin luchadores ocupados) vuelve a en curso con su marcador para corregir y finalizar. Ambos con motivo, como acciones `CANCEL`/`REOPEN` en la línea de tiempo y la cola offline. Con un combate en curso el tablero no recomienda otro. En móvil vertical el número va junto al nombre. Flecha de volver sin texto (destino en el tooltip). Campana con el iPhone en silencio: sesión de audio "playback".
 - Marcador (2026-11-06):
   - Vertical: reloj (16 % del alto), Iniciar o Finalizar (relleno) / Parar (con borde) y Deshacer arriba; rojo y azul debajo. Horizontal (más ancho que alto: móvil girado, tablet, escritorio): rojo | reloj y botones | azul.
   - Esquinas desactivadas hasta el primer Iniciar. Nombre en una línea (completo en tooltip y lector), número que llena el hueco; sin desbordes con texto al 200 %.
@@ -91,11 +101,12 @@ Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, f
   - Pantalla siempre encendida con el tablero o el marcador abiertos (`wakelock_plus`; en web nada).
 - Sondeo (tablero, marcador, puntuaciones y tapices del club): el siguiente al acabar el anterior, nunca dos a la vez; en pausa con la app en segundo plano y sondeo inmediato al volver. La cola offline sigue enviando en segundo plano.
 - Club (`app/lib/features/club/`): panel con 4 secciones (barra inferior en móvil, raíl en tablet/escritorio). Puntuaciones (sondeo 5 s, filtro por categoría, orden por puntos o nombre). Tapices (árbitro, en curso/parado, grupos, pendientes, fin estimado solo si queda algo por jugar) → tablero en solo lectura → combate ("Tapiz N · Grupo M") con marcador y línea de tiempo, sin controles. Inscripciones: alta, edición y borrado; casilla del tutor obligatoria si es menor el día del evento; chip "Falta tutor" en la lista. Configuración: nombre, fecha, duración (min:s, 0:30–20:00, no con un combate en curso) y límite de puntos (1–99, no tras empezar un combate), tapices con su árbitro (añadir/quitar el último, con confirmación), categorías solo lectura; cada cambio se guarda solo, sin botón (el nombre al dejar de escribir) y si el servidor lo rechaza vuelve el valor guardado. Exportar desde la barra (solo web): clasificación, inscritos, combates, línea de tiempo y todo el evento (.zip); importar resultados del pabellón (`servidor-local.md`). Clubes participantes en Configuración y club de cada inscrito (opcional; 409 al quitar uno con inscritos). Si hay grupos, el 409 se explica con un aviso.
+- Personal (2026-11-12, pedido de Raul): en Configuración el club escribe la persona detrás de cada cuenta de ayudante o árbitro (`event_staff_name`, por evento; `PUT /events/{id}/staff/{cuenta}/name`). Se muestra "Juan Pérez (arbitro1)" en los tapices, el desplegable de árbitro y el superadmin, y quién hizo cada grupo ("por …") en el tablero, la lista del ayudante y el superadmin.
 
 Login, inicio por rol, categorías → alumnos → crear grupos, tablero del tapiz, marcador, panel del club (config, inscripciones, puntuaciones, tapices, línea de tiempo, exportar). Responsive (`07-diseno.md`), textos i18n.
 
 ## Tests
-Recomendado (empates, intercalado, fantasma ocupado), fin estimado, asignación de tapiz, fantasma, puntuación global, reglas del marcador (límite, tiempo, una mano 4-7, descalificación 15-0, −1, ajuste de reloj, deshacer); simulaciones del recomendador y del tablero con semilla fija (1-3 grupos, equipos, fantasma, alumno ocupado en otro tapiz, grupo creado a mitad); deshacer grupo, permisos por rol. Widget tests de marcador, crear grupos y panel del club en 3 tamaños.
+Recomendado (empates, intercalado, fantasma ocupado), fin estimado, asignación de tapiz, fantasma, puntuación global, reglas del marcador (límite, tiempo, una mano 4-8, descalificación 15-0, −1, ajuste de reloj, deshacer); simulaciones del recomendador y del tablero con semilla fija (1-3 grupos, equipos, fantasma, alumno ocupado en otro tapiz, grupo creado a mitad); jornadas completas al azar por la API (`EventDaySimulationTest`: 3 tapices o uno sin árbitro, grupos a mitad, equipos comodín, cancelaciones, descalificaciones, deshacer grupos, árbitros que no siguen la recomendación; nadie en dos combates, descanso, ningún tapiz parado con combates de equipos libres, todo jugado una vez); deshacer grupo, permisos por rol. Widget tests de marcador, crear grupos y panel del club en 3 tamaños.
 
 ## Plan (PRs en serie hacia `development`)
 1. Back: evento, categorías, tapices, staff, inscripciones, cuentas demo.

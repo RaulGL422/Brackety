@@ -13,6 +13,7 @@ import 'create_groups.dart';
 import 'draft_panel.dart';
 import 'pick_mark.dart';
 import '../../../core/up_button.dart';
+import '../../mat/ui/mat_label.dart';
 
 /// A category's participants: pick 4 (or 3 and a ghost) and send them to a mat.
 /// Opened from a team category ([teamSize] set) for those left without a team, with a way back.
@@ -46,6 +47,14 @@ class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
       (eventId: widget.eventId, categoryId: widget.categoryId);
 
   Future<void> _create() async {
+    final l10n = AppLocalizations.of(context);
+    final all =
+        ref.read(categoryParticipantsProvider(_key)).value ??
+        const <CategoryParticipant>[];
+    final names = [
+      for (final p in all)
+        if (_group.contains(p.id)) p.fullName,
+    ].join(', ');
     setState(() => _busy = true);
     final created = await createGroup(
       context,
@@ -55,6 +64,7 @@ class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
       group: _group,
       matId: _matId,
       refresh: _refresh,
+      label: l10n.queuedGroupLabel(names),
     );
     if (!mounted) return;
     setState(() {
@@ -74,6 +84,21 @@ class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    listenHelperQueue(context, ref);
+    // Another helper (or the superadmin) changed the groups: whoever got a group meanwhile leaves the
+    // draft now, not with a refusal on "Create". Not while this helper's own group is being sent.
+    ref.listen(categoryParticipantsProvider(_key), (_, next) {
+      if (_busy) return;
+      final taken = {
+        for (final p in next.value ?? const <CategoryParticipant>[])
+          if (p.isTaken && _group.members.contains(p.id)) p.id: p.fullName,
+      };
+      if (taken.isEmpty) return;
+      setState(() => _group = _group.without(taken.keys.toSet()));
+      Toasts.of(
+        context,
+      ).show(l10n.draftTakenElsewhere(taken.length, taken.values.join(', ')));
+    });
     final participants = ref.watch(categoryParticipantsProvider(_key));
     final panel = DraftPanel(
       eventId: widget.eventId,
@@ -233,7 +258,13 @@ class _ParticipantTile extends StatelessWidget {
           details,
           if (p.teamNumber != null) l10n.teamName(p.teamNumber!),
           if (p.isGrouped)
-            l10n.participantGrouped(p.groupNumber!, p.matNumber!),
+            l10n.participantGrouped(
+              p.groupNumber!,
+              matLabel(l10n, p.matNumber),
+            ),
+          if (p.isGrouped && p.groupCreatedBy != null)
+            l10n.groupCreatedBy(p.groupCreatedBy!),
+          if (p.queued) l10n.queuedPending,
         ].join(' · '),
       ),
       trailing: state == PickState.ghost

@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/storage/browser_storage.dart';
+import '../../offline/data/offline_get_cache.dart';
 import '../data/account_api.dart';
 import '../data/auth_api.dart';
 import '../data/refresh_token_store.dart';
@@ -266,5 +267,6 @@ final apiProvider = Provider<Dio>((ref) {
       },
     ),
   );
+  dio.interceptors.add(OfflineGetCache(ref));
   return dio;
 });

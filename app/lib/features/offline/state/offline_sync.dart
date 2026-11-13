@@ -104,6 +104,9 @@ class OfflineSync extends Notifier<OfflineState> {
   // same browser shares that queue: what is stored and not here came from it.
   var _lastStored = <String>{};
   Timer? _retry;
+  // While the server does not answer: a light request in the background finds it again, so the
+  // screens never wait for it (they show what the device keeps).
+  Timer? _probe;
   var _flushing = false;
   var _prefetching = false;
   // Bumped by every sign-out: answers to requests from before it are dropped.
@@ -142,7 +145,10 @@ class OfflineSync extends Notifier<OfflineState> {
     );
     // Another server: nothing saved for the old one is any use.
     ref.listen(serverProvider, (_, _) => _serial(_forgetAll));
-    ref.onDispose(() => _retry?.cancel());
+    ref.onDispose(() {
+      _retry?.cancel();
+      _probe?.cancel();
+    });
     return const OfflineState();
   }
 
@@ -386,12 +392,25 @@ class OfflineSync extends Notifier<OfflineState> {
 
   /// Another request got an answer: the network is back, so the queue goes now.
   void reportResponse() {
+    _probe?.cancel();
+    _probe = null;
     if (!state.connected) state = state.copyWith(connected: true);
     if (state.pendingCount > 0 && !_flushing) unawaited(flush());
   }
 
   void reportNoResponse() {
     if (state.connected) state = state.copyWith(connected: false);
+    _probe ??= Timer.periodic(offlineRetry, (_) => unawaited(_ping()));
+  }
+
+  Future<void> _ping() async {
+    try {
+      await ref.read(apiProvider).get<Object?>('/api/v1/info');
+      if (ref.mounted) reportResponse();
+    } on DioException catch (e) {
+      // Any answer means the server is there again.
+      if (ref.mounted && !ApiError.from(e).noResponse) reportResponse();
+    }
   }
 
   /// Keeps the views of [board]'s matches up to date, so any of them can open without network.

@@ -17,10 +17,15 @@ Liga cuyo cada fase es un minievento (caso real: Liga Yoseikan, 4 fases).
 `phase` (modalidad, estado), `phase_registration`, `group`, `group_assignment`, `phase_points`.
 
 ## Pantallas
-Panel de fase, creación de grupos, asignación a tapiz, tabla por categoría, registro general acumulado.
+- Mis eventos: una tarjeta por liga. El club entra por **"Abrir la liga"** (pedido de Raul, 2026-11-12: la liga antes que sus fases); ayudantes y árbitros ven cada fase con sus botones (grupos, mi tapiz).
+- Pantalla de la liga (`/leagues/<fase>`): fases (fecha, modalidad, inscritos; cada una abre su panel), "Nueva fase" (nombre, fecha, modalidad, puntos de asistencia), clasificación acumulada por categoría con puntos por fase y medallas, CSV (web), y editar nombre y podios.
+- Podios: el general con un toque ("1 oro · 1 plata · 1 bronce", "1·1·2" u "Otro" con contadores −/+); cada categoría "Como el general" o "Propio" con el mismo selector.
+- Panel de una fase: la flecha vuelve a la liga; selector de fase arriba (si hay más de una).
+- Inscripciones: "Inscribir de otras fases" (búsqueda, seleccionar todos, consentimiento de tutores si hay menores).
+- Puntuaciones, Tapices, Inscripciones y Configuración siguen siendo de la fase abierta. En Configuración, los puntos por asistir de la fase (0-100; recalculan la clasificación de la liga).
 
 ## Tests
 Reinscripción, agrupación por categoría/estatura/peso, acumulación entre fases, asistencia, semilla.
 
 ## Estado
-Servidor hecho (2026-11-11, `feat/league-phases`): liga con fases (cada evento es una fase; la F1 pasa a fase 1), nueva fase copiando configuración, reinscripción por persona, clasificación de liga (asistencia y puntos por fase) y podios por categoría. Pantallas pendientes: después de la F1 (decidido por Raul).
+Servidor hecho (2026-11-11, `feat/league-phases`): liga con fases (cada evento es una fase; la F1 pasa a fase 1), nueva fase copiando configuración, reinscripción por persona, clasificación de liga (asistencia y puntos por fase) y podios por categoría. Pantallas en pruebas (2026-11-12, `feat/league-phases-front`): mis eventos por liga, selector de fase, pestaña Liga y reinscripción (#81); puntos por asistir editables en Configuración; falta la prueba a mano.

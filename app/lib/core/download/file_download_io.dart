@@ -18,3 +18,7 @@ Future<void> saveFile(String name, List<int> bytes, String mimeType) async {
     ),
   );
 }
+
+/// No viewer of our own: the share sheet opens it in the phone's PDF app.
+Future<void> openPdf(String name, Future<List<int>> bytes) async =>
+    saveFile(name, await bytes, 'application/pdf');

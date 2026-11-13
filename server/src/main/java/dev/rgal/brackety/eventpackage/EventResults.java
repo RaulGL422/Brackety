@@ -16,18 +16,24 @@ public record EventResults(
         @NotNull List<@NotNull @Valid GroupEntry> groups,
         @NotNull List<@NotNull @Valid MatchEntry> matches) {
 
+    /**
+     * {@code ghostMemberPersonIds}: members of a real team who fill it in without scoring for it; absent in files from
+     * before they existed.
+     */
     public record TeamEntry(
             int number,
             @NotNull String categoryName,
             boolean ghost,
             String createdBy,
             @NotNull Instant createdAt,
-            @NotNull List<@NotNull UUID> memberPersonIds) {}
+            @NotNull List<@NotNull UUID> memberPersonIds,
+            List<@NotNull UUID> ghostMemberPersonIds) {}
 
+    /** {@code matNumber}: null for a group of teams (its matches go to the free mats). */
     public record GroupEntry(
             int number,
             @NotNull String categoryName,
-            int matNumber,
+            Integer matNumber,
             String createdBy,
             @NotNull Instant createdAt,
             @NotNull List<@NotNull @Valid MemberEntry> members) {}
@@ -37,10 +43,11 @@ public record EventResults(
 
     public record SideEntry(UUID personId, Integer teamNumber) {}
 
+    /** {@code matNumber}: null for a team match not started (in the pool). */
     public record MatchEntry(
             int groupNumber,
             int orderIndex,
-            int matNumber,
+            Integer matNumber,
             @NotNull SideEntry red,
             @NotNull SideEntry blue,
             @NotNull String status,

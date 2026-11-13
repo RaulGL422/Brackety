@@ -27,6 +27,20 @@ final standingsProvider = FutureProvider.autoDispose
       ),
     );
 
+typedef ParticipantKey = ({String eventId, String participantId});
+
+/// Live: it changes with every point of their matches.
+final participantRecordProvider = FutureProvider.autoDispose
+    .family<ParticipantRecord, ParticipantKey>(
+      (ref, key) => liveReload(
+        ref,
+        eventTopics(key.eventId),
+        () => ref
+            .watch(clubRepositoryProvider)
+            .record(key.eventId, key.participantId),
+      ),
+    );
+
 final matsOverviewProvider = FutureProvider.autoDispose
     .family<List<MatOverview>, String>(
       (ref, eventId) => liveReload(

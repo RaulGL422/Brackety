@@ -30,7 +30,10 @@ public class Event {
     private int maxGroupsPerMat;
     private int matchSeconds;
     private int pointsLimit;
+    private int teamMatchSeconds;
+    private int teamPointsLimit;
     private int changeoverSeconds;
+    private int minRestSeconds;
     private int attendancePoints;
     private Instant createdAt;
     private UUID originEventId;
@@ -62,15 +65,21 @@ public class Event {
         this.pointsLimit = pointsLimit;
         this.changeoverSeconds = changeoverSeconds;
         this.attendancePoints = attendancePoints;
+        this.teamMatchSeconds = DEFAULT_TEAM_MATCH_SECONDS;
+        this.minRestSeconds = DEFAULT_MIN_REST_SECONDS;
         this.createdAt = now;
     }
 
+    static final int DEFAULT_TEAM_MATCH_SECONDS = 180;
+    static final int DEFAULT_MIN_REST_SECONDS = 30;
+
     /**
-     * Liga Yoseikan tambo, Fase 1: 3 min per match (Raul, 2026-11-11; the manual says 2), 15 points end it,
-     * 10 points for attending. The club can change length and limit in the settings.
+     * Liga Yoseikan tambo, Fase 1 (Raul, 2026-11-13): individual 1 min and 15 points end it; teams 3 min with no
+     * points limit; 10 points for attending; 30 s of rest at least between two matches of a fighter. The club can
+     * change all of it in the settings.
      */
     public static Event tambo(UUID ownerAccountId, UUID leagueId, String name, LocalDate eventDate, Instant now) {
-        return new Event(ownerAccountId, leagueId, 1, Discipline.TAMBO, name, eventDate, 1, 180, 15, 30, 10, now);
+        return new Event(ownerAccountId, leagueId, 1, Discipline.TAMBO, name, eventDate, 1, 60, 15, 30, 10, now);
     }
 
     /** The next phase of the same league, with this one's match settings. */
@@ -82,18 +91,27 @@ public class Event {
             int attendancePoints,
             Instant now) {
         return new Event(
-                ownerAccountId,
-                leagueId,
-                phaseNumber,
-                discipline,
-                name,
-                eventDate,
-                maxGroupsPerMat,
-                matchSeconds,
-                pointsLimit,
-                changeoverSeconds,
-                attendancePoints,
-                now);
+                        ownerAccountId,
+                        leagueId,
+                        phaseNumber,
+                        discipline,
+                        name,
+                        eventDate,
+                        maxGroupsPerMat,
+                        matchSeconds,
+                        pointsLimit,
+                        changeoverSeconds,
+                        attendancePoints,
+                        now)
+                .withTeamRules(teamMatchSeconds, teamPointsLimit, minRestSeconds);
+    }
+
+    /** {@code teamPointsLimit}: 0 = none. */
+    public Event withTeamRules(int teamMatchSeconds, int teamPointsLimit, int minRestSeconds) {
+        this.teamMatchSeconds = teamMatchSeconds;
+        this.teamPointsLimit = teamPointsLimit;
+        this.minRestSeconds = minRestSeconds;
+        return this;
     }
 
     public UUID getId() {
@@ -136,6 +154,28 @@ public class Event {
         return pointsLimit;
     }
 
+    public int getTeamMatchSeconds() {
+        return teamMatchSeconds;
+    }
+
+    /** 0 = no limit. */
+    public int getTeamPointsLimit() {
+        return teamPointsLimit;
+    }
+
+    public int matchSecondsFor(boolean teams) {
+        return teams ? teamMatchSeconds : matchSeconds;
+    }
+
+    /** 0 = no limit. */
+    public int pointsLimitFor(boolean teams) {
+        return teams ? teamPointsLimit : pointsLimit;
+    }
+
+    public int getMinRestSeconds() {
+        return minRestSeconds;
+    }
+
     public int getChangeoverSeconds() {
         return changeoverSeconds;
     }
@@ -171,7 +211,11 @@ public class Event {
             int maxGroupsPerMat,
             int matchSeconds,
             int pointsLimit,
-            int attendancePoints) {
+            int attendancePoints,
+            int teamMatchSeconds,
+            int teamPointsLimit,
+            int minRestSeconds) {
+        withTeamRules(teamMatchSeconds, teamPointsLimit, minRestSeconds);
         this.name = name;
         this.eventDate = eventDate;
         this.maxGroupsPerMat = maxGroupsPerMat;
