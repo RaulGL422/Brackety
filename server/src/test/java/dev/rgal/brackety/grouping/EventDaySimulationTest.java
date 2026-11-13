@@ -247,6 +247,11 @@ class EventDaySimulationTest extends EventApiTest {
             }
             String match =
                     roll < 30 && !available.isEmpty() ? available.get(random.nextInt(available.size())) : recommended;
+            // At least once a day a referee takes another one than the recommended, then by chance.
+            var others = available.stream().filter(m -> !m.equals(recommended)).toList();
+            if (!seen.containsKey("other than recommended") && tick > 20 && !others.isEmpty()) {
+                match = others.get(random.nextInt(others.size()));
+            }
             if (match == null) {
                 return;
             }
