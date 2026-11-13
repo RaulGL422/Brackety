@@ -135,7 +135,9 @@ void main() {
       }
       await tester.tap(find.text('Wildcard team'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Add wildcard team'));
+      await tester.tap(
+        find.text('Make a wildcard team with loose participants'),
+      );
       await tester.pumpAndSettle();
 
       // The group's own fighters are not offered for its ghost team.
@@ -169,6 +171,74 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  testWidgets('a team of another group joins as a wildcard team with a tap', (
+    tester,
+  ) async {
+    tester.view.physicalSize = sizes['tablet']!;
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    // Team 4 (Fede, Gema, Hugo) already fights in group 2.
+    final repository = FakeGroupingRepository(
+      participants,
+      teamList: [
+        ...teams,
+        const Team(
+          id: 't4',
+          number: 4,
+          groupNumber: 2,
+          members: [
+            TeamMember(participantId: 'p9', fullName: 'Fede Prueba'),
+            TeamMember(participantId: 'p10', fullName: 'Gema Prueba'),
+            TeamMember(participantId: 'p11', fullName: 'Hugo Prueba'),
+          ],
+        ),
+      ],
+    );
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...sessionOverrides(FakeAuthApi(signedIn: true)),
+          groupingRepositoryProvider.overrideWithValue(repository),
+          fakeMatsOverride,
+          myEventsProvider.overrideWith((ref) async => []),
+        ],
+        child: const BracketyApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
+        .read(routerProvider)
+        .push('/events/e1/categories/c1/teams?name=15-16&size=3');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Teams'));
+    await tester.pumpAndSettle();
+
+    for (final team in ['Team 1', 'Team 2', 'Team 3']) {
+      await tester.tap(find.text(team));
+      await tester.pump();
+    }
+    // Without wildcard mode, team 4 stays out.
+    await tester.tap(find.text('Team 4'));
+    await tester.pump();
+    expect(find.textContaining('Tap to join as a wildcard team'), findsNothing);
+    await tester.tap(find.text('Wildcard team'));
+    await tester.pumpAndSettle();
+    expect(
+      find.textContaining('Tap to join as a wildcard team'),
+      findsOneWidget,
+    );
+    await tester.tap(find.text('Team 4'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Create group'));
+    await tester.pumpAndSettle();
+
+    final group = repository.created.single;
+    expect(group.members, ['t1', 't2', 't3']);
+    expect(group.ghostTeams, [
+      ['p9', 'p10', 'p11'],
+    ]);
+  });
 
   testWidgets('a team can be made of ghosts only', (tester) async {
     final repository = await open(tester, sizes['tablet']!);

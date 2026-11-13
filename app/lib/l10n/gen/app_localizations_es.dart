@@ -10,6 +10,22 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
+  String get draftGhostTeamPanelHint =>
+      'Equipos comodín (hasta 3): toca en la lista un equipo de otro grupo, o forma uno con alumnos sueltos. Combaten pero no puntúan.';
+
+  @override
+  String get teamJoinsAsWildcard => 'Toca para que entre como equipo comodín';
+
+  @override
+  String get ghostTeamPageTitle => 'Formar equipo comodín';
+
+  @override
+  String get ghostTeamSearch => 'Buscar alumno';
+
+  @override
+  String get formGhostTeam => 'Formar equipo comodín con alumnos sueltos';
+
+  @override
   String get teamPickWildcards => 'Elegir comodines';
 
   @override

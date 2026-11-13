@@ -360,14 +360,69 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
           for (final m in t.members) m.participantId,
       ...group.ghostTeamPeople,
     };
-    final picked = await showModalBottomSheet<List<String>>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (_) =>
-          _GhostTeamSheet(categoryKey: widget.categoryKey, excluded: own),
+    final picked = await Navigator.of(context).push<List<String>>(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (_) =>
+            _GhostTeamPage(categoryKey: widget.categoryKey, excluded: own),
+      ),
     );
     if (picked != null) _change((g) => g.addGhostTeam(picked));
+  }
+
+  /// Everyone already in the draft: its real teams and its wildcard teams.
+  Set<String> _draftPeople(List<Team> teams) => {
+    for (final t in teams)
+      if (_group.members.contains(t.id))
+        for (final m in t.members) m.participantId,
+    ..._group.ghostTeamPeople,
+  };
+
+  /// The index of the wildcard team made of exactly [team]'s people, or -1.
+  int _asWildcard(Team team) {
+    final people = {for (final m in team.members) m.participantId};
+    return _group.ghostTeams.indexWhere(
+      (g) => g.length == people.length && people.containsAll(g),
+    );
+  }
+
+  /// A team already in another group joins this one as a wildcard team: tapped in wildcard mode.
+  bool _canJoinAsWildcard(Team team, List<Team> teams) =>
+      team.isTaken &&
+      _group.canAddGhostTeam &&
+      team.members.length >= DraftGroup.minTeam &&
+      team.members.length <= DraftGroup.maxTeam &&
+      team.members.every((m) => !_draftPeople(teams).contains(m.participantId));
+
+  void _tapTeam(Team team, List<Team> teams) {
+    final wildcard = _asWildcard(team);
+    if (wildcard >= 0) {
+      _change((g) => g.removeGhostTeam(wildcard));
+    } else if (_canJoinAsWildcard(team, teams)) {
+      _change(
+        (g) => g.addGhostTeam([for (final m in team.members) m.participantId]),
+      );
+    } else {
+      _change((g) => g.toggle(team.id, grouped: team.isTaken));
+    }
+  }
+
+  /// "Equipo 7" for a whole team, or the people's names.
+  String _ghostTeamLabel(List<String> people, List<Team> teams) {
+    final l10n = AppLocalizations.of(context);
+    for (final t in teams) {
+      final ids = {for (final m in t.members) m.participantId};
+      if (ids.length == people.length && ids.containsAll(people)) {
+        return l10n.teamName(t.number);
+      }
+    }
+    final names = {
+      for (final p
+          in ref.read(categoryParticipantsProvider(widget.categoryKey)).value ??
+              const <CategoryParticipant>[])
+        p.id: p.firstName,
+    };
+    return people.map((id) => names[id] ?? '').join(', ');
   }
 
   /// The club picks one of [team]'s people and the team they go to; the server checks the rest.
@@ -497,9 +552,12 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
               itemBuilder: (context, i) => _TeamTile(
                 team: all[i],
                 group: _group,
-                onTap: () => _change(
-                  (g) => g.toggle(all[i].id, grouped: all[i].isTaken),
-                ),
+                wildcard: _asWildcard(all[i]) >= 0
+                    ? PickState.ghost
+                    : _canJoinAsWildcard(all[i], all)
+                    ? PickState.free
+                    : null,
+                onTap: () => _tapTeam(all[i], all),
                 onDelete: all[i].isTaken ? null : () => _delete(all[i]),
                 onMoveMember: club && all.length > 1
                     ? () => _moveMember(all[i], all)
@@ -530,6 +588,8 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
         return team == null ? '' : l10n.teamName(team.number);
       },
       onPickGhostTeam: () => _pickGhostTeam(teams.value ?? const []),
+      ghostTeamLabel: (people) =>
+          _ghostTeamLabel(people, teams.value ?? const []),
     );
     return _ListWithPanel(list: list, panel: panel);
   }
@@ -543,10 +603,15 @@ class _TeamTile extends StatelessWidget {
     required this.onDelete,
     this.onUndoGroup,
     this.onMoveMember,
+    this.wildcard,
   });
 
   final Team team;
   final DraftGroup group;
+
+  /// In wildcard mode, a team of another group: [PickState.ghost] if it is in this draft as a
+  /// wildcard team, [PickState.free] if it can join as one; null otherwise.
+  final PickState? wildcard;
   final VoidCallback onTap;
   final VoidCallback? onDelete;
   final VoidCallback? onUndoGroup;
@@ -557,19 +622,29 @@ class _TeamTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final state = group.stateOf(team.id, grouped: team.isTaken);
+    final state = wildcard ?? group.stateOf(team.id, grouped: team.isTaken);
     final names = team.members
         .map((m) => m.ghost ? l10n.ghostMemberName(m.fullName) : m.fullName)
         .join(', ');
+    final grouped = team.isGrouped
+        ? l10n.participantGrouped(
+            team.groupNumber!,
+            matLabel(l10n, team.matNumber),
+          )
+        : null;
     return ListTile(
       enabled: state != PickState.unavailable,
       onTap: onTap,
       leading: PickMark(state: state, onTap: onTap),
       title: Text(l10n.teamName(team.number)),
       subtitle: Text(
-        team.isGrouped
-            ? '$names\n${l10n.participantGrouped(team.groupNumber!, matLabel(l10n, team.matNumber))}'
-            : names,
+        [
+          names,
+          if (wildcard != null)
+            [?grouped, l10n.teamJoinsAsWildcard].join(' · ')
+          else
+            ?grouped,
+        ].join('\n'),
       ),
       isThreeLine: team.isGrouped,
       trailing: Row(
@@ -599,19 +674,21 @@ class _TeamTile extends StatelessWidget {
   }
 }
 
-/// Any 2 or 3 participants of the category, except those already in the group.
-class _GhostTeamSheet extends ConsumerStatefulWidget {
-  const _GhostTeamSheet({required this.categoryKey, required this.excluded});
+/// Any 2 or 3 participants of the category, except those already in the group: a page of its own,
+/// with a search, to make a wildcard team that does not exist as a team.
+class _GhostTeamPage extends ConsumerStatefulWidget {
+  const _GhostTeamPage({required this.categoryKey, required this.excluded});
 
   final CategoryKey categoryKey;
   final Set<String> excluded;
 
   @override
-  ConsumerState<_GhostTeamSheet> createState() => _GhostTeamSheetState();
+  ConsumerState<_GhostTeamPage> createState() => _GhostTeamPageState();
 }
 
-class _GhostTeamSheetState extends ConsumerState<_GhostTeamSheet> {
+class _GhostTeamPageState extends ConsumerState<_GhostTeamPage> {
   var _picks = <String>[];
+  var _search = '';
 
   @override
   Widget build(BuildContext context) {
@@ -619,16 +696,29 @@ class _GhostTeamSheetState extends ConsumerState<_GhostTeamSheet> {
     final participants = ref.watch(
       categoryParticipantsProvider(widget.categoryKey),
     );
-    return SizedBox(
-      height: MediaQuery.sizeOf(context).height * 0.8,
-      child: Column(
+    return Scaffold(
+      appBar: AppBar(title: Text(l10n.ghostTeamPageTitle)),
+      body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.m),
-            child: Text(
-              l10n.draftGhostTeamHint(DraftGroup.maxTeam),
-              style: Theme.of(context).textTheme.titleMedium,
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.m,
+              AppSpacing.m,
+              AppSpacing.m,
+              0,
+            ),
+            child: Text(l10n.draftGhostTeamHint(DraftGroup.maxTeam)),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.m),
+            child: TextField(
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.search),
+                hintText: l10n.ghostTeamSearch,
+              ),
+              onChanged: (text) =>
+                  setState(() => _search = text.trim().toLowerCase()),
             ),
           ),
           Expanded(
@@ -640,7 +730,11 @@ class _GhostTeamSheetState extends ConsumerState<_GhostTeamSheet> {
               data: (all) {
                 final options = [
                   for (final p in all)
-                    if (!widget.excluded.contains(p.id)) p,
+                    if (!widget.excluded.contains(p.id) &&
+                        (_search.isEmpty ||
+                            p.fullName.toLowerCase().contains(_search) ||
+                            _picks.contains(p.id)))
+                      p,
                 ];
                 return ListView.builder(
                   itemCount: options.length,

@@ -177,6 +177,13 @@ class TeamControllerTest extends EventApiTest {
         // Each mat shows its own expected queue: together, every match of the pool once.
         var shown = poolMatches(1, 5);
         assertThat(shown.stream().map(m -> m.get("id")).toList()).hasSize(6).doesNotHaveDuplicates();
+        // The club's Mats tab counts them where they are expected, before any starts (Raul, 2026-11-13).
+        var overview =
+                call(get(event() + "/mats"), "club1").andReturn().getResponse().getContentAsString();
+        List<Integer> pending = JsonPath.read(overview, "$[*].pendingMatches");
+        List<Integer> groups = JsonPath.read(overview, "$[*].groups");
+        assertThat(pending.stream().mapToInt(Integer::intValue).sum()).isEqualTo(6);
+        assertThat(groups.stream().mapToInt(Integer::intValue).sum()).isPositive();
         call(get(event() + "/categories/" + category() + "/teams"), "ayudante2")
                 .andExpect(jsonPath("$[0].groupNumber").value(1))
                 .andExpect(jsonPath("$[0].matNumber").doesNotExist());

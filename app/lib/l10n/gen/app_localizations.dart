@@ -98,6 +98,36 @@ abstract class AppLocalizations {
     Locale('es'),
   ];
 
+  /// No description provided for @draftGhostTeamPanelHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Equipos comodín (hasta 3): toca en la lista un equipo de otro grupo, o forma uno con alumnos sueltos. Combaten pero no puntúan.'**
+  String get draftGhostTeamPanelHint;
+
+  /// No description provided for @teamJoinsAsWildcard.
+  ///
+  /// In es, this message translates to:
+  /// **'Toca para que entre como equipo comodín'**
+  String get teamJoinsAsWildcard;
+
+  /// No description provided for @ghostTeamPageTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Formar equipo comodín'**
+  String get ghostTeamPageTitle;
+
+  /// No description provided for @ghostTeamSearch.
+  ///
+  /// In es, this message translates to:
+  /// **'Buscar alumno'**
+  String get ghostTeamSearch;
+
+  /// No description provided for @formGhostTeam.
+  ///
+  /// In es, this message translates to:
+  /// **'Formar equipo comodín con alumnos sueltos'**
+  String get formGhostTeam;
+
   /// No description provided for @teamPickWildcards.
   ///
   /// In es, this message translates to:

@@ -10,6 +10,22 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get draftGhostTeamPanelHint =>
+      'Wildcard teams (up to 3): tap a team of another group in the list, or make one with loose participants. They fight but do not score.';
+
+  @override
+  String get teamJoinsAsWildcard => 'Tap to join as a wildcard team';
+
+  @override
+  String get ghostTeamPageTitle => 'Make a wildcard team';
+
+  @override
+  String get ghostTeamSearch => 'Search a participant';
+
+  @override
+  String get formGhostTeam => 'Make a wildcard team with loose participants';
+
+  @override
   String get teamPickWildcards => 'Pick wildcards';
 
   @override

@@ -17,6 +17,7 @@ import dev.rgal.brackety.grouping.dto.MatBoardResponse.Fighter;
 import dev.rgal.brackety.grouping.dto.MatBoardResponse.MatChoice;
 import dev.rgal.brackety.grouping.dto.MatOverview;
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -63,25 +64,59 @@ class MatBoardService {
         this.staffNames = staffNames;
     }
 
-    /** Every mat of the event with its load and estimated end. */
+    /**
+     * Every mat of the event with its load and estimated end. Team matches of the pool count on the mat whose
+     * expected queue has them (as its board shows), and their groups too: before they start they have no mat.
+     */
     @Transactional(readOnly = true)
     List<MatOverview> overview(UUID eventId, UUID accountId) {
         access.require(eventId, accountId, EventRole.CLUB, EventRole.GROUPER);
         var now = clock.instant();
-        var states = schedule.states(events.get(eventId), now);
+        var event = events.get(eventId);
+        var states = schedule.states(event, now);
         var referees = staffNames.labels(eventId);
+        var floor = this.floor.load(event, now);
+        var plan = MatPlanner.simulate(event, floor, now);
+        var poolMatches = floor.matches().stream()
+                .filter(m -> m.getMatId() == null)
+                .collect(Collectors.toMap(Match::getId, Function.identity()));
         return states.stream()
-                .map(s -> new MatOverview(
-                        s.mat().getId(),
-                        s.mat().getNumber(),
-                        referees.get(s.mat().getRefereeAccountId()),
-                        s.groups(),
-                        s.pendingMatches(),
-                        s.matchInProgress(),
-                        s.matchesInReview(),
-                        s.remaining().toSeconds(),
-                        now.plus(s.remaining())))
+                .map(s -> {
+                    var planned = plan.getOrDefault(s.mat().getId(), List.of());
+                    var pool = planned.stream()
+                            .map(p -> poolMatches.get(p.matchId()))
+                            .filter(m -> m != null)
+                            .toList();
+                    var poolGroups = (int)
+                            pool.stream().map(Match::getGroupId).distinct().count();
+                    // With team matches of the pool, its queue ends when its last expected match does; never before
+                    // what
+                    // its own matches need.
+                    var remaining = pool.isEmpty()
+                            ? s.remaining()
+                            : max(
+                                    s.remaining(),
+                                    Duration.between(now, planned.getLast().startsAt())
+                                            .plus(MatFloor.slot(
+                                                    event,
+                                                    poolMatches.containsKey(
+                                                            planned.getLast().matchId()))));
+                    return new MatOverview(
+                            s.mat().getId(),
+                            s.mat().getNumber(),
+                            referees.get(s.mat().getRefereeAccountId()),
+                            s.groups() + poolGroups,
+                            s.pendingMatches() + pool.size(),
+                            s.matchInProgress(),
+                            s.matchesInReview(),
+                            remaining.toSeconds(),
+                            now.plus(remaining));
+                })
                 .toList();
+    }
+
+    private static Duration max(Duration a, Duration b) {
+        return a.compareTo(b) >= 0 ? a : b;
     }
 
     /** For the mat's referee and the club. */

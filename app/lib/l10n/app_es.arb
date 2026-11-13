@@ -1,4 +1,9 @@
 {
+  "draftGhostTeamPanelHint": "Equipos comodín (hasta 3): toca en la lista un equipo de otro grupo, o forma uno con alumnos sueltos. Combaten pero no puntúan.",
+  "teamJoinsAsWildcard": "Toca para que entre como equipo comodín",
+  "ghostTeamPageTitle": "Formar equipo comodín",
+  "ghostTeamSearch": "Buscar alumno",
+  "formGhostTeam": "Formar equipo comodín con alumnos sueltos",
   "teamPickWildcards": "Elegir comodines",
   "matReservedElsewhere": "Alguien de este combate lo espera ahora el tapiz {mat}",
   "@matReservedElsewhere": {"placeholders": {"mat": {"type": "int"}}},
