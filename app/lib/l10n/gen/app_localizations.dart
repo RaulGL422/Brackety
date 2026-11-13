@@ -98,6 +98,150 @@ abstract class AppLocalizations {
     Locale('es'),
   ];
 
+  /// No description provided for @controlMenu.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar'**
+  String get controlMenu;
+
+  /// No description provided for @controlDone.
+  ///
+  /// In es, this message translates to:
+  /// **'Hecho'**
+  String get controlDone;
+
+  /// No description provided for @controlError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo hacer el cambio. Recarga y vuelve a intentarlo.'**
+  String get controlError;
+
+  /// No description provided for @controlMatchInProgress.
+  ///
+  /// In es, this message translates to:
+  /// **'Hay un combate de este grupo en curso: espera a que acabe.'**
+  String get controlMatchInProgress;
+
+  /// No description provided for @controlMatchNotPending.
+  ///
+  /// In es, this message translates to:
+  /// **'Ese combate ya ha empezado: no se puede cambiar.'**
+  String get controlMatchNotPending;
+
+  /// No description provided for @controlMatWithoutReferee.
+  ///
+  /// In es, this message translates to:
+  /// **'Ese tapiz no tiene árbitro.'**
+  String get controlMatWithoutReferee;
+
+  /// No description provided for @controlOrderChanged.
+  ///
+  /// In es, this message translates to:
+  /// **'Los combates han cambiado mientras tanto: recarga y vuelve a ordenarlos.'**
+  String get controlOrderChanged;
+
+  /// No description provided for @controlTeamSize.
+  ///
+  /// In es, this message translates to:
+  /// **'Los equipos tienen que quedar de 2 o 3.'**
+  String get controlTeamSize;
+
+  /// No description provided for @controlGroupStarted.
+  ///
+  /// In es, this message translates to:
+  /// **'El grupo de esos equipos ya ha empezado: sus equipos ya no cambian.'**
+  String get controlGroupStarted;
+
+  /// No description provided for @controlSameFighter.
+  ///
+  /// In es, this message translates to:
+  /// **'Esa persona ya lucha en el grupo del otro equipo (como comodín).'**
+  String get controlSameFighter;
+
+  /// No description provided for @controlPickMat.
+  ///
+  /// In es, this message translates to:
+  /// **'¿A qué tapiz?'**
+  String get controlPickMat;
+
+  /// No description provided for @controlNoOtherMat.
+  ///
+  /// In es, this message translates to:
+  /// **'No hay otro tapiz con árbitro.'**
+  String get controlNoOtherMat;
+
+  /// No description provided for @controlMatOption.
+  ///
+  /// In es, this message translates to:
+  /// **'Tapiz {number} · {referee} · {pending, plural, =0{sin combates pendientes} =1{1 pendiente} other{{pending} pendientes}}'**
+  String controlMatOption(int number, String referee, int pending);
+
+  /// No description provided for @controlMoveMatch.
+  ///
+  /// In es, this message translates to:
+  /// **'Mover este combate a otro tapiz'**
+  String get controlMoveMatch;
+
+  /// No description provided for @controlWaiveRest.
+  ///
+  /// In es, this message translates to:
+  /// **'Dejar empezar sin esperar el descanso'**
+  String get controlWaiveRest;
+
+  /// No description provided for @controlWaiveRestTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Empezar sin el descanso mínimo?'**
+  String get controlWaiveRestTitle;
+
+  /// No description provided for @controlWaiveRestBody.
+  ///
+  /// In es, this message translates to:
+  /// **'{red} contra {blue} podrá empezar aunque alguien no haya descansado. Queda registrado quién lo permitió.'**
+  String controlWaiveRestBody(String red, String blue);
+
+  /// No description provided for @controlConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'Sí, permitir'**
+  String get controlConfirm;
+
+  /// No description provided for @controlMoveGroup.
+  ///
+  /// In es, this message translates to:
+  /// **'Mover el grupo a otro tapiz'**
+  String get controlMoveGroup;
+
+  /// No description provided for @controlReorder.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar el orden de los combates'**
+  String get controlReorder;
+
+  /// No description provided for @controlReorderHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Arrastra para ordenar los combates pendientes. Los jugados no cambian.'**
+  String get controlReorderHint;
+
+  /// No description provided for @controlMoveMember.
+  ///
+  /// In es, this message translates to:
+  /// **'Mover un alumno a otro equipo'**
+  String get controlMoveMember;
+
+  /// No description provided for @controlMoveMemberWho.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Quién se cambia?'**
+  String get controlMoveMemberWho;
+
+  /// No description provided for @controlMoveMemberTo.
+  ///
+  /// In es, this message translates to:
+  /// **'¿A qué equipo?'**
+  String get controlMoveMemberTo;
+
   /// No description provided for @settingsMatNeedsReferee.
   ///
   /// In es, this message translates to:

@@ -17,6 +17,10 @@ import 'create_groups.dart';
 import 'draft_panel.dart';
 import 'pick_mark.dart';
 import '../../../core/up_button.dart';
+import '../../control/control_repository.dart';
+import '../../control/control_ui.dart';
+import '../../events/data/my_event.dart';
+import '../../events/state/events_providers.dart';
 import '../../mat/ui/mat_label.dart';
 
 /// A team category (docs/modulos/prototipo-f1-equipos.md): make teams from its participants, then
@@ -343,6 +347,55 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
     if (picked != null) _change((g) => g.addGhostTeam(picked));
   }
 
+  /// The club picks one of [team]'s people and the team they go to; the server checks the rest.
+  Future<void> _moveMember(Team team, List<Team> all) async {
+    final l10n = AppLocalizations.of(context);
+    final member = await showDialog<TeamMember>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: Text(l10n.controlMoveMemberWho),
+        children: [
+          for (final m in team.members)
+            SimpleDialogOption(
+              onPressed: () => Navigator.pop(context, m),
+              child: Text(m.fullName),
+            ),
+        ],
+      ),
+    );
+    if (member == null || !mounted) return;
+    final to = await showDialog<Team>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: Text(l10n.controlMoveMemberTo),
+        children: [
+          for (final t in all)
+            if (t.id != team.id)
+              SimpleDialogOption(
+                onPressed: () => Navigator.pop(context, t),
+                child: Text(
+                  '${l10n.teamName(t.number)} · ${t.members.map((m) => m.fullName).join(', ')}',
+                ),
+              ),
+        ],
+      ),
+    );
+    if (to == null || !mounted) return;
+    final key = widget.categoryKey;
+    final moved = await runControl(
+      context,
+      () => ref
+          .read(controlRepositoryProvider)
+          .moveTeamMember(
+            key.eventId,
+            participantId: member.participantId,
+            fromTeamId: team.id,
+            toTeamId: to.id,
+          ),
+    );
+    if (moved) _refresh(ref, key);
+  }
+
   Future<void> _delete(Team team) async {
     final l10n = AppLocalizations.of(context);
     final toasts = Toasts.of(context);
@@ -401,6 +454,16 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
       }
     });
     final teams = ref.watch(categoryTeamsProvider(key));
+    // The club also moves people between teams whose group has not started (control panel).
+    final club =
+        ref
+            .watch(myEventsProvider)
+            .value
+            ?.where((e) => e.id == key.eventId)
+            .firstOrNull
+            ?.roles
+            .contains(EventRole.club) ??
+        false;
     final list = AsyncView(
       value: teams,
       onRetry: () => _refresh(ref, key),
@@ -415,6 +478,9 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
                   (g) => g.toggle(all[i].id, grouped: all[i].isTaken),
                 ),
                 onDelete: all[i].isTaken ? null : () => _delete(all[i]),
+                onMoveMember: club && all.length > 1
+                    ? () => _moveMember(all[i], all)
+                    : null,
                 onUndoGroup: all[i].canUndoGroup
                     ? () => undoGroup(
                         context,
@@ -453,6 +519,7 @@ class _TeamTile extends StatelessWidget {
     required this.onTap,
     required this.onDelete,
     this.onUndoGroup,
+    this.onMoveMember,
   });
 
   final Team team;
@@ -460,6 +527,9 @@ class _TeamTile extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback? onDelete;
   final VoidCallback? onUndoGroup;
+
+  /// The club's: move one of its people to another team.
+  final VoidCallback? onMoveMember;
 
   @override
   Widget build(BuildContext context) {
@@ -479,19 +549,29 @@ class _TeamTile extends StatelessWidget {
             : names,
       ),
       isThreeLine: team.isGrouped,
-      trailing: onDelete != null
-          ? IconButton(
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (onMoveMember != null)
+            IconButton(
+              tooltip: l10n.controlMoveMember,
+              icon: const Icon(Icons.swap_horiz),
+              onPressed: onMoveMember,
+            ),
+          if (onDelete != null)
+            IconButton(
               tooltip: l10n.deleteTeam,
               icon: const Icon(Icons.delete_outline),
               onPressed: onDelete,
             )
-          : onUndoGroup != null
-          ? IconButton(
+          else if (onUndoGroup != null)
+            IconButton(
               tooltip: l10n.undoGroupNumber(team.groupNumber!),
               icon: const Icon(Icons.undo),
               onPressed: onUndoGroup,
-            )
-          : null,
+            ),
+        ],
+      ),
     );
   }
 }

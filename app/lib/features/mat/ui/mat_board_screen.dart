@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import '../../../core/async_view.dart';
 import '../../../core/keep_screen_on.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../control/control_ui.dart';
 import '../../offline/ui/sync_status_icon.dart';
 import '../../rulebook/rulebook_ui.dart';
 import '../../scoreboard/data/match_view.dart';
@@ -103,7 +104,14 @@ class MatBoardScreen extends ConsumerWidget {
                     ? Center(child: Text(l10n.matEmpty))
                     : RefreshIndicator(
                         onRefresh: () => ref.refresh(provider.future),
-                        child: _BoardList(board: board, readOnly: readOnly),
+                        child: _BoardList(
+                          board: board,
+                          readOnly: readOnly,
+                          // The club's control panel: after a change, the board again.
+                          onControl: readOnly
+                              ? () => ref.invalidate(provider)
+                              : null,
+                        ),
                       ),
               ),
             ),
@@ -115,10 +123,17 @@ class MatBoardScreen extends ConsumerWidget {
 }
 
 class _BoardList extends StatelessWidget {
-  const _BoardList({required this.board, required this.readOnly});
+  const _BoardList({
+    required this.board,
+    required this.readOnly,
+    this.onControl,
+  });
 
   final MatBoard board;
   final bool readOnly;
+
+  /// Set for the club: pending matches and groups get the control panel's menu.
+  final VoidCallback? onControl;
 
   @override
   Widget build(BuildContext context) {
@@ -177,15 +192,26 @@ class _BoardList extends StatelessWidget {
               board: board,
               match: recommended,
               readOnly: readOnly,
+              onControl: onControl,
             ),
           if (available.isNotEmpty) ...[
             // With a match in progress none of them can start yet: not "available".
             section(busy ? l10n.matQueued : l10n.matPending),
-            _MatchList(board: board, matches: available, readOnly: readOnly),
+            _MatchList(
+              board: board,
+              matches: available,
+              readOnly: readOnly,
+              onControl: onControl,
+            ),
           ],
           if (waiting.isNotEmpty) ...[
             section(l10n.matWaitingTitle),
-            _MatchList(board: board, matches: waiting, readOnly: readOnly),
+            _MatchList(
+              board: board,
+              matches: waiting,
+              readOnly: readOnly,
+              onControl: onControl,
+            ),
           ],
           if (byStatus[MatchStatus.finished]!.isNotEmpty) ...[
             section(l10n.matFinished),
@@ -199,7 +225,15 @@ class _BoardList extends StatelessWidget {
           Wrap(
             spacing: AppSpacing.s,
             runSpacing: AppSpacing.s,
-            children: [for (final g in board.groups) _GroupCard(group: g)],
+            children: [
+              for (final g in board.groups)
+                _GroupCard(
+                  group: g,
+                  control: onControl == null || board.eventId == null
+                      ? null
+                      : _groupMenu(board, g, onControl!),
+                ),
+            ],
           ),
         ],
       ),
@@ -209,6 +243,22 @@ class _BoardList extends StatelessWidget {
   /// On wide windows the board keeps a reading width instead of stretching.
   static double _gutter(double width) =>
       max(AppSpacing.l, (width - AppSizes.readingMaxWidth) / 2);
+}
+
+/// The club's menu of an individual group: groups of teams have no mat to change.
+Widget? _groupMenu(MatBoard board, BoardGroup group, VoidCallback onChanged) {
+  if (group.members.any((m) => m.teamNumber != null)) return null;
+  final pending = [
+    for (final m in board.matches)
+      if (m.groupId == group.id && m.status == MatchStatus.pending) m,
+  ];
+  return GroupControlMenu(
+    eventId: board.eventId!,
+    group: group,
+    pending: pending,
+    matNumber: board.matNumber,
+    onChanged: onChanged,
+  );
 }
 
 /// Without network: the board saved here, and no recommendation.
@@ -239,12 +289,14 @@ class _FeaturedMatch extends ConsumerWidget {
     required this.match,
     required this.readOnly,
     this.inProgress = false,
+    this.onControl,
   });
 
   final MatBoard board;
   final BoardMatch match;
   final bool readOnly;
   final bool inProgress;
+  final VoidCallback? onControl;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -282,12 +334,19 @@ class _FeaturedMatch extends ConsumerWidget {
                     color: onBand,
                     size: 20,
                   ),
-                  Flexible(
+                  Expanded(
                     child: Text(
                       inProgress ? l10n.matInProgress : l10n.matRecommended,
                       style: text.titleSmall?.copyWith(color: onBand),
                     ),
                   ),
+                  if (!inProgress && onControl != null && board.eventId != null)
+                    MatchControlMenu(
+                      eventId: board.eventId!,
+                      match: match,
+                      matNumber: board.matNumber,
+                      onChanged: onControl!,
+                    ),
                 ],
               ),
             ),
@@ -377,11 +436,13 @@ class _MatchList extends StatelessWidget {
     required this.board,
     required this.matches,
     required this.readOnly,
+    this.onControl,
   });
 
   final MatBoard board;
   final List<BoardMatch> matches;
   final bool readOnly;
+  final VoidCallback? onControl;
 
   @override
   Widget build(BuildContext context) => Card(
@@ -390,7 +451,12 @@ class _MatchList extends StatelessWidget {
       children: [
         for (final (i, m) in matches.indexed) ...[
           if (i > 0) const Divider(),
-          _MatchRow(board: board, match: m, readOnly: readOnly),
+          _MatchRow(
+            board: board,
+            match: m,
+            readOnly: readOnly,
+            onControl: onControl,
+          ),
         ],
       ],
     ),
@@ -403,11 +469,13 @@ class _MatchRow extends StatelessWidget {
     required this.board,
     required this.match,
     required this.readOnly,
+    this.onControl,
   });
 
   final MatBoard board;
   final BoardMatch match;
   final bool readOnly;
+  final VoidCallback? onControl;
 
   @override
   Widget build(BuildContext context) {
@@ -444,6 +512,13 @@ class _MatchRow extends StatelessWidget {
           ? Text(
               '${match.redScore} - ${match.blueScore}',
               style: theme.textTheme.headlineSmall,
+            )
+          : pending && onControl != null && board.eventId != null
+          ? MatchControlMenu(
+              eventId: board.eventId!,
+              match: match,
+              matNumber: board.matNumber,
+              onChanged: onControl!,
             )
           : Icon(locked ? Icons.lock_outline : Icons.chevron_right),
       onTap: locked ? null : () => _open(context, match, readOnly),
@@ -616,9 +691,12 @@ class _Mark extends StatelessWidget {
 }
 
 class _GroupCard extends StatelessWidget {
-  const _GroupCard({required this.group});
+  const _GroupCard({required this.group, this.control});
 
   final BoardGroup group;
+
+  /// The club's menu for the group, or null.
+  final Widget? control;
 
   @override
   Widget build(BuildContext context) {
@@ -642,6 +720,7 @@ class _GroupCard extends StatelessWidget {
                     style: text.titleSmall,
                   ),
                 ),
+                ?control,
               ],
             ),
             if (group.createdBy != null)

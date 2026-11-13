@@ -10,6 +10,96 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
+  String get controlMenu => 'Cambiar';
+
+  @override
+  String get controlDone => 'Hecho';
+
+  @override
+  String get controlError =>
+      'No se pudo hacer el cambio. Recarga y vuelve a intentarlo.';
+
+  @override
+  String get controlMatchInProgress =>
+      'Hay un combate de este grupo en curso: espera a que acabe.';
+
+  @override
+  String get controlMatchNotPending =>
+      'Ese combate ya ha empezado: no se puede cambiar.';
+
+  @override
+  String get controlMatWithoutReferee => 'Ese tapiz no tiene árbitro.';
+
+  @override
+  String get controlOrderChanged =>
+      'Los combates han cambiado mientras tanto: recarga y vuelve a ordenarlos.';
+
+  @override
+  String get controlTeamSize => 'Los equipos tienen que quedar de 2 o 3.';
+
+  @override
+  String get controlGroupStarted =>
+      'El grupo de esos equipos ya ha empezado: sus equipos ya no cambian.';
+
+  @override
+  String get controlSameFighter =>
+      'Esa persona ya lucha en el grupo del otro equipo (como comodín).';
+
+  @override
+  String get controlPickMat => '¿A qué tapiz?';
+
+  @override
+  String get controlNoOtherMat => 'No hay otro tapiz con árbitro.';
+
+  @override
+  String controlMatOption(int number, String referee, int pending) {
+    String _temp0 = intl.Intl.pluralLogic(
+      pending,
+      locale: localeName,
+      other: '$pending pendientes',
+      one: '1 pendiente',
+      zero: 'sin combates pendientes',
+    );
+    return 'Tapiz $number · $referee · $_temp0';
+  }
+
+  @override
+  String get controlMoveMatch => 'Mover este combate a otro tapiz';
+
+  @override
+  String get controlWaiveRest => 'Dejar empezar sin esperar el descanso';
+
+  @override
+  String get controlWaiveRestTitle => '¿Empezar sin el descanso mínimo?';
+
+  @override
+  String controlWaiveRestBody(String red, String blue) {
+    return '$red contra $blue podrá empezar aunque alguien no haya descansado. Queda registrado quién lo permitió.';
+  }
+
+  @override
+  String get controlConfirm => 'Sí, permitir';
+
+  @override
+  String get controlMoveGroup => 'Mover el grupo a otro tapiz';
+
+  @override
+  String get controlReorder => 'Cambiar el orden de los combates';
+
+  @override
+  String get controlReorderHint =>
+      'Arrastra para ordenar los combates pendientes. Los jugados no cambian.';
+
+  @override
+  String get controlMoveMember => 'Mover un alumno a otro equipo';
+
+  @override
+  String get controlMoveMemberWho => '¿Quién se cambia?';
+
+  @override
+  String get controlMoveMemberTo => '¿A qué equipo?';
+
+  @override
   String get settingsMatNeedsReferee =>
       'Ese tapiz tiene combates por jugar: no puede quedarse sin árbitro. Pon otro árbitro o espera a que acaben.';
 
