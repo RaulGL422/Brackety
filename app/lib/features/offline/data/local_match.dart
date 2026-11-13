@@ -124,6 +124,7 @@ class LocalMatch {
                 : MatchStatus.pending,
             length: server.length,
             pointsLimit: server.pointsLimit,
+            readyAt: server.readyAt,
             remaining: state.remainingAt(now),
             running: state.isRunning(now),
             endReason: state.endReason(now),

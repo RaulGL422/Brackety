@@ -75,6 +75,23 @@ void main() {
     expect(repository.sent, isEmpty);
   });
 
+  test('a match whose fighters are still resting does not start', () async {
+    // The device's clock is 10:00:30; someone rests until 10:00:45.
+    repository.current = matchView(readyAt: DateTime(2027, 3, 10, 10, 0, 45));
+    final controller = await load();
+
+    expect(
+      (await controller.send(MatchAction.start))?.local,
+      MatchRefusal.resting,
+    );
+    await pumpEventQueue();
+    expect(repository.sent, isEmpty);
+
+    repository.current = matchView(readyAt: DateTime(2027, 3, 10, 10, 0, 20));
+    container.invalidate(matchControllerProvider('m1'));
+    expect(await (await load()).send(MatchAction.start), isNull);
+  });
+
   test(
     'five fast points show at once and go out one at a time, in order',
     () async {

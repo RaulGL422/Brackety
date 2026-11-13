@@ -46,6 +46,7 @@ class ScoreboardService {
     static final String MATCH_CONFLICT = "MATCH_CONFLICT";
     static final String MATCH_IN_REVIEW = "MATCH_IN_REVIEW";
     static final String MATCH_STALE = "MATCH_STALE";
+    static final String FIGHTER_RESTING = "FIGHTER_RESTING";
 
     private static final Logger log = LoggerFactory.getLogger(ScoreboardService.class);
 
@@ -220,10 +221,12 @@ class ScoreboardService {
             throw EventException.conflict(
                     MATCH_STALE, "The match changed on another device: check the scoreboard and try again.");
         }
-        writer.append(match, event, history, action, now, true).ifPresent(refusal -> {
-            throw refusal.cause() == Cause.AGE
-                    ? EventException.invalid(refusal.detail())
-                    : EventException.conflict(refusal.detail());
+        writer.append(match, event, history, action, now, true, true).ifPresent(refusal -> {
+            throw switch (refusal.cause()) {
+                case AGE -> EventException.invalid(refusal.detail());
+                case FIGHTER_RESTING -> EventException.conflict(FIGHTER_RESTING, refusal.detail());
+                default -> EventException.conflict(refusal.detail());
+            };
         });
         return null;
     }
@@ -246,7 +249,7 @@ class ScoreboardService {
         if (request.knownEvents() != MatchWriter.knownEvents(history)) {
             return reject(match, action, now, Cause.KNOWN_EVENTS, serverNow);
         }
-        return writer.append(match, event, history, action, now, true)
+        return writer.append(match, event, history, action, now, true, false)
                 .map(refusal -> reject(match, action, now, refusal.cause(), serverNow))
                 .orElse(null);
     }
@@ -296,7 +299,10 @@ class ScoreboardService {
                 corner(event, state, Side.BLUE, competitors.get(match.getBlueId()), ghosts),
                 timeline(history, state, actors),
                 now,
-                match.isInReview() ? review(match, pending, actors) : null);
+                match.isInReview() ? review(match, pending, actors) : null,
+                match.getStatus() == Match.Status.PENDING
+                        ? writer.restedAt(match, event).filter(now::isBefore).orElse(null)
+                        : null);
     }
 
     private Map<UUID, String> actors(Stream<UUID> ids) {

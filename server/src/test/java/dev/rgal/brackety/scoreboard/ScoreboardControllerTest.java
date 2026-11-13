@@ -151,6 +151,32 @@ class ScoreboardControllerTest extends ScoreboardApiTest {
     }
 
     @Test
+    void nobodyStartsAgainBeforeTheLeastRest() throws Exception {
+        var first = match(young, 0, 1);
+        event(first, "START");
+        clock.advance(Duration.ofMinutes(5));
+        event(first, "FINISH").andExpect(status().isOk());
+        var finishedAt = clock.instant();
+        // Fighter 0 again, as soon as the mat is free.
+        var next = jdbc.sql("select id from fight_match where status = 'PENDING' and (red_participant_id = ?"
+                        + " or blue_participant_id = ?) limit 1")
+                .params(young.get(0), young.get(0))
+                .query(UUID.class)
+                .single();
+
+        call(get(path(next)), "arbitro1")
+                .andExpect(
+                        jsonPath("$.readyAt").value(finishedAt.plusSeconds(30).toString()));
+        event(next, "START")
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("FIGHTER_RESTING"));
+
+        clock.advance(Duration.ofSeconds(30));
+        call(get(path(next)), "arbitro1").andExpect(jsonPath("$.readyAt").doesNotExist());
+        event(next, "START").andExpect(status().isOk());
+    }
+
+    @Test
     void onlyTheMatsRefereeWritesAndTheClubOnlyReads() throws Exception {
         var match = match(young, 0, 1);
 

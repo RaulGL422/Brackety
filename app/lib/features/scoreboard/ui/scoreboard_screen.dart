@@ -229,6 +229,7 @@ class ScoreboardScreen extends ConsumerWidget {
         MatchRefusal.notForAge => l10n.refusalNotForAge,
         MatchRefusal.inReview => l10n.refusalInReview,
         MatchRefusal.matBusy => l10n.refusalMatBusy,
+        MatchRefusal.resting => l10n.refusalResting,
         MatchRefusal.noPoints => l10n.refusalNoPoints,
         MatchRefusal.clockRunning => l10n.refusalClockRunning,
         MatchRefusal.clockLimit => l10n.refusalClockLimit,

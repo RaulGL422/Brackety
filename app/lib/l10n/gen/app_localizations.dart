@@ -98,6 +98,12 @@ abstract class AppLocalizations {
     Locale('es'),
   ];
 
+  /// No description provided for @refusalResting.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no: alguien de este combate no ha cumplido el descanso mínimo desde su último combate. Espera a que se desbloquee en el tablero.'**
+  String get refusalResting;
+
   /// No description provided for @cornerFightingNow.
   ///
   /// In es, this message translates to:

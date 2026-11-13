@@ -10,6 +10,10 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
+  String get refusalResting =>
+      'Todavía no: alguien de este combate no ha cumplido el descanso mínimo desde su último combate. Espera a que se desbloquee en el tablero.';
+
+  @override
   String cornerFightingNow(int mat) {
     return 'Luchando en el tapiz $mat';
   }

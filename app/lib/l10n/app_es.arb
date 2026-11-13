@@ -1,4 +1,5 @@
 {
+  "refusalResting": "Todavía no: alguien de este combate no ha cumplido el descanso mínimo desde su último combate. Espera a que se desbloquee en el tablero.",
   "cornerFightingNow": "Luchando en el tapiz {mat}",
   "@cornerFightingNow": {"placeholders": {"mat": {"type": "int"}}},
   "cornerFighting": "Luchando en el tapiz {mat} · libre hacia las {time}",

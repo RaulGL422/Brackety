@@ -18,6 +18,9 @@ enum MatchRefusal {
   notForAge,
   inReview,
   matBusy,
+
+  /// A fighter has not had the least rest since their last match.
+  resting,
 }
 
 /// [target]: for an UNDO, the entry it undoes. [delta]: for a CLOCK_ADJUST, the time added.

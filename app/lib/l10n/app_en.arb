@@ -1,4 +1,5 @@
 {
+  "refusalResting": "Not yet: someone in this match has not had the least rest since their last match. Wait until the board unlocks it.",
   "cornerFightingNow": "Fighting on mat {mat}",
   "cornerFighting": "Fighting on mat {mat} · free around {time}",
   "cornerResting": "Resting until {time}",

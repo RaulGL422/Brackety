@@ -78,7 +78,7 @@ class MatchReviewService {
                     scoreboard.refereeMatOf(match, op.getActorAccountId()).ifPresent(m -> match.takeMat(m.getId()));
                 }
                 var at = MatchWriter.effectiveTime(history, op.getAt(), now);
-                var refused = writer.append(match, event, history, op.action(), at, false);
+                var refused = writer.append(match, event, history, op.action(), at, false, false);
                 resolution = refused.isPresent() ? Resolution.SKIPPED : Resolution.APPLIED;
                 applied += refused.isPresent() ? 0 : 1;
                 skipped += refused.isPresent() ? 1 : 0;

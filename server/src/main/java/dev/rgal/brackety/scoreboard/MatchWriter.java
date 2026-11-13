@@ -51,12 +51,19 @@ class MatchWriter {
     /**
      * Appends {@code action} as done at {@code now} to {@code history} (the match's events, which grows),
      * or says why it cannot happen. {@code checkOtherMats}: refuse a first start if a fighter is fighting
-     * on another mat.
+     * on another mat. {@code checkRest}: also if a fighter has not had the event's least rest since their last
+     * match (online only: a device without network already started it, and the club review applies what happened).
      */
     Optional<Refusal> append(
-            Match match, Event event, List<MatchEvent> history, Action action, Instant now, boolean checkOtherMats) {
+            Match match,
+            Event event,
+            List<MatchEvent> history,
+            Action action,
+            Instant now,
+            boolean checkOtherMats,
+            boolean checkRest) {
         var state = replay(event, match, history);
-        var refusal = refusal(match, event, state, action, now, checkOtherMats);
+        var refusal = refusal(match, event, state, action, now, checkOtherMats, checkRest);
         if (refusal.isPresent()) {
             return refusal;
         }
@@ -109,7 +116,13 @@ class MatchWriter {
     }
 
     private Optional<Refusal> refusal(
-            Match match, Event event, TamboMatch state, Action action, Instant now, boolean checkOtherMats) {
+            Match match,
+            Event event,
+            TamboMatch state,
+            Action action,
+            Instant now,
+            boolean checkOtherMats,
+            boolean checkRest) {
         var rules = state.refuse(action.type(), action.side(), action.deltaMs() == null ? 0 : action.deltaMs(), now);
         if (rules.isPresent()) {
             return Optional.of(new Refusal(Cause.RULES, rules.get()));
@@ -119,6 +132,13 @@ class MatchWriter {
             var start = startRefusal(match, checkOtherMats);
             if (start.isPresent()) {
                 return start;
+            }
+        }
+        // Not on a reopen: the fighters' last match is this very one.
+        if (checkRest && action.type() == MatchEventType.START && !state.isStarted()) {
+            var rested = restRefusal(match, event, now);
+            if (rested.isPresent()) {
+                return rested;
             }
         }
         if (action.type() == MatchEventType.ONE_HAND_WARNING && !oneHandRule(event, fighter(match, action.side()))) {
@@ -147,6 +167,28 @@ class MatchWriter {
             return Optional.of(new Refusal(Cause.FIGHTER_BUSY, "A fighter is in a match on another mat."));
         }
         return Optional.empty();
+    }
+
+    // The least rest between two matches of a person, on any mat (Raul, 2026-11-13): the board already shows
+    // it, this stops a stale screen or a second device.
+    private Optional<Refusal> restRefusal(Match match, Event event, Instant now) {
+        return restedAt(match, event)
+                .filter(readyAt -> readyAt.isAfter(now))
+                .map(readyAt ->
+                        new Refusal(Cause.FIGHTER_RESTING, "A fighter is still resting until " + readyAt + "."));
+    }
+
+    /** When every fighter of {@code match} has had the least rest since their last other match; empty if none. */
+    Optional<Instant> restedAt(Match match, Event event) {
+        var competitors = directory.of(match.getEventId());
+        var fighters = competitors.participants(match.getRedId(), match.getBlueId());
+        var minRest = Duration.ofSeconds(event.getMinRestSeconds());
+        return matches.findByEventId(match.getEventId()).stream()
+                .filter(m -> !m.getId().equals(match.getId()) && m.getFinishedAt() != null)
+                .filter(m -> competitors.participants(m.getRedId(), m.getBlueId()).stream()
+                        .anyMatch(fighters::contains))
+                .map(m -> m.getFinishedAt().plus(minRest))
+                .max(Instant::compareTo);
     }
 
     // Points or a disqualification end the match: the clock stops here and stays stopped after an undo.
