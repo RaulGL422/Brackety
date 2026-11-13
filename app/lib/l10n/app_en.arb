@@ -1,4 +1,5 @@
 {
+  "matPlannedAt": "Expected around {time}",
   "controlMenu": "Change",
   "controlDone": "Done",
   "controlError": "The change could not be made. Reload and try again.",

@@ -125,6 +125,33 @@ class FakeEventsApi implements EventsApi {
   }
 
   @override
+  Future<void> moveGroup(String eventId, String groupId, String matId) async =>
+      calls.add('moveGroup $groupId $matId');
+
+  @override
+  Future<void> moveMatch(String eventId, String matchId, String matId) async =>
+      calls.add('moveMatch $matchId $matId');
+
+  @override
+  Future<void> reorder(
+    String eventId,
+    String groupId,
+    List<String> matchIds,
+  ) async => calls.add('reorder $groupId');
+
+  @override
+  Future<void> moveTeamMember(
+    String eventId, {
+    required String participantId,
+    required String fromTeamId,
+    required String toTeamId,
+  }) async => calls.add('member $participantId $fromTeamId $toTeamId');
+
+  @override
+  Future<void> waiveRest(String eventId, String matchId) async =>
+      calls.add('waiveRest $matchId');
+
+  @override
   Future<Cleared> clearCompetition(String eventId, String reason) async {
     calls.add('clear $eventId: $reason');
     final cleared = (groups: groups.length, teams: 1);
@@ -220,6 +247,34 @@ void main() {
       expect(find.text('Match restarted.'), findsOneWidget);
     },
   );
+
+  testWidgets('a pending match can skip the rest, after asking', (
+    tester,
+  ) async {
+    useSize(tester, screenSizes['desktop']!);
+    final api = await open(tester);
+    await openDetail(tester);
+
+    await tester.tap(find.byTooltip('Change').first);
+    await tester.pumpAndSettle();
+    await tapText(tester, 'Let it start without waiting for the rest');
+    expect(find.text('Start without the least rest?'), findsOneWidget);
+    await tapText(tester, 'Yes, allow');
+
+    expect(api.calls, ['waiveRest g1-m2']);
+  });
+
+  testWidgets('a group only moves to a mat with a referee', (tester) async {
+    useSize(tester, screenSizes['desktop']!);
+    final api = await open(tester);
+    await openDetail(tester);
+
+    await tester.tap(find.text('Move the group to another mat').first);
+    await tester.pumpAndSettle();
+    // Mat 2 has no referee and mat 1 is its own.
+    expect(find.text('No other mat has a referee.'), findsOneWidget);
+    expect(api.calls, isEmpty);
+  });
 
   testWidgets('cancelling asks nothing of the server', (tester) async {
     useSize(tester, screenSizes['desktop']!);

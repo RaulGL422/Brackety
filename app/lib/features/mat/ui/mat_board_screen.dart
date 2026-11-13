@@ -107,10 +107,8 @@ class MatBoardScreen extends ConsumerWidget {
                         child: _BoardList(
                           board: board,
                           readOnly: readOnly,
-                          // The club's control panel: after a change, the board again.
-                          onControl: readOnly
-                              ? () => ref.invalidate(provider)
-                              : null,
+                          // Club (control panel) and referee (move a match): after a change, the board again.
+                          onControl: () => ref.invalidate(provider),
                         ),
                       ),
               ),
@@ -132,7 +130,8 @@ class _BoardList extends StatelessWidget {
   final MatBoard board;
   final bool readOnly;
 
-  /// Set for the club: pending matches and groups get the control panel's menu.
+  /// Pending matches get a menu: the control panel's for the club, moving to another mat for
+  /// the referee; groups only for the club.
   final VoidCallback? onControl;
 
   @override
@@ -229,7 +228,8 @@ class _BoardList extends StatelessWidget {
               for (final g in board.groups)
                 _GroupCard(
                   group: g,
-                  control: onControl == null || board.eventId == null
+                  control:
+                      !readOnly || onControl == null || board.eventId == null
                       ? null
                       : _groupMenu(board, g, onControl!),
                 ),
@@ -243,6 +243,27 @@ class _BoardList extends StatelessWidget {
   /// On wide windows the board keeps a reading width instead of stretching.
   static double _gutter(double width) =>
       max(AppSpacing.l, (width - AppSizes.readingMaxWidth) / 2);
+}
+
+/// The menu of a pending match: the club's control panel, or the referee's move to another
+/// mat (it needs network: the server checks the match is theirs). Null without the event.
+Widget? _matchMenu(
+  MatBoard board,
+  BoardMatch match,
+  bool readOnly,
+  VoidCallback onChanged,
+) {
+  if (board.eventId == null) return null;
+  return readOnly
+      ? MatchControlMenu(
+          eventId: board.eventId!,
+          match: match,
+          matNumber: board.matNumber,
+          onChanged: onChanged,
+        )
+      : board.offline
+      ? null
+      : RefereeMoveMenu(board: board, match: match, onChanged: onChanged);
 }
 
 /// The club's menu of an individual group: groups of teams have no mat to change.
@@ -340,13 +361,9 @@ class _FeaturedMatch extends ConsumerWidget {
                       style: text.titleSmall?.copyWith(color: onBand),
                     ),
                   ),
-                  if (!inProgress && onControl != null && board.eventId != null)
-                    MatchControlMenu(
-                      eventId: board.eventId!,
-                      match: match,
-                      matNumber: board.matNumber,
-                      onChanged: onControl!,
-                    ),
+                  if (!inProgress && onControl != null)
+                    _matchMenu(board, match, readOnly, onControl!) ??
+                        const SizedBox.shrink(),
                 ],
               ),
             ),
@@ -507,20 +524,27 @@ class _MatchRow extends StatelessWidget {
           ? Text(l10n.matInReview)
           : waiting || match.waitReason == WaitReason.otherMat
           ? Text(waitText(context, match))
+          : pending && match.plannedAt != null
+          ? Text(
+              l10n.matPlannedAt(
+                DateFormat.Hm(Localizations.localeOf(context).toLanguageTag())
+                    .format(match.plannedAt!.toLocal()),
+              ),
+            )
           : null,
       trailing: finished
           ? Text(
               '${match.redScore} - ${match.blueScore}',
               style: theme.textTheme.headlineSmall,
             )
-          : pending && onControl != null && board.eventId != null
-          ? MatchControlMenu(
-              eventId: board.eventId!,
-              match: match,
-              matNumber: board.matNumber,
-              onChanged: onControl!,
-            )
-          : Icon(locked ? Icons.lock_outline : Icons.chevron_right),
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (pending && onControl != null)
+                  ?_matchMenu(board, match, readOnly, onControl!),
+                Icon(locked ? Icons.lock_outline : Icons.chevron_right),
+              ],
+            ),
       onTap: locked ? null : () => _open(context, match, readOnly),
     );
   }

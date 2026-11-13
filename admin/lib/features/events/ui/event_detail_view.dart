@@ -9,6 +9,7 @@ import '../../../core/run_action.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../data/events_api.dart';
 import '../state/events_controller.dart';
+import 'event_control.dart';
 
 /// An event's mats and groups, and the three things the superadmin can undo in it.
 class EventDetailView extends ConsumerWidget {
@@ -103,8 +104,13 @@ class _Detail extends ConsumerWidget {
         for (final group in event.groups)
           Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.m),
-            child: _GroupCard(eventId: event.id, group: group),
+            child: _GroupCard(event: event, group: group),
           ),
+        if (event.teams.isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.l),
+          Text(l10n.controlTeams, style: text.titleMedium),
+          TeamsControl(event: event),
+        ],
       ],
     );
   }
@@ -131,10 +137,12 @@ class _Detail extends ConsumerWidget {
 }
 
 class _GroupCard extends ConsumerWidget {
-  const _GroupCard({required this.eventId, required this.group});
+  const _GroupCard({required this.event, required this.group});
 
-  final String eventId;
+  final AdminEventDetail event;
   final AdminGroup group;
+
+  String get eventId => event.id;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -170,6 +178,9 @@ class _GroupCard extends ConsumerWidget {
                 ),
               ],
             ),
+            // Groups of teams have no mat: their matches go to the free mats.
+            if (group.matNumber != null)
+              GroupControlButtons(event: event, group: group),
             Wrap(
               spacing: AppSpacing.s,
               runSpacing: AppSpacing.xs,
@@ -185,7 +196,7 @@ class _GroupCard extends ConsumerWidget {
             ),
             const Divider(),
             for (final match in group.matches)
-              _MatchRow(eventId: eventId, match: match),
+              _MatchRow(event: event, group: group, match: match),
           ],
         ),
       ),
@@ -213,10 +224,17 @@ class _GroupCard extends ConsumerWidget {
 }
 
 class _MatchRow extends ConsumerWidget {
-  const _MatchRow({required this.eventId, required this.match});
+  const _MatchRow({
+    required this.event,
+    required this.group,
+    required this.match,
+  });
 
-  final String eventId;
+  final AdminEventDetail event;
+  final AdminGroup group;
   final AdminMatch match;
+
+  String get eventId => event.id;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -259,6 +277,11 @@ class _MatchRow extends ConsumerWidget {
         ? TextButton(
             onPressed: () => _reset(context, ref),
             child: Text(l10n.matchReset),
+          )
+        : match.status == AdminMatchStatus.pending
+        ? Align(
+            alignment: AlignmentDirectional.centerEnd,
+            child: MatchControlMenu(event: event, group: group, match: match),
           )
         : null;
     return Padding(

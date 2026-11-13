@@ -245,6 +245,59 @@ class AdminEventPage {
   bool get hasNext => page + 1 < pageCount;
 }
 
+/// A person of a real team; [ghost]: fills it in without scoring.
+class AdminTeamPerson {
+  const AdminTeamPerson({
+    required this.participantId,
+    required this.name,
+    this.ghost = false,
+  });
+
+  factory AdminTeamPerson.fromJson(Map<String, dynamic> json) =>
+      AdminTeamPerson(
+        participantId: json['participantId'] as String,
+        name: json['name'] as String,
+        ghost: json['ghost'] as bool? ?? false,
+      );
+
+  final String participantId;
+  final String name;
+  final bool ghost;
+}
+
+/// A real team: who is in it and the group it fights in, for the control panel.
+class AdminTeam {
+  const AdminTeam({
+    required this.id,
+    required this.number,
+    required this.category,
+    required this.members,
+    this.groupNumber,
+    this.groupStarted = false,
+  });
+
+  factory AdminTeam.fromJson(Map<String, dynamic> json) => AdminTeam(
+    id: json['id'] as String,
+    number: json['number'] as int,
+    category: json['category'] as String,
+    groupNumber: json['groupNumber'] as int?,
+    groupStarted: json['groupStarted'] as bool? ?? false,
+    members: [
+      for (final m in json['members'] as List)
+        AdminTeamPerson.fromJson(m as Map<String, dynamic>),
+    ],
+  );
+
+  final String id;
+  final int number;
+  final String category;
+  final int? groupNumber;
+
+  /// Its group has started: its people no longer change.
+  final bool groupStarted;
+  final List<AdminTeamPerson> members;
+}
+
 class AdminEventDetail {
   const AdminEventDetail({
     required this.id,
@@ -254,6 +307,7 @@ class AdminEventDetail {
     required this.entries,
     required this.mats,
     required this.groups,
+    this.teams = const [],
   });
 
   factory AdminEventDetail.fromJson(Map<String, dynamic> json) =>
@@ -271,6 +325,10 @@ class AdminEventDetail {
           for (final g in json['groups'] as List)
             AdminGroup.fromJson(g as Map<String, dynamic>),
         ],
+        teams: [
+          for (final t in json['teams'] as List? ?? const [])
+            AdminTeam.fromJson(t as Map<String, dynamic>),
+        ],
       );
 
   final String id;
@@ -280,6 +338,7 @@ class AdminEventDetail {
   final int entries;
   final List<AdminMat> mats;
   final List<AdminGroup> groups;
+  final List<AdminTeam> teams;
 }
 
 /// What clearing the competition took: groups and teams (ghost teams included).
@@ -317,6 +376,43 @@ class EventsApi {
     '$_base/groups/$groupId/dissolve',
     data: {'reason': reason},
   );
+
+  String _control(String eventId) => '$_base/events/$eventId/control';
+
+  Future<void> moveGroup(String eventId, String groupId, String matId) =>
+      _dio.put<void>(
+        '${_control(eventId)}/groups/$groupId/mat',
+        data: {'matId': matId},
+      );
+
+  Future<void> moveMatch(String eventId, String matchId, String matId) =>
+      _dio.put<void>(
+        '${_control(eventId)}/matches/$matchId/mat',
+        data: {'matId': matId},
+      );
+
+  Future<void> reorder(String eventId, String groupId, List<String> matchIds) =>
+      _dio.put<void>(
+        '${_control(eventId)}/groups/$groupId/order',
+        data: {'matchIds': matchIds},
+      );
+
+  Future<void> moveTeamMember(
+    String eventId, {
+    required String participantId,
+    required String fromTeamId,
+    required String toTeamId,
+  }) => _dio.post<void>(
+    '${_control(eventId)}/team-members',
+    data: {
+      'participantId': participantId,
+      'fromTeamId': fromTeamId,
+      'toTeamId': toTeamId,
+    },
+  );
+
+  Future<void> waiveRest(String eventId, String matchId) =>
+      _dio.post<void>('${_control(eventId)}/matches/$matchId/waive-rest');
 
   Future<Cleared> clearCompetition(String eventId, String reason) async {
     final response = await _dio.post<Map<String, dynamic>>(

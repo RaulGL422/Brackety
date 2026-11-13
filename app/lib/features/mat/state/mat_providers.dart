@@ -70,6 +70,7 @@ MatBoard _offlineBoard(Map<String, dynamic> cached) {
     offline: true,
     teamPool: board.teamPool,
     eventId: board.eventId,
+    mats: board.mats,
   );
 }
 

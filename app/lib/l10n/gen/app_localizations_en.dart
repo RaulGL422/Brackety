@@ -10,6 +10,11 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String matPlannedAt(String time) {
+    return 'Expected around $time';
+  }
+
+  @override
   String get controlMenu => 'Change';
 
   @override

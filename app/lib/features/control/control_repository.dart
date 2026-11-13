@@ -44,6 +44,10 @@ class ControlRepository {
     },
   );
 
+  /// The referee sends one of their mat's pending matches to another mat.
+  Future<void> moveAsReferee(String matchId, String matId) =>
+      _dio.post<void>('/api/v1/matches/$matchId/move', data: {'matId': matId});
+
   Future<void> waiveRest(String eventId, String matchId) =>
       _dio.post<void>('${_base(eventId)}/matches/$matchId/waive-rest');
 }

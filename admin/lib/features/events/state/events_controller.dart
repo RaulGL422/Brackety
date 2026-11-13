@@ -78,6 +78,31 @@ class EventDetailController extends AsyncNotifier<AdminEventDetail> {
   Future<Cleared> clearCompetition(String reason) =>
       _run(() => _api.clearCompetition(eventId, reason));
 
+  Future<void> moveGroup(String groupId, String matId) =>
+      _run(() => _api.moveGroup(eventId, groupId, matId));
+
+  Future<void> moveMatch(String matchId, String matId) =>
+      _run(() => _api.moveMatch(eventId, matchId, matId));
+
+  Future<void> reorder(String groupId, List<String> matchIds) =>
+      _run(() => _api.reorder(eventId, groupId, matchIds));
+
+  Future<void> moveTeamMember({
+    required String participantId,
+    required String fromTeamId,
+    required String toTeamId,
+  }) => _run(
+    () => _api.moveTeamMember(
+      eventId,
+      participantId: participantId,
+      fromTeamId: fromTeamId,
+      toTeamId: toTeamId,
+    ),
+  );
+
+  Future<void> waiveRest(String matchId) =>
+      _run(() => _api.waiveRest(eventId, matchId));
+
   // Reloads after it, and after a 404 too: the match or group was already gone.
   Future<T> _run<T>(Future<T> Function() call) async {
     try {

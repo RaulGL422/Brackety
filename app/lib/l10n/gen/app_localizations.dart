@@ -98,6 +98,12 @@ abstract class AppLocalizations {
     Locale('es'),
   ];
 
+  /// No description provided for @matPlannedAt.
+  ///
+  /// In es, this message translates to:
+  /// **'Previsto hacia las {time}'**
+  String matPlannedAt(String time);
+
   /// No description provided for @controlMenu.
   ///
   /// In es, this message translates to:

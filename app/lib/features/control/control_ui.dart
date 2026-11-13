@@ -74,6 +74,64 @@ Future<MatOverview?> pickMat(
   );
 }
 
+/// For the referee, on a pending match of their mat: send it to another mat with a referee.
+class RefereeMoveMenu extends ConsumerWidget {
+  const RefereeMoveMenu({
+    super.key,
+    required this.board,
+    required this.match,
+    required this.onChanged,
+  });
+
+  final MatBoard board;
+  final BoardMatch match;
+  final VoidCallback onChanged;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    return PopupMenuButton<bool>(
+      tooltip: l10n.controlMenu,
+      icon: const Icon(Icons.more_vert),
+      itemBuilder: (_) => [
+        PopupMenuItem(value: true, child: Text(l10n.controlMoveMatch)),
+      ],
+      onSelected: (_) async {
+        final mats = board.mats
+            .where((m) => m.hasReferee && m.number != board.matNumber)
+            .toList();
+        final mat = await showDialog<MatChoice>(
+          context: context,
+          builder: (context) => SimpleDialog(
+            title: Text(l10n.controlPickMat),
+            children: [
+              if (mats.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(AppSpacing.l),
+                  child: Text(l10n.controlNoOtherMat),
+                ),
+              for (final m in mats)
+                SimpleDialogOption(
+                  onPressed: () => Navigator.pop(context, m),
+                  child: Text(l10n.matTitle(m.number)),
+                ),
+            ],
+          ),
+        );
+        if (mat == null || !context.mounted) return;
+        if (await runControl(
+          context,
+          () => ref
+              .read(controlRepositoryProvider)
+              .moveAsReferee(match.id, mat.id),
+        )) {
+          onChanged();
+        }
+      },
+    );
+  }
+}
+
 enum _MatchChoice { move, waiveRest }
 
 /// For the club, on a pending match of a mat: move it to another mat (individual only) or let it
@@ -95,16 +153,14 @@ class MatchControlMenu extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final team = match.red.teamNumber != null;
     return PopupMenuButton<_MatchChoice>(
       tooltip: l10n.controlMenu,
       icon: const Icon(Icons.more_vert),
       itemBuilder: (_) => [
-        if (!team)
-          PopupMenuItem(
-            value: _MatchChoice.move,
-            child: Text(l10n.controlMoveMatch),
-          ),
+        PopupMenuItem(
+          value: _MatchChoice.move,
+          child: Text(l10n.controlMoveMatch),
+        ),
         PopupMenuItem(
           value: _MatchChoice.waiveRest,
           child: Text(l10n.controlWaiveRest),

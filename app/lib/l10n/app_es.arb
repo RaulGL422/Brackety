@@ -1,4 +1,6 @@
 {
+  "matPlannedAt": "Previsto hacia las {time}",
+  "@matPlannedAt": {"placeholders": {"time": {"type": "String"}}},
   "controlMenu": "Cambiar",
   "controlDone": "Hecho",
   "controlError": "No se pudo hacer el cambio. Recarga y vuelve a intentarlo.",

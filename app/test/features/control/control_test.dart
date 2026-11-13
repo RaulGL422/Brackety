@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/offline_fakes.dart';
+
 class _FakeControl extends ControlRepository {
   _FakeControl() : super(Dio());
 
@@ -34,6 +36,10 @@ class _FakeControl extends ControlRepository {
   @override
   Future<void> waiveRest(String eventId, String matchId) async =>
       calls.add('waiveRest $eventId $matchId');
+
+  @override
+  Future<void> moveAsReferee(String matchId, String matId) async =>
+      calls.add('referee moves $matchId $matId');
 }
 
 void main() {
@@ -164,6 +170,64 @@ void main() {
     await tester.pumpAndSettle();
     expect(control.calls, ['waiveRest e1 m2']);
   });
+
+  testWidgets(
+    'the referee sends a match of their queue to a mat with a referee',
+    (tester) async {
+      tester.view.physicalSize = const Size(800, 1280);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final refereeBoard = MatBoard(
+        eventId: 'e1',
+        matNumber: 2,
+        groups: board.groups,
+        matches: board.matches,
+        recommendedMatchId: 'm1',
+        mats: const [
+          MatChoice(id: 'mat1', number: 1, hasReferee: true),
+          MatChoice(id: 'mat2', number: 2, hasReferee: true),
+          MatChoice(id: 'mat3', number: 3, hasReferee: false),
+        ],
+      );
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            ...quietQueueOverrides(),
+            cachedBoardProvider.overrideWith(
+              (ref, matId) async => refereeBoard,
+            ),
+            controlRepositoryProvider.overrideWithValue(control),
+          ],
+          child: MaterialApp(
+            builder: (_, child) => ToastHost(child: child!),
+            theme: lightTheme(),
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              ...coreLocalizationsDelegates,
+            ],
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: const MatBoardScreen(matId: 'mat2'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('Change').at(1));
+      await tester.pumpAndSettle();
+      // Only moving: the rest and the groups are the club's.
+      expect(
+        find.text('Let it start without waiting for the rest'),
+        findsNothing,
+      );
+      await tester.tap(find.text('Move this match to another mat'));
+      await tester.pumpAndSettle();
+      expect(find.text('Mat 3'), findsNothing);
+      await tester.tap(find.text('Mat 1'));
+      await tester.pumpAndSettle();
+
+      expect(control.calls, ['referee moves m3 mat1']);
+    },
+  );
 
   testWidgets('the group moves and its pending matches can be reordered', (
     tester,
