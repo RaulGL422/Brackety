@@ -225,7 +225,10 @@ class LeagueStandingsService {
         header.add("Descalificaciones en la liga");
         var rows = result.rows().stream()
                 .map(r -> {
-                    var cells = new ArrayList<Object>(List.of(r.categoryName(), r.position()));
+                    var cells = new ArrayList<Object>();
+                    cells.add(r.categoryName());
+                    // With 0 points nobody has a place yet (the app shows a dash too).
+                    cells.add(r.total() > 0 ? r.position() : null);
                     cells.add(SheetText.medal(r.medal()));
                     cells.add(r.firstName());
                     cells.add(r.lastName());

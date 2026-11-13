@@ -256,8 +256,17 @@ void main() {
       expect(find.text('This phase'), findsNothing);
       expect(find.textContaining('40 entries'), findsOneWidget);
       expect(find.text('Zoe Test'), findsOneWidget);
-      expect(find.textContaining('P1: 30   P2: 15'), findsOneWidget);
-      expect(find.textContaining('P1: 10   P2: –'), findsOneWidget);
+      expect(
+        find.textContaining(
+          'Phase 1: 30 (10 for attending + 20 in matches)\n'
+          'Phase 2: 15 (10 for attending + 5 in matches)',
+        ),
+        findsOneWidget,
+      );
+      expect(find.textContaining('Phase 2: not entered'), findsOneWidget);
+      // One heading per category, in the league's order.
+      expect(find.text('8-11 · 1 person'), findsOneWidget);
+      expect(find.text('4-7 · 1 person'), findsOneWidget);
       expect(find.byTooltip('Gold'), findsOneWidget);
 
       await tester.ensureVisible(find.text('All categories'));
