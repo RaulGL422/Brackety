@@ -77,11 +77,13 @@ class BoardGroup {
 }
 
 /// Why a pending match cannot start now.
-enum WaitReason { review, busy, resting, otherMat }
+enum WaitReason { review, busy, resting, otherMat, afterIndividual, reserved }
 
 WaitReason? waitReasonFromJson(String? value) => switch (value) {
   'REVIEW' => WaitReason.review,
   'BUSY' => WaitReason.busy,
+  'AFTER_INDIVIDUAL' => WaitReason.afterIndividual,
+  'RESERVED' => WaitReason.reserved,
   'RESTING' => WaitReason.resting,
   'OTHER_MAT' => WaitReason.otherMat,
   _ => null,
@@ -132,6 +134,7 @@ class BoardMatch {
     this.pool = false,
     this.redCorner,
     this.blueCorner,
+    this.plannedAt,
   });
 
   factory BoardMatch.fromJson(Map<String, dynamic> json) => BoardMatch(
@@ -154,6 +157,10 @@ class BoardMatch {
     pool: json['pool'] as bool? ?? false,
     redCorner: _corner(json['redCorner']),
     blueCorner: _corner(json['blueCorner']),
+    plannedAt: switch (json['plannedAt']) {
+      final String at => DateTime.parse(at),
+      _ => null,
+    },
   );
 
   final String id;
@@ -187,6 +194,9 @@ class BoardMatch {
   final CornerState? redCorner;
   final CornerState? blueCorner;
 
+  /// Pending: when it would start on this mat if all goes as planned (an estimate).
+  final DateTime? plannedAt;
+
   BoardMatch copyWith({
     MatchStatus? status,
     int? redScore,
@@ -210,7 +220,27 @@ class BoardMatch {
     pool: pool,
     redCorner: redCorner,
     blueCorner: blueCorner,
+    plannedAt: plannedAt,
   );
+}
+
+/// A mat of the event, to send a match to: only one with a referee takes it.
+class MatChoice {
+  const MatChoice({
+    required this.id,
+    required this.number,
+    required this.hasReferee,
+  });
+
+  factory MatChoice.fromJson(Map<String, dynamic> json) => MatChoice(
+    id: json['id'] as String,
+    number: json['number'] as int,
+    hasReferee: json['hasReferee'] as bool,
+  );
+
+  final String id;
+  final int number;
+  final bool hasReferee;
 }
 
 class MatBoard {
@@ -222,6 +252,7 @@ class MatBoard {
     this.offline = false,
     this.teamPool = false,
     this.eventId,
+    this.mats = const [],
   });
 
   factory MatBoard.fromJson(Map<String, dynamic> json) => MatBoard(
@@ -237,6 +268,10 @@ class MatBoard {
     recommendedMatchId: json['recommendedMatchId'] as String?,
     teamPool: json['teamPool'] as bool? ?? false,
     eventId: json['eventId'] as String?,
+    mats: [
+      for (final m in json['mats'] as List? ?? const [])
+        MatChoice.fromJson(m as Map<String, dynamic>),
+    ],
   );
 
   final int matNumber;
@@ -252,4 +287,7 @@ class MatBoard {
 
   /// The phase: its rulebook opens from the mat. Null in a board cached before it was sent.
   final String? eventId;
+
+  /// The event's mats.
+  final List<MatChoice> mats;
 }

@@ -79,7 +79,7 @@ class Corner implements FighterInfo {
   @override
   final List<String> members;
 
-  /// Aged 4 to 7 (for a team, someone in it): the one-hand warning applies.
+  /// Aged 4 to 8 (for a team, someone in it): the one-hand warning applies.
   final bool oneHandRule;
   final int points;
   final int warnings;
@@ -332,6 +332,7 @@ class MatchView {
     this.endReason,
     this.serverTime,
     this.review,
+    this.readyAt,
   });
 
   factory MatchView.fromJson(Map<String, dynamic> json) => MatchView(
@@ -364,6 +365,10 @@ class MatchView {
       final Map<String, dynamic> review => MatchReview.fromJson(review),
       _ => null,
     },
+    readyAt: switch (json['readyAt']) {
+      final String at => DateTime.parse(at),
+      _ => null,
+    },
   );
 
   Map<String, dynamic> toJson() => {
@@ -391,6 +396,7 @@ class MatchView {
     'timeline': [for (final e in timeline) e.toJson()],
     'serverTime': serverTime?.toUtc().toIso8601String(),
     'review': review?.toJson(),
+    'readyAt': readyAt?.toUtc().toIso8601String(),
   };
 
   final String id;
@@ -419,6 +425,9 @@ class MatchView {
   /// Set while the club has to review what a device sent: nothing more is accepted.
   final MatchReview? review;
 
+  /// Pending and a fighter has not had the least rest yet: it cannot start before this.
+  final DateTime? readyAt;
+
   /// What the device counts in `knownEvents`: the automatic stops are left out.
   int get knownEvents => timeline.where((e) => !e.automatic).length;
 
@@ -440,6 +449,7 @@ class MatchView {
     timeline: timeline,
     serverTime: serverTime,
     review: review,
+    readyAt: readyAt,
   );
 
   bool get finished => status == MatchStatus.finished;

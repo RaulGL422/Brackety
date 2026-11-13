@@ -72,3 +72,9 @@ Las de octubre de 2026, en `decisiones-2026-10.md`.
 - 2026-11-13 · La F1 usa 3 tapices con 3 árbitros: se configura en el evento (quitar tapices 4 y 5); la demo sigue con 5 · aviso de la organización.
 - 2026-11-13 · Reglamento en PDF por fase: lo sube el club en Configuración (hasta 10 MB), viaja en el paquete al portátil y el árbitro lo abre desde su tapiz con el visor del navegador (en el móvil, la app de PDF) · pedido por Raul.
 - 2026-11-13 · Clasificación de la liga: un apartado por categoría (los puestos cuentan dentro de cada una), sin puesto con 0 puntos y con el desglose asistencia + combates por fase · pedido por Raul.
+- 2026-11-13 · El descanso mínimo se hace cumplir en el marcador y en el servidor (con red); sin red se acepta tal cual · Raul.
+- 2026-11-13 · Un tapiz con combates por jugar no puede quedarse sin árbitro · Raul.
+- 2026-11-13 · Panel de control en el club y el superadmin: mover grupos y combates pendientes, reordenar, cambiar alumnos de equipo (solo grupos sin empezar) y dejar empezar sin descanso · Raul ("tener yo el control de todo").
+- 2026-11-13 · Reparto de equipos: siguen en el bote común, que ya equilibra (el tapiz libre coge el siguiente); no se pre-asignan por tapiz · Raul.
+- 2026-11-13 · Cada tapiz enseña su orden previsto (recalculado con cada cambio, sin guardar un orden fijo); club, superadmin y árbitros pueden mover un combate pendiente a otro tapiz, también los de equipos · Raul.
+- 2026-11-13 · F1 real: 3 tapices; 5-8 individual y siempre a dos manos (aviso de una mano ampliado a 4-8 años); 9-12, 13-16 y 17+ por equipos (2 o 3); cuentas del portátil con usuario = contraseña; botón del superadmin para reiniciar el evento desde el paquete · Raul.

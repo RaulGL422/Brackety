@@ -8,6 +8,7 @@ import java.util.UUID;
  * phase). {@code phases} of a row follow {@code phases} of the league; null where they did not enter. {@code medal}:
  * 1, 2 or 3 by the category's podium, or null. {@code warnings} (both kinds) and {@code disqualifications}: in every
  * match of the league they fought, also as a wildcard; in a team match, the team's count for each member.
+ * {@code eventId} and {@code participantId}: their entry in the latest phase they are in, to open their record.
  */
 public record LeagueStandings(List<Phase> phases, List<Row> rows) {
 
@@ -31,5 +32,7 @@ public record LeagueStandings(List<Phase> phases, List<Row> rows) {
             List<PhasePoints> phases,
             int total,
             int warnings,
-            int disqualifications) {}
+            int disqualifications,
+            UUID eventId,
+            UUID participantId) {}
 }

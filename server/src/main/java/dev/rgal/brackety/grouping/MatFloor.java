@@ -30,9 +30,13 @@ class MatFloor {
     /** Why a pending match cannot start now. */
     enum Wait {
         REVIEW,
+        /** A team match of this mat's queue: it waits for the mat's individual matches (Raul, 2026-11-13). */
+        AFTER_INDIVIDUAL,
         BUSY,
         RESTING,
-        OTHER_MAT
+        OTHER_MAT,
+        /** Someone in it is in the match proposed to another mat: expected there first. A hint, like OTHER_MAT. */
+        RESERVED
     }
 
     record Floor(
@@ -58,6 +62,9 @@ class MatFloor {
             if (m.isInReview()) {
                 return Wait.REVIEW;
             }
+            if (m.getMatId() == null && !takesPool(matId)) {
+                return Wait.AFTER_INDIVIDUAL;
+            }
             var c = candidate(m);
             if (!context.isFree(c)) {
                 return Wait.BUSY;
@@ -65,7 +72,21 @@ class MatFloor {
             if (!context.isReady(c)) {
                 return Wait.RESTING;
             }
-            return proposedTo(m).filter(other -> !other.equals(matId)).isPresent() ? Wait.OTHER_MAT : null;
+            if (proposedTo(m).filter(other -> !other.equals(matId)).isPresent()) {
+                return Wait.OTHER_MAT;
+            }
+            return reservedBy(m, matId).isPresent() ? Wait.RESERVED : null;
+        }
+
+        /** Another mat whose proposed match has someone of {@code m}. */
+        Optional<UUID> reservedBy(Match m, UUID matId) {
+            var people = context.people(candidate(m));
+            return proposals.entrySet().stream()
+                    .filter(e ->
+                            !e.getKey().equals(matId) && !e.getValue().matchId().equals(m.getId()))
+                    .filter(e -> context.people(e.getValue()).stream().anyMatch(people::contains))
+                    .map(Map.Entry::getKey)
+                    .findFirst();
         }
 
         Instant readyAt(Match m) {
@@ -159,7 +180,11 @@ class MatFloor {
                 busy,
                 Set.of(),
                 competitors.teamMembers(),
-                Duration.ofSeconds(event.getMinRestSeconds()));
+                Duration.ofSeconds(event.getMinRestSeconds()),
+                eventMatches.stream()
+                        .filter(Match::isRestWaived)
+                        .map(Match::getId)
+                        .collect(Collectors.toSet()));
 
         var views = new HashMap<UUID, MatView>();
         for (var mat : eventMats) {

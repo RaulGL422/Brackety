@@ -19,6 +19,7 @@ class DraftPanel extends StatelessWidget {
     required this.onCreate,
     required this.labelOf,
     this.onPickGhostTeam,
+    this.ghostTeamLabel,
   });
 
   final String eventId;
@@ -37,6 +38,9 @@ class DraftPanel extends StatelessWidget {
   /// Opens the ghost team picker; only for groups of teams.
   final VoidCallback? onPickGhostTeam;
 
+  /// Names a wildcard team in its slot.
+  final String Function(List<String> people)? ghostTeamLabel;
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -45,7 +49,7 @@ class DraftPanel extends StatelessWidget {
     final hint = !group.ofTeams && group.ghostMode && !group.isComplete
         ? l10n.draftGhostHint
         : group.ofTeams && group.ghostMode
-        ? l10n.draftGhostTeamHint(DraftGroup.maxTeam)
+        ? l10n.draftGhostTeamPanelHint
         : group.ofTeams
         ? l10n.teamGroupPoolHint
         : null;
@@ -95,7 +99,12 @@ class DraftPanel extends StatelessWidget {
                   ),
                 ],
               ),
-              DraftSlots(group: group, labelOf: labelOf, onChanged: onChanged),
+              DraftSlots(
+                group: group,
+                labelOf: labelOf,
+                onChanged: onChanged,
+                ghostTeamLabel: ghostTeamLabel,
+              ),
               if (hint != null)
                 Text(
                   hint,
@@ -109,7 +118,7 @@ class DraftPanel extends StatelessWidget {
                     minimumSize: const Size.fromHeight(AppSizes.touchTarget),
                   ),
                   icon: const Icon(Icons.group_add_outlined),
-                  label: Text(l10n.addGhostTeam),
+                  label: Text(l10n.formGhostTeam),
                   onPressed: onPickGhostTeam,
                 ),
               // A group of teams has no mat: its matches go to the free mats.

@@ -10,6 +10,8 @@ public interface TeamMemberRepository extends JpaRepository<TeamMember, UUID> {
 
     List<TeamMember> findByParticipantIdInAndGhostFalse(Collection<UUID> participantIds);
 
+    List<TeamMember> findByTeamIdIn(Collection<UUID> teamIds);
+
     @Query("select m from TeamMember m where m.teamId in (select t.id from Team t where t.eventId = :eventId)"
             + " order by m.position")
     List<TeamMember> findByEventId(UUID eventId);

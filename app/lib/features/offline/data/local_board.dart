@@ -46,5 +46,6 @@ MatBoard localBoard(
     offline: board.offline,
     teamPool: board.teamPool,
     eventId: board.eventId,
+    mats: board.mats,
   );
 }

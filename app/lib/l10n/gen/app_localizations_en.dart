@@ -10,6 +10,136 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get draftGhostTeamPanelHint =>
+      'Wildcard teams (up to 3): tap a team of another group in the list, or make one with loose participants. They fight but do not score.';
+
+  @override
+  String get teamJoinsAsWildcard => 'Tap to join as a wildcard team';
+
+  @override
+  String get ghostTeamPageTitle => 'Make a wildcard team';
+
+  @override
+  String get ghostTeamSearch => 'Search a participant';
+
+  @override
+  String get formGhostTeam => 'Make a wildcard team with loose participants';
+
+  @override
+  String get teamPickWildcards => 'Pick wildcards';
+
+  @override
+  String matReservedElsewhere(int mat) {
+    return 'Someone in this match is expected on mat $mat now';
+  }
+
+  @override
+  String get matAfterIndividual => 'After your individual group';
+
+  @override
+  String matPlannedAt(String time) {
+    return 'Expected around $time';
+  }
+
+  @override
+  String get controlMenu => 'Change';
+
+  @override
+  String get controlDone => 'Done';
+
+  @override
+  String get controlError =>
+      'The change could not be made. Reload and try again.';
+
+  @override
+  String get controlMatchInProgress =>
+      'A match of this group is in progress: wait until it ends.';
+
+  @override
+  String get controlMatchNotPending =>
+      'That match has started: it cannot change.';
+
+  @override
+  String get controlMatWithoutReferee => 'That mat has no referee.';
+
+  @override
+  String get controlOrderChanged =>
+      'The matches changed meanwhile: reload and order them again.';
+
+  @override
+  String get controlTeamSize => 'Teams must stay of 2 or 3.';
+
+  @override
+  String get controlGroupStarted =>
+      'The group of those teams has started: its teams no longer change.';
+
+  @override
+  String get controlSameFighter =>
+      'That person already fights in the other team\'s group (as a wildcard).';
+
+  @override
+  String get controlPickMat => 'To which mat?';
+
+  @override
+  String get controlNoOtherMat => 'No other mat has a referee.';
+
+  @override
+  String controlMatOption(int number, String referee, int pending) {
+    String _temp0 = intl.Intl.pluralLogic(
+      pending,
+      locale: localeName,
+      other: '$pending pending',
+      one: '1 pending',
+      zero: 'nothing pending',
+    );
+    return 'Mat $number · $referee · $_temp0';
+  }
+
+  @override
+  String get controlMoveMatch => 'Move this match to another mat';
+
+  @override
+  String get controlWaiveRest => 'Let it start without waiting for the rest';
+
+  @override
+  String get controlWaiveRestTitle => 'Start without the least rest?';
+
+  @override
+  String controlWaiveRestBody(String red, String blue) {
+    return '$red against $blue may start although someone has not rested. Who allowed it is recorded.';
+  }
+
+  @override
+  String get controlConfirm => 'Yes, allow';
+
+  @override
+  String get controlMoveGroup => 'Move the group to another mat';
+
+  @override
+  String get controlReorder => 'Change the order of the matches';
+
+  @override
+  String get controlReorderHint =>
+      'Drag to order the pending matches. The played ones do not change.';
+
+  @override
+  String get controlMoveMember => 'Move a participant to another team';
+
+  @override
+  String get controlMoveMemberWho => 'Who changes?';
+
+  @override
+  String get controlMoveMemberTo => 'To which team?';
+
+  @override
+  String get settingsMatNeedsReferee =>
+      'That mat has matches to play: it cannot be left without a referee. Assign another referee or wait until they finish.';
+
+  @override
+  String get refusalResting =>
+      'Not yet: someone in this match has not had the least rest since their last match. Wait until the board unlocks it.';
+
+  @override
   String cornerFightingNow(int mat) {
     return 'Fighting on mat $mat';
   }
@@ -1745,7 +1875,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get refusalNotForAge =>
-      'The one-hand warning is only for fighters aged 4 to 7.';
+      'The one-hand warning is only for fighters aged 4 to 8.';
 
   @override
   String get refusalInReview => 'The match is under the club\'s review.';
@@ -1769,7 +1899,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'The scoreboard rules did not allow one of the phone\'s actions.';
 
   @override
-  String get reviewReasonAge => 'One-hand warning to someone not aged 4 to 7.';
+  String get reviewReasonAge => 'One-hand warning to someone not aged 4 to 8.';
 
   @override
   String get reviewReasonMatBusy => 'Another match was in progress on the mat.';

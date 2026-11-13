@@ -110,14 +110,18 @@ class MatchController extends AsyncNotifier<MatchView> {
     final local = _local();
     if (local == null) return const ActionRefusal.server('');
     final now = _sync.now();
+    final firstStart =
+        action == MatchAction.start && local.view.status == MatchStatus.pending;
     final refusal =
         local.refuse(action, side, now, delta: delta ?? Duration.zero) ??
         // A first start or a reopening takes the mat: not while another match is on it.
-        (((action == MatchAction.start &&
-                        local.view.status == MatchStatus.pending) ||
-                    action == MatchAction.reopen) &&
+        ((firstStart || action == MatchAction.reopen) &&
                 _matBusy(local.view, now)
             ? MatchRefusal.matBusy
+            : null) ??
+        // The least rest since each fighter's last match, as the server last said.
+        (firstStart && (local.view.readyAt?.isAfter(now) ?? false)
+            ? MatchRefusal.resting
             : null);
     if (refusal != null) return ActionRefusal.local(refusal);
     final queued = await _sync.enqueue(

@@ -24,7 +24,9 @@ class RejectedOp {
         MAT_BUSY,
         FIGHTER_BUSY,
         /** It arrived while the match was already waiting for the review. */
-        IN_REVIEW
+        IN_REVIEW,
+        /** A fighter had not had the least rest: only refused online, never stored. */
+        FIGHTER_RESTING
     }
 
     enum Resolution {

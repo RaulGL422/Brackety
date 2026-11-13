@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/async_view.dart';
 import '../../../core/page_header.dart';
+import '../../../core/reason_dialog.dart';
+import '../../../core/run_action.dart';
 import '../../../core/table_line.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../data/events_api.dart';
@@ -40,6 +42,7 @@ class _EventList extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         PageHeader(title: l10n.eventsTitle, onRefresh: refresh),
+        const _EventReset(),
         const SizedBox(height: AppSpacing.m),
         Expanded(
           child: AsyncView(
@@ -52,6 +55,55 @@ class _EventList extends ConsumerWidget {
         ),
       ],
     );
+  }
+}
+
+/// On the hall laptop: everything back to the package it started with.
+class _EventReset extends ConsumerWidget {
+  const _EventReset();
+
+  static const _typed = 'REINICIAR';
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final package = ref.watch(resetPackageProvider).value;
+    if (package == null) return const SizedBox.shrink();
+    final l10n = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.s),
+      child: Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: OutlinedButton.icon(
+          icon: const Icon(Icons.restart_alt),
+          label: Text(l10n.eventReset),
+          onPressed: () => _reset(context, ref, package),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _reset(
+    BuildContext context,
+    WidgetRef ref,
+    String package,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final reason = await askReason(
+      context,
+      title: l10n.eventResetTitle,
+      body: l10n.eventResetBody(package, _typed),
+      confirmLabel: l10n.eventReset,
+      typeToConfirm: _typed,
+    );
+    if (reason == null || !context.mounted) return;
+    await runAction(
+      context,
+      () => ref.read(eventsApiProvider).resetEvent(reason),
+      done: (_) => l10n.eventResetDone,
+      notFound: l10n.eventChanged,
+    );
+    ref.read(selectedEventProvider.notifier).close();
+    ref.read(eventsProvider.notifier).refresh();
   }
 }
 

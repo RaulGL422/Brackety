@@ -50,18 +50,61 @@ final class MatchRecommender {
             Set<UUID> busy,
             Set<UUID> justFought,
             Map<UUID, Set<UUID>> teamMembers,
-            Duration minRest) {
+            Duration minRest,
+            Set<UUID> restWaived) {
+
+        /** {@code restWaived}: matches the club let start without the least rest. */
+        Context(
+                Instant now,
+                Duration slot,
+                Map<UUID, Instant> lastFought,
+                Map<UUID, Instant> groupCreated,
+                Map<UUID, Instant> groupLastPlayed,
+                Set<UUID> busy,
+                Set<UUID> justFought,
+                Map<UUID, Set<UUID>> teamMembers,
+                Duration minRest) {
+            this(
+                    now,
+                    slot,
+                    lastFought,
+                    groupCreated,
+                    groupLastPlayed,
+                    busy,
+                    justFought,
+                    teamMembers,
+                    minRest,
+                    Set.of());
+        }
 
         Context forMat(Duration slot, Set<UUID> justFought) {
             return new Context(
-                    now, slot, lastFought, groupCreated, groupLastPlayed, busy, justFought, teamMembers, minRest);
+                    now,
+                    slot,
+                    lastFought,
+                    groupCreated,
+                    groupLastPlayed,
+                    busy,
+                    justFought,
+                    teamMembers,
+                    minRest,
+                    restWaived);
         }
 
         Context alsoBusy(Set<UUID> more) {
             var all = new HashSet<>(busy);
             all.addAll(more);
             return new Context(
-                    now, slot, lastFought, groupCreated, groupLastPlayed, all, justFought, teamMembers, minRest);
+                    now,
+                    slot,
+                    lastFought,
+                    groupCreated,
+                    groupLastPlayed,
+                    all,
+                    justFought,
+                    teamMembers,
+                    minRest,
+                    restWaived);
         }
 
         boolean isFree(Candidate c) {
@@ -74,6 +117,9 @@ final class MatchRecommender {
 
         /** When every person of the match has had the least rest: {@code Instant.MIN} if nobody has fought. */
         Instant readyAt(Candidate c) {
+            if (restWaived.contains(c.matchId())) {
+                return Instant.MIN;
+            }
             return people(c).stream()
                     .filter(lastFought::containsKey)
                     .map(p -> lastFought.get(p).plus(minRest))

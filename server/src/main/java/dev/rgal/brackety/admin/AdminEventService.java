@@ -10,6 +10,8 @@ import dev.rgal.brackety.admin.dto.AdminEventDtos.Match;
 import dev.rgal.brackety.admin.dto.AdminEventDtos.Member;
 import dev.rgal.brackety.admin.dto.AdminEventDtos.PlannedMatch;
 import dev.rgal.brackety.admin.dto.AdminEventDtos.Side;
+import dev.rgal.brackety.admin.dto.AdminEventDtos.Team;
+import dev.rgal.brackety.admin.dto.AdminEventDtos.TeamPerson;
 import dev.rgal.brackety.auth.admin.AdminAuditLog;
 import dev.rgal.brackety.event.EventException;
 import dev.rgal.brackety.event.StaffNames;
@@ -150,12 +152,57 @@ class AdminEventService {
                         rs.getString("email"),
                         rs.getInt("entry_count"),
                         List.of(),
+                        List.of(),
                         List.of()))
                 .optional()
                 .orElseThrow(EventException::notFound);
         var groups = groups(eventId);
         return new EventDetail(
-                head.id(), head.name(), head.date(), head.ownerEmail(), head.entries(), mats(eventId, groups), groups);
+                head.id(),
+                head.name(),
+                head.date(),
+                head.ownerEmail(),
+                head.entries(),
+                mats(eventId, groups),
+                groups,
+                teams(eventId));
+    }
+
+    private List<Team> teams(UUID eventId) {
+        var members = new HashMap<UUID, List<TeamPerson>>();
+        jdbc.sql("""
+                        select tm.team_id, tm.participant_id, p.first_name || ' ' || p.last_name as name, tm.ghost
+                        from team_member tm
+                        join team t on t.id = tm.team_id
+                        join participant p on p.id = tm.participant_id
+                        where t.event_id = :eventId and not t.ghost
+                        order by tm.team_id, tm.position""").param("eventId", eventId).query(rs -> {
+            members.computeIfAbsent(rs.getObject("team_id", UUID.class), k -> new ArrayList<>())
+                    .add(new TeamPerson(
+                            rs.getObject("participant_id", UUID.class), rs.getString("name"), rs.getBoolean("ghost")));
+        });
+        return jdbc.sql("""
+                        select t.id, t.number, c.name as category, g.number as group_number,
+                               exists (select 1 from fight_match f where f.group_id = g.id and (f.status <> 'PENDING'
+                                 or exists (select 1 from match_event e where e.match_id = f.id))) as started
+                        from team t
+                        join event_category c on c.id = t.category_id
+                        left join group_member gm on gm.team_id = t.id and not gm.ghost
+                        left join fight_group g on g.id = gm.group_id
+                        where t.event_id = :eventId and not t.ghost
+                        order by t.number""")
+                .param("eventId", eventId)
+                .query((rs, n) -> {
+                    var id = rs.getObject("id", UUID.class);
+                    return new Team(
+                            id,
+                            rs.getInt("number"),
+                            rs.getString("category"),
+                            rs.getObject("group_number", Integer.class),
+                            rs.getBoolean("started"),
+                            members.getOrDefault(id, List.of()));
+                })
+                .list();
     }
 
     private List<Mat> mats(UUID eventId, List<Group> groups) {

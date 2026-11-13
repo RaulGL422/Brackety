@@ -46,6 +46,12 @@ public class Match {
     private String disqualifiedSide;
     /** Why an offline action clashed; while set, the match takes no actions until the club reviews it. */
     private String reviewReason;
+    /** Set when the club or the superadmin lets it start without the least rest. */
+    private UUID restWaivedBy;
+
+    private Instant restWaivedAt;
+    /** A team match sent to a mat by hand: it no longer goes back to the pool. */
+    private boolean pinned;
 
     protected Match() {}
 
@@ -86,15 +92,37 @@ public class Match {
         this.matId = matId;
     }
 
-    /** A pending match of a group without mat (of teams) goes back to the pool; any other keeps its mat. */
+    /**
+     * A pending match of a group without mat (of teams) goes back to the pool; any other keeps its mat, as does one
+     * sent to a mat by hand.
+     */
     public void backToPoolIf(FightGroup group) {
-        if (group.getMatId() == null && status == Status.PENDING) {
+        if (group.getMatId() == null && status == Status.PENDING && !pinned) {
             matId = null;
         }
     }
 
     public int getOrderIndex() {
         return orderIndex;
+    }
+
+    /** A pending individual match goes to another mat (the club's control panel). */
+    void moveTo(UUID matId) {
+        this.matId = matId;
+        this.pinned = true;
+    }
+
+    void order(int orderIndex) {
+        this.orderIndex = orderIndex;
+    }
+
+    public boolean isRestWaived() {
+        return restWaivedAt != null;
+    }
+
+    void waiveRest(UUID by, Instant at) {
+        this.restWaivedBy = by;
+        this.restWaivedAt = at;
     }
 
     /** The red participant's or team's id. */

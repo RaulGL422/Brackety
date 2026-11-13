@@ -227,6 +227,15 @@ public class EventPackageService {
     /** All or nothing; refused if the database already has an event. Results in the package load too. */
     @Transactional
     public LoadedPackage load(byte[] content) {
+        return load(content, false);
+    }
+
+    /**
+     * {@code usernamePasswords}: the staff accounts it creates get their username as password, like the demo ones
+     * (a risk Raul accepted for the F1 laptop); otherwise a random one. Existing accounts keep theirs.
+     */
+    @Transactional
+    public LoadedPackage load(byte[] content, boolean usernamePasswords) {
         var p = parse(content);
         if (events.count() > 0) {
             throw new InvalidEventPackageException(
@@ -234,7 +243,7 @@ public class EventPackageService {
         }
         EventPackageRules.check(p, validator);
         var passwords = new HashMap<String, String>();
-        var accountIds = createAccounts(p, passwords);
+        var accountIds = createAccounts(p, passwords, usernamePasswords);
         var settings = p.event();
         var ownerId = accountIds.get(EventPackageRules.username(p.owner().username()));
         var leagueEntry = p.league();
@@ -570,7 +579,7 @@ public class EventPackageService {
      * Usernames → account ids; the owner gets a club profile, everyone else a helper one. Accounts that already exist
      * keep their password; the new ones get a random one, added to {@code passwords}.
      */
-    private Map<String, UUID> createAccounts(EventPackage p, Map<String, String> passwords) {
+    private Map<String, UUID> createAccounts(EventPackage p, Map<String, String> passwords, boolean usernamePasswords) {
         var owner = EventPackageRules.username(p.owner().username());
         var ids = new HashMap<String, UUID>();
         ids.put(
@@ -580,11 +589,13 @@ public class EventPackageService {
                                 owner,
                                 blankToNull(p.owner().organizationName()),
                                 Cif.normalize(p.owner().taxId()),
-                                newPassword(owner, passwords))));
+                                newPassword(owner, passwords, usernamePasswords))));
         for (var member : p.staff()) {
             var username = member.username();
             ids.computeIfAbsent(
-                    username, u -> existing(u).orElseGet(() -> demoAccounts.helper(u, newPassword(u, passwords))));
+                    username,
+                    u -> existing(u)
+                            .orElseGet(() -> demoAccounts.helper(u, newPassword(u, passwords, usernamePasswords))));
         }
         return ids;
     }
@@ -593,8 +604,8 @@ public class EventPackageService {
         return accounts.findByEmail(username).map(Account::getId);
     }
 
-    private static String newPassword(String username, Map<String, String> passwords) {
-        var password = StaffPasswords.next();
+    private static String newPassword(String username, Map<String, String> passwords, boolean usernamePasswords) {
+        var password = usernamePasswords ? username : StaffPasswords.next();
         passwords.put(username, password);
         return password;
     }

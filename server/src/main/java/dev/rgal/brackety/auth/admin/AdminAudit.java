@@ -21,7 +21,9 @@ class AdminAudit {
         COMPETITION_CLEARED,
         USER_SUSPENDED,
         USER_UNSUSPENDED,
-        USER_DELETED
+        USER_DELETED,
+        /** A change from the control panel (MatchControlService); the reason says which. */
+        CONTROL_CHANGE
     }
 
     @Id

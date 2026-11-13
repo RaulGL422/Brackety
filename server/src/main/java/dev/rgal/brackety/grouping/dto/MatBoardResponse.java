@@ -17,7 +17,11 @@ public record MatBoardResponse(
         List<BoardMatch> matches,
         UUID recommendedMatchId,
         boolean teamPool,
-        UUID eventId) {
+        UUID eventId,
+        List<MatChoice> mats) {
+
+    /** The event's mats, for moving a match to another one: only those with a referee take it. */
+    public record MatChoice(UUID id, int number, boolean hasReferee) {}
 
     /**
      * A participant ({@code participantId}) or a team ({@code teamId}, {@code teamNumber}); {@code members}
@@ -31,7 +35,9 @@ public record MatBoardResponse(
 
     /**
      * {@code available}: it can start now. {@code waitReason} says why not: REVIEW (an offline action clashed and
-     * the club has to apply or discard it), BUSY (someone is fighting on a mat) or RESTING (someone has not had the
+     * the club has to apply or discard it), AFTER_INDIVIDUAL (a team match of this mat's queue, after its individual
+     * matches), RESERVED (someone in it is in the match proposed to mat {@code otherMatNumber}: a hint, it stays
+     * available), BUSY (someone is fighting on a mat) or RESTING (someone has not had the
      * least rest; until {@code readyAt}). OTHER_MAT (proposed to mat {@code otherMatNumber}) is only a hint: it stays
      * available, so a stalled mat never holds it. {@code pool}: a team match waiting for a free mat.
      */
@@ -52,7 +58,8 @@ public record MatBoardResponse(
             Integer otherMatNumber,
             boolean pool,
             Corner redCorner,
-            Corner blueCorner) {}
+            Corner blueCorner,
+            Instant plannedAt) {}
 
     /**
      * Where a pending match's fighter (all of a team's people) is now, so the referee knows when to call them:

@@ -26,8 +26,27 @@ public final class AdminEventDtos {
             int matchesFinished,
             int matches) {}
 
+    /** {@code teams}: the real teams, for the control panel (who can change team). */
     public record EventDetail(
-            UUID id, String name, LocalDate date, String ownerEmail, int entries, List<Mat> mats, List<Group> groups) {}
+            UUID id,
+            String name,
+            LocalDate date,
+            String ownerEmail,
+            int entries,
+            List<Mat> mats,
+            List<Group> groups,
+            List<Team> teams) {}
+
+    /** {@code groupNumber}: the group it fights in, or null; {@code groupStarted}: then its members no longer change. */
+    public record Team(
+            UUID id,
+            int number,
+            String category,
+            Integer groupNumber,
+            boolean groupStarted,
+            List<TeamPerson> members) {}
+
+    public record TeamPerson(UUID participantId, String name, boolean ghost) {}
 
     /**
      * {@code referee}: the referee ("Juan Pérez (arbitro1)", or the sign-in alone), null when the mat has none.

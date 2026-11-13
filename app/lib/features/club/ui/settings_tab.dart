@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/async_view.dart';
 import '../../rulebook/rulebook_ui.dart';
+import '../../auth/data/api_error.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../auth/ui/widgets/confirm_dialog.dart';
 import '../../events/state/events_providers.dart';
@@ -417,7 +418,9 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
       );
     } on DioException catch (e) {
       toasts.show(
-        rulesChanged && e.response?.statusCode == 409
+        ApiError.from(e).code == 'MAT_HAS_MATCHES'
+            ? l10n.settingsMatNeedsReferee
+            : rulesChanged && e.response?.statusCode == 409
             ? l10n.settingsMatchRulesConflict
             : saveErrorMessage(l10n, e),
         kind: ToastKind.error,

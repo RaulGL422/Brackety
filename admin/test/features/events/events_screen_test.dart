@@ -7,9 +7,12 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../support/fakes.dart';
 
 class FakeEventsApi implements EventsApi {
-  FakeEventsApi({this.total = 1});
+  FakeEventsApi({this.total = 1, this.package});
 
   final int total;
+
+  /// The hall laptop's package; null on a server without one.
+  final String? package;
   final pages = <int>[];
   final calls = <String>[];
   DioException? error;
@@ -125,6 +128,40 @@ class FakeEventsApi implements EventsApi {
   }
 
   @override
+  Future<void> moveGroup(String eventId, String groupId, String matId) async =>
+      calls.add('moveGroup $groupId $matId');
+
+  @override
+  Future<void> moveMatch(String eventId, String matchId, String matId) async =>
+      calls.add('moveMatch $matchId $matId');
+
+  @override
+  Future<void> reorder(
+    String eventId,
+    String groupId,
+    List<String> matchIds,
+  ) async => calls.add('reorder $groupId');
+
+  @override
+  Future<void> moveTeamMember(
+    String eventId, {
+    required String participantId,
+    required String fromTeamId,
+    required String toTeamId,
+  }) async => calls.add('member $participantId $fromTeamId $toTeamId');
+
+  @override
+  Future<void> waiveRest(String eventId, String matchId) async =>
+      calls.add('waiveRest $matchId');
+
+  @override
+  Future<String?> resetPackage() async => package;
+
+  @override
+  Future<void> resetEvent(String reason) async =>
+      calls.add('resetEvent: $reason');
+
+  @override
   Future<Cleared> clearCompetition(String eventId, String reason) async {
     calls.add('clear $eventId: $reason');
     final cleared = (groups: groups.length, teams: 1);
@@ -134,8 +171,12 @@ class FakeEventsApi implements EventsApi {
 }
 
 void main() {
-  Future<FakeEventsApi> open(WidgetTester tester, {int total = 1}) async {
-    final api = FakeEventsApi(total: total);
+  Future<FakeEventsApi> open(
+    WidgetTester tester, {
+    int total = 1,
+    String? package,
+  }) async {
+    final api = FakeEventsApi(total: total, package: package);
     await pumpAdmin(
       tester,
       location: '/events',
@@ -195,6 +236,58 @@ void main() {
     });
   }
 
+  testWidgets('without a package there is no event reset', (tester) async {
+    useSize(tester, screenSizes['desktop']!);
+    await open(tester);
+
+    expect(find.text('Start the event again from the package'), findsNothing);
+  });
+
+  for (final MapEntry(key: device, value: size) in screenSizes.entries) {
+    testWidgets(
+      'the hall laptop starts the event again, typing the word, on $device',
+      (tester) async {
+        useSize(tester, size);
+        final api = await open(tester, package: 'fase-1.brackety');
+
+        await tester.tap(find.text('Start the event again from the package'));
+        await tester.pumpAndSettle();
+        expect(
+          find.textContaining('fase-1.brackety is loaded again'),
+          findsOneWidget,
+        );
+        final confirm = find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.widgetWithText(
+            FilledButton,
+            'Start the event again from the package',
+          ),
+        );
+        await giveReason(tester, 'Pruebas acabadas');
+        expect(tester.widget<FilledButton>(confirm).onPressed, isNull);
+        await tester.enterText(
+          find
+              .descendant(
+                of: find.byType(AlertDialog),
+                matching: find.byType(TextField),
+              )
+              .last,
+          'REINICIAR',
+        );
+        await tester.pump();
+        await tester.tap(confirm);
+        await tester.pumpAndSettle();
+
+        expect(api.calls, ['resetEvent: Pruebas acabadas']);
+        expect(
+          find.text('Event started again from the package.'),
+          findsOneWidget,
+        );
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
   testWidgets(
     'a played match restarts with a reason; a pending one has no button',
     (tester) async {
@@ -220,6 +313,34 @@ void main() {
       expect(find.text('Match restarted.'), findsOneWidget);
     },
   );
+
+  testWidgets('a pending match can skip the rest, after asking', (
+    tester,
+  ) async {
+    useSize(tester, screenSizes['desktop']!);
+    final api = await open(tester);
+    await openDetail(tester);
+
+    await tester.tap(find.byTooltip('Change').first);
+    await tester.pumpAndSettle();
+    await tapText(tester, 'Let it start without waiting for the rest');
+    expect(find.text('Start without the least rest?'), findsOneWidget);
+    await tapText(tester, 'Yes, allow');
+
+    expect(api.calls, ['waiveRest g1-m2']);
+  });
+
+  testWidgets('a group only moves to a mat with a referee', (tester) async {
+    useSize(tester, screenSizes['desktop']!);
+    final api = await open(tester);
+    await openDetail(tester);
+
+    await tester.tap(find.text('Move the group to another mat').first);
+    await tester.pumpAndSettle();
+    // Mat 2 has no referee and mat 1 is its own.
+    expect(find.text('No other mat has a referee.'), findsOneWidget);
+    expect(api.calls, isEmpty);
+  });
 
   testWidgets('cancelling asks nothing of the server', (tester) async {
     useSize(tester, screenSizes['desktop']!);
