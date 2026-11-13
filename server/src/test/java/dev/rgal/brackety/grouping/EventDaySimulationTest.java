@@ -57,9 +57,20 @@ class EventDaySimulationTest extends EventApiTest {
     private final Map<String, String> tokens = new HashMap<>();
 
     @ParameterizedTest
-    @ValueSource(longs = {11, 22, 33, 44, 55})
+    @ValueSource(longs = {11, 22, 33, 44, 55, 88, 99, 123})
     void aDayOnThreeMatsEndsWithEveryMatchPlayedOnceAndTheRulesKept(long seed) throws Exception {
-        new Day(new Random(seed), Set.of(1, 2, 3)).run();
+        new Day(new Random(seed), Set.of(1, 2, 3), false).run();
+    }
+
+    /**
+     * The F1's team categories: those without a team fight individual groups there, their wildcards are people of
+     * teams, and the wildcard teams take people of the individual groups (Raul, 2026-11-13). One person can be in a
+     * team, an individual group and a wildcard team at once: still in one match at a time, with their rest.
+     */
+    @ParameterizedTest
+    @ValueSource(longs = {101, 202, 303, 404, 505, 606, 707, 808, 909, 1010, 1111, 1212})
+    void aMixedCategoryDayKeepsEveryoneInOneMatchAtATime(long seed) throws Exception {
+        new Day(new Random(seed), Set.of(1, 2, 3), true).run();
     }
 
     @ParameterizedTest
@@ -67,8 +78,19 @@ class EventDaySimulationTest extends EventApiTest {
     void aMatWithoutRefereeHoldsNothingBack(long seed) throws Exception {
         // Mat 3 is set up but nobody referees it: no individual group goes there, the pool must not wait for it.
         jdbc.sql("update mat set referee_account_id = null where number = 3").update();
-        new Day(new Random(seed), Set.of(1, 2)).run();
+        new Day(new Random(seed), Set.of(1, 2), false).run();
     }
+
+    private static final String PLAYED_ALONE_AND_IN_A_TEAM = """
+            select count(distinct p) from (
+              select red_participant_id p from fight_match where status = 'FINISHED'
+              union all select blue_participant_id from fight_match where status = 'FINISHED') alone
+            where p is not null and p in (select tm.participant_id from fight_match f join team_member tm
+              on tm.team_id in (f.red_team_id, f.blue_team_id) where f.status = 'FINISHED')""";
+
+    private static final String TEAM_PEOPLE_AS_INDIVIDUAL_WILDCARDS = """
+            select count(*) from group_member gm where gm.ghost and gm.participant_id in
+              (select tm.participant_id from team_member tm join team t on t.id = tm.team_id where not tm.ghost)""";
 
     private record Running(String matchId, int endTick, boolean team) {}
 
@@ -78,6 +100,10 @@ class EventDaySimulationTest extends EventApiTest {
 
         private final Random random;
         private final Set<Integer> refereed;
+        private final boolean mixed;
+        // Who fights the individual groups, and who their wildcards can be.
+        private final List<UUID> individualPeople;
+        private final List<UUID> individualWildcards;
         private final List<UUID> kids;
         private final List<UUID> teens;
         private final Map<String, List<UUID>> teamMembers = new HashMap<>();
@@ -92,9 +118,10 @@ class EventDaySimulationTest extends EventApiTest {
         private final Map<String, Integer> seen = new HashMap<>();
         private final Set<Integer> poolMats = new HashSet<>();
 
-        Day(Random random, Set<Integer> refereed) throws Exception {
+        Day(Random random, Set<Integer> refereed, boolean mixed) throws Exception {
             this.random = random;
             this.refereed = refereed;
+            this.mixed = mixed;
             jdbc.sql("delete from mat where number > 3").update();
             jdbc.sql("update event set match_seconds = 60, team_match_seconds = 180, team_points_limit = 0,"
                             + " min_rest_seconds = ?, changeover_seconds = 0")
@@ -102,7 +129,10 @@ class EventDaySimulationTest extends EventApiTest {
                     .update();
             kids = people(28, 7);
             teens = people(30, 15);
-            makeTeams();
+            // Mixed: 21 teens make teams, the other 9 fight individual groups in the same category.
+            makeTeams(mixed ? teens.subList(0, 21) : teens);
+            individualPeople = mixed ? teens.subList(21, 30) : kids;
+            individualWildcards = mixed ? teens : kids;
             // Groups arrive through the morning: a few at the start, the rest while others fight.
             for (int i = 0; i < 6; i++) {
                 plans.add(new Plan(i < 2 ? 0 : random.nextInt(120), false));
@@ -149,6 +179,15 @@ class EventDaySimulationTest extends EventApiTest {
             assertThat(seen)
                     .as("what the day went through")
                     .containsKeys("pool start", "locked refused", "cancel", "other than recommended");
+            if (mixed) {
+                // Someone really fought both alone and in a team, and someone with a team as an individual wildcard.
+                assertThat(countOf(PLAYED_ALONE_AND_IN_A_TEAM))
+                        .as("alone and in a team")
+                        .isPositive();
+                assertThat(countOf(TEAM_PEOPLE_AS_INDIVIDUAL_WILDCARDS))
+                        .as("people of teams as individual wildcards")
+                        .isPositive();
+            }
         }
 
         private void step(int mat) throws Exception {
@@ -177,7 +216,9 @@ class EventDaySimulationTest extends EventApiTest {
                     board,
                     "$.matches[?(@.status == 'PENDING' && @.available == false && @.waitReason != 'REVIEW')].id");
             if (recommended != null) {
-                assertThat(available).as("the recommended match is available").contains(recommended);
+                assertThat(available)
+                        .as("tick %d mat %d: the recommended match is available: %s%n%s", tick, mat, board, log)
+                        .contains(recommended);
             }
             // No mat stays idle while it could take a team match (Raul: as few free mats as possible): one whose
             // people are not in a match offered to another idle mat (that one is theirs).
@@ -278,7 +319,7 @@ class EventDaySimulationTest extends EventApiTest {
         }
 
         private void createGroup(boolean ofTeams) throws Exception {
-            var category = categoryId(ofTeams ? TEENS : KIDS);
+            var category = categoryId(ofTeams || mixed ? TEENS : KIDS);
             String body;
             String mat;
             if (ofTeams) {
@@ -298,6 +339,15 @@ class EventDaySimulationTest extends EventApiTest {
                     var options = new ArrayList<>(teens);
                     options.removeAll(taken);
                     Collections.shuffle(options, random);
+                    if (mixed) {
+                        // First someone who fights an individual group, if any is left.
+                        var alone =
+                                options.stream().filter(kidsGrouped::contains).findFirst();
+                        alone.ifPresent(a -> {
+                            options.remove(a);
+                            options.addFirst(a);
+                        });
+                    }
                     var wildcard = List.copyOf(options.subList(0, 2 + random.nextInt(2)));
                     taken.addAll(wildcard);
                     wildcards.add(wildcard);
@@ -309,14 +359,14 @@ class EventDaySimulationTest extends EventApiTest {
                 teamsGrouped.addAll(real);
                 mat = "null";
             } else {
-                var free = new ArrayList<>(kids);
+                var free = new ArrayList<>(individualPeople);
                 free.removeAll(kidsGrouped);
                 Collections.shuffle(free, random);
                 var real = List.copyOf(free.subList(0, Math.min(free.size(), 2 + random.nextInt(3))));
                 if (real.isEmpty()) {
                     return;
                 }
-                var options = new ArrayList<>(kids);
+                var options = new ArrayList<>(individualWildcards);
                 options.removeAll(real);
                 Collections.shuffle(options, random);
                 var ghosts = options.subList(0, 4 - real.size());
@@ -363,8 +413,8 @@ class EventDaySimulationTest extends EventApiTest {
             seen.merge("undo", 1, Integer::sum);
         }
 
-        private void makeTeams() throws Exception {
-            var free = new ArrayList<>(teens);
+        private void makeTeams(List<UUID> people) throws Exception {
+            var free = new ArrayList<>(people);
             Collections.shuffle(free, random);
             var category = categoryId(TEENS);
             while (free.size() >= 3) {

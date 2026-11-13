@@ -166,6 +166,48 @@ class GroupControllerTest extends EventApiTest {
     }
 
     @Test
+    void anIndividualWildcardIsBusyAndRestsLikeATeam() throws Exception {
+        createGroups(group(0, 1, 2, 3)).andExpect(status().isCreated());
+        createGroups(ghostGroup(sevens.get(0), 4, 5, 6)).andExpect(status().isCreated());
+        var asGhost = jdbc.sql("select id from fight_match where mat_id = ? and ? in (red_participant_id,"
+                        + " blue_participant_id) order by order_index limit 1")
+                .params(matId(2), sevens.get(0))
+                .query(UUID.class)
+                .single();
+        refereeAction(matchId(0, 1), "START", 0, "arbitro1").andExpect(status().isOk());
+
+        // Mat 2 sees where the wildcard is and when they will be free: 1:00 of match + 30 s of rest.
+        var board = call(get("/api/v1/mats/" + matId(2) + "/board"), "arbitro2")
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        var match = "$.matches[?(@.id == '" + asGhost + "')]";
+        assertThat(JsonPath.<List<Boolean>>read(board, match + ".available")).containsExactly(false);
+        assertThat(JsonPath.<List<String>>read(board, match + ".waitReason")).containsExactly("BUSY");
+        List<Integer> fighting = JsonPath.read(board, match + "..fightingOnMat");
+        assertThat(fighting).contains(1);
+        List<String> freeAt = JsonPath.read(board, match + "..freeAt");
+        assertThat(freeAt).contains(clock.instant().plusSeconds(90).toString());
+        refereeAction(asGhost.toString(), "START", 0, "arbitro2").andExpect(status().isConflict());
+
+        // Done on mat 1: still resting, then free.
+        clock.advance(java.time.Duration.ofSeconds(60));
+        refereeAction(matchId(0, 1), "FINISH", 1, "arbitro1").andExpect(status().isOk());
+        call(get("/api/v1/mats/" + matId(2) + "/board"), "arbitro2")
+                .andExpect(jsonPath(match + ".waitReason", contains("RESTING")));
+        refereeAction(asGhost.toString(), "START", 0, "arbitro2")
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("FIGHTER_RESTING"));
+        clock.advance(java.time.Duration.ofSeconds(30));
+        refereeAction(asGhost.toString(), "START", 0, "arbitro2").andExpect(status().isOk());
+    }
+
+    private ResultActions refereeAction(String match, String type, int known, String referee) throws Exception {
+        return call(post("/api/v1/matches/" + match + "/events").content("""
+                                {"type":"%s","knownEvents":%d}""".formatted(type, known)), referee);
+    }
+
+    @Test
     void matOverviewEstimatesTheEndFromTheMatchesLeft() throws Exception {
         createGroups(group(0, 1, 2, 3)).andExpect(status().isCreated());
 
