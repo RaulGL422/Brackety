@@ -125,7 +125,8 @@ public class MatPlanner {
                     busy,
                     Set.of(),
                     start.teamMembers(),
-                    start.minRest());
+                    start.minRest(),
+                    start.restWaived());
             var views = floor.mats().stream()
                     .map(mat -> new MatView(
                             mat.getId(),

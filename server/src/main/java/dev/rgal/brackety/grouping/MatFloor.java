@@ -159,7 +159,11 @@ class MatFloor {
                 busy,
                 Set.of(),
                 competitors.teamMembers(),
-                Duration.ofSeconds(event.getMinRestSeconds()));
+                Duration.ofSeconds(event.getMinRestSeconds()),
+                eventMatches.stream()
+                        .filter(Match::isRestWaived)
+                        .map(Match::getId)
+                        .collect(Collectors.toSet()));
 
         var views = new HashMap<UUID, MatView>();
         for (var mat : eventMats) {

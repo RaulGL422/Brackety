@@ -46,6 +46,10 @@ public class Match {
     private String disqualifiedSide;
     /** Why an offline action clashed; while set, the match takes no actions until the club reviews it. */
     private String reviewReason;
+    /** Set when the club or the superadmin lets it start without the least rest. */
+    private UUID restWaivedBy;
+
+    private Instant restWaivedAt;
 
     protected Match() {}
 
@@ -95,6 +99,24 @@ public class Match {
 
     public int getOrderIndex() {
         return orderIndex;
+    }
+
+    /** A pending individual match goes to another mat (the club's control panel). */
+    void moveTo(UUID matId) {
+        this.matId = matId;
+    }
+
+    void order(int orderIndex) {
+        this.orderIndex = orderIndex;
+    }
+
+    public boolean isRestWaived() {
+        return restWaivedAt != null;
+    }
+
+    void waiveRest(UUID by, Instant at) {
+        this.restWaivedBy = by;
+        this.restWaivedAt = at;
     }
 
     /** The red participant's or team's id. */

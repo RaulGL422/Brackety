@@ -47,6 +47,12 @@ public class AdminAuditLog {
         save(AdminAudit.Action.USER_DELETED, accountId, reason);
     }
 
+    /** {@code what}: the change, as "group moved to mat 2". */
+    @Transactional
+    public void control(UUID target, String what) {
+        save(AdminAudit.Action.CONTROL_CHANGE, target, what);
+    }
+
     private void save(AdminAudit.Action action, UUID target, String reason) {
         audit.save(new AdminAudit(action, target.toString(), reason, clock.instant()));
     }

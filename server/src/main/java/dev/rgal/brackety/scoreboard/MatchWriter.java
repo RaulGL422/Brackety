@@ -180,6 +180,9 @@ class MatchWriter {
 
     /** When every fighter of {@code match} has had the least rest since their last other match; empty if none. */
     Optional<Instant> restedAt(Match match, Event event) {
+        if (match.isRestWaived()) {
+            return Optional.empty();
+        }
         var competitors = directory.of(match.getEventId());
         var fighters = competitors.participants(match.getRedId(), match.getBlueId());
         var minRest = Duration.ofSeconds(event.getMinRestSeconds());

@@ -46,6 +46,73 @@ class TeamControllerTest extends EventApiTest {
     }
 
     @Test
+    void theClubMovesSomeoneBetweenTeamsOnlyBeforeTheirGroupStarts() throws Exception {
+        var full = teams(2);
+        var a = full.get(0);
+        var b = full.get(1);
+        var c = UUID.fromString(JsonPath.read(
+                createTeam(6, 7)
+                        .andExpect(status().isCreated())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString(),
+                "$.id"));
+
+        moveMember(0, a, b)
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("TEAM_SIZE"));
+        moveMember(0, a, c).andExpect(status().isNoContent());
+        // A would be left with one.
+        moveMember(1, a, c)
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("TEAM_SIZE"));
+        moveMember(3, a, c).andExpect(status().isBadRequest());
+        call(get(event() + "/categories/" + category() + "/teams"), "ayudante1")
+                .andExpect(jsonPath("$[?(@.id == '" + c + "')].members[*]", hasSize(3)));
+        call(post(event() + "/control/team-members").content(memberMove(4, b, a)), "ayudante1")
+                .andExpect(status().isForbidden());
+
+        // Team A in a group with three wildcard teams; 8 fights in one of them.
+        createGroups("""
+                        {"teamIds":["%s"],"ghostTeams":[[%s],[%s],[%s]]}""".formatted(a, quoted(8, 9), quoted(10, 11), quoted(12, 13)))
+                .andExpect(status().isCreated());
+        // A real team whose three people are the wildcards above: none can join A, they would fight on both sides.
+        var e = UUID.fromString(JsonPath.read(
+                createTeam(8, 12, 13)
+                        .andExpect(status().isCreated())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString(),
+                "$.id"));
+        moveMember(8, e, a)
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("SAME_FIGHTER"));
+        moveMember(4, b, c)
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("TEAM_SIZE"));
+        // Before anyone fights, the group's team can still change.
+        moveMember(5, b, a).andExpect(status().isNoContent());
+
+        var match = jdbc.sql("select id from fight_match where red_team_id = ? or blue_team_id = ? limit 1")
+                .params(a, a)
+                .query(UUID.class)
+                .single();
+        referee(match, "START", null);
+        moveMember(1, a, b)
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("GROUP_STARTED"));
+    }
+
+    private ResultActions moveMember(int person, UUID from, UUID to) throws Exception {
+        return call(post(event() + "/control/team-members").content(memberMove(person, from, to)), "club1");
+    }
+
+    private String memberMove(int person, UUID from, UUID to) {
+        return """
+                {"participantId":"%s","fromTeamId":"%s","toTeamId":"%s"}""".formatted(teens.get(person), from, to);
+    }
+
+    @Test
     void teamCategoriesSayItAndTeamsAreNumberedThroughTheEvent() throws Exception {
         var first = createTeam(0, 1, 2)
                 .andExpect(status().isCreated())
