@@ -173,6 +173,8 @@ class LeagueStandingRow {
     this.organizationName,
     this.warnings = 0,
     this.disqualifications = 0,
+    this.eventId,
+    this.participantId,
   });
 
   factory LeagueStandingRow.fromJson(Map<String, dynamic> json) =>
@@ -195,6 +197,8 @@ class LeagueStandingRow {
         total: json['total'] as int,
         warnings: json['warnings'] as int? ?? 0,
         disqualifications: json['disqualifications'] as int? ?? 0,
+        eventId: json['eventId'] as String?,
+        participantId: json['participantId'] as String?,
       );
 
   final String? categoryName;
@@ -211,6 +215,10 @@ class LeagueStandingRow {
   /// In every match of the league (both kinds of warning; a team's count for each member).
   final int warnings;
   final int disqualifications;
+
+  /// Their entry in the latest phase they are in: their record opens from there.
+  final String? eventId;
+  final String? participantId;
 }
 
 class LeagueStandings {

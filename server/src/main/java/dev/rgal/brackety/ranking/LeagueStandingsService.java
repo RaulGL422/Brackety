@@ -88,10 +88,12 @@ class LeagueStandingsService {
     LeagueStandings of(Event event) {
         var phases = events.findByLeagueIdOrderByPhaseNumber(event.getLeagueId());
         var latest = new HashMap<UUID, StandingRow>();
+        var latestPhase = new HashMap<UUID, UUID>();
         var points = new HashMap<UUID, PhasePoints[]>();
         for (int i = 0; i < phases.size(); i++) {
             for (var row : standings.rows(phases.get(i))) {
                 latest.put(row.personId(), row);
+                latestPhase.put(row.personId(), phases.get(i).getId());
                 points.computeIfAbsent(row.personId(), k -> new PhasePoints[phases.size()])[i] =
                         new PhasePoints(row.attendancePoints(), row.matchPoints());
             }
@@ -124,7 +126,9 @@ class LeagueStandingsService {
                                         phasePoints,
                                         total,
                                         discipline.warnings().getOrDefault(r.personId(), 0),
-                                        discipline.disqualifications().getOrDefault(r.personId(), 0));
+                                        discipline.disqualifications().getOrDefault(r.personId(), 0),
+                                        latestPhase.get(r.personId()),
+                                        r.participantId());
                             })
                             .sorted(Comparator.comparingInt(Row::total)
                                     .reversed()
@@ -148,7 +152,9 @@ class LeagueStandingsService {
                                 r.phases(),
                                 r.total(),
                                 r.warnings(),
-                                r.disqualifications()));
+                                r.disqualifications(),
+                                r.eventId(),
+                                r.participantId()));
                     }
                 });
         return new LeagueStandings(

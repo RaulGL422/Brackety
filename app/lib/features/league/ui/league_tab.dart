@@ -10,6 +10,7 @@ import '../../../core/medal.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../club/data/club_repository.dart';
 import '../../club/ui/export_download.dart';
+import '../../club/ui/participant_record_sheet.dart';
 import '../../events/state/events_providers.dart';
 import '../data/league_models.dart';
 import '../state/league_providers.dart';
@@ -305,21 +306,97 @@ class _LeagueStandingTile extends StatelessWidget {
         ),
       ),
       title: Text('${row.firstName} ${row.lastName}'),
-      subtitle: Text(
-        [
-          ?row.organizationName,
-          ...perPhase,
-          [
-            if (row.warnings > 0) l10n.recordWarnings(row.warnings),
-            if (row.disqualifications > 0)
-              l10n.leagueDisqualifications(row.disqualifications),
-          ].join(' · '),
-        ].where((line) => line.isNotEmpty).join('\n'),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text([?row.organizationName, ...perPhase].join('\n')),
+          if (row.warnings > 0 || row.disqualifications > 0)
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.xs),
+              child: Wrap(
+                spacing: AppSpacing.s,
+                runSpacing: AppSpacing.xs,
+                children: [
+                  if (row.warnings > 0)
+                    _DisciplineBadge(
+                      icon: Icons.warning_amber_rounded,
+                      label: l10n.recordWarnings(row.warnings),
+                      serious: false,
+                    ),
+                  if (row.disqualifications > 0)
+                    _DisciplineBadge(
+                      icon: Icons.block,
+                      label: l10n.leagueDisqualifications(
+                        row.disqualifications,
+                      ),
+                      serious: true,
+                    ),
+                ],
+              ),
+            ),
+        ],
       ),
       isThreeLine: true,
+      // The record of their latest phase: matches, points, warnings.
+      onTap: row.eventId == null || row.participantId == null
+          ? null
+          : () => showParticipantRecord(
+              context,
+              eventId: row.eventId!,
+              participantId: row.participantId!,
+              name: '${row.firstName} ${row.lastName}',
+            ),
       trailing: Text(
         l10n.standingsTotal(row.total),
         style: Theme.of(context).textTheme.titleLarge,
+      ),
+    );
+  }
+}
+
+/// Warnings (amber) or disqualifications (red) of a person in the league, hard to miss.
+class _DisciplineBadge extends StatelessWidget {
+  const _DisciplineBadge({
+    required this.icon,
+    required this.label,
+    required this.serious,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool serious;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final (fill, ink) = serious
+        ? (scheme.errorContainer, scheme.onErrorContainer)
+        : (const Color(0xFFFFE8B3), const Color(0xFF5C3B00));
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: fill,
+        borderRadius: BorderRadius.circular(AppRadius.m),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.s,
+          vertical: 2,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          spacing: AppSpacing.xs,
+          children: [
+            Icon(icon, size: 16, color: ink),
+            Flexible(
+              child: Text(
+                label,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelMedium
+                    ?.copyWith(color: ink, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

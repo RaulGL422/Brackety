@@ -110,6 +110,10 @@ void main() {
           {'attendancePoints': 10, 'matchPoints': 5},
         ],
         'total': 45,
+        'warnings': 3,
+        'disqualifications': 1,
+        'eventId': 'e2',
+        'participantId': 'pz',
       },
       {
         'categoryName': '4-7',
@@ -264,6 +268,9 @@ void main() {
         findsOneWidget,
       );
       expect(find.textContaining('Phase 2: not entered'), findsOneWidget);
+      // Warnings and disqualifications stand out on their own.
+      expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.block), findsOneWidget);
       // One heading per category, in the league's order.
       expect(find.text('8-11 · 1 person'), findsOneWidget);
       expect(find.text('4-7 · 1 person'), findsOneWidget);
