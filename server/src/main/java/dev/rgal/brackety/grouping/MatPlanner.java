@@ -81,7 +81,9 @@ public class MatPlanner {
         for (var m : floor.matches()) {
             if (m.getStatus() == Match.Status.IN_PROGRESS) {
                 var length = Duration.ofSeconds(event.matchSecondsFor(m.isTeamMatch()));
-                var end = now.plus(m.clockLeft(now, length));
+                // Over its time but not finished: its mat is still busy now, as the dispatch sees it (with no
+                // changeover, ending it "now" gave its mat a match while another mat was told to start that one).
+                var end = later(now.plus(m.clockLeft(now, length)), now.plusMillis(1));
                 running.add(new Running(
                         m.getMatId(), m.getGroupId(), competitors.participants(m.getRedId(), m.getBlueId()), end));
                 freeAt.put(m.getMatId(), end.plus(changeover));

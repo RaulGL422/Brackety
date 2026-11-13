@@ -18,8 +18,11 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 /**
@@ -36,8 +39,16 @@ class MatchDispatchSimulationTest {
     private static final Duration CHANGEOVER = Duration.ofSeconds(30);
     private static final Duration MIN_REST = Duration.ofSeconds(30);
 
+    static LongStream typicalSeeds() {
+        return LongStream.rangeClosed(1, 60);
+    }
+
+    static LongStream tangledSeeds() {
+        return LongStream.rangeClosed(1001, 1060);
+    }
+
     @ParameterizedTest
-    @ValueSource(longs = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12})
+    @MethodSource("typicalSeeds")
     void aFullDayEndsWithEveryMatchPlayedOnceAndEveryoneRested(long seed) {
         var day = new Day(new Random(seed), 3);
         day.typicalPhase();
@@ -64,6 +75,25 @@ class MatchDispatchSimulationTest {
         day.assertEveryoneRested();
         var perMat = day.teamMatchesPerMat();
         assertThat(perMat.values()).as(perMat.toString()).allMatch(n -> n >= 5);
+    }
+
+    /**
+     * Wildcards taken from anyone already in the day (Raul, 2026-11-13): someone real in a team can fill an
+     * individual group and a wildcard team of other groups, all at once. On 1 to 3 mats.
+     */
+    @ParameterizedTest
+    @MethodSource("tangledSeeds")
+    void wildcardsTangledEverywhereNeverDoubleBookAnyoneAndEveryoneRests(long seed) {
+        var day = new Day(new Random(seed), 1 + (int) (seed % 3));
+        day.tangledPhase();
+
+        day.playAll();
+
+        day.assertEveryMatchPlayedOnce();
+        day.assertNobodyInTwoMatchesAtOnce();
+        day.assertEveryoneRested();
+        day.assertTeamMatchesOnlyOnMatsFreeOfIndividualMatches();
+        assertThat(day.peopleInSeveralGroups()).as("the day was really tangled").isPositive();
     }
 
     @Test
@@ -163,6 +193,56 @@ class MatchDispatchSimulationTest {
             // Someone of that group fills a team of another group in as a wildcard member.
             var wildcard = teamMembers.get(adult.get(0)).iterator().next();
             addToFirstTeam(teamGroup(List.of(2, 2, 3), 1, later), wildcard);
+        }
+
+        /** Individual and team groups arriving through the morning, their wildcards anyone already in the day. */
+        void tangledPhase() {
+            var groups = 3 + random.nextInt(4);
+            for (int g = 0; g < groups; g++) {
+                var created = START.plus(Duration.ofMinutes(3L * random.nextInt(4)));
+                if (random.nextBoolean() || people.isEmpty()) {
+                    var borrowed = new ArrayList<UUID>();
+                    for (int i = random.nextInt(4); i > 0 && !people.isEmpty(); i--) {
+                        var someone = people.get(random.nextInt(people.size()));
+                        if (!borrowed.contains(someone)) {
+                            borrowed.add(someone);
+                        }
+                    }
+                    individualGroup(random.nextInt(mats.size()), borrowed, 0, created);
+                } else {
+                    var real = 1 + random.nextInt(4);
+                    var sizes = new ArrayList<Integer>();
+                    for (int i = 0; i < real; i++) {
+                        sizes.add(2 + random.nextInt(2));
+                    }
+                    var group = teamGroup(sizes, 4 - real, created);
+                    var inGroup = groupUnits.get(group).stream()
+                            .flatMap(t -> teamMembers.get(t).stream())
+                            .collect(Collectors.toCollection(HashSet::new));
+                    for (var team : groupUnits.get(group)) {
+                        // Someone of another group fills this team in (never twice in one group).
+                        var someone = people.get(random.nextInt(people.size()));
+                        if (random.nextBoolean() && inGroup.add(someone)) {
+                            var members = new HashSet<>(teamMembers.get(team));
+                            members.add(someone);
+                            teamMembers.put(team, members);
+                        }
+                    }
+                }
+            }
+        }
+
+        /** People who fight in more than one group (alone or in a team). */
+        long peopleInSeveralGroups() {
+            var groupsOf = new HashMap<UUID, Set<UUID>>();
+            groupUnits.forEach((group, units) -> {
+                for (var unit : units) {
+                    for (var person : teamMembers.getOrDefault(unit, Set.of(unit))) {
+                        groupsOf.computeIfAbsent(person, p -> new HashSet<>()).add(group);
+                    }
+                }
+            });
+            return groupsOf.values().stream().filter(g -> g.size() > 1).count();
         }
 
         /** A group of 4 on mat {@code matIndex}: the given wildcards, {@code wildcards} more of nobody, the rest new. */
