@@ -55,7 +55,7 @@ class MatchWriter {
      */
     Optional<Refusal> append(
             Match match, Event event, List<MatchEvent> history, Action action, Instant now, boolean checkOtherMats) {
-        var state = replay(event, history);
+        var state = replay(event, match, history);
         var refusal = refusal(match, event, state, action, now, checkOtherMats);
         if (refusal.isPresent()) {
             return refusal;
@@ -101,9 +101,10 @@ class MatchWriter {
                 .anyMatch(age -> age >= ONE_HAND_MIN_AGE && age <= ONE_HAND_MAX_AGE);
     }
 
-    static TamboMatch replay(Event event, List<MatchEvent> history) {
+    static TamboMatch replay(Event event, Match match, List<MatchEvent> history) {
+        var teams = match.isTeamMatch();
         return TamboMatch.replay(
-                new Rules(Duration.ofSeconds(event.getMatchSeconds()), event.getPointsLimit()),
+                new Rules(Duration.ofSeconds(event.matchSecondsFor(teams)), event.pointsLimitFor(teams)),
                 history.stream().map(MatchEvent::toEntry).toList());
     }
 
@@ -134,7 +135,7 @@ class MatchWriter {
                 .filter(m ->
                         m.getStatus() == Match.Status.IN_PROGRESS && !m.getId().equals(match.getId()))
                 .toList();
-        if (inProgress.stream().anyMatch(m -> m.getMatId().equals(match.getMatId()))) {
+        if (inProgress.stream().anyMatch(m -> match.getMatId().equals(m.getMatId()))) {
             return Optional.of(new Refusal(Cause.MAT_BUSY, "Another match is in progress on this mat."));
         }
         var competitors = directory.of(match.getEventId());
@@ -150,7 +151,7 @@ class MatchWriter {
 
     // Points or a disqualification end the match: the clock stops here and stays stopped after an undo.
     private void stopIfOverAndSnapshot(Match match, Event event, List<MatchEvent> history, Action action, Instant now) {
-        var state = replay(event, history);
+        var state = replay(event, match, history);
         var endsNow =
                 state.endReason(now).filter(r -> r != TamboMatch.EndReason.TIME).isPresent();
         if (endsNow && state.isRunning(now)) {
@@ -167,7 +168,7 @@ class MatchWriter {
                     state.elapsedAt(now),
                     null,
                     null)));
-            state = replay(event, history);
+            state = replay(event, match, history);
         }
         match.updateFromScoreboard(
                 state.corner(Side.RED).points(),

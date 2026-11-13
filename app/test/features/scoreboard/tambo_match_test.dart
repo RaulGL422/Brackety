@@ -188,4 +188,43 @@ void main() {
     expect(replay().refuse(MatchAction.stop, t0), MatchRefusal.notRunning);
     expect(replay().started, isFalse);
   });
+
+  test(
+    'every second warning gives the rival a point, apart from one-hand ones',
+    () {
+      add(MatchAction.start, null, 0);
+      add(MatchAction.warning, Side.red, 5);
+      add(MatchAction.oneHandWarning, Side.red, 6);
+      final second = add(MatchAction.warning, Side.red, 10);
+      final match = replay();
+      expect(match.points(Side.blue), 1);
+      expect(match.warnings(Side.red), 2);
+      expect(match.gaveAutoPoint(second), isTrue);
+      add(MatchAction.undo, null, 12, second);
+      expect(replay().points(Side.blue), 0);
+    },
+  );
+
+  test('with no points limit only the time ends it; a disqualification gives 15 at least', () {
+    TamboMatch teams() => TamboMatch.replay(
+      length: const Duration(minutes: 3),
+      pointsLimit: 0,
+      entries: entries,
+    );
+    add(MatchAction.start, null, 0);
+    for (var i = 1; i <= 20; i++) {
+      add(MatchAction.point, Side.red, i);
+    }
+    expect(teams().endReason(at(21)), isNull);
+    expect(teams().endReason(at(180)), EndReason.time);
+    add(MatchAction.disqualification, Side.blue, 22);
+    expect(teams().points(Side.red), 20);
+    expect(teams().points(Side.blue), 0);
+
+    entries = [];
+    add(MatchAction.start, null, 0);
+    add(MatchAction.point, Side.red, 1);
+    add(MatchAction.disqualification, Side.blue, 2);
+    expect(teams().points(Side.red), 15);
+  });
 }

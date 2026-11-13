@@ -282,9 +282,18 @@ class _LeagueStandingTile extends StatelessWidget {
             ?row.organizationName,
           ].join(' · '),
           perPhase,
+          [
+            if (row.warnings > 0) l10n.recordWarnings(row.warnings),
+            if (row.disqualifications > 0)
+              l10n.leagueDisqualifications(row.disqualifications),
+          ].join(' · '),
         ].where((line) => line.isNotEmpty).join('\n'),
       ),
-      isThreeLine: showCategory || row.organizationName != null,
+      isThreeLine:
+          showCategory ||
+          row.organizationName != null ||
+          row.warnings > 0 ||
+          row.disqualifications > 0,
       trailing: Text(
         l10n.standingsTotal(row.total),
         style: Theme.of(context).textTheme.titleLarge,

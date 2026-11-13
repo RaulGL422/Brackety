@@ -82,6 +82,9 @@ class EventSettings {
     required this.pointsLimit,
     required this.attendancePoints,
     this.organizations = const [],
+    this.teamMatchLength = const Duration(minutes: 3),
+    this.teamPointsLimit = 0,
+    this.minRest = const Duration(seconds: 30),
   });
 
   factory EventSettings.fromJson(Map<String, dynamic> json) {
@@ -111,6 +114,11 @@ class EventSettings {
         for (final o in json['organizations'] as List? ?? [])
           Organization.fromJson(o as Map<String, dynamic>),
       ],
+      teamMatchLength: Duration(
+        seconds: json['teamMatchSeconds'] as int? ?? 180,
+      ),
+      teamPointsLimit: json['teamPointsLimit'] as int? ?? 0,
+      minRest: Duration(seconds: json['minRestSeconds'] as int? ?? 30),
     );
   }
 
@@ -133,6 +141,13 @@ class EventSettings {
 
   /// Points everyone in a group of this phase adds to the standings.
   final int attendancePoints;
+
+  /// Team matches have their own length and points limit (0 = no limit).
+  final Duration teamMatchLength;
+  final int teamPointsLimit;
+
+  /// The least rest of a fighter between two matches, on any mat.
+  final Duration minRest;
 
   /// The clubs taking part, in the order the club entered them.
   final List<Organization> organizations;
@@ -368,7 +383,7 @@ class RecordMatch {
 
   factory RecordMatch.fromJson(Map<String, dynamic> json) => RecordMatch(
     matchId: json['matchId'] as String,
-    matNumber: json['matNumber'] as int,
+    matNumber: json['matNumber'] as int?,
     groupNumber: json['groupNumber'] as int,
     status: switch (json['status']) {
       'IN_PROGRESS' => MatchStatus.inProgress,
@@ -389,7 +404,9 @@ class RecordMatch {
   );
 
   final String matchId;
-  final int matNumber;
+
+  /// Null for a team match not started yet.
+  final int? matNumber;
   final int groupNumber;
   final MatchStatus status;
   final bool red;

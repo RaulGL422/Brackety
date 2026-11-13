@@ -24,6 +24,6 @@ public class MatchSnapshots {
     /** No access check: callers do it. */
     @Transactional(readOnly = true)
     public MatchView of(Match match) {
-        return scoreboard.view(match, scoreboard.mat(match), events.get(match.getEventId()), clock.instant());
+        return scoreboard.view(match, scoreboard.matOrNull(match), events.get(match.getEventId()), clock.instant());
     }
 }

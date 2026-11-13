@@ -16,7 +16,7 @@ public record ParticipantRecord(StandingRow standing, List<RecordMatch> matches)
      */
     public record RecordMatch(
             UUID matchId,
-            int matNumber,
+            Integer matNumber,
             int groupNumber,
             String status,
             String side,

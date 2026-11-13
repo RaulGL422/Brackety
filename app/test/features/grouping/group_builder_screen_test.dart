@@ -218,7 +218,7 @@ void main() {
       await tester.pump();
     }
 
-    final ghostBox = find.widgetWithText(FilterChip, 'Ghost competitor');
+    final ghostBox = find.widgetWithText(FilterChip, 'Wildcard');
     expect(tester.widget<FilterChip>(ghostBox).onSelected, isNull);
     await tester.tap(ghostBox, warnIfMissed: false);
     await tester.tap(ghostBox, warnIfMissed: false);
@@ -249,7 +249,7 @@ void main() {
         .push('/events/e1/categories/c1');
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Ghost competitor'));
+    await tester.tap(find.text('Wildcard'));
     for (final name in ['Ana', 'Bea', 'Carla', 'Zoe']) {
       await tester.tap(find.text('$name Prueba'));
       await tester.pump();

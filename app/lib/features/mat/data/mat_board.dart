@@ -76,6 +76,17 @@ class BoardGroup {
   final String? createdBy;
 }
 
+/// Why a pending match cannot start now.
+enum WaitReason { review, busy, resting, otherMat }
+
+WaitReason? waitReasonFromJson(String? value) => switch (value) {
+  'REVIEW' => WaitReason.review,
+  'BUSY' => WaitReason.busy,
+  'RESTING' => WaitReason.resting,
+  'OTHER_MAT' => WaitReason.otherMat,
+  _ => null,
+};
+
 class BoardMatch {
   const BoardMatch({
     required this.id,
@@ -88,6 +99,10 @@ class BoardMatch {
     required this.blueScore,
     required this.available,
     this.inReview = false,
+    this.waitReason,
+    this.readyAt,
+    this.otherMatNumber,
+    this.pool = false,
   });
 
   factory BoardMatch.fromJson(Map<String, dynamic> json) => BoardMatch(
@@ -101,6 +116,13 @@ class BoardMatch {
     blueScore: json['blueScore'] as int,
     available: json['available'] as bool,
     inReview: json['inReview'] as bool? ?? false,
+    waitReason: waitReasonFromJson(json['waitReason'] as String?),
+    readyAt: switch (json['readyAt']) {
+      final String at => DateTime.parse(at),
+      _ => null,
+    },
+    otherMatNumber: json['otherMatNumber'] as int?,
+    pool: json['pool'] as bool? ?? false,
   );
 
   final String id;
@@ -117,6 +139,18 @@ class BoardMatch {
 
   /// An offline action clashed: it waits for the club and cannot start.
   final bool inReview;
+
+  /// Why it cannot start now; null if it can (or the server is older).
+  final WaitReason? waitReason;
+
+  /// [WaitReason.resting]: when every fighter will have had the least rest.
+  final DateTime? readyAt;
+
+  /// [WaitReason.otherMat]: the mat it is proposed to.
+  final int? otherMatNumber;
+
+  /// A team match from the pool shared by the mats without individual matches.
+  final bool pool;
 
   BoardMatch copyWith({
     MatchStatus? status,
@@ -135,6 +169,10 @@ class BoardMatch {
     blueScore: blueScore ?? this.blueScore,
     available: available ?? this.available,
     inReview: inReview ?? this.inReview,
+    waitReason: waitReason,
+    readyAt: readyAt,
+    otherMatNumber: otherMatNumber,
+    pool: pool,
   );
 }
 
@@ -145,6 +183,7 @@ class MatBoard {
     required this.matches,
     this.recommendedMatchId,
     this.offline = false,
+    this.teamPool = false,
   });
 
   factory MatBoard.fromJson(Map<String, dynamic> json) => MatBoard(
@@ -158,6 +197,7 @@ class MatBoard {
         BoardMatch.fromJson(m as Map<String, dynamic>),
     ],
     recommendedMatchId: json['recommendedMatchId'] as String?,
+    teamPool: json['teamPool'] as bool? ?? false,
   );
 
   final int matNumber;
@@ -167,4 +207,7 @@ class MatBoard {
 
   /// From the device's cache: the server did not answer.
   final bool offline;
+
+  /// No individual match is pending here: the mat takes team matches from the shared pool.
+  final bool teamPool;
 }

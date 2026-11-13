@@ -327,8 +327,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get heightUnknown => 'no height';
 
   @override
-  String participantGrouped(int group, int mat) {
-    return 'Group $group · Mat $mat';
+  String participantGrouped(int group, String mat) {
+    return 'Group $group · $mat';
   }
 
   @override
@@ -337,11 +337,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get draftGhost => 'Ghost competitor';
+  String get draftGhost => 'Wildcard';
 
   @override
   String get draftGhostHint =>
-      'Ghosts (up to 3): anyone already in a group, or your 4th pick. They fight but do not score.';
+      'Wildcards (up to 3): anyone already in a group, or your 4th pick. They fight but do not score.';
 
   @override
   String createGroup(int count) {
@@ -376,11 +376,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ok => 'OK';
 
   @override
-  String get ghostBadge => 'Ghost';
+  String get ghostBadge => 'Wildcard';
 
   @override
   String matTitle(int number) {
     return 'Mat $number';
+  }
+
+  @override
+  String get matPool => 'Free mats';
+
+  @override
+  String queuedOffline(String what) {
+    return 'Offline: $what will be sent when the network is back. Meanwhile its participants show as pending.';
+  }
+
+  @override
+  String queuedSent(String what) {
+    return 'Sent: $what';
+  }
+
+  @override
+  String queuedRefused(String what) {
+    return '$what could not be created: someone was already in another group or team. Check the list.';
+  }
+
+  @override
+  String get queuedPending => 'Waiting to be sent (offline)';
+
+  @override
+  String queuedGroupLabel(String names) {
+    return 'the group of $names';
+  }
+
+  @override
+  String queuedTeamLabel(String names) {
+    return 'the team of $names';
   }
 
   @override
@@ -427,14 +458,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matWaiting => 'A fighter is in a match right now';
 
   @override
+  String matResting(String time) {
+    return 'Resting until $time';
+  }
+
+  @override
+  String matProposedElsewhere(int number) {
+    return 'Proposed to mat $number';
+  }
+
+  @override
+  String get matPoolOffline => 'Offline: another mat may be running it';
+
+  @override
+  String get matTeamPoolNotice =>
+      'No individual groups pending: this mat takes team matches from the shared pool, spread over the free mats. The most rested go first.';
+
+  @override
   String get matNoneAvailable => 'No match can start right now.';
 
   @override
   String get versus => 'vs';
 
   @override
-  String scoreboardTitle(int mat, int group) {
-    return 'Mat $mat, group $group';
+  String scoreboardTitle(String mat, int group) {
+    return '$mat, group $group';
   }
 
   @override
@@ -616,7 +664,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsMatchRules => 'Matches';
 
   @override
-  String get settingsMatchLength => 'Match length (min:s)';
+  String get settingsMatchLength => 'Individual: match length (min:s)';
+
+  @override
+  String get settingsTeamMatchLength => 'Teams: match length (min:s)';
+
+  @override
+  String get settingsTeamPointsLimit => 'Teams: points that end the match';
+
+  @override
+  String get settingsTeamPointsLimitHint =>
+      'Empty = no limit: the time ends it. A disqualification gives the rival 15 points, or theirs if higher.';
+
+  @override
+  String get settingsMinRest => 'Least rest between matches (seconds)';
+
+  @override
+  String get settingsMinRestHint =>
+      'Nobody starts a match without this rest since their last one, on any mat. Until then the match waits.';
+
+  @override
+  String get settingsMinRestInvalid => 'Between 0 and 600 seconds.';
 
   @override
   String get settingsMatchLengthHint =>
@@ -627,7 +695,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Type minutes and seconds between 0:30 and 20:00, for example 3:00.';
 
   @override
-  String get settingsPointsLimit => 'Points that end the match';
+  String get settingsPointsLimit => 'Individual: points that end the match';
 
   @override
   String get settingsPointsLimitHint =>
@@ -929,7 +997,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String teamGhostName(int number) {
-    return 'Team $number (ghost)';
+    return 'Team $number (wildcard)';
   }
 
   @override
@@ -1006,12 +1074,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteTeamError => 'The team could not be undone.';
 
   @override
-  String get draftGhostTeam => 'Ghost team';
+  String get draftGhostTeam => 'Wildcard team';
 
   @override
   String draftGhostTeamHint(int size) {
-    return 'Pick any $size participants of the category: they fight but do not score.';
+    return 'Wildcard teams (up to 3): 2 to $size participants of the category not in the group yet. They fight but do not score.';
   }
+
+  @override
+  String get addGhostTeam => 'Add wildcard team';
+
+  @override
+  String get teamGroupPoolHint =>
+      'No mat: its matches are spread over the mats without individual groups.';
 
   @override
   String pickGhostTeam(int count, int size) {
@@ -1204,9 +1279,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get categoryIndividual => 'Individual';
 
   @override
-  String categoryTeams(int size) {
-    return 'Teams of $size';
-  }
+  String get categoryTeams => 'Teams of 2 or 3';
 
   @override
   String get categoryAdd => 'Add category';
@@ -1228,9 +1301,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get categoryByTeams => 'By teams';
-
-  @override
-  String get categoryTeamSize => 'Participants per team';
 
   @override
   String categoryGroupSize(int size) {
@@ -1757,7 +1827,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String ghostOf(String name) {
-    return '$name (ghost)';
+    return '$name (wildcard)';
   }
 
   @override
@@ -1986,32 +2056,25 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get teamGhostMember => 'joins as a ghost';
+  String get teamGhostMember => 'joins as a wildcard';
 
   @override
   String get teamGhostHint =>
-      'Whoever already has a team or a group joins as a ghost: fights, but does not score for this team.';
+      'Whoever already has a team or a group joins as a wildcard: fights, but does not score for this team.';
 
   @override
   String ghostMemberName(String name) {
-    return '$name (ghost)';
+    return '$name (wildcard)';
   }
 
   @override
-  String get teamOverlapTitle => 'Participants in two teams of the group';
-
-  @override
-  String teamOverlapBody(String lines) {
-    return '$lines\n\nThey will fight a team they are also in. Create the group anyway?';
-  }
+  String get teamOverlapTitle =>
+      'Not possible: participants in two teams of the group';
 
   @override
   String teamOverlapLine(String name, String teams) {
     return '$name: $teams';
   }
-
-  @override
-  String get createAnyway => 'Create anyway';
 
   @override
   String groupCreatedBy(String name) {
@@ -2097,8 +2160,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String recordWhere(int mat, int group) {
-    return 'Mat $mat · Group $group';
+  String recordWhere(String mat, int group) {
+    return '$mat · Group $group';
   }
 
   @override
@@ -2111,7 +2174,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recordDraw => 'Draw';
 
   @override
-  String get recordAsGhost => 'as a ghost (no score)';
+  String get recordAsGhost => 'as a wildcard (no score)';
 
   @override
   String recordWarnings(num count) {
@@ -2137,6 +2200,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recordDisqualified => 'Disqualified';
+
+  @override
+  String leagueDisqualifications(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count disqualifications',
+      one: '1 disqualification',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get recordRivalDisqualified => 'Rival disqualified';

@@ -318,8 +318,8 @@ class ReviewOutcome {
 class MatchView {
   const MatchView({
     required this.id,
-    required this.matId,
-    required this.matNumber,
+    this.matId,
+    this.matNumber,
     required this.groupNumber,
     required this.status,
     required this.length,
@@ -336,8 +336,8 @@ class MatchView {
 
   factory MatchView.fromJson(Map<String, dynamic> json) => MatchView(
     id: json['id'] as String,
-    matId: json['matId'] as String,
-    matNumber: json['matNumber'] as int,
+    matId: json['matId'] as String?,
+    matNumber: json['matNumber'] as int?,
     groupNumber: json['groupNumber'] as int,
     status: matchStatusFromJson(json['status'] as String),
     length: Duration(seconds: json['lengthSeconds'] as int),
@@ -394,8 +394,12 @@ class MatchView {
   };
 
   final String id;
-  final String matId;
-  final int matNumber;
+
+  /// Null for a team match in the pool, until a mat starts it.
+  final String? matId;
+
+  /// Null for a team match in the pool, until a mat starts it.
+  final int? matNumber;
   final int groupNumber;
   final MatchStatus status;
   final Duration length;

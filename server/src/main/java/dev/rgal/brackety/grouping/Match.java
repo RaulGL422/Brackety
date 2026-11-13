@@ -77,8 +77,20 @@ public class Match {
         return groupId;
     }
 
+    /** Null for a team match waiting in the pool (MatchPool): it takes the mat whose referee starts it. */
     public UUID getMatId() {
         return matId;
+    }
+
+    public void takeMat(UUID matId) {
+        this.matId = matId;
+    }
+
+    /** A pending match of a group without mat (of teams) goes back to the pool; any other keeps its mat. */
+    public void backToPoolIf(FightGroup group) {
+        if (group.getMatId() == null && status == Status.PENDING) {
+            matId = null;
+        }
     }
 
     public int getOrderIndex() {
@@ -92,6 +104,10 @@ public class Match {
 
     public UUID getBlueId() {
         return blueTeamId != null ? blueTeamId : blueParticipantId;
+    }
+
+    public boolean isTeamMatch() {
+        return redTeamId != null;
     }
 
     public Status getStatus() {

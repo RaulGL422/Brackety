@@ -1,6 +1,7 @@
 package dev.rgal.brackety.scoreboard;
 
 import dev.rgal.brackety.event.EventException;
+import dev.rgal.brackety.grouping.FightGroupRepository;
 import dev.rgal.brackety.grouping.MatchRepository;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -13,9 +14,15 @@ public class MatchReset {
     private final MatchRepository matches;
     private final MatchEventRepository events;
     private final RejectedOpRepository rejected;
+    private final FightGroupRepository groups;
 
-    MatchReset(MatchRepository matches, MatchEventRepository events, RejectedOpRepository rejected) {
+    MatchReset(
+            MatchRepository matches,
+            MatchEventRepository events,
+            RejectedOpRepository rejected,
+            FightGroupRepository groups) {
         this.matches = matches;
+        this.groups = groups;
         this.events = events;
         this.rejected = rejected;
     }
@@ -32,6 +39,7 @@ public class MatchReset {
         // The deletes cleared the persistence context: the match is read again before changing it.
         var fresh = matches.findById(matchId).orElseThrow(EventException::notFound);
         fresh.reset();
+        fresh.backToPoolIf(groups.findById(fresh.getGroupId()).orElseThrow());
         return match.getEventId();
     }
 }

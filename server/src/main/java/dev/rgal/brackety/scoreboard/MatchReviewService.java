@@ -4,6 +4,7 @@ import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventException;
 import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventService;
+import dev.rgal.brackety.grouping.FightGroupRepository;
 import dev.rgal.brackety.grouping.MatchRepository;
 import dev.rgal.brackety.scoreboard.RejectedOp.Resolution;
 import dev.rgal.brackety.scoreboard.dto.ReviewRequest;
@@ -23,6 +24,7 @@ class MatchReviewService {
     private static final Logger log = LoggerFactory.getLogger(MatchReviewService.class);
 
     private final MatchRepository matches;
+    private final FightGroupRepository groups;
     private final MatchEventRepository matchEvents;
     private final RejectedOpRepository rejectedOps;
     private final EventService events;
@@ -33,6 +35,7 @@ class MatchReviewService {
 
     MatchReviewService(
             MatchRepository matches,
+            FightGroupRepository groups,
             MatchEventRepository matchEvents,
             RejectedOpRepository rejectedOps,
             EventService events,
@@ -41,6 +44,7 @@ class MatchReviewService {
             ScoreboardService scoreboard,
             Clock clock) {
         this.matches = matches;
+        this.groups = groups;
         this.matchEvents = matchEvents;
         this.rejectedOps = rejectedOps;
         this.events = events;
@@ -57,12 +61,11 @@ class MatchReviewService {
     @Transactional
     ReviewResponse review(UUID matchId, UUID accountId, ReviewRequest request) {
         var match = matches.lockById(matchId).orElseThrow(EventException::notFound);
-        var mat = scoreboard.mat(match);
-        access.require(mat.getEventId(), accountId, EventRole.CLUB);
+        access.require(match.getEventId(), accountId, EventRole.CLUB);
         if (!match.isInReview()) {
             throw EventException.conflict("MATCH_NOT_IN_REVIEW", "The match is not in review.");
         }
-        var event = events.get(mat.getEventId());
+        var event = events.get(match.getEventId());
         var now = clock.instant();
         var history = new ArrayList<>(matchEvents.findByMatchIdOrderByPosition(matchId));
         int applied = 0;
@@ -70,6 +73,10 @@ class MatchReviewService {
         for (var op : rejectedOps.findByMatchIdAndResolutionIsNullOrderByPosition(matchId)) {
             var resolution = Resolution.DISCARDED;
             if (request.action() == ReviewRequest.Action.APPLY) {
+                // A pool match started offline goes to the mat of the referee who started it.
+                if (match.getMatId() == null) {
+                    scoreboard.refereeMatOf(match, op.getActorAccountId()).ifPresent(m -> match.takeMat(m.getId()));
+                }
                 var at = MatchWriter.effectiveTime(history, op.getAt(), now);
                 var refused = writer.append(match, event, history, op.action(), at, false);
                 resolution = refused.isPresent() ? Resolution.SKIPPED : Resolution.APPLIED;
@@ -79,6 +86,8 @@ class MatchReviewService {
             op.resolve(resolution, accountId, now);
         }
         match.endReview();
+        match.backToPoolIf(groups.findById(match.getGroupId()).orElseThrow());
+        var mat = scoreboard.matOrNull(match);
         log.info("Match {} review {}: {} applied, {} skipped", matchId, request.action(), applied, skipped);
         return new ReviewResponse(scoreboard.view(match, mat, event, now), applied, skipped);
     }

@@ -86,31 +86,35 @@ void main() {
   });
 
   group('groups of teams', () {
-    test(
-      'three teams and a full ghost team of participants complete a group',
-      () {
-        var draft = pick(const DraftGroup(ghostTeamSize: 3), [
-          't1',
-          't2',
-          't3',
-        ]).setGhostMode(true);
+    test('up to three wildcard teams of 2 or 3 fill a group of teams in', () {
+      var draft = pick(const DraftGroup(ofTeams: true), [
+        't1',
+      ]).setGhostMode(true);
 
-        expect(draft.choosingGhost, isFalse);
-        expect(draft.choosingGhostTeam, isTrue);
-        expect(draft.stateOf('t4', grouped: false), PickState.unavailable);
+      expect(draft.choosingGhost, isFalse);
+      expect(draft.canAddGhostTeam, isTrue);
+      expect(draft.addGhostTeam(['p1']), same(draft));
+      expect(draft.addGhostTeam(['p1', 'p2', 'p3', 'p4']), same(draft));
 
-        draft = draft.setGhostTeam(['p1', 'p2']);
-        expect(draft.isComplete, isFalse);
-        expect(draft.setGhostTeam(['p1', 'p2', 'p3', 'p4']), same(draft));
+      draft = draft
+          .addGhostTeam(['p1', 'p2'])
+          .addGhostTeam(['p3', 'p4', 'p5'])
+          .addGhostTeam(['p6', 'p7']);
+      expect(draft.isComplete, isTrue);
+      expect(draft.canAddGhostTeam, isFalse);
+      expect(draft.stateOf('t2', grouped: false), PickState.unavailable);
+      expect(draft.ghostTeamPeople, hasLength(7));
 
-        draft = draft.setGhostTeam(['p1', 'p2', 'p3']);
-        expect(draft.isComplete, isTrue);
-        expect(draft.ghostTeam, ['p1', 'p2', 'p3']);
-      },
-    );
+      draft = draft.removeGhostTeam(1);
+      expect(draft.isComplete, isFalse);
+      expect(draft.ghostTeams, [
+        ['p1', 'p2'],
+        ['p6', 'p7'],
+      ]);
+    });
 
-    test('turning ghost mode on with four teams drops the fourth, not making it a ghost', () {
-      final draft = pick(const DraftGroup(ghostTeamSize: 3), [
+    test('turning wildcard mode on with four teams drops the fourth, not making it a wildcard', () {
+      final draft = pick(const DraftGroup(ofTeams: true), [
         't1',
         't2',
         't3',
@@ -119,24 +123,19 @@ void main() {
 
       expect(draft.members, ['t1', 't2', 't3']);
       expect(draft.ghosts, isEmpty);
-      expect(draft.choosingGhostTeam, isTrue);
+      expect(draft.canAddGhostTeam, isTrue);
       expect(draft.ofTeams, isTrue);
     });
 
-    test(
-      'the ghost team needs its three teams first and goes with a removed team',
-      () {
-        var draft = pick(
-          const DraftGroup(ghostTeamSize: 3).setGhostMode(true),
-          ['t1', 't2'],
-        );
-        expect(draft.setGhostTeam(['p1']), same(draft));
-
-        draft = pick(draft, ['t3']).setGhostTeam(['p1', 'p2', 'p3']);
-        draft = pick(draft, ['t2']);
-        expect(draft.ghostTeam, isEmpty);
-      },
-    );
+    test('without real teams the wildcard teams do not make a group', () {
+      final draft = const DraftGroup(ofTeams: true)
+          .setGhostMode(true)
+          .addGhostTeam(['p1', 'p2'])
+          .addGhostTeam(['p3', 'p4'])
+          .addGhostTeam(['p5', 'p6']);
+      expect(draft.isComplete, isFalse);
+      expect(draft.canAddGhostTeam, isFalse);
+    });
   });
 
   test(

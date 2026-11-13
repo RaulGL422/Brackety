@@ -57,7 +57,7 @@ public class CompetitorDirectory {
                             // Shown on the scoreboard and in the CSVs, Spanish like "Equipo N".
                             members.stream()
                                     .map(m -> fullName(people.get(m.getParticipantId()))
-                                            + (m.isGhost() && !team.isGhost() ? " (fantasma)" : ""))
+                                            + (m.isGhost() && !team.isGhost() ? " (comodín)" : ""))
                                     .toList(),
                             scorers));
         }

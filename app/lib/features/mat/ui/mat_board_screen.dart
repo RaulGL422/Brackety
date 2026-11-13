@@ -4,6 +4,7 @@ import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 import '../../../core/async_view.dart';
 import '../../../core/keep_screen_on.dart';
@@ -156,6 +157,11 @@ class _BoardList extends StatelessWidget {
                 readOnly: readOnly,
                 inProgress: true,
               ),
+            ),
+          if (board.teamPool)
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.m),
+              child: Text(l10n.matTeamPoolNotice, style: text.bodySmall),
             ),
           if (board.offline)
             const _OfflineNotice()
@@ -409,8 +415,8 @@ class _MatchRow extends StatelessWidget {
       ),
       subtitle: match.inReview
           ? Text(l10n.matInReview)
-          : waiting
-          ? Text(l10n.matWaiting)
+          : waiting || match.waitReason == WaitReason.otherMat
+          ? Text(waitText(context, match))
           : null,
       trailing: finished
           ? Text(
@@ -421,6 +427,22 @@ class _MatchRow extends StatelessWidget {
       onTap: locked ? null : () => _open(context, match, readOnly),
     );
   }
+}
+
+/// Why [match] cannot start yet, for its row.
+String waitText(BuildContext context, BoardMatch match) {
+  final l10n = AppLocalizations.of(context);
+  return switch (match.waitReason) {
+    WaitReason.review => l10n.matInReview,
+    WaitReason.resting when match.readyAt != null => l10n.matResting(
+      DateFormat.Hms(Localizations.localeOf(context).toLanguageTag())
+          .format(match.readyAt!.toLocal()),
+    ),
+    WaitReason.otherMat when match.otherMatNumber != null =>
+      l10n.matProposedElsewhere(match.otherMatNumber!),
+    _ when match.pool && match.waitReason == null => l10n.matPoolOffline,
+    _ => l10n.matWaiting,
+  };
 }
 
 /// The corner's colour mark (with its name for screen readers) and the fighter.

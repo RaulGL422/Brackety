@@ -52,7 +52,7 @@ public record EventPackage(
 
     /**
      * {@code originId}: the event on the server it was first exported from (the club's server), so its results can
-     * go back there.
+     * go back there. The team rules and the rest are null in a package from before they existed: defaults then.
      */
     public record Settings(
             @NotBlank @Size(max = 120) String name,
@@ -62,7 +62,10 @@ public record EventPackage(
             @Min(1) int pointsLimit,
             @Min(0) int changeoverSeconds,
             @Min(0) int attendancePoints,
-            UUID originId) {}
+            UUID originId,
+            @Min(1) Integer teamMatchSeconds,
+            @Min(0) Integer teamPointsLimit,
+            @Min(0) Integer minRestSeconds) {}
 
     public record LeagueEntry(
             @NotBlank @Size(max = 120) String name,

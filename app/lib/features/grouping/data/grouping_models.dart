@@ -45,6 +45,7 @@ class CategoryParticipant {
     this.groupId,
     this.groupStarted = false,
     this.groupCreatedBy,
+    this.queued = false,
   });
 
   factory CategoryParticipant.fromJson(Map<String, dynamic> json) =>
@@ -83,12 +84,30 @@ class CategoryParticipant {
   /// A match of their group has started: the helper can no longer undo it.
   final bool groupStarted;
 
+  /// In a team or group made without network, not sent yet.
+  final bool queued;
+
   bool get canUndoGroup => groupId != null && !groupStarted;
 
   bool get isGrouped => groupNumber != null;
 
-  /// Already competing for real somewhere: a group or a team.
-  bool get isTaken => isGrouped || teamNumber != null;
+  /// Already competing for real somewhere: a group or a team (also one waiting to be sent).
+  bool get isTaken => isGrouped || teamNumber != null || queued;
+
+  CategoryParticipant asQueued() => CategoryParticipant(
+    id: id,
+    firstName: firstName,
+    lastName: lastName,
+    age: age,
+    heightCm: heightCm,
+    groupNumber: groupNumber,
+    matNumber: matNumber,
+    teamNumber: teamNumber,
+    groupId: groupId,
+    groupStarted: groupStarted,
+    groupCreatedBy: groupCreatedBy,
+    queued: true,
+  );
 
   String get fullName => '$firstName $lastName';
 }
@@ -101,12 +120,13 @@ class CreatedGroups {
   });
 
   factory CreatedGroups.fromJson(Map<String, dynamic> json) => CreatedGroups(
-    matNumber: json['matNumber'] as int,
+    matNumber: json['matNumber'] as int?,
     groupNumbers: [for (final n in json['groupNumbers'] as List) n as int],
     groupIds: [for (final id in json['groupIds'] as List? ?? []) id as String],
   );
 
-  final int matNumber;
+  /// Null for groups of teams: their matches go to the free mats.
+  final int? matNumber;
   final List<int> groupNumbers;
 
   /// In the order of [groupNumbers].
@@ -123,6 +143,7 @@ class Team {
     this.matNumber,
     this.groupId,
     this.groupStarted = false,
+    this.queued = false,
   });
 
   factory Team.fromJson(Map<String, dynamic> json) => Team(
@@ -150,9 +171,26 @@ class Team {
   final String? groupId;
   final bool groupStarted;
 
+  /// In a group made without network, not sent yet.
+  final bool queued;
+
   bool get isGrouped => groupNumber != null;
 
+  /// In a group, or in one waiting to be sent.
+  bool get isTaken => isGrouped || queued;
+
   bool get canUndoGroup => groupId != null && !groupStarted;
+
+  Team asQueued() => Team(
+    id: id,
+    number: number,
+    members: members,
+    groupNumber: groupNumber,
+    matNumber: matNumber,
+    groupId: groupId,
+    groupStarted: groupStarted,
+    queued: true,
+  );
 }
 
 class TeamMember {

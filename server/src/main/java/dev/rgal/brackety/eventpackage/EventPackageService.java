@@ -256,6 +256,10 @@ public class EventPackageService {
                 settings.changeoverSeconds(),
                 settings.attendancePoints(),
                 clock.instant());
+        event.withTeamRules(
+                Objects.requireNonNullElse(settings.teamMatchSeconds(), event.getTeamMatchSeconds()),
+                Objects.requireNonNullElse(settings.teamPointsLimit(), event.getTeamPointsLimit()),
+                Objects.requireNonNullElse(settings.minRestSeconds(), event.getMinRestSeconds()));
         event.setOriginEventId(settings.originId());
         event = events.save(event);
         for (var member : p.staff()) {
@@ -589,7 +593,10 @@ public class EventPackageService {
                 event.getPointsLimit(),
                 event.getChangeoverSeconds(),
                 event.getAttendancePoints(),
-                Objects.requireNonNullElse(event.getOriginEventId(), event.getId()));
+                Objects.requireNonNullElse(event.getOriginEventId(), event.getId()),
+                event.getTeamMatchSeconds(),
+                event.getTeamPointsLimit(),
+                event.getMinRestSeconds());
     }
 
     private LeagueEntry league(Event event) {

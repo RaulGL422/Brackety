@@ -112,3 +112,8 @@ Sin red → operaciones → sincronización; idempotencia; CSV round trip; choqu
 ## Estado
 Web con cola, sesión tras recarga y rescate CSV hechos (2026-11-11, `feat/realtime-offline-web`); tests de servidor y app en verde. Falta la prueba a mano en el portátil y en la Pi.
 Pendiente; adelanto F1 en pruebas (2026-11-05, rama `feat/offline-f1-scoreboard`): servidor y app hechos. Falta la prueba manual de Raul y un escenario de datos con un combate en revisión (es de `server/`, sin hacer). Prueba a mano: APK sin red (modo avión) en un combate y en el tablero; volver la red; choque con el mismo árbitro en la web escribiendo el combate mientras el móvil está sin red; Aplicar y Descartar desde el club.
+
+## Ayudantes y lecturas sin red (2026-11-13, pedido de Raul)
+- Sin red las pantallas no esperan: el cliente sabe que no hay conexión y sirve lo guardado al instante; un sondeo ligero (`GET /api/v1/info` cada 3 s) detecta la vuelta y entonces se pide todo de nuevo.
+- Lecturas guardadas en el dispositivo (`OfflineGetCache`): mis eventos, categorías, alumnos y equipos de cada categoría, tapices, configuración, clasificación e inscritos. El tablero y los combates del árbitro siguen con su caché propia.
+- Equipos y grupos creados sin red van a una cola (`HelperQueue`, documento `helper-queue`): sus alumnos salen "Pendiente de enviar" y se envían en orden al volver. Si el servidor los rechaza (alguien ya agrupado por otro ayudante) se descartan y se avisa.

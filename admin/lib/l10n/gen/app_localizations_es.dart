@@ -520,6 +520,9 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get groupPool => 'Equipos: tapices libres';
+
+  @override
   String matchTeam(int number) {
     return 'Equipo $number';
   }
@@ -872,7 +875,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String ghostName(String name) {
-    return '$name · fantasma';
+    return '$name · comodín';
   }
 
   @override

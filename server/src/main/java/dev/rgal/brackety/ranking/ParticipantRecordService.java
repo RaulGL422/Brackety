@@ -65,7 +65,8 @@ class ParticipantRecordService {
         var fought = matches.findByEventId(eventId).stream()
                 .filter(m ->
                         competitors.participants(m.getRedId(), m.getBlueId()).contains(participantId))
-                .sorted(Comparator.comparing(Match::getMatId).thenComparingInt(Match::getOrderIndex))
+                .sorted(Comparator.comparing(Match::getMatId, Comparator.nullsLast(Comparator.naturalOrder()))
+                        .thenComparingInt(Match::getOrderIndex))
                 .map(m -> {
                     var side = competitors.participants(m.getRedId()).contains(participantId) ? Side.RED : Side.BLUE;
                     var view = snapshots.of(m);
@@ -88,7 +89,8 @@ class ParticipantRecordService {
                             rival.disqualified(),
                             view.endReason());
                 })
-                .sorted(Comparator.comparingInt(RecordMatch::matNumber).thenComparingInt(RecordMatch::groupNumber))
+                .sorted(Comparator.comparing(RecordMatch::matNumber, Comparator.nullsLast(Comparator.naturalOrder()))
+                        .thenComparingInt(RecordMatch::groupNumber))
                 .toList();
         return new ParticipantRecord(standing, fought);
     }

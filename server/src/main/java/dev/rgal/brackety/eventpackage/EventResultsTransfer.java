@@ -220,7 +220,7 @@ class EventResultsTransfer {
                             id,
                             eventId,
                             required(categories, g.categoryName(), "group category"),
-                            required(mats, g.matNumber(), "group mat"),
+                            g.matNumber() == null ? null : required(mats, g.matNumber(), "group mat"),
                             g.number(),
                             accounts.get(g.createdBy()),
                             timestamp(g.createdAt()))
@@ -248,7 +248,7 @@ class EventResultsTransfer {
                             id,
                             eventId,
                             required(groups, m.groupNumber(), "match group"),
-                            required(mats, m.matNumber(), "match mat"),
+                            m.matNumber() == null ? null : required(mats, m.matNumber(), "match mat"),
                             m.orderIndex(),
                             person(participants, m.red()),
                             person(participants, m.blue()),

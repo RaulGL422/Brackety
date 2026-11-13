@@ -176,8 +176,8 @@ void main() {
       expect(find.text('Group 1, 4-6'), findsOneWidget);
       expect(find.text('Made by Ana López (ayudante1)'), findsWidgets);
       expect(find.text('Leo Molina'), findsWidgets);
-      expect(find.text('Team 2 (Ana, Bea, Carla · ghost)'), findsWidgets);
-      expect(find.text('Zoe Gil · ghost'), findsWidgets);
+      expect(find.text('Team 2 (Ana, Bea, Carla · wildcard)'), findsWidgets);
+      expect(find.text('Zoe Gil · wildcard'), findsWidgets);
       expect(find.text('Nothing pending'), findsOneWidget);
       expect(find.text('15–3'), findsWidgets);
       expect(find.text('1 pending match, starting at 09:30'), findsOneWidget);
@@ -186,7 +186,7 @@ void main() {
       await tester.tap(find.text('Mat 1: arbitro1'));
       await tester.pumpAndSettle();
       expect(find.text('09:30'), findsOneWidget);
-      expect(find.text('Zoe Gil · ghost'), findsWidgets);
+      expect(find.text('Zoe Gil · wildcard'), findsWidgets);
       expect(tester.takeException(), isNull);
 
       await tester.tap(find.byTooltip('Back to the events'));

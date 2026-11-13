@@ -47,7 +47,7 @@ public final class AdminEventDtos {
             UUID id,
             int number,
             String category,
-            int matNumber,
+            Integer matNumber,
             String createdBy,
             List<Side> members,
             List<Match> matches) {}

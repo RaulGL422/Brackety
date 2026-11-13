@@ -7,15 +7,17 @@ import 'package:go_router/go_router.dart';
 import '../../../core/app_bar_action.dart';
 import '../../../core/async_view.dart';
 import '../../../l10n/gen/app_localizations.dart';
-import '../../auth/ui/widgets/confirm_dialog.dart';
 import '../data/grouping_models.dart';
 import '../data/grouping_repository.dart';
+import '../../auth/data/api_error.dart';
 import '../state/group_draft.dart';
+import '../state/helper_queue.dart';
 import '../state/grouping_providers.dart';
 import 'create_groups.dart';
 import 'draft_panel.dart';
 import 'pick_mark.dart';
 import '../../../core/up_button.dart';
+import '../../mat/ui/mat_label.dart';
 
 /// A team category (docs/modulos/prototipo-f1-equipos.md): make teams from its participants, then
 /// group 4 teams (or 3 and a ghost team) and send them to a mat. "Individual group" opens the usual
@@ -37,6 +39,7 @@ class TeamCategoryScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    listenHelperQueue(context, ref);
     final key = (eventId: eventId, categoryId: categoryId);
     return DefaultTabController(
       length: 2,
@@ -103,7 +106,7 @@ class _TeamMakerState extends ConsumerState<_TeamMaker> {
   void _toggle(String id) => setState(() {
     if (_picks.contains(id)) {
       _picks = [..._picks]..remove(id);
-    } else if (_picks.length < widget.teamSize) {
+    } else if (_picks.length < DraftGroup.maxTeam) {
       _picks = [..._picks, id];
     }
   });
@@ -113,19 +116,33 @@ class _TeamMakerState extends ConsumerState<_TeamMaker> {
     final toasts = Toasts.of(context);
     final key = widget.categoryKey;
     setState(() => _busy = true);
+    final ghosts = [..._ghosts];
     try {
       final team = await ref
           .read(groupingRepositoryProvider)
-          .createTeam(
-            key.eventId,
-            key.categoryId,
-            _picks,
-            ghostIds: [..._ghosts],
-          );
+          .createTeam(key.eventId, key.categoryId, _picks, ghostIds: ghosts);
       _picks = [];
       toasts.show(l10n.teamCreated(l10n.teamName(team.number)));
       _refresh(ref, key);
     } on DioException catch (e) {
+      // Without network it waits on the device and goes when the server answers again.
+      if (ApiError.from(e).noResponse) {
+        final label = l10n.queuedTeamLabel(_names(_picks));
+        await ref
+            .read(helperQueueProvider.notifier)
+            .add(
+              path: GroupingRepository.teamsPath(key.eventId, key.categoryId),
+              body: {'participantIds': _picks, 'ghostIds': ghosts},
+              label: label,
+              people: [
+                for (final id in _picks)
+                  if (!ghosts.contains(id)) id,
+              ],
+            );
+        _picks = [];
+        toasts.show(l10n.queuedOffline(label));
+        return;
+      }
       final conflict = e.response?.statusCode == 409;
       if (conflict) _refresh(ref, key);
       toasts.show(
@@ -135,6 +152,16 @@ class _TeamMakerState extends ConsumerState<_TeamMaker> {
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+  }
+
+  String _names(List<String> ids) {
+    final all =
+        ref.read(categoryParticipantsProvider(widget.categoryKey)).value ??
+        const <CategoryParticipant>[];
+    return [
+      for (final p in all)
+        if (ids.contains(p.id)) p.fullName,
+    ].join(', ');
   }
 
   /// The picks who already compete elsewhere: they join as ghosts.
@@ -155,7 +182,7 @@ class _TeamMakerState extends ConsumerState<_TeamMaker> {
       categoryParticipantsProvider(widget.categoryKey),
     );
     final ghosts = _ghosts;
-    final complete = _picks.length == widget.teamSize;
+    final complete = _picks.length >= DraftGroup.minTeam;
     final list = AsyncView(
       value: participants,
       onRetry: () => _refresh(ref, widget.categoryKey),
@@ -174,7 +201,7 @@ class _TeamMakerState extends ConsumerState<_TeamMaker> {
                   ghost: ghosts.contains(sorted[i - 1].id),
                   enabled:
                       _picks.contains(sorted[i - 1].id) ||
-                      _picks.length < widget.teamSize,
+                      _picks.length < DraftGroup.maxTeam,
                   onTap: () => _toggle(sorted[i - 1].id),
                 ),
         );
@@ -191,7 +218,7 @@ class _TeamMakerState extends ConsumerState<_TeamMaker> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                l10n.newTeamCount(_picks.length, widget.teamSize),
+                l10n.newTeamCount(_picks.length, DraftGroup.maxTeam),
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               if (ghosts.isNotEmpty)
@@ -232,14 +259,23 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
   String? _matId;
   var _busy = false;
 
-  DraftGroup _fresh() => DraftGroup(ghostTeamSize: widget.teamSize);
+  DraftGroup _fresh() => const DraftGroup(ofTeams: true);
 
   void _change(DraftGroup Function(DraftGroup) change) =>
       setState(() => _group = change(_group));
 
   Future<void> _create() async {
-    if (!await _acceptOverlaps()) return;
-    if (!mounted) return;
+    if (!_noOverlaps()) return;
+    final l10n = AppLocalizations.of(context);
+    final teams =
+        ref.read(categoryTeamsProvider(widget.categoryKey)).value ??
+        const <Team>[];
+    final label = l10n.queuedGroupLabel(
+      [
+        for (final t in teams)
+          if (_group.members.contains(t.id)) l10n.teamName(t.number),
+      ].join(', '),
+    );
     setState(() => _busy = true);
     final created = await createGroup(
       context,
@@ -249,6 +285,7 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
       group: _group,
       matId: _matId,
       refresh: () => _refresh(ref, widget.categoryKey),
+      label: label,
     );
     if (!mounted) return;
     setState(() {
@@ -260,9 +297,9 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
     });
   }
 
-  /// A participant in two teams of the group (a ghost member, say) would fight their own team: the
-  /// helper may still go on.
-  Future<bool> _acceptOverlaps() async {
+  /// A participant in two teams of the group (a wildcard member, say) would fight their own team:
+  /// never in one group (the server refuses it too).
+  bool _noOverlaps() {
     final l10n = AppLocalizations.of(context);
     final teams =
         ref.read(categoryTeamsProvider(widget.categoryKey)).value ??
@@ -281,12 +318,11 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
       for (final MapEntry(:key, :value) in overlaps.entries)
         l10n.teamOverlapLine(names[key]!, value.map(l10n.teamName).join(', ')),
     ];
-    return confirmAction(
-      context,
-      title: l10n.teamOverlapTitle,
-      body: l10n.teamOverlapBody(lines.join('\n')),
-      confirmLabel: l10n.createAnyway,
+    Toasts.of(context).show(
+      '${l10n.teamOverlapTitle}\n${lines.join('\n')}',
+      kind: ToastKind.error,
     );
+    return false;
   }
 
   Future<void> _pickGhostTeam(List<Team> teams) async {
@@ -295,19 +331,16 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
       for (final t in teams)
         if (group.members.contains(t.id))
           for (final m in t.members) m.participantId,
+      ...group.ghostTeamPeople,
     };
     final picked = await showModalBottomSheet<List<String>>(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder: (_) => _GhostTeamSheet(
-        categoryKey: widget.categoryKey,
-        size: widget.teamSize,
-        initial: group.ghostTeam,
-        excluded: own,
-      ),
+      builder: (_) =>
+          _GhostTeamSheet(categoryKey: widget.categoryKey, excluded: own),
     );
-    if (picked != null) _change((g) => g.setGhostTeam(picked));
+    if (picked != null) _change((g) => g.addGhostTeam(picked));
   }
 
   Future<void> _delete(Team team) async {
@@ -379,9 +412,9 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
                 team: all[i],
                 group: _group,
                 onTap: () => _change(
-                  (g) => g.toggle(all[i].id, grouped: all[i].isGrouped),
+                  (g) => g.toggle(all[i].id, grouped: all[i].isTaken),
                 ),
-                onDelete: all[i].isGrouped ? null : () => _delete(all[i]),
+                onDelete: all[i].isTaken ? null : () => _delete(all[i]),
                 onUndoGroup: all[i].canUndoGroup
                     ? () => undoGroup(
                         context,
@@ -431,7 +464,7 @@ class _TeamTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final state = group.stateOf(team.id, grouped: team.isGrouped);
+    final state = group.stateOf(team.id, grouped: team.isTaken);
     final names = team.members
         .map((m) => m.ghost ? l10n.ghostMemberName(m.fullName) : m.fullName)
         .join(', ');
@@ -442,7 +475,7 @@ class _TeamTile extends StatelessWidget {
       title: Text(l10n.teamName(team.number)),
       subtitle: Text(
         team.isGrouped
-            ? '$names\n${l10n.participantGrouped(team.groupNumber!, team.matNumber!)}'
+            ? '$names\n${l10n.participantGrouped(team.groupNumber!, matLabel(l10n, team.matNumber))}'
             : names,
       ),
       isThreeLine: team.isGrouped,
@@ -463,18 +496,11 @@ class _TeamTile extends StatelessWidget {
   }
 }
 
-/// Any [size] participants of the category, except those of the group's own teams.
+/// Any 2 or 3 participants of the category, except those already in the group.
 class _GhostTeamSheet extends ConsumerStatefulWidget {
-  const _GhostTeamSheet({
-    required this.categoryKey,
-    required this.size,
-    required this.initial,
-    required this.excluded,
-  });
+  const _GhostTeamSheet({required this.categoryKey, required this.excluded});
 
   final CategoryKey categoryKey;
-  final int size;
-  final List<String> initial;
   final Set<String> excluded;
 
   @override
@@ -482,7 +508,7 @@ class _GhostTeamSheet extends ConsumerStatefulWidget {
 }
 
 class _GhostTeamSheetState extends ConsumerState<_GhostTeamSheet> {
-  late var _picks = [...widget.initial];
+  var _picks = <String>[];
 
   @override
   Widget build(BuildContext context) {
@@ -498,7 +524,7 @@ class _GhostTeamSheetState extends ConsumerState<_GhostTeamSheet> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.m),
             child: Text(
-              l10n.draftGhostTeamHint(widget.size),
+              l10n.draftGhostTeamHint(DraftGroup.maxTeam),
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ),
@@ -524,7 +550,7 @@ class _GhostTeamSheetState extends ConsumerState<_GhostTeamSheet> {
                       subtitle: p.teamNumber == null
                           ? null
                           : Text(l10n.teamName(p.teamNumber!)),
-                      onChanged: picked || _picks.length < widget.size
+                      onChanged: picked || _picks.length < DraftGroup.maxTeam
                           ? (_) => setState(
                               () => _picks = picked
                                   ? ([..._picks]..remove(p.id))
@@ -545,10 +571,12 @@ class _GhostTeamSheetState extends ConsumerState<_GhostTeamSheet> {
                 style: FilledButton.styleFrom(
                   minimumSize: const Size.fromHeight(AppSizes.touchTarget),
                 ),
-                onPressed: _picks.length == widget.size
+                onPressed: _picks.length >= DraftGroup.minTeam
                     ? () => Navigator.of(context).pop(_picks)
                     : null,
-                child: Text(l10n.pickGhostTeam(_picks.length, widget.size)),
+                child: Text(
+                  l10n.pickGhostTeam(_picks.length, DraftGroup.maxTeam),
+                ),
               ),
             ),
           ),
@@ -595,9 +623,13 @@ class _PersonTile extends StatelessWidget {
           l10n.participantDetails(p.age, height),
           if (p.teamNumber != null) l10n.teamName(p.teamNumber!),
           if (p.isGrouped)
-            l10n.participantGrouped(p.groupNumber!, p.matNumber!),
+            l10n.participantGrouped(
+              p.groupNumber!,
+              matLabel(l10n, p.matNumber),
+            ),
           if (p.isGrouped && p.groupCreatedBy != null)
             l10n.groupCreatedBy(p.groupCreatedBy!),
+          if (p.queued) l10n.queuedPending,
           if (ghost) l10n.teamGhostMember,
         ].join(' · '),
       ),

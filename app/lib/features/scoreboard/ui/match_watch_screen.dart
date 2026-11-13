@@ -15,6 +15,7 @@ import 'final_score.dart';
 import 'review_panel.dart';
 import 'timeline_list.dart';
 import '../../../core/up_button.dart';
+import '../../mat/ui/mat_label.dart';
 
 /// A match seen by the club: score and timeline, without controls. In review, what the phone
 /// sent and the buttons to apply or discard it.
@@ -33,14 +34,17 @@ class MatchWatchScreen extends ConsumerWidget {
         leading: UpButton(
           label: match.value == null
               ? l10n.eventsTitle
-              : l10n.matTitle(match.value!.matNumber),
-          fallback: match.value == null
+              : matLabel(l10n, match.value!.matNumber),
+          fallback: match.value?.matId == null
               ? '/'
               : '/club/mats/${match.value!.matId}?number=${match.value!.matNumber}',
         ),
         leadingWidth: UpButton.leadingWidth(context),
         title: Text(switch (match.value) {
-          final view? => l10n.scoreboardTitle(view.matNumber, view.groupNumber),
+          final view? => l10n.scoreboardTitle(
+            matLabel(l10n, view.matNumber),
+            view.groupNumber,
+          ),
           null => l10n.timeline,
         }),
       ),

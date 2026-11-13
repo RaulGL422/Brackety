@@ -34,7 +34,7 @@ class FullExportService {
                                     (cuántos primeros, segundos y terceros).
             tapices.csv             Tapices con su árbitro y cuántos grupos y combates tuvieron.
             grupos.csv              Una fila por miembro de cada grupo (alumno o equipo), en su orden,
-                                    con el fantasma marcado.
+                                    con el comodín marcado.
             combates.csv            Cada combate: grupo, tapiz, rojo y azul con su club, puntos, ganador,
                                     cómo acabó, horas y tiempo de combate.
             linea-de-tiempo.csv     Cada acción del árbitro en cada combate, en orden, con la hora y el

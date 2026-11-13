@@ -167,14 +167,14 @@
     }
   },
   "heightUnknown": "sin estatura",
-  "participantGrouped": "Grupo {group} · Tapiz {mat}",
+  "participantGrouped": "Grupo {group} · {mat}",
   "@participantGrouped": {
     "placeholders": {
       "group": {
         "type": "int"
       },
       "mat": {
-        "type": "int"
+        "type": "String"
       }
     }
   },
@@ -186,8 +186,8 @@
       }
     }
   },
-  "draftGhost": "Competidor fantasma",
-  "draftGhostHint": "Fantasmas (hasta 3): quien ya tiene grupo, o el 4.º que elijas. Combaten pero no puntúan.",
+  "draftGhost": "Comodín",
+  "draftGhostHint": "Comodines (hasta 3): quien ya tiene grupo, o el 4.º que elijas. Combaten pero no puntúan.",
   "createGroup": "{count, plural, =1{Crear grupo} other{Crear grupos}}",
   "@createGroup": {
     "placeholders": {
@@ -207,8 +207,20 @@
   "groupsConflict": "Algún alumno ya está en un grupo o el tapiz se ha quedado sin árbitro. La lista se ha actualizado.",
   "groupsError": "No se ha podido crear el grupo.",
   "ok": "Aceptar",
-  "ghostBadge": "Fantasma",
+  "ghostBadge": "Comodín",
   "matTitle": "Tapiz {number}",
+  "matPool": "Tapices libres",
+  "queuedOffline": "Sin conexión: {what} se enviará al volver la red. Mientras, sus alumnos salen como pendientes.",
+  "@queuedOffline": {"placeholders": {"what": {"type": "String"}}},
+  "queuedSent": "Enviado: {what}",
+  "@queuedSent": {"placeholders": {"what": {"type": "String"}}},
+  "queuedRefused": "No se pudo crear {what}: alguien ya estaba en otro grupo o equipo. Revisa la lista.",
+  "@queuedRefused": {"placeholders": {"what": {"type": "String"}}},
+  "queuedPending": "Pendiente de enviar (sin conexión)",
+  "queuedGroupLabel": "el grupo de {names}",
+  "@queuedGroupLabel": {"placeholders": {"names": {"type": "String"}}},
+  "queuedTeamLabel": "el equipo de {names}",
+  "@queuedTeamLabel": {"placeholders": {"names": {"type": "String"}}},
   "@matTitle": {
     "placeholders": {
       "number": {
@@ -246,13 +258,19 @@
   "matGroups": "Grupos en este tapiz",
   "matFinished": "Disputados",
   "matWaiting": "Un luchador está combatiendo ahora",
+  "matResting": "Descansando hasta las {time}",
+  "@matResting": {"placeholders": {"time": {"type": "String"}}},
+  "matProposedElsewhere": "Propuesto en el tapiz {number}",
+  "@matProposedElsewhere": {"placeholders": {"number": {"type": "int"}}},
+  "matPoolOffline": "Sin conexión: otro tapiz puede estar haciéndolo",
+  "matTeamPoolNotice": "Sin grupos individuales pendientes: este tapiz coge los combates de equipos del bote común, repartidos entre los tapices libres. Primero los que más han descansado.",
   "matNoneAvailable": "Ningún combate puede empezar ahora.",
   "versus": "vs",
-  "scoreboardTitle": "Tapiz {mat}, grupo {group}",
+  "scoreboardTitle": "{mat}, grupo {group}",
   "@scoreboardTitle": {
     "placeholders": {
       "mat": {
-        "type": "int"
+        "type": "String"
       },
       "group": {
         "type": "int"
@@ -361,10 +379,16 @@
   "refusalClockRunning": "Para el reloj antes de ajustarlo.",
   "refusalClockLimit": "El reloj no puede ir más allá.",
   "settingsMatchRules": "Combates",
-  "settingsMatchLength": "Duración del combate (min:s)",
+  "settingsMatchLength": "Individual: duración del combate (min:s)",
+  "settingsTeamMatchLength": "Equipos: duración del combate (min:s)",
+  "settingsTeamPointsLimit": "Equipos: puntos para acabar el combate",
+  "settingsTeamPointsLimitHint": "Vacío = sin límite: acaba por tiempo. Descalificar da al rival 15 puntos, o los suyos si lleva más.",
+  "settingsMinRest": "Descanso mínimo entre combates (segundos)",
+  "settingsMinRestHint": "Nadie empieza un combate sin este descanso desde el anterior, en cualquier tapiz. Hasta entonces el combate sale en espera.",
+  "settingsMinRestInvalid": "Entre 0 y 600 segundos.",
   "settingsMatchLengthHint": "De 0:30 a 20:00. No cambia con un combate en curso.",
   "settingsMatchLengthInvalid": "Escribe minutos y segundos entre 0:30 y 20:00, por ejemplo 3:00.",
-  "settingsPointsLimit": "Puntos para acabar el combate",
+  "settingsPointsLimit": "Individual: puntos para acabar el combate",
   "settingsPointsLimitHint": "Al llegar uno, acaba. La descalificación da estos puntos al rival. No cambia una vez empezado un combate.",
   "settingsMatchRulesConflict": "No se puede cambiar ahora: hay un combate en curso o ya empezado.",
   "settingsPointsLimitInvalid": "Entre 1 y 99.",
@@ -525,7 +549,7 @@
       }
     }
   },
-  "teamGhostName": "Equipo {number} (fantasma)",
+  "teamGhostName": "Equipo {number} (comodín)",
   "@teamGhostName": {
     "placeholders": {
       "number": {
@@ -597,8 +621,10 @@
     }
   },
   "deleteTeamError": "No se ha podido deshacer el equipo.",
-  "draftGhostTeam": "Equipo fantasma",
-  "draftGhostTeamHint": "Elige {size} alumnos cualesquiera de la categoría: combaten pero no puntúan.",
+  "draftGhostTeam": "Equipo comodín",
+  "draftGhostTeamHint": "Equipos comodín (hasta 3): de 2 o hasta {size} alumnos cualesquiera de la categoría que no estén ya en el grupo. Combaten pero no puntúan.",
+  "addGhostTeam": "Añadir equipo comodín",
+  "teamGroupPoolHint": "Sin tapiz: sus combates se reparten entre los tapices sin grupos individuales.",
   "@draftGhostTeamHint": {
     "placeholders": {
       "size": {
@@ -700,14 +726,7 @@
   "confirmEmailChangeTitle": "Cambio de email",
   "confirmEmailChangeDone": "Email cambiado. Se han cerrado todas las sesiones: inicia sesión con el email nuevo.",
   "categoryIndividual": "Individual",
-  "categoryTeams": "Equipos de {size}",
-  "@categoryTeams": {
-    "placeholders": {
-      "size": {
-        "type": "int"
-      }
-    }
-  },
+  "categoryTeams": "Equipos de 2 o 3",
   "categoryAdd": "Añadir categoría",
   "categoryEdit": "Editar categoría",
   "categoryRemove": "Quitar categoría",
@@ -715,7 +734,6 @@
   "categoryMinAge": "Desde",
   "categoryMaxAge": "Hasta",
   "categoryByTeams": "Por equipos",
-  "categoryTeamSize": "Alumnos por equipo",
   "categoryGroupSize": "Grupos de {size}",
   "@categoryGroupSize": {
     "placeholders": {
@@ -1087,7 +1105,7 @@
       }
     }
   },
-  "ghostOf": "{name} (fantasma)",
+  "ghostOf": "{name} (comodín)",
   "@ghostOf": {
     "placeholders": {
       "name": {
@@ -1256,16 +1274,13 @@
   "settingsAttendanceHint": "Los suma a la clasificación quien compite en un grupo de esta fase. Al cambiarlos se recalcula la clasificación.",
   "draftTakenElsewhere": "{count, plural, =1{{names} ya está en otro grupo: se ha quitado del grupo nuevo.} other{{names} ya están en otro grupo: se han quitado del grupo nuevo.}}",
   "@draftTakenElsewhere": {"placeholders": {"count": {"type": "int"}, "names": {"type": "String"}}},
-  "teamGhostMember": "entra como fantasma",
-  "teamGhostHint": "Quien ya tiene equipo o grupo entra como fantasma: combate, pero no puntúa por este equipo.",
-  "ghostMemberName": "{name} (fantasma)",
+  "teamGhostMember": "entra como comodín",
+  "teamGhostHint": "Quien ya tiene equipo o grupo entra como comodín: combate, pero no puntúa por este equipo.",
+  "ghostMemberName": "{name} (comodín)",
   "@ghostMemberName": {"placeholders": {"name": {"type": "String"}}},
-  "teamOverlapTitle": "Alumnos en dos equipos del grupo",
-  "teamOverlapBody": "{lines}\n\nLes tocará combatir contra un equipo en el que también están. ¿Crear el grupo igualmente?",
-  "@teamOverlapBody": {"placeholders": {"lines": {"type": "String"}}},
+  "teamOverlapTitle": "No se puede: alumnos en dos equipos del grupo",
   "teamOverlapLine": "{name}: {teams}",
   "@teamOverlapLine": {"placeholders": {"name": {"type": "String"}, "teams": {"type": "String"}}},
-  "createAnyway": "Crear igualmente",
   "groupCreatedBy": "por {name}",
   "@groupCreatedBy": {"placeholders": {"name": {"type": "String"}}},
   "staffTitle": "Personal",
@@ -1294,15 +1309,17 @@
   "recordNoMatches": "Aún no está en ningún grupo.",
   "recordVs": "Contra {rival}",
   "@recordVs": {"placeholders": {"rival": {"type": "String"}}},
-  "recordWhere": "Tapiz {mat} · Grupo {group}",
-  "@recordWhere": {"placeholders": {"mat": {"type": "int"}, "group": {"type": "int"}}},
+  "recordWhere": "{mat} · Grupo {group}",
+  "@recordWhere": {"placeholders": {"mat": {"type": "String"}, "group": {"type": "int"}}},
   "recordWon": "Ganado",
   "recordLost": "Perdido",
   "recordDraw": "Empate",
-  "recordAsGhost": "como fantasma (no puntúa)",
+  "recordAsGhost": "como comodín (no puntúa)",
   "recordWarnings": "{count, plural, =1{1 advertencia} other{{count} advertencias}}",
   "recordOneHand": "{count, plural, =1{1 de una mano} other{{count} de una mano}}",
   "recordDisqualified": "Descalificado",
+  "leagueDisqualifications": "{count, plural, =1{1 descalificación} other{{count} descalificaciones}}",
+  "@leagueDisqualifications": {"placeholders": {"count": {"type": "int"}}},
   "recordRivalDisqualified": "Rival descalificado",
   "recordOpen": "Ver combates",
   "openLeague": "Abrir la liga",

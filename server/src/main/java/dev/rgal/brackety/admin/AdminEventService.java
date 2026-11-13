@@ -216,7 +216,7 @@ class AdminEventService {
                         select g.id, g.number, c.name as category, m.number as mat_number, g.created_by
                         from fight_group g
                         join event_category c on c.id = g.category_id
-                        join mat m on m.id = g.mat_id
+                        left join mat m on m.id = g.mat_id
                         where g.event_id = :eventId order by g.number""")
                 .param("eventId", eventId)
                 .query((rs, n) -> {
@@ -225,7 +225,7 @@ class AdminEventService {
                             id,
                             rs.getInt("number"),
                             rs.getString("category"),
-                            rs.getInt("mat_number"),
+                            rs.getObject("mat_number", Integer.class),
                             labels.get(rs.getObject("created_by", UUID.class)),
                             membersByGroup.getOrDefault(id, List.of()),
                             matchesByGroup.getOrDefault(id, List.of()));

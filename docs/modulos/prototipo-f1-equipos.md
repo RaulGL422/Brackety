@@ -8,7 +8,7 @@ A partir de cierta edad, la categoría compite **por equipos de 3** en lugar de 
 ## Reglas
 ### Configuración de categorías (club)
 - Cada categoría del evento: nombre, edad mín./máx., **formato** (`INDIVIDUAL` | `TEAM`), **tamaño de equipo** (solo `TEAM`, 3 por defecto) y **tamaño de grupo** (unidades por grupo: alumnos o equipos; 4).
-- Prototipo: tamaño de grupo solo 4 (el nórdico de 4 es el único calendario); tamaño de equipo 2-5.
+- Prototipo: tamaño de grupo solo 4 (el nórdico de 4 es el único calendario). Equipos **siempre de 2 o 3** (2026-11-13): el tamaño de la categoría ya no se usa.
 - Una categoría con equipos o grupos no cambia formato ni tamaños (409).
 - Demo: las 4 categorías mayores (`15-16`, `17-19`, `20-25`, `26+`) son de ejemplo por equipos; las reales sustituyen a estas sin tocar código (son datos del evento).
 
@@ -22,9 +22,9 @@ A partir de cierta edad, la categoría compite **por equipos de 3** en lugar de 
 ### Grupos de equipos (ayudante)
 - Lista de equipos de la categoría sin grupo → selecciona 4 → "Crear grupo", con el mismo desplegable de tapiz que en individual.
 - **Equipo fantasma**: casilla en el grupo; con 3 equipos seleccionados se eligen 3 alumnos cualesquiera de la categoría (también los que ya están en equipos o grupos, salvo los de los equipos de ese grupo). Forma "Equipo N (fantasma)": combate, no puntúa.
-- Grupo = 4 equipos reales, o 3 + 1 equipo fantasma.
+- Grupo = 4 equipos: de 1 a 4 reales y hasta 3 **equipos comodín** (2 o 3 alumnos cada uno; 2026-11-13). Nunca el mismo alumno en dos equipos del grupo: 409 `SAME_FIGHTER` (antes solo avisaba).
 - **Alumno fantasma dentro de un equipo** (pedido de Raul, 2026-11-12): al crear un equipo, quien ya tiene equipo o grupo entra como fantasma: combate con ese equipo pero no puntúa por él (ni asistencia ni puntos). El equipo puede ser entero de fantasmas. Si un alumno queda en dos equipos del mismo grupo, la app avisa antes de crearlo (no lo impide).
-- Tapiz: mismo criterio (menor fin estimado).
+- **Sin tapiz** (2026-11-13): los combates de los grupos de equipos van a un **bote común**. Un tapiz sin combates individuales pendientes coge del bote; si le cae un grupo individual, vuelve a individual al acabar el de equipos. Reparto (`MatchDispatch`): primero los tapices con individuales (sus grupos), luego los tapices libres, el que lleva más parado elige primero, nadie propuesto a dos tapices a la vez; cada elección sigue el recomendado (más descanso primero, descanso mínimo). El combate toma el tapiz del árbitro que lo empieza (al cancelarlo vuelve al bote). Sin red, del bote solo se puede empezar el último propuesto a ese tapiz.
 
 ### Grupo individual dentro de una categoría por equipos
 - Botón "Grupo individual": por si no salen equipos y se resuelve con individuales. Mismo flujo y reglas que una categoría individual (4, o 3 + fantasma).

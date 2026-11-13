@@ -330,8 +330,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get heightUnknown => 'sin estatura';
 
   @override
-  String participantGrouped(int group, int mat) {
-    return 'Grupo $group · Tapiz $mat';
+  String participantGrouped(int group, String mat) {
+    return 'Grupo $group · $mat';
   }
 
   @override
@@ -340,11 +340,11 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get draftGhost => 'Competidor fantasma';
+  String get draftGhost => 'Comodín';
 
   @override
   String get draftGhostHint =>
-      'Fantasmas (hasta 3): quien ya tiene grupo, o el 4.º que elijas. Combaten pero no puntúan.';
+      'Comodines (hasta 3): quien ya tiene grupo, o el 4.º que elijas. Combaten pero no puntúan.';
 
   @override
   String createGroup(int count) {
@@ -379,11 +379,42 @@ class AppLocalizationsEs extends AppLocalizations {
   String get ok => 'Aceptar';
 
   @override
-  String get ghostBadge => 'Fantasma';
+  String get ghostBadge => 'Comodín';
 
   @override
   String matTitle(int number) {
     return 'Tapiz $number';
+  }
+
+  @override
+  String get matPool => 'Tapices libres';
+
+  @override
+  String queuedOffline(String what) {
+    return 'Sin conexión: $what se enviará al volver la red. Mientras, sus alumnos salen como pendientes.';
+  }
+
+  @override
+  String queuedSent(String what) {
+    return 'Enviado: $what';
+  }
+
+  @override
+  String queuedRefused(String what) {
+    return 'No se pudo crear $what: alguien ya estaba en otro grupo o equipo. Revisa la lista.';
+  }
+
+  @override
+  String get queuedPending => 'Pendiente de enviar (sin conexión)';
+
+  @override
+  String queuedGroupLabel(String names) {
+    return 'el grupo de $names';
+  }
+
+  @override
+  String queuedTeamLabel(String names) {
+    return 'el equipo de $names';
   }
 
   @override
@@ -436,14 +467,32 @@ class AppLocalizationsEs extends AppLocalizations {
   String get matWaiting => 'Un luchador está combatiendo ahora';
 
   @override
+  String matResting(String time) {
+    return 'Descansando hasta las $time';
+  }
+
+  @override
+  String matProposedElsewhere(int number) {
+    return 'Propuesto en el tapiz $number';
+  }
+
+  @override
+  String get matPoolOffline =>
+      'Sin conexión: otro tapiz puede estar haciéndolo';
+
+  @override
+  String get matTeamPoolNotice =>
+      'Sin grupos individuales pendientes: este tapiz coge los combates de equipos del bote común, repartidos entre los tapices libres. Primero los que más han descansado.';
+
+  @override
   String get matNoneAvailable => 'Ningún combate puede empezar ahora.';
 
   @override
   String get versus => 'vs';
 
   @override
-  String scoreboardTitle(int mat, int group) {
-    return 'Tapiz $mat, grupo $group';
+  String scoreboardTitle(String mat, int group) {
+    return '$mat, grupo $group';
   }
 
   @override
@@ -625,7 +674,28 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsMatchRules => 'Combates';
 
   @override
-  String get settingsMatchLength => 'Duración del combate (min:s)';
+  String get settingsMatchLength => 'Individual: duración del combate (min:s)';
+
+  @override
+  String get settingsTeamMatchLength => 'Equipos: duración del combate (min:s)';
+
+  @override
+  String get settingsTeamPointsLimit =>
+      'Equipos: puntos para acabar el combate';
+
+  @override
+  String get settingsTeamPointsLimitHint =>
+      'Vacío = sin límite: acaba por tiempo. Descalificar da al rival 15 puntos, o los suyos si lleva más.';
+
+  @override
+  String get settingsMinRest => 'Descanso mínimo entre combates (segundos)';
+
+  @override
+  String get settingsMinRestHint =>
+      'Nadie empieza un combate sin este descanso desde el anterior, en cualquier tapiz. Hasta entonces el combate sale en espera.';
+
+  @override
+  String get settingsMinRestInvalid => 'Entre 0 y 600 segundos.';
 
   @override
   String get settingsMatchLengthHint =>
@@ -636,7 +706,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'Escribe minutos y segundos entre 0:30 y 20:00, por ejemplo 3:00.';
 
   @override
-  String get settingsPointsLimit => 'Puntos para acabar el combate';
+  String get settingsPointsLimit => 'Individual: puntos para acabar el combate';
 
   @override
   String get settingsPointsLimitHint =>
@@ -937,7 +1007,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String teamGhostName(int number) {
-    return 'Equipo $number (fantasma)';
+    return 'Equipo $number (comodín)';
   }
 
   @override
@@ -1014,12 +1084,19 @@ class AppLocalizationsEs extends AppLocalizations {
   String get deleteTeamError => 'No se ha podido deshacer el equipo.';
 
   @override
-  String get draftGhostTeam => 'Equipo fantasma';
+  String get draftGhostTeam => 'Equipo comodín';
 
   @override
   String draftGhostTeamHint(int size) {
-    return 'Elige $size alumnos cualesquiera de la categoría: combaten pero no puntúan.';
+    return 'Equipos comodín (hasta 3): de 2 o hasta $size alumnos cualesquiera de la categoría que no estén ya en el grupo. Combaten pero no puntúan.';
   }
+
+  @override
+  String get addGhostTeam => 'Añadir equipo comodín';
+
+  @override
+  String get teamGroupPoolHint =>
+      'Sin tapiz: sus combates se reparten entre los tapices sin grupos individuales.';
 
   @override
   String pickGhostTeam(int count, int size) {
@@ -1213,9 +1290,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get categoryIndividual => 'Individual';
 
   @override
-  String categoryTeams(int size) {
-    return 'Equipos de $size';
-  }
+  String get categoryTeams => 'Equipos de 2 o 3';
 
   @override
   String get categoryAdd => 'Añadir categoría';
@@ -1237,9 +1312,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get categoryByTeams => 'Por equipos';
-
-  @override
-  String get categoryTeamSize => 'Alumnos por equipo';
 
   @override
   String categoryGroupSize(int size) {
@@ -1773,7 +1845,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String ghostOf(String name) {
-    return '$name (fantasma)';
+    return '$name (comodín)';
   }
 
   @override
@@ -2002,32 +2074,25 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get teamGhostMember => 'entra como fantasma';
+  String get teamGhostMember => 'entra como comodín';
 
   @override
   String get teamGhostHint =>
-      'Quien ya tiene equipo o grupo entra como fantasma: combate, pero no puntúa por este equipo.';
+      'Quien ya tiene equipo o grupo entra como comodín: combate, pero no puntúa por este equipo.';
 
   @override
   String ghostMemberName(String name) {
-    return '$name (fantasma)';
+    return '$name (comodín)';
   }
 
   @override
-  String get teamOverlapTitle => 'Alumnos en dos equipos del grupo';
-
-  @override
-  String teamOverlapBody(String lines) {
-    return '$lines\n\nLes tocará combatir contra un equipo en el que también están. ¿Crear el grupo igualmente?';
-  }
+  String get teamOverlapTitle =>
+      'No se puede: alumnos en dos equipos del grupo';
 
   @override
   String teamOverlapLine(String name, String teams) {
     return '$name: $teams';
   }
-
-  @override
-  String get createAnyway => 'Crear igualmente';
 
   @override
   String groupCreatedBy(String name) {
@@ -2115,8 +2180,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String recordWhere(int mat, int group) {
-    return 'Tapiz $mat · Grupo $group';
+  String recordWhere(String mat, int group) {
+    return '$mat · Grupo $group';
   }
 
   @override
@@ -2129,7 +2194,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get recordDraw => 'Empate';
 
   @override
-  String get recordAsGhost => 'como fantasma (no puntúa)';
+  String get recordAsGhost => 'como comodín (no puntúa)';
 
   @override
   String recordWarnings(num count) {
@@ -2155,6 +2220,17 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get recordDisqualified => 'Descalificado';
+
+  @override
+  String leagueDisqualifications(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count descalificaciones',
+      one: '1 descalificación',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get recordRivalDisqualified => 'Rival descalificado';

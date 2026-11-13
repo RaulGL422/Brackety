@@ -128,7 +128,7 @@ void main() {
 
       expect(find.text('Team 1'), findsOneWidget);
       expect(find.text('Ana P, Bea P, Carla P'), findsOneWidget);
-      expect(find.text('Team 4 · Ghost'), findsOneWidget);
+      expect(find.text('Team 4 · Wildcard'), findsOneWidget);
       expect(tester.takeException(), isNull);
 
       await tester.pumpWidget(const SizedBox());

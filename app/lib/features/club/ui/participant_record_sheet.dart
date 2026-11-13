@@ -9,6 +9,7 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../../mat/data/mat_board.dart';
 import '../data/club_models.dart';
 import '../state/club_providers.dart';
+import '../../mat/ui/mat_label.dart';
 
 /// A participant's day for the club: their place and points, and each match with the rival, the
 /// score, the warnings and how it ended. A match opens its timeline.
@@ -138,7 +139,7 @@ class _MatchCard extends StatelessWidget {
         title: Text(l10n.recordVs(m.rival)),
         subtitle: Text(
           [
-            l10n.recordWhere(m.matNumber, m.groupNumber),
+            l10n.recordWhere(matLabel(l10n, m.matNumber), m.groupNumber),
             switch (m.status) {
               MatchStatus.pending => l10n.matchNotStarted,
               MatchStatus.inProgress => l10n.matchLive,

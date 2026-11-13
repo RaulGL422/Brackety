@@ -35,6 +35,12 @@ Future<MatBoard> _board(Ref ref, String matId) async {
 
 Future<MatBoard> _cachedBoard(Ref ref, String matId) async {
   final sync = ref.read(offlineSyncProvider.notifier);
+  // Known to be offline: the saved board at once, not after a timeout. When the background
+  // check finds the server again, this runs again and fetches it.
+  if (!ref.watch(offlineSyncProvider.select((s) => s.connected))) {
+    final cached = await sync.cachedBoard(matId);
+    if (cached is Map<String, dynamic>) return _offlineBoard(cached);
+  }
   try {
     final response = await ref
         .watch(apiProvider)
@@ -49,14 +55,21 @@ Future<MatBoard> _cachedBoard(Ref ref, String matId) async {
     sync.reportNoResponse();
     final cached = await sync.cachedBoard(matId);
     if (cached is! Map<String, dynamic>) rethrow;
-    final board = MatBoard.fromJson(cached);
-    return MatBoard(
-      matNumber: board.matNumber,
-      groups: board.groups,
-      matches: board.matches,
-      offline: true,
-    );
+    return _offlineBoard(cached);
   }
+}
+
+// The last proposal stays: offline only that one of the team pool can start here.
+MatBoard _offlineBoard(Map<String, dynamic> cached) {
+  final board = MatBoard.fromJson(cached);
+  return MatBoard(
+    matNumber: board.matNumber,
+    groups: board.groups,
+    matches: board.matches,
+    recommendedMatchId: board.recommendedMatchId,
+    offline: true,
+    teamPool: board.teamPool,
+  );
 }
 
 /// [cachedBoardProvider] with the device's queue on top: the matches played here, the ones in

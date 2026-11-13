@@ -202,7 +202,7 @@ void main() {
         expect(matchTile('Ana', 'Carla'), findsOneWidget);
         expect(scheme, isNotNull);
 
-        final waiting = matchTile('Carla', 'Diego · Ghost');
+        final waiting = matchTile('Carla', 'Diego · Wildcard');
         await tester.scrollUntilVisible(waiting, 200);
         expect(tile(waiting).onTap, isNull);
         expect(tile(waiting).enabled, isTrue);
@@ -283,7 +283,7 @@ void main() {
     await tester.pumpAndSettle();
 
     final waiting = tester.widget<ListTile>(
-      matchTile('Carla', 'Diego · Ghost'),
+      matchTile('Carla', 'Diego · Wildcard'),
     );
     expect(waiting.onTap, isNotNull);
   });
@@ -351,7 +351,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(matchTile('Team 1', 'Team 2'), findsOneWidget);
-      expect(find.text('Team 4 · Ghost'), findsOneWidget);
+      expect(find.text('Team 4 · Wildcard'), findsOneWidget);
       expect(find.text('A1, B1, C1'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });

@@ -113,11 +113,18 @@ public class EventService {
         }
         var matchSeconds = request.matchSeconds() == null ? event.getMatchSeconds() : request.matchSeconds();
         var pointsLimit = request.pointsLimit() == null ? event.getPointsLimit() : request.pointsLimit();
-        if (matchSeconds != event.getMatchSeconds() && events.hasMatchIn(eventId, "IN_PROGRESS")) {
+        var teamMatchSeconds =
+                request.teamMatchSeconds() == null ? event.getTeamMatchSeconds() : request.teamMatchSeconds();
+        var teamPointsLimit =
+                request.teamPointsLimit() == null ? event.getTeamPointsLimit() : request.teamPointsLimit();
+        var minRestSeconds = request.minRestSeconds() == null ? event.getMinRestSeconds() : request.minRestSeconds();
+        if ((matchSeconds != event.getMatchSeconds() || teamMatchSeconds != event.getTeamMatchSeconds())
+                && events.hasMatchIn(eventId, "IN_PROGRESS")) {
             throw EventException.conflict("The match length cannot change while a match is in progress.");
         }
         // A disqualification scores the limit for the rival: started matches keep the one they had.
-        if (pointsLimit != event.getPointsLimit() && events.hasStartedMatches(eventId)) {
+        if ((pointsLimit != event.getPointsLimit() || teamPointsLimit != event.getTeamPointsLimit())
+                && events.hasStartedMatches(eventId)) {
             throw EventException.conflict("The points limit cannot change once a match has started.");
         }
         var current = mats.findByEventIdOrderByNumber(eventId);
@@ -136,7 +143,10 @@ public class EventService {
                 request.maxGroupsPerMat(),
                 matchSeconds,
                 pointsLimit,
-                attendancePoints);
+                attendancePoints,
+                teamMatchSeconds,
+                teamPointsLimit,
+                minRestSeconds);
         for (int i = 0; i < request.matReferees().size(); i++) {
             var referee = request.matReferees().get(i);
             if (i < current.size()) {
@@ -184,7 +194,10 @@ public class EventService {
                 EventOrganizationService.list(organizations, event.getId()),
                 event.getAttendancePoints(),
                 event.getPhaseNumber(),
-                event.getDiscipline().name());
+                event.getDiscipline().name(),
+                event.getTeamMatchSeconds(),
+                event.getTeamPointsLimit(),
+                event.getMinRestSeconds());
     }
 
     private List<UUID> refereeIds(UUID eventId) {

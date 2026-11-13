@@ -1,12 +1,22 @@
 package dev.rgal.brackety.grouping.dto;
 
 import dev.rgal.brackety.grouping.Match;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-/** What the referee sees on a mat; {@code recommendedMatchId} is null when nothing can start. */
+/**
+ * What the referee sees on a mat; {@code recommendedMatchId} is null when nothing can start. {@code teamPool}: the
+ * mat has no individual match pending, so it takes team matches from the pool shared by every such mat; those are
+ * in {@code matches} too.
+ */
 public record MatBoardResponse(
-        UUID matId, int matNumber, List<BoardGroup> groups, List<BoardMatch> matches, UUID recommendedMatchId) {
+        UUID matId,
+        int matNumber,
+        List<BoardGroup> groups,
+        List<BoardMatch> matches,
+        UUID recommendedMatchId,
+        boolean teamPool) {
 
     /**
      * A participant ({@code participantId}) or a team ({@code teamId}, {@code teamNumber}); {@code members}
@@ -19,8 +29,10 @@ public record MatBoardResponse(
     public record BoardGroup(UUID id, int number, String categoryName, List<Fighter> members, String createdBy) {}
 
     /**
-     * {@code available}: neither fighter is in a match in progress on any mat, and it is not in review.
-     * {@code inReview}: an offline action clashed and the club has to apply or discard it.
+     * {@code available}: it can start now. {@code waitReason} says why not: REVIEW (an offline action clashed and
+     * the club has to apply or discard it), BUSY (someone is fighting on a mat) or RESTING (someone has not had the
+     * least rest; until {@code readyAt}). OTHER_MAT (proposed to mat {@code otherMatNumber}) is only a hint: it stays
+     * available, so a stalled mat never holds it. {@code pool}: a team match waiting for a free mat.
      */
     public record BoardMatch(
             UUID id,
@@ -33,5 +45,9 @@ public record MatBoardResponse(
             int redScore,
             int blueScore,
             boolean available,
-            boolean inReview) {}
+            boolean inReview,
+            String waitReason,
+            Instant readyAt,
+            Integer otherMatNumber,
+            boolean pool) {}
 }
