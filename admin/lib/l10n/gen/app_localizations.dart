@@ -98,6 +98,30 @@ abstract class AppLocalizations {
     Locale('es'),
   ];
 
+  /// No description provided for @eventReset.
+  ///
+  /// In es, this message translates to:
+  /// **'Reiniciar el evento desde el paquete'**
+  String get eventReset;
+
+  /// No description provided for @eventResetTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Reiniciar el evento?'**
+  String get eventResetTitle;
+
+  /// No description provided for @eventResetBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Se borra todo lo hecho (grupos, equipos, combates, puntuaciones, cambios de configuración e inscritos añadidos) y se vuelve a cargar {package}. Las cuentas y contraseñas se mantienen. Todos tendrán que recargar la página. No se puede deshacer: escribe {word} para confirmar.'**
+  String eventResetBody(String package, String word);
+
+  /// No description provided for @eventResetDone.
+  ///
+  /// In es, this message translates to:
+  /// **'Evento reiniciado desde el paquete.'**
+  String get eventResetDone;
+
   /// No description provided for @controlSave.
   ///
   /// In es, this message translates to:

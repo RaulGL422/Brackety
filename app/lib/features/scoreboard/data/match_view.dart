@@ -79,7 +79,7 @@ class Corner implements FighterInfo {
   @override
   final List<String> members;
 
-  /// Aged 4 to 7 (for a team, someone in it): the one-hand warning applies.
+  /// Aged 4 to 8 (for a team, someone in it): the one-hand warning applies.
   final bool oneHandRule;
   final int points;
   final int warnings;

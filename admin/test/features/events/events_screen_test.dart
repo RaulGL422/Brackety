@@ -7,9 +7,12 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../support/fakes.dart';
 
 class FakeEventsApi implements EventsApi {
-  FakeEventsApi({this.total = 1});
+  FakeEventsApi({this.total = 1, this.package});
 
   final int total;
+
+  /// The hall laptop's package; null on a server without one.
+  final String? package;
   final pages = <int>[];
   final calls = <String>[];
   DioException? error;
@@ -152,6 +155,13 @@ class FakeEventsApi implements EventsApi {
       calls.add('waiveRest $matchId');
 
   @override
+  Future<String?> resetPackage() async => package;
+
+  @override
+  Future<void> resetEvent(String reason) async =>
+      calls.add('resetEvent: $reason');
+
+  @override
   Future<Cleared> clearCompetition(String eventId, String reason) async {
     calls.add('clear $eventId: $reason');
     final cleared = (groups: groups.length, teams: 1);
@@ -161,8 +171,12 @@ class FakeEventsApi implements EventsApi {
 }
 
 void main() {
-  Future<FakeEventsApi> open(WidgetTester tester, {int total = 1}) async {
-    final api = FakeEventsApi(total: total);
+  Future<FakeEventsApi> open(
+    WidgetTester tester, {
+    int total = 1,
+    String? package,
+  }) async {
+    final api = FakeEventsApi(total: total, package: package);
     await pumpAdmin(
       tester,
       location: '/events',
@@ -220,6 +234,58 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Fase 1 página 1'), findsOneWidget);
     });
+  }
+
+  testWidgets('without a package there is no event reset', (tester) async {
+    useSize(tester, screenSizes['desktop']!);
+    await open(tester);
+
+    expect(find.text('Start the event again from the package'), findsNothing);
+  });
+
+  for (final MapEntry(key: device, value: size) in screenSizes.entries) {
+    testWidgets(
+      'the hall laptop starts the event again, typing the word, on $device',
+      (tester) async {
+        useSize(tester, size);
+        final api = await open(tester, package: 'fase-1.brackety');
+
+        await tester.tap(find.text('Start the event again from the package'));
+        await tester.pumpAndSettle();
+        expect(
+          find.textContaining('fase-1.brackety is loaded again'),
+          findsOneWidget,
+        );
+        final confirm = find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.widgetWithText(
+            FilledButton,
+            'Start the event again from the package',
+          ),
+        );
+        await giveReason(tester, 'Pruebas acabadas');
+        expect(tester.widget<FilledButton>(confirm).onPressed, isNull);
+        await tester.enterText(
+          find
+              .descendant(
+                of: find.byType(AlertDialog),
+                matching: find.byType(TextField),
+              )
+              .last,
+          'REINICIAR',
+        );
+        await tester.pump();
+        await tester.tap(confirm);
+        await tester.pumpAndSettle();
+
+        expect(api.calls, ['resetEvent: Pruebas acabadas']);
+        expect(
+          find.text('Event started again from the package.'),
+          findsOneWidget,
+        );
+        expect(tester.takeException(), isNull);
+      },
+    );
   }
 
   testWidgets(

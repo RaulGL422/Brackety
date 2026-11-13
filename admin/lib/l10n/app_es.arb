@@ -1,4 +1,9 @@
 {
+  "eventReset": "Reiniciar el evento desde el paquete",
+  "eventResetTitle": "¿Reiniciar el evento?",
+  "eventResetBody": "Se borra todo lo hecho (grupos, equipos, combates, puntuaciones, cambios de configuración e inscritos añadidos) y se vuelve a cargar {package}. Las cuentas y contraseñas se mantienen. Todos tendrán que recargar la página. No se puede deshacer: escribe {word} para confirmar.",
+  "@eventResetBody": {"placeholders": {"package": {"type": "String"}, "word": {"type": "String"}}},
+  "eventResetDone": "Evento reiniciado desde el paquete.",
   "controlSave": "Guardar",
   "controlMenu": "Cambiar",
   "controlDone": "Hecho",

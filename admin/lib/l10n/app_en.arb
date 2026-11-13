@@ -1,4 +1,9 @@
 {
+  "eventReset": "Start the event again from the package",
+  "eventResetTitle": "Start the event again?",
+  "eventResetBody": "Everything done is deleted (groups, teams, matches, scores, setting changes and added entries) and {package} is loaded again. Accounts and passwords stay. Everyone will have to reload the page. It cannot be undone: type {word} to confirm.",
+  "@eventResetBody": {"placeholders": {"package": {"type": "String"}, "word": {"type": "String"}}},
+  "eventResetDone": "Event started again from the package.",
   "controlSave": "Save",
   "controlMenu": "Change",
   "controlDone": "Done",

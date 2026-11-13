@@ -22,14 +22,17 @@ class EventPackageLoader implements SmartInitializingSingleton {
     private final EventPackageService packages;
     private final String file;
     private final String credentialsFile;
+    private final boolean usernamePasswords;
 
     EventPackageLoader(
             EventPackageService packages,
             @Value("${brackety.package}") String file,
-            @Value("${brackety.package-credentials}") String credentialsFile) {
+            @Value("${brackety.package-credentials}") String credentialsFile,
+            @Value("${brackety.package-username-passwords}") boolean usernamePasswords) {
         this.packages = packages;
         this.file = file;
         this.credentialsFile = credentialsFile;
+        this.usernamePasswords = usernamePasswords;
     }
 
     @Override
@@ -50,7 +53,7 @@ class EventPackageLoader implements SmartInitializingSingleton {
         }
         LoadedPackage loaded;
         try {
-            loaded = packages.load(content);
+            loaded = packages.load(content, usernamePasswords);
         } catch (InvalidEventPackageException e) {
             throw new IllegalStateException(
                     "Event package " + path.getFileName() + " not loaded: " + e.getMessage(), e);

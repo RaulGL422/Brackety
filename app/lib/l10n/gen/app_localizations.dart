@@ -3183,7 +3183,7 @@ abstract class AppLocalizations {
   /// No description provided for @refusalNotForAge.
   ///
   /// In es, this message translates to:
-  /// **'El aviso de una mano solo es para alumnos de 4 a 7 años.'**
+  /// **'El aviso de una mano solo es para alumnos de 4 a 8 años.'**
   String get refusalNotForAge;
 
   /// No description provided for @refusalInReview.
@@ -3225,7 +3225,7 @@ abstract class AppLocalizations {
   /// No description provided for @reviewReasonAge.
   ///
   /// In es, this message translates to:
-  /// **'Aviso de una mano a quien no tiene de 4 a 7 años.'**
+  /// **'Aviso de una mano a quien no tiene de 4 a 8 años.'**
   String get reviewReasonAge;
 
   /// No description provided for @reviewReasonMatBusy.

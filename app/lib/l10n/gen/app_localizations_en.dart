@@ -1875,7 +1875,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get refusalNotForAge =>
-      'The one-hand warning is only for fighters aged 4 to 7.';
+      'The one-hand warning is only for fighters aged 4 to 8.';
 
   @override
   String get refusalInReview => 'The match is under the club\'s review.';
@@ -1899,7 +1899,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'The scoreboard rules did not allow one of the phone\'s actions.';
 
   @override
-  String get reviewReasonAge => 'One-hand warning to someone not aged 4 to 7.';
+  String get reviewReasonAge => 'One-hand warning to someone not aged 4 to 8.';
 
   @override
   String get reviewReasonMatBusy => 'Another match was in progress on the mat.';

@@ -20,9 +20,10 @@ import org.springframework.stereotype.Component;
 @Component
 class MatchWriter {
 
-    // Reglamento tambo: under 8, touching with one hand is warned and, twice, scores for the rival.
+    // Reglamento tambo: from 4 to 8 (both hands always, the F1's 5-8 category), touching with one hand is warned
+    // and, twice, scores for the rival.
     static final int ONE_HAND_MIN_AGE = 4;
-    static final int ONE_HAND_MAX_AGE = 7;
+    static final int ONE_HAND_MAX_AGE = 8;
 
     /** {@code deltaMs}: only for a CLOCK_ADJUST. {@code opId}: the device's id, or null from the web. */
     record Action(MatchEventType type, Side side, String reason, Long deltaMs, UUID opId, UUID actorAccountId) {}
@@ -105,7 +106,11 @@ class MatchWriter {
     boolean oneHandRule(Event event, Competitor fighter) {
         return participants.findAllById(fighter.participantIds()).stream()
                 .map(p -> event.ageOf(p.getBirthDate()))
-                .anyMatch(age -> age >= ONE_HAND_MIN_AGE && age <= ONE_HAND_MAX_AGE);
+                .anyMatch(MatchWriter::oneHandAge);
+    }
+
+    static boolean oneHandAge(int age) {
+        return age >= ONE_HAND_MIN_AGE && age <= ONE_HAND_MAX_AGE;
     }
 
     static TamboMatch replay(Event event, Match match, List<MatchEvent> history) {

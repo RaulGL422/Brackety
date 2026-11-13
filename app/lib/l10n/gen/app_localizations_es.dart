@@ -1887,7 +1887,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get refusalNotForAge =>
-      'El aviso de una mano solo es para alumnos de 4 a 7 años.';
+      'El aviso de una mano solo es para alumnos de 4 a 8 años.';
 
   @override
   String get refusalInReview => 'El combate está en revisión del club.';
@@ -1912,7 +1912,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get reviewReasonAge =>
-      'Aviso de una mano a quien no tiene de 4 a 7 años.';
+      'Aviso de una mano a quien no tiene de 4 a 8 años.';
 
   @override
   String get reviewReasonMatBusy => 'Había otro combate en curso en el tapiz.';

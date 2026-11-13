@@ -10,6 +10,20 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
+  String get eventReset => 'Reiniciar el evento desde el paquete';
+
+  @override
+  String get eventResetTitle => '¿Reiniciar el evento?';
+
+  @override
+  String eventResetBody(String package, String word) {
+    return 'Se borra todo lo hecho (grupos, equipos, combates, puntuaciones, cambios de configuración e inscritos añadidos) y se vuelve a cargar $package. Las cuentas y contraseñas se mantienen. Todos tendrán que recargar la página. No se puede deshacer: escribe $word para confirmar.';
+  }
+
+  @override
+  String get eventResetDone => 'Evento reiniciado desde el paquete.';
+
+  @override
   String get controlSave => 'Guardar';
 
   @override

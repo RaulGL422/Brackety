@@ -128,6 +128,54 @@ class EventPackageServiceTest extends EventApiTest {
     }
 
     @Test
+    void theStaffCanGetTheirUsernameAsPassword() {
+        var file = exportFile();
+        emptyDatabase();
+
+        var created = packages.load(file, true).newAccounts();
+
+        assertThat(created)
+                .hasSize(STAFF)
+                .allSatisfy(a -> assertThat(a.password()).isEqualTo(a.username()));
+        assertThat(auth.login("arbitro1", "arbitro1", "127.0.0.1").accessToken())
+                .isNotBlank();
+    }
+
+    @Test
+    void aResetWipesTheEventAndLoadsThePackageAgainKeepingTheAccounts(@TempDir Path dir) throws Exception {
+        var file = Files.write(dir.resolve("f1.brackety"), exportFile());
+        var reset = new EventPackageReset(packages, jdbc, file.toString());
+        var extra = new Participant(eventId, clock.instant());
+        extra.update("Nuevo", "Prueba", java.time.LocalDate.of(2020, 1, 1), 120, true);
+        participants.save(extra);
+        jdbc.sql("update event set name = 'Cambiado'").update();
+        var accountsBefore = count("account");
+
+        assertThat(reset.packageName()).contains("f1.brackety");
+        var newEvent = reset.reset();
+
+        assertThat(newEvent).isNotEqualTo(eventId);
+        assertThat(count("event")).isOne();
+        assertThat(count("league")).isOne();
+        assertThat(count("participant")).isEqualTo(PARTICIPANTS);
+        assertThat(jdbc.sql("select name from event").query(String.class).single())
+                .isNotEqualTo("Cambiado");
+        // Same accounts, same passwords.
+        assertThat(count("account")).isEqualTo(accountsBefore);
+        assertThat(auth.login("arbitro1", "arbitro1", "127.0.0.1").accessToken())
+                .isNotBlank();
+    }
+
+    @Test
+    void withoutAPackageThereIsNothingToResetTo() {
+        var reset = new EventPackageReset(packages, jdbc, "");
+
+        assertThat(reset.packageName()).isEmpty();
+        assertThatThrownBy(reset::reset).isInstanceOf(IllegalStateException.class);
+        assertThat(count("event")).isOne();
+    }
+
+    @Test
     void reusesAnAccountThatAlreadyExists() {
         var file = exportFile();
         emptyDatabase();
@@ -197,7 +245,7 @@ class EventPackageServiceTest extends EventApiTest {
     void theStartupLoaderLoadsTheFileOrStopsWithTheReason(@TempDir Path dir) throws Exception {
         var file = Files.write(dir.resolve("f1.brackety"), exportFile());
         var credentials = dir.resolve("credentials.txt");
-        var loader = new EventPackageLoader(packages, file.toString(), credentials.toString());
+        var loader = new EventPackageLoader(packages, file.toString(), credentials.toString(), false);
 
         assertThatThrownBy(loader::afterSingletonsInstantiated)
                 .isInstanceOf(IllegalStateException.class)
@@ -225,7 +273,7 @@ class EventPackageServiceTest extends EventApiTest {
         var file = Files.write(dir.resolve("f1.brackety"), exportFile());
         emptyDatabase();
 
-        assertThatThrownBy(new EventPackageLoader(packages, file.toString(), " ")::afterSingletonsInstantiated)
+        assertThatThrownBy(new EventPackageLoader(packages, file.toString(), " ", false)::afterSingletonsInstantiated)
                 .hasMessageContaining("BRACKETY_PACKAGE_CREDENTIALS is required");
         assertThat(count("account")).isZero();
     }

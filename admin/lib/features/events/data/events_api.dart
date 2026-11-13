@@ -414,6 +414,16 @@ class EventsApi {
   Future<void> waiveRest(String eventId, String matchId) =>
       _dio.post<void>('${_control(eventId)}/matches/$matchId/waive-rest');
 
+  /// The package this hall laptop started with, to start the event again from it; null where there is none.
+  Future<String?> resetPackage() async {
+    final response = await _dio.get<Map<String, dynamic>>('$_base/event-reset');
+    return response.data!['packageName'] as String?;
+  }
+
+  /// Wipes every event and loads the package again (accounts and passwords stay).
+  Future<void> resetEvent(String reason) =>
+      _dio.post<void>('$_base/event-reset', data: {'reason': reason});
+
   Future<Cleared> clearCompetition(String eventId, String reason) async {
     final response = await _dio.post<Map<String, dynamic>>(
       '$_base/events/$eventId/clear-competition',

@@ -45,7 +45,8 @@ Llevar el evento ya preparado (configuración e inscripciones) y arrancarlo en c
 - `start-event.ps1 -Package f1.brackety` en una carpeta sin datos: lo copia a `brackety-data/` y la API lo carga al arrancar, antes de abrir el puerto, en una transacción (todo o nada).
 - Rechazos (la API no arranca y el script muestra el motivo, con campo e índice de fila, sin datos personales): BD con algún evento, `schemaVersion` desconocida, JSON inválido, categoría inexistente o repetida, tapices que no van de 1 a N, árbitro que no es REFEREE del staff o en dos tapices, dueño que no es CLUB del staff, menor sin consentimiento, CIF inválido, límites de campos.
 - Cuentas del staff que falten: verificadas, `es`, contraseña aleatoria de 10 caracteres (minúsculas y dígitos sin `l`, `1`, `o`, `0`; `SecureRandom`); el dueño con perfil Club, organización y CIF del paquete; el resto Ayudante. Las existentes se reutilizan sin cambiar su contraseña.
-- Las contraseñas nuevas van a `BRACKETY_PACKAGE_CREDENTIALS` (`brackety.package-credentials`, obligatoria con paquete), nunca al log: `usuario;rol;contraseña;tapices` (roles y tapices separados por comas). El script usa `brackety-data/credentials.txt` y lo muestra al acabar el primer arranque, con aviso de repartirlas a mano y borrarlo tras la fase. `-Demo` sigue con usuario = contraseña.
+- Las contraseñas nuevas van a `BRACKETY_PACKAGE_CREDENTIALS` (`brackety.package-credentials`, obligatoria con paquete), nunca al log: `usuario;rol;contraseña;tapices` (roles y tapices separados por comas). El script usa `brackety-data/credentials.txt` y lo muestra al acabar el primer arranque, con aviso de repartirlas a mano y borrarlo tras la fase. `-Demo` sigue con usuario = contraseña. Con `-UsernamePasswords` (`BRACKETY_PACKAGE_USERNAME_PASSWORDS`) las cuentas que crea el paquete también (riesgo aceptado por Raul para la F1, 2026-11-13).
+- Reinicio (F1): el script pasa `BRACKETY_RESET_PACKAGE` (el paquete guardado en `brackety-data`). El superadmin, en Eventos, "Reiniciar el evento desde el paquete" (motivo + escribir REINICIAR): `truncate event, league cascade` y se vuelve a cargar, todo en una transacción. Cuentas, contraseñas y auditoría se quedan. Sin paquete no aparece el botón.
 - Con paquete, `DemoSetup` no crea su evento (y nunca si ya hay alguno); el script apaga las cuentas demo.
 - Tras arrancar, el evento está listo: el club ve sus inscritos y los ayudantes ya pueden crear grupos.
 - El fichero lleva datos de menores: se guarda solo en el portátil del evento y se borra después (ver Legal).
@@ -75,6 +76,7 @@ Sin tablas nuevas. Formato del paquete versionado (`schemaVersion`).
 - `GET /events/{id}/export/full` (.zip) y `POST /events/{id}/import/results?dryRun=` (cuerpo: el fichero), solo CLUB.
 - `GET /api/v1/events/{id}/export/package` (solo CLUB del evento, como los CSV): `application/json`, `Content-Disposition: attachment; filename="<nombre-en-slug>-<fecha>.brackety"`. El log solo lleva recuentos. CORS expone `Content-Disposition` para que la web use ese nombre.
 - Carga al arrancar con `BRACKETY_PACKAGE` (`brackety.package`, ruta del fichero), no por API.
+- Superadmin: `GET /api/v1/admin/event-reset` (`packageName` o null) · `POST /api/v1/admin/event-reset` (`reason`; 404 sin paquete).
 
 ## Pantallas
 - Club: menú Exportar (icono de descarga, solo web como los CSV) con los 3 CSV y "Exportar paquete del evento"; el fichero se llama como dice el servidor.

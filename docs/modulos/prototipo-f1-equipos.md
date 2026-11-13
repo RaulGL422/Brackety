@@ -31,7 +31,7 @@ A partir de cierta edad, la categoría compite **por equipos de 3** en lugar de 
 - Solo con alumnos que no estén en un equipo real. Un alumno es real en un único sitio: un equipo o un grupo individual.
 
 ### Árbitro y marcador
-- Combate = **un marcador Tambo equipo contra equipo**: rojo = equipo A, azul = equipo B. Mismas reglas (2:00, 15, avisos, deshacer, finalizar, campana); aviso de una mano si algún miembro tiene 4-7.
+- Combate = **un marcador Tambo equipo contra equipo**: rojo = equipo A, azul = equipo B. Mismas reglas (2:00, 15, avisos, deshacer, finalizar, campana); aviso de una mano si algún miembro tiene 4-8.
 - Tablero y marcador muestran "Equipo N"; los nombres de los miembros, en pequeño debajo.
 - Nórdico de 4 sobre equipos (1-2, 3-4, 1-3, 2-4, 1-4, 2-3), equipo fantasma al final.
 - Recomendado: mismos pasos. Un equipo está ocupado si **cualquiera** de sus alumnos combate ahora en cualquier tapiz (también como fantasma). Descanso del equipo = el de su miembro con menos descanso.

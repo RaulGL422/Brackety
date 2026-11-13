@@ -35,6 +35,12 @@ class EventsController extends AsyncNotifier<AdminEventPage> {
   void refresh() => ref.invalidateSelf();
 }
 
+/// The package the hall laptop can start the event again from; null on other servers.
+final resetPackageProvider = FutureProvider.autoDispose<String?>(
+  (ref) => ref.read(eventsApiProvider).resetPackage(),
+  retry: (_, _) => null,
+);
+
 /// The event open in the tab; null shows the list.
 final selectedEventProvider =
     NotifierProvider<SelectedEventController, String?>(

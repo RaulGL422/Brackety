@@ -10,6 +10,20 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get eventReset => 'Start the event again from the package';
+
+  @override
+  String get eventResetTitle => 'Start the event again?';
+
+  @override
+  String eventResetBody(String package, String word) {
+    return 'Everything done is deleted (groups, teams, matches, scores, setting changes and added entries) and $package is loaded again. Accounts and passwords stay. Everyone will have to reload the page. It cannot be undone: type $word to confirm.';
+  }
+
+  @override
+  String get eventResetDone => 'Event started again from the package.';
+
+  @override
   String get controlSave => 'Save';
 
   @override

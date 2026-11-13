@@ -19,6 +19,11 @@ PRIMER ARRANQUE (carpeta sin datos)
   (10 letras y números) y las muestra al acabar; también quedan en brackety-data\credentials.txt
   (usuario;rol;contraseña;tapices). Reparte cada una a mano a su dueño y borra el fichero tras la fase.
   Si el paquete no es válido, dice por qué y no carga nada: corrígelo y vuelve con -Reset -Package.
+  Con -UsernamePasswords las cuentas nuevas tienen de contraseña su usuario (club1/club1): más cómodo,
+  pero cualquiera en la wifi del pabellón que conozca un usuario puede entrar.
+- Reiniciar el evento sin parar el servidor: superadmin (http://localhost:8080/admin/) > Eventos >
+  "Reiniciar el evento desde el paquete". Borra todo lo hecho y vuelve a cargar el paquete del primer
+  arranque; las cuentas y contraseñas se mantienen. Todos recargan la página después.
 - O un evento de prueba con las cuentas demo (club1, ayudante1-2, arbitro1-5):
      ... -File .\start-event.ps1 -Demo                (fecha de hoy)
      ... -File .\start-event.ps1 -Demo -EventDate 2026-11-14
