@@ -33,9 +33,15 @@ public record EventPackage(
         @NotNull @Size(max = 20) List<@NotNull @Valid MatEntry> mats,
         @NotNull List<@NotNull @Valid ParticipantEntry> participants,
         @Valid EventResults results,
-        @Size(max = 100) List<@NotNull @Valid StaffName> staffNames) {
+        @Size(max = 100) List<@NotNull @Valid StaffName> staffNames,
+        @Valid RulebookEntry rulebook) {
 
     public static final int SCHEMA_VERSION = 2;
+
+    /** The phase's rulebook PDF, in base64; absent when it has none or in files from before rulebooks. */
+    public record RulebookEntry(
+            @NotBlank @Size(max = 200) String fileName,
+            @NotBlank String pdf) {}
 
     /** The person behind a staff account (set by the club); absent in files from before names existed. */
     public record StaffName(

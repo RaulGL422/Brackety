@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/async_view.dart';
+import '../../rulebook/rulebook_ui.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../auth/ui/widgets/confirm_dialog.dart';
 import '../../events/state/events_providers.dart';
@@ -321,6 +322,8 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
             eventId: widget.eventId,
             organizations: settings.organizations,
           ),
+          const SizedBox(height: AppSpacing.xl),
+          RulebookSection(eventId: widget.eventId),
         ],
       ),
     );

@@ -5,8 +5,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import dev.rgal.brackety.auth.account.ProfileType;
 import dev.rgal.brackety.event.EventApiTest;
+import dev.rgal.brackety.event.RulebookService;
 import dev.rgal.brackety.participant.Participant;
 import dev.rgal.brackety.participant.ParticipantRepository;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -38,6 +40,9 @@ class EventPackageServiceTest extends EventApiTest {
     @Autowired
     JsonMapper json;
 
+    @Autowired
+    RulebookService rulebooks;
+
     @BeforeEach
     void yoseikanParticipantsAndOwnSettings() {
         var random = new Random(2027);
@@ -67,6 +72,7 @@ class EventPackageServiceTest extends EventApiTest {
         jdbc.sql("insert into event_staff_name (event_id, account_id, name) values (?, ?, 'Juan Pérez')")
                 .params(eventId, accountId("arbitro1"))
                 .update();
+        rulebooks.put(eventId, "Reglamento F1.pdf", "%PDF-1.7 tambo".getBytes(StandardCharsets.US_ASCII));
         var exported = packages.export(eventId, accountId("club1"));
         var file = json.writeValueAsBytes(exported);
         emptyDatabase();
@@ -86,6 +92,9 @@ class EventPackageServiceTest extends EventApiTest {
                 .filteredOn(p -> "15-16".equals(p.categoryName()))
                 .hasSize(2);
         assertThat(count("event")).isOne();
+        // The referees on the laptop read the same rulebook.
+        assertThat(loaded.rulebook()).isEqualTo(exported.rulebook());
+        assertThat(loaded.rulebook().fileName()).isEqualTo("Reglamento F1.pdf");
     }
 
     @Test

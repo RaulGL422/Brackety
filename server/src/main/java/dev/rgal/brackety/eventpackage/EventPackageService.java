@@ -22,6 +22,7 @@ import dev.rgal.brackety.event.EventStaff;
 import dev.rgal.brackety.event.EventStaffRepository;
 import dev.rgal.brackety.event.Mat;
 import dev.rgal.brackety.event.MatRepository;
+import dev.rgal.brackety.event.RulebookService;
 import dev.rgal.brackety.event.StaffNames;
 import dev.rgal.brackety.eventpackage.EventPackage.Category;
 import dev.rgal.brackety.eventpackage.EventPackage.CategoryPodiumEntry;
@@ -44,6 +45,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.text.Normalizer;
 import java.time.Clock;
+import java.util.Base64;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -94,6 +96,7 @@ public class EventPackageService {
     private final Validator validator;
     private final Clock clock;
     private final StaffNames staffNames;
+    private final RulebookService rulebooks;
 
     EventPackageService(
             EventService eventService,
@@ -113,7 +116,8 @@ public class EventPackageService {
             JsonMapper json,
             Validator validator,
             Clock clock,
-            StaffNames staffNames) {
+            StaffNames staffNames,
+            RulebookService rulebooks) {
         this.eventService = eventService;
         this.access = access;
         this.events = events;
@@ -132,6 +136,7 @@ public class EventPackageService {
         this.validator = validator;
         this.clock = clock;
         this.staffNames = staffNames;
+        this.rulebooks = rulebooks;
     }
 
     /** "liga-yoseikan-fase-1-2027-03-10": a file name for the event's exports. */
@@ -203,7 +208,12 @@ public class EventPackageService {
                         .filter(e -> usernames.containsKey(e.getKey()))
                         .map(e -> new EventPackage.StaffName(usernames.get(e.getKey()), e.getValue()))
                         .sorted(Comparator.comparing(EventPackage.StaffName::username))
-                        .toList());
+                        .toList(),
+                rulebooks
+                        .find(eventId)
+                        .map(r -> new EventPackage.RulebookEntry(
+                                r.getFileName(), Base64.getEncoder().encodeToString(r.getContent())))
+                        .orElse(null));
         log.info(
                 "Event package exported: {} staff, {} categories, {} mats, {} participants, {}",
                 result.staff().size(),
@@ -289,6 +299,15 @@ public class EventPackageService {
         }
         for (var entry : p.participants()) {
             participants.save(newParticipant(event.getId(), entry, categoryIds, organizationIds));
+        }
+        if (p.rulebook() != null) {
+            byte[] pdf;
+            try {
+                pdf = Base64.getDecoder().decode(p.rulebook().pdf());
+            } catch (IllegalArgumentException e) {
+                throw EventException.invalid("The rulebook in the file is damaged.");
+            }
+            rulebooks.put(event.getId(), p.rulebook().fileName(), pdf);
         }
         if (p.results() != null && !p.results().isEmpty()) {
             participants.flush();
