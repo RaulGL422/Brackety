@@ -82,7 +82,13 @@ void main() {
 
         expect(action('Individual group'), findsOneWidget);
         expect(find.text('New team · 0/3'), findsOneWidget);
-        // Ana is in team 1: she joins as a wildcard (fights, does not score here).
+        // Ana is in team 1: locked until the helper chooses to pick wildcards.
+        await tester.tap(find.text('Ana Prueba'));
+        await tester.pump();
+        expect(find.text('New team · 0/3'), findsOneWidget);
+        await tester.tap(find.text('Pick wildcards'));
+        await tester.pump();
+        // Now she joins as a wildcard (fights, does not score here).
         await tester.tap(find.text('Ana Prueba'));
         await tester.pump();
         expect(find.text('New team · 1/3'), findsOneWidget);
@@ -166,6 +172,8 @@ void main() {
 
   testWidgets('a team can be made of ghosts only', (tester) async {
     final repository = await open(tester, sizes['tablet']!);
+    await tester.tap(find.text('Pick wildcards'));
+    await tester.pump();
     for (final name in ['Ana', 'Bea', 'Diego']) {
       await tester.tap(find.text('$name Prueba'));
       await tester.pump();

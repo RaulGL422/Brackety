@@ -90,8 +90,9 @@ void _refresh(WidgetRef ref, CategoryKey key) {
   ref.invalidate(categoriesProvider(key.eventId));
 }
 
-/// Pick [teamSize] participants and make "Equipo N" with them. Someone who already has a team or a
-/// group joins as a ghost: fights for the team but does not score for it.
+/// Pick 2 or 3 participants and make "Equipo N" with them. Someone who already has a team or a
+/// group is locked; only after "Elegir comodines" can they join, as a wildcard: fights for the team
+/// but does not score for it (Raul, 2026-11-13).
 class _TeamMaker extends ConsumerStatefulWidget {
   const _TeamMaker({required this.categoryKey, required this.teamSize});
 
@@ -107,12 +108,22 @@ class _TeamMakerState extends ConsumerState<_TeamMaker> {
   var _sort = ParticipantSort.name;
   var _busy = false;
 
-  void _toggle(String id) => setState(() {
-    if (_picks.contains(id)) {
-      _picks = [..._picks]..remove(id);
-    } else if (_picks.length < DraftGroup.maxTeam) {
-      _picks = [..._picks, id];
+  /// Only with it on can someone who already competes be picked (as a wildcard).
+  var _wildcards = false;
+
+  void _toggle(CategoryParticipant p) => setState(() {
+    if (_picks.contains(p.id)) {
+      _picks = [..._picks]..remove(p.id);
+    } else if (_picks.length < DraftGroup.maxTeam &&
+        (_wildcards || !p.isTaken)) {
+      _picks = [..._picks, p.id];
     }
+  });
+
+  void _setWildcards(bool on) => setState(() {
+    _wildcards = on;
+    // Off again: the wildcards picked leave the team.
+    if (!on) _picks = [..._picks.where((id) => !_ghosts.contains(id))];
   });
 
   Future<void> _create() async {
@@ -205,8 +216,9 @@ class _TeamMakerState extends ConsumerState<_TeamMaker> {
                   ghost: ghosts.contains(sorted[i - 1].id),
                   enabled:
                       _picks.contains(sorted[i - 1].id) ||
-                      _picks.length < DraftGroup.maxTeam,
-                  onTap: () => _toggle(sorted[i - 1].id),
+                      (_picks.length < DraftGroup.maxTeam &&
+                          (_wildcards || !sorted[i - 1].isTaken)),
+                  onTap: () => _toggle(sorted[i - 1]),
                 ),
         );
       },
@@ -221,11 +233,22 @@ class _TeamMakerState extends ConsumerState<_TeamMaker> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                l10n.newTeamCount(_picks.length, DraftGroup.maxTeam),
-                style: Theme.of(context).textTheme.titleMedium,
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      l10n.newTeamCount(_picks.length, DraftGroup.maxTeam),
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                  FilterChip(
+                    label: Text(l10n.teamPickWildcards),
+                    selected: _wildcards,
+                    onSelected: _setWildcards,
+                  ),
+                ],
               ),
-              if (ghosts.isNotEmpty)
+              if (_wildcards || ghosts.isNotEmpty)
                 Text(
                   l10n.teamGhostHint,
                   style: Theme.of(context).textTheme.bodySmall,

@@ -98,6 +98,12 @@ abstract class AppLocalizations {
     Locale('es'),
   ];
 
+  /// No description provided for @teamPickWildcards.
+  ///
+  /// In es, this message translates to:
+  /// **'Elegir comodines'**
+  String get teamPickWildcards;
+
   /// No description provided for @matReservedElsewhere.
   ///
   /// In es, this message translates to:

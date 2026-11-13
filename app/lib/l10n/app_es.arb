@@ -1,4 +1,5 @@
 {
+  "teamPickWildcards": "Elegir comodines",
   "matReservedElsewhere": "Alguien de este combate lo espera ahora el tapiz {mat}",
   "@matReservedElsewhere": {"placeholders": {"mat": {"type": "int"}}},
   "matAfterIndividual": "Después de tu grupo individual",

@@ -10,6 +10,9 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get teamPickWildcards => 'Pick wildcards';
+
+  @override
   String matReservedElsewhere(int mat) {
     return 'Someone in this match is expected on mat $mat now';
   }

@@ -1,4 +1,5 @@
 {
+  "teamPickWildcards": "Pick wildcards",
   "matReservedElsewhere": "Someone in this match is expected on mat {mat} now",
   "matAfterIndividual": "After your individual group",
   "matPlannedAt": "Expected around {time}",
