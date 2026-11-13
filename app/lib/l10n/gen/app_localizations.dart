@@ -98,6 +98,12 @@ abstract class AppLocalizations {
     Locale('es'),
   ];
 
+  /// No description provided for @settingsMatNeedsReferee.
+  ///
+  /// In es, this message translates to:
+  /// **'Ese tapiz tiene combates por jugar: no puede quedarse sin árbitro. Pon otro árbitro o espera a que acaben.'**
+  String get settingsMatNeedsReferee;
+
   /// No description provided for @refusalResting.
   ///
   /// In es, this message translates to:

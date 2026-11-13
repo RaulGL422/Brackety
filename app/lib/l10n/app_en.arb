@@ -1,4 +1,5 @@
 {
+  "settingsMatNeedsReferee": "That mat has matches to play: it cannot be left without a referee. Assign another referee or wait until they finish.",
   "refusalResting": "Not yet: someone in this match has not had the least rest since their last match. Wait until the board unlocks it.",
   "cornerFightingNow": "Fighting on mat {mat}",
   "cornerFighting": "Fighting on mat {mat} · free around {time}",

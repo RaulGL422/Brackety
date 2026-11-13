@@ -10,6 +10,10 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get settingsMatNeedsReferee =>
+      'That mat has matches to play: it cannot be left without a referee. Assign another referee or wait until they finish.';
+
+  @override
   String get refusalResting =>
       'Not yet: someone in this match has not had the least rest since their last match. Wait until the board unlocks it.';
 

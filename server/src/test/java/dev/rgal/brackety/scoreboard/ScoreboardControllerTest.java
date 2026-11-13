@@ -273,6 +273,35 @@ class ScoreboardControllerTest extends ScoreboardApiTest {
         call(put(settings()).content(settingsJson(null, 15)), "club1").andExpect(status().isConflict());
     }
 
+    @Test
+    void aMatWithMatchesToPlayKeepsAReferee() throws Exception {
+        var mat = jdbc.sql("select number from mat where id = ?")
+                .param(matOf(match(young, 0, 1)))
+                .query(Integer.class)
+                .single();
+        var referees = new java.util.ArrayList<String>();
+        for (int i = 1; i <= 5; i++) {
+            referees.add("\"" + accountId("arbitro" + i) + "\"");
+        }
+        var withoutReferee = new java.util.ArrayList<>(referees);
+        withoutReferee.set(mat - 1, "null");
+        call(put(settings()).content(refereesJson(withoutReferee)), "club1")
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("MAT_HAS_MATCHES"));
+
+        // Another referee takes it: fine. A mat with nothing to play can be left without one.
+        var swapped = new java.util.ArrayList<>(referees);
+        var other = mat == 5 ? 4 : 5;
+        swapped.set(mat - 1, referees.get(other - 1));
+        swapped.set(other - 1, "null");
+        call(put(settings()).content(refereesJson(swapped)), "club1").andExpect(status().isOk());
+    }
+
+    private static String refereesJson(java.util.List<String> referees) {
+        return """
+                {"name":"Fase 1","date":"2027-03-10","maxGroupsPerMat":1,"matReferees":[%s]}""".formatted(String.join(",", referees));
+    }
+
     private String settings() {
         return "/api/v1/events/" + eventId + "/settings";
     }

@@ -135,6 +135,16 @@ public class EventService {
                 && events.hasGroupsOnMats(removed.stream().map(Mat::getId).toList())) {
             throw EventException.conflict("A mat with groups cannot be removed.");
         }
+        // Nobody would ever play the matches of a mat left without its referee (Raul, 2026-11-13).
+        for (int i = 0; i < Math.min(current.size(), request.matReferees().size()); i++) {
+            var mat = current.get(i);
+            if (request.matReferees().get(i) == null
+                    && mat.getRefereeAccountId() != null
+                    && events.hasMatchesToPlayOn(mat.getId())) {
+                throw EventException.conflict(
+                        "MAT_HAS_MATCHES", "Mat " + mat.getNumber() + " has matches to play: it needs its referee.");
+            }
+        }
         var attendancePoints =
                 request.attendancePoints() != null ? request.attendancePoints() : event.getAttendancePoints();
         event.update(
