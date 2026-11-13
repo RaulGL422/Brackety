@@ -10,6 +10,14 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String matReservedElsewhere(int mat) {
+    return 'Someone in this match is expected on mat $mat now';
+  }
+
+  @override
+  String get matAfterIndividual => 'After your individual group';
+
+  @override
   String matPlannedAt(String time) {
     return 'Expected around $time';
   }

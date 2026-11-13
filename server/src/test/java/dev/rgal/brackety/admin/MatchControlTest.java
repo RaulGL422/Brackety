@@ -130,6 +130,38 @@ class MatchControlTest extends AdminApiTestBase {
                 .isEqualTo(2);
         assertThat(rows("select count(*) from fight_match where id = ? and rest_waived_at is not null", match))
                 .isOne();
+
+        // Its event view lists the real teams with their people, for moving someone between teams.
+        var team = jdbc.sql("select id from event_category where name = '15-16'")
+                .query(UUID.class)
+                .single();
+        var teens = participants(15, "Teen");
+        call(
+                        post("/api/v1/events/" + eventId + "/categories/" + team + "/teams")
+                                .content("{\"participantIds\":[\"%s\",\"%s\"]}".formatted(teens.get(0), teens.get(1))),
+                        "ayudante1")
+                .andExpect(status().isCreated());
+        admin(get("/api/v1/admin/events/" + eventId))
+                .andExpect(jsonPath("$.teams[0].category").value("15-16"))
+                .andExpect(jsonPath("$.teams[0].groupNumber").doesNotExist())
+                .andExpect(jsonPath("$.teams[0].groupStarted").value(false))
+                .andExpect(jsonPath("$.teams[0].members[*].participantId")
+                        .value(org.hamcrest.Matchers.containsInAnyOrder(
+                                teens.get(0).toString(), teens.get(1).toString())));
+    }
+
+    @Test
+    void aRefereeMovesOnlyTheirOwnMatches() throws Exception {
+        var match = match(young, 2, 3);
+        var target = freeMat();
+        var body = mat(target);
+
+        call(post("/api/v1/matches/" + match + "/move").content(body), "arbitro2")
+                .andExpect(status().isForbidden());
+        call(post("/api/v1/matches/" + match + "/move").content(body), "arbitro1")
+                .andExpect(status().isNoContent());
+        assertThat(rows("select count(*) from fight_match where id = ? and mat_id = ?", match, target))
+                .isOne();
     }
 
     @Test

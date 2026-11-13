@@ -522,7 +522,9 @@ class _MatchRow extends StatelessWidget {
       ),
       subtitle: match.inReview
           ? Text(l10n.matInReview)
-          : waiting || match.waitReason == WaitReason.otherMat
+          : waiting ||
+                match.waitReason == WaitReason.otherMat ||
+                match.waitReason == WaitReason.reserved
           ? Text(waitText(context, match))
           : pending && match.plannedAt != null
           ? Text(
@@ -555,12 +557,15 @@ String waitText(BuildContext context, BoardMatch match) {
   final l10n = AppLocalizations.of(context);
   return switch (match.waitReason) {
     WaitReason.review => l10n.matInReview,
+    WaitReason.afterIndividual => l10n.matAfterIndividual,
     WaitReason.resting when match.readyAt != null => l10n.matResting(
       DateFormat.Hms(Localizations.localeOf(context).toLanguageTag())
           .format(match.readyAt!.toLocal()),
     ),
     WaitReason.otherMat when match.otherMatNumber != null =>
       l10n.matProposedElsewhere(match.otherMatNumber!),
+    WaitReason.reserved when match.otherMatNumber != null =>
+      l10n.matReservedElsewhere(match.otherMatNumber!),
     _ when match.pool && match.waitReason == null => l10n.matPoolOffline,
     _ => l10n.matWaiting,
   };

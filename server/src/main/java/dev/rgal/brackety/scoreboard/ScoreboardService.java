@@ -47,6 +47,7 @@ class ScoreboardService {
     static final String MATCH_IN_REVIEW = "MATCH_IN_REVIEW";
     static final String MATCH_STALE = "MATCH_STALE";
     static final String FIGHTER_RESTING = "FIGHTER_RESTING";
+    static final String MAT_HAS_INDIVIDUAL = "MAT_HAS_INDIVIDUAL";
 
     private static final Logger log = LoggerFactory.getLogger(ScoreboardService.class);
 
@@ -175,6 +176,17 @@ class ScoreboardService {
         var event = events.get(mat.getEventId());
         var action = action(request, accountId);
         var serverNow = clock.instant();
+        // Online, a mat with individual matches to play does not take one from the pool: they go first (Raul,
+        // 2026-11-13). Without network the device already started it: accepted as it is.
+        if (request.opId() == null
+                && request.type() == MatchEventType.START
+                && match.getMatId() == null
+                && matches.findByEventId(match.getEventId()).stream()
+                        .anyMatch(m -> mat.getId().equals(m.getMatId())
+                                && m.getStatus() == Match.Status.PENDING
+                                && !m.isInReview())) {
+            throw EventException.conflict(MAT_HAS_INDIVIDUAL, "This mat has individual matches to play first.");
+        }
         // A pool match is on this mat while it runs; refused or cancelled, it goes back to the pool.
         match.takeMat(mat.getId());
         var conflict = request.opId() == null

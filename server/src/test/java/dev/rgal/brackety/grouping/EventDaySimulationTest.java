@@ -149,13 +149,13 @@ class EventDaySimulationTest extends EventApiTest {
             assertThat(seen)
                     .as("what the day went through")
                     .containsKeys("pool start", "locked refused", "cancel", "other than recommended");
-            assertThat(poolMats).as("mats that took team matches").hasSizeGreaterThanOrEqualTo(2);
         }
 
         private void step(int mat) throws Exception {
             var current = running.get(matKey(mat));
             if (current != null) {
-                if (random.nextInt(100) < 2) {
+                // At least one cancel a day, then by chance.
+                if (random.nextInt(100) < 2 || (!seen.containsKey("cancel") && tick > 20)) {
                     act(mat, current.matchId(), "CANCEL", null).expect(200);
                     log("cancel " + current.matchId() + " on " + mat);
                     seen.merge("cancel", 1, Integer::sum);
@@ -178,6 +178,21 @@ class EventDaySimulationTest extends EventApiTest {
                     "$.matches[?(@.status == 'PENDING' && @.available == false && @.waitReason != 'REVIEW')].id");
             if (recommended != null) {
                 assertThat(available).as("the recommended match is available").contains(recommended);
+            }
+            // No mat stays idle while it could take a team match (Raul: as few free mats as possible): one whose
+            // people are not in a match offered to another idle mat (that one is theirs).
+            List<String> poolReady = JsonPath.read(
+                    board, "$.matches[?(@.pool == true && @.available == true && @.waitReason == null)].id");
+            List<String> offeredElsewhere = JsonPath.read(board, "$.matches[?(@.waitReason == 'OTHER_MAT')].id");
+            var promised = new HashSet<String>();
+            offeredElsewhere.forEach(m -> promised.addAll(fighters(m)));
+            var free = poolReady.stream()
+                    .filter(m -> fighters(m).stream().noneMatch(promised::contains))
+                    .toList();
+            if (!free.isEmpty()) {
+                assertThat(recommended)
+                        .as("tick %d: idle mat %d with team matches ready %s: %s", tick, mat, free, board)
+                        .isNotNull();
             }
             var roll = random.nextInt(100);
             if (roll < 10 && !locked.isEmpty()) {

@@ -98,6 +98,18 @@ abstract class AppLocalizations {
     Locale('es'),
   ];
 
+  /// No description provided for @matReservedElsewhere.
+  ///
+  /// In es, this message translates to:
+  /// **'Alguien de este combate lo espera ahora el tapiz {mat}'**
+  String matReservedElsewhere(int mat);
+
+  /// No description provided for @matAfterIndividual.
+  ///
+  /// In es, this message translates to:
+  /// **'Después de tu grupo individual'**
+  String get matAfterIndividual;
+
   /// No description provided for @matPlannedAt.
   ///
   /// In es, this message translates to:

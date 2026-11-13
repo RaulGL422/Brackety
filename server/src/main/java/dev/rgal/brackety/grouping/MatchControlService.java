@@ -39,6 +39,7 @@ public class MatchControlService {
     private final EventAccess access;
     private final JdbcClient jdbc;
     private final Clock clock;
+    private final MatPlanner planner;
 
     MatchControlService(
             MatchRepository matches,
@@ -50,7 +51,8 @@ public class MatchControlService {
             EventService events,
             EventAccess access,
             JdbcClient jdbc,
-            Clock clock) {
+            Clock clock,
+            MatPlanner planner) {
         this.matches = matches;
         this.groups = groups;
         this.mats = mats;
@@ -61,6 +63,7 @@ public class MatchControlService {
         this.access = access;
         this.jdbc = jdbc;
         this.clock = clock;
+        this.planner = planner;
     }
 
     /** Only the club of the event; the superadmin's API checks its own access. */
@@ -86,17 +89,41 @@ public class MatchControlService {
         log.info("Group {} moved to mat {} by {}", groupId, mat.getNumber(), who(by));
     }
 
-    /** One pending individual match goes to another mat; the rest of its group stays. */
+    /**
+     * One pending match goes to another mat; the rest of its group stays. A team match leaves the pool and waits on
+     * that mat (Raul, 2026-11-13: "mover un combate de un tapiz en cualquier caso"); cancelled, it goes back to it.
+     */
     @Transactional
     public void moveMatch(UUID eventId, UUID matchId, UUID matId, UUID by) {
         var match = pending(eventId, matchId);
         events.lock(eventId);
-        if (match.isTeamMatch()) {
-            throw EventException.invalid("Team matches have no mat: they go to the free mats.");
-        }
         var mat = refereedMat(eventId, matId);
         match.moveTo(mat.getId());
         log.info("Match {} moved to mat {} by {}", matchId, mat.getNumber(), who(by));
+    }
+
+    /**
+     * A referee moves one of their mat's pending matches to another mat: one already on it, or a team match of the
+     * pool that their mat would take next (its planned queue).
+     */
+    @Transactional
+    public void moveMatchAsReferee(UUID matchId, UUID matId, UUID accountId) {
+        var match = matches.findById(matchId).orElseThrow(EventException::notFound);
+        var eventId = match.getEventId();
+        access.require(eventId, accountId, EventRole.REFEREE);
+        var own = mats.findByEventIdAndRefereeAccountIdOrderByNumber(eventId, accountId).stream()
+                .map(Mat::getId)
+                .toList();
+        var mine = match.getMatId() == null
+                ? planner.plan(eventId).entrySet().stream()
+                        .filter(e -> own.contains(e.getKey()))
+                        .anyMatch(e ->
+                                e.getValue().stream().anyMatch(p -> p.matchId().equals(matchId)))
+                : own.contains(match.getMatId());
+        if (!mine) {
+            throw EventException.forbidden();
+        }
+        moveMatch(eventId, matchId, matId, accountId);
     }
 
     /**

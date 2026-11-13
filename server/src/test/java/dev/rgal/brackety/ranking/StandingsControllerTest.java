@@ -131,6 +131,8 @@ class StandingsControllerTest extends EventApiTest {
     @Test
     void aDisqualifiedFighterScoresNothingInThatMatch() throws Exception {
         var third = match(fighters.get(0), fighters.get(2));
+        // Ana has just fought: the least rest first.
+        clock.advance(Duration.ofSeconds(30));
         referee(third, "START", null, null);
         referee(third, "POINT", "RED", null);
         referee(third, "DISQUALIFICATION", "RED", "Conducta antideportiva");

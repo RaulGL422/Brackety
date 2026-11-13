@@ -14,9 +14,12 @@ import dev.rgal.brackety.grouping.dto.MatBoardResponse;
 import dev.rgal.brackety.grouping.dto.MatBoardResponse.BoardGroup;
 import dev.rgal.brackety.grouping.dto.MatBoardResponse.BoardMatch;
 import dev.rgal.brackety.grouping.dto.MatBoardResponse.Fighter;
+import dev.rgal.brackety.grouping.dto.MatBoardResponse.MatChoice;
 import dev.rgal.brackety.grouping.dto.MatOverview;
 import java.time.Clock;
+import java.time.Instant;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -91,10 +94,23 @@ class MatBoardService {
 
         var floor = this.floor.load(event, now);
         var teamPool = floor.takesPool(matId);
+        // Each mat's own expected queue (Raul, 2026-11-13): its matches and the team matches it would take, in the
+        // order they would come up; recomputed on every change, so it moves only when reality does.
+        var plannedMat = new HashMap<UUID, UUID>();
+        var plannedAt = new HashMap<UUID, Instant>();
+        MatPlanner.simulate(event, floor, now)
+                .forEach((planMat, planned) -> planned.forEach(p -> {
+                    plannedMat.put(p.matchId(), planMat);
+                    plannedAt.put(p.matchId(), p.startsAt());
+                }));
         var onMat = floor.matches().stream()
-                .filter(m -> matId.equals(m.getMatId()) || (teamPool && m.getMatId() == null))
-                .sorted(Comparator.comparingInt(
-                                (Match m) -> floor.groups().get(m.getGroupId()).getNumber())
+                .filter(m -> matId.equals(m.getMatId())
+                        || (m.getMatId() == null
+                                && (matId.equals(plannedMat.get(m.getId()))
+                                        || (teamPool && !plannedMat.containsKey(m.getId())))))
+                .sorted(Comparator.comparing((Match m) -> plannedAt.getOrDefault(m.getId(), Instant.MAX))
+                        .thenComparingInt(
+                                m -> floor.groups().get(m.getGroupId()).getNumber())
                         .thenComparingInt(Match::getOrderIndex))
                 .toList();
         var shownGroups = onMat.stream().map(Match::getGroupId).collect(Collectors.toSet());
@@ -133,15 +149,23 @@ class MatBoardService {
                                 labels.get(g.getCreatedBy())))
                         .toList(),
                 onMat.stream()
-                        .map(m -> boardMatch(event, floor, matId, m, fighter))
+                        .map(m -> boardMatch(event, floor, matId, m, fighter, plannedAt.get(m.getId())))
                         .toList(),
                 recommended,
                 teamPool,
-                mat.getEventId());
+                mat.getEventId(),
+                floor.mats().stream()
+                        .map(x -> new MatChoice(x.getId(), x.getNumber(), x.getRefereeAccountId() != null))
+                        .toList());
     }
 
     private static BoardMatch boardMatch(
-            Event event, MatFloor.Floor floor, UUID matId, Match m, BiFunction<UUID, UUID, Fighter> fighter) {
+            Event event,
+            MatFloor.Floor floor,
+            UUID matId,
+            Match m,
+            BiFunction<UUID, UUID, Fighter> fighter,
+            Instant plannedAt) {
         var pending = m.getStatus() == Match.Status.PENDING;
         var wait = pending ? floor.waitOf(m, matId) : null;
         return new BoardMatch(
@@ -154,17 +178,22 @@ class MatBoardService {
                 m.getStatus(),
                 m.getRedScore(),
                 m.getBlueScore(),
-                // Proposed to another mat is only a hint: if that mat stalls, this one may take it.
-                m.getStatus() == Match.Status.PENDING && (wait == null || wait == MatFloor.Wait.OTHER_MAT),
+                // Proposed to another mat (or someone in it) is only a hint: if that mat stalls, this one may take it.
+                m.getStatus() == Match.Status.PENDING
+                        && (wait == null || wait == MatFloor.Wait.OTHER_MAT || wait == MatFloor.Wait.RESERVED),
                 m.isInReview(),
                 wait == null ? null : wait.name(),
                 wait == MatFloor.Wait.RESTING ? floor.readyAt(m) : null,
-                wait == MatFloor.Wait.OTHER_MAT
-                        ? floor.proposedTo(m).map(floor::matNumber).orElse(null)
-                        : null,
+                switch (wait) {
+                    case OTHER_MAT -> floor.proposedTo(m).map(floor::matNumber).orElse(null);
+                    case RESERVED ->
+                        floor.reservedBy(m, matId).map(floor::matNumber).orElse(null);
+                    case null, default -> null;
+                },
                 m.getMatId() == null,
                 pending ? floor.corner(m, m.getRedId(), event) : null,
-                pending ? floor.corner(m, m.getBlueId(), event) : null);
+                pending ? floor.corner(m, m.getBlueId(), event) : null,
+                pending ? plannedAt : null);
     }
 
     private static Fighter fighter(Competitor c, boolean ghost) {

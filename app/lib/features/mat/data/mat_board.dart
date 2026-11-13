@@ -77,11 +77,13 @@ class BoardGroup {
 }
 
 /// Why a pending match cannot start now.
-enum WaitReason { review, busy, resting, otherMat }
+enum WaitReason { review, busy, resting, otherMat, afterIndividual, reserved }
 
 WaitReason? waitReasonFromJson(String? value) => switch (value) {
   'REVIEW' => WaitReason.review,
   'BUSY' => WaitReason.busy,
+  'AFTER_INDIVIDUAL' => WaitReason.afterIndividual,
+  'RESERVED' => WaitReason.reserved,
   'RESTING' => WaitReason.resting,
   'OTHER_MAT' => WaitReason.otherMat,
   _ => null,
