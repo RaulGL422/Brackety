@@ -64,6 +64,10 @@ class TeamService {
     }
 
     /** The category's real teams by number, with their group once they have one. */
+    static final int MIN_SIZE = 2;
+
+    static final int MAX_SIZE = 3;
+
     @Transactional(readOnly = true)
     List<TeamResponse> list(UUID eventId, UUID categoryId, UUID accountId) {
         access.require(eventId, accountId, EventRole.CLUB, EventRole.GROUPER);
@@ -96,7 +100,7 @@ class TeamService {
                                     })
                                     .toList(),
                             group == null ? null : group.getNumber(),
-                            group == null ? null : matNumbers.get(group.getMatId()),
+                            group == null || group.getMatId() == null ? null : matNumbers.get(group.getMatId()),
                             group == null ? null : group.getId(),
                             group != null && started.contains(group.getId()),
                             group == null ? null : labels.get(group.getCreatedBy()));
@@ -113,9 +117,7 @@ class TeamService {
             throw EventException.invalid("This category is not by teams.");
         }
         var ids = request.participantIds();
-        if (ids.size() != category.getTeamSize() || new HashSet<>(ids).size() != ids.size()) {
-            throw EventException.invalid("A team is " + category.getTeamSize() + " different participants.");
-        }
+        requireTeamShape(ids);
         var ghosts = request.ghostIds() == null ? Set.<UUID>of() : Set.copyOf(request.ghostIds());
         if (!ids.containsAll(ghosts)) {
             throw EventException.invalid("Ghost members are members of the team.");
@@ -128,6 +130,13 @@ class TeamService {
                 .filter(t -> t.id().equals(team.getId()))
                 .findFirst()
                 .orElseThrow();
+    }
+
+    /** Teams are of 2 or 3, always (Raul, 2026-11-13): the category's team size is no longer used. */
+    static void requireTeamShape(List<UUID> ids) {
+        if (ids.size() < MIN_SIZE || ids.size() > MAX_SIZE || new HashSet<>(ids).size() != ids.size()) {
+            throw EventException.invalid("A team is 2 or 3 different participants.");
+        }
     }
 
     /** Undoes a team made by mistake; once in a group it stays. */

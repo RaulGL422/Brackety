@@ -5,8 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
 import '../../auth/ui/widgets/confirm_dialog.dart';
+import '../../auth/data/api_error.dart';
 import '../data/grouping_repository.dart';
+import '../state/helper_queue.dart';
 import '../state/group_draft.dart';
+import '../../mat/ui/mat_label.dart';
 
 /// Sends the group to [matId], or to the mat the server picks if null, and shows which one. Calls
 /// [refresh] after creating it or on a conflict (someone else took a participant or team, or the
@@ -19,6 +22,7 @@ Future<bool> createGroup(
   required DraftGroup group,
   required String? matId,
   required VoidCallback refresh,
+  required String label,
 }) async {
   final l10n = AppLocalizations.of(context);
   final toasts = Toasts.of(context);
@@ -43,7 +47,7 @@ Future<bool> createGroup(
             children: [
               Text(created.groupNumbers.map(l10n.draftGroup).join(', ')),
               const Icon(Icons.arrow_forward),
-              Text(l10n.matTitle(created.matNumber)),
+              Text(matLabel(l10n, created.matNumber)),
             ],
           ),
         ),
@@ -73,14 +77,51 @@ Future<bool> createGroup(
     }
     return true;
   } on DioException catch (e) {
+    // Without network it waits on the device and goes when the server answers again.
+    if (ApiError.from(e).noResponse) {
+      await ref
+          .read(helperQueueProvider.notifier)
+          .add(
+            path: GroupingRepository.groupsPath(eventId),
+            body: GroupingRepository.groupBody(categoryId, group, matId: matId),
+            label: label,
+            people: [
+              if (!group.ofTeams) ...group.members,
+              for (final t in group.ghostTeams) ...t,
+            ],
+            teams: [if (group.ofTeams) ...group.members],
+          );
+      toasts.show(l10n.queuedOffline(label));
+      return true;
+    }
     final conflict = e.response?.statusCode == 409;
     if (conflict) refresh();
     toasts.show(
-      conflict ? l10n.groupsConflict : l10n.groupsError,
+      conflict
+          ? (ApiError.from(e).code == 'SAME_FIGHTER'
+                ? l10n.teamOverlapTitle
+                : l10n.groupsConflict)
+          : l10n.groupsError,
       kind: ToastKind.error,
     );
     return false;
   }
+}
+
+/// Tells the helper how the teams and groups made without network ended once sent.
+void listenHelperQueue(BuildContext context, WidgetRef ref) {
+  ref.listen(helperQueueProvider.select((q) => q.results), (_, results) {
+    if (results.isEmpty) return;
+    final l10n = AppLocalizations.of(context);
+    final toasts = Toasts.of(context);
+    for (final r in results) {
+      toasts.show(
+        r.created ? l10n.queuedSent(r.label) : l10n.queuedRefused(r.label),
+        kind: r.created ? ToastKind.success : ToastKind.error,
+      );
+    }
+    ref.read(helperQueueProvider.notifier).shown();
+  });
 }
 
 /// Asks first, then undoes group [number]: its matches go and its members are free again. Once a

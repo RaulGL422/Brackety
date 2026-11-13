@@ -938,6 +938,12 @@ abstract class AppLocalizations {
   /// **'Tapiz {number}'**
   String groupMat(int number);
 
+  /// No description provided for @groupPool.
+  ///
+  /// In es, this message translates to:
+  /// **'Equipos: tapices libres'**
+  String get groupPool;
+
   /// No description provided for @matchTeam.
   ///
   /// In es, this message translates to:
@@ -1517,7 +1523,7 @@ abstract class AppLocalizations {
   /// No description provided for @ghostName.
   ///
   /// In es, this message translates to:
-  /// **'{name} · fantasma'**
+  /// **'{name} · comodín'**
   String ghostName(String name);
 
   /// No description provided for @planEmpty.

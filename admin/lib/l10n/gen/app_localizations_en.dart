@@ -519,6 +519,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get groupPool => 'Teams: free mats';
+
+  @override
   String matchTeam(int number) {
     return 'Team $number';
   }
@@ -870,7 +873,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String ghostName(String name) {
-    return '$name · ghost';
+    return '$name · wildcard';
   }
 
   @override

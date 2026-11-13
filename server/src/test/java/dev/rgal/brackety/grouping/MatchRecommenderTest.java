@@ -137,16 +137,18 @@ class MatchRecommenderTest {
 
         Optional<UUID> recommend() {
             return MatchRecommender.recommend(
-                    pending,
-                    new Context(
-                            now,
-                            MATCH.plus(CHANGEOVER),
-                            lastFought,
-                            groupCreated,
-                            groupLastPlayed,
-                            busy,
-                            justFought,
-                            Map.of()));
+                            pending,
+                            new Context(
+                                    now,
+                                    MATCH.plus(CHANGEOVER),
+                                    lastFought,
+                                    groupCreated,
+                                    groupLastPlayed,
+                                    busy,
+                                    justFought,
+                                    Map.of(),
+                                    Duration.ZERO))
+                    .map(Candidate::matchId);
         }
 
         void play(UUID matchId) {

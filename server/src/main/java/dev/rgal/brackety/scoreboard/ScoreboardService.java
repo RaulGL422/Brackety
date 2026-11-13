@@ -30,6 +30,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -117,15 +118,18 @@ class ScoreboardService {
     @Transactional(readOnly = true)
     MatchView view(UUID matchId, UUID accountId) {
         var match = matches.findById(matchId).orElseThrow(EventException::notFound);
-        var mat = mat(match);
-        var roles = access.roles(mat.getEventId(), accountId);
+        var roles = access.roles(match.getEventId(), accountId);
         if (roles.isEmpty()) {
             throw EventException.notFound();
         }
-        if (!roles.contains(EventRole.CLUB) && !isReferee(mat, accountId, roles)) {
+        // A team match in the pool can go to any mat: every referee may open it.
+        var mat = matOrNull(match);
+        var allowed = roles.contains(EventRole.CLUB)
+                || (mat == null ? roles.contains(EventRole.REFEREE) : isReferee(mat, accountId, roles));
+        if (!allowed) {
             throw EventException.forbidden();
         }
-        return view(match, mat, events.get(mat.getEventId()), clock.instant());
+        return view(match, mat, events.get(match.getEventId()), clock.instant());
     }
 
     /**
@@ -135,15 +139,21 @@ class ScoreboardService {
     @Transactional
     Recorded record(UUID matchId, UUID accountId, MatchEventRequest request) {
         var match = matches.lockById(matchId).orElseThrow(EventException::notFound);
-        var mat = mat(match);
-        var roles = access.roles(mat.getEventId(), accountId);
+        var roles = access.roles(match.getEventId(), accountId);
         if (roles.isEmpty()) {
             throw EventException.notFound();
         }
-        if (!isReferee(mat, accountId, roles)) {
+        var mat = match.getMatId() == null ? refereeMatOf(match, accountId).orElse(null) : mat(match);
+        if (mat == null || !isReferee(mat, accountId, roles)) {
             throw EventException.forbidden();
         }
         return apply(match, mat, accountId, request);
+    }
+
+    /** The mat a team match from the pool goes to: the one of the referee who starts it. */
+    Optional<Mat> refereeMatOf(Match match, UUID accountId) {
+        return mats.findByEventIdAndRefereeAccountIdOrderByNumber(match.getEventId(), accountId).stream()
+                .findFirst();
     }
 
     /**
@@ -153,16 +163,23 @@ class ScoreboardService {
     @Transactional
     Recorded recordImported(UUID matchId, UUID actorId, MatchEventRequest request) {
         var match = matches.lockById(matchId).orElseThrow(EventException::notFound);
-        return apply(match, mat(match), actorId, request);
+        var mat = match.getMatId() == null
+                ? refereeMatOf(match, actorId)
+                        .orElseThrow(() -> EventException.conflict("The referee of this action has no mat now."))
+                : mat(match);
+        return apply(match, mat, actorId, request);
     }
 
     private Recorded apply(Match match, Mat mat, UUID accountId, MatchEventRequest request) {
         var event = events.get(mat.getEventId());
         var action = action(request, accountId);
         var serverNow = clock.instant();
+        // A pool match is on this mat while it runs; refused or cancelled, it goes back to the pool.
+        match.takeMat(mat.getId());
         var conflict = request.opId() == null
                 ? recordOnline(match, event, action, request.knownEvents(), serverNow)
                 : recordOffline(match, event, action, request, serverNow);
+        match.backToPoolIf(groups.findById(match.getGroupId()).orElseThrow());
         return new Recorded(conflict == null ? view(match, mat, event, serverNow) : null, conflict);
     }
 
@@ -251,7 +268,7 @@ class ScoreboardService {
 
     MatchView view(Match match, Mat mat, Event event, Instant now) {
         var history = matchEvents.findByMatchIdOrderByPosition(match.getId());
-        var state = MatchWriter.replay(event, history);
+        var state = MatchWriter.replay(event, match, history);
         var group = groups.findById(match.getGroupId()).orElseThrow();
         var competitors = directory.of(match.getEventId());
         var ghosts = members.findByGroupIdInOrderByPosition(List.of(group.getId())).stream()
@@ -266,12 +283,12 @@ class ScoreboardService {
                 pending.stream().map(RejectedOp::getActorAccountId)));
         return new MatchView(
                 match.getId(),
-                mat.getId(),
-                mat.getNumber(),
+                mat == null ? null : mat.getId(),
+                mat == null ? null : mat.getNumber(),
                 group.getNumber(),
                 match.getStatus(),
-                event.getMatchSeconds(),
-                event.getPointsLimit(),
+                event.matchSecondsFor(match.isTeamMatch()),
+                event.pointsLimitFor(match.isTeamMatch()),
                 state.remainingAt(now).toMillis(),
                 state.isRunning(now),
                 state.endReason(now).map(Enum::name).orElse(null),
@@ -344,6 +361,11 @@ class ScoreboardService {
 
     private static boolean isReferee(Mat mat, UUID accountId, Set<EventRole> roles) {
         return roles.contains(EventRole.REFEREE) && accountId.equals(mat.getRefereeAccountId());
+    }
+
+    /** Null for a team match in the pool. */
+    Mat matOrNull(Match match) {
+        return match.getMatId() == null ? null : mat(match);
     }
 
     Mat mat(Match match) {

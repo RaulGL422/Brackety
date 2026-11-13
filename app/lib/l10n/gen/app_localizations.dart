@@ -98,6 +98,96 @@ abstract class AppLocalizations {
     Locale('es'),
   ];
 
+  /// No description provided for @cornerFightingNow.
+  ///
+  /// In es, this message translates to:
+  /// **'Luchando en el tapiz {mat}'**
+  String cornerFightingNow(int mat);
+
+  /// No description provided for @cornerFighting.
+  ///
+  /// In es, this message translates to:
+  /// **'Luchando en el tapiz {mat} · libre hacia las {time}'**
+  String cornerFighting(int mat, String time);
+
+  /// No description provided for @cornerResting.
+  ///
+  /// In es, this message translates to:
+  /// **'Descansando hasta las {time}'**
+  String cornerResting(String time);
+
+  /// No description provided for @cornerPending.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{Le queda otro combate} other{Le quedan {count} combates}} en tapiz {mats}'**
+  String cornerPending(int count, String mats);
+
+  /// No description provided for @rulebookTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Reglamento de la fase'**
+  String get rulebookTitle;
+
+  /// No description provided for @rulebookHint.
+  ///
+  /// In es, this message translates to:
+  /// **'El PDF con el reglamento completo. Los árbitros lo abren desde la pantalla de su tapiz, también en el portátil del pabellón (va dentro del paquete del evento).'**
+  String get rulebookHint;
+
+  /// No description provided for @rulebookNone.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin reglamento'**
+  String get rulebookNone;
+
+  /// No description provided for @rulebookUpload.
+  ///
+  /// In es, this message translates to:
+  /// **'Subir PDF'**
+  String get rulebookUpload;
+
+  /// No description provided for @rulebookReplace.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar PDF'**
+  String get rulebookReplace;
+
+  /// No description provided for @rulebookOpen.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver reglamento'**
+  String get rulebookOpen;
+
+  /// No description provided for @rulebookRemove.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar'**
+  String get rulebookRemove;
+
+  /// No description provided for @rulebookUploaded.
+  ///
+  /// In es, this message translates to:
+  /// **'Reglamento subido'**
+  String get rulebookUploaded;
+
+  /// No description provided for @rulebookUploadError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo subir: tiene que ser un PDF de hasta 10 MB.'**
+  String get rulebookUploadError;
+
+  /// No description provided for @rulebookRemoveError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo quitar el reglamento.'**
+  String get rulebookRemoveError;
+
+  /// No description provided for @rulebookOpenError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo abrir el reglamento. Comprueba la conexión.'**
+  String get rulebookOpenError;
+
   /// No description provided for @appTitle.
   ///
   /// In es, this message translates to:
@@ -671,8 +761,8 @@ abstract class AppLocalizations {
   /// No description provided for @participantGrouped.
   ///
   /// In es, this message translates to:
-  /// **'Grupo {group} · Tapiz {mat}'**
-  String participantGrouped(int group, int mat);
+  /// **'Grupo {group} · {mat}'**
+  String participantGrouped(int group, String mat);
 
   /// No description provided for @draftGroup.
   ///
@@ -683,13 +773,13 @@ abstract class AppLocalizations {
   /// No description provided for @draftGhost.
   ///
   /// In es, this message translates to:
-  /// **'Competidor fantasma'**
+  /// **'Comodín'**
   String get draftGhost;
 
   /// No description provided for @draftGhostHint.
   ///
   /// In es, this message translates to:
-  /// **'Fantasmas (hasta 3): quien ya tiene grupo, o el 4.º que elijas. Combaten pero no puntúan.'**
+  /// **'Comodines (hasta 3): quien ya tiene grupo, o el 4.º que elijas. Combaten pero no puntúan.'**
   String get draftGhostHint;
 
   /// No description provided for @createGroup.
@@ -725,7 +815,7 @@ abstract class AppLocalizations {
   /// No description provided for @ghostBadge.
   ///
   /// In es, this message translates to:
-  /// **'Fantasma'**
+  /// **'Comodín'**
   String get ghostBadge;
 
   /// No description provided for @matTitle.
@@ -733,6 +823,48 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Tapiz {number}'**
   String matTitle(int number);
+
+  /// No description provided for @matPool.
+  ///
+  /// In es, this message translates to:
+  /// **'Tapices libres'**
+  String get matPool;
+
+  /// No description provided for @queuedOffline.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin conexión: {what} se enviará al volver la red. Mientras, sus alumnos salen como pendientes.'**
+  String queuedOffline(String what);
+
+  /// No description provided for @queuedSent.
+  ///
+  /// In es, this message translates to:
+  /// **'Enviado: {what}'**
+  String queuedSent(String what);
+
+  /// No description provided for @queuedRefused.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo crear {what}: alguien ya estaba en otro grupo o equipo. Revisa la lista.'**
+  String queuedRefused(String what);
+
+  /// No description provided for @queuedPending.
+  ///
+  /// In es, this message translates to:
+  /// **'Pendiente de enviar (sin conexión)'**
+  String get queuedPending;
+
+  /// No description provided for @queuedGroupLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'el grupo de {names}'**
+  String queuedGroupLabel(String names);
+
+  /// No description provided for @queuedTeamLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'el equipo de {names}'**
+  String queuedTeamLabel(String names);
 
   /// No description provided for @matEmpty.
   ///
@@ -812,6 +944,30 @@ abstract class AppLocalizations {
   /// **'Un luchador está combatiendo ahora'**
   String get matWaiting;
 
+  /// No description provided for @matResting.
+  ///
+  /// In es, this message translates to:
+  /// **'Descansando hasta las {time}'**
+  String matResting(String time);
+
+  /// No description provided for @matProposedElsewhere.
+  ///
+  /// In es, this message translates to:
+  /// **'Propuesto en el tapiz {number}'**
+  String matProposedElsewhere(int number);
+
+  /// No description provided for @matPoolOffline.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin conexión: otro tapiz puede estar haciéndolo'**
+  String get matPoolOffline;
+
+  /// No description provided for @matTeamPoolNotice.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin grupos individuales pendientes: este tapiz coge los combates de equipos del bote común, repartidos entre los tapices libres. Primero los que más han descansado.'**
+  String get matTeamPoolNotice;
+
   /// No description provided for @matNoneAvailable.
   ///
   /// In es, this message translates to:
@@ -827,8 +983,8 @@ abstract class AppLocalizations {
   /// No description provided for @scoreboardTitle.
   ///
   /// In es, this message translates to:
-  /// **'Tapiz {mat}, grupo {group}'**
-  String scoreboardTitle(int mat, int group);
+  /// **'{mat}, grupo {group}'**
+  String scoreboardTitle(String mat, int group);
 
   /// No description provided for @cornerRed.
   ///
@@ -1139,8 +1295,44 @@ abstract class AppLocalizations {
   /// No description provided for @settingsMatchLength.
   ///
   /// In es, this message translates to:
-  /// **'Duración del combate (min:s)'**
+  /// **'Individual: duración del combate (min:s)'**
   String get settingsMatchLength;
+
+  /// No description provided for @settingsTeamMatchLength.
+  ///
+  /// In es, this message translates to:
+  /// **'Equipos: duración del combate (min:s)'**
+  String get settingsTeamMatchLength;
+
+  /// No description provided for @settingsTeamPointsLimit.
+  ///
+  /// In es, this message translates to:
+  /// **'Equipos: puntos para acabar el combate'**
+  String get settingsTeamPointsLimit;
+
+  /// No description provided for @settingsTeamPointsLimitHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Vacío = sin límite: acaba por tiempo. Descalificar da al rival 15 puntos, o los suyos si lleva más.'**
+  String get settingsTeamPointsLimitHint;
+
+  /// No description provided for @settingsMinRest.
+  ///
+  /// In es, this message translates to:
+  /// **'Descanso mínimo entre combates (segundos)'**
+  String get settingsMinRest;
+
+  /// No description provided for @settingsMinRestHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Nadie empieza un combate sin este descanso desde el anterior, en cualquier tapiz. Hasta entonces el combate sale en espera.'**
+  String get settingsMinRestHint;
+
+  /// No description provided for @settingsMinRestInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'Entre 0 y 600 segundos.'**
+  String get settingsMinRestInvalid;
 
   /// No description provided for @settingsMatchLengthHint.
   ///
@@ -1157,7 +1349,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsPointsLimit.
   ///
   /// In es, this message translates to:
-  /// **'Puntos para acabar el combate'**
+  /// **'Individual: puntos para acabar el combate'**
   String get settingsPointsLimit;
 
   /// No description provided for @settingsPointsLimitHint.
@@ -1660,7 +1852,7 @@ abstract class AppLocalizations {
   /// No description provided for @teamGhostName.
   ///
   /// In es, this message translates to:
-  /// **'Equipo {number} (fantasma)'**
+  /// **'Equipo {number} (comodín)'**
   String teamGhostName(int number);
 
   /// No description provided for @tabParticipants.
@@ -1786,14 +1978,26 @@ abstract class AppLocalizations {
   /// No description provided for @draftGhostTeam.
   ///
   /// In es, this message translates to:
-  /// **'Equipo fantasma'**
+  /// **'Equipo comodín'**
   String get draftGhostTeam;
 
   /// No description provided for @draftGhostTeamHint.
   ///
   /// In es, this message translates to:
-  /// **'Elige {size} alumnos cualesquiera de la categoría: combaten pero no puntúan.'**
+  /// **'Equipos comodín (hasta 3): de 2 o hasta {size} alumnos cualesquiera de la categoría que no estén ya en el grupo. Combaten pero no puntúan.'**
   String draftGhostTeamHint(int size);
+
+  /// No description provided for @addGhostTeam.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir equipo comodín'**
+  String get addGhostTeam;
+
+  /// No description provided for @teamGroupPoolHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin tapiz: sus combates se reparten entre los tapices sin grupos individuales.'**
+  String get teamGroupPoolHint;
 
   /// No description provided for @pickGhostTeam.
   ///
@@ -2134,8 +2338,8 @@ abstract class AppLocalizations {
   /// No description provided for @categoryTeams.
   ///
   /// In es, this message translates to:
-  /// **'Equipos de {size}'**
-  String categoryTeams(int size);
+  /// **'Equipos de 2 o 3'**
+  String get categoryTeams;
 
   /// No description provided for @categoryAdd.
   ///
@@ -2178,12 +2382,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Por equipos'**
   String get categoryByTeams;
-
-  /// No description provided for @categoryTeamSize.
-  ///
-  /// In es, this message translates to:
-  /// **'Alumnos por equipo'**
-  String get categoryTeamSize;
 
   /// No description provided for @categoryGroupSize.
   ///
@@ -2979,7 +3177,7 @@ abstract class AppLocalizations {
   /// No description provided for @ghostOf.
   ///
   /// In es, this message translates to:
-  /// **'{name} (fantasma)'**
+  /// **'{name} (comodín)'**
   String ghostOf(String name);
 
   /// No description provided for @settingsAppearance.
@@ -3147,8 +3345,26 @@ abstract class AppLocalizations {
   /// No description provided for @leaguePhasePoints.
   ///
   /// In es, this message translates to:
-  /// **'F{number}: {points}'**
-  String leaguePhasePoints(int number, String points);
+  /// **'Fase {number}: {total} ({attendance} por asistir + {matches} en combates)'**
+  String leaguePhasePoints(int number, int total, int attendance, int matches);
+
+  /// No description provided for @leaguePhaseAbsent.
+  ///
+  /// In es, this message translates to:
+  /// **'Fase {number}: no inscrito'**
+  String leaguePhaseAbsent(int number);
+
+  /// No description provided for @leagueNoPoints.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin puntos todavía: sin puesto'**
+  String get leagueNoPoints;
+
+  /// No description provided for @leagueCategoryHeader.
+  ///
+  /// In es, this message translates to:
+  /// **'{category} · {count, plural, =1{1 persona} other{{count} personas}}'**
+  String leagueCategoryHeader(String category, int count);
 
   /// No description provided for @medalGold.
   ///
@@ -3327,44 +3543,32 @@ abstract class AppLocalizations {
   /// No description provided for @teamGhostMember.
   ///
   /// In es, this message translates to:
-  /// **'entra como fantasma'**
+  /// **'entra como comodín'**
   String get teamGhostMember;
 
   /// No description provided for @teamGhostHint.
   ///
   /// In es, this message translates to:
-  /// **'Quien ya tiene equipo o grupo entra como fantasma: combate, pero no puntúa por este equipo.'**
+  /// **'Quien ya tiene equipo o grupo entra como comodín: combate, pero no puntúa por este equipo.'**
   String get teamGhostHint;
 
   /// No description provided for @ghostMemberName.
   ///
   /// In es, this message translates to:
-  /// **'{name} (fantasma)'**
+  /// **'{name} (comodín)'**
   String ghostMemberName(String name);
 
   /// No description provided for @teamOverlapTitle.
   ///
   /// In es, this message translates to:
-  /// **'Alumnos en dos equipos del grupo'**
+  /// **'No se puede: alumnos en dos equipos del grupo'**
   String get teamOverlapTitle;
-
-  /// No description provided for @teamOverlapBody.
-  ///
-  /// In es, this message translates to:
-  /// **'{lines}\n\nLes tocará combatir contra un equipo en el que también están. ¿Crear el grupo igualmente?'**
-  String teamOverlapBody(String lines);
 
   /// No description provided for @teamOverlapLine.
   ///
   /// In es, this message translates to:
   /// **'{name}: {teams}'**
   String teamOverlapLine(String name, String teams);
-
-  /// No description provided for @createAnyway.
-  ///
-  /// In es, this message translates to:
-  /// **'Crear igualmente'**
-  String get createAnyway;
 
   /// No description provided for @groupCreatedBy.
   ///
@@ -3513,8 +3717,8 @@ abstract class AppLocalizations {
   /// No description provided for @recordWhere.
   ///
   /// In es, this message translates to:
-  /// **'Tapiz {mat} · Grupo {group}'**
-  String recordWhere(int mat, int group);
+  /// **'{mat} · Grupo {group}'**
+  String recordWhere(String mat, int group);
 
   /// No description provided for @recordWon.
   ///
@@ -3537,7 +3741,7 @@ abstract class AppLocalizations {
   /// No description provided for @recordAsGhost.
   ///
   /// In es, this message translates to:
-  /// **'como fantasma (no puntúa)'**
+  /// **'como comodín (no puntúa)'**
   String get recordAsGhost;
 
   /// No description provided for @recordWarnings.
@@ -3557,6 +3761,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Descalificado'**
   String get recordDisqualified;
+
+  /// No description provided for @leagueDisqualifications.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 descalificación} other{{count} descalificaciones}}'**
+  String leagueDisqualifications(int count);
 
   /// No description provided for @recordRivalDisqualified.
   ///

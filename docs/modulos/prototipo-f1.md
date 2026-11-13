@@ -6,7 +6,7 @@ Usar Brackety en la **Fase 1 real** (≈ 2026-11-14): inscripciones, grupos, tap
 Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, fotos, Android nativo (se usa la web en móvil/tablet), varias fases.
 
 ## Cuentas (riesgo aceptado por Raul)
-- Usuario = contraseña, sin email real: `club1`; `ayudante1`, `ayudante2`; `arbitro1`…`arbitro5`.
+- Usuario = contraseña, sin email real: `club1`; `ayudante1`, `ayudante2`; `arbitro1`…`arbitro5` (la F1 usa 3 tapices: se quitan el 4 y el 5 en Configuración).
 - Solo se crean si `DEMO_ACCOUNTS_ENABLED=true`; ya verificadas. El bloqueo por intentos y el limitador siguen activos.
 - Se borran tras la fase (pendiente: quitar la variable y purgar).
 
@@ -27,7 +27,7 @@ Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, f
 - Tapiz: desplegable a la derecha de "Crear grupo". Por defecto **Automático** = el de menor fin estimado (empate: número más bajo), con una línea que lo dice; o uno con árbitro elegido a mano (sin árbitro, deshabilitado). Vuelve a Automático tras crear. Popup con el tapiz asignado.
 - Alumno ya agrupado: fila deshabilitada, no desaparece.
 - Deshacer grupo (2026-11-11): desde el aviso tras crearlo o con el icono en un alumno o equipo agrupado, con confirmación, mientras ningún combate suyo haya empezado (`DELETE /events/{id}/groups/{groupId}`, ayudante o club; después 409 y solo el superadmin).
-- **Competidor fantasma**: casilla en el grupo; con 3 seleccionados se habilitan todos los de la categoría (también los ya agrupados, salvo los del mismo grupo) y se elige 1 fantasma. El fantasma combate pero no puntúa; mesa gestiona sus cruces.
+- **Comodín** (antes "fantasma", 2026-11-13): casilla en el grupo; con 3 seleccionados se habilitan todos los de la categoría (también los ya agrupados, salvo los del mismo grupo) y se elige 1 comodín. El comodín combate pero no puntúa; mesa gestiona sus cruces.
 - Grupo = 4 en total, de 1 a 4 reales y hasta 3 fantasmas (pedido de Raul, 2026-11-12). Con la casilla marcada, quien ya tiene grupo entra como fantasma, y también el 4.º elegido.
 
 ### Fin estimado de un tapiz
@@ -38,7 +38,7 @@ Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, f
 - Solo su tapiz. Ve sus grupos, los combates disponibles y el **recomendado**.
 - Orden del grupo = orden en que el ayudante seleccionó (fantasma al final). Nórdico de 4: 1-2, 3-4, 1-3, 2-4, 1-4, 2-3 (rojo el primero).
 - Recomendado (`MatchRecommender`), por pasos:
-  1. Fuera los combates con alguien combatiendo ahora en cualquier tapiz (fantasma ocupado: se ve, no está disponible).
+  1. Fuera los combates con alguien combatiendo ahora en cualquier tapiz (comodín ocupado: se ve, no está disponible) o sin el **descanso mínimo** desde su último combate en cualquier tapiz (30 s por defecto, "Descanso mínimo" en Configuración; sale "Descansando hasta las …").
   2. Si hay alternativa, fuera los que repiten alumno del combate recién acabado en el tapiz.
   3. Primero los que tienen más alumnos sin combatir todavía.
   4. Mayor suma de descanso de los dos (desde su último combate o desde que se creó el grupo); sumas a menos de un hueco (2:00 + 30 s) cuentan como iguales.
@@ -48,7 +48,8 @@ Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, f
 - Rojo y azul fijos. Cronómetro con la duración del evento (F1: 3:00) con iniciar/parar; tiempo restante visible. El reloj lo manda el servidor (eventos con hora).
 - Contador +1 y −1 (nunca por debajo de 0) por competidor y deshacer última acción.
 - Con el reloj parado, ajuste ±1 s y ±10 s (evento `CLOCK_ADJUST` con `deltaMs`; ni por debajo de 0 ni por encima de la duración).
-- Menú por competidor: advertencia, descalificación; en 4-7 años además "advertencia por golpear con una mano" (a la 2.ª, +1 al rival automático). Siempre popup de confirmación con motivo obligatorio.
+- Menú por competidor: advertencia, descalificación; en 4-7 años además "advertencia por golpear con una mano". Cada 2.ª advertencia y cada 2.ª de una mano (contadas aparte) dan +1 al rival automático (2026-11-13). Siempre popup de confirmación con motivo obligatorio.
+- Duración y límite por formato (2026-11-13): individual 1:00 y 15; equipos 3:00 y sin límite (0). Sin límite, la descalificación da al rival 15 o sus puntos si lleva más.
 - Límite de puntos o fin del tiempo → desaparece el reloj y aparece "Finalizar combate". Descalificación también finaliza y da el resultado límite–0 al rival (15-0); al deshacerla vuelven los puntos de antes.
 - Campana de ring: un golpe al iniciar, tres al acabar (límite, tiempo o descalificación) y carraca de madera a los 10 s.
 - Todo queda en la línea de tiempo (quién, qué, cuándo, tiempo de combate).

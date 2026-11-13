@@ -156,7 +156,11 @@ class _GroupCard extends ConsumerWidget {
                   l10n.groupTitle(group.number, group.category),
                   style: text.titleSmall,
                 ),
-                Text(l10n.groupMat(group.matNumber)),
+                Text(
+                  group.matNumber == null
+                      ? l10n.groupPool
+                      : l10n.groupMat(group.matNumber!),
+                ),
                 if (group.createdBy != null)
                   Text(l10n.groupCreatedBy(group.createdBy!)),
                 TextButton.icon(

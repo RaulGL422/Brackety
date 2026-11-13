@@ -63,10 +63,11 @@ class FakeGroupingRepository implements GroupingRepository {
   }) async {
     created.add(group);
     createdOnMat.add(matId);
-    return const CreatedGroups(
-      matNumber: 2,
-      groupNumbers: [1],
-      groupIds: ['g1'],
+    // Like the server: a group of teams has no mat.
+    return CreatedGroups(
+      matNumber: group.ofTeams ? null : 2,
+      groupNumbers: const [1],
+      groupIds: const ['g1'],
     );
   }
 

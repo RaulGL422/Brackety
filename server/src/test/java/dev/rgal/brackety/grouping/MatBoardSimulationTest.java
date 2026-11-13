@@ -100,14 +100,14 @@ class MatBoardSimulationTest extends EventApiTest {
     }
 
     @Test
-    void aTeamGroupAndAnIndividualGroupOfTheSameCategoryShareAMatToTheEnd() throws Exception {
+    void aTeamGroupInThePoolAndAnIndividualGroupOfTheSameCategoryAreAllPlayed() throws Exception {
         var people = participants(12, 15);
         var teams = new ArrayList<String>();
         for (int t = 0; t < 4; t++) {
             teams.add(createTeam(people.subList(t * 3, t * 3 + 3)));
         }
         createGroup("15-16", """
-                {"teamIds":[%s]}""".formatted(quoted(teams)), 1);
+                {"teamIds":[%s]}""".formatted(quoted(teams)), null);
         var loners = participants(4, 16);
 
         var played = new ArrayList<String>();
@@ -115,7 +115,7 @@ class MatBoardSimulationTest extends EventApiTest {
             if (round == 1) {
                 createGroup("15-16", individual(loners, null), 1);
             }
-            played.addAll(playRound(List.of(1)));
+            played.addAll(playRound(List.of(1, 2, 3, 4, 5)));
         }
 
         assertThat(played).hasSize(12).doesNotHaveDuplicates();
@@ -129,7 +129,7 @@ class MatBoardSimulationTest extends EventApiTest {
             teams.add(createTeam(people.subList(t * 3, t * 3 + 3)));
         }
         createGroup("15-16", """
-                {"teamIds":[%s]}""".formatted(quoted(teams.subList(0, 4))), 1);
+                {"teamIds":[%s]}""".formatted(quoted(teams.subList(0, 4))), null);
         // The ghost team borrows team 1's fighters, who fight on mat 1.
         createGroup(
                 "15-16",
@@ -137,11 +137,11 @@ class MatBoardSimulationTest extends EventApiTest {
                 {"teamIds":[%s],"ghostTeam":[%s]}""".formatted(
                         quoted(teams.subList(4, 7)),
                         quoted(people.subList(0, 3).stream().map(UUID::toString).toList())),
-                2);
+                null);
 
         var played = new ArrayList<String>();
         for (int round = 0; round < 40 && played.size() < 12; round++) {
-            played.addAll(playRound(List.of(1, 2)));
+            played.addAll(playRound(List.of(1, 2, 3, 4, 5)));
         }
 
         assertThat(played).hasSize(12).doesNotHaveDuplicates();
@@ -166,7 +166,12 @@ class MatBoardSimulationTest extends EventApiTest {
             var fighters = fighters(recommended);
             assertThat(fighters).as("a fighter in two matches at once").noneMatch(busy::contains);
             busy.addAll(fighters);
-            referee(recommended, "START").andExpect(status().isOk());
+            // A team match from the pool takes the mat of the referee who starts it.
+            as(
+                            "arbitro" + number,
+                            post("/api/v1/matches/" + recommended + "/events").content("""
+                            {"type":"START","knownEvents":0}"""))
+                    .andExpect(status().isOk());
             started.add(recommended);
         }
         clock.advance(Duration.ofSeconds(180));
@@ -238,10 +243,12 @@ class MatBoardSimulationTest extends EventApiTest {
         return JsonPath.read(body, "$.id");
     }
 
-    private void createGroup(String category, String group, int matNumber) throws Exception {
+    /** {@code matNumber}: null for a group of teams, which goes to the pool of the free mats. */
+    private void createGroup(String category, String group, Integer matNumber) throws Exception {
+        var mat = matNumber == null ? "null" : "\"" + matId(matNumber) + "\"";
         as("ayudante1", post("/api/v1/events/" + eventId + "/groups").content("""
-                        {"categoryId":"%s","groups":[%s],"matId":"%s"}""".formatted(
-                                categoryId(category), group, matId(matNumber))))
+                        {"categoryId":"%s","groups":[%s],"matId":%s}""".formatted(
+                                categoryId(category), group, mat)))
                 .andExpect(status().isCreated());
     }
 

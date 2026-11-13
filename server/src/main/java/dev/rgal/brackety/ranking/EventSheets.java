@@ -137,7 +137,8 @@ class EventSheets {
                         .collect(Collectors.toMap(FightGroup::getId, Function.identity())),
                 members.findByEventId(eventId),
                 matches.findByEventId(eventId).stream()
-                        .sorted(Comparator.comparing(Match::getMatId).thenComparing(Match::getOrderIndex))
+                        .sorted(Comparator.comparing(Match::getMatId, Comparator.nullsLast(Comparator.naturalOrder()))
+                                .thenComparing(Match::getOrderIndex))
                         .toList(),
                 eventMats.stream().collect(Collectors.toMap(Mat::getId, Mat::getNumber)),
                 eventMats);
@@ -261,13 +262,13 @@ class EventSheets {
         var rows = d.mats().stream()
                 .map(mat -> {
                     var mine = d.matches().stream()
-                            .filter(m -> m.getMatId().equals(mat.getId()))
+                            .filter(m -> mat.getId().equals(m.getMatId()))
                             .toList();
                     return Arrays.<Object>asList(
                             mat.getNumber(),
                             referees.getOrDefault(mat.getRefereeAccountId(), "Sin árbitro"),
                             d.groups().values().stream()
-                                    .filter(g -> g.getMatId().equals(mat.getId()))
+                                    .filter(g -> mat.getId().equals(g.getMatId()))
                                     .count(),
                             mine.size(),
                             mine.stream()
@@ -318,7 +319,7 @@ class EventSheets {
                         "Alumno o equipo",
                         "Miembros del equipo",
                         "Club",
-                        "Fantasma"),
+                        "Comodín"),
                 rows);
     }
 
@@ -351,7 +352,7 @@ class EventSheets {
                             m.getRedScore(),
                             m.getBlueScore(),
                             winner(m, red, blue),
-                            endReason(m, d.event().getPointsLimit(), red, blue),
+                            endReason(m, d.event().pointsLimitFor(m.isTeamMatch()), red, blue),
                             SheetText.status(m.getStatus()),
                             ghostNames.isEmpty() ? null : ghostNames,
                             SheetText.date(m.getStartedAt(), zone),
@@ -375,7 +376,7 @@ class EventSheets {
                         "Ganador",
                         "Cómo acabó",
                         "Estado",
-                        "Fantasma del grupo (no puntúa)",
+                        "Comodín del grupo (no puntúa)",
                         "Fecha",
                         "Hora de inicio",
                         "Hora de fin",
@@ -470,6 +471,7 @@ class EventSheets {
         return m.getRedScore() > m.getBlueScore() ? red.name() : blue.name();
     }
 
+    /** {@code pointsLimit}: 0 = no limit. */
     static String endReason(Match m, int pointsLimit, Competitor red, Competitor blue) {
         if (m.getStatus() != Match.Status.FINISHED) {
             return null;
@@ -477,7 +479,7 @@ class EventSheets {
         if (m.getDisqualifiedSide() != null) {
             return "Descalificación de " + (Side.RED.name().equals(m.getDisqualifiedSide()) ? red.name() : blue.name());
         }
-        if (Math.max(m.getRedScore(), m.getBlueScore()) >= pointsLimit) {
+        if (pointsLimit > 0 && Math.max(m.getRedScore(), m.getBlueScore()) >= pointsLimit) {
             return "Llegó a " + pointsLimit + " puntos";
         }
         return "Fin del tiempo";

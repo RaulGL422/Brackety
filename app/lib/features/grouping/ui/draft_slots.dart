@@ -48,10 +48,12 @@ class DraftSlots extends StatelessWidget {
         onTap: () => onChanged((g) => g.toggle(ghost, grouped: false)),
       );
     }
-    if (ghostSlot &&
-        group.ofTeams &&
-        group.ghostTeam.length == group.ghostTeamSize) {
-      return _Slot(label: l10n.ghostBadge, ghost: true);
+    if (group.ofTeams && ghostIndex < group.ghostTeams.length) {
+      return _Slot(
+        label: l10n.ghostBadge,
+        ghost: true,
+        onTap: () => onChanged((g) => g.removeGhostTeam(ghostIndex)),
+      );
     }
     return _Slot(
       label: ghostSlot ? l10n.ghostBadge : l10n.draftSlot(i + 1),

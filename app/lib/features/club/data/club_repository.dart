@@ -54,6 +54,9 @@ class ClubRepository {
     required Duration matchLength,
     required int pointsLimit,
     required int attendancePoints,
+    required Duration teamMatchLength,
+    required int teamPointsLimit,
+    required Duration minRest,
   }) async {
     final response = await _dio.put<Map<String, dynamic>>(
       '/api/v1/events/$eventId/settings',
@@ -66,6 +69,9 @@ class ClubRepository {
         'matchSeconds': matchLength.inSeconds,
         'pointsLimit': pointsLimit,
         'attendancePoints': attendancePoints,
+        'teamMatchSeconds': teamMatchLength.inSeconds,
+        'teamPointsLimit': teamPointsLimit,
+        'minRestSeconds': minRest.inSeconds,
       },
     );
     return EventSettings.fromJson(response.data!);

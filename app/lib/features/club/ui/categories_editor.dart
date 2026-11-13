@@ -86,7 +86,7 @@ class _CategoriesEditorState extends ConsumerState<CategoriesEditor> {
             contentPadding: EdgeInsets.zero,
             title: Text(l10n.categoryRange(c.name, c.minAge, c.maxAge)),
             subtitle: Text(
-              '${c.isTeam ? l10n.categoryTeams(c.teamSize!) : l10n.categoryIndividual}'
+              '${c.isTeam ? l10n.categoryTeams : l10n.categoryIndividual}'
               ' · ${l10n.categoryGroupSize(c.groupSize)}',
             ),
             onTap: _saving ? null : () => _edit(i),
@@ -230,18 +230,7 @@ class _CategoryDialogState extends State<_CategoryDialog> {
                   value: _teamSize != null,
                   onChanged: (on) => setState(() => _teamSize = on ? 3 : null),
                 ),
-                if (_teamSize != null)
-                  DropdownButtonFormField<int>(
-                    initialValue: _teamSize,
-                    decoration: InputDecoration(
-                      labelText: l10n.categoryTeamSize,
-                    ),
-                    items: [
-                      for (var n = 2; n <= 5; n++)
-                        DropdownMenuItem(value: n, child: Text('$n')),
-                    ],
-                    onChanged: (n) => setState(() => _teamSize = n),
-                  ),
+                // Teams are always of 2 or 3 (Raul, 2026-11-13): nothing to choose.
               ],
             ),
           ),

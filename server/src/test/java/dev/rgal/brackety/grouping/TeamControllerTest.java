@@ -2,6 +2,7 @@ package dev.rgal.brackety.grouping;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -16,6 +17,7 @@ import dev.rgal.brackety.participant.Participant;
 import dev.rgal.brackety.participant.ParticipantRepository;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,7 +75,9 @@ class TeamControllerTest extends EventApiTest {
     void rejectsWrongTeamsAndParticipantsAlreadyInATeam() throws Exception {
         createTeam(0, 1, 2).andExpect(status().isCreated());
 
-        createTeam(3, 4).andExpect(status().isBadRequest());
+        // Teams are of 2 or 3, always.
+        createTeam(3).andExpect(status().isBadRequest());
+        createTeam(3, 4, 5, 6).andExpect(status().isBadRequest());
         createTeam(3, 4, 4).andExpect(status().isBadRequest());
         createTeam(2, 3, 4).andExpect(status().isConflict());
         var seven = participant("Peque", 7);
@@ -88,13 +92,15 @@ class TeamControllerTest extends EventApiTest {
     }
 
     @Test
-    void fourTeamsMakeAGroupWithTeamMatchesOnTheSoonestMat() throws Exception {
+    void fourTeamsMakeAGroupWhoseMatchesGoToThePoolOfTheFreeMats() throws Exception {
         var teams = teams(4);
         createGroups(teamGroup(teams, null))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.matNumber").value(1));
+                .andExpect(jsonPath("$.matNumber").doesNotExist());
 
         call(get("/api/v1/mats/" + matId(1) + "/board"), "arbitro1")
+                .andExpect(jsonPath("$.teamPool").value(true))
+                .andExpect(jsonPath("$.matches[0].pool").value(true))
                 .andExpect(jsonPath("$.groups[0].members[*].teamNumber", contains(1, 2, 3, 4)))
                 .andExpect(jsonPath("$.groups[0].members[0].members", hasSize(3)))
                 .andExpect(jsonPath("$.matches", hasSize(6)))
@@ -105,7 +111,7 @@ class TeamControllerTest extends EventApiTest {
                         .value(teamMatch(teams.get(0), teams.get(1)).toString()));
         call(get(event() + "/categories/" + category() + "/teams"), "ayudante2")
                 .andExpect(jsonPath("$[0].groupNumber").value(1))
-                .andExpect(jsonPath("$[0].matNumber").value(1));
+                .andExpect(jsonPath("$[0].matNumber").doesNotExist());
 
         createGroups(teamGroup(teams, null)).andExpect(status().isConflict());
         call(delete(event() + "/teams/" + teams.get(0)), "ayudante1").andExpect(status().isConflict());
@@ -116,8 +122,9 @@ class TeamControllerTest extends EventApiTest {
         var teams = teams(4);
         var three = teams.subList(0, 3);
 
-        createGroups(teamGroup(three, quoted(9, 10))).andExpect(status().isBadRequest());
-        createGroups(teamGroup(three, quoted(0, 9, 10))).andExpect(status().isBadRequest());
+        createGroups(teamGroup(three, quoted(9))).andExpect(status().isBadRequest());
+        // 0 is in team 1 of the group: nobody fights against themselves.
+        createGroups(teamGroup(three, quoted(0, 9, 10))).andExpect(status().isConflict());
         createGroups(teamGroup(three, quoted(9, 10, 11))).andExpect(status().isCreated());
 
         call(get("/api/v1/mats/" + matId(1) + "/board"), "arbitro1")
@@ -157,7 +164,14 @@ class TeamControllerTest extends EventApiTest {
 
         call(get("/api/v1/mats/" + matId(2) + "/board"), "arbitro2")
                 .andExpect(jsonPath("$.matches[?(@.order == 1)].available", contains(false)))
-                .andExpect(jsonPath("$.matches[?(@.order == 0)].available", contains(true)));
+                .andExpect(jsonPath("$.matches[?(@.order == 0)].available", contains(true)))
+                // The referee sees where the ghost team is and when it will be free: 12 on mat 1 (1:00 + 30 s
+                // of rest), and 12 and 9 still have 4 matches there.
+                .andExpect(jsonPath("$.matches[?(@.order == 1)].*.fightingOnMat", hasItem(1)))
+                .andExpect(jsonPath(
+                        "$.matches[?(@.order == 1)].*.freeAt",
+                        hasItem(clock.instant().plusSeconds(90).toString())))
+                .andExpect(jsonPath("$.matches[?(@.order == 1)].*.pendingMats", hasItem(List.of(1, 1, 1, 1))));
     }
 
     @Test
@@ -172,13 +186,17 @@ class TeamControllerTest extends EventApiTest {
                 .andExpect(jsonPath("$.red.teamNumber").value(1))
                 .andExpect(jsonPath("$.red.members", hasSize(3)))
                 .andExpect(jsonPath("$.red.oneHandRule").value(false));
+        // Team matches have no points limit: the time ends them.
         referee(match, "START", null);
         points(match, "RED", 15);
+        clock.advance(Duration.ofMinutes(3));
         referee(match, "FINISH", null);
+        clock.advance(Duration.ofMinutes(1));
         var ghostMatch = teamMatch(teams.get(2), ghostTeam);
         referee(ghostMatch, "START", null);
         points(ghostMatch, "RED", 4);
         points(ghostMatch, "BLUE", 15);
+        clock.advance(Duration.ofMinutes(3));
         referee(ghostMatch, "FINISH", null);
 
         call(get(event() + "/standings"), "club1")
@@ -233,14 +251,19 @@ class TeamControllerTest extends EventApiTest {
         // A real member must still be free: 1 is in team 1.
         createTeam(new int[] {11, 12, 1}, 11).andExpect(status().isConflict());
 
-        // Team 1 and the filled team share 0: they may go in one group (the app warns first).
+        // Team 1 and the filled team share 0: never in one group.
         createGroups(teamGroup(List.of(full.get(0), full.get(1), full.get(2), filled), null))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("SAME_FIGHTER"));
+        // A wildcard team of two fills the group in.
+        createGroups(teamGroup(List.of(full.get(1), full.get(2), filled), quoted(11, 12)))
                 .andExpect(status().isCreated());
         var match = teamMatch(full.get(1), filled);
         call(get("/api/v1/matches/" + match), "arbitro1")
-                .andExpect(jsonPath("$.blue.members[2]").value("AlumnoA Prueba (fantasma)"));
+                .andExpect(jsonPath("$.blue.members[2]").value("AlumnoA Prueba (comodín)"));
         referee(match, "START", null);
         points(match, "BLUE", 15);
+        clock.advance(Duration.ofMinutes(3));
         referee(match, "FINISH", null);
 
         call(get(event() + "/standings"), "club1")
@@ -248,9 +271,9 @@ class TeamControllerTest extends EventApiTest {
                         .value(25))
                 .andExpect(jsonPath("$[?(@.participantId == '%s')].teamNumber".formatted(teens.get(9)))
                         .value(4))
-                // The ghost member: attendance and team number from team 1 only, nothing from the filled team.
+                // The wildcard member scores nothing for the filled team (team 1 has no group).
                 .andExpect(jsonPath("$[?(@.participantId == '%s')].total".formatted(teens.get(0)))
-                        .value(10))
+                        .value(0))
                 .andExpect(jsonPath("$[?(@.participantId == '%s')].matches".formatted(teens.get(0)))
                         .value(0))
                 .andExpect(jsonPath("$[?(@.participantId == '%s')].teamNumber".formatted(teens.get(0)))

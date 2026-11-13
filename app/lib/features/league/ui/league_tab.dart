@@ -225,14 +225,36 @@ class _StandingsState extends ConsumerState<_Standings> {
                 child: Text(l10n.standingsEmpty, textAlign: TextAlign.center),
               );
             }
+            // Places count within each category, so each goes under its own heading.
+            final byCategory = <String, List<LeagueStandingRow>>{};
+            for (final r in rows) {
+              byCategory
+                  .putIfAbsent(r.categoryName ?? l10n.noCategory, () => [])
+                  .add(r);
+            }
             return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                for (final r in rows)
-                  _LeagueStandingTile(
-                    row: r,
-                    phaseNumbers: standings.phaseNumbers,
-                    showCategory: category == null,
+                for (final MapEntry(key: name, value: people)
+                    in byCategory.entries) ...[
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.l,
+                      AppSpacing.l,
+                      AppSpacing.l,
+                      AppSpacing.xs,
+                    ),
+                    child: Text(
+                      l10n.leagueCategoryHeader(name, people.length),
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
                   ),
+                  for (final r in people)
+                    _LeagueStandingTile(
+                      row: r,
+                      phaseNumbers: standings.phaseNumbers,
+                    ),
+                ],
               ],
             );
           },
@@ -243,48 +265,58 @@ class _StandingsState extends ConsumerState<_Standings> {
 }
 
 class _LeagueStandingTile extends StatelessWidget {
-  const _LeagueStandingTile({
-    required this.row,
-    required this.phaseNumbers,
-    required this.showCategory,
-  });
+  const _LeagueStandingTile({required this.row, required this.phaseNumbers});
 
   final LeagueStandingRow row;
   final List<int> phaseNumbers;
-  final bool showCategory;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final perPhase = [
-      for (final (i, points) in row.phasePoints.indexed)
-        l10n.leaguePhasePoints(
-          phaseNumbers[i],
-          points == null ? '–' : '$points',
-        ),
-    ].join('   ');
+      for (final (i, p) in row.phasePoints.indexed)
+        p == null
+            ? l10n.leaguePhaseAbsent(phaseNumbers[i])
+            : l10n.leaguePhasePoints(
+                phaseNumbers[i],
+                p.attendance + p.matches,
+                p.attendance,
+                p.matches,
+              ),
+    ];
     final medal = row.medal;
+    // With 0 points nobody has earned a place: before the first match everyone would share a meaningless "1".
+    final ranked = row.total > 0;
+    final metal = medal == null ? null : medalColor(medal);
     return ListTile(
-      leading: CircleAvatar(child: Text('${row.position}')),
-      title: Row(
-        children: [
-          Flexible(child: Text('${row.firstName} ${row.lastName}')),
-          if (medal != null) ...[
-            const SizedBox(width: AppSpacing.s),
-            MedalIcon(medal: medal),
-          ],
-        ],
+      leading: Tooltip(
+        message: medal != null
+            ? medalName(l10n, medal)
+            : ranked
+            ? ''
+            : l10n.leagueNoPoints,
+        child: CircleAvatar(
+          backgroundColor: metal,
+          foregroundColor: metal == null ? null : Colors.black,
+          child: Text(
+            ranked ? '${row.position}' : '–',
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
       ),
+      title: Text('${row.firstName} ${row.lastName}'),
       subtitle: Text(
         [
+          ?row.organizationName,
+          ...perPhase,
           [
-            if (showCategory) row.categoryName ?? l10n.noCategory,
-            ?row.organizationName,
+            if (row.warnings > 0) l10n.recordWarnings(row.warnings),
+            if (row.disqualifications > 0)
+              l10n.leagueDisqualifications(row.disqualifications),
           ].join(' · '),
-          perPhase,
         ].where((line) => line.isNotEmpty).join('\n'),
       ),
-      isThreeLine: showCategory || row.organizationName != null,
+      isThreeLine: true,
       trailing: Text(
         l10n.standingsTotal(row.total),
         style: Theme.of(context).textTheme.titleLarge,

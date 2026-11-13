@@ -158,6 +158,8 @@ class LeagueCandidate {
   final String? categoryName;
 }
 
+typedef PhasePoints = ({int attendance, int matches});
+
 /// One person on the accumulated standings; [phasePoints] follows the league's phases, null where absent.
 class LeagueStandingRow {
   const LeagueStandingRow({
@@ -169,6 +171,8 @@ class LeagueStandingRow {
     required this.total,
     this.medal,
     this.organizationName,
+    this.warnings = 0,
+    this.disqualifications = 0,
   });
 
   factory LeagueStandingRow.fromJson(Map<String, dynamic> json) =>
@@ -183,9 +187,14 @@ class LeagueStandingRow {
           for (final p in json['phases'] as List)
             p == null
                 ? null
-                : (p['attendancePoints'] as int) + (p['matchPoints'] as int),
+                : (
+                    attendance: p['attendancePoints'] as int,
+                    matches: p['matchPoints'] as int,
+                  ),
         ],
         total: json['total'] as int,
+        warnings: json['warnings'] as int? ?? 0,
+        disqualifications: json['disqualifications'] as int? ?? 0,
       );
 
   final String? categoryName;
@@ -196,8 +205,12 @@ class LeagueStandingRow {
   final String firstName;
   final String lastName;
   final String? organizationName;
-  final List<int?> phasePoints;
+  final List<PhasePoints?> phasePoints;
   final int total;
+
+  /// In every match of the league (both kinds of warning; a team's count for each member).
+  final int warnings;
+  final int disqualifications;
 }
 
 class LeagueStandings {

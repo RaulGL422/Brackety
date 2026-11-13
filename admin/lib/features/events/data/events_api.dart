@@ -127,7 +127,7 @@ class AdminGroup {
     id: json['id'] as String,
     number: json['number'] as int,
     category: json['category'] as String,
-    matNumber: json['matNumber'] as int,
+    matNumber: json['matNumber'] as int?,
     createdBy: json['createdBy'] as String?,
     members: [
       for (final m in json['members'] as List? ?? const [])
@@ -142,7 +142,9 @@ class AdminGroup {
   final String id;
   final int number;
   final String category;
-  final int matNumber;
+
+  /// Null for a group of teams: its matches go to the free mats.
+  final int? matNumber;
 
   /// Who made it ("Ana López (ayudante1)", or the sign-in alone).
   final String? createdBy;

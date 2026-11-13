@@ -21,6 +21,7 @@ import 'reason_dialog.dart';
 import 'timeline_list.dart';
 import 'undo_text.dart';
 import '../../../core/up_button.dart';
+import '../../mat/ui/mat_label.dart';
 
 /// How long the "undone" message stays.
 const undoneNotice = Duration(seconds: 3);
@@ -43,6 +44,8 @@ class ScoreboardScreen extends ConsumerWidget {
     final view = match.value;
     final fallback = view == null
         ? '/'
+        : view.matId == null
+        ? '/'
         : '/mats/${view.matId}?number=${view.matNumber}';
     void leave() => _leave(context, ref, fallback);
     // Any tap opens the browser's audio, so the bells that come later by themselves sound.
@@ -63,7 +66,7 @@ class ScoreboardScreen extends ConsumerWidget {
                 leading: UpButton(
                   label: view == null
                       ? l10n.eventsTitle
-                      : l10n.matTitle(view.matNumber),
+                      : matLabel(l10n, view.matNumber),
                   fallback: fallback,
                   onPressed: leave,
                 ),
@@ -71,7 +74,10 @@ class ScoreboardScreen extends ConsumerWidget {
                 title: Text(
                   view == null
                       ? ''
-                      : l10n.scoreboardTitle(view.matNumber, view.groupNumber),
+                      : l10n.scoreboardTitle(
+                          matLabel(l10n, view.matNumber),
+                          view.groupNumber,
+                        ),
                 ),
                 actions: [
                   const SyncStatusIcon(),
@@ -179,9 +185,9 @@ class ScoreboardScreen extends ConsumerWidget {
       undoing: action == MatchAction.undo ? view.lastUndoable : null,
     );
     // The match is over: the mat board must show the next recommendation.
-    if (action == MatchAction.finish) {
-      ref.invalidate(matBoardProvider(view.matId));
-      ref.invalidate(cachedBoardProvider(view.matId));
+    if (action == MatchAction.finish && view.matId != null) {
+      ref.invalidate(matBoardProvider(view.matId!));
+      ref.invalidate(cachedBoardProvider(view.matId!));
     }
   }
 

@@ -29,7 +29,7 @@ class ScoreboardControllerTest extends ScoreboardApiTest {
         event(match, "POINT", "RED");
         event(match, "STOP")
                 .andExpect(jsonPath("$.running").value(false))
-                .andExpect(jsonPath("$.remainingMs").value(150_000))
+                .andExpect(jsonPath("$.remainingMs").value(30_000))
                 .andExpect(jsonPath("$.red.points").value(2));
         event(match, "FINISH").andExpect(status().isConflict());
 
@@ -179,13 +179,13 @@ class ScoreboardControllerTest extends ScoreboardApiTest {
         event(match, "CLOCK_ADJUST").andExpect(status().isBadRequest());
         adjust(match, 10_000)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.remainingMs").value(160_000))
+                .andExpect(jsonPath("$.remainingMs").value(40_000))
                 .andExpect(jsonPath("$.timeline[5].type").value("CLOCK_ADJUST"))
                 .andExpect(jsonPath("$.timeline[5].deltaMs").value(10_000))
                 .andExpect(jsonPath("$.timeline[5].clockMs").value(30_000));
 
         event(match, "UNDO")
-                .andExpect(jsonPath("$.remainingMs").value(150_000))
+                .andExpect(jsonPath("$.remainingMs").value(30_000))
                 .andExpect(jsonPath("$.timeline[5].undone").value(true));
         event(match, "UNDO").andExpect(jsonPath("$.red.points").value(2));
 
@@ -223,7 +223,7 @@ class ScoreboardControllerTest extends ScoreboardApiTest {
     @Test
     void theClubSetsLengthAndLimitButNotWhileAMatchIsInProgress() throws Exception {
         call(get(settings()), "club1")
-                .andExpect(jsonPath("$.matchSeconds").value(180))
+                .andExpect(jsonPath("$.matchSeconds").value(60))
                 .andExpect(jsonPath("$.pointsLimit").value(15));
         call(put(settings()).content(settingsJson(20, null)), "club1").andExpect(status().isBadRequest());
         call(put(settings()).content(settingsJson(1201, null)), "club1").andExpect(status().isBadRequest());

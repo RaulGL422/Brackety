@@ -61,6 +61,11 @@ class MatchController extends AsyncNotifier<MatchView> {
       if (state.hasValue && local != null) _show(local.view);
     });
     await _sync.ready;
+    // Known to be offline: what the device keeps at once; the polls and the background check
+    // bring the server's view when it answers again.
+    if (!ref.read(offlineSyncProvider).connected && _local() != null) {
+      return _local()!.view;
+    }
     try {
       final view = await _repository.load(matchId);
       _sync.reportResponse();

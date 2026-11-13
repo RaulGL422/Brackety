@@ -21,7 +21,10 @@ public record EventSettingsResponse(
         List<OrganizationResponse> organizations,
         int attendancePoints,
         int phaseNumber,
-        String discipline) {
+        String discipline,
+        int teamMatchSeconds,
+        int teamPointsLimit,
+        int minRestSeconds) {
 
     public record OrganizationResponse(UUID id, String name, String shortName) {
 

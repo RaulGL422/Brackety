@@ -4,11 +4,13 @@ import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 import '../../../core/async_view.dart';
 import '../../../core/keep_screen_on.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../offline/ui/sync_status_icon.dart';
+import '../../rulebook/rulebook_ui.dart';
 import '../../scoreboard/data/match_view.dart';
 import '../../scoreboard/ui/match_corrections.dart';
 import '../data/mat_board.dart';
@@ -78,6 +80,8 @@ class MatBoardScreen extends ConsumerWidget {
             ],
           ),
           actions: [
+            if (board.value?.eventId case final eventId?)
+              RulebookButton(eventId: eventId, color: colors.onBand),
             if (queued) const SyncStatusIcon(),
             if (toPlay != null && toPlay > 0)
               Padding(
@@ -156,6 +160,11 @@ class _BoardList extends StatelessWidget {
                 readOnly: readOnly,
                 inProgress: true,
               ),
+            ),
+          if (board.teamPool)
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.m),
+              child: Text(l10n.matTeamPoolNotice, style: text.bodySmall),
             ),
           if (board.offline)
             const _OfflineNotice()
@@ -294,8 +303,18 @@ class _FeaturedMatch extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               spacing: AppSpacing.m,
               children: [
-                _CornerLine(side: Side.red, fighter: match.red, large: true),
-                _CornerLine(side: Side.blue, fighter: match.blue, large: true),
+                _CornerLine(
+                  side: Side.red,
+                  fighter: match.red,
+                  corner: inProgress ? null : match.redCorner,
+                  large: true,
+                ),
+                _CornerLine(
+                  side: Side.blue,
+                  fighter: match.blue,
+                  corner: inProgress ? null : match.blueCorner,
+                  large: true,
+                ),
               ],
             ),
           ),
@@ -395,7 +414,8 @@ class _MatchRow extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final finished = match.status == MatchStatus.finished;
-    final waiting = match.status == MatchStatus.pending && !match.available;
+    final pending = match.status == MatchStatus.pending;
+    final waiting = pending && !match.available;
     final locked = waiting && !readOnly;
     return ListTile(
       minTileHeight: AppSizes.scoreTouchTarget,
@@ -403,14 +423,22 @@ class _MatchRow extends StatelessWidget {
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _CornerLine(side: Side.red, fighter: match.red),
-          _CornerLine(side: Side.blue, fighter: match.blue),
+          _CornerLine(
+            side: Side.red,
+            fighter: match.red,
+            corner: pending ? match.redCorner : null,
+          ),
+          _CornerLine(
+            side: Side.blue,
+            fighter: match.blue,
+            corner: pending ? match.blueCorner : null,
+          ),
         ],
       ),
       subtitle: match.inReview
           ? Text(l10n.matInReview)
-          : waiting
-          ? Text(l10n.matWaiting)
+          : waiting || match.waitReason == WaitReason.otherMat
+          ? Text(waitText(context, match))
           : null,
       trailing: finished
           ? Text(
@@ -423,27 +451,92 @@ class _MatchRow extends StatelessWidget {
   }
 }
 
-/// The corner's colour mark (with its name for screen readers) and the fighter.
+/// Why [match] cannot start yet, for its row.
+String waitText(BuildContext context, BoardMatch match) {
+  final l10n = AppLocalizations.of(context);
+  return switch (match.waitReason) {
+    WaitReason.review => l10n.matInReview,
+    WaitReason.resting when match.readyAt != null => l10n.matResting(
+      DateFormat.Hms(Localizations.localeOf(context).toLanguageTag())
+          .format(match.readyAt!.toLocal()),
+    ),
+    WaitReason.otherMat when match.otherMatNumber != null =>
+      l10n.matProposedElsewhere(match.otherMatNumber!),
+    _ when match.pool && match.waitReason == null => l10n.matPoolOffline,
+    _ => l10n.matWaiting,
+  };
+}
+
+/// Where a pending fighter is now, in one short line; null when they are free with nothing else.
+String? cornerText(BuildContext context, CornerState? state) {
+  if (state == null) return null;
+  final l10n = AppLocalizations.of(context);
+  final locale = Localizations.localeOf(context).toLanguageTag();
+  final freeAt = state.freeAt?.toLocal();
+  final parts = [
+    if (state.fightingOnMat != null)
+      // Past the estimate (a long match): only where.
+      freeAt == null
+          ? l10n.cornerFightingNow(state.fightingOnMat!)
+          : l10n.cornerFighting(
+              state.fightingOnMat!,
+              DateFormat.Hm(locale).format(freeAt),
+            )
+    else if (freeAt != null)
+      l10n.cornerResting(DateFormat.Hms(locale).format(freeAt)),
+    if (state.pendingMats.isNotEmpty)
+      l10n.cornerPending(
+        state.pendingMats.length,
+        state.pendingMats.toSet().join(', '),
+      ),
+  ];
+  return parts.isEmpty ? null : parts.join(' · ');
+}
+
+/// The corner's colour mark (with its name for screen readers) and the fighter: a team by its
+/// title with its people below, to call them, and for a pending match where they are now.
 /// [large]: the featured match, with the corner named in words too.
 class _CornerLine extends StatelessWidget {
   const _CornerLine({
     required this.side,
     required this.fighter,
+    this.corner,
     this.large = false,
   });
 
   final Side side;
   final Fighter fighter;
+  final CornerState? corner;
   final bool large;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final text = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
     final corner = side == Side.red ? l10n.cornerRed : l10n.cornerBlue;
     final color = side == Side.red ? CompetitorColor.red : CompetitorColor.blue;
+    final members = fighter.membersLine;
+    final where = cornerText(context, this.corner);
+    final details = [
+      if (members != null)
+        Text(
+          members,
+          style: (large ? text.bodyLarge : text.bodySmall)?.copyWith(
+            color: scheme.onSurfaceVariant,
+          ),
+        ),
+      if (where != null)
+        Text(
+          where,
+          style: (large ? text.bodyMedium : text.bodySmall)?.copyWith(
+            color: scheme.onSurface,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+    ];
     return Semantics(
-      label: '$corner: ${fighter.label(l10n)}',
+      label: ['$corner: ${fighter.label(l10n)}', ?members, ?where].join('. '),
       excludeSemantics: true,
       child: large
           ? IntrinsicHeight(
@@ -465,6 +558,7 @@ class _CornerLine extends StatelessWidget {
                           ),
                         ),
                         Text(fighter.label(l10n), style: text.titleLarge),
+                        ...details,
                       ],
                     ),
                   ),
@@ -472,10 +566,31 @@ class _CornerLine extends StatelessWidget {
               ),
             )
           : Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               spacing: AppSpacing.s,
               children: [
-                _Mark(color: color.color, width: AppSpacing.m, height: 12),
-                Expanded(child: Text(fighter.label(l10n))),
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: _Mark(
+                    color: color.color,
+                    width: AppSpacing.m,
+                    height: 12,
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        fighter.label(l10n),
+                        style: fighter.teamNumber == null
+                            ? null
+                            : const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      ...details,
+                    ],
+                  ),
+                ),
               ],
             ),
     );

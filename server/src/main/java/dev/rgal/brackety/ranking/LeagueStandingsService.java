@@ -7,14 +7,20 @@ import dev.rgal.brackety.event.EventCategoryRepository;
 import dev.rgal.brackety.event.EventRepository;
 import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventService;
+import dev.rgal.brackety.grouping.CompetitorDirectory;
+import dev.rgal.brackety.grouping.Match;
+import dev.rgal.brackety.grouping.MatchRepository;
 import dev.rgal.brackety.league.CategoryPodium;
 import dev.rgal.brackety.league.CategoryPodiumRepository;
 import dev.rgal.brackety.league.LeagueRepository;
 import dev.rgal.brackety.league.Podium;
+import dev.rgal.brackety.participant.Participant;
+import dev.rgal.brackety.participant.ParticipantRepository;
 import dev.rgal.brackety.ranking.dto.LeagueStandings;
 import dev.rgal.brackety.ranking.dto.LeagueStandings.PhasePoints;
 import dev.rgal.brackety.ranking.dto.LeagueStandings.Row;
 import dev.rgal.brackety.ranking.dto.StandingRow;
+import dev.rgal.brackety.scoreboard.MatchSnapshots;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -43,6 +49,10 @@ class LeagueStandingsService {
     private final LeagueRepository leagues;
     private final CategoryPodiumRepository podiums;
     private final EventAccess access;
+    private final MatchRepository matches;
+    private final CompetitorDirectory directory;
+    private final ParticipantRepository participants;
+    private final MatchSnapshots snapshots;
 
     LeagueStandingsService(
             StandingsService standings,
@@ -51,7 +61,15 @@ class LeagueStandingsService {
             EventCategoryRepository categories,
             LeagueRepository leagues,
             CategoryPodiumRepository podiums,
-            EventAccess access) {
+            EventAccess access,
+            MatchRepository matches,
+            CompetitorDirectory directory,
+            ParticipantRepository participants,
+            MatchSnapshots snapshots) {
+        this.matches = matches;
+        this.directory = directory;
+        this.participants = participants;
+        this.snapshots = snapshots;
         this.standings = standings;
         this.events = events;
         this.eventService = eventService;
@@ -78,6 +96,7 @@ class LeagueStandingsService {
                         new PhasePoints(row.attendancePoints(), row.matchPoints());
             }
         }
+        var discipline = discipline(phases);
         var podium = podiums(event.getLeagueId());
         var order = categoryOrder(phases);
         var byCategory = latest.values().stream()
@@ -103,7 +122,9 @@ class LeagueStandingsService {
                                         r.lastName(),
                                         r.organizationName(),
                                         phasePoints,
-                                        total);
+                                        total,
+                                        discipline.warnings().getOrDefault(r.personId(), 0),
+                                        discipline.disqualifications().getOrDefault(r.personId(), 0));
                             })
                             .sorted(Comparator.comparingInt(Row::total)
                                     .reversed()
@@ -125,7 +146,9 @@ class LeagueStandingsService {
                                 r.lastName(),
                                 r.organizationName(),
                                 r.phases(),
-                                r.total()));
+                                r.total(),
+                                r.warnings(),
+                                r.disqualifications()));
                     }
                 });
         return new LeagueStandings(
@@ -133,6 +156,34 @@ class LeagueStandingsService {
                         .map(p -> new LeagueStandings.Phase(p.getId(), p.getPhaseNumber(), p.getName()))
                         .toList(),
                 rows);
+    }
+
+    private record Discipline(Map<UUID, Integer> warnings, Map<UUID, Integer> disqualifications) {}
+
+    // Per person, from every started match of every phase: a team's warnings count for each of its members.
+    private Discipline discipline(List<Event> phases) {
+        var warnings = new HashMap<UUID, Integer>();
+        var disqualifications = new HashMap<UUID, Integer>();
+        for (var phase : phases) {
+            var persons = participants.findByEventIdOrderByFirstNameAscLastNameAsc(phase.getId()).stream()
+                    .collect(Collectors.toMap(Participant::getId, Participant::getPersonId));
+            var competitors = directory.of(phase.getId());
+            for (var m : matches.findByEventId(phase.getId())) {
+                if (m.getStatus() == Match.Status.PENDING) {
+                    continue;
+                }
+                var view = snapshots.of(m);
+                for (var corner : List.of(view.red(), view.blue())) {
+                    var fighter = corner.teamId() != null ? corner.teamId() : corner.participantId();
+                    for (var p : competitors.participants(fighter)) {
+                        var person = persons.get(p);
+                        warnings.merge(person, corner.warnings() + corner.oneHandWarnings(), Integer::sum);
+                        disqualifications.merge(person, corner.disqualified() ? 1 : 0, Integer::sum);
+                    }
+                }
+            }
+        }
+        return new Discipline(warnings, disqualifications);
     }
 
     /** The league's podium and the categories with their own. */
@@ -170,9 +221,14 @@ class LeagueStandingsService {
             header.add("Fase " + phase.number() + ": total");
         }
         header.add("Total liga");
+        header.add("Advertencias en la liga");
+        header.add("Descalificaciones en la liga");
         var rows = result.rows().stream()
                 .map(r -> {
-                    var cells = new ArrayList<Object>(List.of(r.categoryName(), r.position()));
+                    var cells = new ArrayList<Object>();
+                    cells.add(r.categoryName());
+                    // With 0 points nobody has a place yet (the app shows a dash too).
+                    cells.add(r.total() > 0 ? r.position() : null);
                     cells.add(SheetText.medal(r.medal()));
                     cells.add(r.firstName());
                     cells.add(r.lastName());
@@ -183,6 +239,8 @@ class LeagueStandingsService {
                         cells.add(p == null ? null : p.total());
                     }
                     cells.add(r.total());
+                    cells.add(r.warnings());
+                    cells.add(r.disqualifications());
                     return cells;
                 })
                 .toList();

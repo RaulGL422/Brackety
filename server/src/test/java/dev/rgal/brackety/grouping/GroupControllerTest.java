@@ -174,7 +174,7 @@ class GroupControllerTest extends EventApiTest {
                 .andExpect(jsonPath("$", hasSize(5)))
                 .andExpect(jsonPath("$[0].referee").value("arbitro1"))
                 .andExpect(jsonPath("$[0].pendingMatches").value(6))
-                .andExpect(jsonPath("$[0].remainingSeconds").value(180 + 5 * 210))
+                .andExpect(jsonPath("$[0].remainingSeconds").value(60 + 5 * 90))
                 .andExpect(jsonPath("$[1].remainingSeconds").value(0));
     }
 

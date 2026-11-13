@@ -45,7 +45,9 @@ class DraftPanel extends StatelessWidget {
     final hint = !group.ofTeams && group.ghostMode && !group.isComplete
         ? l10n.draftGhostHint
         : group.ofTeams && group.ghostMode
-        ? l10n.draftGhostTeamHint(group.ghostTeamSize!)
+        ? l10n.draftGhostTeamHint(DraftGroup.maxTeam)
+        : group.ofTeams
+        ? l10n.teamGroupPoolHint
         : null;
     return Material(
       color: scheme.surfaceContainerLowest,
@@ -101,45 +103,48 @@ class DraftPanel extends StatelessWidget {
                     color: scheme.onSurfaceVariant,
                   ),
                 ),
-              if (group.ofTeams &&
-                  group.ghostMode &&
-                  group.members.length == DraftGroup.size - 1) ...[
+              if (group.canAddGhostTeam)
                 OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size.fromHeight(AppSizes.touchTarget),
                   ),
-                  icon: const Icon(Icons.visibility_off_outlined),
-                  label: Text(
-                    l10n.pickGhostTeam(
-                      group.ghostTeam.length,
-                      group.ghostTeamSize!,
-                    ),
-                  ),
+                  icon: const Icon(Icons.group_add_outlined),
+                  label: Text(l10n.addGhostTeam),
                   onPressed: onPickGhostTeam,
                 ),
-              ],
-              Row(
-                children: [
-                  Expanded(
-                    child: FilledButton(
-                      style: FilledButton.styleFrom(
-                        minimumSize: const Size.fromHeight(56),
+              // A group of teams has no mat: its matches go to the free mats.
+              if (group.ofTeams)
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(56),
+                  ),
+                  onPressed: group.isComplete && !busy ? onCreate : null,
+                  child: Text(l10n.createGroup(1)),
+                )
+              else ...[
+                Row(
+                  children: [
+                    Expanded(
+                      child: FilledButton(
+                        style: FilledButton.styleFrom(
+                          minimumSize: const Size.fromHeight(56),
+                        ),
+                        onPressed: group.isComplete && !busy ? onCreate : null,
+                        child: Text(l10n.createGroup(1)),
                       ),
-                      onPressed: group.isComplete && !busy ? onCreate : null,
-                      child: Text(l10n.createGroup(1)),
                     ),
-                  ),
-                  const SizedBox(width: AppSpacing.s),
-                  Expanded(
-                    child: MatPicker(
-                      eventId: eventId,
-                      matId: matId,
-                      onChanged: onMatChanged,
+                    const SizedBox(width: AppSpacing.s),
+                    Expanded(
+                      child: MatPicker(
+                        eventId: eventId,
+                        matId: matId,
+                        onChanged: onMatChanged,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              MatPickerHint(eventId: eventId, matId: matId),
+                  ],
+                ),
+                MatPickerHint(eventId: eventId, matId: matId),
+              ],
             ],
           ),
         ),
@@ -149,9 +154,7 @@ class DraftPanel extends StatelessWidget {
 
   String _status(AppLocalizations l10n) {
     final ghosts = group.ofTeams
-        ? (group.ghostMode && group.ghostTeam.length == group.ghostTeamSize
-              ? 1
-              : 0)
+        ? (group.ghostMode ? group.ghostTeams.length : 0)
         : group.ghosts.length;
     final missing = DraftGroup.size - group.members.length - ghosts;
     return missing == 0 ? l10n.draftReady : l10n.draftMissing(missing);

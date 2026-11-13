@@ -27,6 +27,8 @@ void main() {
     Fighter blue,
     MatchStatus status, {
     bool available = true,
+    CornerState? redCorner,
+    CornerState? blueCorner,
   }) => BoardMatch(
     id: id,
     groupId: 'g1',
@@ -37,6 +39,8 @@ void main() {
     redScore: status == MatchStatus.finished ? 4 : 0,
     blueScore: status == MatchStatus.finished ? 15 : 0,
     available: available,
+    redCorner: redCorner,
+    blueCorner: blueCorner,
   );
 
   final ana = fighter('Ana');
@@ -202,7 +206,7 @@ void main() {
         expect(matchTile('Ana', 'Carla'), findsOneWidget);
         expect(scheme, isNotNull);
 
-        final waiting = matchTile('Carla', 'Diego · Ghost');
+        final waiting = matchTile('Carla', 'Diego · Wildcard');
         await tester.scrollUntilVisible(waiting, 200);
         expect(tile(waiting).onTap, isNull);
         expect(tile(waiting).enabled, isTrue);
@@ -283,7 +287,7 @@ void main() {
     await tester.pumpAndSettle();
 
     final waiting = tester.widget<ListTile>(
-      matchTile('Carla', 'Diego · Ghost'),
+      matchTile('Carla', 'Diego · Wildcard'),
     );
     expect(waiting.onTap, isNotNull);
   });
@@ -326,7 +330,22 @@ void main() {
             members: teams,
           ),
         ],
-        matches: [match('m1', teams[0], teams[1], MatchStatus.pending)],
+        matches: [
+          match('m1', teams[0], teams[1], MatchStatus.pending),
+          // Team 3 still has two matches on mat 2; team 1 is fighting on mat 3.
+          match(
+            'm2',
+            teams[2],
+            teams[0],
+            MatchStatus.pending,
+            available: false,
+            redCorner: const CornerState(pendingMats: [2, 2]),
+            blueCorner: CornerState(
+              fightingOnMat: 3,
+              freeAt: DateTime.now().add(const Duration(minutes: 4)),
+            ),
+          ),
+        ],
         recommendedMatchId: 'm1',
       );
 
@@ -351,8 +370,19 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(matchTile('Team 1', 'Team 2'), findsOneWidget);
-      expect(find.text('Team 4 · Ghost'), findsOneWidget);
-      expect(find.text('A1, B1, C1'), findsOneWidget);
+      await tester.scrollUntilVisible(
+        find.text('Team 4 · Wildcard'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.text('Team 4 · Wildcard'), findsOneWidget);
+      // Each team with its people, to call them: in the group and in every match.
+      expect(find.text('A1, B1, C1'), findsNWidgets(3));
+      expect(find.text('2 more matches on mat 2'), findsOneWidget);
+      expect(
+        find.textContaining('Fighting on mat 3 · free around'),
+        findsOneWidget,
+      );
       expect(tester.takeException(), isNull);
     });
   }
