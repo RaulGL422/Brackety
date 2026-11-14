@@ -414,6 +414,16 @@ class EventsApi {
   Future<void> waiveRest(String eventId, String matchId) =>
       _dio.post<void>('${_control(eventId)}/matches/$matchId/waive-rest');
 
+  /// [groupMats]: group id → the mat chosen for it; the others go to the mat free first.
+  Future<void> disableMat(
+    String eventId,
+    String matId,
+    Map<String, String> groupMats,
+  ) => _dio.post<void>(
+    '${_control(eventId)}/mats/$matId/disable',
+    data: {'groupMats': groupMats},
+  );
+
   /// The package this hall laptop started with, to start the event again from it; null where there is none.
   Future<String?> resetPackage() async {
     final response = await _dio.get<Map<String, dynamic>>('$_base/event-reset');

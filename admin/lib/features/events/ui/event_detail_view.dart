@@ -96,7 +96,7 @@ class _Detail extends ConsumerWidget {
         const SizedBox(height: AppSpacing.l),
         Text(l10n.eventMats, style: text.titleMedium),
         const SizedBox(height: AppSpacing.s),
-        for (final mat in event.mats) _MatPlan(mat: mat),
+        for (final mat in event.mats) _MatPlan(event: event, mat: mat),
         const SizedBox(height: AppSpacing.l),
         Text(l10n.eventGroups, style: text.titleMedium),
         const SizedBox(height: AppSpacing.s),
@@ -351,8 +351,9 @@ String sideName(AppLocalizations l10n, AdminSide side) {
 
 /// A mat, its referee and, folded, the order its pending matches would come up in.
 class _MatPlan extends StatelessWidget {
-  const _MatPlan({required this.mat});
+  const _MatPlan({required this.event, required this.mat});
 
+  final AdminEventDetail event;
   final AdminMat mat;
 
   @override
@@ -383,6 +384,7 @@ class _MatPlan extends StatelessWidget {
         ),
         expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          if (mat.referee != null) DisableMatButton(event: event, mat: mat),
           if (mat.plan.isNotEmpty) Text(l10n.planHint, style: text.bodySmall),
           for (final (i, p) in mat.plan.indexed)
             Padding(

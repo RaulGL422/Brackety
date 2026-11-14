@@ -109,6 +109,9 @@ class EventDetailController extends AsyncNotifier<AdminEventDetail> {
   Future<void> waiveRest(String matchId) =>
       _run(() => _api.waiveRest(eventId, matchId));
 
+  Future<void> disableMat(String matId, Map<String, String> groupMats) =>
+      _run(() => _api.disableMat(eventId, matId, groupMats));
+
   // Reloads after it, and after a 404 too: the match or group was already gone.
   Future<T> _run<T>(Future<T> Function() call) async {
     try {
