@@ -42,6 +42,7 @@ class ConfirmDialog extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final title = this.title;
     return AlertDialog(
+      scrollable: true,
       actionsOverflowDirection: VerticalDirection.up,
       actionsOverflowButtonSpacing: 8,
       title: title == null ? null : Text(title),

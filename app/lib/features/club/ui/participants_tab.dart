@@ -146,6 +146,7 @@ class _ParticipantTile extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        scrollable: true,
         actionsOverflowDirection: VerticalDirection.up,
         actionsOverflowButtonSpacing: 8,
         title: Text(

@@ -104,6 +104,7 @@ class _StatusDialog extends ConsumerWidget {
     final unsent = [...s.ops, ...s.hidden].where((op) => !op.rejected).length;
     final rejected = s.rejected.length;
     return AlertDialog(
+      scrollable: true,
       actionsOverflowDirection: VerticalDirection.up,
       actionsOverflowButtonSpacing: 8,
       title: Text(s.connected ? l10n.syncConnected : l10n.syncOffline),
@@ -167,6 +168,7 @@ class _RejectedDialog extends ConsumerWidget {
       Localizations.localeOf(context).toLanguageTag(),
     );
     return AlertDialog(
+      scrollable: true,
       actionsOverflowDirection: VerticalDirection.up,
       actionsOverflowButtonSpacing: 8,
       title: Text(l10n.syncRejectedTitle),

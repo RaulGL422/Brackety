@@ -20,6 +20,7 @@ class FakeEventsApi implements EventsApi {
   final calls = <String>[];
   DioException? error;
   var groups = [group('g1', 1), group('g2', 2)];
+  var teams = <AdminTeam>[];
 
   static AdminGroup group(String id, int number) => AdminGroup(
     id: id,
@@ -113,6 +114,7 @@ class FakeEventsApi implements EventsApi {
       AdminMat(id: 'm2', number: 2, referee: secondReferee ? 'arbitro2' : null),
     ],
     groups: groups,
+    teams: teams,
   );
 
   @override
@@ -176,6 +178,7 @@ class FakeEventsApi implements EventsApi {
     calls.add('clear $eventId: $reason');
     final cleared = (groups: groups.length, teams: 1);
     groups = [];
+    teams = [];
     return cleared;
   }
 }
@@ -447,6 +450,55 @@ void main() {
       find.text('Competition cleared: 2 groups and 1 team deleted.'),
       findsOneWidget,
     );
+  });
+
+  testWidgets('teams without a group are cleared too, on a phone', (
+    tester,
+  ) async {
+    useSize(tester, screenSizes['phone']!);
+    final api = FakeEventsApi()
+      ..groups = []
+      ..teams = [
+        const AdminTeam(
+          id: 't1',
+          number: 1,
+          category: '9-12',
+          members: [
+            AdminTeamPerson(participantId: 'p1', name: 'Ana'),
+            AdminTeamPerson(participantId: 'p2', name: 'Bea'),
+          ],
+        ),
+      ];
+    await pumpAdmin(
+      tester,
+      location: '/events',
+      overrides: [eventsApiProvider.overrideWithValue(api)],
+    );
+    await openDetail(tester);
+
+    await tester.tap(find.text('Clear the competition'));
+    await tester.pumpAndSettle();
+    // The keyboard takes half of the screen.
+    tester.view.viewInsets = const FakeViewPadding(bottom: 400);
+    addTearDown(tester.view.resetViewInsets);
+    await tester.pumpAndSettle();
+    final fields = find.descendant(
+      of: find.byType(AlertDialog),
+      matching: find.byType(TextField),
+    );
+    await tester.enterText(fields.first, 'Equipos mal hechos');
+    await tester.enterText(fields.last, 'Fase 1');
+    await tester.pump();
+    final confirm = find.descendant(
+      of: find.byType(AlertDialog),
+      matching: find.widgetWithText(FilledButton, 'Clear the competition'),
+    );
+    // The buttons stay reachable on a small screen.
+    await tester.tap(confirm);
+    await tester.pumpAndSettle();
+
+    expect(api.calls, ['clear e0: Equipos mal hechos']);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('a match gone meanwhile reloads and says so', (tester) async {
