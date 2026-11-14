@@ -481,6 +481,7 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        scrollable: true,
         actionsOverflowDirection: VerticalDirection.up,
         actionsOverflowButtonSpacing: 8,
         title: Text(l10n.deleteTeam),

@@ -110,6 +110,7 @@ class _ChangeEmailDialogState extends State<_ChangeEmailDialog> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return AlertDialog(
+      scrollable: true,
       actionsOverflowDirection: VerticalDirection.up,
       actionsOverflowButtonSpacing: 8,
       title: Text(l10n.settingsChangeEmail),

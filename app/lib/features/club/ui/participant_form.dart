@@ -83,6 +83,7 @@ class _ParticipantFormState extends ConsumerState<_ParticipantForm> {
     String? required(String? v) =>
         v == null || v.trim().isEmpty ? l10n.fieldRequired : null;
     return AlertDialog(
+      scrollable: true,
       actionsOverflowDirection: VerticalDirection.up,
       actionsOverflowButtonSpacing: 8,
       title: Text(

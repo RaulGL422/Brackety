@@ -118,6 +118,7 @@ class MatchControlMenu extends ConsumerWidget {
             final sure = await showDialog<bool>(
               context: context,
               builder: (context) => AlertDialog(
+                scrollable: true,
                 title: Text(l10n.controlWaiveRestTitle),
                 content: Text(
                   l10n.controlWaiveRestBody(
@@ -266,6 +267,7 @@ class _DisableMatDialogState extends State<_DisableMatDialog> {
         .where((m) => m.referee != null && m.id != widget.mat.id)
         .toList();
     return AlertDialog(
+      scrollable: true,
       title: Text(l10n.controlDisableMatTitle(widget.mat.number)),
       content: SizedBox(
         width: 480,
@@ -338,6 +340,7 @@ class _ReorderDialogState extends State<_ReorderDialog> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return AlertDialog(
+      scrollable: true,
       title: Text(l10n.controlReorder),
       content: SizedBox(
         width: 480,

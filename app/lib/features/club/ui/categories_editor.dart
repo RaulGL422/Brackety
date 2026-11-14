@@ -160,6 +160,7 @@ class _CategoryDialogState extends State<_CategoryDialog> {
     }
 
     return AlertDialog(
+      scrollable: true,
       actionsOverflowDirection: VerticalDirection.up,
       actionsOverflowButtonSpacing: 8,
       title: Text(

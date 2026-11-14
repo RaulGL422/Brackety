@@ -15,6 +15,7 @@ class RestoreAccountDialog extends StatelessWidget {
     final locale = Localizations.localeOf(context).toLanguageTag();
     final date = DateFormat.yMMMMd(locale).format(deletesOn);
     return AlertDialog(
+      scrollable: true,
       actionsOverflowDirection: VerticalDirection.up,
       actionsOverflowButtonSpacing: 8,
       title: Text(l10n.restoreTitle),
