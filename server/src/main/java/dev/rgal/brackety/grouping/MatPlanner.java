@@ -92,6 +92,9 @@ public class MatPlanner {
             }
         }
         var teamMatches = pool.stream().map(Candidate::matchId).collect(Collectors.toSet());
+        // The plan starts from what the boards propose now.
+        var kept = floor.proposals().entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().matchId()));
 
         while (true) {
             var withWork = floor.mats().stream()
@@ -140,7 +143,7 @@ public class MatPlanner {
                             individual.get(mat.getId())))
                     .toList();
             var picks = MatchDispatch.recommend(
-                    views, pool, context, MatFloor.slot(event, false), MatFloor.slot(event, true));
+                    views, pool, context, MatFloor.slot(event, false), MatFloor.slot(event, true), kept);
             var idle =
                     withWork.stream().filter(id -> !freeAt.get(id).isAfter(at)).toList();
             for (var matId : idle.stream().filter(picks::containsKey).toList()) {
