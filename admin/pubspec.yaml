@@ -1,7 +1,7 @@
 name: brackety_admin
 description: Brackety superadmin web.
 publish_to: 'none'
-version: 0.5.0+7
+version: 0.6.0+8
 
 environment:
   sdk: ^3.13.7
