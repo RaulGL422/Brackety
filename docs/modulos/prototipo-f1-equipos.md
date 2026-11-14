@@ -26,6 +26,8 @@ A partir de cierta edad, la categoría compite **por equipos de 3** en lugar de 
 - **Alumno fantasma dentro de un equipo** (pedido de Raul, 2026-11-12): al crear un equipo, quien ya tiene equipo o grupo entra como fantasma: combate con ese equipo pero no puntúa por él (ni asistencia ni puntos). El equipo puede ser entero de fantasmas. Si un alumno queda en dos equipos del mismo grupo, la app avisa antes de crearlo (no lo impide).
 - **Sin tapiz** (2026-11-13): los combates de los grupos de equipos van a un **bote común**. Un tapiz sin combates individuales pendientes coge del bote; si le cae un grupo individual, vuelve a individual al acabar el de equipos. Reparto (`MatchDispatch`): primero los tapices con individuales (sus grupos), luego los tapices libres, el que lleva más parado elige primero, nadie propuesto a dos tapices a la vez; cada elección sigue el recomendado (más descanso primero, descanso mínimo). El combate toma el tapiz del árbitro que lo empieza (al cancelarlo vuelve al bote). Sin red, del bote solo se puede empezar el último propuesto a ese tapiz.
 
+- Propuestas estables (2026-11-14, pedido de Raul): cada tapiz conserva el combate del bote que ya tenía propuesto mientras pueda empezarlo; al quitar, añadir o inhabilitar un tapiz solo se reparte lo que cambió. El servidor recuerda la última propuesta en memoria (tras reiniciar, reparte de cero).
+
 ### Grupo individual dentro de una categoría por equipos
 - Botón "Grupo individual": por si no salen equipos y se resuelve con individuales. Mismo flujo y reglas que una categoría individual (4, o 3 + fantasma).
 - Solo con alumnos que no estén en un equipo real. Un alumno es real en un único sitio: un equipo o un grupo individual.
