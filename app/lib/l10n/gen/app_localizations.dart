@@ -3174,6 +3174,18 @@ abstract class AppLocalizations {
   /// **'Sin conexión: tablero guardado en este dispositivo. Sin recomendado; puedes empezar un pendiente si no hay otro en curso.'**
   String get matOfflineBoard;
 
+  /// No description provided for @matSyncingTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Sincronizando combates'**
+  String get matSyncingTitle;
+
+  /// No description provided for @matSyncingBody.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{Han cambiado los tapices y al tapiz {mats} aún no le ha llegado. Hasta que le llegue, su combate propuesto puede cambiar.} other{Han cambiado los tapices y a los tapices {mats} aún no les ha llegado. Hasta que les llegue, sus combates propuestos pueden cambiar.}}'**
+  String matSyncingBody(int count, String mats);
+
   /// No description provided for @matInReview.
   ///
   /// In es, this message translates to:

@@ -1892,6 +1892,22 @@ class AppLocalizationsEn extends AppLocalizations {
       'Offline: board saved on this device. No recommendation; you can start a pending match if none is in progress.';
 
   @override
+  String get matSyncingTitle => 'Syncing matches';
+
+  @override
+  String matSyncingBody(int count, String mats) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'The mats have changed and mats $mats have not got it yet. Until they do, their proposed matches may change.',
+      one:
+          'The mats have changed and mat $mats has not got it yet. Until it does, its proposed match may change.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get matInReview => 'Under the club\'s review';
 
   @override
