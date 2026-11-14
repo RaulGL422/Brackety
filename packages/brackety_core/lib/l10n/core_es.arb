@@ -1,5 +1,9 @@
 {
   "@@locale": "es",
+  "appVersion": "Versión {version}",
+  "@appVersion": {"placeholders": {"version": {"type": "String"}}},
+  "appVersionBuild": "Versión {version} ({build})",
+  "@appVersionBuild": {"placeholders": {"version": {"type": "String"}, "build": {"type": "String"}}},
   "connectionTitle": "Conexión",
   "connectionServer": "Servidor",
   "connectionStatusOk": "Conectado",

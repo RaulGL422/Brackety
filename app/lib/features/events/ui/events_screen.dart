@@ -183,6 +183,8 @@ class _AccountMenu extends ConsumerWidget {
             title: Text(l10n.logout),
           ),
         ),
+        // Which version this device runs, at a glance.
+        const PopupMenuItem(enabled: false, child: AppVersionText()),
       ],
       child: Padding(
         padding: const EdgeInsets.symmetric(
