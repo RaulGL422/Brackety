@@ -35,6 +35,7 @@ Future<bool> createGroup(
     final undo = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        scrollable: true,
         actionsOverflowDirection: VerticalDirection.up,
         actionsOverflowButtonSpacing: 8,
         title: Text(l10n.groupsCreatedTitle(created.groupNumbers.length)),

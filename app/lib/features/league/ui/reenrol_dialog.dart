@@ -42,6 +42,7 @@ class _ReenrolDialogState extends ConsumerState<_ReenrolDialog> {
       (c) => _selected.contains(c.personId) && c.age < adultAge,
     );
     return AlertDialog(
+      scrollable: true,
       actionsOverflowDirection: VerticalDirection.up,
       actionsOverflowButtonSpacing: 8,
       title: Text(l10n.reenrolTitle),
