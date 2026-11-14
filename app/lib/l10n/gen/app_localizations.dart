@@ -3972,6 +3972,60 @@ abstract class AppLocalizations {
   /// **'Descalificado'**
   String get recordDisqualified;
 
+  /// No description provided for @recordNoIncidents.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin advertencias en esta fase.'**
+  String get recordNoIncidents;
+
+  /// No description provided for @recordNoIncidentsLeague.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin advertencias en la liga.'**
+  String get recordNoIncidentsLeague;
+
+  /// No description provided for @recordWarningsLeague.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =0{Sin advertencias en la liga} =1{1 advertencia en la liga} other{{count} advertencias en la liga}}'**
+  String recordWarningsLeague(int count);
+
+  /// No description provided for @recordIncidentsHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Toca para ver en qué combate, el minuto y el motivo.'**
+  String get recordIncidentsHint;
+
+  /// No description provided for @recordPhase.
+  ///
+  /// In es, this message translates to:
+  /// **'Fase {number} · {name}'**
+  String recordPhase(int number, String name);
+
+  /// No description provided for @incidentWarning.
+  ///
+  /// In es, this message translates to:
+  /// **'Advertencia'**
+  String get incidentWarning;
+
+  /// No description provided for @incidentOneHand.
+  ///
+  /// In es, this message translates to:
+  /// **'Advertencia de una mano'**
+  String get incidentOneHand;
+
+  /// No description provided for @incidentBy.
+  ///
+  /// In es, this message translates to:
+  /// **'puesta por {who}'**
+  String incidentBy(String who);
+
+  /// No description provided for @incidentGavePoint.
+  ///
+  /// In es, this message translates to:
+  /// **'+1 al rival'**
+  String get incidentGavePoint;
+
   /// No description provided for @leagueDisqualifications.
   ///
   /// In es, this message translates to:
