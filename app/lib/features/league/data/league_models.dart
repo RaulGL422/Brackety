@@ -175,6 +175,7 @@ class LeagueStandingRow {
     this.disqualifications = 0,
     this.eventId,
     this.participantId,
+    this.personId,
   });
 
   factory LeagueStandingRow.fromJson(Map<String, dynamic> json) =>
@@ -199,10 +200,14 @@ class LeagueStandingRow {
         disqualifications: json['disqualifications'] as int? ?? 0,
         eventId: json['eventId'] as String?,
         participantId: json['participantId'] as String?,
+        personId: json['personId'] as String?,
       );
 
   final String? categoryName;
   final int position;
+
+  /// The person across phases: their warnings in the whole league come by it.
+  final String? personId;
 
   /// 1, 2 or 3 by the category's podium.
   final int? medal;

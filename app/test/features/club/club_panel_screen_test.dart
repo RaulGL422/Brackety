@@ -260,6 +260,14 @@ void main() {
                   disqualified: false,
                   rivalDisqualified: false,
                   endReason: 'POINTS',
+                  incidents: [
+                    Incident(
+                      kind: IncidentKind.warning,
+                      reason: 'Agarre',
+                      clock: Duration(seconds: 35),
+                      by: 'arbitro1',
+                    ),
+                  ],
                 ),
                 RecordMatch(
                   matchId: 'x2',
@@ -375,7 +383,26 @@ void main() {
         find.textContaining('Mat 2 · Group 3 · Lost · 1 warning'),
         findsOneWidget,
       );
+      await tester.scrollUntilVisible(
+        find.textContaining('as a wildcard (no score)'),
+        100,
+        scrollable: find.byType(Scrollable).last,
+      );
       expect(find.textContaining('as a wildcard (no score)'), findsOneWidget);
+      await tester.scrollUntilVisible(
+        find.text('1 warning'),
+        -100,
+        scrollable: find.byType(Scrollable).last,
+      );
+
+      // Next to the points, how many warnings; unfolded, where, when and why.
+      await tester.tap(find.text('1 warning'));
+      await tester.pumpAndSettle();
+      expect(find.text('Warning · 0:35 · Agarre'), findsOneWidget);
+      expect(
+        find.text('Against Bea Test · Mat 2 · Group 3 · given by arbitro1'),
+        findsOneWidget,
+      );
       expect(tester.takeException(), isNull);
     });
 

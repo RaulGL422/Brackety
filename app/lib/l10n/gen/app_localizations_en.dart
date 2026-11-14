@@ -2452,6 +2452,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recordDisqualified => 'Disqualified';
 
   @override
+  String get recordNoIncidents => 'No warnings in this phase.';
+
+  @override
+  String get recordNoIncidentsLeague => 'No warnings in the league.';
+
+  @override
+  String recordWarningsLeague(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count warnings in the league',
+      one: '1 warning in the league',
+      zero: 'No warnings in the league',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get recordIncidentsHint =>
+      'Tap to see in which match, the minute and the reason.';
+
+  @override
+  String recordPhase(int number, String name) {
+    return 'Phase $number · $name';
+  }
+
+  @override
+  String get incidentWarning => 'Warning';
+
+  @override
+  String get incidentOneHand => 'One-hand warning';
+
+  @override
+  String incidentBy(String who) {
+    return 'given by $who';
+  }
+
+  @override
+  String get incidentGavePoint => '+1 to the rival';
+
+  @override
   String leagueDisqualifications(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

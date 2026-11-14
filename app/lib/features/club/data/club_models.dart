@@ -361,6 +361,59 @@ class ParticipantRecord {
   final List<RecordMatch> matches;
 }
 
+enum IncidentKind { warning, oneHandWarning, disqualification }
+
+/// A warning, one-hand warning or disqualification of a match: why, when on its clock and who.
+/// [gaveRivalPoint]: a second warning that gave the rival a point.
+class Incident {
+  const Incident({
+    required this.kind,
+    required this.reason,
+    required this.clock,
+    this.by,
+    this.gaveRivalPoint = false,
+  });
+
+  factory Incident.fromJson(Map<String, dynamic> json) => Incident(
+    kind: switch (json['kind']) {
+      'ONE_HAND_WARNING' => IncidentKind.oneHandWarning,
+      'DISQUALIFICATION' => IncidentKind.disqualification,
+      _ => IncidentKind.warning,
+    },
+    reason: json['reason'] as String? ?? '',
+    clock: Duration(milliseconds: json['clockMs'] as int),
+    by: json['by'] as String?,
+    gaveRivalPoint: json['gaveRivalPoint'] as bool? ?? false,
+  );
+
+  final IncidentKind kind;
+  final String reason;
+  final Duration clock;
+  final String? by;
+  final bool gaveRivalPoint;
+
+  bool get isWarning => kind != IncidentKind.disqualification;
+}
+
+/// One person across the league: each phase they entered, with its matches.
+class LeagueRecord {
+  const LeagueRecord(this.phases);
+
+  factory LeagueRecord.fromJson(Map<String, dynamic> json) => LeagueRecord([
+    for (final p in json['phases'] as List)
+      (
+        number: (p as Map<String, dynamic>)['number'] as int,
+        name: p['name'] as String,
+        matches: [
+          for (final m in p['matches'] as List)
+            RecordMatch.fromJson(m as Map<String, dynamic>),
+        ],
+      ),
+  ]);
+
+  final List<({int number, String name, List<RecordMatch> matches})> phases;
+}
+
 /// [red]: they fight in red. [asGhost]: they (or their team) only fill the group in.
 class RecordMatch {
   const RecordMatch({
@@ -379,6 +432,7 @@ class RecordMatch {
     required this.disqualified,
     required this.rivalDisqualified,
     this.endReason,
+    this.incidents = const [],
   });
 
   factory RecordMatch.fromJson(Map<String, dynamic> json) => RecordMatch(
@@ -401,7 +455,14 @@ class RecordMatch {
     disqualified: json['disqualified'] as bool,
     rivalDisqualified: json['rivalDisqualified'] as bool,
     endReason: json['endReason'] as String?,
+    incidents: [
+      for (final i in json['incidents'] as List? ?? const [])
+        Incident.fromJson(i as Map<String, dynamic>),
+    ],
   );
+
+  /// Their warnings and disqualification that stand, in order.
+  final List<Incident> incidents;
 
   final String matchId;
 
