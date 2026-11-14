@@ -1904,6 +1904,22 @@ class AppLocalizationsEs extends AppLocalizations {
       'Sin conexión: tablero guardado en este dispositivo. Sin recomendado; puedes empezar un pendiente si no hay otro en curso.';
 
   @override
+  String get matSyncingTitle => 'Sincronizando combates';
+
+  @override
+  String matSyncingBody(int count, String mats) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Han cambiado los tapices y a los tapices $mats aún no les ha llegado. Hasta que les llegue, sus combates propuestos pueden cambiar.',
+      one:
+          'Han cambiado los tapices y al tapiz $mats aún no le ha llegado. Hasta que le llegue, su combate propuesto puede cambiar.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get matInReview => 'En revisión del club';
 
   @override
