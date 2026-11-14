@@ -87,7 +87,8 @@ class _Detail extends ConsumerWidget {
               ),
               icon: const Icon(Icons.restart_alt),
               label: Text(l10n.competitionClear),
-              onPressed: event.groups.isEmpty
+              // Teams without a group go too: they cannot be undone one by one.
+              onPressed: event.groups.isEmpty && event.teams.isEmpty
                   ? null
                   : () => _clear(context, ref),
             ),
