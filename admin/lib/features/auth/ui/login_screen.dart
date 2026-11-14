@@ -91,6 +91,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: AppSpacing.xl),
                 const _OtherPages(),
+                const SizedBox(height: AppSpacing.s),
+                const AppVersionText(textAlign: TextAlign.center),
               ],
             ),
           ),

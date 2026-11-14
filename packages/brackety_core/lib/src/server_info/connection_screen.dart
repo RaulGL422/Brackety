@@ -5,6 +5,7 @@ import '../../l10n/gen/core_localizations.dart';
 import '../network/dio_provider.dart';
 import '../theme/brackety_colors.dart';
 import '../theme/tokens.dart';
+import 'app_version.dart';
 import 'server_info.dart';
 
 /// Shows which backend the app talks to and the server's "today" (shifted in local scenario runs).
@@ -50,6 +51,10 @@ class ConnectionScreen extends ConsumerWidget {
           title: Text(l10n.licenses),
           trailing: const Icon(Icons.chevron_right),
           onTap: () => showLicensePage(context: context),
+        ),
+        const ListTile(
+          leading: Icon(Icons.info_outline),
+          title: AppVersionText(),
         ),
       ],
     );

@@ -98,6 +98,18 @@ abstract class CoreLocalizations {
     Locale('es'),
   ];
 
+  /// No description provided for @appVersion.
+  ///
+  /// In es, this message translates to:
+  /// **'Versión {version}'**
+  String appVersion(String version);
+
+  /// No description provided for @appVersionBuild.
+  ///
+  /// In es, this message translates to:
+  /// **'Versión {version} ({build})'**
+  String appVersionBuild(String version, String build);
+
   /// No description provided for @connectionTitle.
   ///
   /// In es, this message translates to:
