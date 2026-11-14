@@ -112,6 +112,12 @@ public class Match {
         this.pinned = true;
     }
 
+    /** A pending team match sent to a mat by hand goes back to the pool (its mat is out of use). */
+    void backToPool() {
+        this.matId = null;
+        this.pinned = false;
+    }
+
     void order(int orderIndex) {
         this.orderIndex = orderIndex;
     }
