@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../server_info/app_version.dart';
+import '../theme/tokens.dart';
 import 'window_size.dart';
 
 class AdaptiveDestination {
@@ -108,6 +110,16 @@ class AdaptiveScaffold extends StatelessWidget {
                 : NavigationRailLabelType.none,
             selectedIndex: selectedIndex,
             onDestinationSelected: onSelected,
+            // At the foot of the side panel: which version this device runs.
+            trailing: const Expanded(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: EdgeInsets.all(AppSpacing.s),
+                  child: AppVersionText(textAlign: TextAlign.center),
+                ),
+              ),
+            ),
             destinations: [
               for (final d in destinations)
                 NavigationRailDestination(

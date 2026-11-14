@@ -10,6 +10,16 @@ class CoreLocalizationsEn extends CoreLocalizations {
   CoreLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String appVersion(String version) {
+    return 'Version $version';
+  }
+
+  @override
+  String appVersionBuild(String version, String build) {
+    return 'Version $version ($build)';
+  }
+
+  @override
   String get connectionTitle => 'Connection';
 
   @override

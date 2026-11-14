@@ -212,6 +212,42 @@ abstract class AppLocalizations {
   /// **'Esa persona ya lucha en el grupo del otro equipo (como comodín).'**
   String get controlSameFighter;
 
+  /// No description provided for @controlMatInReview.
+  ///
+  /// In es, this message translates to:
+  /// **'Un combate de este tapiz espera revisión: resuélvela antes.'**
+  String get controlMatInReview;
+
+  /// No description provided for @controlMatBusy.
+  ///
+  /// In es, this message translates to:
+  /// **'Hay un combate en curso en este tapiz: espera a que acabe.'**
+  String get controlMatBusy;
+
+  /// No description provided for @controlDisableMat.
+  ///
+  /// In es, this message translates to:
+  /// **'Inhabilitar tapiz'**
+  String get controlDisableMat;
+
+  /// No description provided for @controlDisableMatTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Inhabilitar el tapiz {number}?'**
+  String controlDisableMatTitle(int number);
+
+  /// No description provided for @controlDisableMatBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Elige a qué tapiz va cada grupo con combates pendientes (Automático: el que acabe antes). Los combates de equipos se reparten entre los demás tapices. Se queda sin árbitro: para volver a usarlo, asígnale uno en Configuración.'**
+  String get controlDisableMatBody;
+
+  /// No description provided for @controlMatDisabled.
+  ///
+  /// In es, this message translates to:
+  /// **'Tapiz inhabilitado: {groups, plural, =0{ningún grupo movido} =1{1 grupo movido} other{{groups} grupos movidos}}{pool, plural, =0{} =1{, 1 combate de equipos vuelve al bote} other{, {pool} combates de equipos vuelven al bote}}.'**
+  String controlMatDisabled(int groups, int pool);
+
   /// No description provided for @controlPickMat.
   ///
   /// In es, this message translates to:
@@ -3138,6 +3174,18 @@ abstract class AppLocalizations {
   /// **'Sin conexión: tablero guardado en este dispositivo. Sin recomendado; puedes empezar un pendiente si no hay otro en curso.'**
   String get matOfflineBoard;
 
+  /// No description provided for @matSyncingTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Sincronizando combates'**
+  String get matSyncingTitle;
+
+  /// No description provided for @matSyncingBody.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{Han cambiado los tapices y al tapiz {mats} aún no le ha llegado. Hasta que le llegue, su combate propuesto puede cambiar.} other{Han cambiado los tapices y a los tapices {mats} aún no les ha llegado. Hasta que les llegue, sus combates propuestos pueden cambiar.}}'**
+  String matSyncingBody(int count, String mats);
+
   /// No description provided for @matInReview.
   ///
   /// In es, this message translates to:
@@ -3971,6 +4019,60 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Descalificado'**
   String get recordDisqualified;
+
+  /// No description provided for @recordNoIncidents.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin advertencias en esta fase.'**
+  String get recordNoIncidents;
+
+  /// No description provided for @recordNoIncidentsLeague.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin advertencias en la liga.'**
+  String get recordNoIncidentsLeague;
+
+  /// No description provided for @recordWarningsLeague.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =0{Sin advertencias en la liga} =1{1 advertencia en la liga} other{{count} advertencias en la liga}}'**
+  String recordWarningsLeague(int count);
+
+  /// No description provided for @recordIncidentsHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Toca para ver en qué combate, el minuto y el motivo.'**
+  String get recordIncidentsHint;
+
+  /// No description provided for @recordPhase.
+  ///
+  /// In es, this message translates to:
+  /// **'Fase {number} · {name}'**
+  String recordPhase(int number, String name);
+
+  /// No description provided for @incidentWarning.
+  ///
+  /// In es, this message translates to:
+  /// **'Advertencia'**
+  String get incidentWarning;
+
+  /// No description provided for @incidentOneHand.
+  ///
+  /// In es, this message translates to:
+  /// **'Advertencia de una mano'**
+  String get incidentOneHand;
+
+  /// No description provided for @incidentBy.
+  ///
+  /// In es, this message translates to:
+  /// **'puesta por {who}'**
+  String incidentBy(String who);
+
+  /// No description provided for @incidentGavePoint.
+  ///
+  /// In es, this message translates to:
+  /// **'+1 al rival'**
+  String get incidentGavePoint;
 
   /// No description provided for @leagueDisqualifications.
   ///

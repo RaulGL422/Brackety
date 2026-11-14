@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
@@ -144,6 +145,10 @@ class MatFloor {
     private final MatchRepository matches;
     private final CompetitorDirectory directory;
 
+    // Per event, the last match proposed to each mat, so the next deal keeps it while it can (MatchDispatch). A
+    // hint only: after a restart the pool is dealt afresh.
+    private final Map<UUID, Map<UUID, UUID>> lastProposals = new ConcurrentHashMap<>();
+
     MatFloor(MatRepository mats, FightGroupRepository groups, MatchRepository matches, CompetitorDirectory directory) {
         this.mats = mats;
         this.groups = groups;
@@ -218,7 +223,13 @@ class MatFloor {
                 pool,
                 context,
                 slot(event, false),
-                slot(event, true));
+                slot(event, true),
+                lastProposals.getOrDefault(event.getId(), Map.of()));
+        lastProposals.put(
+                event.getId(),
+                proposals.entrySet().stream()
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey, e -> e.getValue().matchId())));
         return new Floor(eventMats, eventMatches, groupById, competitors, context, views, proposals);
     }
 

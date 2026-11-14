@@ -52,6 +52,7 @@ class _LeagueSettingsDialogState extends ConsumerState<_LeagueSettingsDialog> {
     final l10n = AppLocalizations.of(context);
     final text = Theme.of(context).textTheme;
     return AlertDialog(
+      scrollable: true,
       actionsOverflowDirection: VerticalDirection.up,
       actionsOverflowButtonSpacing: 8,
       title: Text(l10n.leagueEdit),

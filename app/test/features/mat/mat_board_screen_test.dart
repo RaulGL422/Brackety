@@ -292,6 +292,58 @@ void main() {
     expect(waiting.onTap, isNotNull);
   });
 
+  for (final MapEntry(key: device, value: size) in sizes.entries) {
+    testWidgets(
+      'after a change of mats the board says which have not got it on $device',
+      (tester) async {
+        tester.view.physicalSize = size;
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        var loads = 0;
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              matBoardProvider.overrideWith((ref, matId) async {
+                loads++;
+                return MatBoard(
+                  matNumber: 2,
+                  groups: board.groups,
+                  matches: board.matches,
+                  recommendedMatchId: 'm3',
+                  // The second load: everyone has it.
+                  syncingMats: loads == 1 ? const [1, 3] : const [],
+                );
+              }),
+            ],
+            child: MaterialApp(
+              theme: lightTheme(),
+              localizationsDelegates: const [
+                AppLocalizations.delegate,
+                ...coreLocalizationsDelegates,
+              ],
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: const MatBoardScreen(matId: 'mat2', readOnly: true),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Syncing matches'), findsOneWidget);
+        expect(
+          find.textContaining('mats 1, 3 have not got it yet'),
+          findsOneWidget,
+        );
+        expect(tester.takeException(), isNull);
+
+        // It asks again a few seconds later, and the notice goes once all have it.
+        await tester.pump(const Duration(seconds: 3));
+        await tester.pumpAndSettle();
+        expect(loads, 2);
+        expect(find.text('Syncing matches'), findsNothing);
+      },
+    );
+  }
+
   test('a team fighter has no participant id and keeps its members', () {
     final f = Fighter.fromJson({
       'participantId': null,

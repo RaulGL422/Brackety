@@ -60,6 +60,7 @@ class _ReasonDialogState extends State<ReasonDialog> {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     return AlertDialog(
+      scrollable: true,
       actionsOverflowDirection: VerticalDirection.up,
       actionsOverflowButtonSpacing: 8,
       title: Text(widget.title),

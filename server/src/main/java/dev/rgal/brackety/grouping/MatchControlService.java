@@ -6,11 +6,15 @@ import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.event.Mat;
 import dev.rgal.brackety.event.MatRepository;
+import dev.rgal.brackety.event.MatSync;
+import dev.rgal.brackety.grouping.dto.DisabledMat;
 import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +44,8 @@ public class MatchControlService {
     private final JdbcClient jdbc;
     private final Clock clock;
     private final MatPlanner planner;
+    private final MatSchedule schedule;
+    private final MatSync matSync;
 
     MatchControlService(
             MatchRepository matches,
@@ -52,7 +58,10 @@ public class MatchControlService {
             EventAccess access,
             JdbcClient jdbc,
             Clock clock,
-            MatPlanner planner) {
+            MatPlanner planner,
+            MatSchedule schedule,
+            MatSync matSync) {
+        this.matSync = matSync;
         this.matches = matches;
         this.groups = groups;
         this.mats = mats;
@@ -64,6 +73,7 @@ public class MatchControlService {
         this.jdbc = jdbc;
         this.clock = clock;
         this.planner = planner;
+        this.schedule = schedule;
     }
 
     /** Only the club of the event; the superadmin's API checks its own access. */
@@ -208,6 +218,66 @@ public class MatchControlService {
         // A ghost member (fills in without scoring) stays one.
         teamMembers.save(new TeamMember(to, participantId, position, moving.isGhost()));
         log.info("A member moved from team {} to team {} by {}", from.getNumber(), to.getNumber(), who(by));
+    }
+
+    /**
+     * The mat goes out of use (Raul, 2026-11-14): it loses its referee, each of its individual groups with matches to
+     * play goes with them to the mat {@code chosen} for it (group id → mat id) or else to the mat that will be free
+     * first (as "Automatic" on creating a group); the pool's dispatch and plan leave it out. Team matches sent
+     * to it by hand go back to the pool and individual ones go back to their group's mat. Assigning a referee in the
+     * settings puts it back in use. Not while a match on it is in progress or in review.
+     */
+    @Transactional
+    public DisabledMat disableMat(UUID eventId, UUID matId, Map<UUID, UUID> chosen, UUID by) {
+        var event = events.lock(eventId);
+        var mat =
+                mats.findById(matId).filter(m -> m.getEventId().equals(eventId)).orElseThrow(EventException::notFound);
+        var toPlay = matches.findByEventId(eventId).stream()
+                .filter(m -> matId.equals(m.getMatId()) && m.getStatus() != Match.Status.FINISHED)
+                .toList();
+        if (toPlay.stream().anyMatch(m -> m.getStatus() == Match.Status.IN_PROGRESS)) {
+            throw EventException.conflict("MATCH_IN_PROGRESS", "A match on this mat is in progress.");
+        }
+        if (toPlay.stream().anyMatch(Match::isInReview)) {
+            throw EventException.conflict("MATCH_IN_REVIEW", "A match on this mat waits for the club's review.");
+        }
+        if (mats.findByEventIdOrderByNumber(eventId).stream()
+                .noneMatch(m -> !m.getId().equals(matId) && m.getRefereeAccountId() != null)) {
+            throw EventException.conflict("NO_OTHER_MAT", "No other mat has a referee to take its matches.");
+        }
+        mat.disable();
+        matSync.changed(eventId);
+        var moved = new HashSet<UUID>();
+        // The chosen ones first, so the automatic ones count them on their new mats.
+        var onMat = groups.findByMatIdOrderByNumber(matId).stream()
+                .sorted(Comparator.comparing(g -> !chosen.containsKey(g.getId())))
+                .toList();
+        for (var group : onMat) {
+            var pending = toPlay.stream()
+                    .filter(m -> m.getGroupId().equals(group.getId()))
+                    .toList();
+            if (pending.isEmpty()) {
+                continue;
+            }
+            var target = chosen.containsKey(group.getId())
+                    ? refereedMat(eventId, chosen.get(group.getId()))
+                    : schedule.soonestFree(event, clock.instant()).orElseThrow();
+            group.moveTo(target.getId());
+            pending.forEach(m -> m.moveTo(target.getId()));
+            moved.add(group.getId());
+        }
+        var toPool = 0;
+        for (var m :
+                toPlay.stream().filter(m -> !moved.contains(m.getGroupId())).toList()) {
+            if (m.isTeamMatch()) {
+                m.backToPool();
+                toPool++;
+            } else {
+                m.moveTo(group(eventId, m.getGroupId()).getMatId());
+            }
+        }
+        log.info("Mat {} disabled by {}: {} groups moved", mat.getNumber(), who(by), moved.size());
+        return new DisabledMat(moved.size(), toPool);
     }
 
     /** The referee may start it although someone in it has not had the least rest. Recorded with who and when. */

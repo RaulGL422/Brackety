@@ -44,4 +44,9 @@ public class Mat {
     void assignReferee(UUID refereeAccountId) {
         this.refereeAccountId = refereeAccountId;
     }
+
+    /** Out of use: without a referee it gets no groups and takes no team matches until one is assigned again. */
+    public void disable() {
+        this.refereeAccountId = null;
+    }
 }

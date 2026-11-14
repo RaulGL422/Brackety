@@ -48,6 +48,24 @@ class ControlRepository {
   Future<void> moveAsReferee(String matchId, String matId) =>
       _dio.post<void>('/api/v1/matches/$matchId/move', data: {'matId': matId});
 
+  /// The mat goes out of use: its groups go to the mats free first, its pinned team matches to the pool.
+  /// [groupMats]: group id → the mat chosen for it; the others go to the mat free first.
+  Future<({int groupsMoved, int teamMatchesToPool})> disableMat(
+    String eventId,
+    String matId,
+    Map<String, String> groupMats,
+  ) async {
+    final response = await _dio.post<Map<String, dynamic>>(
+      '${_base(eventId)}/mats/$matId/disable',
+      data: {'groupMats': groupMats},
+    );
+    final data = response.data!;
+    return (
+      groupsMoved: data['groupsMoved'] as int,
+      teamMatchesToPool: data['teamMatchesToPool'] as int,
+    );
+  }
+
   Future<void> waiveRest(String eventId, String matchId) =>
       _dio.post<void>('${_base(eventId)}/matches/$matchId/waive-rest');
 }

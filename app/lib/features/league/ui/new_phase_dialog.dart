@@ -70,6 +70,7 @@ class _NewPhaseDialogState extends ConsumerState<_NewPhaseDialog> {
     final l10n = AppLocalizations.of(context);
     final locale = Localizations.localeOf(context).toLanguageTag();
     return AlertDialog(
+      scrollable: true,
       actionsOverflowDirection: VerticalDirection.up,
       actionsOverflowButtonSpacing: 8,
       title: Text(l10n.leagueNewPhaseTitle(_number)),

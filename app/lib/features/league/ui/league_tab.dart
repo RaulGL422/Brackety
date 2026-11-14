@@ -337,13 +337,14 @@ class _LeagueStandingTile extends StatelessWidget {
         ],
       ),
       isThreeLine: true,
-      // The record of their latest phase: matches, points, warnings.
+      // The record of their latest phase, with the warnings of the whole league.
       onTap: row.eventId == null || row.participantId == null
           ? null
           : () => showParticipantRecord(
               context,
               eventId: row.eventId!,
               participantId: row.participantId!,
+              personId: row.personId,
               name: '${row.firstName} ${row.lastName}',
             ),
       trailing: Text(

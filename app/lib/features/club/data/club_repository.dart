@@ -167,6 +167,14 @@ class ClubRepository {
     return ParticipantRecord.fromJson(response.data!);
   }
 
+  /// The person's matches in every phase of the event's league.
+  Future<LeagueRecord> leagueRecord(String eventId, String personId) async {
+    final response = await _dio.get<Map<String, dynamic>>(
+      '/api/v1/events/$eventId/league/people/$personId/record',
+    );
+    return LeagueRecord.fromJson(response.data!);
+  }
+
   Future<List<StandingRow>> standings(String eventId) async {
     final response = await _dio.get<List<dynamic>>(
       '/api/v1/events/$eventId/standings',

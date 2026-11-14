@@ -115,6 +115,54 @@ class StandingsControllerTest extends EventApiTest {
     }
 
     @Test
+    void eachWarningThatStandsComesWithItsReasonAlsoAcrossTheLeague() throws Exception {
+        var ana = fighters.get(0);
+        var third = fighters.get(2);
+        var match = jdbc.sql("select id from fight_match where (red_participant_id = ? and blue_participant_id = ?)"
+                        + " or (red_participant_id = ? and blue_participant_id = ?)")
+                .params(ana, third, third, ana)
+                .query(UUID.class)
+                .single();
+        var side = jdbc.sql("select red_participant_id = ? from fight_match where id = ?")
+                        .params(ana, match)
+                        .query(Boolean.class)
+                        .single()
+                ? "RED"
+                : "BLUE";
+        // Both have just fought: past the least rest.
+        clock.advance(Duration.ofMinutes(1));
+        referee(match, "START", null, null);
+        referee(match, "WARNING", side, "Agarre");
+        referee(match, "WARNING", side, "Salida del tapiz");
+        referee(match, "WARNING", side, "Sin control");
+        referee(match, "UNDO", null, null);
+
+        var path = "$.matches[?(@.matchId == '" + match + "')]";
+        call(get("/api/v1/events/" + eventId + "/participants/" + ana + "/record"), "club1")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(path + ".warnings").value(2))
+                .andExpect(jsonPath(path + ".incidents[*].reason")
+                        .value(org.hamcrest.Matchers.contains("Agarre", "Salida del tapiz")))
+                .andExpect(jsonPath(path + ".incidents[*].kind")
+                        .value(org.hamcrest.Matchers.contains("WARNING", "WARNING")))
+                .andExpect(jsonPath(path + ".incidents[*].gaveRivalPoint")
+                        .value(org.hamcrest.Matchers.contains(false, true)))
+                .andExpect(jsonPath(path + ".incidents[0].by").isNotEmpty());
+
+        var person = participants.findById(ana).orElseThrow().getPersonId();
+        call(get("/api/v1/events/" + eventId + "/league/people/" + person + "/record"), "club1")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.phases", hasSize(1)))
+                .andExpect(jsonPath("$.phases[0].number").value(1))
+                .andExpect(jsonPath("$.phases[0]" + path.substring(1) + ".incidents[*].reason")
+                        .value(org.hamcrest.Matchers.contains("Agarre", "Salida del tapiz")));
+        call(get("/api/v1/events/" + eventId + "/league/people/" + person + "/record"), "ayudante1")
+                .andExpect(status().isForbidden());
+        call(get("/api/v1/events/" + eventId + "/league/people/" + UUID.randomUUID() + "/record"), "club1")
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void positionsCountWithinEachCategory() throws Exception {
         var younger = new Participant(eventId, clock.instant());
         younger.update("Lia", "Prueba", LocalDate.of(2027, 3, 1).minusYears(5), 110, true);

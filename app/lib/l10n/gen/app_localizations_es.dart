@@ -78,6 +78,45 @@ class AppLocalizationsEs extends AppLocalizations {
       'Esa persona ya lucha en el grupo del otro equipo (como comodín).';
 
   @override
+  String get controlMatInReview =>
+      'Un combate de este tapiz espera revisión: resuélvela antes.';
+
+  @override
+  String get controlMatBusy =>
+      'Hay un combate en curso en este tapiz: espera a que acabe.';
+
+  @override
+  String get controlDisableMat => 'Inhabilitar tapiz';
+
+  @override
+  String controlDisableMatTitle(int number) {
+    return '¿Inhabilitar el tapiz $number?';
+  }
+
+  @override
+  String get controlDisableMatBody =>
+      'Elige a qué tapiz va cada grupo con combates pendientes (Automático: el que acabe antes). Los combates de equipos se reparten entre los demás tapices. Se queda sin árbitro: para volver a usarlo, asígnale uno en Configuración.';
+
+  @override
+  String controlMatDisabled(int groups, int pool) {
+    String _temp0 = intl.Intl.pluralLogic(
+      groups,
+      locale: localeName,
+      other: '$groups grupos movidos',
+      one: '1 grupo movido',
+      zero: 'ningún grupo movido',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      pool,
+      locale: localeName,
+      other: ', $pool combates de equipos vuelven al bote',
+      one: ', 1 combate de equipos vuelve al bote',
+      zero: '',
+    );
+    return 'Tapiz inhabilitado: $_temp0$_temp1.';
+  }
+
+  @override
   String get controlPickMat => '¿A qué tapiz?';
 
   @override
@@ -1865,6 +1904,22 @@ class AppLocalizationsEs extends AppLocalizations {
       'Sin conexión: tablero guardado en este dispositivo. Sin recomendado; puedes empezar un pendiente si no hay otro en curso.';
 
   @override
+  String get matSyncingTitle => 'Sincronizando combates';
+
+  @override
+  String matSyncingBody(int count, String mats) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Han cambiado los tapices y a los tapices $mats aún no les ha llegado. Hasta que les llegue, sus combates propuestos pueden cambiar.',
+      one:
+          'Han cambiado los tapices y al tapiz $mats aún no le ha llegado. Hasta que le llegue, su combate propuesto puede cambiar.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get matInReview => 'En revisión del club';
 
   @override
@@ -2431,6 +2486,47 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get recordDisqualified => 'Descalificado';
+
+  @override
+  String get recordNoIncidents => 'Sin advertencias en esta fase.';
+
+  @override
+  String get recordNoIncidentsLeague => 'Sin advertencias en la liga.';
+
+  @override
+  String recordWarningsLeague(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count advertencias en la liga',
+      one: '1 advertencia en la liga',
+      zero: 'Sin advertencias en la liga',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get recordIncidentsHint =>
+      'Toca para ver en qué combate, el minuto y el motivo.';
+
+  @override
+  String recordPhase(int number, String name) {
+    return 'Fase $number · $name';
+  }
+
+  @override
+  String get incidentWarning => 'Advertencia';
+
+  @override
+  String get incidentOneHand => 'Advertencia de una mano';
+
+  @override
+  String incidentBy(String who) {
+    return 'puesta por $who';
+  }
+
+  @override
+  String get incidentGavePoint => '+1 al rival';
 
   @override
   String leagueDisqualifications(int count) {

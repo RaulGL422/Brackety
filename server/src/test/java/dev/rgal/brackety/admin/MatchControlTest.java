@@ -165,6 +165,141 @@ class MatchControlTest extends AdminApiTestBase {
     }
 
     @Test
+    void aDisabledMatSendsItsGroupsToTheSoonestFreeMatsAndItsPinnedTeamMatchesToThePool() throws Exception {
+        var youngMat = matOf(match(young, 0, 1));
+        var olderMat = matOf(match(older, 0, 1));
+        var youngGroup = groupOf(match(young, 0, 1));
+        var target = freeMat();
+        var strayOlder = match(older, 2, 3);
+        club(put(control() + "/matches/" + strayOlder + "/mat").content(mat(youngMat)))
+                .andExpect(status().isNoContent());
+        var teamMatch = teamMatch();
+        club(put(control() + "/matches/" + teamMatch + "/mat").content(mat(youngMat)))
+                .andExpect(status().isNoContent());
+
+        club(post(control() + "/mats/" + youngMat + "/disable"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.groupsMoved").value(1))
+                .andExpect(jsonPath("$.teamMatchesToPool").value(1));
+
+        assertThat(rows("select count(*) from mat where id = ? and referee_account_id is null", youngMat))
+                .isOne();
+        assertThat(rows("select count(*) from fight_group where id = ? and mat_id = ?", youngGroup, target))
+                .isOne();
+        assertThat(rows("select count(*) from fight_match where group_id = ? and mat_id = ?", youngGroup, target))
+                .isEqualTo(6);
+        assertThat(rows("select count(*) from fight_match where id = ? and mat_id = ?", strayOlder, olderMat))
+                .isOne();
+        assertThat(rows("select count(*) from fight_match where id = ? and mat_id is null and not pinned", teamMatch))
+                .isOne();
+        assertThat(rows("select count(*) from fight_match where mat_id = ?", youngMat))
+                .isZero();
+    }
+
+    @Test
+    void twoAutomaticGroupsOfADisabledMatSpreadOverTheFreeMats() throws Exception {
+        var youngMat = matOf(match(young, 0, 1));
+        var olderGroup = groupOf(match(older, 0, 1));
+        club(put(control() + "/groups/" + olderGroup + "/mat").content(mat(youngMat)))
+                .andExpect(status().isNoContent());
+
+        club(post(control() + "/mats/" + youngMat + "/disable"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.groupsMoved").value(2));
+
+        assertThat(rows(
+                        "select count(distinct mat_id) from fight_group where event_id = ? and mat_id <> ?",
+                        eventId,
+                        youngMat))
+                .isEqualTo(2);
+    }
+
+    @Test
+    void onDisablingAMatEachGroupMayGoToTheMatChosenForIt() throws Exception {
+        var youngMat = matOf(match(young, 0, 1));
+        var olderMat = matOf(match(older, 0, 1));
+        var youngGroup = groupOf(match(young, 0, 1));
+        var toItself = "{\"groupMats\":{\"%s\":\"%s\"}}".formatted(youngGroup, youngMat);
+        club(post(control() + "/mats/" + youngMat + "/disable").content(toItself))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("MAT_WITHOUT_REFEREE"));
+        assertThat(rows("select count(*) from mat where id = ? and referee_account_id is not null", youngMat))
+                .isOne();
+
+        var toOlder = "{\"groupMats\":{\"%s\":\"%s\"}}".formatted(youngGroup, olderMat);
+        club(post(control() + "/mats/" + youngMat + "/disable").content(toOlder))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.groupsMoved").value(1));
+        assertThat(rows("select count(*) from fight_match where group_id = ? and mat_id = ?", youngGroup, olderMat))
+                .isEqualTo(6);
+    }
+
+    @Test
+    void afterAChangeOfMatsEveryBoardSaysWhichMatsHaveNotGotItYet() throws Exception {
+        var youngMat = matOf(match(young, 0, 1));
+        var refereed = jdbc.sql(
+                        "select number from mat where event_id = ? and referee_account_id is not null and id <> ?"
+                                + " order by number")
+                .params(eventId, youngMat)
+                .query(Integer.class)
+                .list();
+        var first = refereed.getFirst();
+        var second = refereed.get(1);
+        call(get("/api/v1/mats/" + matNumbered(first) + "/board"), "arbitro" + first)
+                .andExpect(jsonPath("$.syncingMats").isEmpty());
+
+        club(post(control() + "/mats/" + youngMat + "/disable")).andExpect(status().isOk());
+
+        // Its own board has it now; the others have not loaded theirs yet. The mat out of use waits for nobody.
+        call(get("/api/v1/mats/" + matNumbered(first) + "/board"), "arbitro" + first)
+                .andExpect(jsonPath("$.syncingMats")
+                        .value(org.hamcrest.Matchers.equalTo(refereed.subList(1, refereed.size()))));
+        call(get("/api/v1/mats/" + matNumbered(second) + "/board"), "arbitro" + second)
+                .andExpect(status().isOk());
+        call(get("/api/v1/mats/" + matNumbered(first) + "/board"), "club1")
+                .andExpect(jsonPath("$.syncingMats")
+                        .value(org.hamcrest.Matchers.equalTo(refereed.subList(2, refereed.size()))));
+
+        // A tablet that never loads holds nobody for more than a minute.
+        clock.advance(Duration.ofSeconds(61));
+        call(get("/api/v1/mats/" + matNumbered(first) + "/board"), "club1")
+                .andExpect(jsonPath("$.syncingMats").isEmpty());
+    }
+
+    @Test
+    void aMatIsNotDisabledWhileAMatchOnItIsInProgressOrWithoutAnotherMat() throws Exception {
+        var first = match(young, 0, 1);
+        var youngMat = matOf(first);
+        referee(first, "START", null, 0);
+        club(post(control() + "/mats/" + youngMat + "/disable"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("MATCH_IN_PROGRESS"));
+        clock.advance(Duration.ofMinutes(2));
+        referee(first, "FINISH", null, 1);
+
+        jdbc.sql("update mat set referee_account_id = null where event_id = ? and id <> ?")
+                .params(eventId, youngMat)
+                .update();
+        club(post(control() + "/mats/" + youngMat + "/disable"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("NO_OTHER_MAT"));
+        assertThat(rows("select count(*) from mat where id = ? and referee_account_id is not null", youngMat))
+                .isOne();
+    }
+
+    @Test
+    void theSuperadminDisablesAMatAudited() throws Exception {
+        var youngMat = matOf(match(young, 0, 1));
+        admin(post("/api/v1/admin/events/" + eventId + "/control/mats/" + youngMat + "/disable"))
+                .andExpect(status().isOk());
+        assertThat(rows(
+                        "select count(*) from admin_audit where action = 'CONTROL_CHANGE' and target = ?",
+                        youngMat.toString()))
+                .isOne();
+        call(post(control() + "/mats/" + youngMat + "/disable"), "arbitro1").andExpect(status().isForbidden());
+    }
+
+    @Test
     void onlyTheClub() throws Exception {
         var match = match(young, 2, 3);
         for (var user : List.of("ayudante1", "arbitro1")) {
@@ -204,6 +339,44 @@ class MatchControlTest extends AdminApiTestBase {
     private UUID matOf(UUID match) {
         return jdbc.sql("select mat_id from fight_match where id = ?")
                 .param(match)
+                .query(UUID.class)
+                .single();
+    }
+
+    // A pending match of a new group of four teams of two (15-16), in the pool.
+    private UUID teamMatch() throws Exception {
+        var category = jdbc.sql("select id from event_category where name = '15-16'")
+                .query(UUID.class)
+                .single();
+        var people = new ArrayList<>(participants(15, "Teen"));
+        people.addAll(participants(16, "Joven"));
+        var teams = new ArrayList<String>();
+        for (int i = 0; i < 8; i += 2) {
+            var created = call(
+                            post("/api/v1/events/" + eventId + "/categories/" + category + "/teams")
+                                    .content("{\"participantIds\":[\"%s\",\"%s\"]}"
+                                            .formatted(people.get(i), people.get(i + 1))),
+                            "ayudante1")
+                    .andExpect(status().isCreated())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+            teams.add("\"" + JsonPath.read(created, "$.id") + "\"");
+        }
+        call(
+                        post("/api/v1/events/" + eventId + "/groups")
+                                .content("{\"categoryId\":\"%s\",\"groups\":[{\"teamIds\":[%s]}]}"
+                                        .formatted(category, String.join(",", teams))),
+                        "ayudante1")
+                .andExpect(status().isCreated());
+        return jdbc.sql("select id from fight_match where red_team_id is not null and status = 'PENDING' limit 1")
+                .query(UUID.class)
+                .single();
+    }
+
+    private UUID matNumbered(int number) {
+        return jdbc.sql("select id from mat where event_id = ? and number = ?")
+                .params(eventId, number)
                 .query(UUID.class)
                 .single();
     }

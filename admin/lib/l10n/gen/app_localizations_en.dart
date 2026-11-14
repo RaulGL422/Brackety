@@ -59,6 +59,25 @@ class AppLocalizationsEn extends AppLocalizations {
       'That person already fights in the other team\'s group (as a wildcard).';
 
   @override
+  String get controlMatInReview =>
+      'A match on this mat waits for review: resolve it first.';
+
+  @override
+  String get controlDisableMat => 'Disable mat';
+
+  @override
+  String controlDisableMatTitle(int number) {
+    return 'Disable mat $number?';
+  }
+
+  @override
+  String get controlDisableMatBody =>
+      'Choose the mat for each group with pending matches (Automatic: the one that finishes first). Team matches are shared among the other mats. It is left without a referee: to use it again, the club assigns one in Settings.';
+
+  @override
+  String get controlMatAutomatic => 'Automatic';
+
+  @override
   String get controlPickMat => 'To which mat?';
 
   @override

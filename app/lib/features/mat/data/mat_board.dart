@@ -253,6 +253,7 @@ class MatBoard {
     this.teamPool = false,
     this.eventId,
     this.mats = const [],
+    this.syncingMats = const [],
   });
 
   factory MatBoard.fromJson(Map<String, dynamic> json) => MatBoard(
@@ -272,9 +273,15 @@ class MatBoard {
       for (final m in json['mats'] as List? ?? const [])
         MatChoice.fromJson(m as Map<String, dynamic>),
     ],
+    syncingMats: [
+      for (final n in json['syncingMats'] as List? ?? const []) n as int,
+    ],
   );
 
   final int matNumber;
+
+  /// The event's mats changed a moment ago and these mats have not loaded their board since.
+  final List<int> syncingMats;
   final List<BoardGroup> groups;
   final List<BoardMatch> matches;
   final String? recommendedMatchId;

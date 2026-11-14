@@ -2,6 +2,7 @@ package dev.rgal.brackety.ranking;
 
 import dev.rgal.brackety.auth.RequiresVerifiedEmail;
 import dev.rgal.brackety.common.CurrentAccount;
+import dev.rgal.brackety.ranking.dto.LeagueRecord;
 import dev.rgal.brackety.ranking.dto.LeagueStandings;
 import dev.rgal.brackety.ranking.dto.ParticipantRecord;
 import dev.rgal.brackety.ranking.dto.StandingRow;
@@ -51,6 +52,13 @@ class StandingsController {
     ParticipantRecord record(
             @PathVariable UUID eventId, @PathVariable UUID participantId, @AuthenticationPrincipal Jwt jwt) {
         return records.record(eventId, participantId, CurrentAccount.id(jwt));
+    }
+
+    /** One person's matches in every phase of the league, for the club (warnings and their reasons). */
+    @GetMapping("/league/people/{personId}/record")
+    LeagueRecord leagueRecord(
+            @PathVariable UUID eventId, @PathVariable UUID personId, @AuthenticationPrincipal Jwt jwt) {
+        return records.leagueRecord(eventId, personId, CurrentAccount.id(jwt));
     }
 
     @GetMapping("/standings")

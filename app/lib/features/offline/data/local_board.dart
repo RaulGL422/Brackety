@@ -47,5 +47,6 @@ MatBoard localBoard(
     teamPool: board.teamPool,
     eventId: board.eventId,
     mats: board.mats,
+    syncingMats: board.syncingMats,
   );
 }

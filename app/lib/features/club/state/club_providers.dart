@@ -41,6 +41,20 @@ final participantRecordProvider = FutureProvider.autoDispose
       ),
     );
 
+typedef LeaguePersonKey = ({String eventId, String personId});
+
+/// Live like the record: a warning in the current phase shows at once.
+final leagueRecordProvider = FutureProvider.autoDispose
+    .family<LeagueRecord, LeaguePersonKey>(
+      (ref, key) => liveReload(
+        ref,
+        eventTopics(key.eventId),
+        () => ref
+            .watch(clubRepositoryProvider)
+            .leagueRecord(key.eventId, key.personId),
+      ),
+    );
+
 final matsOverviewProvider = FutureProvider.autoDispose
     .family<List<MatOverview>, String>(
       (ref, eventId) => liveReload(

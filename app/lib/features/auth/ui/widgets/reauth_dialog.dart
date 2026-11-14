@@ -64,6 +64,7 @@ class _ReauthDialogState extends ConsumerState<ReauthDialog> {
     final l10n = AppLocalizations.of(context);
     final error = _error;
     return AlertDialog(
+      scrollable: true,
       actionsOverflowDirection: VerticalDirection.up,
       actionsOverflowButtonSpacing: 8,
       title: Text(l10n.reauthTitle),

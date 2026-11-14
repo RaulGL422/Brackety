@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:brackety_core/brackety_core.dart';
@@ -84,6 +85,17 @@ class MatBoardScreen extends ConsumerWidget {
             if (board.value?.eventId case final eventId?)
               RulebookButton(eventId: eventId, color: colors.onBand),
             if (queued) const SyncStatusIcon(),
+            if (readOnly)
+              if (board.value case final b?
+                  when b.eventId != null &&
+                      b.mats.any((m) => m.id == matId && m.hasReferee))
+                DisableMatButton(
+                  eventId: b.eventId!,
+                  matId: matId,
+                  board: b,
+                  color: colors.onBand,
+                  onChanged: () => ref.invalidate(provider),
+                ),
             if (toPlay != null && toPlay > 0)
               Padding(
                 padding: const EdgeInsets.only(right: AppSpacing.l),
@@ -175,6 +187,8 @@ class _BoardList extends StatelessWidget {
                 inProgress: true,
               ),
             ),
+          if (board.syncingMats.isNotEmpty && !board.offline)
+            _SyncingNotice(mats: board.syncingMats, onRecheck: onControl),
           if (board.teamPool)
             Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.m),
@@ -280,6 +294,79 @@ Widget? _groupMenu(MatBoard board, BoardGroup group, VoidCallback onChanged) {
     matNumber: board.matNumber,
     onChanged: onChanged,
   );
+}
+
+/// The event's mats changed a moment ago (one more or less, a referee, a mat out of use) and
+/// [mats] have not got it yet: say so, so nobody waits without knowing for whom. Nothing is
+/// blocked. It asks again every few seconds until they all have it.
+class _SyncingNotice extends StatefulWidget {
+  const _SyncingNotice({required this.mats, this.onRecheck});
+
+  final List<int> mats;
+  final VoidCallback? onRecheck;
+
+  @override
+  State<_SyncingNotice> createState() => _SyncingNoticeState();
+}
+
+class _SyncingNoticeState extends State<_SyncingNotice> {
+  static const _recheck = Duration(seconds: 3);
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(_recheck, (_) => widget.onRecheck?.call());
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final colors = BracketyColors.of(context);
+    final text = Theme.of(context).textTheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.m),
+      child: Card(
+        color: colors.warningContainer,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.m),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: AppSpacing.m,
+            children: [
+              Icon(Icons.sync, color: colors.onWarningContainer),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.matSyncingTitle,
+                      style: text.titleSmall?.copyWith(
+                        color: colors.onWarningContainer,
+                      ),
+                    ),
+                    Text(
+                      l10n.matSyncingBody(
+                        widget.mats.length,
+                        widget.mats.join(', '),
+                      ),
+                      style: TextStyle(color: colors.onWarningContainer),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 /// Without network: the board saved here, and no recommendation.

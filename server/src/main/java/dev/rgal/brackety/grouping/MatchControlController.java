@@ -2,9 +2,11 @@ package dev.rgal.brackety.grouping;
 
 import dev.rgal.brackety.auth.RequiresVerifiedEmail;
 import dev.rgal.brackety.common.CurrentAccount;
+import dev.rgal.brackety.grouping.dto.ControlRequests.DisableMatRequest;
 import dev.rgal.brackety.grouping.dto.ControlRequests.MoveRequest;
 import dev.rgal.brackety.grouping.dto.ControlRequests.OrderRequest;
 import dev.rgal.brackety.grouping.dto.ControlRequests.TeamMoveRequest;
+import dev.rgal.brackety.grouping.dto.DisabledMat;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
@@ -69,6 +71,16 @@ class MatchControlController {
             @PathVariable UUID eventId, @Valid @RequestBody TeamMoveRequest request, @AuthenticationPrincipal Jwt jwt) {
         var by = club(eventId, jwt);
         control.moveTeamMember(eventId, request.participantId(), request.fromTeamId(), request.toTeamId(), by);
+    }
+
+    @PostMapping("/mats/{matId}/disable")
+    DisabledMat disableMat(
+            @PathVariable UUID eventId,
+            @PathVariable UUID matId,
+            @Valid @RequestBody(required = false) DisableMatRequest request,
+            @AuthenticationPrincipal Jwt jwt) {
+        var by = club(eventId, jwt);
+        return control.disableMat(eventId, matId, DisableMatRequest.chosen(request), by);
     }
 
     @PostMapping("/matches/{matchId}/waive-rest")

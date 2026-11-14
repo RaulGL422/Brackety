@@ -78,6 +78,45 @@ class AppLocalizationsEn extends AppLocalizations {
       'That person already fights in the other team\'s group (as a wildcard).';
 
   @override
+  String get controlMatInReview =>
+      'A match on this mat waits for review: resolve it first.';
+
+  @override
+  String get controlMatBusy =>
+      'A match is in progress on this mat: wait for it to end.';
+
+  @override
+  String get controlDisableMat => 'Disable mat';
+
+  @override
+  String controlDisableMatTitle(int number) {
+    return 'Disable mat $number?';
+  }
+
+  @override
+  String get controlDisableMatBody =>
+      'Choose the mat for each group with pending matches (Automatic: the one that finishes first). Team matches are shared among the other mats. It is left without a referee: to use it again, assign one in Settings.';
+
+  @override
+  String controlMatDisabled(int groups, int pool) {
+    String _temp0 = intl.Intl.pluralLogic(
+      groups,
+      locale: localeName,
+      other: '$groups groups moved',
+      one: '1 group moved',
+      zero: 'no group moved',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      pool,
+      locale: localeName,
+      other: ', $pool team matches back to the pool',
+      one: ', 1 team match back to the pool',
+      zero: '',
+    );
+    return 'Mat disabled: $_temp0$_temp1.';
+  }
+
+  @override
   String get controlPickMat => 'To which mat?';
 
   @override
@@ -1853,6 +1892,22 @@ class AppLocalizationsEn extends AppLocalizations {
       'Offline: board saved on this device. No recommendation; you can start a pending match if none is in progress.';
 
   @override
+  String get matSyncingTitle => 'Syncing matches';
+
+  @override
+  String matSyncingBody(int count, String mats) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'The mats have changed and mats $mats have not got it yet. Until they do, their proposed matches may change.',
+      one:
+          'The mats have changed and mat $mats has not got it yet. Until it does, its proposed match may change.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get matInReview => 'Under the club\'s review';
 
   @override
@@ -2411,6 +2466,47 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recordDisqualified => 'Disqualified';
+
+  @override
+  String get recordNoIncidents => 'No warnings in this phase.';
+
+  @override
+  String get recordNoIncidentsLeague => 'No warnings in the league.';
+
+  @override
+  String recordWarningsLeague(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count warnings in the league',
+      one: '1 warning in the league',
+      zero: 'No warnings in the league',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get recordIncidentsHint =>
+      'Tap to see in which match, the minute and the reason.';
+
+  @override
+  String recordPhase(int number, String name) {
+    return 'Phase $number · $name';
+  }
+
+  @override
+  String get incidentWarning => 'Warning';
+
+  @override
+  String get incidentOneHand => 'One-hand warning';
+
+  @override
+  String incidentBy(String who) {
+    return 'given by $who';
+  }
+
+  @override
+  String get incidentGavePoint => '+1 to the rival';
 
   @override
   String leagueDisqualifications(int count) {

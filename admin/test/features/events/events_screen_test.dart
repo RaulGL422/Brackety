@@ -7,9 +7,12 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../support/fakes.dart';
 
 class FakeEventsApi implements EventsApi {
-  FakeEventsApi({this.total = 1, this.package});
+  FakeEventsApi({this.total = 1, this.package, this.secondReferee = false});
 
   final int total;
+
+  /// Mat 2 with a referee (by default it has none).
+  final bool secondReferee;
 
   /// The hall laptop's package; null on a server without one.
   final String? package;
@@ -17,6 +20,7 @@ class FakeEventsApi implements EventsApi {
   final calls = <String>[];
   DioException? error;
   var groups = [group('g1', 1), group('g2', 2)];
+  var teams = <AdminTeam>[];
 
   static AdminGroup group(String id, int number) => AdminGroup(
     id: id,
@@ -107,9 +111,10 @@ class FakeEventsApi implements EventsApi {
           ),
         ],
       ),
-      const AdminMat(id: 'm2', number: 2),
+      AdminMat(id: 'm2', number: 2, referee: secondReferee ? 'arbitro2' : null),
     ],
     groups: groups,
+    teams: teams,
   );
 
   @override
@@ -155,6 +160,13 @@ class FakeEventsApi implements EventsApi {
       calls.add('waiveRest $matchId');
 
   @override
+  Future<void> disableMat(
+    String eventId,
+    String matId,
+    Map<String, String> groupMats,
+  ) async => calls.add('disableMat $matId $groupMats');
+
+  @override
   Future<String?> resetPackage() async => package;
 
   @override
@@ -166,6 +178,7 @@ class FakeEventsApi implements EventsApi {
     calls.add('clear $eventId: $reason');
     final cleared = (groups: groups.length, teams: 1);
     groups = [];
+    teams = [];
     return cleared;
   }
 }
@@ -342,6 +355,33 @@ void main() {
     expect(api.calls, isEmpty);
   });
 
+  testWidgets('disabling a mat chooses where each of its groups goes', (
+    tester,
+  ) async {
+    useSize(tester, screenSizes['desktop']!);
+    final api = FakeEventsApi(secondReferee: true);
+    await pumpAdmin(
+      tester,
+      location: '/events',
+      overrides: [eventsApiProvider.overrideWithValue(api)],
+    );
+    await openDetail(tester);
+    await tester.tap(find.text('Mat 1: arbitro1'));
+    await tester.pumpAndSettle();
+
+    await tapText(tester, 'Disable mat');
+    expect(find.text('Disable mat 1?'), findsOneWidget);
+    // Only group 1 is on mat 1; it may go to mat 2, which has a referee.
+    await tester.tap(find.byType(DropdownButtonFormField<String?>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Mat 2: arbitro2').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Disable mat'));
+    await tester.pumpAndSettle();
+
+    expect(api.calls, ['disableMat m1 {g1: m2}']);
+  });
+
   testWidgets('cancelling asks nothing of the server', (tester) async {
     useSize(tester, screenSizes['desktop']!);
     final api = await open(tester);
@@ -410,6 +450,55 @@ void main() {
       find.text('Competition cleared: 2 groups and 1 team deleted.'),
       findsOneWidget,
     );
+  });
+
+  testWidgets('teams without a group are cleared too, on a phone', (
+    tester,
+  ) async {
+    useSize(tester, screenSizes['phone']!);
+    final api = FakeEventsApi()
+      ..groups = []
+      ..teams = [
+        const AdminTeam(
+          id: 't1',
+          number: 1,
+          category: '9-12',
+          members: [
+            AdminTeamPerson(participantId: 'p1', name: 'Ana'),
+            AdminTeamPerson(participantId: 'p2', name: 'Bea'),
+          ],
+        ),
+      ];
+    await pumpAdmin(
+      tester,
+      location: '/events',
+      overrides: [eventsApiProvider.overrideWithValue(api)],
+    );
+    await openDetail(tester);
+
+    await tester.tap(find.text('Clear the competition'));
+    await tester.pumpAndSettle();
+    // The keyboard takes half of the screen.
+    tester.view.viewInsets = const FakeViewPadding(bottom: 400);
+    addTearDown(tester.view.resetViewInsets);
+    await tester.pumpAndSettle();
+    final fields = find.descendant(
+      of: find.byType(AlertDialog),
+      matching: find.byType(TextField),
+    );
+    await tester.enterText(fields.first, 'Equipos mal hechos');
+    await tester.enterText(fields.last, 'Fase 1');
+    await tester.pump();
+    final confirm = find.descendant(
+      of: find.byType(AlertDialog),
+      matching: find.widgetWithText(FilledButton, 'Clear the competition'),
+    );
+    // The buttons stay reachable on a small screen.
+    await tester.tap(confirm);
+    await tester.pumpAndSettle();
+
+    expect(api.calls, ['clear e0: Equipos mal hechos']);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('a match gone meanwhile reloads and says so', (tester) async {

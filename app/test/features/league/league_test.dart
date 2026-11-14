@@ -10,6 +10,7 @@ import 'package:brackety/features/league/ui/league_settings_dialog.dart';
 import 'package:brackety/features/league/ui/league_tab.dart';
 import 'package:brackety/features/league/ui/phase_switcher.dart';
 import 'package:brackety/features/league/ui/reenrol_dialog.dart';
+import 'package:brackety/features/mat/data/mat_board.dart';
 import 'package:brackety/l10n/gen/app_localizations.dart';
 import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
@@ -287,6 +288,105 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  testWidgets(
+    'a person opened from the league shows the warnings of every phase',
+    (tester) async {
+      setSize(tester, sizes['phone']!);
+      RecordMatch fought(String id, String rival, List<Incident> incidents) =>
+          RecordMatch(
+            matchId: id,
+            matNumber: 1,
+            groupNumber: 2,
+            status: MatchStatus.finished,
+            red: true,
+            asGhost: false,
+            rival: rival,
+            points: 5,
+            rivalPoints: 15,
+            warnings: 1,
+            oneHandWarnings: 0,
+            disqualified: false,
+            rivalDisqualified: false,
+            incidents: incidents,
+          );
+      String? opened;
+      await tester.pumpWidget(
+        app(
+          const Scaffold(body: LeagueTab(eventId: 'e2')),
+          overrides: [
+            leagueProvider.overrideWith((ref, _) async => league),
+            leagueStandingsProvider.overrideWith((ref, _) async => standings),
+            participantRecordProvider.overrideWith(
+              (ref, key) async => ParticipantRecord(
+                standing: const StandingRow(
+                  position: 1,
+                  participantId: 'pz',
+                  firstName: 'Zoe',
+                  lastName: 'Test',
+                  age: 9,
+                  categoryName: '8-11',
+                  attendancePoints: 10,
+                  matchPoints: 5,
+                  total: 15,
+                  matches: 1,
+                ),
+                matches: const [],
+              ),
+            ),
+            leagueRecordProvider.overrideWith((ref, key) async {
+              opened = key.personId;
+              return LeagueRecord([
+                (
+                  number: 1,
+                  name: 'Fase 1',
+                  matches: [
+                    fought('m1', 'Ana Test', const [
+                      Incident(
+                        kind: IncidentKind.warning,
+                        reason: 'Agarre',
+                        clock: Duration(seconds: 35),
+                      ),
+                    ]),
+                  ],
+                ),
+                (
+                  number: 2,
+                  name: 'Fase 2',
+                  matches: [
+                    fought('m2', 'Eva Test', const [
+                      Incident(
+                        kind: IncidentKind.disqualification,
+                        reason: 'Mordisco',
+                        clock: Duration(seconds: 70),
+                      ),
+                    ]),
+                  ],
+                ),
+              ]);
+            }),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Zoe Test'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Zoe Test'));
+      await tester.pumpAndSettle();
+      expect(opened, 'a');
+      await tester.tap(
+        find.text('1 warning in the league · 1 disqualification'),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Phase 1 · Fase 1'), findsOneWidget);
+      expect(find.text('Warning · 0:35 · Agarre'), findsOneWidget);
+      expect(find.text('Phase 2 · Fase 2'), findsOneWidget);
+      expect(find.text('Disqualified · 1:10 · Mordisco'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets(
     'podiums are set with one tap, and a category only when it differs',
