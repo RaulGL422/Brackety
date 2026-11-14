@@ -19,6 +19,8 @@ String? controlError(AppLocalizations l10n, AdminApiError error) =>
       'TEAM_SIZE' => l10n.controlTeamSize,
       'GROUP_STARTED' => l10n.controlGroupStarted,
       'SAME_FIGHTER' => l10n.controlSameFighter,
+      'MATCH_IN_REVIEW' => l10n.controlMatInReview,
+      'NO_OTHER_MAT' => l10n.controlNoOtherMat,
       _ => null,
     };
 
@@ -198,6 +200,125 @@ class GroupControlButtons extends ConsumerWidget {
               );
             },
           ),
+      ],
+    );
+  }
+}
+
+/// On a mat with a referee: put it out of use. Each individual group with pending matches goes
+/// to the mat chosen for it, or the one free first; it takes no more team matches.
+class DisableMatButton extends ConsumerWidget {
+  const DisableMatButton({super.key, required this.event, required this.mat});
+
+  final AdminEventDetail event;
+  final AdminMat mat;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: TextButton.icon(
+        icon: const Icon(Icons.block),
+        label: Text(l10n.controlDisableMat),
+        onPressed: () async {
+          final groupMats = await showDialog<Map<String, String>>(
+            context: context,
+            builder: (_) => _DisableMatDialog(event: event, mat: mat),
+          );
+          if (groupMats == null || !context.mounted) return;
+          await _control(
+            context,
+            () => ref
+                .read(eventDetailProvider(event.id).notifier)
+                .disableMat(mat.id, groupMats),
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// Where each individual group of [mat] with matches to play goes; pops the chosen mats
+/// (group id → mat id; Automatic ones left out), or null if cancelled.
+class _DisableMatDialog extends StatefulWidget {
+  const _DisableMatDialog({required this.event, required this.mat});
+
+  final AdminEventDetail event;
+  final AdminMat mat;
+
+  @override
+  State<_DisableMatDialog> createState() => _DisableMatDialogState();
+}
+
+class _DisableMatDialogState extends State<_DisableMatDialog> {
+  final _chosen = <String, String>{};
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final groups = [
+      for (final g in widget.event.groups)
+        if (g.matNumber == widget.mat.number &&
+            g.matches.any((m) => m.status == AdminMatchStatus.pending))
+          g,
+    ];
+    final mats = widget.event.mats
+        .where((m) => m.referee != null && m.id != widget.mat.id)
+        .toList();
+    return AlertDialog(
+      scrollable: true,
+      title: Text(l10n.controlDisableMatTitle(widget.mat.number)),
+      content: SizedBox(
+        width: 480,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: AppSpacing.m,
+            children: [
+              Text(l10n.controlDisableMatBody),
+              if (mats.isEmpty) Text(l10n.controlNoOtherMat),
+              if (mats.isNotEmpty)
+                for (final g in groups)
+                  DropdownButtonFormField<String?>(
+                    initialValue: _chosen[g.id],
+                    decoration: InputDecoration(
+                      labelText: l10n.groupTitle(g.number, g.category),
+                    ),
+                    items: [
+                      DropdownMenuItem(
+                        value: null,
+                        child: Text(l10n.controlMatAutomatic),
+                      ),
+                      for (final m in mats)
+                        DropdownMenuItem(
+                          value: m.id,
+                          child: Text(
+                            l10n.eventMatReferee(m.number, m.referee!),
+                          ),
+                        ),
+                    ],
+                    onChanged: (id) => setState(
+                      () => id == null
+                          ? _chosen.remove(g.id)
+                          : _chosen[g.id] = id,
+                    ),
+                  ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n.cancel),
+        ),
+        FilledButton(
+          onPressed: mats.isEmpty
+              ? null
+              : () => Navigator.pop(context, _chosen),
+          child: Text(l10n.controlDisableMat),
+        ),
       ],
     );
   }
