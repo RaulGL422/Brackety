@@ -197,6 +197,24 @@ class MatchControlTest extends AdminApiTestBase {
     }
 
     @Test
+    void twoAutomaticGroupsOfADisabledMatSpreadOverTheFreeMats() throws Exception {
+        var youngMat = matOf(match(young, 0, 1));
+        var olderGroup = groupOf(match(older, 0, 1));
+        club(put(control() + "/groups/" + olderGroup + "/mat").content(mat(youngMat)))
+                .andExpect(status().isNoContent());
+
+        club(post(control() + "/mats/" + youngMat + "/disable"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.groupsMoved").value(2));
+
+        assertThat(rows(
+                        "select count(distinct mat_id) from fight_group where event_id = ? and mat_id <> ?",
+                        eventId,
+                        youngMat))
+                .isEqualTo(2);
+    }
+
+    @Test
     void onDisablingAMatEachGroupMayGoToTheMatChosenForIt() throws Exception {
         var youngMat = matOf(match(young, 0, 1));
         var olderMat = matOf(match(older, 0, 1));
