@@ -37,6 +37,8 @@ String controlErrorText(AppLocalizations l10n, DioException e) =>
       'TEAM_SIZE' => l10n.controlTeamSize,
       'GROUP_STARTED' => l10n.controlGroupStarted,
       'SAME_FIGHTER' => l10n.controlSameFighter,
+      'MATCH_IN_REVIEW' => l10n.controlMatInReview,
+      'NO_OTHER_MAT' => l10n.controlNoOtherMat,
       _ => l10n.controlError,
     };
 
@@ -201,6 +203,143 @@ class MatchControlMenu extends ConsumerWidget {
             }
         }
       },
+    );
+  }
+}
+
+/// For the club, on a mat with a referee: put it out of use. Each individual group with
+/// pending matches goes to the mat chosen for it, or the one free first; it takes no more team
+/// matches. A referee in the settings puts it back.
+class DisableMatButton extends ConsumerWidget {
+  const DisableMatButton({
+    super.key,
+    required this.eventId,
+    required this.matId,
+    required this.board,
+    required this.onChanged,
+    this.color,
+  });
+
+  final String eventId;
+  final String matId;
+  final MatBoard board;
+  final VoidCallback onChanged;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    return IconButton(
+      tooltip: l10n.controlDisableMat,
+      icon: Icon(Icons.block, color: color),
+      onPressed: () async {
+        final groupMats = await showDialog<Map<String, String>>(
+          context: context,
+          builder: (_) => _DisableMatDialog(board: board, matId: matId),
+        );
+        if (groupMats == null || !context.mounted) return;
+        final toasts = Toasts.of(context);
+        try {
+          final done = await ref
+              .read(controlRepositoryProvider)
+              .disableMat(eventId, matId, groupMats);
+          toasts.show(
+            l10n.controlMatDisabled(done.groupsMoved, done.teamMatchesToPool),
+            kind: ToastKind.success,
+          );
+          ref.invalidate(matsOverviewProvider(eventId));
+          onChanged();
+        } on DioException catch (e) {
+          toasts.show(
+            ApiError.from(e).code == 'MATCH_IN_PROGRESS'
+                ? l10n.controlMatBusy
+                : controlErrorText(l10n, e),
+            kind: ToastKind.error,
+          );
+        }
+      },
+    );
+  }
+}
+
+/// The individual groups of [board] with matches to play there: where each goes. Pops the
+/// chosen mats (group id → mat id; Automatic ones left out), or null if cancelled.
+class _DisableMatDialog extends StatefulWidget {
+  const _DisableMatDialog({required this.board, required this.matId});
+
+  final MatBoard board;
+  final String matId;
+
+  @override
+  State<_DisableMatDialog> createState() => _DisableMatDialogState();
+}
+
+class _DisableMatDialogState extends State<_DisableMatDialog> {
+  final _chosen = <String, String>{};
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final board = widget.board;
+    final groups = [
+      for (final g in board.groups)
+        if (board.matches.any(
+          (m) =>
+              m.groupId == g.id && m.status == MatchStatus.pending && !m.pool,
+        ))
+          g,
+    ];
+    final mats = board.mats
+        .where((m) => m.hasReferee && m.id != widget.matId)
+        .toList();
+    return AlertDialog(
+      title: Text(l10n.controlDisableMatTitle(board.matNumber)),
+      content: SizedBox(
+        width: 420,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: AppSpacing.m,
+            children: [
+              Text(l10n.controlDisableMatBody),
+              if (mats.isEmpty) Text(l10n.controlNoOtherMat),
+              if (mats.isNotEmpty)
+                for (final g in groups)
+                  DropdownButtonFormField<String?>(
+                    initialValue: _chosen[g.id],
+                    decoration: InputDecoration(
+                      labelText: l10n.matGroupHeader(g.number, g.categoryName),
+                    ),
+                    items: [
+                      DropdownMenuItem(value: null, child: Text(l10n.matAuto)),
+                      for (final m in mats)
+                        DropdownMenuItem(
+                          value: m.id,
+                          child: Text(l10n.matTitle(m.number)),
+                        ),
+                    ],
+                    onChanged: (id) => setState(
+                      () => id == null
+                          ? _chosen.remove(g.id)
+                          : _chosen[g.id] = id,
+                    ),
+                  ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n.cancel),
+        ),
+        FilledButton(
+          onPressed: mats.isEmpty
+              ? null
+              : () => Navigator.pop(context, _chosen),
+          child: Text(l10n.controlDisableMat),
+        ),
+      ],
     );
   }
 }

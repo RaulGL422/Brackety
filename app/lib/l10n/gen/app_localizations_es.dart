@@ -78,6 +78,45 @@ class AppLocalizationsEs extends AppLocalizations {
       'Esa persona ya lucha en el grupo del otro equipo (como comodín).';
 
   @override
+  String get controlMatInReview =>
+      'Un combate de este tapiz espera revisión: resuélvela antes.';
+
+  @override
+  String get controlMatBusy =>
+      'Hay un combate en curso en este tapiz: espera a que acabe.';
+
+  @override
+  String get controlDisableMat => 'Inhabilitar tapiz';
+
+  @override
+  String controlDisableMatTitle(int number) {
+    return '¿Inhabilitar el tapiz $number?';
+  }
+
+  @override
+  String get controlDisableMatBody =>
+      'Elige a qué tapiz va cada grupo con combates pendientes (Automático: el que acabe antes). Los combates de equipos se reparten entre los demás tapices. Se queda sin árbitro: para volver a usarlo, asígnale uno en Configuración.';
+
+  @override
+  String controlMatDisabled(int groups, int pool) {
+    String _temp0 = intl.Intl.pluralLogic(
+      groups,
+      locale: localeName,
+      other: '$groups grupos movidos',
+      one: '1 grupo movido',
+      zero: 'ningún grupo movido',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      pool,
+      locale: localeName,
+      other: ', $pool combates de equipos vuelven al bote',
+      one: ', 1 combate de equipos vuelve al bote',
+      zero: '',
+    );
+    return 'Tapiz inhabilitado: $_temp0$_temp1.';
+  }
+
+  @override
   String get controlPickMat => '¿A qué tapiz?';
 
   @override

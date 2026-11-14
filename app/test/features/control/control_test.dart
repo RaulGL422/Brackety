@@ -38,6 +38,16 @@ class _FakeControl extends ControlRepository {
       calls.add('waiveRest $eventId $matchId');
 
   @override
+  Future<({int groupsMoved, int teamMatchesToPool})> disableMat(
+    String eventId,
+    String matId,
+    Map<String, String> groupMats,
+  ) async {
+    calls.add('disableMat $eventId $matId $groupMats');
+    return (groupsMoved: 1, teamMatchesToPool: 0);
+  }
+
+  @override
   Future<void> moveAsReferee(String matchId, String matId) async =>
       calls.add('referee moves $matchId $matId');
 }
@@ -96,14 +106,27 @@ void main() {
     estimatedEnd: DateTime(2027, 3, 10, 12),
   );
 
-  Future<void> open(WidgetTester tester) async {
+  final withMats = MatBoard(
+    eventId: 'e1',
+    matNumber: 2,
+    groups: board.groups,
+    matches: board.matches,
+    recommendedMatchId: 'm1',
+    mats: const [
+      MatChoice(id: 'mat1', number: 1, hasReferee: true),
+      MatChoice(id: 'mat2', number: 2, hasReferee: true),
+      MatChoice(id: 'mat3', number: 3, hasReferee: false),
+    ],
+  );
+
+  Future<void> open(WidgetTester tester, {MatBoard? shown}) async {
     tester.view.physicalSize = const Size(800, 1280);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          matBoardProvider.overrideWith((ref, matId) async => board),
+          matBoardProvider.overrideWith((ref, matId) async => shown ?? board),
           controlRepositoryProvider.overrideWithValue(control),
           matsOverviewProvider.overrideWith(
             (ref, eventId) async => [
@@ -228,6 +251,27 @@ void main() {
       expect(control.calls, ['referee moves m3 mat1']);
     },
   );
+
+  testWidgets('disabling a mat lets the club choose where each group goes', (
+    tester,
+  ) async {
+    await open(tester, shown: withMats);
+    await tester.tap(find.byTooltip('Disable mat'));
+    await tester.pumpAndSettle();
+    expect(find.text('Disable mat 2?'), findsOneWidget);
+
+    await tester.tap(find.byType(DropdownButtonFormField<String?>));
+    await tester.pumpAndSettle();
+    // Neither itself nor a mat without a referee.
+    expect(find.text('Mat 3'), findsNothing);
+    await tester.tap(find.text('Mat 1').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Disable mat'));
+    await tester.pumpAndSettle();
+
+    expect(control.calls, ['disableMat e1 mat2 {g1: mat1}']);
+    expect(find.textContaining('Mat disabled: 1 group moved'), findsOneWidget);
+  });
 
   testWidgets('the group moves and its pending matches can be reordered', (
     tester,
