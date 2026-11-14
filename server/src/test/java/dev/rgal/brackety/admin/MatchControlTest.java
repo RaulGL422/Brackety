@@ -235,6 +235,38 @@ class MatchControlTest extends AdminApiTestBase {
     }
 
     @Test
+    void afterAChangeOfMatsEveryBoardSaysWhichMatsHaveNotGotItYet() throws Exception {
+        var youngMat = matOf(match(young, 0, 1));
+        var refereed = jdbc.sql(
+                        "select number from mat where event_id = ? and referee_account_id is not null and id <> ?"
+                                + " order by number")
+                .params(eventId, youngMat)
+                .query(Integer.class)
+                .list();
+        var first = refereed.getFirst();
+        var second = refereed.get(1);
+        call(get("/api/v1/mats/" + matNumbered(first) + "/board"), "arbitro" + first)
+                .andExpect(jsonPath("$.syncingMats").isEmpty());
+
+        club(post(control() + "/mats/" + youngMat + "/disable")).andExpect(status().isOk());
+
+        // Its own board has it now; the others have not loaded theirs yet. The mat out of use waits for nobody.
+        call(get("/api/v1/mats/" + matNumbered(first) + "/board"), "arbitro" + first)
+                .andExpect(jsonPath("$.syncingMats")
+                        .value(org.hamcrest.Matchers.equalTo(refereed.subList(1, refereed.size()))));
+        call(get("/api/v1/mats/" + matNumbered(second) + "/board"), "arbitro" + second)
+                .andExpect(status().isOk());
+        call(get("/api/v1/mats/" + matNumbered(first) + "/board"), "club1")
+                .andExpect(jsonPath("$.syncingMats")
+                        .value(org.hamcrest.Matchers.equalTo(refereed.subList(2, refereed.size()))));
+
+        // A tablet that never loads holds nobody for more than a minute.
+        clock.advance(Duration.ofSeconds(61));
+        call(get("/api/v1/mats/" + matNumbered(first) + "/board"), "club1")
+                .andExpect(jsonPath("$.syncingMats").isEmpty());
+    }
+
+    @Test
     void aMatIsNotDisabledWhileAMatchOnItIsInProgressOrWithoutAnotherMat() throws Exception {
         var first = match(young, 0, 1);
         var youngMat = matOf(first);
@@ -338,6 +370,13 @@ class MatchControlTest extends AdminApiTestBase {
                         "ayudante1")
                 .andExpect(status().isCreated());
         return jdbc.sql("select id from fight_match where red_team_id is not null and status = 'PENDING' limit 1")
+                .query(UUID.class)
+                .single();
+    }
+
+    private UUID matNumbered(int number) {
+        return jdbc.sql("select id from mat where event_id = ? and number = ?")
+                .params(eventId, number)
                 .query(UUID.class)
                 .single();
     }

@@ -8,7 +8,8 @@ import java.util.UUID;
 /**
  * What the referee sees on a mat; {@code recommendedMatchId} is null when nothing can start. {@code teamPool}: the
  * mat has no individual match pending, so it takes team matches from the pool shared by every such mat; those are
- * in {@code matches} too.
+ * in {@code matches} too. {@code syncingMats}: the event's mats changed a moment ago and these mats' referees have not
+ * loaded their board since (MatSync); empty otherwise.
  */
 public record MatBoardResponse(
         UUID matId,
@@ -18,7 +19,8 @@ public record MatBoardResponse(
         UUID recommendedMatchId,
         boolean teamPool,
         UUID eventId,
-        List<MatChoice> mats) {
+        List<MatChoice> mats,
+        List<Integer> syncingMats) {
 
     /** The event's mats, for moving a match to another one: only those with a referee take it. */
     public record MatChoice(UUID id, int number, boolean hasReferee) {}

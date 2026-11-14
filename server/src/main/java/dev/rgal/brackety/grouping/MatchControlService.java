@@ -6,6 +6,7 @@ import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.event.Mat;
 import dev.rgal.brackety.event.MatRepository;
+import dev.rgal.brackety.event.MatSync;
 import dev.rgal.brackety.grouping.dto.DisabledMat;
 import java.time.Clock;
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ public class MatchControlService {
     private final Clock clock;
     private final MatPlanner planner;
     private final MatSchedule schedule;
+    private final MatSync matSync;
 
     MatchControlService(
             MatchRepository matches,
@@ -57,7 +59,9 @@ public class MatchControlService {
             JdbcClient jdbc,
             Clock clock,
             MatPlanner planner,
-            MatSchedule schedule) {
+            MatSchedule schedule,
+            MatSync matSync) {
+        this.matSync = matSync;
         this.matches = matches;
         this.groups = groups;
         this.mats = mats;
@@ -242,6 +246,7 @@ public class MatchControlService {
             throw EventException.conflict("NO_OTHER_MAT", "No other mat has a referee to take its matches.");
         }
         mat.disable();
+        matSync.changed(eventId);
         var moved = new HashSet<UUID>();
         // The chosen ones first, so the automatic ones count them on their new mats.
         var onMat = groups.findByMatIdOrderByNumber(matId).stream()

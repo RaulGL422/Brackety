@@ -30,6 +30,7 @@ public class EventService {
     private final AccountRepository accounts;
     private final StaffNames staffNames;
     private final EventAccess access;
+    private final MatSync matSync;
 
     EventService(
             EventRepository events,
@@ -39,7 +40,9 @@ public class EventService {
             EventOrganizationRepository organizations,
             AccountRepository accounts,
             EventAccess access,
-            StaffNames staffNames) {
+            StaffNames staffNames,
+            MatSync matSync) {
+        this.matSync = matSync;
         this.staffNames = staffNames;
         this.events = events;
         this.staff = staff;
@@ -128,6 +131,9 @@ public class EventService {
             throw EventException.conflict("The points limit cannot change once a match has started.");
         }
         var current = mats.findByEventIdOrderByNumber(eventId);
+        if (!current.stream().map(Mat::getRefereeAccountId).toList().equals(request.matReferees())) {
+            matSync.changed(eventId);
+        }
         var removed = current.size() > request.matReferees().size()
                 ? current.subList(request.matReferees().size(), current.size())
                 : List.<Mat>of();

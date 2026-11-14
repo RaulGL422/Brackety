@@ -9,6 +9,7 @@ import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.event.Mat;
 import dev.rgal.brackety.event.MatRepository;
+import dev.rgal.brackety.event.MatSync;
 import dev.rgal.brackety.event.StaffNames;
 import dev.rgal.brackety.grouping.dto.MatBoardResponse;
 import dev.rgal.brackety.grouping.dto.MatBoardResponse.BoardGroup;
@@ -42,6 +43,7 @@ class MatBoardService {
     private final MatSchedule schedule;
     private final Clock clock;
     private final StaffNames staffNames;
+    private final MatSync matSync;
 
     MatBoardService(
             MatRepository mats,
@@ -52,7 +54,9 @@ class MatBoardService {
             EventAccess access,
             MatSchedule schedule,
             Clock clock,
-            StaffNames staffNames) {
+            StaffNames staffNames,
+            MatSync matSync) {
+        this.matSync = matSync;
         this.mats = mats;
         this.members = members;
         this.floor = floor;
@@ -126,6 +130,9 @@ class MatBoardService {
         requireBoardAccess(mat, accountId);
         var event = events.get(mat.getEventId());
         var now = clock.instant();
+        if (accountId.equals(mat.getRefereeAccountId())) {
+            matSync.seen(matId);
+        }
 
         var floor = this.floor.load(event, now);
         var teamPool = floor.takesPool(matId);
@@ -191,7 +198,8 @@ class MatBoardService {
                 mat.getEventId(),
                 floor.mats().stream()
                         .map(x -> new MatChoice(x.getId(), x.getNumber(), x.getRefereeAccountId() != null))
-                        .toList());
+                        .toList(),
+                matSync.waitingFor(event.getId(), floor.mats()));
     }
 
     private static BoardMatch boardMatch(
