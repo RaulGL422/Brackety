@@ -62,6 +62,7 @@ Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, f
 ### Puntuación global
 - Alumno = 10 por asistir (estar en un grupo como real) + lo que marca en cada combate (gane o no, hasta el límite). Descalificado: 0 en ese combate y su rival el límite.
 - Fantasma: no suma en ese grupo; su rival sí.
+- Ficha del alumno (club, 2026-11-14): junto a los puntos, sus advertencias (y descalificaciones); al desplegar, cada una con combate, minuto, motivo y árbitro, y abre el combate. Solo las que siguen en pie (sin deshacer ni anteriores a una cancelación). Desde la fase, las de la fase; desde la liga, las de todas sus fases agrupadas (`GET /events/{id}/league/people/{personId}/record`; `incidents` en cada combate del record).
 
 ## Protecciones
 - Con grupos: no cambia la fecha del evento ni el nacimiento de un alumno agrupado (cambiarían categorías); no se quita un tapiz con grupos ni se borra un alumno agrupado (409).
