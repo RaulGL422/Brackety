@@ -2,9 +2,11 @@ package dev.rgal.brackety.admin;
 
 import dev.rgal.brackety.auth.admin.AdminAuditLog;
 import dev.rgal.brackety.grouping.MatchControlService;
+import dev.rgal.brackety.grouping.dto.ControlRequests.DisableMatRequest;
 import dev.rgal.brackety.grouping.dto.ControlRequests.MoveRequest;
 import dev.rgal.brackety.grouping.dto.ControlRequests.OrderRequest;
 import dev.rgal.brackety.grouping.dto.ControlRequests.TeamMoveRequest;
+import dev.rgal.brackety.grouping.dto.DisabledMat;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
@@ -55,6 +57,16 @@ class AdminControlController {
     void moveTeamMember(@PathVariable UUID eventId, @Valid @RequestBody TeamMoveRequest request) {
         control.moveTeamMember(eventId, request.participantId(), request.fromTeamId(), request.toTeamId(), null);
         audit.control(request.participantId(), "moved from team " + request.fromTeamId() + " to " + request.toTeamId());
+    }
+
+    @PostMapping("/mats/{matId}/disable")
+    DisabledMat disableMat(
+            @PathVariable UUID eventId,
+            @PathVariable UUID matId,
+            @Valid @RequestBody(required = false) DisableMatRequest request) {
+        var disabled = control.disableMat(eventId, matId, DisableMatRequest.chosen(request), null);
+        audit.control(matId, "mat out of use");
+        return disabled;
     }
 
     @PostMapping("/matches/{matchId}/waive-rest")

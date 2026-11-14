@@ -212,6 +212,42 @@ abstract class AppLocalizations {
   /// **'Esa persona ya lucha en el grupo del otro equipo (como comodín).'**
   String get controlSameFighter;
 
+  /// No description provided for @controlMatInReview.
+  ///
+  /// In es, this message translates to:
+  /// **'Un combate de este tapiz espera revisión: resuélvela antes.'**
+  String get controlMatInReview;
+
+  /// No description provided for @controlMatBusy.
+  ///
+  /// In es, this message translates to:
+  /// **'Hay un combate en curso en este tapiz: espera a que acabe.'**
+  String get controlMatBusy;
+
+  /// No description provided for @controlDisableMat.
+  ///
+  /// In es, this message translates to:
+  /// **'Inhabilitar tapiz'**
+  String get controlDisableMat;
+
+  /// No description provided for @controlDisableMatTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Inhabilitar el tapiz {number}?'**
+  String controlDisableMatTitle(int number);
+
+  /// No description provided for @controlDisableMatBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Elige a qué tapiz va cada grupo con combates pendientes (Automático: el que acabe antes). Los combates de equipos se reparten entre los demás tapices. Se queda sin árbitro: para volver a usarlo, asígnale uno en Configuración.'**
+  String get controlDisableMatBody;
+
+  /// No description provided for @controlMatDisabled.
+  ///
+  /// In es, this message translates to:
+  /// **'Tapiz inhabilitado: {groups, plural, =0{ningún grupo movido} =1{1 grupo movido} other{{groups} grupos movidos}}{pool, plural, =0{} =1{, 1 combate de equipos vuelve al bote} other{, {pool} combates de equipos vuelven al bote}}.'**
+  String controlMatDisabled(int groups, int pool);
+
   /// No description provided for @controlPickMat.
   ///
   /// In es, this message translates to:

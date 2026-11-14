@@ -182,6 +182,36 @@ abstract class AppLocalizations {
   /// **'Esa persona ya lucha en el grupo del otro equipo (como comodín).'**
   String get controlSameFighter;
 
+  /// No description provided for @controlMatInReview.
+  ///
+  /// In es, this message translates to:
+  /// **'Un combate de este tapiz espera revisión: resuélvela antes.'**
+  String get controlMatInReview;
+
+  /// No description provided for @controlDisableMat.
+  ///
+  /// In es, this message translates to:
+  /// **'Inhabilitar tapiz'**
+  String get controlDisableMat;
+
+  /// No description provided for @controlDisableMatTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Inhabilitar el tapiz {number}?'**
+  String controlDisableMatTitle(int number);
+
+  /// No description provided for @controlDisableMatBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Elige a qué tapiz va cada grupo con combates pendientes (Automático: el que acabe antes). Los combates de equipos se reparten entre los demás tapices. Se queda sin árbitro: para volver a usarlo, el club le asigna uno en Configuración.'**
+  String get controlDisableMatBody;
+
+  /// No description provided for @controlMatAutomatic.
+  ///
+  /// In es, this message translates to:
+  /// **'Automático'**
+  String get controlMatAutomatic;
+
   /// No description provided for @controlPickMat.
   ///
   /// In es, this message translates to:

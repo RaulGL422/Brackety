@@ -7,9 +7,12 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../support/fakes.dart';
 
 class FakeEventsApi implements EventsApi {
-  FakeEventsApi({this.total = 1, this.package});
+  FakeEventsApi({this.total = 1, this.package, this.secondReferee = false});
 
   final int total;
+
+  /// Mat 2 with a referee (by default it has none).
+  final bool secondReferee;
 
   /// The hall laptop's package; null on a server without one.
   final String? package;
@@ -107,7 +110,7 @@ class FakeEventsApi implements EventsApi {
           ),
         ],
       ),
-      const AdminMat(id: 'm2', number: 2),
+      AdminMat(id: 'm2', number: 2, referee: secondReferee ? 'arbitro2' : null),
     ],
     groups: groups,
   );
@@ -153,6 +156,13 @@ class FakeEventsApi implements EventsApi {
   @override
   Future<void> waiveRest(String eventId, String matchId) async =>
       calls.add('waiveRest $matchId');
+
+  @override
+  Future<void> disableMat(
+    String eventId,
+    String matId,
+    Map<String, String> groupMats,
+  ) async => calls.add('disableMat $matId $groupMats');
 
   @override
   Future<String?> resetPackage() async => package;
@@ -340,6 +350,33 @@ void main() {
     // Mat 2 has no referee and mat 1 is its own.
     expect(find.text('No other mat has a referee.'), findsOneWidget);
     expect(api.calls, isEmpty);
+  });
+
+  testWidgets('disabling a mat chooses where each of its groups goes', (
+    tester,
+  ) async {
+    useSize(tester, screenSizes['desktop']!);
+    final api = FakeEventsApi(secondReferee: true);
+    await pumpAdmin(
+      tester,
+      location: '/events',
+      overrides: [eventsApiProvider.overrideWithValue(api)],
+    );
+    await openDetail(tester);
+    await tester.tap(find.text('Mat 1: arbitro1'));
+    await tester.pumpAndSettle();
+
+    await tapText(tester, 'Disable mat');
+    expect(find.text('Disable mat 1?'), findsOneWidget);
+    // Only group 1 is on mat 1; it may go to mat 2, which has a referee.
+    await tester.tap(find.byType(DropdownButtonFormField<String?>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Mat 2: arbitro2').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Disable mat'));
+    await tester.pumpAndSettle();
+
+    expect(api.calls, ['disableMat m1 {g1: m2}']);
   });
 
   testWidgets('cancelling asks nothing of the server', (tester) async {

@@ -84,6 +84,17 @@ class MatBoardScreen extends ConsumerWidget {
             if (board.value?.eventId case final eventId?)
               RulebookButton(eventId: eventId, color: colors.onBand),
             if (queued) const SyncStatusIcon(),
+            if (readOnly)
+              if (board.value case final b?
+                  when b.eventId != null &&
+                      b.mats.any((m) => m.id == matId && m.hasReferee))
+                DisableMatButton(
+                  eventId: b.eventId!,
+                  matId: matId,
+                  board: b,
+                  color: colors.onBand,
+                  onChanged: () => ref.invalidate(provider),
+                ),
             if (toPlay != null && toPlay > 0)
               Padding(
                 padding: const EdgeInsets.only(right: AppSpacing.l),

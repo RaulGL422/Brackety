@@ -59,6 +59,25 @@ class AppLocalizationsEs extends AppLocalizations {
       'Esa persona ya lucha en el grupo del otro equipo (como comodín).';
 
   @override
+  String get controlMatInReview =>
+      'Un combate de este tapiz espera revisión: resuélvela antes.';
+
+  @override
+  String get controlDisableMat => 'Inhabilitar tapiz';
+
+  @override
+  String controlDisableMatTitle(int number) {
+    return '¿Inhabilitar el tapiz $number?';
+  }
+
+  @override
+  String get controlDisableMatBody =>
+      'Elige a qué tapiz va cada grupo con combates pendientes (Automático: el que acabe antes). Los combates de equipos se reparten entre los demás tapices. Se queda sin árbitro: para volver a usarlo, el club le asigna uno en Configuración.';
+
+  @override
+  String get controlMatAutomatic => 'Automático';
+
+  @override
   String get controlPickMat => '¿A qué tapiz?';
 
   @override

@@ -78,4 +78,5 @@ Las de octubre de 2026, en `decisiones-2026-10.md`.
 - 2026-11-13 · Reparto de equipos: siguen en el bote común, que ya equilibra (el tapiz libre coge el siguiente); no se pre-asignan por tapiz · Raul.
 - 2026-11-13 · Cada tapiz enseña su orden previsto (recalculado con cada cambio, sin guardar un orden fijo); club, superadmin y árbitros pueden mover un combate pendiente a otro tapiz, también los de equipos · Raul.
 - 2026-11-14 · Ficha del alumno abierta desde la liga: advertencias de todas las fases (coinciden con la cifra de la tabla); desde la fase, solo las de la fase · Claude, por defecto, pendiente de que Raul lo confirme.
+- 2026-11-14 · Inhabilitar tapiz = quitarle el árbitro tras repartir sus grupos individuales (destino elegido por grupo o Automático) y devolver al bote sus combates de equipos; sin estado nuevo en BD · Raul.
 - 2026-11-13 · F1 real: 3 tapices; 5-8 individual y siempre a dos manos (aviso de una mano ampliado a 4-8 años); 9-12, 13-16 y 17+ por equipos (2 o 3); cuentas del portátil con usuario = contraseña; botón del superadmin para reiniciar el evento desde el paquete · Raul.
