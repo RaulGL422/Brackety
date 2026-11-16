@@ -22,6 +22,7 @@ import dev.rgal.brackety.event.EventStaff;
 import dev.rgal.brackety.event.EventStaffRepository;
 import dev.rgal.brackety.event.Mat;
 import dev.rgal.brackety.event.MatRepository;
+import dev.rgal.brackety.event.Modality;
 import dev.rgal.brackety.event.RulebookService;
 import dev.rgal.brackety.event.StaffNames;
 import dev.rgal.brackety.eventpackage.EventPackage.Category;
@@ -270,15 +271,9 @@ public class EventPackageService {
                 settings.name().strip(),
                 settings.date(),
                 settings.maxGroupsPerMat(),
-                settings.matchSeconds(),
-                settings.pointsLimit(),
-                settings.changeoverSeconds(),
                 settings.attendancePoints(),
+                modality(settings),
                 clock.instant());
-        event.withTeamRules(
-                Objects.requireNonNullElse(settings.teamMatchSeconds(), event.getTeamMatchSeconds()),
-                Objects.requireNonNullElse(settings.teamPointsLimit(), event.getTeamPointsLimit()),
-                Objects.requireNonNullElse(settings.minRestSeconds(), event.getMinRestSeconds()));
         event.setOriginEventId(settings.originId());
         event = events.save(event);
         for (var member : p.staff()) {
@@ -619,14 +614,28 @@ public class EventPackageService {
                 event.getName(),
                 event.getEventDate(),
                 event.getMaxGroupsPerMat(),
-                event.getMatchSeconds(),
-                event.getPointsLimit(),
-                event.getChangeoverSeconds(),
+                event.modality().individual().matchSeconds(),
+                event.modality().individual().pointsLimit(),
+                event.modality().getChangeoverSeconds(),
                 event.getAttendancePoints(),
                 Objects.requireNonNullElse(event.getOriginEventId(), event.getId()),
-                event.getTeamMatchSeconds(),
-                event.getTeamPointsLimit(),
-                event.getMinRestSeconds());
+                event.modality().team().matchSeconds(),
+                event.modality().team().pointsLimit(),
+                event.modality().getMinRestSeconds());
+    }
+
+    /** Packages from before the team rules (schema 1 of the first F1 builds) take the tambo defaults. */
+    private static Modality modality(EventPackage.Settings settings) {
+        var defaults = Modality.tambo();
+        return Modality.of(
+                settings.matchSeconds(),
+                settings.pointsLimit(),
+                Objects.requireNonNullElse(
+                        settings.teamMatchSeconds(), defaults.team().matchSeconds()),
+                Objects.requireNonNullElse(
+                        settings.teamPointsLimit(), defaults.team().pointsLimit()),
+                Objects.requireNonNullElse(settings.minRestSeconds(), defaults.getMinRestSeconds()),
+                settings.changeoverSeconds());
     }
 
     private LeagueEntry league(Event event) {

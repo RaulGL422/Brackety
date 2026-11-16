@@ -44,8 +44,9 @@ class WildcardOverlapTest extends EventApiTest {
 
     @BeforeEach
     void teamsAndLooseOnes() throws Exception {
-        jdbc.sql("update event set match_seconds = ?, team_match_seconds = ?, min_rest_seconds = ?")
-                .params(INDIVIDUAL_SECONDS, TEAM_SECONDS, REST_SECONDS)
+        jdbc.sql("update modality set min_rest_seconds = ?").param(REST_SECONDS).update();
+        jdbc.sql("update modality_rules set match_seconds = case format when 'TEAM' then ? else ? end")
+                .params(TEAM_SECONDS, INDIVIDUAL_SECONDS)
                 .update();
         teens = new ArrayList<>();
         for (int i = 0; i < 24; i++) {
@@ -139,7 +140,7 @@ class WildcardOverlapTest extends EventApiTest {
      */
     @Test
     void aMatchOverItsTimeKeepsItsMatBusyInThePlannedQueues() throws Exception {
-        jdbc.sql("update event set changeover_seconds = 0").update();
+        jdbc.sql("update modality set changeover_seconds = 0").update();
         var first = createGroup(teamGroup(0, 1, 2, 18, 19, 20));
         createGroup(teamGroup(3, 4, 5, 21, 22, 23));
         start(matchOf(first, 0), "arbitro2").andExpect(status().isOk());

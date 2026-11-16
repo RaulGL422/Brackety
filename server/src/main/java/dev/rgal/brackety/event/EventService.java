@@ -114,19 +114,26 @@ public class EventService {
         if (!request.date().equals(event.getEventDate()) && events.hasGroupsOrTeams(eventId)) {
             throw EventException.conflict("The date cannot change once there are groups or teams.");
         }
-        var matchSeconds = request.matchSeconds() == null ? event.getMatchSeconds() : request.matchSeconds();
-        var pointsLimit = request.pointsLimit() == null ? event.getPointsLimit() : request.pointsLimit();
-        var teamMatchSeconds =
-                request.teamMatchSeconds() == null ? event.getTeamMatchSeconds() : request.teamMatchSeconds();
-        var teamPointsLimit =
-                request.teamPointsLimit() == null ? event.getTeamPointsLimit() : request.teamPointsLimit();
-        var minRestSeconds = request.minRestSeconds() == null ? event.getMinRestSeconds() : request.minRestSeconds();
-        if ((matchSeconds != event.getMatchSeconds() || teamMatchSeconds != event.getTeamMatchSeconds())
+        var modality = event.modality();
+        var individual = new Modality.FormatRules(
+                Objects.requireNonNullElse(
+                        request.matchSeconds(), modality.individual().matchSeconds()),
+                Objects.requireNonNullElse(
+                        request.pointsLimit(), modality.individual().pointsLimit()));
+        var team = new Modality.FormatRules(
+                Objects.requireNonNullElse(
+                        request.teamMatchSeconds(), modality.team().matchSeconds()),
+                Objects.requireNonNullElse(
+                        request.teamPointsLimit(), modality.team().pointsLimit()));
+        var minRestSeconds = Objects.requireNonNullElse(request.minRestSeconds(), modality.getMinRestSeconds());
+        if ((individual.matchSeconds() != modality.individual().matchSeconds()
+                        || team.matchSeconds() != modality.team().matchSeconds())
                 && events.hasMatchIn(eventId, "IN_PROGRESS")) {
             throw EventException.conflict("The match length cannot change while a match is in progress.");
         }
         // A disqualification scores the limit for the rival: started matches keep the one they had.
-        if ((pointsLimit != event.getPointsLimit() || teamPointsLimit != event.getTeamPointsLimit())
+        if ((individual.pointsLimit() != modality.individual().pointsLimit()
+                        || team.pointsLimit() != modality.team().pointsLimit())
                 && events.hasStartedMatches(eventId)) {
             throw EventException.conflict("The points limit cannot change once a match has started.");
         }
@@ -157,11 +164,9 @@ public class EventService {
                 request.name().strip(),
                 request.date(),
                 request.maxGroupsPerMat(),
-                matchSeconds,
-                pointsLimit,
                 attendancePoints,
-                teamMatchSeconds,
-                teamPointsLimit,
+                individual,
+                team,
                 minRestSeconds);
         for (int i = 0; i < request.matReferees().size(); i++) {
             var referee = request.matReferees().get(i);
@@ -197,8 +202,8 @@ public class EventService {
                 event.getName(),
                 event.getEventDate(),
                 event.getMaxGroupsPerMat(),
-                event.getMatchSeconds(),
-                event.getPointsLimit(),
+                event.modality().individual().matchSeconds(),
+                event.modality().individual().pointsLimit(),
                 mats.findByEventIdOrderByNumber(event.getId()).stream()
                         .map(m -> new MatSettings(m.getId(), m.getNumber(), m.getRefereeAccountId()))
                         .toList(),
@@ -211,9 +216,9 @@ public class EventService {
                 event.getAttendancePoints(),
                 event.getPhaseNumber(),
                 event.getDiscipline().name(),
-                event.getTeamMatchSeconds(),
-                event.getTeamPointsLimit(),
-                event.getMinRestSeconds());
+                event.modality().team().matchSeconds(),
+                event.modality().team().pointsLimit(),
+                event.modality().getMinRestSeconds());
     }
 
     private List<UUID> refereeIds(UUID eventId) {

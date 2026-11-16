@@ -61,8 +61,10 @@ class EventPackageServiceTest extends EventApiTest {
                     age == 13 ? teamCategory : null);
             participants.save(participant);
         }
-        jdbc.sql("update event set max_groups_per_mat = 2, match_seconds = 90, points_limit = 12,"
-                        + " changeover_seconds = 20, attendance_points = 5")
+        jdbc.sql("update event set max_groups_per_mat = 2, attendance_points = 5")
+                .update();
+        jdbc.sql("update modality set changeover_seconds = 20").update();
+        jdbc.sql("update modality_rules set match_seconds = 90, points_limit = 12 where format = 'INDIVIDUAL'")
                 .update();
         jdbc.sql("update mat set referee_account_id = null where number = 5").update();
     }

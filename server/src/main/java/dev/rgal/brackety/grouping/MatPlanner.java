@@ -57,7 +57,7 @@ public class MatPlanner {
 
     static Map<UUID, List<Planned>> simulate(Event event, MatFloor.Floor floor, Instant now) {
         var competitors = floor.competitors();
-        var changeover = Duration.ofSeconds(event.getChangeoverSeconds());
+        var changeover = Duration.ofSeconds(event.modality().getChangeoverSeconds());
         var start = floor.context();
         var lastFought = new HashMap<>(start.lastFought());
         var groupLastPlayed = new HashMap<>(start.groupLastPlayed());
@@ -80,7 +80,7 @@ public class MatPlanner {
         var pool = new ArrayList<Candidate>();
         for (var m : floor.matches()) {
             if (m.getStatus() == Match.Status.IN_PROGRESS) {
-                var length = Duration.ofSeconds(event.matchSecondsFor(m.isTeamMatch()));
+                var length = Duration.ofSeconds(event.modality().matchSeconds(m.isTeamMatch()));
                 // Over its time but not finished: its mat is still busy now, as the dispatch sees it (with no
                 // changeover, ending it "now" gave its mat a match while another mat was told to start that one).
                 var end = later(now.plus(m.clockLeft(now, length)), now.plusMillis(1));
@@ -151,7 +151,7 @@ public class MatPlanner {
                 individual.get(matId).remove(pick);
                 pool.remove(pick);
                 plan.get(matId).add(new Planned(pick.matchId(), at));
-                var length = Duration.ofSeconds(event.matchSecondsFor(teamMatches.contains(pick.matchId())));
+                var length = Duration.ofSeconds(event.modality().matchSeconds(teamMatches.contains(pick.matchId())));
                 running.add(new Running(matId, pick.groupId(), context.people(pick), at.plus(length)));
                 freeAt.put(matId, at.plus(length).plus(changeover));
             }

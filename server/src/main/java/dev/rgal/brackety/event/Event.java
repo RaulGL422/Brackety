@@ -1,16 +1,25 @@
 package dev.rgal.brackety.event;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import org.hibernate.annotations.BatchSize;
 
+/** Its match rules live in its modalities ({@link Modality}), never here. */
 @Entity
 public class Event {
 
@@ -28,16 +37,16 @@ public class Event {
     private String name;
     private LocalDate eventDate;
     private int maxGroupsPerMat;
-    private int matchSeconds;
-    private int pointsLimit;
-    private int teamMatchSeconds;
-    private int teamPointsLimit;
-    private int changeoverSeconds;
-    private int minRestSeconds;
     private int attendancePoints;
     private Instant createdAt;
     private UUID originEventId;
     private String resultsImportHash;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "event_id", nullable = false)
+    @OrderBy("position")
+    @BatchSize(size = 50)
+    private List<Modality> modalities = new ArrayList<>();
 
     protected Event() {}
 
@@ -49,10 +58,8 @@ public class Event {
             String name,
             LocalDate eventDate,
             int maxGroupsPerMat,
-            int matchSeconds,
-            int pointsLimit,
-            int changeoverSeconds,
             int attendancePoints,
+            Modality modality,
             Instant now) {
         this.ownerAccountId = ownerAccountId;
         this.leagueId = leagueId;
@@ -61,28 +68,17 @@ public class Event {
         this.name = name;
         this.eventDate = eventDate;
         this.maxGroupsPerMat = maxGroupsPerMat;
-        this.matchSeconds = matchSeconds;
-        this.pointsLimit = pointsLimit;
-        this.changeoverSeconds = changeoverSeconds;
         this.attendancePoints = attendancePoints;
-        this.teamMatchSeconds = DEFAULT_TEAM_MATCH_SECONDS;
-        this.minRestSeconds = DEFAULT_MIN_REST_SECONDS;
+        this.modalities.add(modality);
         this.createdAt = now;
     }
 
-    static final int DEFAULT_TEAM_MATCH_SECONDS = 180;
-    static final int DEFAULT_MIN_REST_SECONDS = 30;
-
-    /**
-     * Liga Yoseikan tambo, Fase 1 (Raul, 2026-11-13): individual 1 min and 15 points end it; teams 3 min with no
-     * points limit; 10 points for attending; 30 s of rest at least between two matches of a fighter. The club can
-     * change all of it in the settings.
-     */
+    /** Liga Yoseikan tambo, Fase 1: 10 points for attending; its match rules in {@link Modality#tambo()}. */
     public static Event tambo(UUID ownerAccountId, UUID leagueId, String name, LocalDate eventDate, Instant now) {
-        return new Event(ownerAccountId, leagueId, 1, Discipline.TAMBO, name, eventDate, 1, 60, 15, 30, 10, now);
+        return new Event(ownerAccountId, leagueId, 1, Discipline.TAMBO, name, eventDate, 1, 10, Modality.tambo(), now);
     }
 
-    /** The next phase of the same league, with this one's match settings. */
+    /** The next phase of the same league, with this one's match rules. */
     public Event nextPhase(
             int phaseNumber,
             Discipline discipline,
@@ -91,27 +87,16 @@ public class Event {
             int attendancePoints,
             Instant now) {
         return new Event(
-                        ownerAccountId,
-                        leagueId,
-                        phaseNumber,
-                        discipline,
-                        name,
-                        eventDate,
-                        maxGroupsPerMat,
-                        matchSeconds,
-                        pointsLimit,
-                        changeoverSeconds,
-                        attendancePoints,
-                        now)
-                .withTeamRules(teamMatchSeconds, teamPointsLimit, minRestSeconds);
-    }
-
-    /** {@code teamPointsLimit}: 0 = none. */
-    public Event withTeamRules(int teamMatchSeconds, int teamPointsLimit, int minRestSeconds) {
-        this.teamMatchSeconds = teamMatchSeconds;
-        this.teamPointsLimit = teamPointsLimit;
-        this.minRestSeconds = minRestSeconds;
-        return this;
+                ownerAccountId,
+                leagueId,
+                phaseNumber,
+                discipline,
+                name,
+                eventDate,
+                maxGroupsPerMat,
+                attendancePoints,
+                modality().copy(),
+                now);
     }
 
     public UUID getId() {
@@ -146,38 +131,9 @@ public class Event {
         return maxGroupsPerMat;
     }
 
-    public int getMatchSeconds() {
-        return matchSeconds;
-    }
-
-    public int getPointsLimit() {
-        return pointsLimit;
-    }
-
-    public int getTeamMatchSeconds() {
-        return teamMatchSeconds;
-    }
-
-    /** 0 = no limit. */
-    public int getTeamPointsLimit() {
-        return teamPointsLimit;
-    }
-
-    public int matchSecondsFor(boolean teams) {
-        return teams ? teamMatchSeconds : matchSeconds;
-    }
-
-    /** 0 = no limit. */
-    public int pointsLimitFor(boolean teams) {
-        return teams ? teamPointsLimit : pointsLimit;
-    }
-
-    public int getMinRestSeconds() {
-        return minRestSeconds;
-    }
-
-    public int getChangeoverSeconds() {
-        return changeoverSeconds;
+    /** Its only modality for now; the competition of 2026-12-20 will bring several. */
+    public Modality modality() {
+        return modalities.getFirst();
     }
 
     public int getAttendancePoints() {
@@ -209,18 +165,14 @@ public class Event {
             String name,
             LocalDate eventDate,
             int maxGroupsPerMat,
-            int matchSeconds,
-            int pointsLimit,
             int attendancePoints,
-            int teamMatchSeconds,
-            int teamPointsLimit,
+            Modality.FormatRules individual,
+            Modality.FormatRules team,
             int minRestSeconds) {
-        withTeamRules(teamMatchSeconds, teamPointsLimit, minRestSeconds);
         this.name = name;
         this.eventDate = eventDate;
         this.maxGroupsPerMat = maxGroupsPerMat;
-        this.matchSeconds = matchSeconds;
-        this.pointsLimit = pointsLimit;
         this.attendancePoints = attendancePoints;
+        modality().update(individual, team, minRestSeconds);
     }
 }

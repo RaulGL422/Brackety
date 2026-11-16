@@ -62,7 +62,7 @@ class MatSchedule {
     }
 
     private static MatState state(Event event, Mat mat, int groupCount, List<Match> onMat, Instant now) {
-        var match = Duration.ofSeconds(event.getMatchSeconds());
+        var match = Duration.ofSeconds(event.modality().matchSeconds(false));
         var pending = (int) onMat.stream()
                 .filter(m -> m.getStatus() == Match.Status.PENDING)
                 .count();
@@ -75,11 +75,12 @@ class MatSchedule {
                 .max(Comparator.naturalOrder());
         var remaining = MatEstimate.remaining(
                 pending,
-                current.map(m -> m.clockLeft(now, Duration.ofSeconds(event.matchSecondsFor(m.isTeamMatch()))))
+                current.map(m -> m.clockLeft(
+                                now, Duration.ofSeconds(event.modality().matchSeconds(m.isTeamMatch()))))
                         .orElse(null),
                 lastFinished.map(f -> Duration.between(f, now)).orElse(null),
                 match,
-                Duration.ofSeconds(event.getChangeoverSeconds()));
+                Duration.ofSeconds(event.modality().getChangeoverSeconds()));
         var inReview = (int) onMat.stream().filter(Match::isInReview).count();
         return new MatState(mat, groupCount, pending, current.isPresent(), inReview, remaining);
     }

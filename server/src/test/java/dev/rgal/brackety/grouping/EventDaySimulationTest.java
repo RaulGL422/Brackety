@@ -123,9 +123,12 @@ class EventDaySimulationTest extends EventApiTest {
             this.refereed = refereed;
             this.mixed = mixed;
             jdbc.sql("delete from mat where number > 3").update();
-            jdbc.sql("update event set match_seconds = 60, team_match_seconds = 180, team_points_limit = 0,"
-                            + " min_rest_seconds = ?, changeover_seconds = 0")
+            jdbc.sql("update modality set min_rest_seconds = ?, changeover_seconds = 0")
                     .param(MIN_REST_SECONDS)
+                    .update();
+            jdbc.sql("update modality_rules set match_seconds = 60 where format = 'INDIVIDUAL'")
+                    .update();
+            jdbc.sql("update modality_rules set match_seconds = 180, points_limit = 0 where format = 'TEAM'")
                     .update();
             kids = people(28, 7);
             teens = people(30, 15);
