@@ -146,7 +146,7 @@ public class EventPackageService {
     }
 
     /** "Liga Yoseikan · Fase 1" → "liga-yoseikan-fase-1". */
-    static String slug(String name) {
+    public static String slug(String name) {
         var slug = Normalizer.normalize(name, Normalizer.Form.NFD)
                 .replaceAll("\\p{M}", "")
                 .toLowerCase(Locale.ROOT)

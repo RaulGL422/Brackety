@@ -63,6 +63,7 @@ Estados: pendiente · en curso · en pruebas · cerrado.
 | F1: inhabilitar tapiz (pedido de Raul, 2026-11-14) | modulos/prototipo-f1.md | fusionado (#97, 2026-11-14): botón en el tablero del club y en el superadmin, destino por grupo o Automático, equipos al bote; falta prueba manual de Raul | – |
 | F1-1: inhabilitar tapiz visible y con estado (fallo de la F1) | modulos/prototipo-f1.md | en pruebas: estado guardado en el tapiz, «Inhabilitar» y «Reactivar» en la pestaña Tapices del club y en el superadmin; tests de servidor, app y admin; falta prueba manual de Raul (2026-11-16) | fix/proto-f1-disable-mat |
 | marcador web: doble pulsación (pedido de Raul) | modulos/offline.md | cerrado: `knownEvents` obligatorio, 409 `MATCH_STALE` en la web, envío de una en una; probado a mano por Raul con dos pestañas (#59, 2026-11-09) | – |
+| CSV de clasificación por categoría (petición urgente de la entidad, 2026-11-16) | producto/feedback-f1.md | en pruebas: un CSV por categoría en .zip (pestaña de liga, solo web) y en la exportación completa; falta la prueba a mano de Raul (2026-11-16) | feat/ranking-category-csv |
 
 ## Hasta la Fase 1 (14-11)
 Orden acordado con Raul el 2026-11-04 (una PR abierta cada vez):
