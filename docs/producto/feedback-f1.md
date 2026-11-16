@@ -13,6 +13,7 @@ Fuente: Raul, 2026-11-16. Las tareas salen de aquí hacia `roadmap.md`.
 - Causa probable: la decisión del 2026-11-14 lo hizo sin estado en BD (inhabilitar = quitar árbitro). El tapiz no se ve "inhabilitado" y la acción queda escondida o se confunde con quitar al árbitro.
 - Propuesta: estado visible del tapiz (Activo / Inhabilitado), acción "Inhabilitar tapiz" en el menú del propio tapiz y "Reactivar". El tablero lo enseña atenuado con su motivo.
 - Aceptación: desde el tablero del club, en móvil y escritorio, se inhabilita un tapiz en 2 toques o menos, sus grupos se reparten y el tapiz sale marcado como inhabilitado.
+- Hecho (2026-11-16): el botón solo estaba como icono en la barra del tablero de cada tapiz. Ahora está a la vista en cada tarjeta de Tapices, el tapiz guarda su estado y «Reactivar tapiz» le devuelve su árbitro (`modulos/prototipo-f1.md`).
 
 ### F1-2 · Comodín elegido antes que un equipo normal se guardaba como normal
 - Gravedad **crítica**: cambia quién puntúa. Hubo que apañarlo in situ.
