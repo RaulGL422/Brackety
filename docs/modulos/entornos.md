@@ -12,7 +12,7 @@
 - Las cuentas genéricas (`club1`, `arbitro1`…) y `DEMO_ACCOUNTS_ENABLED` solo existen en debug.
 - Emails de debug: solo al log, o a una lista blanca de direcciones de Raul.
 
-## URLs (propuesta, un nivel de subdominio por el SSL gratuito de Cloudflare)
+## URLs (aprobadas por Raul el 2026-11-16; un nivel de subdominio por el SSL gratuito de Cloudflare)
 | Entorno | Web | API | Admin |
 |---|---|---|---|
 | Producción | `brackety.rgal.dev` | `brackety-api.rgal.dev` | `brackety-admin.rgal.dev` |

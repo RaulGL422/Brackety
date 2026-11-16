@@ -32,13 +32,15 @@ Línea de infraestructura; puede ir en paralelo con la etapa 2 (otro worktree).
 9. Release `vX.Y.Z` con la batería completa.
 
 ## Después · Etapa 2: arreglos de la F1 (antes de la F2)
-1. F1-2 Comodín guardado como normal (crítico) + revisión de los datos de la F1.
+1. F1-2 Comodín guardado como normal (crítico): arreglado en la app (2026-11-16); falta revisar los datos de la F1 en la Pi.
 2. F1-1 Inhabilitar tapiz visible y con estado.
 3. F1-3 Puntos fuera de tiempo.
 4. F1-4 Motivos de advertencia predefinidos y "Otro".
 5. F1-5 Cuentas propias: invitaciones del club a árbitros y ayudantes (adelanto de `ayudantes-permisos`); retirar `staffNames`.
 6. F2-1 Peso de los alumnos.
-7. F2-2 Edades mezcladas dentro de una categoría, ordenadas y distinguidas.
+7. F2-2 Edades mezcladas dentro de una categoría, divididas en la pantalla de crear grupos.
+8. F2-3 CSV de resultados claro en Excel.
+9. F2-4 Clasificaciones configurables (global opcional; por peso, sexo, categoría…).
 
 ## Después · Etapa 2b: competición del 2026-12-20 (`competicion-2026-12-20.md`)
 - Torneo con grupos de 4 y 3 modalidades seguidas. Diseño en cuanto lleguen los detalles; prueba in situ hacia el 13-12.

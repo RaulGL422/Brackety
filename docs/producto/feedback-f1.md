@@ -42,16 +42,24 @@ Fuente: Raul, 2026-11-16. Las tareas salen de aquí hacia `roadmap.md`.
 - La configuración y gran parte de la interfaz del evento no se entienden a la primera. Plan en `eventos-ux.md`.
 
 ## Peticiones para la F2 (2026-11-16)
-### F2-1 · Peso
-- Registrar el peso de cada alumno en la F2.
-- Ya previsto en `modulos/eventos.md` (pesaje desactivado / opcional / recomendado / obligatorio): se adelanta la versión mínima.
-- Propuesta: modo de pesaje en la fase; peso en kg con un decimal en inscripción, importación y ficha; el ayudante lo apunta o corrige el día del evento. Se ve al crear grupos.
-- Datos de menores: solo lo ven el club y los ayudantes, nunca en público ni en el CSV público.
+### F2-1 · Peso y estatura (respuestas de Raul, 2026-11-16)
+- Se pesa **el mismo día**, pero queda guardado en la inscripción y en la ficha global del alumno. Igual con la estatura, relacionada con cada evento.
+- Cada dato (peso, estatura…) se configura en la **plantilla del deporte** y en el **propio evento**: desactivado, opcional u obligatorio (`modulos/eventos.md`).
+- Obligatorio: no se puede meter al alumno en un grupo ni en las llaves sin el dato.
+- No obligatorio: al crear el grupo se avisa al lado de quién no lo ha declarado ("sin peso", "sin estatura").
+- Peso en kg con un decimal; el ayudante lo apunta o corrige el día. Datos de menores: solo club y ayudantes, nunca en público.
 
 ### F2-2 · Edades mezcladas dentro de una categoría
 - Una categoría puede juntar varias edades, pero cada alumno debe salir **distinguido por su edad**.
-- Propuesta: al crear grupos, alumnos ordenados y agrupados por edad, con la edad bien visible (columna o chip). Edad también en el tablero, el marcador y la clasificación.
-- Opcional: tramos de edad dentro de la categoría que solo ordenan y sugieren grupos, sin partir la clasificación.
+- Alcance (Raul, 2026-11-16): **la pantalla de crear grupos**. Se reorganiza para sacar esa división por edad llegado el momento (alumnos agrupados por edad, la edad bien visible).
+- Encaja con la reordenación de esa pantalla de `calidad.md` y `eventos-ux.md`.
+
+### F2-3 · CSV de resultados confuso
+- Abierto en Excel, la entidad de la liga no entiende bien los puestos (1.º, 2.º, 3.º). Rehacer todo el CSV para que se lea claro: una hoja o bloque por categoría, columnas con nombre y sin datos mezclados en una celda.
+
+### F2-4 · Clasificaciones configurables
+- La clasificación global debe ser una opción: en esta liga no sirve.
+- Según el deporte, se clasifica por peso, sexo, categoría, edad…: criterios de la plantilla de deporte, ajustables en el evento (`modulos/ranking.md`, `modulos/puntuacion.md`).
 
 ## Qué mantener
 - Probar in situ con el staff real antes del evento: destapó lo importante.
