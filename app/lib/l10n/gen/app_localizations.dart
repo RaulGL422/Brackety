@@ -1874,6 +1874,48 @@ abstract class AppLocalizations {
   /// **'Entre 50 y 250 cm'**
   String get heightInvalid;
 
+  /// No description provided for @sexLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Sexo'**
+  String get sexLabel;
+
+  /// No description provided for @sexFemale.
+  ///
+  /// In es, this message translates to:
+  /// **'Mujer'**
+  String get sexFemale;
+
+  /// No description provided for @sexMale.
+  ///
+  /// In es, this message translates to:
+  /// **'Hombre'**
+  String get sexMale;
+
+  /// No description provided for @sexUnknown.
+  ///
+  /// In es, this message translates to:
+  /// **'sexo sin declarar'**
+  String get sexUnknown;
+
+  /// No description provided for @weightOptional.
+  ///
+  /// In es, this message translates to:
+  /// **'Peso en kg (opcional)'**
+  String get weightOptional;
+
+  /// No description provided for @weightInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'Entre 10 y 250 kg, con un decimal como mucho'**
+  String get weightInvalid;
+
+  /// No description provided for @weightKg.
+  ///
+  /// In es, this message translates to:
+  /// **'{kg} kg'**
+  String weightKg(String kg);
+
   /// No description provided for @guardianConsent.
   ///
   /// In es, this message translates to:
@@ -2898,6 +2940,24 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'la estatura'**
   String get fieldHeight;
+
+  /// No description provided for @fieldSex.
+  ///
+  /// In es, this message translates to:
+  /// **'el sexo'**
+  String get fieldSex;
+
+  /// No description provided for @fieldWeight.
+  ///
+  /// In es, this message translates to:
+  /// **'el peso'**
+  String get fieldWeight;
+
+  /// No description provided for @issueWeight.
+  ///
+  /// In es, this message translates to:
+  /// **'Peso {kg}: tiene que estar entre 10 y 250 kg, con un decimal como mucho'**
+  String issueWeight(String kg);
 
   /// No description provided for @fieldCategory.
   ///

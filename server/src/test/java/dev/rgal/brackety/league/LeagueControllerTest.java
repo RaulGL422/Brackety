@@ -225,7 +225,7 @@ class LeagueControllerTest extends EventApiTest {
 
     private static String ana(String lastName, String birthDate) {
         return """
-                {"firstName":"Ana","lastName":"%s","birthDate":"%s","heightCm":130,"guardianConsent":true}""".formatted(lastName, birthDate);
+                {"firstName":"Ana","lastName":"%s","birthDate":"%s","sex":"FEMALE","heightCm":130,"guardianConsent":true}""".formatted(lastName, birthDate);
     }
 
     @Test

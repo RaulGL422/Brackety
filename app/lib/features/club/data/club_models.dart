@@ -1,4 +1,5 @@
 import '../../mat/data/mat_board.dart';
+import 'sex.dart';
 
 /// A helper or referee account of the event; [personName]: who is behind it, set by the club.
 class StaffMember {
@@ -185,7 +186,9 @@ class Participant {
     required this.birthDate,
     required this.guardianConsent,
     required this.age,
+    this.sex,
     this.heightCm,
+    this.weightKg,
     this.categoryName,
     this.chosenCategoryId,
     this.organizationId,
@@ -199,7 +202,9 @@ class Participant {
     birthDate: DateTime.parse(json['birthDate'] as String),
     guardianConsent: json['guardianConsent'] as bool,
     age: json['age'] as int,
+    sex: Sex.fromJson(json['sex']),
     heightCm: json['heightCm'] as int?,
+    weightKg: (json['weightKg'] as num?)?.toDouble(),
     categoryName: json['categoryName'] as String?,
     chosenCategoryId: json['chosenCategoryId'] as String?,
     organizationId: json['organizationId'] as String?,
@@ -214,7 +219,13 @@ class Participant {
 
   /// Age on the day of the event.
   final int age;
+
+  /// Null only for people entered before it was asked.
+  final Sex? sex;
+
+  /// Measured for this event.
   final int? heightCm;
+  final double? weightKg;
 
   /// Null when no category of the event covers the age.
   final String? categoryName;

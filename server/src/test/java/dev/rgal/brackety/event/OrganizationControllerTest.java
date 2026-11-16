@@ -73,7 +73,7 @@ class OrganizationControllerTest extends EventApiTest {
 
     private static String participant(String organizationId) {
         return """
-                {"firstName":"Ana","lastName":"Ruiz","birthDate":"1990-05-20","heightCm":165,
+                {"firstName":"Ana","lastName":"Ruiz","birthDate":"1990-05-20","sex":"FEMALE","heightCm":165,
                  "guardianConsent":false,"categoryId":null,"organizationId":"%s"}""".formatted(organizationId);
     }
 

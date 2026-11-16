@@ -12,6 +12,7 @@ public record RowIssue(String field, Code code, String detail) {
         INVALID_DATE,
         FUTURE_DATE,
         HEIGHT_OUT_OF_RANGE,
+        WEIGHT_OUT_OF_RANGE,
         NO_CATEGORY,
         UNKNOWN_CATEGORY,
         CATEGORY_MISMATCH,

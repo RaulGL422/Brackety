@@ -11,6 +11,7 @@ import static dev.rgal.brackety.participant.importing.dto.RowIssue.Code.NO_CATEG
 import static dev.rgal.brackety.participant.importing.dto.RowIssue.Code.TOO_LONG;
 import static dev.rgal.brackety.participant.importing.dto.RowIssue.Code.UNKNOWN_CATEGORY;
 import static dev.rgal.brackety.participant.importing.dto.RowIssue.Code.UNSURE;
+import static dev.rgal.brackety.participant.importing.dto.RowIssue.Code.WEIGHT_OUT_OF_RANGE;
 
 import dev.rgal.brackety.event.Event;
 import dev.rgal.brackety.event.EventCategory;
@@ -18,6 +19,7 @@ import dev.rgal.brackety.participant.Participant;
 import dev.rgal.brackety.participant.importing.dto.CheckedRow;
 import dev.rgal.brackety.participant.importing.dto.ImportRow;
 import dev.rgal.brackety.participant.importing.dto.RowIssue;
+import java.math.BigDecimal;
 import java.text.Normalizer;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -36,6 +38,8 @@ final class ImportValidator {
     static final int MAX_LAST_NAME = 80;
     static final int MIN_HEIGHT = 50;
     static final int MAX_HEIGHT = 250;
+    static final BigDecimal MIN_WEIGHT = new BigDecimal("10");
+    static final BigDecimal MAX_WEIGHT = new BigDecimal("250");
 
     private ImportValidator() {}
 
@@ -63,6 +67,16 @@ final class ImportValidator {
             if (row.heightCm() != null && (row.heightCm() < MIN_HEIGHT || row.heightCm() > MAX_HEIGHT)) {
                 errors.add(new RowIssue(
                         "heightCm", HEIGHT_OUT_OF_RANGE, row.heightCm().toString()));
+            }
+            if (row.sex() == null) {
+                errors.add(RowIssue.of("sex", MISSING));
+            }
+            if (row.weightKg() != null
+                    && (row.weightKg().compareTo(MIN_WEIGHT) < 0
+                            || row.weightKg().compareTo(MAX_WEIGHT) > 0
+                            || row.weightKg().scale() > 1)) {
+                errors.add(new RowIssue(
+                        "weightKg", WEIGHT_OUT_OF_RANGE, row.weightKg().toPlainString()));
             }
             Integer age = date == null ? null : event.ageOf(date);
             var byAge = age == null ? Optional.<EventCategory>empty() : byAge(categories, age);

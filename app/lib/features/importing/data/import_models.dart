@@ -1,5 +1,7 @@
 import 'package:intl/intl.dart';
 
+import '../../club/data/sex.dart';
+
 final _day = DateFormat('yyyy-MM-dd');
 
 /// One participant of a list, as read and then edited by the club. The server checks it.
@@ -9,7 +11,9 @@ class ImportRow {
     this.lastName,
     this.birthDate,
     this.birthDateText,
+    this.sex,
     this.heightCm,
+    this.weightKg,
     this.categoryText,
     this.categoryId,
     this.unsure = const [],
@@ -22,7 +26,9 @@ class ImportRow {
         ? null
         : DateTime.parse(json['birthDate'] as String),
     birthDateText: json['birthDateText'] as String?,
+    sex: Sex.fromJson(json['sex']),
     heightCm: json['heightCm'] as int?,
+    weightKg: (json['weightKg'] as num?)?.toDouble(),
     categoryText: json['categoryText'] as String?,
     categoryId: json['categoryId'] as String?,
     unsure: [for (final u in json['unsure'] as List? ?? []) u as String],
@@ -34,7 +40,11 @@ class ImportRow {
 
   /// The date as written, kept when it is not a real date.
   final String? birthDateText;
+
+  /// Required to register them; a list may not say it.
+  final Sex? sex;
   final int? heightCm;
+  final double? weightKg;
 
   /// The category as written in the list.
   final String? categoryText;
@@ -52,7 +62,9 @@ class ImportRow {
     'lastName': lastName,
     'birthDate': birthDate == null ? null : _day.format(birthDate!),
     'birthDateText': birthDateText,
+    'sex': sex?.toJson(),
     'heightCm': heightCm,
+    'weightKg': weightKg,
     'categoryText': categoryText,
     'categoryId': categoryId,
     'unsure': unsure,
@@ -63,13 +75,17 @@ class ImportRow {
     required String firstName,
     required String lastName,
     required DateTime? birthDate,
+    required Sex? sex,
     required int? heightCm,
+    required double? weightKg,
   }) => ImportRow(
     firstName: firstName,
     lastName: lastName,
     birthDate: birthDate,
     birthDateText: birthDate == null ? birthDateText : null,
+    sex: sex,
     heightCm: heightCm,
+    weightKg: weightKg,
     categoryText: categoryText,
     categoryId: categoryId,
   );
@@ -80,7 +96,9 @@ class ImportRow {
     lastName: lastName,
     birthDate: birthDate,
     birthDateText: birthDateText,
+    sex: sex,
     heightCm: heightCm,
+    weightKg: weightKg,
     categoryId: id,
     unsure: [
       for (final u in unsure)
@@ -95,6 +113,7 @@ enum IssueCode {
   invalidDate,
   futureDate,
   heightOutOfRange,
+  weightOutOfRange,
   noCategory,
   unknownCategory,
   categoryMismatch,
@@ -114,6 +133,7 @@ class RowIssue {
       'INVALID_DATE' => IssueCode.invalidDate,
       'FUTURE_DATE' => IssueCode.futureDate,
       'HEIGHT_OUT_OF_RANGE' => IssueCode.heightOutOfRange,
+      'WEIGHT_OUT_OF_RANGE' => IssueCode.weightOutOfRange,
       'NO_CATEGORY' => IssueCode.noCategory,
       'UNKNOWN_CATEGORY' => IssueCode.unknownCategory,
       'CATEGORY_MISMATCH' => IssueCode.categoryMismatch,
@@ -124,7 +144,7 @@ class RowIssue {
     detail: json['detail'] as String?,
   );
 
-  /// firstName, lastName, birthDate, heightCm or category.
+  /// firstName, lastName, birthDate, sex, heightCm, weightKg or category.
   final String field;
   final IssueCode code;
   final String? detail;

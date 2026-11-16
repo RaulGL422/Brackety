@@ -1,5 +1,6 @@
 package dev.rgal.brackety.participant.importing;
 
+import dev.rgal.brackety.participant.Sex;
 import dev.rgal.brackety.participant.importing.dto.ImportRow;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -46,7 +47,10 @@ class ClaudeListReader implements ListReader {
             Una fila por alumno, en el orden de la lista. firstName: nombre; lastName: apellidos. \
             birthDate: fecha de nacimiento en formato AAAA-MM-DD, leyendo las fechas como día/mes/año; \
             null si falta o no es una fecha real. birthDateText: la fecha tal como está escrita, o null. \
-            heightCm: estatura en centímetros (convierte metros), o null. category: la categoría si \
+            sex: FEMALE o MALE solo si la lista lo dice (columna de sexo o género, M/F, H/M, chico/chica…); \
+            null si no lo dice: nunca lo deduzcas del nombre. \
+            heightCm: estatura en centímetros (convierte metros), o null. \
+            weightKg: peso en kilos con un decimal como mucho (convierte gramos), o null. category: la categoría si \
             está escrita, tal cual, o null. unsure: los campos que no has podido leer con seguridad. \
             No inventes datos ni corrijas fechas. Si la lista tiene varias partes, júntalas. \
             Si un alumno aparece repetido, incluye cada aparición: no las juntes ni quites ninguna. \
@@ -55,11 +59,12 @@ class ClaudeListReader implements ListReader {
     private static final String SCHEMA = """
             {"type":"object","additionalProperties":false,"required":["rows"],"properties":{"rows":{"type":"array",\
             "items":{"type":"object","additionalProperties":false,"required":["firstName","lastName","birthDate",\
-            "birthDateText","heightCm","category","unsure"],"properties":{"firstName":{"type":"string"},\
+            "birthDateText","sex","heightCm","weightKg","category","unsure"],"properties":{"firstName":{"type":"string"},\
             "lastName":{"type":"string"},"birthDate":{"type":["string","null"]},\
-            "birthDateText":{"type":["string","null"]},"heightCm":{"type":["integer","null"]},\
+            "birthDateText":{"type":["string","null"]},"sex":{"type":["string","null"],"enum":["FEMALE","MALE",null]},\
+            "heightCm":{"type":["integer","null"]},"weightKg":{"type":["number","null"]},\
             "category":{"type":["string","null"]},"unsure":{"type":"array","items":{"type":"string",\
-            "enum":["firstName","lastName","birthDate","heightCm","category"]}}}}}}}""";
+            "enum":["firstName","lastName","birthDate","sex","heightCm","weightKg","category"]}}}}}}}""";
 
     private final JsonMapper json;
     private final String claudePath;
@@ -158,10 +163,16 @@ class ClaudeListReader implements ListReader {
                 text(r, "lastName"),
                 date(text(r, "birthDate")),
                 text(r, "birthDateText"),
+                sex(text(r, "sex")),
                 r.path("heightCm").isInt() ? r.path("heightCm").asInt() : null,
+                r.path("weightKg").isNumber() ? r.path("weightKg").decimalValue() : null,
                 text(r, "category"),
                 null,
                 unsure);
+    }
+
+    private static Sex sex(String text) {
+        return "FEMALE".equals(text) ? Sex.FEMALE : "MALE".equals(text) ? Sex.MALE : null;
     }
 
     private static String text(JsonNode r, String field) {
