@@ -11,7 +11,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get draftGhostTeamPanelHint =>
-      'Wildcard teams (up to 3): tap a team of another group in the list, or make one with loose participants. They fight but do not score.';
+      'Up to 3 wildcard teams: they fight but do not score. A team of another group always is.';
 
   @override
   String get teamJoinsAsWildcard => 'Tap to join as a wildcard team';
@@ -572,7 +572,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get draftGhostHint =>
-      'Wildcards (up to 3): anyone already in a group, or your 4th pick. They fight but do not score.';
+      'Up to 3 wildcards: they fight but do not score. Anyone already in a group and the 4th pick always are.';
+
+  @override
+  String get draftAddAs => 'Add as';
+
+  @override
+  String get draftAddAsReal => 'Normal';
+
+  @override
+  String get draftAddAsGhost => 'Wildcard';
 
   @override
   String createGroup(int count) {

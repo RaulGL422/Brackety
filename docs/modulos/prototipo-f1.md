@@ -28,7 +28,7 @@ Fuera de alcance: offline, WebSocket (se usa sondeo), QR, invitaciones, pagos, f
 - Alumno ya agrupado: fila deshabilitada, no desaparece.
 - Deshacer grupo (2026-11-11): desde el aviso tras crearlo o con el icono en un alumno o equipo agrupado, con confirmación, mientras ningún combate suyo haya empezado (`DELETE /events/{id}/groups/{groupId}`, ayudante o club; después 409 y solo el superadmin).
 - **Comodín** (antes "fantasma", 2026-11-13): casilla en el grupo; con 3 seleccionados se habilitan todos los de la categoría (también los ya agrupados, salvo los del mismo grupo) y se elige 1 comodín. El comodín combate pero no puntúa; mesa gestiona sus cruces.
-- Grupo = 4 en total, de 1 a 4 reales y hasta 3 fantasmas (pedido de Raul, 2026-11-12). Con la casilla marcada, quien ya tiene grupo entra como fantasma, y también el 4.º elegido.
+- Grupo = 4 en total, de 1 a 4 reales y hasta 3 fantasmas (pedido de Raul, 2026-11-12). Con la casilla marcada, quien ya tiene grupo entra como fantasma, y también el 4.º elegido. Además, «Añadir como: Normal | Comodín» elige el papel del siguiente toque, en cualquier orden (F1-2, 2026-11-16: un comodín elegido primero se guardaba como normal); con 3 reales o 3 comodines el papel del 4.º queda fijo.
 
 ### Fin estimado de un tapiz
 - Restante = reloj del combate en curso + pendientes × (duración + 30 s); sin combate en curso, solo lo que quede de los 30 s tras el último.

@@ -39,7 +39,7 @@ Que cualquier pantalla o servicio se entienda sin haberlo escrito. El prototipo 
 - Filtros por ruta: `server/**` → server; `app/**` o `packages/**` → app; `admin/**` o `packages/**` → admin.
 - Un trabajo final `ci-ok` que resume a los demás: los saltados cuentan como verdes, así la protección de rama sigue pidiendo un solo check.
 - En PRs hacia `main` (releases) no hay filtros: corre todo, más los E2E.
-- E2E (pendiente de crear): login, inscripción, marcador con y sin red, sincronización.
+- E2E con **Playwright** sobre la web (Raul, 2026-11-16): login, inscripción, crear grupo, marcador con y sin red, sincronización. Usan el árbol de semántica de Flutter web (`08-ejecucion-local.md`) y corren solo en la batería completa de cada release, no en cada PR.
 
 ## Estado
 Pendiente (2026-11-16). Tareas en `roadmap.md`, etapa 3.
