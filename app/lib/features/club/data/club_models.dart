@@ -289,6 +289,8 @@ class MatOverview {
     required this.estimatedEnd,
     this.referee,
     this.matchesInReview = 0,
+    this.disabledAt,
+    this.disabledReferee,
   });
 
   factory MatOverview.fromJson(Map<String, dynamic> json) => MatOverview(
@@ -301,6 +303,11 @@ class MatOverview {
     remaining: Duration(seconds: json['remainingSeconds'] as int),
     estimatedEnd: DateTime.parse(json['estimatedEnd'] as String).toLocal(),
     matchesInReview: json['matchesInReview'] as int? ?? 0,
+    disabledAt: switch (json['disabledAt']) {
+      final String at => DateTime.parse(at).toLocal(),
+      _ => null,
+    },
+    disabledReferee: json['disabledReferee'] as String?,
   );
 
   final String id;
@@ -314,6 +321,14 @@ class MatOverview {
 
   /// Matches waiting for the club to apply or discard what a phone sent.
   final int matchesInReview;
+
+  /// Out of use since then (F1-1); null while in use.
+  final DateTime? disabledAt;
+
+  /// The referee it had, who gets it back on enabling it.
+  final String? disabledReferee;
+
+  bool get isDisabled => disabledAt != null;
 }
 
 /// What importing the hall's results brings. [alreadyImported]: the same results came before, nothing changes.

@@ -217,7 +217,7 @@ class AdminEventService {
             }
         }
         return jdbc.sql("""
-                        select m.id, m.number, m.referee_account_id from mat m
+                        select m.id, m.number, m.referee_account_id, m.disabled_at from mat m
                         where m.event_id = :eventId order by m.number""")
                 .param("eventId", eventId)
                 .query((rs, n) -> {
@@ -236,7 +236,12 @@ class AdminEventService {
                             })
                             .toList();
                     var referee = rs.getObject("referee_account_id", UUID.class);
-                    return new Mat(id, rs.getInt("number"), referee == null ? null : labels.get(referee), planned);
+                    return new Mat(
+                            id,
+                            rs.getInt("number"),
+                            referee == null ? null : labels.get(referee),
+                            rs.getObject("disabled_at") != null,
+                            planned);
                 })
                 .list();
     }

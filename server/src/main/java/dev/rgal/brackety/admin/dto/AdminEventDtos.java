@@ -53,7 +53,7 @@ public final class AdminEventDtos {
      * {@code plan}: its
      * pending matches in the order the referee would be offered them if everything goes as planned.
      */
-    public record Mat(UUID id, int number, String referee, List<PlannedMatch> plan) {}
+    public record Mat(UUID id, int number, String referee, boolean disabled, List<PlannedMatch> plan) {}
 
     /** {@code startsAt}: estimated, with every match at its full time plus the changeover. */
     public record PlannedMatch(UUID matchId, int groupNumber, String category, Instant startsAt, Side red, Side blue) {}

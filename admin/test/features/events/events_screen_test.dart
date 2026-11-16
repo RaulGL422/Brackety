@@ -7,12 +7,20 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../support/fakes.dart';
 
 class FakeEventsApi implements EventsApi {
-  FakeEventsApi({this.total = 1, this.package, this.secondReferee = false});
+  FakeEventsApi({
+    this.total = 1,
+    this.package,
+    this.secondReferee = false,
+    this.secondDisabled = false,
+  });
 
   final int total;
 
   /// Mat 2 with a referee (by default it has none).
   final bool secondReferee;
+
+  /// Mat 2 out of use.
+  final bool secondDisabled;
 
   /// The hall laptop's package; null on a server without one.
   final String? package;
@@ -111,7 +119,12 @@ class FakeEventsApi implements EventsApi {
           ),
         ],
       ),
-      AdminMat(id: 'm2', number: 2, referee: secondReferee ? 'arbitro2' : null),
+      AdminMat(
+        id: 'm2',
+        number: 2,
+        referee: secondReferee ? 'arbitro2' : null,
+        disabled: secondDisabled,
+      ),
     ],
     groups: groups,
     teams: teams,
@@ -165,6 +178,10 @@ class FakeEventsApi implements EventsApi {
     String matId,
     Map<String, String> groupMats,
   ) async => calls.add('disableMat $matId $groupMats');
+
+  @override
+  Future<void> enableMat(String eventId, String matId) async =>
+      calls.add('enableMat $matId');
 
   @override
   Future<String?> resetPackage() async => package;
@@ -381,6 +398,28 @@ void main() {
 
     expect(api.calls, ['disableMat m1 {g1: m2}']);
   });
+
+  for (final MapEntry(key: device, value: size) in screenSizes.entries) {
+    testWidgets('a mat out of use says so and goes back in use on $device', (
+      tester,
+    ) async {
+      useSize(tester, size);
+      final api = FakeEventsApi(secondDisabled: true);
+      await pumpAdmin(
+        tester,
+        location: '/events',
+        overrides: [eventsApiProvider.overrideWithValue(api)],
+      );
+      await openDetail(tester);
+      await tester.ensureVisible(find.text('Mat 2: out of use'));
+      await tester.tap(find.text('Mat 2: out of use'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Disable mat'), findsNothing);
+      await tapText(tester, 'Enable mat');
+      expect(api.calls, ['enableMat m2']);
+    });
+  }
 
   testWidgets('cancelling asks nothing of the server', (tester) async {
     useSize(tester, screenSizes['desktop']!);
