@@ -33,6 +33,9 @@
 - [ ] Competición del 2026-12-20: modalidades y sus reglas, clasificación, categorías, tapices y servidor (`producto/competicion-2026-12-20.md`).
 - [ ] F1-2 comodín: arreglado en la app (2026-11-16); falta revisar en la Pi qué se apañó a mano y que la clasificación sea correcta.
 - [ ] F2-3 CSV de resultados: la entidad de la liga ve confusos los puestos (1.º, 2.º, 3.º) al abrirlos en Excel. Rehacer todo el CSV para que se lea claro (Raul aún no lo ha revisado).
+- [ ] Modelo de datos (`producto/modelo-datos.md`, plan en `modelo-datos-migracion.md`): ¿apruebas el objetivo y el calendario (M1 antes del 20-12, M2 antes del 24-01, el resto después)?
+- [ ] Modelo de datos: ¿el alumno (`person`) pertenece a un club o es global (un mismo alumno en dos clubes)? ¿Guardamos todos los pesajes o solo el último? ¿Sexo como dato opcional, solo si una categoría o clasificación lo pide?
+- [ ] Modelo de datos: ¿las categorías de la liga son las mismas en todas las fases o pueden cambiar de una fase a otra?
 - [ ] F2-4 clasificaciones configurables: la global debe ser opcional (en esta liga no sirve) y poder clasificar por peso, sexo, categoría, etc. según el deporte y el evento.
 - [ ] F1-3 puntos fuera de tiempo: ¿solo hasta "Finalizar" o también después (con motivo)? ¿Quién: árbitro, club o ambos?
 - [ ] F1-4 advertencias: ¿motivos por deporte, por evento o por fase? ¿Cuáles para Yoseikan?

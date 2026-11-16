@@ -11,6 +11,7 @@ Documentos: `feedback-f1.md` (qué pasó y peticiones para la F2), `competicion-
 | 2027-01-24 | Fase 2 de la liga (armas) |
 - La pausa es corta: **antes del 20-12**, la etapa 1, F1-1 y F1-2 de la etapa 2 y la competición (lista hacia el 13-12 para probarla in situ).
 - **Antes del 24-01**, el resto de la etapa 2 (con peso y edades) y la plantilla de la F2 en `puntuacion`.
+- Modelo de datos (`modelo-datos.md`): M1 (reglas y modalidades) antes del 20-12, M2 (persona e inscripción) antes del 24-01 y M3-M6 en la etapa 3.
 - La etapa 3 empieza después del 24-01, salvo los filtros del CI, que se pueden hacer antes.
 
 ## Ahora · Etapa 0: organizarse (pausa)
@@ -51,6 +52,7 @@ Línea de infraestructura; puede ir en paralelo con la etapa 2 (otro worktree).
 3. Refactor por módulo con tests de caracterización, empezando por marcador, grupos y tablero.
 4. Revisión de diseño completa con `frontend-design` y lista priorizada.
 5. E2E con Playwright sobre la web de los flujos críticos (login, crear grupo, marcador con y sin red, sincronización), solo en la batería completa de cada release.
+6. Modelo de datos, pasos M3-M6 (`modelo-datos-migracion.md`), cada uno con el refactor del módulo que toca.
 
 ## Más tarde · Etapa 4: eventos y módulos pendientes
 - Rediseño de eventos (`eventos-ux.md`): maquetas, prueba con 6 tareas y, después, por secciones.
