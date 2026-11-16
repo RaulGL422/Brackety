@@ -1,53 +1,52 @@
 # Modelo de datos: estado actual y objetivo
 
-Propuesta del 2026-11-16, pedida por Raul ("se está enredando el código"). **Nada decidido**: el plan está en `modelo-datos-migracion.md` y las preguntas, en `pendientes.md`.
+Propuesta del 2026-11-16, pedida por Raul ("se está enredando el código"); versión ligera tras su revisión. **Nada decidido**: el plan está en `modelo-datos-migracion.md` y las preguntas, en `pendientes.md`.
 
-## Hoy (24 migraciones, 28 tablas)
-| Bloque | Tablas | Nota |
+## Regla de oro (Raul, 2026-11-16)
+- **Un dato vive en un solo sitio** de la BD. Lo que se puede calcular a partir de otro dato se calcula, no se guarda.
+- Una caché solo se permite si se ha medido que hace falta, figura en la lista de abajo y tiene un test que la reconstruye y la compara.
+- **En el código, igual**: una regla o un cálculo tiene un solo dueño (servicio o función) y el resto lo llama.
+
+## Hoy: 28 tablas
+| Bloque | Tablas | Qué hacer |
 |---|---|---|
-| Cuentas | `account`, `identity`, `profile`, `consent`, `refresh_token`, `email_token`, `login_attempt` | Bien separado; `auth` cerrado |
-| Liga y evento | `league`, `league_category_podium`, `event`, `event_category`, `event_organization`, `event_rulebook` | Cada evento es una fase de una liga |
-| Staff | `event_staff`, `event_staff_name`, `mat` | `event_staff_name` ya no sirve (cuentas propias) |
-| Alumnos | `participant`, `participant_import` | Un `participant` por evento |
-| Competición | `fight_group`, `group_member`, `team`, `team_member`, `fight_match`, `match_event`, `offline_rejected_op` | Lo más enredado |
-| Admin | `admin_audit` | – |
+| Login y seguridad (7) | `account`, `identity`, `profile`, `consent`, `refresh_token`, `email_token`, `login_attempt` | Nada: normal para email + Google, verificación y RGPD |
+| Registros obligatorios (3) | `admin_audit`, `participant_import`, `offline_rejected_op` | Nada |
+| Competición (18) | `league`, `league_category_podium`, `event`, `event_category`, `event_organization`, `event_rulebook`, `event_staff`, `event_staff_name`, `mat`, `participant`, `fight_group`, `group_member`, `team`, `team_member`, `fight_match`, `match_event` | Aquí está el enredo |
 
-## Problemas (de más a menos coste en el código)
-1. **Reglas como columnas de `event`**: `match_seconds`, `points_limit`, `team_match_seconds`, `team_points_limit`, `min_rest_seconds`, `changeover_seconds` y `max_groups_per_mat` (sin uso). Cada formato nuevo añade columnas e `if (equipo)`. No sirve para las 3 modalidades del 20-12, los motivos de advertencia (F1-4) ni los datos obligatorios por deporte (F2-1).
-2. **El alumno no existe fuera del evento**: `participant` copia nombre, nacimiento y estatura en cada fase; `person_id` es un UUID sin tabla que solo une las fases de una liga. No hay dónde guardar el peso "en la ficha global", ni sexo, ni historial.
-3. **Un combate tiene dos tipos de lado**: `fight_match` lleva `red/blue_participant_id` y `red/blue_team_id`, y en `group_member` pasa lo mismo (`participant_id` o `team_id`). Por eso el nombre del competidor se calcula en 3 servicios y cada consulta pregunta si es de equipos.
-4. **"Comodín" en tres sitios**: `group_member.ghost`, `team.ghost` y `team_member.ghost`. Un equipo comodín es una fila de `team` creada para un solo grupo. El papel se deducía y falló (F1-2).
-5. **"Dónde se juega" repartido**: `mat_id` en el grupo y en cada combate, `mat_id` nulo = bote y `pinned` = movido a mano. `MatSchedule`, `MatPlanner` y el panel de control repiten esa lógica.
-6. **Organizaciones por evento**: `profile.organization_name` (el organizador) y `event_organization` (clubes participantes) son copias sueltas; el mismo club se escribe en cada fase.
-7. **Categorías por nombre**: `league_category_podium.category_name` une fases por texto; renombrar una categoría rompe la clasificación.
-8. **Marcador**: `fight_match` guarda reloj y puntos además de `match_event`. Es una caché válida, pero hoy no se dice en ningún sitio.
+## Datos repetidos hoy
+| Dato | Dónde se repite | Objetivo |
+|---|---|---|
+| Alumno (nombre, nacimiento, estatura) | Un `participant` por fase | Una vez en `person` |
+| Club participante | `event_organization` en cada fase; organizador en `profile` | Una vez en `organization` |
+| Categorías de la liga | Copiadas en cada fase; podios unidos por nombre | Una vez en `competition_category` |
+| Reglas | Columnas de `event`, por formato (`match_seconds`, `team_match_seconds`…) | Una fila por modalidad |
+| Comodín | `group_member.ghost`, `team.ghost`, `team_member.ghost` | Papel del puesto en `group_slot` |
+| Tapiz de un combate | `fight_group.mat_id`, `fight_match.mat_id`, `pinned` | Del grupo, salvo excepción del combate |
+| Lado de un combate | Columnas de alumno y de equipo | Una columna por lado |
+| Evento de un combate | `fight_match.event_id` (sale del grupo) | Del grupo |
+| Marcador | Puntos y reloj en `fight_match` y en `match_event` | Calculado de `match_event` (o caché medida) |
+| Nombre de la persona del staff | `event_staff_name` | Fuera: cuentas propias |
 
-## Objetivo
-### Personas y organizaciones
-- `organization`: club o entidad global (nombre, nombre corto, CIF), con el organizador como miembro. Sustituye a `profile.organization_name` y a `event_organization` (pasa a ser `event_organization(event_id, organization_id)`).
-- `person`: alumno global de una organización (nombre, apellidos, nacimiento, sexo opcional, tutor). Es el `student_profile` de `perfiles-menores`.
-- `person_measure`: peso y estatura con fecha y origen (declarado o pesaje). La ficha global enseña la última.
-- `registration`: persona × evento (categoría elegida, medidas del día, pagado o no, consentimiento). Sustituye a `participant`.
+## Objetivo ligero: unas 26-27 tablas
+Las 10 de login y registros siguen igual. Competición:
+- **`organization`**: club o entidad (nombre, nombre corto, CIF). `event_organization` queda como enlace evento ↔ organización, sin copiar el nombre.
+- **`person`**: alumno de una organización (nombre, apellidos, nacimiento, sexo opcional, tutor, último peso y estatura). Si se quiere historial de pesajes, `person_measure`; si no, son 2 columnas.
+- **`registration`** (hoy `participant`): persona × evento con categoría elegida, medidas del día, pagado o no y consentimiento. Sin nombre ni nacimiento: los saca de `person`.
+- **`competition`** (hoy `league`) y **`competition_category`**: las categorías se definen una vez y cada fase las usa. Sustituye a `league_category_podium`.
+- **`event`**: fase, jornada o torneo de una competición. Sin columnas de reglas.
+- **`event_category`**: la categoría en esa fase (edad, sexo y peso mín./máx., formato y tamaños), enlazada a su `competition_category`.
+- **`modality`**: lista ordenada por evento (1 en la liga, 3 el 20-12), con sus reglas (duración, límite, descanso, cambio entre combates, descalificación, +1 cada N advertencias, motivos de advertencia, datos obligatorios) y su forma de clasificar (por categoría, sexo, peso o edad; global sí o no). Una categoría puede sobrescribir alguna regla.
+- **`event_staff`** y **`location`** (hoy `mat`): nombre ("Tapiz 1", "Pista 2"), estado (en uso o inhabilitado) y árbitro.
+- **`entry`** y **`entry_member`**: quien compite. **Un individual es una entrada de 1**; un equipo, de 2 o 3. Sustituye a `team` y `team_member`.
+- **`fight_group`** y **`group_slot`** (`entry_id`, posición y papel: real o comodín). Sustituye a `group_member` y a las 3 marcas `ghost`.
+- **`fight_match`** (`group_id`, `modality_id`, `red_entry_id`, `blue_entry_id`, orden y `location_override_id` si se movió a mano) y **`match_event`**.
+- **`event_rulebook`**: igual, o un fichero en disco (a decidir).
 
-### Competición y reglas
-- `competition`: la liga o el torneo (hoy `league`), con sus `competition_category` compartidas por todas las fases.
-- `event`: una fase, jornada o torneo de una competición (fecha, estado, origen del paquete).
-- `ruleset`: duración, límite, descanso, cambio entre combates (`changeover_seconds`), descalificación, advertencias (+1 cada N), motivos de advertencia y datos obligatorios (peso, estatura, sexo). Viene de una plantilla de deporte; el evento, la categoría o la modalidad lo pueden sobrescribir.
-- `modality`: lista ordenada por evento (1 en la liga; 3 el 20-12), cada una con su `ruleset`.
-- `event_category`: edad, sexo y peso (mín./máx.), formato, tamaños y la `competition_category` a la que pertenece.
-- `standing_rule`: cómo se clasifica (por categoría, sexo, peso o edad; global sí o no). Cubre F2-4.
+Salen `event_staff_name`, `league_category_podium`, `team`, `team_member` y `group_member`. Entran `organization`, `person`, `competition_category`, `modality`, `entry`, `entry_member` y `group_slot`.
 
-### Combates
-- `competitor`: lo que ocupa un lado, alumno o equipo (`registration_id` o `team_id`, exactamente uno). Un sitio para su nombre.
-- `team` + `team_member(registration_id)`: solo equipos reales.
-- `group_slot(group_id, position, competitor_id, role)` con `role` = `real` o `comodin`. Sustituye a `group_member` y a las tres marcas `ghost`; un equipo comodín es un `competitor` del grupo, no una fila nueva de `team`.
-- `fight_match(red_competitor_id, blue_competitor_id, modality_id, …)`: un lado = una columna.
-- Dónde se juega: `fight_group.location_id` (nulo = bote) y `fight_match.location_override_id` (movido a mano). Tapiz efectivo = el del combate o el de su grupo. Desaparecen `pinned` y el `mat_id` duplicado.
-- `location` (hoy `mat`): nombre ("Tapiz 1", "Pista 2"), estado (en uso / inhabilitado, F1-1) y árbitro.
-- `match_event`: igual. El reloj y los puntos de `fight_match` quedan documentados como caché.
-
-### Se quita
-`event_staff_name`, `max_groups_per_mat`, las marcas `ghost` y `league_category_podium.category_name` (pasa a `competition_category_id`).
-
-## Qué no cambia
-Cuentas, sesiones, consentimientos, auditoría, `match_event` y `offline_rejected_op`, y la regla de oro: el servidor es la fuente de verdad y el móvil manda acciones (`opId`).
+## En el código
+- **Sin "¿es de equipos?"**: con `entry` hay un solo camino para el marcador, el tablero, la clasificación y los CSV.
+- Un solo dueño por cálculo: nombre del competidor, tapiz efectivo, reglas que aplican a un combate, puntos de un combate y permiso "club o árbitro del tapiz" (hoy repetidos en varios servicios, `revision-f1.md`).
+- Las reglas del marcador existen en Java y en Dart (hace falta para el modo offline): un solo juego de casos JSON que pasan los dos.
+- La caché offline de la app no cuenta como dato repetido: es una copia del servidor que se reemplaza entera.
