@@ -172,6 +172,96 @@ void main() {
     });
   }
 
+  for (final MapEntry(key: device, value: size) in sizes.entries) {
+    testWidgets(
+      'a free team picked first as a wildcard stays a wildcard on $device (F1-2)',
+      (tester) async {
+        tester.view.physicalSize = size;
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        // Team 4 (Fede, Gema, Hugo) has no group either.
+        final repository = FakeGroupingRepository(
+          participants,
+          teamList: [
+            ...teams,
+            const Team(
+              id: 't4',
+              number: 4,
+              members: [
+                TeamMember(participantId: 'p9', fullName: 'Fede Prueba'),
+                TeamMember(participantId: 'p10', fullName: 'Gema Prueba'),
+                TeamMember(participantId: 'p11', fullName: 'Hugo Prueba'),
+              ],
+            ),
+          ],
+        );
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              ...sessionOverrides(FakeAuthApi(signedIn: true)),
+              groupingRepositoryProvider.overrideWithValue(repository),
+              fakeMatsOverride,
+              myEventsProvider.overrideWith((ref) async => []),
+            ],
+            child: const BracketyApp(),
+          ),
+        );
+        await tester.pumpAndSettle();
+        ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
+            .read(routerProvider)
+            .push('/events/e1/categories/c1/teams?name=15-16&size=3');
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Teams'));
+        await tester.pumpAndSettle();
+        Finder addAs(String label) => find.descendant(
+          of: find.byType(SegmentedButton<bool>),
+          matching: find.text(label),
+        );
+
+        await tester.tap(find.text('Wildcard team'));
+        await tester.pumpAndSettle();
+        await tester.tap(addAs('Wildcard'));
+        await tester.pump();
+        await tester.scrollUntilVisible(
+          find.text('Team 1'),
+          100,
+          scrollable: find
+              .descendant(
+                of: find.byType(ListView),
+                matching: find.byType(Scrollable),
+              )
+              .first,
+        );
+        await tester.tap(find.text('Team 1'));
+        await tester.pump();
+        await tester.tap(addAs('Normal'));
+        await tester.pump();
+        for (final team in ['Team 2', 'Team 3', 'Team 4']) {
+          await tester.scrollUntilVisible(
+            find.text(team),
+            100,
+            scrollable: find
+                .descendant(
+                  of: find.byType(ListView),
+                  matching: find.byType(Scrollable),
+                )
+                .first,
+          );
+          await tester.tap(find.text(team));
+          await tester.pump();
+        }
+        await tester.tap(find.text('Create group'));
+        await tester.pumpAndSettle();
+
+        final group = repository.created.single;
+        expect(group.members, ['t2', 't3', 't4']);
+        expect(group.ghostTeams, [
+          ['p0', 'p1', 'p2'],
+        ]);
+      },
+    );
+  }
+
   testWidgets('a team of another group joins as a wildcard team with a tap', (
     tester,
   ) async {

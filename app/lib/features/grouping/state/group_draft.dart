@@ -10,6 +10,7 @@ class DraftGroup {
     this.ghosts = const [],
     this.ghostTeams = const [],
     this.ofTeams = false,
+    this.pickGhost = false,
   });
 
   static const size = 4;
@@ -32,6 +33,10 @@ class DraftGroup {
 
   final bool ofTeams;
 
+  /// In wildcard mode, the helper's "Add as wildcard": the next free pick joins as a wildcard
+  /// whatever its place, so a wildcard can be picked before the real ones (F1-2, 2026-11-16).
+  final bool pickGhost;
+
   int get _filled => members.length + (ofTeams ? ghostTeams.length : 0);
 
   bool get isComplete {
@@ -50,6 +55,17 @@ class DraftGroup {
   bool get canAddGhostTeam =>
       ofTeams && ghostMode && _filled < size && ghostTeams.length < size - 1;
 
+  /// Whether the next free pick joins as a wildcard (participant or team).
+  bool get addsAsGhost =>
+      ofTeams ? ghostMode && pickGhost && canAddGhostTeam : _picksGhost(false);
+
+  /// A group of participants leaves no choice with 3 real (the 4th is the wildcard) or 3 wildcards
+  /// (the 4th is real).
+  bool get roleForced =>
+      !ofTeams &&
+      ghostMode &&
+      (members.length == size - 1 || ghosts.length == size - 1);
+
   bool contains(String id) => members.contains(id) || ghosts.contains(id);
 
   /// The wildcard box can be ticked while there is room for a wildcard (3 or fewer picked), and untick always.
@@ -60,13 +76,17 @@ class DraftGroup {
     bool? ghostMode,
     List<String>? ghosts,
     List<List<String>>? ghostTeams,
+    bool? pickGhost,
   }) => DraftGroup(
     members: members ?? this.members,
     ghostMode: ghostMode ?? this.ghostMode,
     ghosts: ghosts ?? this.ghosts,
     ghostTeams: ghostTeams ?? this.ghostTeams,
     ofTeams: ofTeams,
+    pickGhost: pickGhost ?? this.pickGhost,
   );
+
+  DraftGroup withPickGhost(bool on) => copyWith(pickGhost: on);
 
   /// Where [id] stands; [grouped] = already in a group on the server.
   PickState stateOf(String id, {required bool grouped}) {
@@ -84,9 +104,14 @@ class DraftGroup {
     return grouped ? PickState.unavailable : PickState.free;
   }
 
-  /// In wildcard mode, someone already in a group joins as a wildcard, and so does the pick after 3 real ones.
+  /// In wildcard mode, someone already in a group joins as a wildcard, and so does the pick after 3
+  /// real ones or any pick with "Add as wildcard" while there is room for one more wildcard.
   bool _picksGhost(bool grouped) =>
-      !ofTeams && ghostMode && (grouped || members.length == size - 1);
+      !ofTeams &&
+      ghostMode &&
+      (grouped ||
+          members.length == size - 1 ||
+          (pickGhost && ghosts.length < size - 1));
 
   DraftGroup toggle(String id, {required bool grouped}) {
     switch (stateOf(id, grouped: grouped)) {

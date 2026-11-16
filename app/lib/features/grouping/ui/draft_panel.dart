@@ -46,11 +46,12 @@ class DraftPanel extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
-    final hint = !group.ofTeams && group.ghostMode && !group.isComplete
-        ? l10n.draftGhostHint
-        : group.ofTeams && group.ghostMode
+    // The wildcard rules sit behind an info button next to "Add as": on a phone the panel
+    // already leaves little room for the list.
+    final ghostHint = group.ofTeams
         ? l10n.draftGhostTeamPanelHint
-        : group.ofTeams
+        : l10n.draftGhostHint;
+    final hint = group.ofTeams && !group.ghostMode
         ? l10n.teamGroupPoolHint
         : null;
     return Material(
@@ -99,6 +100,46 @@ class DraftPanel extends StatelessWidget {
                   ),
                 ],
               ),
+              if (group.ghostMode)
+                Row(
+                  spacing: AppSpacing.s,
+                  children: [
+                    Tooltip(
+                      message: ghostHint,
+                      triggerMode: TooltipTriggerMode.tap,
+                      showDuration: const Duration(seconds: 6),
+                      child: SizedBox.square(
+                        dimension: AppSizes.touchTarget,
+                        child: Icon(
+                          Icons.info_outline,
+                          color: scheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                    Text(l10n.draftAddAs, style: text.bodyMedium),
+                    Expanded(
+                      child: SegmentedButton<bool>(
+                        showSelectedIcon: false,
+                        segments: [
+                          ButtonSegment(
+                            value: false,
+                            label: Text(l10n.draftAddAsReal),
+                          ),
+                          ButtonSegment(
+                            value: true,
+                            label: Text(l10n.draftAddAsGhost),
+                          ),
+                        ],
+                        selected: {group.addsAsGhost},
+                        onSelectionChanged: group.roleForced
+                            ? null
+                            : (picked) => onChanged(
+                                (g) => g.withPickGhost(picked.single),
+                              ),
+                      ),
+                    ),
+                  ],
+                ),
               DraftSlots(
                 group: group,
                 labelOf: labelOf,

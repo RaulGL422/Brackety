@@ -1,5 +1,5 @@
 {
-  "draftGhostTeamPanelHint": "Equipos comodín (hasta 3): toca en la lista un equipo de otro grupo, o forma uno con alumnos sueltos. Combaten pero no puntúan.",
+  "draftGhostTeamPanelHint": "Hasta 3 equipos comodín: combaten pero no puntúan. Uno de otro grupo lo es siempre.",
   "teamJoinsAsWildcard": "Toca para que entre como equipo comodín",
   "ghostTeamPageTitle": "Formar equipo comodín",
   "ghostTeamSearch": "Buscar alumno",
@@ -263,7 +263,10 @@
     }
   },
   "draftGhost": "Comodín",
-  "draftGhostHint": "Comodines (hasta 3): quien ya tiene grupo, o el 4.º que elijas. Combaten pero no puntúan.",
+  "draftGhostHint": "Hasta 3 comodines: combaten pero no puntúan. Quien ya tiene grupo y el 4.º lo son siempre.",
+  "draftAddAs": "Añadir como",
+  "draftAddAsReal": "Normal",
+  "draftAddAsGhost": "Comodín",
   "createGroup": "{count, plural, =1{Crear grupo} other{Crear grupos}}",
   "@createGroup": {
     "placeholders": {

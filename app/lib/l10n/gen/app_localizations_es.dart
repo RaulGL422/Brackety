@@ -11,7 +11,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get draftGhostTeamPanelHint =>
-      'Equipos comodín (hasta 3): toca en la lista un equipo de otro grupo, o forma uno con alumnos sueltos. Combaten pero no puntúan.';
+      'Hasta 3 equipos comodín: combaten pero no puntúan. Uno de otro grupo lo es siempre.';
 
   @override
   String get teamJoinsAsWildcard => 'Toca para que entre como equipo comodín';
@@ -603,7 +603,16 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get draftGhostHint =>
-      'Comodines (hasta 3): quien ya tiene grupo, o el 4.º que elijas. Combaten pero no puntúan.';
+      'Hasta 3 comodines: combaten pero no puntúan. Quien ya tiene grupo y el 4.º lo son siempre.';
+
+  @override
+  String get draftAddAs => 'Añadir como';
+
+  @override
+  String get draftAddAsReal => 'Normal';
+
+  @override
+  String get draftAddAsGhost => 'Comodín';
 
   @override
   String createGroup(int count) {

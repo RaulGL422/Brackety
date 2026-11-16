@@ -88,4 +88,7 @@ Las de octubre de 2026, en `decisiones-2026-10.md`.
 - 2026-11-16 · El entorno debug va en la misma Pi que producción, parado los días de evento · Raul.
 - 2026-11-16 · Todos los datos de la F1 pasan a producción en una cuenta privada de la entidad que lleva Raul; se cede al club cuando la app esté estable · Raul.
 - 2026-11-16 · Calendario: competición aparte de la liga el 2026-12-20 (grupos de 4 individuales, 3 modalidades seguidas) y F2 el 2027-01-24; peso y edades mezcladas pero distinguidas, para la F2 · Raul.
+- 2026-11-16 · Al crear un grupo con comodines, «Añadir como: Normal | Comodín» fija el papel del siguiente toque en cualquier orden; quien ya tiene grupo (o el equipo de otro grupo) sigue entrando como comodín y, en individual, el 4.º tras 3 reales también · F1-2: el papel se deducía del orden y un comodín elegido primero se guardaba como normal.
+- 2026-11-16 · Debug en `brackety-debug.rgal.dev`, `brackety-debug-api.rgal.dev` y `brackety-debug-admin.rgal.dev` · Raul.
+- 2026-11-16 · Peso y estatura: se miden el día, se guardan en la inscripción y en la ficha global; obligatorio u opcional según la plantilla del deporte y el evento (obligatorio bloquea agruparlo; opcional avisa al crear el grupo) · Raul.
 - 2026-11-16 · Inhabilitar tapiz guarda estado (cuándo y qué árbitro tenía) y se reactiva con un botón que le devuelve su árbitro; el reparto sigue basándose en «sin árbitro, no recibe nada» · F1-1: sin estado nadie veía el tapiz inhabilitado ni encontraba la acción; sustituye a «sin estado nuevo en BD» del 2026-11-14.

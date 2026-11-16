@@ -31,10 +31,9 @@
 
 ## Tras la Fase 1 (2026-11-16; plan en `producto/roadmap.md`)
 - [ ] Competición del 2026-12-20: modalidades y sus reglas, clasificación, categorías, tapices y servidor (`producto/competicion-2026-12-20.md`).
-- [ ] Debug en la Pi: ¿valen las URLs `brackety-debug*.rgal.dev`? (`modulos/entornos.md`).
-- [ ] F2-1 peso: ¿solo informativo o sirve para hacer grupos? ¿Declarado en la inscripción o pesado el día?
-- [ ] F2-2 edades: ¿en qué pantallas debe verse la edad? ¿La clasificación sigue siendo una por categoría o se separa por edad?
-- [ ] F1-2 comodín: ¿qué se apañó a mano en la Pi? Revisar que la clasificación sea correcta.
+- [ ] F1-2 comodín: arreglado en la app (2026-11-16); falta revisar en la Pi qué se apañó a mano y que la clasificación sea correcta.
+- [ ] F2-3 CSV de resultados: la entidad de la liga ve confusos los puestos (1.º, 2.º, 3.º) al abrirlos en Excel. Rehacer todo el CSV para que se lea claro (Raul aún no lo ha revisado).
+- [ ] F2-4 clasificaciones configurables: la global debe ser opcional (en esta liga no sirve) y poder clasificar por peso, sexo, categoría, etc. según el deporte y el evento.
 - [ ] F1-3 puntos fuera de tiempo: ¿solo hasta "Finalizar" o también después (con motivo)? ¿Quién: árbitro, club o ambos?
 - [ ] F1-4 advertencias: ¿motivos por deporte, por evento o por fase? ¿Cuáles para Yoseikan?
 - [ ] F1-5 cuentas propias: ¿un árbitro sin cuenta puede entrar con un enlace de invitación de un solo evento, o siempre cuenta completa?
