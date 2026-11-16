@@ -137,7 +137,7 @@ public class LeagueService {
                     new EventCategory(phase.getId(), c.getName(), c.getMinAge(), c.getMaxAge(), c.getTeamSize()));
         }
         for (var o : organizations.findByEventIdOrderByName(eventId)) {
-            organizations.save(new EventOrganization(phase.getId(), o.getName(), o.getShortName()));
+            organizations.save(new EventOrganization(phase.getId(), o.getOrganization()));
         }
         return new PhaseResponse(
                 phase.getId(), number, phase.getName(), phase.getEventDate(), phase.getDiscipline(), 0);
@@ -193,9 +193,9 @@ public class LeagueService {
         access.require(eventId, accountId, EventRole.CLUB);
         var event = eventService.get(eventId);
         var latest = latestEntries(event);
-        var organizationIds = organizations.findByEventIdOrderByName(eventId).stream()
-                .collect(Collectors.toMap(EventOrganization::getName, EventOrganization::getId));
-        var organizationNames = new HashMap<UUID, String>();
+        // Club → its link in this phase.
+        var links = organizations.findByEventIdOrderByName(eventId).stream()
+                .collect(Collectors.toMap(o -> o.getOrganization().getId(), EventOrganization::getId));
         var added = 0;
         for (var personId : new HashSet<>(request.personIds())) {
             var previous = latest.get(personId);
@@ -209,13 +209,10 @@ public class LeagueService {
             var participant = new Participant(eventId, previous.getPerson(), clock.instant());
             participant.setGuardianConsent(minor ? request.guardianConsent() : previous.hasGuardianConsent());
             if (previous.getOrganizationId() != null) {
-                var name = organizationNames.computeIfAbsent(
-                        previous.getOrganizationId(),
-                        id -> organizations
-                                .findById(id)
-                                .map(EventOrganization::getName)
-                                .orElse(""));
-                participant.setOrganizationId(organizationIds.get(name));
+                organizations
+                        .findById(previous.getOrganizationId())
+                        .map(o -> links.get(o.getOrganization().getId()))
+                        .ifPresent(participant::setOrganizationId);
             }
             participants.save(participant);
             added++;

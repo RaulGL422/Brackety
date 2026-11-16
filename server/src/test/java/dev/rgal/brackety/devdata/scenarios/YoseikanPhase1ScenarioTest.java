@@ -7,6 +7,8 @@ import dev.rgal.brackety.demo.DemoSetup;
 import dev.rgal.brackety.devdata.ScenarioContext;
 import dev.rgal.brackety.event.EventCategoryRepository;
 import dev.rgal.brackety.event.EventOrganizationRepository;
+import dev.rgal.brackety.event.EventRepository;
+import dev.rgal.brackety.event.OrganizationRepository;
 import dev.rgal.brackety.participant.ParticipantRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +27,16 @@ class YoseikanPhase1ScenarioTest extends AuthIntegrationTest {
     @Autowired
     EventCategoryRepository categories;
 
+    @Autowired
+    OrganizationRepository clubs;
+
+    @Autowired
+    EventRepository events;
+
     @Test
     void seedsTheDemoEventWithParticipantsInEveryChildCategory() {
-        new YoseikanPhase1Scenario(demo, participants, organizations, categories).seed(new ScenarioContext(clock));
+        new YoseikanPhase1Scenario(demo, participants, organizations, clubs, events, categories)
+                .seed(new ScenarioContext(clock));
 
         assertThat(count("participant"))
                 .isEqualTo(YoseikanPhase1Scenario.PARTICIPANTS + YoseikanPhase1Scenario.TEENS + 2);

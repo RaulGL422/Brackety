@@ -8,6 +8,8 @@ import dev.rgal.brackety.event.EventCategory;
 import dev.rgal.brackety.event.EventCategoryRepository;
 import dev.rgal.brackety.event.EventOrganization;
 import dev.rgal.brackety.event.EventOrganizationRepository;
+import dev.rgal.brackety.event.EventRepository;
+import dev.rgal.brackety.event.OrganizationRepository;
 import dev.rgal.brackety.participant.Participant;
 import dev.rgal.brackety.participant.ParticipantRepository;
 import java.util.List;
@@ -54,16 +56,22 @@ class YoseikanPhase1Scenario implements Scenario {
     private final DemoSetup demo;
     private final ParticipantRepository participants;
     private final EventOrganizationRepository organizations;
+    private final OrganizationRepository clubs;
+    private final EventRepository events;
     private final EventCategoryRepository categories;
 
     YoseikanPhase1Scenario(
             DemoSetup demo,
             ParticipantRepository participants,
             EventOrganizationRepository organizations,
+            OrganizationRepository clubs,
+            EventRepository events,
             EventCategoryRepository categories) {
         this.demo = demo;
         this.participants = participants;
         this.organizations = organizations;
+        this.clubs = clubs;
+        this.events = events;
         this.categories = categories;
     }
 
@@ -83,8 +91,10 @@ class YoseikanPhase1Scenario implements Scenario {
     @Override
     public void seed(ScenarioContext ctx) {
         var eventId = demo.seed();
+        var owner = events.findById(eventId).orElseThrow().getOwnerAccountId();
         for (var name : MORE_CLUBS) {
-            organizations.save(new EventOrganization(eventId, name, null));
+            organizations.save(new EventOrganization(
+                    eventId, clubs.named(owner, name, null, ctx.now().toInstant())));
         }
         var clubs = organizations.findByEventIdOrderByName(eventId);
         var random = new Random(2027);

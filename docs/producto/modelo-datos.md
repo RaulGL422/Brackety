@@ -31,6 +31,7 @@ Pedido por Raul ("se está enredando el código"); versión ligera **aprobada el
 ## Objetivo ligero: unas 26-27 tablas
 Las 10 de login y registros siguen igual. Competición:
 - **`organization`**: club o entidad (nombre, nombre corto, CIF). `event_organization` queda como enlace evento ↔ organización, sin copiar el nombre.
+  - M2b: un club una vez por cuenta dueña (nombre sin distinguir mayúsculas); `event_organization` solo lo enlaza (su id sigue siendo el de la API). Renombrarlo en una fase lo renombra en todas; una fase nueva enlaza los mismos clubes. El club del alumno (`person`) llega en M2c.
 - **`person`**: alumno de un club (nombre, apellidos, nacimiento, sexo obligatorio, tutor, último peso y estatura). Sin historial de pesajes (Raul, 2026-11-16).
   - M2a: `person` con nombre, apellidos, nacimiento y estatura; cambiarlos en una fase los cambia en todas. El nacimiento no cambia si ya está en un grupo o equipo de cualquier fase. Borrar su única inscripción borra la persona. Sexo, peso y club llegan en M2b y M2c.
 - **`registration`** (hoy `participant`): persona × evento con categoría elegida, medidas del día, pagado o no y consentimiento. Sin nombre ni nacimiento: los saca de `person`.
