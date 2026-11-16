@@ -761,6 +761,7 @@
   "disciplineSoon": "{name} (coming soon)",
   "leagueStandings": "League standings",
   "leagueStandingsCsv": "Download CSV",
+  "leagueStandingsByCategory": "One CSV per category (.zip)",
   "leaguePhasePoints": "Phase {number}: {total} ({attendance} for attending + {matches} in matches)",
   "leaguePhaseAbsent": "Phase {number}: not entered",
   "leagueNoPoints": "No points yet: no place",

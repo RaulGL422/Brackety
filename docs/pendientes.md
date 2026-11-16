@@ -30,7 +30,7 @@
 - [ ] Login con Google en la app (botón + `REGISTRATION_REQUIRED`) cuando existan los client IDs.
 
 ## Tras la Fase 1 (2026-11-16; plan en `producto/roadmap.md`)
-- [ ] Competición del 2026-12-20: modalidades y sus reglas, clasificación, categorías, tapices y servidor (`producto/competicion-2026-12-20.md`).
+- [ ] Competición del 2026-12-20: modalidades y su puntuación, categorías, tapices y servidor; la clasificación ya está (`producto/competicion-2026-12-20.md`).
 - [ ] F1-2 comodín: arreglado en la app (2026-11-16); falta revisar en la Pi qué se apañó a mano y que la clasificación sea correcta.
 - [ ] F2-3 CSV de resultados: la entidad de la liga ve confusos los puestos (1.º, 2.º, 3.º) al abrirlos en Excel. Rehacer todo el CSV para que se lea claro (Raul aún no lo ha revisado).
 - [ ] F2-4 clasificaciones configurables: la global debe ser opcional (en esta liga no sirve) y poder clasificar por peso, sexo, categoría, etc. según el deporte y el evento.
