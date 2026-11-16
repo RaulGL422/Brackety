@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @draftGhostTeamPanelHint.
   ///
   /// In es, this message translates to:
-  /// **'Equipos comodín (hasta 3): toca en la lista un equipo de otro grupo, o forma uno con alumnos sueltos. Combaten pero no puntúan.'**
+  /// **'Hasta 3 equipos comodín: combaten pero no puntúan. Uno de otro grupo lo es siempre.'**
   String get draftGhostTeamPanelHint;
 
   /// No description provided for @teamJoinsAsWildcard.
@@ -1025,8 +1025,26 @@ abstract class AppLocalizations {
   /// No description provided for @draftGhostHint.
   ///
   /// In es, this message translates to:
-  /// **'Comodines (hasta 3): quien ya tiene grupo, o el 4.º que elijas. Combaten pero no puntúan.'**
+  /// **'Hasta 3 comodines: combaten pero no puntúan. Quien ya tiene grupo y el 4.º lo son siempre.'**
   String get draftGhostHint;
+
+  /// No description provided for @draftAddAs.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir como'**
+  String get draftAddAs;
+
+  /// No description provided for @draftAddAsReal.
+  ///
+  /// In es, this message translates to:
+  /// **'Normal'**
+  String get draftAddAsReal;
+
+  /// No description provided for @draftAddAsGhost.
+  ///
+  /// In es, this message translates to:
+  /// **'Comodín'**
+  String get draftAddAsGhost;
 
   /// No description provided for @createGroup.
   ///

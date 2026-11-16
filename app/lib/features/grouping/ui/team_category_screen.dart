@@ -386,9 +386,10 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
     );
   }
 
-  /// A team already in another group joins this one as a wildcard team: tapped in wildcard mode.
+  /// In wildcard mode a team joins as a wildcard team if it is already in another group, or if
+  /// the helper chose "Add as wildcard" (whatever the order of the picks).
   bool _canJoinAsWildcard(Team team, List<Team> teams) =>
-      team.isTaken &&
+      (team.isTaken || _group.pickGhost) &&
       _group.canAddGhostTeam &&
       team.members.length >= DraftGroup.minTeam &&
       team.members.length <= DraftGroup.maxTeam &&

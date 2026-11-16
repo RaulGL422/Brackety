@@ -262,6 +262,67 @@ void main() {
     expect(group.ghosts, ['grouped']);
   });
 
+  for (final MapEntry(key: device, value: size) in sizes.entries) {
+    testWidgets('a wildcard picked first stays a wildcard on $device (F1-2)', (
+      tester,
+    ) async {
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final repository = FakeGroupingRepository(participants);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            ...sessionOverrides(FakeAuthApi(signedIn: true)),
+            groupingRepositoryProvider.overrideWithValue(repository),
+            fakeMatsOverride,
+            myEventsProvider.overrideWith((ref) async => []),
+          ],
+          child: const BracketyApp(),
+        ),
+      );
+      await tester.pumpAndSettle();
+      ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
+          .read(routerProvider)
+          .push('/events/e1/categories/c1');
+      await tester.pumpAndSettle();
+      Finder addAs(String label) => find.descendant(
+        of: find.byType(SegmentedButton<bool>),
+        matching: find.text(label),
+      );
+      // On a phone the group's panel leaves room for a few rows: from the top, scroll to each one.
+      final list = find.byType(Scrollable).last;
+      Future<void> tapName(String name) async {
+        await tester.drag(list, const Offset(0, 2000));
+        await tester.pumpAndSettle();
+        await tester.scrollUntilVisible(
+          find.text(name).hitTestable(),
+          100,
+          scrollable: list,
+        );
+        await tester.tap(find.text(name));
+        await tester.pump();
+      }
+
+      await tester.tap(find.widgetWithText(FilterChip, 'Wildcard'));
+      await tester.pumpAndSettle();
+      await tester.tap(addAs('Wildcard'));
+      await tester.pump();
+      await tapName('Eva Prueba');
+      await tester.tap(addAs('Normal'));
+      await tester.pump();
+      for (final name in ['Ana', 'Bea', 'Carla']) {
+        await tapName('$name Prueba');
+      }
+      await tester.tap(find.text('Create group'));
+      await tester.pumpAndSettle();
+
+      final DraftGroup group = repository.created.single;
+      expect(group.members, ['p0', 'p1', 'p2']);
+      expect(group.ghosts, ['p4']);
+    });
+  }
+
   testWidgets('the slots fill as the helper picks and a tap empties one', (
     tester,
   ) async {

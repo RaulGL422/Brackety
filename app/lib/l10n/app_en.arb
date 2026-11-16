@@ -1,5 +1,5 @@
 {
-  "draftGhostTeamPanelHint": "Wildcard teams (up to 3): tap a team of another group in the list, or make one with loose participants. They fight but do not score.",
+  "draftGhostTeamPanelHint": "Up to 3 wildcard teams: they fight but do not score. A team of another group always is.",
   "teamJoinsAsWildcard": "Tap to join as a wildcard team",
   "ghostTeamPageTitle": "Make a wildcard team",
   "ghostTeamSearch": "Search a participant",
@@ -235,7 +235,10 @@
     }
   },
   "draftGhost": "Wildcard",
-  "draftGhostHint": "Wildcards (up to 3): anyone already in a group, or your 4th pick. They fight but do not score.",
+  "draftGhostHint": "Up to 3 wildcards: they fight but do not score. Anyone already in a group and the 4th pick always are.",
+  "draftAddAs": "Add as",
+  "draftAddAsReal": "Normal",
+  "draftAddAsGhost": "Wildcard",
   "createGroup": "{count, plural, =1{Create group} other{Create groups}}",
   "@createGroup": {
     "placeholders": {
