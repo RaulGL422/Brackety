@@ -1,5 +1,6 @@
 package dev.rgal.brackety.participant;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -49,8 +50,13 @@ class ParticipantControllerTest extends EventApiTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.lastName").value("Ruiz"))
                 .andExpect(jsonPath("$.heightCm").value(170));
+        var people =
+                jdbc.sql("select count(*) from person").query(Integer.class).single();
         call(delete(participants() + "/" + id), "club1").andExpect(status().isNoContent());
         call(get(participants()), "club1").andExpect(jsonPath("$", hasSize(0)));
+        // Their only entry: the student goes too.
+        assertThat(jdbc.sql("select count(*) from person").query(Integer.class).single())
+                .isEqualTo(people - 1);
     }
 
     @Test

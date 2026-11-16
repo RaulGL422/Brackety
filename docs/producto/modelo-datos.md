@@ -32,6 +32,7 @@ Pedido por Raul ("se está enredando el código"); versión ligera **aprobada el
 Las 10 de login y registros siguen igual. Competición:
 - **`organization`**: club o entidad (nombre, nombre corto, CIF). `event_organization` queda como enlace evento ↔ organización, sin copiar el nombre.
 - **`person`**: alumno de un club (nombre, apellidos, nacimiento, sexo obligatorio, tutor, último peso y estatura). Sin historial de pesajes (Raul, 2026-11-16).
+  - M2a: `person` con nombre, apellidos, nacimiento y estatura; cambiarlos en una fase los cambia en todas. El nacimiento no cambia si ya está en un grupo o equipo de cualquier fase. Borrar su única inscripción borra la persona. Sexo, peso y club llegan en M2b y M2c.
 - **`registration`** (hoy `participant`): persona × evento con categoría elegida, medidas del día, pagado o no y consentimiento. Sin nombre ni nacimiento: los saca de `person`.
 - **`competition`** (hoy `league`) y **`competition_category`**: las categorías se definen una vez y cada fase las usa. Sustituye a `league_category_podium`.
 - **`event`**: fase, jornada o torneo de una competición. Sin columnas de reglas.

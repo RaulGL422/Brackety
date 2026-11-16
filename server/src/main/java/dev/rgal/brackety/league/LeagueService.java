@@ -206,13 +206,8 @@ public class LeagueService {
             if (minor && !request.guardianConsent()) {
                 throw EventException.invalid("A minor needs the guardian's consent.");
             }
-            var participant = new Participant(eventId, personId, clock.instant());
-            participant.update(
-                    previous.getFirstName(),
-                    previous.getLastName(),
-                    previous.getBirthDate(),
-                    previous.getHeightCm(),
-                    minor ? request.guardianConsent() : previous.hasGuardianConsent());
+            var participant = new Participant(eventId, previous.getPerson(), clock.instant());
+            participant.setGuardianConsent(minor ? request.guardianConsent() : previous.hasGuardianConsent());
             if (previous.getOrganizationId() != null) {
                 var name = organizationNames.computeIfAbsent(
                         previous.getOrganizationId(),
