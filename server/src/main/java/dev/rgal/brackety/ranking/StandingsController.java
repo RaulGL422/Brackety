@@ -28,6 +28,7 @@ class StandingsController {
 
     private static final MediaType CSV = new MediaType("text", "csv", StandardCharsets.UTF_8);
     private static final MediaType ZIP = new MediaType("application", "zip");
+    private static final MediaType PDF = MediaType.APPLICATION_PDF;
 
     private final StandingsService standings;
     private final LeagueStandingsService leagueStandings;
@@ -90,6 +91,11 @@ class StandingsController {
                 .categoryCsvs(eventId, CurrentAccount.id(jwt))
                 .forEach((name, csv) -> files.put(name, Zip.text(csv)));
         return file("clasificacion-por-categoria.zip", ZIP, Zip.of(files));
+    }
+
+    @GetMapping("/export/league-standings.pdf")
+    ResponseEntity<byte[]> standingsPdf(@PathVariable UUID eventId, @AuthenticationPrincipal Jwt jwt) {
+        return file("clasificacion-por-categoria.pdf", PDF, leagueStandings.pdf(eventId, CurrentAccount.id(jwt)));
     }
 
     @GetMapping("/export/matches.csv")

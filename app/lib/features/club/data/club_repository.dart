@@ -26,6 +26,11 @@ enum EventExport {
     'clasificacion-por-categoria.zip',
     'application/zip',
   ),
+  standingsPdf(
+    'export/league-standings.pdf',
+    'clasificacion-por-categoria.pdf',
+    'application/pdf',
+  ),
   full('export/full', 'evento.zip', 'application/zip');
 
   const EventExport(this.path, this.fallbackName, this.mimeType);

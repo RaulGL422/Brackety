@@ -41,6 +41,8 @@ class FullExportService {
             clasificacion-por-categoria/
                                     La misma clasificación de la liga, un fichero por categoría: posición,
                                     medalla, alumno, club, total de cada fase y total de la liga.
+            clasificacion-por-categoria.pdf
+                                    La misma clasificación para imprimir: cada categoría en su página.
             evento.brackety         El evento completo en JSON (configuración, inscritos y resultados):
                                     sirve para arrancar el servidor del pabellón
                                     (start-event.ps1 -Package <este .zip>) o para importar los
@@ -94,6 +96,7 @@ class FullExportService {
         leagueStandings
                 .categoryCsvs(eventId, accountId)
                 .forEach((name, csv) -> files.put(CATEGORY_FOLDER + name, text(csv)));
+        files.put("clasificacion-por-categoria.pdf", leagueStandings.pdf(eventId, accountId));
         files.put(
                 EventPackageService.ZIP_ENTRY,
                 json.writerWithDefaultPrettyPrinter().writeValueAsBytes(eventPackage));

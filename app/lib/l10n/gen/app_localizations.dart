@@ -3666,6 +3666,12 @@ abstract class AppLocalizations {
   /// **'Un CSV por categoría (.zip)'**
   String get leagueStandingsByCategory;
 
+  /// No description provided for @leagueStandingsPdf.
+  ///
+  /// In es, this message translates to:
+  /// **'Clasificación en PDF'**
+  String get leagueStandingsPdf;
+
   /// No description provided for @leaguePhasePoints.
   ///
   /// In es, this message translates to:

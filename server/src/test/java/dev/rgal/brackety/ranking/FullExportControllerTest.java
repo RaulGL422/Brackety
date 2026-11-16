@@ -92,6 +92,7 @@ class FullExportControllerTest extends EventApiTest {
                         "clasificacion-fase.csv",
                         "clasificacion-liga.csv",
                         "clasificacion-por-categoria/clasificacion-9-10.csv",
+                        "clasificacion-por-categoria.pdf",
                         "evento.brackety");
         assertThat(files.get("participantes.csv"))
                 .startsWith(Csv.BOM + "Nombre;Apellidos;Fecha de nacimiento;Edad el día del evento")

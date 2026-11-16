@@ -22,6 +22,9 @@ import dev.rgal.brackety.ranking.dto.LeagueStandings.PhasePoints;
 import dev.rgal.brackety.ranking.dto.LeagueStandings.Row;
 import dev.rgal.brackety.ranking.dto.StandingRow;
 import dev.rgal.brackety.scoreboard.MatchSnapshots;
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -42,6 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
 class LeagueStandingsService {
 
     static final String NO_CATEGORY = "Sin categoría";
+    private static final DateTimeFormatter PDF_TIME = DateTimeFormatter.ofPattern("HH:mm");
 
     private final StandingsService standings;
     private final EventRepository events;
@@ -54,6 +58,7 @@ class LeagueStandingsService {
     private final CompetitorDirectory directory;
     private final ParticipantRepository participants;
     private final MatchSnapshots snapshots;
+    private final Clock clock;
 
     LeagueStandingsService(
             StandingsService standings,
@@ -66,7 +71,9 @@ class LeagueStandingsService {
             MatchRepository matches,
             CompetitorDirectory directory,
             ParticipantRepository participants,
-            MatchSnapshots snapshots) {
+            MatchSnapshots snapshots,
+            Clock clock) {
+        this.clock = clock;
         this.matches = matches;
         this.directory = directory;
         this.participants = participants;
@@ -252,6 +259,18 @@ class LeagueStandingsService {
                 })
                 .toList();
         return Csv.of(header, rows);
+    }
+
+    /** The league standings to print: each category on its own page. */
+    @Transactional(readOnly = true)
+    byte[] pdf(UUID eventId, UUID accountId) {
+        var result = standings(eventId, accountId);
+        var event = eventService.get(eventId);
+        var league = leagues.findById(event.getLeagueId()).orElseThrow();
+        var heading = league.getName() + " · " + event.getName() + " · " + SheetText.date(event.getEventDate());
+        var now = LocalDateTime.now(clock);
+        var generated = SheetText.date(now.toLocalDate()) + " a las " + PDF_TIME.format(now);
+        return StandingsPdf.of(result, heading, generated);
     }
 
     /**

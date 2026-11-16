@@ -58,6 +58,7 @@ Fuente: Raul, 2026-11-16. Las tareas salen de aquí hacia `roadmap.md`.
 ### F2-3 · CSV de resultados confuso
 - Abierto en Excel, la entidad de la liga no entiende bien los puestos (1.º, 2.º, 3.º). Rehacer todo el CSV para que se lea claro: una hoja o bloque por categoría, columnas con nombre y sin datos mezclados en una celda.
 - 2026-11-16, urgente para la entidad: **un CSV por categoría** con la clasificación de la liga (posición, medalla, alumno, club, total por fase), en un .zip desde la pestaña de liga y dentro de la exportación completa. El resto de la reforma del CSV sigue pendiente.
+- 2026-11-17: la misma clasificación **en PDF** para imprimir, una categoría por página.
 
 ### F2-4 · Clasificaciones configurables
 - La clasificación global debe ser una opción: en esta liga no sirve.
