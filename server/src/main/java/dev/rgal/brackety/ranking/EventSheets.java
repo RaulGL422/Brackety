@@ -352,7 +352,7 @@ class EventSheets {
                             m.getRedScore(),
                             m.getBlueScore(),
                             winner(m, red, blue),
-                            endReason(m, d.event().pointsLimitFor(m.isTeamMatch()), red, blue),
+                            endReason(m, d.event().modality().pointsLimit(m.isTeamMatch()), red, blue),
                             SheetText.status(m.getStatus()),
                             ghostNames.isEmpty() ? null : ghostNames,
                             SheetText.date(m.getStartedAt(), zone),

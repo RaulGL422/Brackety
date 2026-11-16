@@ -1,6 +1,6 @@
 # Modelo de datos: estado actual y objetivo
 
-Propuesta del 2026-11-16, pedida por Raul ("se está enredando el código"); versión ligera tras su revisión. **Nada decidido**: el plan está en `modelo-datos-migracion.md` y las preguntas, en `pendientes.md`.
+Pedido por Raul ("se está enredando el código"); versión ligera **aprobada el 2026-11-16**. Plan en `modelo-datos-migracion.md`.
 
 ## Regla de oro (Raul, 2026-11-16)
 - **Un dato vive en un solo sitio** de la BD. Lo que se puede calcular a partir de otro dato se calcula, no se guarda.
@@ -31,17 +31,18 @@ Propuesta del 2026-11-16, pedida por Raul ("se está enredando el código"); ver
 ## Objetivo ligero: unas 26-27 tablas
 Las 10 de login y registros siguen igual. Competición:
 - **`organization`**: club o entidad (nombre, nombre corto, CIF). `event_organization` queda como enlace evento ↔ organización, sin copiar el nombre.
-- **`person`**: alumno de una organización (nombre, apellidos, nacimiento, sexo opcional, tutor, último peso y estatura). Si se quiere historial de pesajes, `person_measure`; si no, son 2 columnas.
+- **`person`**: alumno de un club (nombre, apellidos, nacimiento, sexo obligatorio, tutor, último peso y estatura). Sin historial de pesajes (Raul, 2026-11-16).
 - **`registration`** (hoy `participant`): persona × evento con categoría elegida, medidas del día, pagado o no y consentimiento. Sin nombre ni nacimiento: los saca de `person`.
 - **`competition`** (hoy `league`) y **`competition_category`**: las categorías se definen una vez y cada fase las usa. Sustituye a `league_category_podium`.
 - **`event`**: fase, jornada o torneo de una competición. Sin columnas de reglas.
 - **`event_category`**: la categoría en esa fase (edad, sexo y peso mín./máx., formato y tamaños), enlazada a su `competition_category`.
 - **`modality`**: lista ordenada por evento (1 en la liga, 3 el 20-12), con sus reglas (duración, límite, descanso, cambio entre combates, descalificación, +1 cada N advertencias, motivos de advertencia, datos obligatorios) y su forma de clasificar (por categoría, sexo, peso o edad; global sí o no). Una categoría puede sobrescribir alguna regla.
+  - Hecho en M1 con dos tablas: `modality` (descanso y cambio entre combates) y `modality_rules` (duración y límite por formato). La forma de clasificar llega con M5.
 - **`event_staff`** y **`location`** (hoy `mat`): nombre ("Tapiz 1", "Pista 2"), estado (en uso o inhabilitado) y árbitro.
 - **`entry`** y **`entry_member`**: quien compite. **Un individual es una entrada de 1**; un equipo, de 2 o 3. Sustituye a `team` y `team_member`.
 - **`fight_group`** y **`group_slot`** (`entry_id`, posición y papel: real o comodín). Sustituye a `group_member` y a las 3 marcas `ghost`.
 - **`fight_match`** (`group_id`, `modality_id`, `red_entry_id`, `blue_entry_id`, orden y `location_override_id` si se movió a mano) y **`match_event`**.
-- **`event_rulebook`**: igual, o un fichero en disco (a decidir).
+- **Reglamento**: pasa a un fichero en disco; la tabla `event_rulebook` sale (Raul, 2026-11-16).
 
 Salen `event_staff_name`, `league_category_podium`, `team`, `team_member` y `group_member`. Entran `organization`, `person`, `competition_category`, `modality`, `entry`, `entry_member` y `group_slot`.
 

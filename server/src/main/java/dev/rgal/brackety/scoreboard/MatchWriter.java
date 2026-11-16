@@ -116,7 +116,9 @@ class MatchWriter {
     static TamboMatch replay(Event event, Match match, List<MatchEvent> history) {
         var teams = match.isTeamMatch();
         return TamboMatch.replay(
-                new Rules(Duration.ofSeconds(event.matchSecondsFor(teams)), event.pointsLimitFor(teams)),
+                new Rules(
+                        Duration.ofSeconds(event.modality().matchSeconds(teams)),
+                        event.modality().pointsLimit(teams)),
                 history.stream().map(MatchEvent::toEntry).toList());
     }
 
@@ -190,7 +192,7 @@ class MatchWriter {
         }
         var competitors = directory.of(match.getEventId());
         var fighters = competitors.participants(match.getRedId(), match.getBlueId());
-        var minRest = Duration.ofSeconds(event.getMinRestSeconds());
+        var minRest = Duration.ofSeconds(event.modality().getMinRestSeconds());
         return matches.findByEventId(match.getEventId()).stream()
                 .filter(m -> !m.getId().equals(match.getId()) && m.getFinishedAt() != null)
                 .filter(m -> competitors.participants(m.getRedId(), m.getBlueId()).stream()

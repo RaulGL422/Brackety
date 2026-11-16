@@ -14,7 +14,7 @@ Cómo pasar de lo actual al objetivo ligero de `modelo-datos.md` (un dato en un 
 ## Pasos
 | Paso | Qué | Necesario para | Tamaño |
 |---|---|---|---|
-| M1 | `modality` con reglas y forma de clasificar: las reglas salen de `event`; las categorías por equipos sobrescriben duración y límite | 20-12 (3 modalidades), F1-4 advertencias, F2-4 clasificaciones | M |
+| M1 | `modality` con reglas y forma de clasificar: las reglas salen de `event`; las categorías por equipos sobrescriben duración y límite | 20-12 (3 modalidades), F1-4 advertencias, F2-4 clasificaciones | M · en pruebas (2026-11-16) |
 | M2 | `organization`, `person` (con último peso y estatura) y `registration`: el alumno y el club, una sola vez | F2 (24-01): F2-1 peso y estatura, F2-2 edades | L |
 | M3 | `entry`, `entry_member` y `group_slot` con papel: individual = entrada de 1; fuera `team`, `team_member`, `group_member` y las marcas `ghost` | Un solo camino en marcador, tablero, clasificación y CSV | L |
 | M4 | `location` con estado y `location_override_id` en el combate: fuera `pinned`, `fight_match.mat_id` y `fight_match.event_id` | Simplificar reparto, previsión y panel de control | M |
@@ -43,4 +43,4 @@ Cómo pasar de lo actual al objetivo ligero de `modelo-datos.md` (un dato en un 
 | Retrasar el 20-12 | Solo M1 antes; lo demás no bloquea |
 
 ## Estado
-Propuesta (2026-11-16). Falta que Raul la apruebe y responda las preguntas de `pendientes.md`.
+Aprobado (2026-11-16). M1 en pruebas: modalidades con migración probada (`ModalityMigrationTest`); las columnas de reglas de `event` siguen en la BD sin usarse hasta la siguiente release.
