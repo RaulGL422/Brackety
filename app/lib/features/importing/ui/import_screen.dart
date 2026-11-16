@@ -58,8 +58,8 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
 
   Future<void> _downloadTemplate() async {
     const template =
-        '﻿nombre;apellidos;fecha_nacimiento;estatura_cm;categoria\r\n'
-        'Lucía;García López;12/03/2016;128;\r\n';
+        '﻿nombre;apellidos;fecha_nacimiento;sexo;estatura_cm;peso_kg;categoria\r\n'
+        'Lucía;García López;12/03/2016;Mujer;128;27,5;\r\n';
     await ref.read(saveFileProvider)(
       'plantilla_alumnos.csv',
       utf8.encode(template),
