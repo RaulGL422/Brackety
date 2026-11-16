@@ -178,9 +178,9 @@ class FullExportControllerTest extends EventApiTest {
         importResults(zip, false).andExpect(status().isOk());
 
         assertThat(jdbc.sql("""
-                        select p.first_name from team_member m join team t on t.id = m.team_id
-                        join participant p on p.id = m.participant_id
-                        where t.event_id = ? and m.ghost order by p.first_name""").param(eventId).query(String.class).list()).containsExactly("Eva", "Fran");
+                        select pe.first_name from team_member m join team t on t.id = m.team_id
+                        join participant p on p.id = m.participant_id join person pe on pe.id = p.person_id
+                        where t.event_id = ? and m.ghost order by pe.first_name""").param(eventId).query(String.class).list()).containsExactly("Eva", "Fran");
     }
 
     @Test

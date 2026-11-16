@@ -3,6 +3,7 @@ package dev.rgal.brackety.league;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -167,6 +168,43 @@ class LeagueControllerTest extends EventApiTest {
                 .getContentAsString(StandardCharsets.UTF_8);
         assertThat(csv).contains("Categoría;Posición;Medalla;Nombre;Apellidos;Club;Fase 1: asistencia");
         assertThat(csv).contains("9-10;1;Oro (1.º);Ana;Prueba;Club Demo Yoseikan;10;2;12;No inscrito;;;12");
+    }
+
+    @Test
+    void aPersonIsOneRowInEveryPhase() throws Exception {
+        var kids = new ArrayList<UUID>();
+        for (var name : List.of("Ana", "Bea", "Cris", "Dani")) {
+            kids.add(participant(eventId, name, 9));
+        }
+        group(eventId, kids);
+        var phase2 = newPhase();
+        call(post(league(phase2) + "/reenrol").content("""
+                        {"personIds":["%s"],"guardianConsent":true}""".formatted(person(kids.get(0)))), "club1")
+                .andExpect(status().isOk());
+        var entry = "/api/v1/events/" + phase2 + "/participants/"
+                + participants
+                        .findByEventIdOrderByFirstNameAscLastNameAsc(phase2)
+                        .getFirst()
+                        .getId();
+
+        // A surname fixed in phase 2 is fixed in phase 1 too.
+        call(put(entry).content(ana("Ruiz", "2018-03-01")), "club1").andExpect(status().isOk());
+        assertThat(participants.findById(kids.get(0)).orElseThrow().getLastName())
+                .isEqualTo("Ruiz");
+        // Her birth date set her category in phase 1, where she is in a group.
+        call(put(entry).content(ana("Ruiz", "2017-03-01")), "club1").andExpect(status().isConflict());
+        // Without her phase 2 entry she is still in phase 1.
+        call(delete(entry), "club1").andExpect(status().isNoContent());
+        assertThat(jdbc.sql("select count(*) from person where id = ?")
+                        .param(person(kids.get(0)))
+                        .query(Integer.class)
+                        .single())
+                .isOne();
+    }
+
+    private static String ana(String lastName, String birthDate) {
+        return """
+                {"firstName":"Ana","lastName":"%s","birthDate":"%s","heightCm":130,"guardianConsent":true}""".formatted(lastName, birthDate);
     }
 
     @Test

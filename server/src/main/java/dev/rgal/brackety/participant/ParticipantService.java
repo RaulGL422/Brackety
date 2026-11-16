@@ -26,6 +26,7 @@ public class ParticipantService {
     public static final int ADULT_AGE = 18;
 
     private final ParticipantRepository participants;
+    private final PersonRepository people;
     private final EventCategoryRepository categories;
     private final EventOrganizationRepository organizations;
     private final EventService events;
@@ -34,12 +35,14 @@ public class ParticipantService {
 
     ParticipantService(
             ParticipantRepository participants,
+            PersonRepository people,
             EventCategoryRepository categories,
             EventOrganizationRepository organizations,
             EventService events,
             EventAccess access,
             Clock clock) {
         this.participants = participants;
+        this.people = people;
         this.categories = categories;
         this.organizations = organizations;
         this.events = events;
@@ -72,7 +75,10 @@ public class ParticipantService {
         // The birth date and the chosen category set the category their group or team was made for.
         var changesCategory = !request.birthDate().equals(participant.getBirthDate())
                 || !Objects.equals(request.categoryId(), participant.getCategoryId());
-        if (changesCategory && participants.isInAGroupOrTeam(participantId)) {
+        // The person is shared by every phase: their birth date also set the category of earlier phases.
+        var changesBirthDate = !request.birthDate().equals(participant.getBirthDate());
+        if ((changesCategory && participants.isInAGroupOrTeam(participantId))
+                || (changesBirthDate && participants.isPersonInAGroupOrTeam(participant.getPersonId()))) {
             throw EventException.conflict(
                     "The birth date and category cannot change once the participant is in a group or team.");
         }
@@ -87,6 +93,10 @@ public class ParticipantService {
             throw EventException.conflict("A participant in a group or team cannot be removed.");
         }
         participants.delete(participant);
+        // Their only entry: nothing of the student stays behind.
+        if (!participants.existsByPerson_Id(participant.getPersonId())) {
+            people.delete(participant.getPerson());
+        }
     }
 
     private Participant find(UUID eventId, UUID participantId) {

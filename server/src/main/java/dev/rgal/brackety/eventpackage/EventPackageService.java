@@ -41,6 +41,8 @@ import dev.rgal.brackety.league.League;
 import dev.rgal.brackety.league.LeagueRepository;
 import dev.rgal.brackety.participant.Participant;
 import dev.rgal.brackety.participant.ParticipantRepository;
+import dev.rgal.brackety.participant.Person;
+import dev.rgal.brackety.participant.PersonRepository;
 import jakarta.validation.Validator;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -87,6 +89,7 @@ public class EventPackageService {
     private final EventOrganizationRepository organizations;
     private final MatRepository mats;
     private final ParticipantRepository participants;
+    private final PersonRepository people;
     private final LeagueRepository leagues;
     private final CategoryPodiumRepository podiums;
     private final AccountRepository accounts;
@@ -108,6 +111,7 @@ public class EventPackageService {
             EventOrganizationRepository organizations,
             MatRepository mats,
             ParticipantRepository participants,
+            PersonRepository people,
             LeagueRepository leagues,
             CategoryPodiumRepository podiums,
             AccountRepository accounts,
@@ -127,6 +131,7 @@ public class EventPackageService {
         this.organizations = organizations;
         this.mats = mats;
         this.participants = participants;
+        this.people = people;
         this.leagues = leagues;
         this.podiums = podiums;
         this.accounts = accounts;
@@ -486,8 +491,12 @@ public class EventPackageService {
 
     private Participant newParticipant(
             UUID eventId, ParticipantEntry entry, Map<String, UUID> categoryIds, Map<String, UUID> organizationIds) {
-        var participant = new Participant(
-                eventId, entry.personId() != null ? entry.personId() : UUID.randomUUID(), clock.instant());
+        var now = clock.instant();
+        // A person already here (another phase) is the same row: the package, the latest, updates it.
+        var person = entry.personId() == null
+                ? new Person(UUID.randomUUID(), now)
+                : people.findById(entry.personId()).orElseGet(() -> new Person(entry.personId(), now));
+        var participant = new Participant(eventId, person, now);
         participant.update(
                 entry.firstName().strip(),
                 entry.lastName().strip(),
