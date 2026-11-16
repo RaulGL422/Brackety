@@ -3,6 +3,7 @@ package dev.rgal.brackety.event;
 import dev.rgal.brackety.event.dto.EventSettingsResponse.OrganizationResponse;
 import dev.rgal.brackety.event.dto.OrganizationRequest;
 import dev.rgal.brackety.event.dto.OrganizationsRequest;
+import java.time.Clock;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -18,11 +19,22 @@ import org.springframework.transaction.annotation.Transactional;
 class EventOrganizationService {
 
     private final EventOrganizationRepository organizations;
+    private final OrganizationRepository clubs;
+    private final EventRepository events;
     private final EventAccess access;
+    private final Clock clock;
 
-    EventOrganizationService(EventOrganizationRepository organizations, EventAccess access) {
+    EventOrganizationService(
+            EventOrganizationRepository organizations,
+            OrganizationRepository clubs,
+            EventRepository events,
+            EventAccess access,
+            Clock clock) {
         this.organizations = organizations;
+        this.clubs = clubs;
+        this.events = events;
         this.access = access;
+        this.clock = clock;
     }
 
     @Transactional
@@ -50,11 +62,24 @@ class EventOrganizationService {
         }
         organizations.deleteAllById(removed);
         organizations.flush();
+        var owner = events.findById(eventId).orElseThrow().getOwnerAccountId();
         for (var o : requested) {
-            if (o.id() == null) {
-                organizations.save(new EventOrganization(eventId, o.name().strip(), shortName(o.shortName())));
+            var name = o.name().strip();
+            var shortName = shortName(o.shortName());
+            var link = o.id() == null ? null : current.get(o.id());
+            var same = clubs.findByOwnerAccountIdAndNameIgnoreCase(owner, name);
+            if (link != null && (same.isEmpty() || same.get().equals(link.getOrganization()))) {
+                // A new name for the same club: it changes in every event the club is in.
+                link.getOrganization().update(name, shortName);
+                continue;
+            }
+            var club = same.orElseGet(() -> clubs.named(owner, name, shortName, clock.instant()));
+            club.update(name, shortName);
+            if (link == null) {
+                organizations.save(new EventOrganization(eventId, club));
             } else {
-                current.get(o.id()).update(o.name().strip(), shortName(o.shortName()));
+                // The name of another club of the owner: this event now links that one.
+                link.link(club);
             }
         }
         organizations.flush();

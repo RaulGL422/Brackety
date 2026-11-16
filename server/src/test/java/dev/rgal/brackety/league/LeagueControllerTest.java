@@ -229,6 +229,36 @@ class LeagueControllerTest extends EventApiTest {
     }
 
     @Test
+    void aClubIsOneRowInEveryPhase() throws Exception {
+        var clubs = jdbc.sql("select count(*) from organization")
+                .query(Integer.class)
+                .single();
+        var phase2 = newPhase();
+        // The new phase links the same clubs: none is copied.
+        assertThat(jdbc.sql("select count(*) from organization")
+                        .query(Integer.class)
+                        .single())
+                .isEqualTo(clubs);
+        var settings = call(get("/api/v1/events/" + phase2 + "/settings"), "club1")
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        String id = JsonPath.read(settings, "$.organizations[0].id");
+        String other = JsonPath.read(settings, "$.organizations[1].id");
+        String otherName = JsonPath.read(settings, "$.organizations[1].name");
+
+        call(put("/api/v1/events/" + phase2 + "/organizations").content("""
+                        {"organizations":[{"id":"%s","name":"Club Demo Yoseikan Sevilla","shortName":"CDY"},
+                                          {"id":"%s","name":"%s","shortName":null}]}""".formatted(id, other, otherName)), "club1")
+                .andExpect(status().isOk());
+
+        // Renamed in phase 2, renamed in phase 1 too.
+        call(get("/api/v1/events/" + eventId + "/settings"), "club1")
+                .andExpect(jsonPath("$.organizations[0].name").value("Club Demo Yoseikan Sevilla"))
+                .andExpect(jsonPath("$.organizations[0].shortName").value("CDY"));
+    }
+
+    @Test
     void medalsGoByPositionAndTiesShareThem() {
         var podium = new Podium(2, 2, 3);
         assertThat(List.of(1, 1, 3, 4, 5, 7, 8).stream()
@@ -252,7 +282,9 @@ class LeagueControllerTest extends EventApiTest {
     }
 
     private UUID participant(UUID event, String firstName, int age) {
-        var organization = jdbc.sql("select id from event_organization where event_id = ? order by name limit 1")
+        var organization = jdbc.sql(
+                        "select eo.id from event_organization eo join organization o on o.id = eo.organization_id"
+                                + " where eo.event_id = ? order by o.name limit 1")
                 .param(event)
                 .query(UUID.class)
                 .single();

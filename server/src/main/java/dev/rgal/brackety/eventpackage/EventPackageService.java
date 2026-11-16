@@ -23,6 +23,7 @@ import dev.rgal.brackety.event.EventStaffRepository;
 import dev.rgal.brackety.event.Mat;
 import dev.rgal.brackety.event.MatRepository;
 import dev.rgal.brackety.event.Modality;
+import dev.rgal.brackety.event.OrganizationRepository;
 import dev.rgal.brackety.event.RulebookService;
 import dev.rgal.brackety.event.StaffNames;
 import dev.rgal.brackety.eventpackage.EventPackage.Category;
@@ -87,6 +88,7 @@ public class EventPackageService {
     private final EventStaffRepository staff;
     private final EventCategoryRepository categories;
     private final EventOrganizationRepository organizations;
+    private final OrganizationRepository clubs;
     private final MatRepository mats;
     private final ParticipantRepository participants;
     private final PersonRepository people;
@@ -109,6 +111,7 @@ public class EventPackageService {
             EventStaffRepository staff,
             EventCategoryRepository categories,
             EventOrganizationRepository organizations,
+            OrganizationRepository clubs,
             MatRepository mats,
             ParticipantRepository participants,
             PersonRepository people,
@@ -129,6 +132,7 @@ public class EventPackageService {
         this.staff = staff;
         this.categories = categories;
         this.organizations = organizations;
+        this.clubs = clubs;
         this.mats = mats;
         this.participants = participants;
         this.people = people;
@@ -302,9 +306,10 @@ public class EventPackageService {
         }
         var organizationIds = new HashMap<String, UUID>();
         for (var o : p.organizationsOrEmpty()) {
-            var organization = organizations.save(
-                    new EventOrganization(event.getId(), o.name().strip(), blankToNull(o.shortName())));
-            organizationIds.put(organization.getName(), organization.getId());
+            var club = clubs.named(
+                    event.getOwnerAccountId(), o.name().strip(), blankToNull(o.shortName()), clock.instant());
+            var organization = organizations.save(new EventOrganization(event.getId(), club));
+            organizationIds.put(o.name().strip(), organization.getId());
         }
         for (var entry : p.participants()) {
             participants.save(newParticipant(event.getId(), entry, categoryIds, organizationIds));
@@ -455,9 +460,13 @@ public class EventPackageService {
         var newOrganizations = 0;
         for (var o : p.organizationsOrEmpty()) {
             if (!organizationIds.containsKey(o.name().strip())) {
-                var organization = organizations.save(
-                        new EventOrganization(eventId, o.name().strip(), blankToNull(o.shortName())));
-                organizationIds.put(organization.getName(), organization.getId());
+                var club = clubs.named(
+                        eventService.get(eventId).getOwnerAccountId(),
+                        o.name().strip(),
+                        blankToNull(o.shortName()),
+                        clock.instant());
+                var organization = organizations.save(new EventOrganization(eventId, club));
+                organizationIds.put(o.name().strip(), organization.getId());
                 newOrganizations++;
             }
         }

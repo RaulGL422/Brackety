@@ -40,7 +40,8 @@ class FullExportControllerTest extends EventApiTest {
     @BeforeEach
     void playAMatch() throws Exception {
         kids = new ArrayList<>();
-        var club = jdbc.sql("select id from event_organization where name = 'Club Demo Yoseikan'")
+        var club = jdbc.sql("select eo.id from event_organization eo join organization o on o.id = eo.organization_id"
+                        + " where o.name = 'Club Demo Yoseikan'")
                 .query(UUID.class)
                 .single();
         for (var name : List.of("Ana", "Bea", "Cris", "Dani")) {
