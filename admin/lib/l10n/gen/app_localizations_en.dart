@@ -63,6 +63,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'A match on this mat waits for review: resolve it first.';
 
   @override
+  String get controlEnableMat => 'Enable mat';
+
+  @override
+  String eventMatDisabled(int number) {
+    return 'Mat $number: out of use';
+  }
+
+  @override
   String get controlDisableMat => 'Disable mat';
 
   @override
@@ -72,7 +80,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get controlDisableMatBody =>
-      'Choose the mat for each group with pending matches (Automatic: the one that finishes first). Team matches are shared among the other mats. It is left without a referee: to use it again, the club assigns one in Settings.';
+      'Choose the mat for each group with pending matches (Automatic: the one that finishes first). Team matches are shared among the other mats. To use it again, \"Enable mat\" gives it back its referee.';
 
   @override
   String get controlMatAutomatic => 'Automatic';

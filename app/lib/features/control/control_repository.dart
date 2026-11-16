@@ -66,6 +66,10 @@ class ControlRepository {
     );
   }
 
+  /// A mat out of use goes back in use with the referee it had.
+  Future<void> enableMat(String eventId, String matId) =>
+      _dio.post<void>('${_base(eventId)}/mats/$matId/enable');
+
   Future<void> waiveRest(String eventId, String matchId) =>
       _dio.post<void>('${_base(eventId)}/matches/$matchId/waive-rest');
 }

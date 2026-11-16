@@ -239,7 +239,7 @@ abstract class AppLocalizations {
   /// No description provided for @controlDisableMatBody.
   ///
   /// In es, this message translates to:
-  /// **'Elige a qué tapiz va cada grupo con combates pendientes (Automático: el que acabe antes). Los combates de equipos se reparten entre los demás tapices. Se queda sin árbitro: para volver a usarlo, asígnale uno en Configuración.'**
+  /// **'Elige a qué tapiz va cada grupo con combates pendientes (Automático: el que acabe antes). Los combates de equipos se reparten entre los demás tapices. Para volver a usarlo, «Reactivar tapiz» en Tapices le devuelve su árbitro.'**
   String get controlDisableMatBody;
 
   /// No description provided for @controlMatDisabled.
@@ -253,6 +253,48 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'¿A qué tapiz?'**
   String get controlPickMat;
+
+  /// No description provided for @controlEnableMat.
+  ///
+  /// In es, this message translates to:
+  /// **'Reactivar tapiz'**
+  String get controlEnableMat;
+
+  /// No description provided for @controlMatEnabled.
+  ///
+  /// In es, this message translates to:
+  /// **'Tapiz {number} reactivado con su árbitro.'**
+  String controlMatEnabled(int number);
+
+  /// No description provided for @controlMatNotDisabled.
+  ///
+  /// In es, this message translates to:
+  /// **'Este tapiz ya está en uso.'**
+  String get controlMatNotDisabled;
+
+  /// No description provided for @controlMatRefereeTaken.
+  ///
+  /// In es, this message translates to:
+  /// **'Su árbitro ya no está libre: asígnale uno en Configuración.'**
+  String get controlMatRefereeTaken;
+
+  /// No description provided for @matDisabled.
+  ///
+  /// In es, this message translates to:
+  /// **'Inhabilitado'**
+  String get matDisabled;
+
+  /// No description provided for @matDisabledSince.
+  ///
+  /// In es, this message translates to:
+  /// **'Inhabilitado desde las {time}'**
+  String matDisabledSince(String time);
+
+  /// No description provided for @matDisabledReferee.
+  ///
+  /// In es, this message translates to:
+  /// **'Árbitro: {name}'**
+  String matDisabledReferee(String name);
 
   /// No description provided for @controlNoOtherMat.
   ///

@@ -95,7 +95,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get controlDisableMatBody =>
-      'Elige a qué tapiz va cada grupo con combates pendientes (Automático: el que acabe antes). Los combates de equipos se reparten entre los demás tapices. Se queda sin árbitro: para volver a usarlo, asígnale uno en Configuración.';
+      'Elige a qué tapiz va cada grupo con combates pendientes (Automático: el que acabe antes). Los combates de equipos se reparten entre los demás tapices. Para volver a usarlo, «Reactivar tapiz» en Tapices le devuelve su árbitro.';
 
   @override
   String controlMatDisabled(int groups, int pool) {
@@ -118,6 +118,34 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get controlPickMat => '¿A qué tapiz?';
+
+  @override
+  String get controlEnableMat => 'Reactivar tapiz';
+
+  @override
+  String controlMatEnabled(int number) {
+    return 'Tapiz $number reactivado con su árbitro.';
+  }
+
+  @override
+  String get controlMatNotDisabled => 'Este tapiz ya está en uso.';
+
+  @override
+  String get controlMatRefereeTaken =>
+      'Su árbitro ya no está libre: asígnale uno en Configuración.';
+
+  @override
+  String get matDisabled => 'Inhabilitado';
+
+  @override
+  String matDisabledSince(String time) {
+    return 'Inhabilitado desde las $time';
+  }
+
+  @override
+  String matDisabledReferee(String name) {
+    return 'Árbitro: $name';
+  }
 
   @override
   String get controlNoOtherMat => 'No hay otro tapiz con árbitro.';

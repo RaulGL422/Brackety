@@ -188,6 +188,18 @@ abstract class AppLocalizations {
   /// **'Un combate de este tapiz espera revisión: resuélvela antes.'**
   String get controlMatInReview;
 
+  /// No description provided for @controlEnableMat.
+  ///
+  /// In es, this message translates to:
+  /// **'Reactivar tapiz'**
+  String get controlEnableMat;
+
+  /// No description provided for @eventMatDisabled.
+  ///
+  /// In es, this message translates to:
+  /// **'Tapiz {number}: inhabilitado'**
+  String eventMatDisabled(int number);
+
   /// No description provided for @controlDisableMat.
   ///
   /// In es, this message translates to:
@@ -203,7 +215,7 @@ abstract class AppLocalizations {
   /// No description provided for @controlDisableMatBody.
   ///
   /// In es, this message translates to:
-  /// **'Elige a qué tapiz va cada grupo con combates pendientes (Automático: el que acabe antes). Los combates de equipos se reparten entre los demás tapices. Se queda sin árbitro: para volver a usarlo, el club le asigna uno en Configuración.'**
+  /// **'Elige a qué tapiz va cada grupo con combates pendientes (Automático: el que acabe antes). Los combates de equipos se reparten entre los demás tapices. Para volver a usarlo, «Reactivar tapiz» le devuelve su árbitro.'**
   String get controlDisableMatBody;
 
   /// No description provided for @controlMatAutomatic.

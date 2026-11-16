@@ -63,6 +63,14 @@ class AppLocalizationsEs extends AppLocalizations {
       'Un combate de este tapiz espera revisión: resuélvela antes.';
 
   @override
+  String get controlEnableMat => 'Reactivar tapiz';
+
+  @override
+  String eventMatDisabled(int number) {
+    return 'Tapiz $number: inhabilitado';
+  }
+
+  @override
   String get controlDisableMat => 'Inhabilitar tapiz';
 
   @override
@@ -72,7 +80,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get controlDisableMatBody =>
-      'Elige a qué tapiz va cada grupo con combates pendientes (Automático: el que acabe antes). Los combates de equipos se reparten entre los demás tapices. Se queda sin árbitro: para volver a usarlo, el club le asigna uno en Configuración.';
+      'Elige a qué tapiz va cada grupo con combates pendientes (Automático: el que acabe antes). Los combates de equipos se reparten entre los demás tapices. Para volver a usarlo, «Reactivar tapiz» le devuelve su árbitro.';
 
   @override
   String get controlMatAutomatic => 'Automático';
