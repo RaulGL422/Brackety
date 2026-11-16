@@ -4,6 +4,7 @@ import 'package:brackety/core/download/file_download.dart';
 import 'package:brackety/features/club/data/club_models.dart';
 import 'package:brackety/features/mat/data/mat_board.dart';
 import 'package:brackety/features/club/data/club_repository.dart';
+import 'package:brackety/features/club/data/sex.dart';
 import 'package:brackety/features/club/state/club_providers.dart';
 import 'package:brackety/core/upload/file_upload.dart';
 import 'package:brackety/features/club/ui/club_panel_screen.dart';
@@ -38,6 +39,8 @@ class FakeClubRepository extends Fake implements ClubRepository {
   final savedCategories = <List<EventCategory>>[];
   final savedParticipantCategories = <String?>[];
   final savedParticipantOrganizations = <String?>[];
+  final savedParticipantSexes = <Sex>[];
+  final savedParticipantWeights = <double?>[];
   final savedOrganizations = <List<Organization>>[];
 
   @override
@@ -47,11 +50,15 @@ class FakeClubRepository extends Fake implements ClubRepository {
     required String firstName,
     required String lastName,
     required DateTime birthDate,
+    required Sex sex,
     required int? heightCm,
+    required double? weightKg,
     required bool guardianConsent,
     String? categoryId,
     String? organizationId,
   }) async {
+    savedParticipantSexes.add(sex);
+    savedParticipantWeights.add(weightKg);
     savedParticipantCategories.add(categoryId);
     savedParticipantOrganizations.add(organizationId);
   }
@@ -491,12 +498,28 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('8-11').last);
     await tester.pumpAndSettle();
+    // Entered before the sex was asked: nothing is saved until the club picks it.
+    await tester.tap(find.text('The legal guardian agrees'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+    await tester.pumpAndSettle();
+    expect(repository.savedParticipantCategories, isEmpty);
+    await tester.tap(find.text('The legal guardian agrees'));
+    await tester.ensureVisible(find.text('Female'));
+    await tester.tap(find.text('Female'));
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Weight in kg (optional)'),
+      '32,5',
+    );
+    await tester.pumpAndSettle();
     await tester.tap(find.text('The legal guardian agrees'));
     await tester.pump();
     await tester.tap(find.widgetWithText(FilledButton, 'Save'));
     await tester.pumpAndSettle();
 
     expect(repository.savedParticipantCategories, ['c2']);
+    expect(repository.savedParticipantSexes, [Sex.female]);
+    expect(repository.savedParticipantWeights, [32.5]);
   });
 
   testWidgets('the club adds the clubs taking part in Settings', (
@@ -566,6 +589,9 @@ void main() {
     await tester.tap(find.text('No club'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Club Yoseikan Sevilla').last);
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Male'));
+    await tester.tap(find.text('Male'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('The legal guardian agrees'));
     await tester.pump();

@@ -2,6 +2,7 @@ package dev.rgal.brackety.participant.importing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
@@ -16,6 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import dev.rgal.brackety.event.EventApiTest;
 import dev.rgal.brackety.participant.Participant;
 import dev.rgal.brackety.participant.ParticipantRepository;
+import dev.rgal.brackety.participant.Sex;
 import dev.rgal.brackety.participant.importing.dto.ImportRow;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -53,7 +55,17 @@ class ParticipantImportControllerTest extends EventApiTest {
                 .thenReturn(List.of(
                         row("Ana", "Prueba", LocalDate.of(2018, 1, 1), null),
                         row("Bea", "Prueba", LocalDate.of(2018, 1, 1), "cat. 7-8"),
-                        new ImportRow("Irene", "Vidal", null, "30/02/2017", 300, null, null, List.of("lastName"))));
+                        new ImportRow(
+                                "Irene",
+                                "Vidal",
+                                null,
+                                "30/02/2017",
+                                Sex.FEMALE,
+                                300,
+                                null,
+                                null,
+                                null,
+                                List.of("lastName"))));
 
         read(PHOTO)
                 .andExpect(status().isOk())
@@ -136,8 +148,33 @@ class ParticipantImportControllerTest extends EventApiTest {
         call(post(path("/check")).content(json(List.of(written), null)), "club1")
                 .andExpect(jsonPath("$[0].errors[0].code").value("CATEGORY_MISMATCH"));
 
-        var chosen =
-                new ImportRow("Bea", "Prueba", LocalDate.of(2018, 1, 1), null, null, "7-8", category("7-8"), List.of());
+        // A list may not say the sex: the club fills it in before registering.
+        var noSex = new ImportRow(
+                "Cris",
+                "Prueba",
+                LocalDate.of(2018, 1, 1),
+                null,
+                null,
+                null,
+                new java.math.BigDecimal("300"),
+                null,
+                null,
+                List.of());
+        call(post(path("/check")).content(json(List.of(noSex), null)), "club1")
+                .andExpect(jsonPath("$[0].errors[*].code", containsInAnyOrder("MISSING", "WEIGHT_OUT_OF_RANGE")))
+                .andExpect(jsonPath("$[0].errors[*].field", containsInAnyOrder("sex", "weightKg")));
+
+        var chosen = new ImportRow(
+                "Bea",
+                "Prueba",
+                LocalDate.of(2018, 1, 1),
+                null,
+                Sex.FEMALE,
+                null,
+                null,
+                "7-8",
+                category("7-8"),
+                List.of());
         register(chosen).andExpect(status().isCreated());
 
         // The chosen category wins over the age everywhere: groups and registrations.
@@ -152,7 +189,7 @@ class ParticipantImportControllerTest extends EventApiTest {
     @Test
     void theRegistrationFormChecksTheChosenCategory() throws Exception {
         var body = """
-                {"firstName":"Ana","lastName":"Prueba","birthDate":"2018-01-01","guardianConsent":true,
+                {"firstName":"Ana","lastName":"Prueba","birthDate":"2018-01-01","sex":"FEMALE","guardianConsent":true,
                  "categoryId":"%s"}""";
         call(post("/api/v1/events/" + eventId + "/participants").content(body.formatted(UUID.randomUUID())), "club1")
                 .andExpect(status().isBadRequest());
@@ -167,7 +204,7 @@ class ParticipantImportControllerTest extends EventApiTest {
         for (var name : List.of("A", "B", "C", "D")) {
             var created = call(
                             post("/api/v1/events/" + eventId + "/participants").content("""
-                                    {"firstName":"%s","lastName":"Prueba","birthDate":"2018-01-01","guardianConsent":true}""".formatted(name)), "club1")
+                                    {"firstName":"%s","lastName":"Prueba","birthDate":"2018-01-01","sex":"FEMALE","guardianConsent":true}""".formatted(name)), "club1")
                     .andReturn()
                     .getResponse()
                     .getContentAsString();
@@ -183,7 +220,7 @@ class ParticipantImportControllerTest extends EventApiTest {
         call(
                         put("/api/v1/events/" + eventId + "/participants/" + ids.get(0))
                                 .content("""
-                                {"firstName":"A","lastName":"Prueba","birthDate":"2018-01-01","guardianConsent":true,
+                                {"firstName":"A","lastName":"Prueba","birthDate":"2018-01-01","sex":"FEMALE","guardianConsent":true,
                                  "categoryId":"%s"}""".formatted(category("7-8"))),
                         "club1")
                 .andExpect(status().isConflict());
@@ -209,7 +246,7 @@ class ParticipantImportControllerTest extends EventApiTest {
     }
 
     private static ImportRow row(String first, String last, LocalDate birth, String category) {
-        return new ImportRow(first, last, birth, null, 130, category, null, List.of());
+        return new ImportRow(first, last, birth, null, Sex.FEMALE, 130, null, category, null, List.of());
     }
 
     private String path(String rest) {

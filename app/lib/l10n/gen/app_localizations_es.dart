@@ -1115,6 +1115,29 @@ class AppLocalizationsEs extends AppLocalizations {
   String get heightInvalid => 'Entre 50 y 250 cm';
 
   @override
+  String get sexLabel => 'Sexo';
+
+  @override
+  String get sexFemale => 'Mujer';
+
+  @override
+  String get sexMale => 'Hombre';
+
+  @override
+  String get sexUnknown => 'sexo sin declarar';
+
+  @override
+  String get weightOptional => 'Peso en kg (opcional)';
+
+  @override
+  String get weightInvalid => 'Entre 10 y 250 kg, con un decimal como mucho';
+
+  @override
+  String weightKg(String kg) {
+    return '$kg kg';
+  }
+
+  @override
   String get guardianConsent => 'El tutor legal está de acuerdo';
 
   @override
@@ -1719,6 +1742,17 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get fieldHeight => 'la estatura';
+
+  @override
+  String get fieldSex => 'el sexo';
+
+  @override
+  String get fieldWeight => 'el peso';
+
+  @override
+  String issueWeight(String kg) {
+    return 'Peso $kg: tiene que estar entre 10 y 250 kg, con un decimal como mucho';
+  }
 
   @override
   String get fieldCategory => 'la categoría';

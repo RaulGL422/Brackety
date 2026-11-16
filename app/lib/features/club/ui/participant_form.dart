@@ -9,8 +9,10 @@ import '../../events/state/events_providers.dart';
 import '../../legal/ui/legal_links.dart';
 import '../data/club_models.dart';
 import '../data/club_repository.dart';
+import '../data/sex.dart';
 import '../state/club_providers.dart';
 import 'club_panel_screen.dart';
+import 'measure_fields.dart';
 import 'organizations_editor.dart';
 
 /// Age on [day], as the server counts it for categories.
@@ -53,7 +55,11 @@ class _ParticipantFormState extends ConsumerState<_ParticipantForm> {
   late final _height = TextEditingController(
     text: widget.participant?.heightCm?.toString(),
   );
+  late final _weight = TextEditingController(
+    text: widget.participant?.weightKg?.toString(),
+  );
   late DateTime? _birthDate = widget.participant?.birthDate;
+  late Sex? _sex = widget.participant?.sex;
   late bool _consent = widget.participant?.guardianConsent ?? false;
   late String? _categoryId = widget.participant?.chosenCategoryId;
   late String? _organizationId = widget.participant?.organizationId;
@@ -65,6 +71,7 @@ class _ParticipantFormState extends ConsumerState<_ParticipantForm> {
     _firstName.dispose();
     _lastName.dispose();
     _height.dispose();
+    _weight.dispose();
     super.dispose();
   }
 
@@ -127,7 +134,12 @@ class _ParticipantFormState extends ConsumerState<_ParticipantForm> {
                     ),
                   ),
                 ),
-                const SizedBox(height: AppSpacing.m),
+                const SizedBox(height: AppSpacing.s),
+                SexField(
+                  initialValue: _sex,
+                  requiredText: l10n.fieldRequired,
+                  onChanged: (sex) => _sex = sex,
+                ),
                 TextFormField(
                   controller: _height,
                   decoration: InputDecoration(labelText: l10n.heightOptional),
@@ -140,6 +152,7 @@ class _ParticipantFormState extends ConsumerState<_ParticipantForm> {
                         : null;
                   },
                 ),
+                WeightField(controller: _weight),
                 const SizedBox(height: AppSpacing.s),
                 CategoryChoice(
                   eventId: widget.eventId,
@@ -200,7 +213,7 @@ class _ParticipantFormState extends ConsumerState<_ParticipantForm> {
     final l10n = AppLocalizations.of(context);
     final valid = _form.currentState!.validate();
     setState(() => _birthDateMissing = _birthDate == null);
-    if (!valid || _birthDate == null) return;
+    if (!valid || _birthDate == null || _sex == null) return;
     setState(() => _saving = true);
     try {
       await ref
@@ -211,7 +224,9 @@ class _ParticipantFormState extends ConsumerState<_ParticipantForm> {
             firstName: _firstName.text.trim(),
             lastName: _lastName.text.trim(),
             birthDate: _birthDate!,
+            sex: _sex!,
             heightCm: int.tryParse(_height.text.trim()),
+            weightKg: parseWeight(_weight.text),
             guardianConsent: _isMinor && _consent,
             categoryId: _categoryId,
             organizationId: _organizationId,

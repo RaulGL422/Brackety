@@ -4,12 +4,16 @@ import dev.rgal.brackety.event.Discipline;
 import dev.rgal.brackety.event.EventCategory;
 import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.league.Podium;
+import dev.rgal.brackety.participant.Sex;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -110,7 +114,8 @@ public record EventPackage(
 
     /**
      * {@code categoryName}: the category chosen for them, or null to follow their age. {@code personId}: the same
-     * person in every phase and on every server; results name participants by it.
+     * person in every phase and on every server; results name participants by it. {@code sex} and {@code weightKg}:
+     * absent in packages made before they were asked.
      */
     public record ParticipantEntry(
             @NotBlank @Size(max = 60) String firstName,
@@ -120,5 +125,7 @@ public record EventPackage(
             boolean guardianConsent,
             String categoryName,
             UUID personId,
-            String organizationName) {}
+            String organizationName,
+            Sex sex,
+            @DecimalMin("10.0") @DecimalMax("250.0") BigDecimal weightKg) {}
 }

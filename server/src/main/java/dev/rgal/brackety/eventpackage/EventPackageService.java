@@ -211,7 +211,9 @@ public class EventPackageService {
                                 p.hasGuardianConsent(),
                                 categoryNames.get(p.getCategoryId()),
                                 p.getPersonId(),
-                                organizationNames.get(p.getOrganizationId())))
+                                organizationNames.get(p.getOrganizationId()),
+                                p.getSex(),
+                                p.getWeightKg()))
                         .toList(),
                 results.export(eventId),
                 staffNames.names(eventId).entrySet().stream()
@@ -513,6 +515,8 @@ public class EventPackageService {
                 entry.heightCm(),
                 entry.guardianConsent(),
                 entry.categoryName() == null ? null : categoryIds.get(entry.categoryName()));
+        participant.setSex(entry.sex());
+        participant.measure(entry.heightCm(), entry.weightKg());
         participant.setOrganizationId(
                 entry.organizationName() == null
                         ? null

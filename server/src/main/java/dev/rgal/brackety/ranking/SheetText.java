@@ -2,6 +2,8 @@ package dev.rgal.brackety.ranking;
 
 import dev.rgal.brackety.grouping.Competitor;
 import dev.rgal.brackety.grouping.Match;
+import dev.rgal.brackety.participant.Sex;
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -32,6 +34,18 @@ final class SheetText {
     static String duration(long millis) {
         var d = Duration.ofMillis(millis);
         return "%d:%02d".formatted(d.toMinutes(), d.toSecondsPart());
+    }
+
+    static String sex(Sex sex) {
+        if (sex == null) {
+            return "Sin declarar";
+        }
+        return sex == Sex.FEMALE ? "Mujer" : "Hombre";
+    }
+
+    /** With a decimal comma, as a spreadsheet set to Spanish reads a number. */
+    static String decimal(BigDecimal value) {
+        return value == null ? null : value.toPlainString().replace('.', ',');
     }
 
     static String yesNo(boolean value) {

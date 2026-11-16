@@ -15,6 +15,7 @@ import '../data/club_models.dart';
 import '../data/club_repository.dart';
 import '../state/club_providers.dart';
 import 'club_panel_screen.dart';
+import 'measure_fields.dart';
 import 'participant_form.dart';
 import 'participant_record_sheet.dart';
 
@@ -94,6 +95,7 @@ class _ParticipantTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    final locale = Localizations.localeOf(context).toLanguageTag();
     final height = p.heightCm == null
         ? l10n.heightUnknown
         : l10n.heightCm(p.heightCm!);
@@ -109,7 +111,9 @@ class _ParticipantTile extends ConsumerWidget {
                 p.age,
                 p.categoryName ?? l10n.noCategory,
               ),
+              sexText(l10n, p.sex),
               height,
+              if (p.weightKg != null) weightText(l10n, locale, p.weightKg!),
               ?p.organizationName,
             ].join(' · '),
           ),

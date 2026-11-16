@@ -7,7 +7,9 @@ String issueText(AppLocalizations l10n, RowIssue issue, CheckedRow row) {
     'firstName' => l10n.fieldFirstName,
     'lastName' => l10n.fieldLastName,
     'birthDate' => l10n.fieldBirthDate,
+    'sex' => l10n.fieldSex,
     'heightCm' => l10n.fieldHeight,
+    'weightKg' => l10n.fieldWeight,
     _ => l10n.fieldCategory,
   };
   final detail = issue.detail ?? '';
@@ -17,6 +19,7 @@ String issueText(AppLocalizations l10n, RowIssue issue, CheckedRow row) {
     IssueCode.invalidDate => l10n.issueInvalidDate(detail),
     IssueCode.futureDate => l10n.issueFutureDate,
     IssueCode.heightOutOfRange => l10n.issueHeight(detail),
+    IssueCode.weightOutOfRange => l10n.issueWeight(detail),
     IssueCode.noCategory => l10n.issueNoCategory(detail),
     IssueCode.unknownCategory =>
       issue.detail == null

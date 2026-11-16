@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../auth/state/session_controller.dart';
 import 'club_models.dart';
+import 'sex.dart';
 
 final clubRepositoryProvider = Provider<ClubRepository>(
   (ref) => ClubRepository(ref.watch(apiProvider)),
@@ -145,7 +146,9 @@ class ClubRepository {
     required String firstName,
     required String lastName,
     required DateTime birthDate,
+    required Sex sex,
     required int? heightCm,
+    required double? weightKg,
     required bool guardianConsent,
     String? categoryId,
     String? organizationId,
@@ -154,7 +157,9 @@ class ClubRepository {
       'firstName': firstName,
       'lastName': lastName,
       'birthDate': _day.format(birthDate),
+      'sex': sex.toJson(),
       'heightCm': heightCm,
+      'weightKg': weightKg,
       'guardianConsent': guardianConsent,
       'categoryId': categoryId,
       'organizationId': organizationId,

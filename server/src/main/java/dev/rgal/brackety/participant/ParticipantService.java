@@ -127,6 +127,8 @@ public class ParticipantService {
                 request.heightCm(),
                 request.guardianConsent(),
                 request.categoryId());
+        participant.setSex(request.sex());
+        participant.measure(request.heightCm(), request.weightKg());
         participant.setOrganizationId(request.organizationId());
         participants.save(participant);
         return toResponse(participant, event, eventCategories, organizationNames);
@@ -146,7 +148,9 @@ public class ParticipantService {
                 p.getFirstName(),
                 p.getLastName(),
                 p.getBirthDate(),
+                p.getSex(),
                 p.getHeightCm(),
+                p.getWeightKg(),
                 p.hasGuardianConsent(),
                 age,
                 category.map(EventCategory::getId).orElse(null),

@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -29,6 +30,11 @@ public class Participant {
     @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "person_id")
     private Person person;
+
+    /** Measured for this event; the person keeps the latest. */
+    private Integer heightCm;
+
+    private BigDecimal weightKg;
 
     private boolean guardianConsent;
     private UUID categoryId;
@@ -86,8 +92,32 @@ public class Participant {
         return person.getBirthDate();
     }
 
+    public Sex getSex() {
+        return person.getSex();
+    }
+
+    /** Measured for this event, or null. */
     public Integer getHeightCm() {
-        return person.getHeightCm();
+        return heightCm;
+    }
+
+    /** Measured for this event, or null. */
+    public BigDecimal getWeightKg() {
+        return weightKg;
+    }
+
+    /** Null keeps the sex they have: someone from F1 may still have none. */
+    public void setSex(Sex sex) {
+        if (sex != null) {
+            person.setSex(sex);
+        }
+    }
+
+    /** This event's height and weight; the person keeps them as their latest. */
+    public void measure(Integer heightCm, BigDecimal weightKg) {
+        this.heightCm = heightCm;
+        this.weightKg = weightKg;
+        person.measured(heightCm, weightKg);
     }
 
     public boolean hasGuardianConsent() {
@@ -120,7 +150,10 @@ public class Participant {
         update(firstName, lastName, birthDate, heightCm, guardianConsent, null);
     }
 
-    /** The name, birth date and height change for the person, so in every phase they are in. */
+    /**
+     * The name and birth date change for the person, so in every phase they are in; {@code heightCm} is this event's
+     * (see {@link #measure}, which also takes the weight).
+     */
     public void update(
             String firstName,
             String lastName,
@@ -128,7 +161,8 @@ public class Participant {
             Integer heightCm,
             boolean guardianConsent,
             UUID categoryId) {
-        person.update(firstName, lastName, birthDate, heightCm);
+        person.update(firstName, lastName, birthDate);
+        measure(heightCm, weightKg);
         this.guardianConsent = guardianConsent;
         this.categoryId = categoryId;
     }
