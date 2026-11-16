@@ -209,6 +209,17 @@ class _StandingsState extends ConsumerState<_Standings> {
                     EventExport.leagueStandings,
                   ),
                 ),
+              if (kIsWeb)
+                TextButton.icon(
+                  icon: const Icon(Icons.folder_zip_outlined),
+                  label: Text(l10n.leagueStandingsByCategory),
+                  onPressed: () => downloadExport(
+                    context,
+                    ref,
+                    widget.eventId,
+                    EventExport.categoryStandings,
+                  ),
+                ),
             ],
           ),
         ),

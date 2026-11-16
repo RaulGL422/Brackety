@@ -13,13 +13,16 @@ import com.jayway.jsonpath.JsonPath;
 import dev.rgal.brackety.event.EventApiTest;
 import dev.rgal.brackety.participant.Participant;
 import dev.rgal.brackety.participant.ParticipantRepository;
+import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.zip.ZipInputStream;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -167,6 +170,24 @@ class LeagueControllerTest extends EventApiTest {
                 .getContentAsString(StandardCharsets.UTF_8);
         assertThat(csv).contains("Categoría;Posición;Medalla;Nombre;Apellidos;Club;Fase 1: asistencia");
         assertThat(csv).contains("9-10;1;Oro (1.º);Ana;Prueba;Club Demo Yoseikan;10;2;12;No inscrito;;;12");
+
+        // The entity asked for one file per category (2026-11-16).
+        var zip = call(get("/api/v1/events/" + phase2 + "/export/league-standings-by-category.zip"), "club1")
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsByteArray();
+        var files = new LinkedHashMap<String, String>();
+        try (var in = new ZipInputStream(new ByteArrayInputStream(zip))) {
+            for (var entry = in.getNextEntry(); entry != null; entry = in.getNextEntry()) {
+                files.put(entry.getName(), new String(in.readAllBytes(), StandardCharsets.UTF_8));
+            }
+        }
+        assertThat(files).containsOnlyKeys("clasificacion-9-10.csv");
+        assertThat(files.get("clasificacion-9-10.csv"))
+                .contains("Posición;Medalla;Nombre;Apellidos;Club;Fase 1;Fase 2;Total liga;Advertencias;"
+                        + "Descalificaciones\r\n")
+                .contains("1;Oro (1.º);Ana;Prueba;Club Demo Yoseikan;12;No inscrito;12;0;0\r\n");
     }
 
     @Test

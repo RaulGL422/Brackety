@@ -2232,6 +2232,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get leagueStandingsCsv => 'Descargar CSV';
 
   @override
+  String get leagueStandingsByCategory => 'Un CSV por categoría (.zip)';
+
+  @override
   String leaguePhasePoints(int number, int total, int attendance, int matches) {
     return 'Fase $number: $total ($attendance por asistir + $matches en combates)';
   }

@@ -7,6 +7,7 @@ import dev.rgal.brackety.event.EventCategoryRepository;
 import dev.rgal.brackety.event.EventRepository;
 import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventService;
+import dev.rgal.brackety.eventpackage.EventPackageService;
 import dev.rgal.brackety.grouping.CompetitorDirectory;
 import dev.rgal.brackety.grouping.Match;
 import dev.rgal.brackety.grouping.MatchRepository;
@@ -251,5 +252,43 @@ class LeagueStandingsService {
                 })
                 .toList();
         return Csv.of(header, rows);
+    }
+
+    /**
+     * The league standings with one sheet per category, in the categories' order, keyed by file name
+     * ("clasificacion-9-10.csv"). Only the total of each phase: the full breakdown is in {@link #csv}.
+     */
+    @Transactional(readOnly = true)
+    Map<String, String> categoryCsvs(UUID eventId, UUID accountId) {
+        var result = standings(eventId, accountId);
+        var header = new ArrayList<>(List.of("Posición", "Medalla", "Nombre", "Apellidos", "Club"));
+        result.phases().forEach(phase -> header.add("Fase " + phase.number()));
+        header.addAll(List.of("Total liga", "Advertencias", "Descalificaciones"));
+        var sheets = new LinkedHashMap<String, String>();
+        result.rows().stream()
+                .collect(Collectors.groupingBy(Row::categoryName, LinkedHashMap::new, Collectors.toList()))
+                .forEach((category, rows) -> sheets.put(
+                        "clasificacion-" + EventPackageService.slug(category) + ".csv",
+                        Csv.of(
+                                header,
+                                rows.stream()
+                                        .map(LeagueStandingsService::categoryCells)
+                                        .toList())));
+        return sheets;
+    }
+
+    private static List<Object> categoryCells(Row r) {
+        var cells = new ArrayList<Object>();
+        // With 0 points nobody has a place yet (the app shows a dash too).
+        cells.add(r.total() > 0 ? r.position() : null);
+        cells.add(SheetText.medal(r.medal()));
+        cells.add(r.firstName());
+        cells.add(r.lastName());
+        cells.add(r.organizationName());
+        r.phases().forEach(p -> cells.add(p == null ? "No inscrito" : p.total()));
+        cells.add(r.total());
+        cells.add(r.warnings());
+        cells.add(r.disqualifications());
+        return cells;
     }
 }

@@ -7,6 +7,7 @@ import dev.rgal.brackety.ranking.dto.LeagueStandings;
 import dev.rgal.brackety.ranking.dto.ParticipantRecord;
 import dev.rgal.brackety.ranking.dto.StandingRow;
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.ContentDisposition;
@@ -79,6 +80,16 @@ class StandingsController {
     @GetMapping("/export/league-standings.csv")
     ResponseEntity<byte[]> leagueStandingsCsv(@PathVariable UUID eventId, @AuthenticationPrincipal Jwt jwt) {
         return file("clasificacion-liga.csv", CSV, leagueStandings.csv(eventId, CurrentAccount.id(jwt)));
+    }
+
+    /** One CSV of the league standings per category, in a .zip. */
+    @GetMapping("/export/league-standings-by-category.zip")
+    ResponseEntity<byte[]> categoryStandings(@PathVariable UUID eventId, @AuthenticationPrincipal Jwt jwt) {
+        var files = new LinkedHashMap<String, byte[]>();
+        leagueStandings
+                .categoryCsvs(eventId, CurrentAccount.id(jwt))
+                .forEach((name, csv) -> files.put(name, Zip.text(csv)));
+        return file("clasificacion-por-categoria.zip", ZIP, Zip.of(files));
     }
 
     @GetMapping("/export/matches.csv")

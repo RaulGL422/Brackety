@@ -1263,6 +1263,7 @@
   },
   "leagueStandings": "Clasificación de la liga",
   "leagueStandingsCsv": "Descargar CSV",
+  "leagueStandingsByCategory": "Un CSV por categoría (.zip)",
   "leaguePhasePoints": "Fase {number}: {total} ({attendance} por asistir + {matches} en combates)",
   "@leaguePhasePoints": {
     "placeholders": {

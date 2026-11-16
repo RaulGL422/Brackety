@@ -1,15 +1,11 @@
 package dev.rgal.brackety.ranking;
 
+import static dev.rgal.brackety.ranking.Zip.text;
+
 import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.eventpackage.EventPackageService;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.UUID;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.json.JsonMapper;
@@ -42,6 +38,9 @@ class FullExportService {
             clasificacion-fase.csv  Puntuación de esta fase: asistencia + puntos en combates.
             clasificacion-liga.csv  Puntuación acumulada de la liga por categoría, con una columna por
                                     fase, el total y la medalla según el podio configurado.
+            clasificacion-por-categoria/
+                                    La misma clasificación de la liga, un fichero por categoría: posición,
+                                    medalla, alumno, club, total de cada fase y total de la liga.
             evento.brackety         El evento completo en JSON (configuración, inscritos y resultados):
                                     sirve para arrancar el servidor del pabellón
                                     (start-event.ps1 -Package <este .zip>) o para importar los
@@ -49,6 +48,8 @@ class FullExportService {
 
             Contiene datos personales de menores: guárdalo solo donde haga falta y bórralo cuando ya no.
             """;
+
+    private static final String CATEGORY_FOLDER = "clasificacion-por-categoria/";
 
     private final EventSheets sheets;
     private final StandingsService standings;
@@ -90,28 +91,13 @@ class FullExportService {
         files.put("linea-de-tiempo.csv", text(sheets.timelineCsv(eventId, accountId)));
         files.put("clasificacion-fase.csv", text(standings.standingsCsv(eventId, accountId)));
         files.put("clasificacion-liga.csv", text(leagueStandings.csv(eventId, accountId)));
+        leagueStandings
+                .categoryCsvs(eventId, accountId)
+                .forEach((name, csv) -> files.put(CATEGORY_FOLDER + name, text(csv)));
         files.put(
                 EventPackageService.ZIP_ENTRY,
                 json.writerWithDefaultPrettyPrinter().writeValueAsBytes(eventPackage));
         var filename = EventPackageService.fileName(event) + ".zip";
-        return new Export(filename, zip(files));
-    }
-
-    private static byte[] text(String content) {
-        return content.getBytes(StandardCharsets.UTF_8);
-    }
-
-    private static byte[] zip(LinkedHashMap<String, byte[]> files) {
-        var out = new ByteArrayOutputStream();
-        try (var zip = new ZipOutputStream(out, StandardCharsets.UTF_8)) {
-            for (var file : files.entrySet()) {
-                zip.putNextEntry(new ZipEntry(file.getKey()));
-                zip.write(file.getValue());
-                zip.closeEntry();
-            }
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-        return out.toByteArray();
+        return new Export(filename, Zip.of(files));
     }
 }

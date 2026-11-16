@@ -3660,6 +3660,12 @@ abstract class AppLocalizations {
   /// **'Descargar CSV'**
   String get leagueStandingsCsv;
 
+  /// No description provided for @leagueStandingsByCategory.
+  ///
+  /// In es, this message translates to:
+  /// **'Un CSV por categoría (.zip)'**
+  String get leagueStandingsByCategory;
+
   /// No description provided for @leaguePhasePoints.
   ///
   /// In es, this message translates to:
