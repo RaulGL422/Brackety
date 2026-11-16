@@ -11,6 +11,15 @@ Objetivo: calidad sin horas de QA manual. Los tests se escriben con la tarea, en
 | Widget | `flutter test` | Pantallas críticas (marcador, inscripción) |
 | E2E | Solo flujos críticos | Login, inscripción por QR, marcador offline → sync |
 
+## Cuándo se ejecuta qué (Raul, 2026-11-16)
+| Momento | Qué |
+|---|---|
+| Desarrollo | Tests del módulo tocado |
+| PR a `development` | Componentes tocados (server, app, admin, core) + docs |
+| Release a `main` | Batería completa: todo, E2E, despliegue y restauración |
+| Cierre de módulo | Suite del componente + checklist de abajo |
+- El CI aún corre todo en cada PR: filtros por ruta y trabajo `ci-ok` en `producto/calidad.md`.
+
 ## Checklist de cierre de módulo
 - [ ] Reglas del MD del módulo cubiertas por tests (una regla = al menos un test).
 - [ ] Casos límite: vacíos, impares, 1 participante, duplicados, fechas límite.
