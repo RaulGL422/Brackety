@@ -50,6 +50,7 @@ Línea de infraestructura; puede ir en paralelo con la etapa 2 (otro worktree).
 2. Inventario del código con números.
 3. Refactor por módulo con tests de caracterización, empezando por marcador, grupos y tablero.
 4. Revisión de diseño completa con `frontend-design` y lista priorizada.
+5. E2E con Playwright sobre la web de los flujos críticos (login, crear grupo, marcador con y sin red, sincronización), solo en la batería completa de cada release.
 
 ## Más tarde · Etapa 4: eventos y módulos pendientes
 - Rediseño de eventos (`eventos-ux.md`): maquetas, prueba con 6 tareas y, después, por secciones.
