@@ -59,7 +59,7 @@ Las de octubre de 2026, en `decisiones-2026-10.md`.
 - 2026-11-11 · Descalificación = límite de puntos para el rival y 0 para el descalificado; duración (F1: 3:00) y límite editables en Configuración, sin cambiar con un combate en curso (el límite, tras empezar uno) · pedido por Raul para la F1.
 - 2026-11-11 · El ayudante puede deshacer un grupo mientras ningún combate suyo haya empezado; después solo el superadmin · corregir errores al crear sin borrar puntos.
 - 2026-11-11 · Tiempo real con un WebSocket simple que solo avisa "esto cambió" (el cliente vuelve a pedir por REST), no STOMP; sondeo de respaldo cada 20 s · permisos y vistas en un solo sitio; un aviso perdido solo retrasa.
-- 2026-11-12 · El nombre de la persona detrás de cada cuenta del staff es por evento y lo pone el club · las cuentas del pabellón son genéricas (arbitro1…) y cambian de persona entre fases.
+- 2026-11-12 · (Sustituida el 2026-11-16) El nombre de la persona detrás de cada cuenta del staff es por evento y lo pone el club · las cuentas del pabellón son genéricas (arbitro1…) y cambian de persona entre fases.
 - 2026-11-12 · Un equipo real puede llevar alumnos fantasma (ya en otro equipo o grupo): combaten pero no puntúan por él; dos equipos de un grupo que comparten alumno solo dan aviso · pedido por Raul para completar equipos con pocos alumnos.
 - 2026-11-11 · En la F1 árbitros y ayudantes usan la web también en el pabellón, con la misma cola offline que la APK guardada en el navegador; el paquete ya no lleva APK por defecto · pedido por Raul: solo web, que es lo probado.
 - 2026-11-12 · Sin límite de fantasmas: un grupo individual admite hasta 3 (al menos 1 real) y un equipo puede ser entero de fantasmas · pedido por Raul en la prueba in situ, para categorías con pocos alumnos.
@@ -81,3 +81,10 @@ Las de octubre de 2026, en `decisiones-2026-10.md`.
 - 2026-11-14 · Al cambiar los tapices, propuestas del bote estables y aviso "Sincronizando combates" con los tapices que faltan, sin bloquear el inicio de combates · Raul.
 - 2026-11-14 · Inhabilitar tapiz = quitarle el árbitro tras repartir sus grupos individuales (destino elegido por grupo o Automático) y devolver al bote sus combates de equipos; sin estado nuevo en BD · Raul.
 - 2026-11-13 · F1 real: 3 tapices; 5-8 individual y siempre a dos manos (aviso de una mano ampliado a 4-8 años); 9-12, 13-16 y 17+ por equipos (2 o 3); cuentas del portátil con usuario = contraseña; botón del superadmin para reiniciar el evento desde el paquete · Raul.
+- 2026-11-16 · Fin del staff genérico: en producción cada árbitro y ayudante entra con su cuenta y el club lo invita; se retira el nombre por evento (`staffNames`); las cuentas genéricas quedan solo en debug · Raul tras la F1; el club pide sus datos a buen recaudo.
+- 2026-11-16 · Dos entornos: producción (datos reales, solo releases) y debug con URL propia y escenarios cargables desde su superadmin · Raul: probar sin tocar los datos del club.
+- 2026-11-16 · Tests: en desarrollo y PRs solo los módulos tocados; batería completa (con E2E, despliegue y restauración) antes de cada release a `main` · Raul.
+- 2026-11-16 · Toda PR que cambie pantallas pasa la skill `frontend-design` y capturas en 3 tamaños · Raul: pantallas más ordenadas.
+- 2026-11-16 · El entorno debug va en la misma Pi que producción, parado los días de evento · Raul.
+- 2026-11-16 · Todos los datos de la F1 pasan a producción en una cuenta privada de la entidad que lleva Raul; se cede al club cuando la app esté estable · Raul.
+- 2026-11-16 · Calendario: competición aparte de la liga el 2026-12-20 (grupos de 4 individuales, 3 modalidades seguidas) y F2 el 2027-01-24; peso y edades mezcladas pero distinguidas, para la F2 · Raul.

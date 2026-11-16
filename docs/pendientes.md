@@ -29,6 +29,18 @@
 - [ ] Login con Apple cuando haya cuenta Apple Developer o app iOS.
 - [ ] Login con Google en la app (botón + `REGISTRATION_REQUIRED`) cuando existan los client IDs.
 
+## Tras la Fase 1 (2026-11-16; plan en `producto/roadmap.md`)
+- [ ] Competición del 2026-12-20: modalidades y sus reglas, clasificación, categorías, tapices y servidor (`producto/competicion-2026-12-20.md`).
+- [ ] Debug en la Pi: ¿valen las URLs `brackety-debug*.rgal.dev`? (`modulos/entornos.md`).
+- [ ] F2-1 peso: ¿solo informativo o sirve para hacer grupos? ¿Declarado en la inscripción o pesado el día?
+- [ ] F2-2 edades: ¿en qué pantallas debe verse la edad? ¿La clasificación sigue siendo una por categoría o se separa por edad?
+- [ ] F1-2 comodín: ¿qué se apañó a mano en la Pi? Revisar que la clasificación sea correcta.
+- [ ] F1-3 puntos fuera de tiempo: ¿solo hasta "Finalizar" o también después (con motivo)? ¿Quién: árbitro, club o ambos?
+- [ ] F1-4 advertencias: ¿motivos por deporte, por evento o por fase? ¿Cuáles para Yoseikan?
+- [ ] F1-5 cuentas propias: ¿un árbitro sin cuenta puede entrar con un enlace de invitación de un solo evento, o siempre cuenta completa?
+- [ ] Gestión del club (`producto/gestion-club.md`): ¿se amplía el alcance? Cambia `00-vision.md` (hoy cobros fuera de alcance).
+- [ ] Si se cobra o se factura: forma jurídica, asesor fiscal y contratos con los clubes.
+
 ## Prototipo Fase 1 (bloquean el uso real)
 - [ ] Raul · Cloudflare para dejarlo todo listo (sin configurar el 2026-11-05). Pasos en `09-despliegue.md` (paso 8); `.env` de la Pi en `prototipo-f1.md` (Despliegue):
   - Un túnel en la Pi (Zero Trust → Networks → Tunnels, tipo Cloudflared); su token en `CLOUDFLARE_TUNNEL_TOKEN`.

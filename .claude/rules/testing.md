@@ -7,6 +7,6 @@
 - Front: widget test de cada pantalla crítica en 3 tamaños (móvil 360×800, tablet 800×1280, escritorio 1440×900).
 - Motor de puntuación, sorteos y calendarios: tests deterministas con semilla fija y casos límite (grupos de 3, 4, 5, impares, 0 participantes).
 - Front: unit de lógica, widget test por pantalla crítica. E2E solo en flujos críticos: login, inscripción, marcador, offline/sincronización.
-- Ejecutar solo los tests afectados mientras se desarrolla; la suite completa corre en CI y antes de cerrar módulo.
+- En desarrollo y en las PR, solo los tests de los módulos tocados. Batería completa (todos los tests, E2E, despliegue y restauración) antes de cada release a `main` y al cerrar módulo. Tabla en `docs/04-testing.md`.
 - Test que falla = se arregla la causa; prohibido borrarlo o ignorarlo.
 - Datos de prueba ficticios; nunca datos personales reales.

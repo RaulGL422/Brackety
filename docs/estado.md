@@ -1,10 +1,11 @@
 # Estado del proyecto
 
-Última actualización: 2026-11-13. Fase 0 cerrada; en curso: **auth** (pruebas) y la preparación de la Fase 1 (ver "Hasta la Fase 1").
+Última actualización: 2026-11-16. **Fase 1 hecha (2026-11-14) con éxito**: puntuaciones correctas y casi sin fallos. Ahora, pausa para organizarse; plan en `producto/roadmap.md` (retrospectiva en `producto/feedback-f1.md`). Próximo: competición el 2026-12-20 y F2 el 2027-01-24.
 
 | Módulo | Doc | Estado | Rama activa |
 |---|---|---|---|
 | infra-deploy | modulos/infra-deploy.md | cerrado (2026-10-30) | – |
+| entornos (producción y debug) | modulos/entornos.md | pendiente: diseño propuesto (2026-11-16) | – |
 | auth | modulos/auth.md | en pruebas: tareas 1-9/9 hechas; falta la prueba manual del módulo completo de Raul (registro, login, sesión, bloqueo, limitador; verificación, recuperación, purga, avisos por email; login Google, sustitución de cuenta sin verificar, vincular y desvincular; `/me`, perfiles, reauth, cambio de email, borrado lógico con restaurar y purga, exportación; corte de tokens al cerrar sesiones, bloqueo de borrado a dueños de eventos; superadmin por entorno tras Cloudflare Access verificado en la API, bloqueos y validación de organizadores con auditoría; app: login con bloqueo y restaurar cuenta, registro, verificación pendiente, verificar email, recuperar y cambiar contraseña, sesión con refresh seguro en Android y sin red; entrar tras registrarse, perfiles Club y Ayudante; registro de organizadores con CIF; ajustes de cuenta: idioma de app y emails, perfiles, cambio de email, exportar, borrar, Google ya vinculado; admin: login de superadmin con token en memoria, bloqueos con revocar, organizadores con filtro y validar) (2026-11-02) | feat/auth-admin-login |
 | perfiles-menores | modulos/perfiles-menores.md | pendiente | – |
 | legal-paginas | modulos/legal-paginas.md | en pruebas: pasos 1-2 hechos (back: textos ES/EN en ficheros, `GET /api/v1/legal` y `/{tipo}`, versiones validadas en registro; app: páginas `/legal/<tipo>`, casilla del registro con enlaces y versiones del servidor, pie, ajustes, licencias, aviso en alumno e importación); falta prueba manual de Raul y la puerta `LEGAL_GATE` cuando existan publicar eventos y pasar de fase (2026-11-04) | feat/legal-front |
