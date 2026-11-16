@@ -95,7 +95,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get controlDisableMatBody =>
-      'Choose the mat for each group with pending matches (Automatic: the one that finishes first). Team matches are shared among the other mats. It is left without a referee: to use it again, assign one in Settings.';
+      'Choose the mat each group with pending matches goes to (Automatic: the one that ends first). Team matches go to the other mats. To use it again, \"Enable mat\" in Mats gives it back its referee.';
 
   @override
   String controlMatDisabled(int groups, int pool) {
@@ -118,6 +118,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get controlPickMat => 'To which mat?';
+
+  @override
+  String get controlEnableMat => 'Enable mat';
+
+  @override
+  String controlMatEnabled(int number) {
+    return 'Mat $number back in use with its referee.';
+  }
+
+  @override
+  String get controlMatNotDisabled => 'This mat is already in use.';
+
+  @override
+  String get controlMatRefereeTaken =>
+      'Its referee is no longer free: assign one in Settings.';
+
+  @override
+  String get matDisabled => 'Out of use';
+
+  @override
+  String matDisabledSince(String time) {
+    return 'Out of use since $time';
+  }
+
+  @override
+  String matDisabledReferee(String name) {
+    return 'Referee: $name';
+  }
 
   @override
   String get controlNoOtherMat => 'No other mat has a referee.';

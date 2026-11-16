@@ -364,8 +364,11 @@ class _MatPlan extends StatelessWidget {
     final text = Theme.of(context).textTheme;
     return Card(
       child: ExpansionTile(
+        leading: mat.disabled ? const Icon(Icons.block) : null,
         title: Text(
-          mat.referee == null
+          mat.disabled
+              ? l10n.eventMatDisabled(mat.number)
+              : mat.referee == null
               ? l10n.eventMatNoReferee(mat.number)
               : l10n.eventMatReferee(mat.number, mat.referee!),
         ),
@@ -385,7 +388,10 @@ class _MatPlan extends StatelessWidget {
         ),
         expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (mat.referee != null) DisableMatButton(event: event, mat: mat),
+          if (mat.disabled)
+            EnableMatButton(event: event, mat: mat)
+          else if (mat.referee != null)
+            DisableMatButton(event: event, mat: mat),
           if (mat.plan.isNotEmpty) Text(l10n.planHint, style: text.bodySmall),
           for (final (i, p) in mat.plan.indexed)
             Padding(

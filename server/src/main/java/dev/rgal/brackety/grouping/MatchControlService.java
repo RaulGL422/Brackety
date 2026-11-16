@@ -241,11 +241,14 @@ public class MatchControlService {
         if (toPlay.stream().anyMatch(Match::isInReview)) {
             throw EventException.conflict("MATCH_IN_REVIEW", "A match on this mat waits for the club's review.");
         }
+        if (mat.getRefereeAccountId() == null) {
+            throw EventException.conflict("MAT_WITHOUT_REFEREE", "This mat has no referee: it is already out of use.");
+        }
         if (mats.findByEventIdOrderByNumber(eventId).stream()
                 .noneMatch(m -> !m.getId().equals(matId) && m.getRefereeAccountId() != null)) {
             throw EventException.conflict("NO_OTHER_MAT", "No other mat has a referee to take its matches.");
         }
-        mat.disable();
+        mat.disable(clock.instant());
         matSync.changed(eventId);
         var moved = new HashSet<UUID>();
         // The chosen ones first, so the automatic ones count them on their new mats.
@@ -278,6 +281,32 @@ public class MatchControlService {
         }
         log.info("Mat {} disabled by {}: {} groups moved", mat.getNumber(), who(by), moved.size());
         return new DisabledMat(moved.size(), toPool);
+    }
+
+    /**
+     * A mat put out of use goes back in use with the referee it had (F1-1), as long as that referee is still one of
+     * the event's and no other mat has taken them meanwhile. Groups that left it stay where they went.
+     */
+    @Transactional
+    public void enableMat(UUID eventId, UUID matId, UUID by) {
+        events.lock(eventId);
+        var mat =
+                mats.findById(matId).filter(m -> m.getEventId().equals(eventId)).orElseThrow(EventException::notFound);
+        if (!mat.isDisabled()) {
+            throw EventException.conflict("MAT_NOT_DISABLED", "This mat is in use.");
+        }
+        var referee = mat.getDisabledRefereeAccountId();
+        if (referee == null || !access.roles(eventId, referee).contains(EventRole.REFEREE)) {
+            throw EventException.conflict(
+                    "REFEREE_GONE", "Its referee is no longer one of the event's: assign one in the settings.");
+        }
+        if (mats.findByEventIdOrderByNumber(eventId).stream().anyMatch(m -> referee.equals(m.getRefereeAccountId()))) {
+            throw EventException.conflict(
+                    "REFEREE_ON_OTHER_MAT", "Its referee is on another mat now: assign one in the settings.");
+        }
+        mat.enable();
+        matSync.changed(eventId);
+        log.info("Mat {} enabled by {}", mat.getNumber(), who(by));
     }
 
     /** The referee may start it although someone in it has not had the least rest. Recorded with who and when. */

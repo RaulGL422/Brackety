@@ -109,6 +109,8 @@ class MatBoardService {
                             s.mat().getId(),
                             s.mat().getNumber(),
                             referees.get(s.mat().getRefereeAccountId()),
+                            s.mat().getDisabledAt(),
+                            referees.get(s.mat().getDisabledRefereeAccountId()),
                             s.groups() + poolGroups,
                             s.pendingMatches() + pool.size(),
                             s.matchInProgress(),

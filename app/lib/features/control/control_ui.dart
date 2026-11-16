@@ -39,6 +39,8 @@ String controlErrorText(AppLocalizations l10n, DioException e) =>
       'SAME_FIGHTER' => l10n.controlSameFighter,
       'MATCH_IN_REVIEW' => l10n.controlMatInReview,
       'NO_OTHER_MAT' => l10n.controlNoOtherMat,
+      'MAT_NOT_DISABLED' => l10n.controlMatNotDisabled,
+      'REFEREE_GONE' || 'REFEREE_ON_OTHER_MAT' => l10n.controlMatRefereeTaken,
       _ => l10n.controlError,
     };
 
@@ -210,6 +212,62 @@ class MatchControlMenu extends ConsumerWidget {
 /// For the club, on a mat with a referee: put it out of use. Each individual group with
 /// pending matches goes to the mat chosen for it, or the one free first; it takes no more team
 /// matches. A referee in the settings puts it back.
+/// Puts the mat out of use after the club chooses where each of its groups goes; says how it went.
+/// True if it was disabled.
+Future<bool> disableMat(
+  BuildContext context,
+  WidgetRef ref, {
+  required String eventId,
+  required String matId,
+  required MatBoard board,
+}) async {
+  final l10n = AppLocalizations.of(context);
+  final groupMats = await showDialog<Map<String, String>>(
+    context: context,
+    builder: (_) => _DisableMatDialog(board: board, matId: matId),
+  );
+  if (groupMats == null || !context.mounted) return false;
+  final toasts = Toasts.of(context);
+  try {
+    final done = await ref
+        .read(controlRepositoryProvider)
+        .disableMat(eventId, matId, groupMats);
+    toasts.show(
+      l10n.controlMatDisabled(done.groupsMoved, done.teamMatchesToPool),
+      kind: ToastKind.success,
+    );
+    ref.invalidate(matsOverviewProvider(eventId));
+    return true;
+  } on DioException catch (e) {
+    toasts.show(
+      ApiError.from(e).code == 'MATCH_IN_PROGRESS'
+          ? l10n.controlMatBusy
+          : controlErrorText(l10n, e),
+      kind: ToastKind.error,
+    );
+    return false;
+  }
+}
+
+/// Puts a mat out of use back in use with the referee it had; says how it went.
+Future<void> enableMat(
+  BuildContext context,
+  WidgetRef ref, {
+  required String eventId,
+  required MatOverview mat,
+}) async {
+  final l10n = AppLocalizations.of(context);
+  final toasts = Toasts.of(context);
+  try {
+    await ref.read(controlRepositoryProvider).enableMat(eventId, mat.id);
+    toasts.show(l10n.controlMatEnabled(mat.number), kind: ToastKind.success);
+  } on DioException catch (e) {
+    toasts.show(controlErrorText(l10n, e), kind: ToastKind.error);
+  }
+  ref.invalidate(matsOverviewProvider(eventId));
+}
+
+/// On the club's view of a mat's board: put it out of use.
 class DisableMatButton extends ConsumerWidget {
   const DisableMatButton({
     super.key,
@@ -233,30 +291,14 @@ class DisableMatButton extends ConsumerWidget {
       tooltip: l10n.controlDisableMat,
       icon: Icon(Icons.block, color: color),
       onPressed: () async {
-        final groupMats = await showDialog<Map<String, String>>(
-          context: context,
-          builder: (_) => _DisableMatDialog(board: board, matId: matId),
+        final disabled = await disableMat(
+          context,
+          ref,
+          eventId: eventId,
+          matId: matId,
+          board: board,
         );
-        if (groupMats == null || !context.mounted) return;
-        final toasts = Toasts.of(context);
-        try {
-          final done = await ref
-              .read(controlRepositoryProvider)
-              .disableMat(eventId, matId, groupMats);
-          toasts.show(
-            l10n.controlMatDisabled(done.groupsMoved, done.teamMatchesToPool),
-            kind: ToastKind.success,
-          );
-          ref.invalidate(matsOverviewProvider(eventId));
-          onChanged();
-        } on DioException catch (e) {
-          toasts.show(
-            ApiError.from(e).code == 'MATCH_IN_PROGRESS'
-                ? l10n.controlMatBusy
-                : controlErrorText(l10n, e),
-            kind: ToastKind.error,
-          );
-        }
+        if (disabled) onChanged();
       },
     );
   }

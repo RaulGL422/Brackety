@@ -288,6 +288,68 @@ class MatchControlTest extends AdminApiTestBase {
     }
 
     @Test
+    void aDisabledMatShowsSinceWhenAndWithWhomAndGoesBackInUseWithItsReferee() throws Exception {
+        var youngMat = matOf(match(young, 0, 1));
+        var referee = refereeOf(youngMat);
+        var overview = "$[?(@.id == '" + youngMat + "')]";
+
+        club(post(control() + "/mats/" + youngMat + "/disable")).andExpect(status().isOk());
+
+        call(get("/api/v1/events/" + eventId + "/mats"), "club1")
+                .andExpect(jsonPath(overview + ".disabledAt")
+                        .value(org.hamcrest.Matchers.contains(org.hamcrest.Matchers.notNullValue())))
+                .andExpect(jsonPath(overview + ".referee").value(org.hamcrest.Matchers.contains((Object) null)))
+                .andExpect(jsonPath(overview + ".disabledReferee")
+                        .value(org.hamcrest.Matchers.contains(org.hamcrest.Matchers.startsWith("arbitro"))));
+        club(post(control() + "/mats/" + youngMat + "/disable"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("MAT_WITHOUT_REFEREE"));
+
+        club(post(control() + "/mats/" + youngMat + "/enable")).andExpect(status().isNoContent());
+
+        assertThat(refereeOf(youngMat)).isEqualTo(referee);
+        assertThat(rows("select count(*) from mat where id = ? and disabled_at is null", youngMat))
+                .isOne();
+        call(get("/api/v1/events/" + eventId + "/mats"), "club1")
+                .andExpect(jsonPath(overview + ".disabledAt").value(org.hamcrest.Matchers.contains((Object) null)));
+        club(post(control() + "/mats/" + youngMat + "/enable"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("MAT_NOT_DISABLED"));
+    }
+
+    @Test
+    void aDisabledMatIsNotEnabledIfItsRefereeTookAnotherMat() throws Exception {
+        var youngMat = matOf(match(young, 0, 1));
+        var referee = refereeOf(youngMat);
+        club(post(control() + "/mats/" + youngMat + "/disable")).andExpect(status().isOk());
+        jdbc.sql("update mat set referee_account_id = ? where id = ?")
+                .params(referee, freeMat())
+                .update();
+
+        club(post(control() + "/mats/" + youngMat + "/enable"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("REFEREE_ON_OTHER_MAT"));
+        assertThat(rows("select count(*) from mat where id = ? and disabled_at is not null", youngMat))
+                .isOne();
+    }
+
+    @Test
+    void theSuperadminEnablesAMatAudited() throws Exception {
+        var youngMat = matOf(match(young, 0, 1));
+        club(post(control() + "/mats/" + youngMat + "/disable")).andExpect(status().isOk());
+        call(post(control() + "/mats/" + youngMat + "/enable"), "arbitro1").andExpect(status().isForbidden());
+
+        admin(post("/api/v1/admin/events/" + eventId + "/control/mats/" + youngMat + "/enable"))
+                .andExpect(status().isNoContent());
+        assertThat(rows(
+                        "select count(*) from admin_audit where action = 'CONTROL_CHANGE' and target = ?",
+                        youngMat.toString()))
+                .isOne();
+        assertThat(rows("select count(*) from mat where id = ? and referee_account_id is not null", youngMat))
+                .isOne();
+    }
+
+    @Test
     void theSuperadminDisablesAMatAudited() throws Exception {
         var youngMat = matOf(match(young, 0, 1));
         admin(post("/api/v1/admin/events/" + eventId + "/control/mats/" + youngMat + "/disable"))
@@ -377,6 +439,13 @@ class MatchControlTest extends AdminApiTestBase {
     private UUID matNumbered(int number) {
         return jdbc.sql("select id from mat where event_id = ? and number = ?")
                 .params(eventId, number)
+                .query(UUID.class)
+                .single();
+    }
+
+    private UUID refereeOf(UUID mat) {
+        return jdbc.sql("select referee_account_id from mat where id = ?")
+                .param(mat)
                 .query(UUID.class)
                 .single();
     }

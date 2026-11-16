@@ -1,5 +1,6 @@
 import 'package:brackety/features/club/data/club_models.dart';
 import 'package:brackety/features/club/state/club_providers.dart';
+import 'package:brackety/features/club/ui/mats_tab.dart';
 import 'package:brackety/features/control/control_repository.dart';
 import 'package:brackety/features/mat/data/mat_board.dart';
 import 'package:brackety/features/mat/state/mat_providers.dart';
@@ -46,6 +47,10 @@ class _FakeControl extends ControlRepository {
     calls.add('disableMat $eventId $matId $groupMats');
     return (groupsMoved: 1, teamMatchesToPool: 0);
   }
+
+  @override
+  Future<void> enableMat(String eventId, String matId) async =>
+      calls.add('enableMat $eventId $matId');
 
   @override
   Future<void> moveAsReferee(String matchId, String matId) async =>
@@ -271,6 +276,89 @@ void main() {
 
     expect(control.calls, ['disableMat e1 mat2 {g1: mat1}']);
     expect(find.textContaining('Mat disabled: 1 group moved'), findsOneWidget);
+  });
+
+  group('the Mats tab shows which mats are out of use (F1-1)', () {
+    const sizes = {
+      'phone': Size(360, 800),
+      'tablet': Size(800, 1280),
+      'desktop': Size(1440, 900),
+    };
+
+    Future<void> openMats(WidgetTester tester, Size size) async {
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            matBoardProvider.overrideWith((ref, matId) async => withMats),
+            controlRepositoryProvider.overrideWithValue(control),
+            matsOverviewProvider.overrideWith(
+              (ref, eventId) async => [
+                mat('mat1', 1, 'arbitro1'),
+                mat('mat2', 2, 'arbitro2'),
+                MatOverview(
+                  id: 'mat3',
+                  number: 3,
+                  groups: 0,
+                  pendingMatches: 0,
+                  matchInProgress: false,
+                  remaining: Duration.zero,
+                  estimatedEnd: DateTime(2027, 3, 10, 12),
+                  disabledAt: DateTime(2027, 3, 10, 10, 30),
+                  disabledReferee: 'arbitro3',
+                ),
+              ],
+            ),
+          ],
+          child: MaterialApp(
+            builder: (_, child) => ToastHost(child: child!),
+            theme: lightTheme(),
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              ...coreLocalizationsDelegates,
+            ],
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: const Scaffold(body: MatsTab(eventId: 'e1')),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    for (final MapEntry(key: device, value: size) in sizes.entries) {
+      testWidgets('disable and enable from the card on $device', (
+        tester,
+      ) async {
+        await openMats(tester, size);
+
+        expect(find.text('Mat 3 · Out of use'), findsOneWidget);
+        expect(find.textContaining('Out of use since 10:30'), findsOneWidget);
+        expect(find.textContaining('Referee: arbitro3'), findsOneWidget);
+        // Only the mats in use offer "Disable"; the one out of use offers "Enable".
+        expect(
+          find.widgetWithText(TextButton, 'Disable mat'),
+          findsNWidgets(2),
+        );
+
+        await tester.ensureVisible(find.text('Enable mat'));
+        await tester.tap(find.text('Enable mat'));
+        await tester.pumpAndSettle();
+        expect(control.calls, ['enableMat e1 mat3']);
+        expect(
+          find.text('Mat 3 back in use with its referee.'),
+          findsOneWidget,
+        );
+
+        await tester.tap(find.widgetWithText(TextButton, 'Disable mat').at(1));
+        await tester.pumpAndSettle();
+        expect(find.text('Disable mat 2?'), findsOneWidget);
+        await tester.tap(find.widgetWithText(FilledButton, 'Disable mat'));
+        await tester.pumpAndSettle();
+        expect(control.calls.last, 'disableMat e1 mat2 {}');
+      });
+    }
   });
 
   testWidgets('the group moves and its pending matches can be reordered', (
