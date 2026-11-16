@@ -2,16 +2,21 @@ package dev.rgal.brackety.participant;
 
 import dev.rgal.brackety.event.Event;
 import dev.rgal.brackety.event.EventCategory;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/** A person's entry in one event: what belongs to the entry; who they are lives in {@link Person}. */
 @Entity
 public class Participant {
 
@@ -20,11 +25,11 @@ public class Participant {
     private UUID id;
 
     private UUID eventId;
-    private UUID personId;
-    private String firstName;
-    private String lastName;
-    private LocalDate birthDate;
-    private Integer heightCm;
+
+    @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "person_id")
+    private Person person;
+
     private boolean guardianConsent;
     private UUID categoryId;
     private UUID organizationId;
@@ -32,14 +37,15 @@ public class Participant {
 
     protected Participant() {}
 
+    /** A new person. */
     public Participant(UUID eventId, Instant now) {
-        this(eventId, UUID.randomUUID(), now);
+        this(eventId, new Person(UUID.randomUUID(), now), now);
     }
 
-    /** {@code personId}: the same person in another phase of the league, or a new one. */
-    public Participant(UUID eventId, UUID personId, Instant now) {
+    /** {@code person}: the same person in another phase of the league, or a new one. */
+    public Participant(UUID eventId, Person person, Instant now) {
         this.eventId = eventId;
-        this.personId = personId;
+        this.person = person;
         this.createdAt = now;
     }
 
@@ -51,9 +57,13 @@ public class Participant {
         return eventId;
     }
 
+    public Person getPerson() {
+        return person;
+    }
+
     /** The same person in every phase of a league: their points add up. */
     public UUID getPersonId() {
-        return personId;
+        return person.getId();
     }
 
     public UUID getOrganizationId() {
@@ -65,23 +75,27 @@ public class Participant {
     }
 
     public String getFirstName() {
-        return firstName;
+        return person.getFirstName();
     }
 
     public String getLastName() {
-        return lastName;
+        return person.getLastName();
     }
 
     public LocalDate getBirthDate() {
-        return birthDate;
+        return person.getBirthDate();
     }
 
     public Integer getHeightCm() {
-        return heightCm;
+        return person.getHeightCm();
     }
 
     public boolean hasGuardianConsent() {
         return guardianConsent;
+    }
+
+    public void setGuardianConsent(boolean guardianConsent) {
+        this.guardianConsent = guardianConsent;
     }
 
     /** The category chosen for them, or null to follow their age. */
@@ -97,7 +111,7 @@ public class Participant {
         if (categoryId != null) {
             return categories.stream().filter(c -> c.getId().equals(categoryId)).findFirst();
         }
-        var age = event.ageOf(birthDate);
+        var age = event.ageOf(getBirthDate());
         return categories.stream().filter(c -> c.contains(age)).findFirst();
     }
 
@@ -106,6 +120,7 @@ public class Participant {
         update(firstName, lastName, birthDate, heightCm, guardianConsent, null);
     }
 
+    /** The name, birth date and height change for the person, so in every phase they are in. */
     public void update(
             String firstName,
             String lastName,
@@ -113,10 +128,7 @@ public class Participant {
             Integer heightCm,
             boolean guardianConsent,
             UUID categoryId) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.birthDate = birthDate;
-        this.heightCm = heightCm;
+        person.update(firstName, lastName, birthDate, heightCm);
         this.guardianConsent = guardianConsent;
         this.categoryId = categoryId;
     }
