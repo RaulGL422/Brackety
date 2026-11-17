@@ -54,6 +54,16 @@ class FakeGroupingRepository implements GroupingRepository {
   @override
   Future<List<CategorySummary>> categories(String eventId) async => [];
 
+  final measured = <(String, int?, double?)>[];
+
+  @override
+  Future<void> measure(
+    String eventId,
+    String participantId, {
+    required int? heightCm,
+    required double? weightKg,
+  }) async => measured.add((participantId, heightCm, weightKg));
+
   @override
   Future<CreatedGroups> create(
     String eventId,

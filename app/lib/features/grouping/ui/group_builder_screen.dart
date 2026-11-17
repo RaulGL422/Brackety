@@ -14,6 +14,8 @@ import 'draft_panel.dart';
 import 'pick_mark.dart';
 import '../../../core/up_button.dart';
 import '../../mat/ui/mat_label.dart';
+import 'measures.dart';
+import '../../events/data/measure_rules.dart';
 
 /// A category's participants: pick 4 (or 3 and a ghost) and send them to a mat.
 /// Opened from a team category ([teamSize] set) for those left without a team, with a way back.
@@ -120,6 +122,7 @@ class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
       value: participants,
       onRetry: _refresh,
       data: (all) {
+        final rules = measureRulesOf(ref, widget.eventId);
         final sorted = sortParticipants(all, _sort);
         return RefreshIndicator(
           onRefresh: () =>
@@ -139,12 +142,23 @@ class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
                       refresh: _refresh,
                     )
                   : null,
-              onTap: () => setState(
-                () => _group = _group.toggle(
-                  sorted[i].id,
-                  grouped: sorted[i].isTaken,
-                ),
-              ),
+              rules: rules,
+              onTap: blockedByMeasures(rules, sorted[i])
+                  ? () async {
+                      if (await showMeasuresDialog(
+                        context,
+                        widget.eventId,
+                        sorted[i],
+                      )) {
+                        _refresh();
+                      }
+                    }
+                  : () => setState(
+                      () => _group = _group.toggle(
+                        sorted[i].id,
+                        grouped: sorted[i].isTaken,
+                      ),
+                    ),
             ),
           ),
         );
@@ -230,12 +244,16 @@ class _ParticipantTile extends StatelessWidget {
   const _ParticipantTile({
     required this.participant,
     required this.group,
+    required this.rules,
     required this.onTap,
     this.onUndoGroup,
   });
 
   final CategoryParticipant participant;
   final DraftGroup group;
+
+  /// A required measure missing: tapping asks for it instead of picking.
+  final MeasureRules rules;
   final VoidCallback onTap;
   final VoidCallback? onUndoGroup;
 
@@ -243,19 +261,23 @@ class _ParticipantTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final p = participant;
+    final locale = Localizations.localeOf(context).toLanguageTag();
+    final blocked = blockedByMeasures(rules, p);
     final state = group.stateOf(p.id, grouped: p.isTaken);
-    final height = p.heightCm == null
-        ? l10n.heightUnknown
-        : l10n.heightCm(p.heightCm!);
-    final details = l10n.participantDetails(p.age, height);
     return ListTile(
-      enabled: state != PickState.unavailable,
+      enabled: blocked || state != PickState.unavailable,
       onTap: onTap,
-      leading: PickMark(state: state, onTap: onTap),
+      leading: blocked
+          ? Icon(
+              Icons.monitor_weight_outlined,
+              color: Theme.of(context).colorScheme.error,
+              semanticLabel: l10n.measuresWrite,
+            )
+          : PickMark(state: state, onTap: onTap),
       title: Text(p.fullName),
       subtitle: Text(
         [
-          details,
+          participantSummary(l10n, locale, rules, p),
           if (p.teamNumber != null) l10n.teamName(p.teamNumber!),
           if (p.isGrouped)
             l10n.participantGrouped(

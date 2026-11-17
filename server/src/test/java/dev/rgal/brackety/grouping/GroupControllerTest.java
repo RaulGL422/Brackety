@@ -271,6 +271,41 @@ class GroupControllerTest extends EventApiTest {
         assertThat(count("fight_group")).isOne();
     }
 
+    @Test
+    void aRequiredWeightKeepsSomeoneOutOfAGroupUntilTheHelperWritesItDown() throws Exception {
+        call(put(event() + "/measures").content("{\"weight\":\"REQUIRED\",\"height\":null}"), "club1")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.weight").value("REQUIRED"))
+                .andExpect(jsonPath("$.sportHeight").value("OPTIONAL"));
+        call(get("/api/v1/events"), "ayudante1")
+                .andExpect(jsonPath("$[0].weightRequirement").value("REQUIRED"))
+                .andExpect(jsonPath("$[0].heightRequirement").value("OPTIONAL"));
+        for (var i = 0; i < 3; i++) {
+            call(
+                            put(event() + "/participants/" + sevens.get(i) + "/measures")
+                                    .content("{\"heightCm\":120,\"weightKg\":25.5}"),
+                            "ayudante1")
+                    .andExpect(status().isNoContent());
+        }
+
+        createGroups(group(0, 1, 2, 3))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("MEASURES_MISSING"))
+                .andExpect(jsonPath("$.detail").value(org.hamcrest.Matchers.containsString("Alumno3")));
+        call(
+                        put(event() + "/participants/" + sevens.get(3) + "/measures")
+                                .content("{\"heightCm\":null,\"weightKg\":24}"),
+                        "ayudante1")
+                .andExpect(status().isNoContent());
+        createGroups(group(0, 1, 2, 3)).andExpect(status().isCreated());
+        // The referee only scores: measures are for the club and the helpers.
+        call(
+                        put(event() + "/participants/" + sevens.get(4) + "/measures")
+                                .content("{\"heightCm\":null,\"weightKg\":24}"),
+                        "arbitro1")
+                .andExpect(status().isForbidden());
+    }
+
     private UUID participant(String firstName, int age) {
         var participant = new Participant(eventId, clock.instant());
         participant.update(firstName, "Prueba", LocalDate.of(2027, 3, 1).minusYears(age), 120, true);

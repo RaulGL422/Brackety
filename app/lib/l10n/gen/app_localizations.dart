@@ -1910,6 +1910,90 @@ abstract class AppLocalizations {
   /// **'Entre 10 y 250 kg, con un decimal como mucho'**
   String get weightInvalid;
 
+  /// No description provided for @weightUnknown.
+  ///
+  /// In es, this message translates to:
+  /// **'sin peso'**
+  String get weightUnknown;
+
+  /// No description provided for @weightMissing.
+  ///
+  /// In es, this message translates to:
+  /// **'falta el peso'**
+  String get weightMissing;
+
+  /// No description provided for @heightMissing.
+  ///
+  /// In es, this message translates to:
+  /// **'falta la estatura'**
+  String get heightMissing;
+
+  /// No description provided for @measuresTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Peso y estatura'**
+  String get measuresTitle;
+
+  /// No description provided for @measuresHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Obligatorio: nadie entra en un grupo ni en un equipo sin el dato, y el ayudante puede apuntarlo ese día. Opcional: se avisa al crear los grupos de quién no lo tiene.'**
+  String get measuresHint;
+
+  /// No description provided for @measureWeight.
+  ///
+  /// In es, this message translates to:
+  /// **'Peso'**
+  String get measureWeight;
+
+  /// No description provided for @measureHeight.
+  ///
+  /// In es, this message translates to:
+  /// **'Estatura'**
+  String get measureHeight;
+
+  /// No description provided for @requirementSport.
+  ///
+  /// In es, this message translates to:
+  /// **'Como el deporte ({value})'**
+  String requirementSport(String value);
+
+  /// No description provided for @requirementOff.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pide'**
+  String get requirementOff;
+
+  /// No description provided for @requirementOptional.
+  ///
+  /// In es, this message translates to:
+  /// **'Opcional'**
+  String get requirementOptional;
+
+  /// No description provided for @requirementRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'Obligatorio'**
+  String get requirementRequired;
+
+  /// No description provided for @measuresOf.
+  ///
+  /// In es, this message translates to:
+  /// **'Peso y estatura de {name}'**
+  String measuresOf(String name);
+
+  /// No description provided for @measuresWrite.
+  ///
+  /// In es, this message translates to:
+  /// **'Apuntar peso y estatura'**
+  String get measuresWrite;
+
+  /// No description provided for @measuresMissingError.
+  ///
+  /// In es, this message translates to:
+  /// **'Falta el peso o la estatura obligatorios de alguien: apúntalo antes de agrupar.'**
+  String get measuresMissingError;
+
   /// No description provided for @weightKg.
   ///
   /// In es, this message translates to:

@@ -1,4 +1,5 @@
 import 'package:brackety/app.dart';
+import 'package:brackety/features/events/data/measure_rules.dart';
 import 'package:brackety/features/events/data/my_event.dart';
 import 'package:brackety/features/events/state/events_providers.dart';
 import 'package:brackety/features/grouping/data/grouping_models.dart';
@@ -39,6 +40,82 @@ void main() {
       matNumber: 2,
     ),
   ];
+
+  for (final MapEntry(key: device, value: size) in sizes.entries) {
+    testWidgets(
+      'a required weight blocks the pick until the helper writes it on $device',
+      (tester) async {
+        tester.view.physicalSize = size;
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        final repository = FakeGroupingRepository(const [
+          CategoryParticipant(
+            id: 'ana',
+            firstName: 'Ana',
+            lastName: 'Prueba',
+            age: 7,
+            heightCm: 130,
+            weightKg: 25,
+          ),
+          CategoryParticipant(
+            id: 'bea',
+            firstName: 'Bea',
+            lastName: 'Prueba',
+            age: 7,
+            heightCm: 129,
+          ),
+        ]);
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              ...sessionOverrides(FakeAuthApi(signedIn: true)),
+              groupingRepositoryProvider.overrideWithValue(repository),
+              fakeMatsOverride,
+              myEventsProvider.overrideWith(
+                (ref) async => [
+                  MyEvent(
+                    id: 'e1',
+                    name: 'Fase 2',
+                    date: DateTime(2027, 1, 24),
+                    roles: const {EventRole.grouper},
+                    measures: const MeasureRules(
+                      weight: MeasureRequirement.required,
+                      height: MeasureRequirement.off,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+            child: const BracketyApp(),
+          ),
+        );
+        await tester.pumpAndSettle();
+        ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
+            .read(routerProvider)
+            .push('/events/e1/categories/c1', extra: '7-8');
+        await tester.pumpAndSettle();
+
+        // Height is not asked; Ana has her weight, Bea still lacks it.
+        expect(find.textContaining('25 kg'), findsOneWidget);
+        expect(find.textContaining('weight missing'), findsOneWidget);
+        expect(find.textContaining('cm'), findsNothing);
+
+        await tester.ensureVisible(find.text('Bea Prueba'));
+        await tester.tap(find.text('Bea Prueba'));
+        await tester.pumpAndSettle();
+        expect(find.text('Weight and height of Bea Prueba'), findsOneWidget);
+        await tester.enterText(
+          find.widgetWithText(TextFormField, 'Weight in kg (optional)'),
+          '24,5',
+        );
+        await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+        await tester.pumpAndSettle();
+
+        expect(repository.measured, [('bea', 129, 24.5)]);
+      },
+    );
+  }
 
   for (final MapEntry(key: device, value: size) in sizes.entries) {
     testWidgets('a helper makes a group and sees its mat on $device', (

@@ -24,6 +24,17 @@ class GroupingRepository {
     ];
   }
 
+  /// The weight and height measured on the day.
+  Future<void> measure(
+    String eventId,
+    String participantId, {
+    required int? heightCm,
+    required double? weightKg,
+  }) => _dio.put<void>(
+    '/api/v1/events/$eventId/participants/$participantId/measures',
+    data: {'heightCm': heightCm, 'weightKg': weightKg},
+  );
+
   Future<List<CategoryParticipant>> participants(
     String eventId,
     String categoryId,

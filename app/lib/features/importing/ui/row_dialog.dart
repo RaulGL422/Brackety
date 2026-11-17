@@ -100,18 +100,7 @@ class _RowDialogState extends State<_RowDialog> {
                   requiredText: l10n.fieldRequired,
                   onChanged: (sex) => _sex = sex,
                 ),
-                TextFormField(
-                  controller: _height,
-                  decoration: InputDecoration(labelText: l10n.heightOptional),
-                  keyboardType: TextInputType.number,
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) return null;
-                    final cm = int.tryParse(v.trim());
-                    return cm == null || cm < 50 || cm > 250
-                        ? l10n.heightInvalid
-                        : null;
-                  },
-                ),
+                HeightField(controller: _height),
                 WeightField(controller: _weight),
               ],
             ),

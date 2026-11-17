@@ -123,6 +123,7 @@ class TeamService {
             throw EventException.invalid("Ghost members are members of the team.");
         }
         roster.requireAllIn(event, category, ids);
+        roster.requireMeasures(event, ids);
         // Ghost members may already compete elsewhere: they fill the team in without scoring for it.
         roster.requireFree(ids.stream().filter(id -> !ghosts.contains(id)).toList());
         var team = save(eventId, categoryId, false, accountId, ids, ghosts);

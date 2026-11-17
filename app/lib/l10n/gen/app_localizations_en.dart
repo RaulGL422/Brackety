@@ -1122,6 +1122,54 @@ class AppLocalizationsEn extends AppLocalizations {
   String get weightInvalid => 'Between 10 and 250 kg, one decimal at most';
 
   @override
+  String get weightUnknown => 'no weight';
+
+  @override
+  String get weightMissing => 'weight missing';
+
+  @override
+  String get heightMissing => 'height missing';
+
+  @override
+  String get measuresTitle => 'Weight and height';
+
+  @override
+  String get measuresHint =>
+      'Required: nobody goes into a group or team without it, and the helper can write it down on the day. Optional: the grouping screens say who lacks it.';
+
+  @override
+  String get measureWeight => 'Weight';
+
+  @override
+  String get measureHeight => 'Height';
+
+  @override
+  String requirementSport(String value) {
+    return 'As the sport ($value)';
+  }
+
+  @override
+  String get requirementOff => 'Not asked';
+
+  @override
+  String get requirementOptional => 'Optional';
+
+  @override
+  String get requirementRequired => 'Required';
+
+  @override
+  String measuresOf(String name) {
+    return 'Weight and height of $name';
+  }
+
+  @override
+  String get measuresWrite => 'Write down weight and height';
+
+  @override
+  String get measuresMissingError =>
+      'Someone lacks the required weight or height: write it down before grouping.';
+
+  @override
   String weightKg(String kg) {
     return '$kg kg';
   }

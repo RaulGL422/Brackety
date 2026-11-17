@@ -1,5 +1,6 @@
 package dev.rgal.brackety.grouping.dto;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 /**
@@ -13,6 +14,7 @@ public record CategoryParticipant(
         String firstName,
         String lastName,
         Integer heightCm,
+        BigDecimal weightKg,
         int age,
         Integer groupNumber,
         Integer matNumber,

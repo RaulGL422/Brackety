@@ -7,6 +7,8 @@ import dev.rgal.brackety.event.dto.EventSettingsRequest;
 import dev.rgal.brackety.event.dto.EventSettingsResponse;
 import dev.rgal.brackety.event.dto.EventSettingsResponse.CategoryResponse;
 import dev.rgal.brackety.event.dto.EventSettingsResponse.OrganizationResponse;
+import dev.rgal.brackety.event.dto.MeasureRules;
+import dev.rgal.brackety.event.dto.MeasureRulesRequest;
 import dev.rgal.brackety.event.dto.MyEventResponse;
 import dev.rgal.brackety.event.dto.OrganizationsRequest;
 import jakarta.validation.Valid;
@@ -61,6 +63,12 @@ class EventController {
             @Valid @RequestBody EventSettingsRequest request,
             @AuthenticationPrincipal Jwt jwt) {
         return events.updateSettings(eventId, CurrentAccount.id(jwt), request);
+    }
+
+    @PutMapping("/{eventId}/measures")
+    MeasureRules measures(
+            @PathVariable UUID eventId, @RequestBody MeasureRulesRequest request, @AuthenticationPrincipal Jwt jwt) {
+        return events.updateMeasures(eventId, CurrentAccount.id(jwt), request);
     }
 
     @PutMapping("/{eventId}/categories")
