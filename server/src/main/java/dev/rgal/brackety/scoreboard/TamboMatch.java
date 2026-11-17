@@ -245,7 +245,10 @@ final class TamboMatch {
         String reason = switch (type) {
             case START -> over ? "The match is over." : isRunning(now) ? "The clock is already running." : null;
             case STOP -> isRunning(now) ? null : "The clock is not running.";
-            case POINT, WARNING, ONE_HAND_WARNING, DISQUALIFICATION ->
+            // The last action's point may come when the clock already shows 0:00 (F1-3); sanctions may not.
+            case POINT ->
+                end.filter(r -> r != EndReason.TIME).isPresent() ? "The match is over." : started ? null : NOT_STARTED;
+            case WARNING, ONE_HAND_WARNING, DISQUALIFICATION ->
                 over ? "The match is over." : started ? null : NOT_STARTED;
             // A correction: also once the time or the points ended the match, which it may reopen.
             case POINT_REMOVED ->

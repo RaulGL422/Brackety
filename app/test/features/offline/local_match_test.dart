@@ -41,6 +41,18 @@ void main() {
       ]);
     });
 
+    test('a queued point at 0:00 counts and says it came after the time', () {
+      final view = LocalMatch.project(serverMatch('m1'), [
+        op(MatchAction.start, 0),
+        op(MatchAction.point, 10, side: Side.red),
+        op(MatchAction.point, 200, side: Side.red),
+      ], at(210)).view;
+
+      expect(view.red.points, 2);
+      expect(view.endReason, EndReason.time);
+      expect(view.timeline.map((e) => e.overtime), [false, false, true]);
+    });
+
     test(
       'the limit stops the clock by itself and an undo leaves it stopped',
       () {

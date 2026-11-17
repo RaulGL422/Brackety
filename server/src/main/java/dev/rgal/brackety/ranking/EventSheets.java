@@ -27,6 +27,7 @@ import dev.rgal.brackety.scoreboard.MatchEvent;
 import dev.rgal.brackety.scoreboard.MatchEventRepository;
 import dev.rgal.brackety.scoreboard.Side;
 import java.time.Clock;
+import java.time.Duration;
 import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -430,7 +431,12 @@ class EventSheets {
                             SheetText.action(e.getType().name()),
                             SheetText.side(side),
                             fighter,
-                            e.getDeltaMs() == null ? e.getReason() : SheetText.clockAdjust(e.getDeltaMs()),
+                            e.getDeltaMs() != null
+                                    ? SheetText.clockAdjust(e.getDeltaMs())
+                                    : e.isOvertimePoint(Duration.ofSeconds(
+                                                    d.event().modality().matchSeconds(m.isTeamMatch())))
+                                            ? "Fuera de tiempo"
+                                            : e.getReason(),
                             e.isAutomatic() ? "Automático" : actors.get(e.getActorAccountId()),
                             e.getTargetEventId() == null
                                     ? null

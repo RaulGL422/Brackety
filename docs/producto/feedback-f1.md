@@ -26,7 +26,8 @@ Fuente: Raul, 2026-11-16. Las tareas salen de aquí hacia `roadmap.md`.
 - Necesidad: dar un punto de la última acción cuando el reloj ya llegó a 0:00.
 - Propuesta: tras 0:00 el marcador sigue aceptando +1 y −1 hasta "Finalizar". La acción se guarda marcada `fuera de tiempo` (se ve en el historial, la ficha y el CSV).
 - Después de "Finalizar": corrección solo del club o del superadmin, con motivo y auditoría.
-- Preguntas en `pendientes.md`: ¿también tras finalizar?, ¿quién puede?
+- Respuesta de Raul (2026-11-17): el árbitro, hasta "Finalizar". Después, como ya es: "Reabrir combate" con motivo, en la línea de tiempo.
+- Hecho (2026-11-17): `modulos/prototipo-f1.md`.
 
 ### F1-4 · Advertencias predefinidas y "Otro"
 - Necesidad: poner una advertencia en un toque, sin escribir.

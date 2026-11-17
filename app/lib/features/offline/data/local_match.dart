@@ -73,6 +73,9 @@ class LocalMatch {
           automatic: false,
           undone: false,
           gaveRivalPoint: false,
+          overtime:
+              op.action == MatchAction.point &&
+              before.remainingAt(at) == Duration.zero,
         ),
       );
       lastAt = at;

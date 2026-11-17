@@ -39,7 +39,11 @@ class ScoreboardControllerTest extends ScoreboardApiTest {
                 .andExpect(jsonPath("$.remainingMs").value(0))
                 .andExpect(jsonPath("$.running").value(false))
                 .andExpect(jsonPath("$.endReason").value("TIME"));
-        event(match, "POINT", "BLUE").andExpect(status().isConflict());
+        // The last action's point, at 0:00 (F1-3); warnings are over.
+        event(match, "POINT", "BLUE")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.blue.points").value(1));
+        event(match, "WARNING", "RED", "Agarre").andExpect(status().isConflict());
         event(match, "FINISH")
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("FINISHED"));
@@ -50,10 +54,20 @@ class ScoreboardControllerTest extends ScoreboardApiTest {
 
         call(get(path(match)), "club1")
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.timeline", hasSize(6)))
+                .andExpect(jsonPath("$.timeline", hasSize(7)))
                 .andExpect(jsonPath("$.timeline[1].type").value("POINT"))
                 .andExpect(jsonPath("$.timeline[1].actor").value("arbitro1"))
-                .andExpect(jsonPath("$.timeline[1].clockMs").value(30_000));
+                .andExpect(jsonPath("$.timeline[1].clockMs").value(30_000))
+                .andExpect(jsonPath("$.timeline[1].overtime").value(false))
+                .andExpect(jsonPath("$.timeline[5].type").value("POINT"))
+                .andExpect(jsonPath("$.timeline[5].overtime").value(true));
+        call(get("/api/v1/events/" + eventId + "/participants/" + young.get(1) + "/record"), "club1")
+                .andExpect(jsonPath("$.matches[0].incidents[0].kind").value("OVERTIME_POINT"));
+        var csv = call(get("/api/v1/events/" + eventId + "/export/timeline.csv"), "club1")
+                .andReturn()
+                .getResponse()
+                .getContentAsString(java.nio.charset.StandardCharsets.UTF_8);
+        assertThat(csv).containsOnlyOnce("Fuera de tiempo");
     }
 
     @Test

@@ -45,6 +45,7 @@ class TimelineList extends StatelessWidget {
           if (e.delta case final delta?)
             l10n.clockAdjustBy(signedSeconds(delta)),
           ?e.reason,
+          if (e.overtime) l10n.tlOvertime,
           if (e.gaveRivalPoint) l10n.tlRivalPoint,
           if (e.automatic) l10n.tlAutomatic,
           if (e.undone) l10n.tlUndone,

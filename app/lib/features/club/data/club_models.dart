@@ -407,7 +407,7 @@ class ParticipantRecord {
   final List<RecordMatch> matches;
 }
 
-enum IncidentKind { warning, oneHandWarning, disqualification }
+enum IncidentKind { warning, oneHandWarning, disqualification, overtimePoint }
 
 /// A warning, one-hand warning or disqualification of a match: why, when on its clock and who.
 /// [gaveRivalPoint]: a second warning that gave the rival a point.
@@ -424,6 +424,7 @@ class Incident {
     kind: switch (json['kind']) {
       'ONE_HAND_WARNING' => IncidentKind.oneHandWarning,
       'DISQUALIFICATION' => IncidentKind.disqualification,
+      'OVERTIME_POINT' => IncidentKind.overtimePoint,
       _ => IncidentKind.warning,
     },
     reason: json['reason'] as String? ?? '',

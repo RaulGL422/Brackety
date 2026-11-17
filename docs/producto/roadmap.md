@@ -35,7 +35,7 @@ Línea de infraestructura; puede ir en paralelo con la etapa 2 (otro worktree).
 ## Después · Etapa 2: arreglos de la F1 (antes de la F2)
 1. F1-2 Comodín guardado como normal (crítico): arreglado en la app (2026-11-16); falta revisar los datos de la F1 en la Pi.
 2. F1-1 Inhabilitar tapiz visible y con estado.
-3. F1-3 Puntos fuera de tiempo.
+3. F1-3 Puntos fuera de tiempo: en pruebas (2026-11-17).
 4. F1-4 Motivos de advertencia predefinidos y "Otro".
 5. F1-5 Cuentas propias: invitaciones del club a árbitros y ayudantes (adelanto de `ayudantes-permisos`); retirar `staffNames`.
 6. F2-1 Peso de los alumnos.

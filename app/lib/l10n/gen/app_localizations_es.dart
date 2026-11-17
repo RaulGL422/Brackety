@@ -876,6 +876,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get tlAutomatic => 'automático';
 
   @override
+  String get tlOvertime => 'fuera de tiempo';
+
+  @override
   String get tlUndone => 'deshecho';
 
   @override
@@ -2652,6 +2655,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get incidentOneHand => 'Advertencia de una mano';
+
+  @override
+  String get incidentOvertimePoint => 'Punto fuera de tiempo';
 
   @override
   String incidentBy(String who) {
