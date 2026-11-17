@@ -101,7 +101,10 @@ public class LeagueService {
                 throw EventException.invalid("A category has two podiums.");
             }
         }
-        league.update(request.name().strip(), request.podium());
+        league.update(
+                request.name().strip(),
+                request.podium(),
+                request.globalStandings() == null ? league.hasGlobalStandings() : request.globalStandings());
         podiums.deleteByLeague(league.getId());
         for (var c : request.categoryPodiums()) {
             podiums.save(new CategoryPodium(league.getId(), c.categoryName().strip(), c.podium()));
@@ -263,6 +266,7 @@ public class LeagueService {
                 league.getId(),
                 league.getName(),
                 league.getPodium(),
+                league.hasGlobalStandings(),
                 podiums.findByLeagueIdOrderByCategoryName(league.getId()).stream()
                         .map(c -> new CategoryPodiumDto(c.getCategoryName(), c.getPodium()))
                         .toList(),

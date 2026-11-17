@@ -4601,6 +4601,18 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Confirma antes tu email con el enlace que te enviamos al registrarte.'**
   String get invitationVerifyFirst;
+
+  /// No description provided for @leagueGlobalStandings.
+  ///
+  /// In es, this message translates to:
+  /// **'Clasificación global'**
+  String get leagueGlobalStandings;
+
+  /// No description provided for @leagueGlobalStandingsHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Todas las categorías juntas en Puntuaciones y en Liga. Apagada, solo se ve una categoría cada vez.'**
+  String get leagueGlobalStandingsHint;
 }
 
 class _AppLocalizationsDelegate

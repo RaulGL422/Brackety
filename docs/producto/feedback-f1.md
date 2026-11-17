@@ -68,6 +68,7 @@ Fuente: Raul, 2026-11-16. Las tareas salen de aquí hacia `roadmap.md`.
 ### F2-4 · Clasificaciones configurables
 - La clasificación global debe ser una opción: en esta liga no sirve.
 - Según el deporte, se clasifica por peso, sexo, categoría, edad…: criterios de la plantilla de deporte, ajustables en el evento (`modulos/ranking.md`, `modulos/puntuacion.md`).
+- Respuesta de Raul (2026-11-17): en la F2 la categoría es solo por edad; sexo y peso, informativos. Hecho: la global es una opción de la liga (`modulos/ranking.md`).
 
 ## Qué mantener
 - Probar in situ con el staff real antes del evento: destapó lo importante.

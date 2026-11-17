@@ -2868,4 +2868,11 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get invitationVerifyFirst =>
       'Confirma antes tu email con el enlace que te enviamos al registrarte.';
+
+  @override
+  String get leagueGlobalStandings => 'Clasificación global';
+
+  @override
+  String get leagueGlobalStandingsHint =>
+      'Todas las categorías juntas en Puntuaciones y en Liga. Apagada, solo se ve una categoría cada vez.';
 }

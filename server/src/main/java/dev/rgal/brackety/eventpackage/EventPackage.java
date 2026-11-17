@@ -86,7 +86,8 @@ public record EventPackage(
             @Min(1) int phaseNumber,
             @NotNull Discipline discipline,
             @NotNull @Valid Podium podium,
-            @NotNull List<@NotNull @Valid CategoryPodiumEntry> categoryPodiums) {}
+            @NotNull List<@NotNull @Valid CategoryPodiumEntry> categoryPodiums,
+            Boolean globalStandings) {}
 
     public record CategoryPodiumEntry(
             @NotBlank @Size(max = 40) String categoryName,

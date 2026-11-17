@@ -266,7 +266,8 @@ public class EventPackageService {
                         : settings.name().strip(),
                 clock.instant());
         if (leagueEntry != null) {
-            league.update(league.getName(), leagueEntry.podium());
+            // A package from before F2-4 has none: off, as every league until then.
+            league.update(league.getName(), leagueEntry.podium(), Boolean.TRUE.equals(leagueEntry.globalStandings()));
         }
         league = leagues.save(league);
         if (leagueEntry != null) {
@@ -674,7 +675,8 @@ public class EventPackageService {
                 league.getPodium(),
                 podiums.findByLeagueIdOrderByCategoryName(league.getId()).stream()
                         .map(c -> new CategoryPodiumEntry(c.getCategoryName(), c.getPodium()))
-                        .toList());
+                        .toList(),
+                league.hasGlobalStandings());
     }
 
     private Owner owner(UUID accountId) {

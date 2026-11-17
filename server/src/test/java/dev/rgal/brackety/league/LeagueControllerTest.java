@@ -45,7 +45,23 @@ class LeagueControllerTest extends EventApiTest {
                 .andExpect(jsonPath("$.phases[0].number").value(1))
                 .andExpect(jsonPath("$.disciplines[0].discipline").value("TAMBO"))
                 .andExpect(jsonPath("$.disciplines[0].available").value(true))
-                .andExpect(jsonPath("$.disciplines[1].available").value(false));
+                .andExpect(jsonPath("$.disciplines[1].available").value(false))
+                .andExpect(jsonPath("$.globalStandings").value(false));
+    }
+
+    @Test
+    void theClubTurnsTheGlobalStandingsOnAndLeavingItOutKeepsIt() throws Exception {
+        var body = """
+                {"name":"Liga Yoseikan 2027","podium":{"firsts":2,"seconds":2,"thirds":3},"categoryPodiums":[]%s}""";
+        call(put(league(eventId)).content(body.formatted(",\"globalStandings\":true")), "club1")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.globalStandings").value(true));
+        call(put(league(eventId)).content(body.formatted("")), "club1")
+                .andExpect(jsonPath("$.globalStandings").value(true));
+        call(put(league(eventId)).content(body.formatted(",\"globalStandings\":false")), "club1")
+                .andExpect(jsonPath("$.globalStandings").value(false));
+        call(put(league(eventId)).content(body.formatted(",\"globalStandings\":true")), "ayudante1")
+                .andExpect(status().isForbidden());
     }
 
     @Test
