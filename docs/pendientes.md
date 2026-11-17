@@ -51,7 +51,7 @@
 - [ ] F1-2 comodín: arreglado en la app (2026-11-16); falta revisar en la Pi qué se apañó a mano y que la clasificación sea correcta.
 - [ ] F2-3 CSV de resultados: la entidad de la liga ve confusos los puestos (1.º, 2.º, 3.º) al abrirlos en Excel. Hecho: CSV por categoría (#108) y PDF (#110). Falta rehacer el resto de CSV (Raul aún no lo ha revisado).
 - [ ] F2-4 clasificaciones configurables: la global debe ser opcional (en esta liga no sirve) y poder clasificar por peso, sexo, categoría, etc. según el deporte y el evento.
-- [ ] F1-4 advertencias: lista por deporte que cada evento puede editar (Raul, 2026-11-17). Falta: los motivos de Yoseikan (Claude propone una lista y Raul la corrige).
+- [ ] F1-4 advertencias: revisar la lista de tambo propuesta (prohibiciones del reglamento, cap. 3.1: proyección o golpeo, tirarse rodando, ataque de pique, exceso de potencia, conducta antideportiva). Se cambia en `Discipline` o por evento en Configuración.
 - [ ] F1-5 cuentas propias: invitación por email que lleva a crear una cuenta completa (Raul, 2026-11-17); necesita Resend.
 - [ ] Gestión del club (`producto/gestion-club.md`): ¿se amplía el alcance? Cambia `00-vision.md` (hoy cobros fuera de alcance).
 - [ ] Si se cobra o se factura: forma jurídica, asesor fiscal y contratos con los clubes.

@@ -319,7 +319,8 @@ class ScoreboardService {
                 match.isInReview() ? review(match, pending, actors) : null,
                 match.getStatus() == Match.Status.PENDING
                         ? writer.restedAt(match, event).filter(now::isBefore).orElse(null)
-                        : null);
+                        : null,
+                event.warningReasons());
     }
 
     private Map<UUID, String> actors(Stream<UUID> ids) {

@@ -20,6 +20,7 @@ import 'categories_editor.dart';
 import 'club_panel_screen.dart';
 import 'organizations_editor.dart';
 import 'measures_editor.dart';
+import 'warning_reasons_editor.dart';
 
 const maxMats = 20;
 
@@ -315,6 +316,9 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
           const SizedBox(height: AppSpacing.xl),
           Text(l10n.measuresTitle, style: text.titleMedium),
           MeasuresEditor(eventId: widget.eventId, settings: settings),
+          const SizedBox(height: AppSpacing.xl),
+          Text(l10n.warningReasonsTitle, style: text.titleMedium),
+          WarningReasonsEditor(eventId: widget.eventId, settings: settings),
           const SizedBox(height: AppSpacing.xl),
           Text(l10n.categoriesTitle, style: text.titleMedium),
           CategoriesEditor(

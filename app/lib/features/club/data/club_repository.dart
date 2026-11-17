@@ -183,6 +183,13 @@ class ClubRepository {
     data: {'weight': weight?.toJson(), 'height': height?.toJson()},
   );
 
+  /// Null follows the sport.
+  Future<void> saveWarningReasons(String eventId, List<String>? reasons) =>
+      _dio.put<void>(
+        '/api/v1/events/$eventId/warning-reasons',
+        data: {'reasons': reasons},
+      );
+
   Future<void> deleteParticipant(String eventId, String participantId) =>
       _dio.delete<void>('/api/v1/events/$eventId/participants/$participantId');
 

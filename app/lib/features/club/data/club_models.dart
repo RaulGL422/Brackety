@@ -91,6 +91,8 @@ class EventSettings {
     this.heightChoice,
     this.sportWeight = MeasureRequirement.optional,
     this.sportHeight = MeasureRequirement.optional,
+    this.ownWarningReasons,
+    this.sportWarningReasons = const [],
   });
 
   factory EventSettings.fromJson(Map<String, dynamic> json) {
@@ -98,6 +100,7 @@ class EventSettings {
       for (final m in json['mats'] as List) m as Map<String, dynamic>,
     ]..sort((a, b) => (a['number'] as int).compareTo(b['number'] as int));
     final measures = json['measures'] as Map<String, dynamic>?;
+    final reasons = json['warningReasons'] as Map<String, dynamic>?;
     return EventSettings(
       name: json['name'] as String,
       date: DateTime.parse(json['date'] as String),
@@ -134,6 +137,13 @@ class EventSettings {
       sportHeight:
           MeasureRequirement.fromJson(measures?['sportHeight']) ??
           MeasureRequirement.optional,
+      ownWarningReasons: switch (reasons?['own']) {
+        final List<dynamic> own => [for (final r in own) r as String],
+        _ => null,
+      },
+      sportWarningReasons: [
+        for (final r in reasons?['sport'] as List? ?? const []) r as String,
+      ],
     );
   }
 
@@ -172,7 +182,14 @@ class EventSettings {
   final MeasureRequirement? heightChoice;
   final MeasureRequirement sportWeight;
   final MeasureRequirement sportHeight;
+
+  /// The event's own warning reasons; null follows the sport ([sportWarningReasons]).
+  final List<String>? ownWarningReasons;
+  final List<String> sportWarningReasons;
 }
+
+/// As the server allows (WarningReasonsRequest).
+const maxWarningReasons = 20;
 
 /// A club taking part in the event; [id] is null until saved.
 class Organization {

@@ -31,7 +31,8 @@ public record MatchView(
         List<TimelineEntry> timeline,
         Instant serverTime,
         Review review,
-        Instant readyAt) {
+        Instant readyAt,
+        List<String> warningReasons) {
 
     /**
      * A participant ({@code participantId}) or a team ({@code teamId}, {@code teamNumber}); {@code members}

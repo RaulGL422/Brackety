@@ -2696,4 +2696,40 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get leagueCategoryPodiumsHint =>
       'Most use the general one; pick \"Its own\" only where other medals are given.';
+
+  @override
+  String get warningReasonsTitle => 'Warning reasons';
+
+  @override
+  String get warningReasonsSportHint =>
+      'The sport\'s. The referee picks one with a tap, or types another. Change the list for this event.';
+
+  @override
+  String get warningReasonsHint =>
+      'This event\'s. The referee picks one with a tap, or types another.';
+
+  @override
+  String get warningReasonsAdd => 'New reason';
+
+  @override
+  String get warningReasonsAddButton => 'Add';
+
+  @override
+  String warningReasonsFull(int count) {
+    return '$count reasons at most';
+  }
+
+  @override
+  String warningReasonsRemove(String reason) {
+    return 'Remove “$reason”';
+  }
+
+  @override
+  String get warningReasonsUseSport => 'Back to the sport\'s';
+
+  @override
+  String get reasonPick => 'Pick the reason. It stays in the match history.';
+
+  @override
+  String get reasonOther => 'Other reason';
 }

@@ -78,7 +78,8 @@ public record EventPackage(
             @Min(0) Integer teamPointsLimit,
             @Min(0) Integer minRestSeconds,
             MeasureRequirement weightRequirement,
-            MeasureRequirement heightRequirement) {}
+            MeasureRequirement heightRequirement,
+            @Size(max = 20) List<@NotBlank @Size(max = 60) String> warningReasons) {}
 
     public record LeagueEntry(
             @NotBlank @Size(max = 120) String name,

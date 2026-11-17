@@ -4379,6 +4379,66 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Casi todas usan el general; elige \"Propio\" solo en las que den otras medallas.'**
   String get leagueCategoryPodiumsHint;
+
+  /// No description provided for @warningReasonsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Motivos de advertencia'**
+  String get warningReasonsTitle;
+
+  /// No description provided for @warningReasonsSportHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Los del deporte. El árbitro los elige con un toque; para otro, escribe el suyo. Cambia la lista para este evento.'**
+  String get warningReasonsSportHint;
+
+  /// No description provided for @warningReasonsHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Los de este evento. El árbitro los elige con un toque; para otro, escribe el suyo.'**
+  String get warningReasonsHint;
+
+  /// No description provided for @warningReasonsAdd.
+  ///
+  /// In es, this message translates to:
+  /// **'Nuevo motivo'**
+  String get warningReasonsAdd;
+
+  /// No description provided for @warningReasonsAddButton.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir'**
+  String get warningReasonsAddButton;
+
+  /// No description provided for @warningReasonsFull.
+  ///
+  /// In es, this message translates to:
+  /// **'Máximo {count} motivos'**
+  String warningReasonsFull(int count);
+
+  /// No description provided for @warningReasonsRemove.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar «{reason}»'**
+  String warningReasonsRemove(String reason);
+
+  /// No description provided for @warningReasonsUseSport.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver a los del deporte'**
+  String get warningReasonsUseSport;
+
+  /// No description provided for @reasonPick.
+  ///
+  /// In es, this message translates to:
+  /// **'Elige el motivo. Queda en el historial del combate.'**
+  String get reasonPick;
+
+  /// No description provided for @reasonOther.
+  ///
+  /// In es, this message translates to:
+  /// **'Otro motivo'**
+  String get reasonOther;
 }
 
 class _AppLocalizationsDelegate

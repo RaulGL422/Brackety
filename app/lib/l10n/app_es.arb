@@ -1465,5 +1465,17 @@
   "@podiumLess": {"placeholders": {"metal": {"type": "String"}}},
   "podiumMore": "Uno más: {metal}",
   "@podiumMore": {"placeholders": {"metal": {"type": "String"}}},
-  "leagueCategoryPodiumsHint": "Casi todas usan el general; elige \"Propio\" solo en las que den otras medallas."
+  "leagueCategoryPodiumsHint": "Casi todas usan el general; elige \"Propio\" solo en las que den otras medallas.",
+  "warningReasonsTitle": "Motivos de advertencia",
+  "warningReasonsSportHint": "Los del deporte. El árbitro los elige con un toque; para otro, escribe el suyo. Cambia la lista para este evento.",
+  "warningReasonsHint": "Los de este evento. El árbitro los elige con un toque; para otro, escribe el suyo.",
+  "warningReasonsAdd": "Nuevo motivo",
+  "warningReasonsAddButton": "Añadir",
+  "warningReasonsFull": "Máximo {count} motivos",
+  "@warningReasonsFull": {"placeholders": {"count": {"type": "int"}}},
+  "warningReasonsRemove": "Quitar «{reason}»",
+  "@warningReasonsRemove": {"placeholders": {"reason": {"type": "String"}}},
+  "warningReasonsUseSport": "Volver a los del deporte",
+  "reasonPick": "Elige el motivo. Queda en el historial del combate.",
+  "reasonOther": "Otro motivo"
 }

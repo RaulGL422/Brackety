@@ -128,6 +128,7 @@ class LocalMatch {
             length: server.length,
             pointsLimit: server.pointsLimit,
             readyAt: server.readyAt,
+            warningReasons: server.warningReasons,
             remaining: state.remainingAt(now),
             running: state.isRunning(now),
             endReason: state.endReason(now),
