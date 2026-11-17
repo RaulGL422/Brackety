@@ -55,4 +55,5 @@ No aplica.
 - Restaurar una copia deja los datos como al guardarla.
 
 ## Estado
-Pendiente: diseño propuesto el 2026-11-16, faltan las decisiones de Raul (`pendientes.md`).
+- 2026-11-17, en pruebas (rama `feat/debug-scenarios`): escenarios en `server/src/devdata` (código de test por defecto; en el jar solo con `./mvnw -P debug package`, entrada `DebugBracketyApplication`), `GET /api/v1/admin/dev`, `GET …/scenarios`, `POST …/scenarios/{nombre}/load {confirm, today?}`, `PUT …/clock {today}`, auditados como `DEBUG_CHANGE`. La imagen de producción no los tiene (404, `ProductionHasNoDebugTest`). Dockerfile: `--build-arg MAVEN_PROFILE=debug`.
+- Falta: copias con nombre (guardar/restaurar), pestaña Escenarios y franja DEBUG (app y admin), despliegue en la Pi (compose `brackety-debug`) y CI de la imagen `api:debug`.
