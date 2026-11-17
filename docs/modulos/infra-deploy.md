@@ -24,7 +24,7 @@ Repo, CI, esqueletos de `server/`, `app/`, `admin/` y despliegue reproducible en
 - `server/Dockerfile` (api) y `deploy/web.Dockerfile` (web y admin con `APP=app|admin`; Flutter clonado en la versión del proyecto). Las etapas de build corren en la plataforma del runner; solo la imagen final es arm64/amd64.
 - `deploy/docker-compose.yml`: sin perfil arranca todo menos `tunnel` (prueba local y CI); `--profile pi` o `--profile windows` añade el túnel en un host público.
 - Puertos solo en `127.0.0.1` (8080 api, 8081 web, 8082 admin); la entrada pública es siempre el túnel.
-- Workflow `images.yml`: en cada PR construye, despliega con `deploy.sh local`, comprueba los healthchecks, hace backup cifrado + restauración (retención incluida) y comprueba que una versión rota hace rollback; en `main` y tags `v*` publica `ghcr.io/raulgl422/brackety-{api,web,admin}` multi-arch (`latest`, versión, sha).
+- Workflow `images.yml`: en cada PR construye, despliega con `deploy.sh local`, comprueba los healthchecks, hace backup cifrado + restauración (retención incluida) y comprueba que una versión rota hace rollback; en `main` y tags `v*` publica `ghcr.io/raulgl422/brackety-{api,web,admin}` multi-arch (`latest`, versión, sha); en `development`, las de debug con la etiqueta `dev` (`modulos/entornos.md`).
 
 ## Tests
 CI verde; ejecutadores locales arrancan (`08-ejecucion-local.md`); `docker compose up` con healthchecks OK; restauración de backup probada.

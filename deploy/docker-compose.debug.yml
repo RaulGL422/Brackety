@@ -1,0 +1,37 @@
+# The debug environment (docs/modulos/entornos.md), on the same Pi as production: ./deploy.sh debug.
+# Laid over docker-compose.yml with its own project, .env.debug, database, ports and tunnel.
+# The limits keep production responsive while both run; on event days: ./deploy.sh debug-stop.
+
+name: brackety-debug
+
+services:
+  db:
+    deploy:
+      resources:
+        limits: { cpus: "0.5", memory: 384M }
+
+  api:
+    build:
+      args:
+        MAVEN_PROFILE: debug
+    deploy:
+      resources:
+        limits: { cpus: "1.0", memory: 1G }
+
+  web:
+    deploy:
+      resources:
+        limits: { cpus: "0.25", memory: 64M }
+
+  admin:
+    build:
+      args:
+        BRACKETY_DEBUG: "true"
+    deploy:
+      resources:
+        limits: { cpus: "0.25", memory: 64M }
+
+  tunnel:
+    deploy:
+      resources:
+        limits: { cpus: "0.25", memory: 128M }

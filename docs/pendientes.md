@@ -16,7 +16,8 @@
 - [ ] #112 M2c sexo y peso: editar a alguien de la F1 (pide el sexo); importar una lista con y sin columna de sexo; peso con coma.
 - [ ] #113 F2-1: peso obligatorio en Ajustes de una fase, intentar agrupar a alguien sin peso y apuntarlo desde crear grupos.
 - [ ] #114 F2-2: categoría con varias edades; crear grupos las separa y el panel muestra la edad.
-- [ ] #115 servidor de debug: cuando esté desplegado (o la pestaña Escenarios), cargar `yoseikan-f1` en una fecha simulada y volver a hoy.
+- [ ] #115/#117 debug: con el debug desplegado, cargar `yoseikan-f1` en una fecha simulada, ver la franja en app y admin, guardar una copia, cambiar algo, restaurarla y volver a hoy.
+- [ ] Despliegue de debug: `./deploy.sh debug`, abrir los tres hostnames (piden Access), `./deploy.sh debug-stop` y comprobar que producción sigue.
 
 ## Despliegue (infra-deploy)
 - [ ] Copia de los backups en la nube (doc 05): elegir proveedor barato; se añadiría con `rclone` al final de `backup.sh`.
@@ -30,7 +31,7 @@
 - [ ] Google Cloud: crear OAuth client IDs (web + Android con SHA-1 de debug y release), ponerlos en `GOOGLE_CLIENT_ID` y probar el login real de Google en web y en Android (en local solo hay Google simulado).
 - [ ] Resend: API key y remitente verificado en `rgal.dev` antes de `feat/auth-email` (en local los emails van al log).
 - [ ] Cloudflare: regla de rate limiting sobre `/api/v1/auth/*` al desplegar.
-- [ ] Cloudflare: hostnames de debug (`brackety-debug.rgal.dev`, `brackety-debug-api.rgal.dev`, `brackety-debug-admin.rgal.dev`) con Access para los tres (`modulos/entornos.md`).
+- [ ] Debug en la Pi (`09-despliegue.md`, «Debug en la misma Pi»): segundo túnel con los hostnames de debug, Access para los tres, variables `DEBUG_API_BASE_URL` y `DEBUG_ADMIN_API_BASE_URL` en GitHub (sin ellas falla la publicación de `development`) y `.env.debug`.
 - [ ] Producción: leer la IP real de `CF-Connecting-IP` y confiar solo en el túnel; comprobar en el despliegue real.
 - [ ] Emails de auth: pasar el envío directo (tras commit, sin reintentos) a la cola con reintentos del módulo `notificaciones`.
 - [ ] Register/forgot: queda una pequeña diferencia de tiempo de BD según exista la cuenta (enumeración por temporización, medible con muchas muestras). Aceptado por ahora; si hiciera falta, mover esas escrituras al hilo asíncrono.
