@@ -35,5 +35,6 @@ class ProductionHasNoDebugTest extends EventApiTest {
                         .header(CloudflareAccess.HEADER, cloudflare.assertion())
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                 .andExpect(status().isNotFound());
+        mvc.perform(get("/api/v1/debug")).andExpect(status().isNotFound());
     }
 }

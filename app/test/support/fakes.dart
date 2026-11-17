@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:brackety_core/brackety_core.dart';
 import 'package:brackety/core/live/live_connection.dart';
 import 'package:brackety/features/auth/data/account.dart';
 import 'package:brackety/features/auth/data/account_api.dart';
@@ -55,6 +56,8 @@ List<Override> sessionOverrides(
   refreshTokenStoreProvider.overrideWithValue(store),
   accountApiProvider.overrideWithValue(account ?? FakeAccountApi()),
   liveSocketConnectProvider.overrideWithValue(live ?? silentLive),
+  // Not the debug environment: no banner, and no request for it.
+  debugStatusProvider.overrideWith((ref) async => null),
 ];
 
 /// Server auth without a server. Sign-in works for [accounts] and when the password equals the

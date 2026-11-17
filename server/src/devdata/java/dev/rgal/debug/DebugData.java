@@ -30,6 +30,7 @@ public class DebugData {
     private final JdbcClient jdbc;
     private final TransactionOperations transactions;
     private final AdminAuditLog audit;
+    private final DebugSnapshots snapshots;
     private volatile String loaded;
 
     DebugData(
@@ -37,7 +38,9 @@ public class DebugData {
             DebugClock clock,
             JdbcClient jdbc,
             TransactionOperations transactions,
-            AdminAuditLog audit) {
+            AdminAuditLog audit,
+            DebugSnapshots snapshots) {
+        this.snapshots = snapshots;
         this.scenarios =
                 scenarios.stream().sorted(Comparator.comparing(Scenario::name)).toList();
         this.clock = clock;
@@ -64,11 +67,8 @@ public class DebugData {
     public Status load(Scenario scenario, LocalDate today) {
         clock.moveTo(today);
         transactions.executeWithoutResult(status -> {
-            var tables = jdbc.sql("select quote_ident(tablename) from pg_tables where schemaname = current_schema()"
-                            + " and tablename <> 'flyway_schema_history'")
-                    .query(String.class)
-                    .list();
-            jdbc.sql("truncate table " + String.join(", ", tables) + " cascade").update();
+            jdbc.sql("truncate table " + String.join(", ", appTables(jdbc)) + " cascade")
+                    .update();
             scenario.seed(new ScenarioContext(clock));
         });
         loaded = scenario.name();
@@ -76,6 +76,32 @@ public class DebugData {
         audit.debug(scenario.name(), "scenario loaded, today " + LocalDate.now(clock));
         log.warn("Debug data wiped and scenario '{}' loaded, today is {}", scenario.name(), LocalDate.now(clock));
         return status();
+    }
+
+    /** The app's tables, quoted: every one of the current schema but the migration history. */
+    static List<String> appTables(JdbcClient jdbc) {
+        return jdbc.sql("select quote_ident(tablename) from pg_tables where schemaname = current_schema()"
+                        + " and tablename <> 'flyway_schema_history' order by tablename")
+                .query(String.class)
+                .list();
+    }
+
+    public List<DebugSnapshots.Snapshot> snapshots() {
+        return snapshots.list();
+    }
+
+    /** Saves what there is now, with the scenario it came from. */
+    public DebugSnapshots.Snapshot save(String name) {
+        return snapshots.save(name, loaded);
+    }
+
+    public Status restore(String name) {
+        loaded = snapshots.restore(name).scenario();
+        return status();
+    }
+
+    public void deleteSnapshot(String name) {
+        snapshots.delete(name);
     }
 
     public Status moveClock(LocalDate today) {

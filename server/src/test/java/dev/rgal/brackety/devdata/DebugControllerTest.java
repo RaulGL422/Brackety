@@ -2,6 +2,7 @@ package dev.rgal.brackety.devdata;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItems;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -93,6 +94,36 @@ class DebugControllerTest extends EventApiTest {
         admin(put("/api/v1/admin/dev/clock").content("{\"today\":null}"))
                 .andExpect(jsonPath("$.simulated").value(false))
                 .andExpect(jsonPath("$.today").value("2027-03-10"));
+    }
+
+    @Test
+    void aCopySurvivesAScenarioAndBringsTheDataBack() throws Exception {
+        var accounts = rows("account");
+        admin(post("/api/v1/admin/dev/snapshots").content("{\"name\":\"Mal nombre\"}"))
+                .andExpect(status().isBadRequest());
+        admin(post("/api/v1/admin/dev/snapshots").content("{\"name\":\"demo_f1\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("demo_f1"));
+        admin(post("/api/v1/admin/dev/scenarios/empty/load").content("{\"confirm\":\"empty\"}"))
+                .andExpect(status().isOk());
+        assertThat(rows("account")).isZero();
+
+        admin(get("/api/v1/admin/dev/snapshots")).andExpect(jsonPath("$[*].name", hasItems("demo_f1")));
+        admin(post("/api/v1/admin/dev/snapshots/demo_f1/restore")).andExpect(status().isOk());
+        assertThat(rows("account")).isEqualTo(accounts);
+        assertThat(rows("event")).isPositive();
+
+        admin(delete("/api/v1/admin/dev/snapshots/demo_f1")).andExpect(status().isNoContent());
+        admin(post("/api/v1/admin/dev/snapshots/demo_f1/restore")).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void theBannerReadsTheStatusWithoutSigningIn() throws Exception {
+        debugClock.moveTo(java.time.LocalDate.of(2027, 1, 24));
+        mvc.perform(get("/api/v1/debug"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.today").value("2027-01-24"))
+                .andExpect(jsonPath("$.simulated").value(true));
     }
 
     @Test
