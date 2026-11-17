@@ -35,11 +35,12 @@ Que cualquier pantalla o servicio se entienda sin haberlo escrito. El prototipo 
 | Release `release/vX.Y.Z` → `main` | **Batería completa**: todos los tests, E2E de flujos críticos, prueba de despliegue y de restauración del backup |
 | Cierre de módulo | Suite completa del componente + checklist de `04-testing.md` |
 
-### Cambios en el CI (tarea)
-- Filtros por ruta: `server/**` → server; `app/**` o `packages/**` → app; `admin/**` o `packages/**` → admin.
-- Un trabajo final `ci-ok` que resume a los demás: los saltados cuentan como verdes, así la protección de rama sigue pidiendo un solo check.
-- En PRs hacia `main` (releases) no hay filtros: corre todo, más los E2E.
+### Cambios en el CI (hecho, 2026-11-17, rama `chore/ci-components`)
+- Trabajo `changes`: mira qué archivos cambia la PR. `server/**` → server; `packages/**` → core, app y admin; `app/**` → app; `admin/**` → admin. Tocar `ci.yml` prueba todo.
+- `docs` corre siempre (es rápido). Las imágenes (`images.yml`) no se construyen en PRs solo de docs.
+- Trabajo final `ci-ok`: los saltados cuentan como verdes, los fallidos o cancelados no. Es el único check que debe pedir la protección de rama.
+- PRs hacia `main` (releases) y pushes: sin filtros, corre todo. Los E2E llegarán con la tarea 5 de la etapa 3.
 - E2E con **Playwright** sobre la web (Raul, 2026-11-16): login, inscripción, crear grupo, marcador con y sin red, sincronización. Usan el árbol de semántica de Flutter web (`08-ejecucion-local.md`) y corren solo en la batería completa de cada release, no en cada PR.
 
 ## Estado
-Pendiente (2026-11-16). Tareas en `roadmap.md`, etapa 3.
+Tarea 1 (CI por componentes) en pruebas (2026-11-17). Resto pendiente; tareas en `roadmap.md`, etapa 3.
