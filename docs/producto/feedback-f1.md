@@ -34,6 +34,7 @@ Fuente: Raul, 2026-11-16. Las tareas salen de aquí hacia `roadmap.md`.
 - Propuesta: lista de motivos en la configuración (por plantilla de deporte, editable por evento). En el marcador, botones con los motivos más usados y "Otro" con texto libre.
 - Datos: catálogo `warning_reason` (id, texto ES/EN, orden, activo); la advertencia guarda id + texto (el texto, por si el motivo cambia luego).
 - Compatible con la ficha del alumno (motivo ya visible) y con "+1 al rival cada 2 advertencias".
+- Hecho (2026-11-17): lista por deporte, editable por evento; sin catálogo en BD (se guarda el texto, como antes). `modulos/prototipo-f1.md`.
 
 ### F1-5 · Cuentas propias para todo el staff
 - Renombrar árbitros por evento (`staffNames`) deja de servir: cada árbitro y ayudante entra con **su cuenta** y el club lo invita al evento.

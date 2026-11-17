@@ -173,6 +173,9 @@ class ScoreboardScreen extends ConsumerWidget {
             ? l10n.reasonApplyDisqualify
             : l10n.reasonApplyWarning,
         destructive: action == MatchAction.disqualification,
+        suggestions: action == MatchAction.oneHandWarning
+            ? const []
+            : view.warningReasons,
       );
       if (reason == null || !context.mounted) return;
     }

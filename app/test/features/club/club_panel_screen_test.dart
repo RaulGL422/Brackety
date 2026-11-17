@@ -42,6 +42,13 @@ class FakeClubRepository extends Fake implements ClubRepository {
   final savedParticipantSexes = <Sex>[];
   final savedParticipantWeights = <double?>[];
   final savedOrganizations = <List<Organization>>[];
+  final savedWarningReasons = <List<String>?>[];
+
+  @override
+  Future<void> saveWarningReasons(
+    String eventId,
+    List<String>? reasons,
+  ) async => savedWarningReasons.add(reasons);
 
   @override
   Future<void> saveParticipant(
@@ -181,6 +188,7 @@ void main() {
     matchLength: const Duration(minutes: 3),
     pointsLimit: 15,
     attendancePoints: 10,
+    sportWarningReasons: const ['Ataque de pique', 'Exceso de potencia'],
     categories: const [
       EventCategory(id: 'c1', name: '4-7', minAge: 4, maxAge: 7),
       EventCategory(id: 'c2', name: '8-11', minAge: 8, maxAge: 11),
@@ -521,6 +529,52 @@ void main() {
     expect(repository.savedParticipantSexes, [Sex.female]);
     expect(repository.savedParticipantWeights, [32.5]);
   });
+
+  for (final MapEntry(key: device, value: size) in sizes.entries) {
+    testWidgets('the club changes the warning reasons on $device', (
+      tester,
+    ) async {
+      final repository = FakeClubRepository(settings);
+      await pumpPanel(tester, size, repository: repository);
+      await tester.tap(find.text('Settings').last);
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text('New reason'),
+        200,
+        scrollable: find
+            .descendant(
+              of: find.byType(ListView),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      expect(find.text('Ataque de pique'), findsOneWidget);
+
+      final remove = find.byTooltip('Remove “Ataque de pique”');
+      await tester.ensureVisible(remove);
+      await tester.pumpAndSettle();
+      await tester.tap(remove);
+      await tester.pumpAndSettle();
+      final field = find.widgetWithText(TextField, 'New reason');
+      await tester.ensureVisible(field);
+      await tester.enterText(field, 'Salida de zona');
+      final add = find.widgetWithText(FilledButton, 'Add');
+      await tester.ensureVisible(add);
+      await tester.pumpAndSettle();
+      await tester.tap(add);
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text("Back to the sport's"));
+      await tester.tap(find.text("Back to the sport's"));
+      await tester.pumpAndSettle();
+
+      expect(repository.savedWarningReasons, [
+        ['Exceso de potencia'],
+        ['Exceso de potencia', 'Salida de zona'],
+        null,
+      ]);
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   testWidgets('the club adds the clubs taking part in Settings', (
     tester,

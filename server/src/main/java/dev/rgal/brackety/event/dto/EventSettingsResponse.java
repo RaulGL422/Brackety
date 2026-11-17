@@ -25,7 +25,8 @@ public record EventSettingsResponse(
         int teamMatchSeconds,
         int teamPointsLimit,
         int minRestSeconds,
-        MeasureRules measures) {
+        MeasureRules measures,
+        WarningReasons warningReasons) {
 
     public record OrganizationResponse(UUID id, String name, String shortName) {
 

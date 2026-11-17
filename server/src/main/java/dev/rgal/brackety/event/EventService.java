@@ -10,6 +10,8 @@ import dev.rgal.brackety.event.dto.EventSettingsResponse.StaffMember;
 import dev.rgal.brackety.event.dto.MeasureRules;
 import dev.rgal.brackety.event.dto.MeasureRulesRequest;
 import dev.rgal.brackety.event.dto.MyEventResponse;
+import dev.rgal.brackety.event.dto.WarningReasons;
+import dev.rgal.brackety.event.dto.WarningReasonsRequest;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -108,6 +110,15 @@ public class EventService {
         var event = get(eventId);
         event.setMeasureRequirements(request.weight(), request.height());
         return MeasureRules.of(event);
+    }
+
+    /** The warning reasons the referee picks from; null follows the sport. */
+    @Transactional
+    public WarningReasons updateWarningReasons(UUID eventId, UUID accountId, WarningReasonsRequest request) {
+        access.require(eventId, accountId, EventRole.CLUB);
+        var event = get(eventId);
+        event.setWarningReasons(request.reasons());
+        return WarningReasons.of(event);
     }
 
     @Transactional
@@ -232,7 +243,8 @@ public class EventService {
                 event.modality().team().matchSeconds(),
                 event.modality().team().pointsLimit(),
                 event.modality().getMinRestSeconds(),
-                MeasureRules.of(event));
+                MeasureRules.of(event),
+                WarningReasons.of(event));
     }
 
     private List<UUID> refereeIds(UUID eventId) {

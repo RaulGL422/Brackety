@@ -15,9 +15,12 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /** Its match rules live in its modalities ({@link Modality}), never here. */
 @Entity
@@ -47,6 +50,10 @@ public class Event {
 
     @Enumerated(EnumType.STRING)
     private MeasureRequirement heightRequirement;
+
+    /** The event's own list; null follows its sport. */
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    private List<String> warningReasons;
 
     private String resultsImportHash;
 
@@ -86,7 +93,7 @@ public class Event {
         return new Event(ownerAccountId, leagueId, 1, Discipline.TAMBO, name, eventDate, 1, 10, Modality.tambo(), now);
     }
 
-    /** The next phase of the same league, with this one's match rules and measures asked. */
+    /** The next phase of the same league, with this one's match rules, measures asked and warning reasons. */
     public Event nextPhase(
             int phaseNumber,
             Discipline discipline,
@@ -106,6 +113,7 @@ public class Event {
                 modality().copy(),
                 now);
         next.setMeasureRequirements(weightRequirement, heightRequirement);
+        next.warningReasons = warningReasons == null ? null : List.copyOf(warningReasons);
         return next;
     }
 
@@ -125,6 +133,30 @@ public class Event {
 
     public MeasureRequirement getOwnHeightRequirement() {
         return heightRequirement;
+    }
+
+    /** What the referee picks from: the event's own list, or its sport's. */
+    public List<String> warningReasons() {
+        return warningReasons != null ? List.copyOf(warningReasons) : discipline.warningReasons();
+    }
+
+    /** Null: as the sport says. */
+    public List<String> getOwnWarningReasons() {
+        return warningReasons == null ? null : List.copyOf(warningReasons);
+    }
+
+    /** Null follows the sport. Trimmed, without blanks nor repeats (case aside), in the order given. */
+    public void setWarningReasons(List<String> reasons) {
+        if (reasons == null) {
+            warningReasons = null;
+            return;
+        }
+        var unique = new LinkedHashMap<String, String>();
+        reasons.stream()
+                .map(String::strip)
+                .filter(r -> !r.isEmpty())
+                .forEach(r -> unique.putIfAbsent(r.toLowerCase(), r));
+        warningReasons = new ArrayList<>(unique.values());
     }
 
     /** Null follows the sport. */

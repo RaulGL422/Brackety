@@ -135,6 +135,100 @@ void main() {
     });
   }
 
+  for (final MapEntry(key: device, value: size) in sizes.entries) {
+    testWidgets(
+      'a warning reason is one tap; another one is typed on $device',
+      (tester) async {
+        tester.view.physicalSize = size;
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        final (repository, _) = await open(
+          tester,
+          matchView(
+            status: MatchStatus.inProgress,
+            warningReasons: const ['Ataque de pique', 'Exceso de potencia'],
+          ),
+        );
+
+        Future<void> warn(int corner) async {
+          await tester.tap(
+            find.byType(PopupMenuButton<MatchAction>).at(corner),
+          );
+          await settle(tester);
+          await tester.tap(find.text('Warning'));
+          await settle(tester);
+        }
+
+        await warn(0);
+        await tester.tap(
+          find.widgetWithText(OutlinedButton, 'Exceso de potencia'),
+        );
+        await settle(tester);
+        expect(repository.sent.last, (
+          MatchAction.warning,
+          Side.red,
+          'Exceso de potencia',
+        ));
+
+        await warn(1);
+        await tester.enterText(
+          find.widgetWithText(TextField, 'Other reason'),
+          'Salida de zona',
+        );
+        await settle(tester);
+        final confirm = find.widgetWithText(FilledButton, 'Give warning');
+        await tester.ensureVisible(confirm);
+        await tester.tap(confirm);
+        await settle(tester);
+        expect(repository.sent.last, (
+          MatchAction.warning,
+          Side.blue,
+          'Salida de zona',
+        ));
+        expect(tester.takeException(), isNull);
+
+        await tester.pumpWidget(const SizedBox());
+      },
+    );
+  }
+
+  testWidgets('a disqualification reason is picked and then confirmed', (
+    tester,
+  ) async {
+    tester.view.physicalSize = sizes['phone']!;
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final (repository, _) = await open(
+      tester,
+      matchView(
+        status: MatchStatus.inProgress,
+        warningReasons: const ['Conducta antideportiva'],
+      ),
+    );
+
+    await tester.tap(find.byType(PopupMenuButton<MatchAction>).first);
+    await settle(tester);
+    await tester.tap(find.text('Disqualification'));
+    await settle(tester);
+    await tester.tap(
+      find.widgetWithText(OutlinedButton, 'Conducta antideportiva'),
+    );
+    await settle(tester);
+    expect(repository.sent, isEmpty);
+
+    final confirm = find.widgetWithText(FilledButton, 'Disqualify');
+    await tester.ensureVisible(confirm);
+    await tester.tap(confirm);
+    await settle(tester);
+    expect(repository.sent.single, (
+      MatchAction.disqualification,
+      Side.red,
+      'Conducta antideportiva',
+    ));
+
+    await tester.pumpWidget(const SizedBox());
+  });
+
   testWidgets('a warning needs a confirmed reason', (tester) async {
     tester.view.physicalSize = sizes['tablet']!;
     tester.view.devicePixelRatio = 1;

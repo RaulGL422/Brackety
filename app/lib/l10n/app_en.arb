@@ -889,5 +889,17 @@
   "podiumOwn": "Its own",
   "podiumLess": "One less: {metal}",
   "podiumMore": "One more: {metal}",
-  "leagueCategoryPodiumsHint": "Most use the general one; pick \"Its own\" only where other medals are given."
+  "leagueCategoryPodiumsHint": "Most use the general one; pick \"Its own\" only where other medals are given.",
+  "warningReasonsTitle": "Warning reasons",
+  "warningReasonsSportHint": "The sport's. The referee picks one with a tap, or types another. Change the list for this event.",
+  "warningReasonsHint": "This event's. The referee picks one with a tap, or types another.",
+  "warningReasonsAdd": "New reason",
+  "warningReasonsAddButton": "Add",
+  "warningReasonsFull": "{count} reasons at most",
+  "@warningReasonsFull": {"placeholders": {"count": {"type": "int"}}},
+  "warningReasonsRemove": "Remove “{reason}”",
+  "@warningReasonsRemove": {"placeholders": {"reason": {"type": "String"}}},
+  "warningReasonsUseSport": "Back to the sport's",
+  "reasonPick": "Pick the reason. It stays in the match history.",
+  "reasonOther": "Other reason"
 }
