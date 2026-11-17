@@ -23,6 +23,7 @@ import '../features/legal/ui/legal_page_screen.dart';
 import '../features/mat/ui/mat_board_screen.dart';
 import '../features/scoreboard/ui/match_watch_screen.dart';
 import '../features/scoreboard/ui/scoreboard_screen.dart';
+import '../features/staff/ui/invitation_screen.dart';
 import '../l10n/gen/app_localizations.dart';
 
 // Email links land here whatever the session (the server builds them, docs/modulos/auth.md).
@@ -136,6 +137,12 @@ final routerProvider = Provider<GoRouter>((ref) {
             LegalPageScreen(slug: state.pathParameters['type']!),
       ),
       GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
+      // From the invitation email; signed out, the sign-in comes back here.
+      GoRoute(
+        path: '/invitation',
+        builder: (_, state) =>
+            InvitationScreen(token: state.uri.queryParameters['token']),
+      ),
       GoRoute(
         path: '/connection',
         builder: (context, _) => Scaffold(

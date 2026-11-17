@@ -20,6 +20,7 @@ import 'categories_editor.dart';
 import 'club_panel_screen.dart';
 import 'organizations_editor.dart';
 import 'measures_editor.dart';
+import '../../staff/ui/staff_section.dart';
 import 'warning_reasons_editor.dart';
 
 const maxMats = 20;
@@ -308,11 +309,21 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
           Text(l10n.staffTitle, style: text.titleMedium),
           Text(l10n.staffHint, style: text.bodySmall),
           for (final member in settings.staff)
-            _StaffNameField(
-              key: ValueKey(member.id),
-              eventId: widget.eventId,
-              member: member,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: _StaffNameField(
+                    key: ValueKey(member.id),
+                    eventId: widget.eventId,
+                    member: member,
+                  ),
+                ),
+                StaffRemoveButton(eventId: widget.eventId, member: member),
+              ],
             ),
+          const SizedBox(height: AppSpacing.s),
+          StaffInvitations(eventId: widget.eventId),
           const SizedBox(height: AppSpacing.xl),
           Text(l10n.measuresTitle, style: text.titleMedium),
           MeasuresEditor(eventId: widget.eventId, settings: settings),

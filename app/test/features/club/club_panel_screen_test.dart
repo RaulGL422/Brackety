@@ -12,12 +12,15 @@ import 'package:brackety/features/club/ui/settings_tab.dart';
 import 'package:brackety/features/club/ui/participant_form.dart';
 import 'package:brackety/features/events/data/my_event.dart';
 import 'package:brackety/features/events/state/events_providers.dart';
+import 'package:brackety/features/staff/data/staff_repository.dart';
 import 'package:brackety/l10n/gen/app_localizations.dart';
 import 'package:brackety_core/brackety_core.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../../support/staff_fakes.dart';
 
 /// Saves settings like the server would, or refuses them with [refuseWith].
 class FakeClubRepository extends Fake implements ClubRepository {
@@ -238,6 +241,7 @@ void main() {
     Size size, {
     ClubRepository? repository,
     List<StandingRow>? scores,
+    FakeStaffRepository? staff,
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
@@ -247,6 +251,9 @@ void main() {
         overrides: [
           if (repository != null)
             clubRepositoryProvider.overrideWithValue(repository),
+          staffRepositoryProvider.overrideWithValue(
+            staff ?? FakeStaffRepository(),
+          ),
           myEventsProvider.overrideWith((ref) async => [event]),
           eventSettingsProvider.overrideWith(
             (ref, _) async => repository is FakeClubRepository
@@ -572,6 +579,81 @@ void main() {
         ['Exceso de potencia', 'Salida de zona'],
         null,
       ]);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  for (final MapEntry(key: device, value: size) in sizes.entries) {
+    testWidgets('the club invites, cancels and removes staff on $device', (
+      tester,
+    ) async {
+      final staff = FakeStaffRepository(
+        pending: const [
+          Invitation(
+            id: 'old',
+            email: 'vieja@example.test',
+            role: StaffRole.grouper,
+            expired: true,
+          ),
+        ],
+      );
+      await pumpPanel(
+        tester,
+        size,
+        repository: FakeClubRepository(settings),
+        staff: staff,
+      );
+      await tester.tap(find.text('Settings').last);
+      await tester.pumpAndSettle();
+      final list = find
+          .descendant(
+            of: find.byType(ListView),
+            matching: find.byType(Scrollable),
+          )
+          .first;
+      await tester.scrollUntilVisible(
+        find.text('Invite'),
+        200,
+        scrollable: list,
+      );
+      expect(find.textContaining('expired'), findsOneWidget);
+
+      final invite = find.widgetWithText(OutlinedButton, 'Invite');
+      await tester.ensureVisible(invite);
+      await tester.pumpAndSettle();
+      await tester.tap(invite);
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Email'),
+        'ana@example.test',
+      );
+      await tester.tap(find.widgetWithText(FilledButton, 'Send invitation'));
+      await tester.pumpAndSettle();
+      expect(staff.calls, ['invite ana@example.test REFEREE']);
+      expect(find.text('ana@example.test'), findsOneWidget);
+
+      // Centred in the list: at its edges the bottom navigation covers them.
+      Future<void> centre(Finder finder) async {
+        await Scrollable.ensureVisible(tester.element(finder), alignment: 0.5);
+        await tester.pumpAndSettle();
+      }
+
+      final cancel = find.byTooltip('Cancel invitation').first;
+      await centre(cancel);
+      await tester.tap(cancel);
+      await tester.pumpAndSettle();
+      expect(staff.calls.last, 'cancel old');
+
+      final remove = find.byTooltip('Remove ayudante1');
+      await tester.scrollUntilVisible(remove, -200, scrollable: list);
+      await centre(remove);
+      await tester.tap(remove);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Remove as helper').last);
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, 'Remove'));
+      await tester.pumpAndSettle();
+      expect(staff.calls.last, 'remove h1 GROUPER');
       expect(tester.takeException(), isNull);
     });
   }

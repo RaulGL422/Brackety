@@ -24,5 +24,14 @@ Gestión de roles y permisos, asignación de ubicaciones, agenda del ayudante.
 ## Tests
 Cada permiso permitido/denegado, delegación de un nivel, cambios en directo, auditoría.
 
+## Adelanto F1-5: invitaciones (2026-11-17, rama `feat/f1-5-staff-invites`)
+- El club invita por email como **ayudante** (`GROUPER`) o **árbitro** (`REFEREE`), en Configuración → Personal.
+- Llega un enlace `/invitation?token=…` de un solo uso. Caduca en 14 días. Solo se guarda su hash. Reenviar: como pronto al minuto, y anula el anterior. Máximo 50 pendientes por evento.
+- Se acepta con una cuenta completa del **mismo email** (verificado). Otra cuenta ve para quién es y puede cambiar de cuenta. Sin sesión, el inicio de sesión vuelve al enlace.
+- El club ve las pendientes (y las caducadas), las anula y quita a cada persona por rol. Un árbitro con tapiz no se quita: antes se le saca del tapiz.
+- Datos: `staff_invitation` (email, rol, hash, enviada, caduca, aceptada por). API: `GET/POST /events/{id}/invitations`, `DELETE /events/{id}/invitations/{id}`, `DELETE /events/{id}/staff/{cuenta}?role=`, `POST /invitations/view|accept {token}`.
+- El nombre por evento (`staffNames`) sigue hasta que las cuentas tengan nombre (`perfiles-menores`/M6): hoy es lo único que pone nombre a un email en los tapices.
+- Tests: `StaffInvitationTest`; app: Configuración y pantalla de la invitación en 3 tamaños.
+
 ## Estado
-Pendiente. Duda abierta: cuándo exactamente se pide el detalle de permisos (al empezar el módulo).
+Adelanto F1-5 en pruebas. El resto (roles libres, permisos, ubicaciones) pendiente; duda abierta: cuándo se pide el detalle de permisos.
