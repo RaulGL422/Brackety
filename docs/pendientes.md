@@ -11,6 +11,7 @@
 - [ ] #108 CSV por categoría: pestaña de liga, «Un CSV por categoría (.zip)», abrir uno con Excel.
 - [ ] #109 M2a alumno único: corregir un apellido en una fase y verlo en la otra; cambiar el nacimiento de alguien ya agrupado da error.
 - [ ] #109 antes de desplegar en la Pi: `select person_id from participant group by person_id having count(distinct birth_date) > 1;` debe salir vacío.
+- [ ] Datos de la F1 a producción: seguir `09-despliegue.md` («Datos de la F1 a producción») cuando estén SSD, backups y Cloudflare; elegir el email de la cuenta de la entidad.
 - [ ] #110 PDF: «Clasificación en PDF» en la pestaña de liga, imprimir una hoja.
 - [ ] #111 M2b club único: renombrar un club en la F2 y verlo en la F1.
 - [ ] #112 M2c sexo y peso: editar a alguien de la F1 (pide el sexo); importar una lista con y sin columna de sexo; peso con coma.
