@@ -12,7 +12,7 @@ Objetivo: arrancar cualquier app en local en un clic, con la base de datos en el
 - Primera vez en Windows: aceptar el aviso del firewall para Java (red privada) si se va a usar desde el móvil.
 
 ## Escenarios
-Cada escenario es una clase `Scenario` en `server/src/test/java/dev/rgal/brackety/devdata/scenarios/`.
+Cada escenario es una clase `Scenario` en `server/src/devdata/java/dev/rgal/brackety/devdata/scenarios/`.
 - Se elige con `--brackety.scenario=<nombre>` (por defecto `empty`).
 - Nombre desconocido → el servidor no arranca y lista los disponibles.
 - Fechas **siempre relativas al reloj** (`ctx.today()`, `ctx.now()`), nunca fijas: "evento que cierra inscripción mañana" sigue siéndolo cualquier día.
