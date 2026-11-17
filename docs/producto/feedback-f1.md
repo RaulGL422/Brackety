@@ -40,6 +40,7 @@ Fuente: Raul, 2026-11-16. Las tareas salen de aquí hacia `roadmap.md`.
 - Renombrar árbitros por evento (`staffNames`) deja de servir: cada árbitro y ayudante entra con **su cuenta** y el club lo invita al evento.
 - Depende de `ayudantes-permisos` (invitaciones, roles por evento) y de producción con emails reales.
 - Las cuentas genéricas (`arbitro1`…) quedan solo en debug y en los escenarios.
+- Hecho (2026-11-17): invitación por email a una cuenta completa (Raul). `modulos/ayudantes-permisos.md`, «Adelanto F1-5».
 
 ### F1-6 · Eventos poco intuitivos
 - La configuración y gran parte de la interfaz del evento no se entienden a la primera. Plan en `eventos-ux.md`.

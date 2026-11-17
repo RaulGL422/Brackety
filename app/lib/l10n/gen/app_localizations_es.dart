@@ -2771,4 +2771,101 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get reasonOther => 'Otro motivo';
+
+  @override
+  String get invitationInvite => 'Invitar';
+
+  @override
+  String get invitationHint =>
+      'Le llega un email con un enlace. Entra, o crea su cuenta, con ese mismo email y acepta. El enlace caduca en 14 días.';
+
+  @override
+  String get invitationEmail => 'Email';
+
+  @override
+  String get invitationEmailInvalid => 'Escribe un email válido';
+
+  @override
+  String get invitationSend => 'Enviar invitación';
+
+  @override
+  String invitationSent(String email) {
+    return 'Invitación enviada a $email';
+  }
+
+  @override
+  String get invitationPending => 'pendiente';
+
+  @override
+  String get invitationExpired => 'caducada: invita de nuevo';
+
+  @override
+  String get invitationCancel => 'Anular invitación';
+
+  @override
+  String get invitationCancelled => 'Invitación anulada';
+
+  @override
+  String get staffRemove => 'Quitar';
+
+  @override
+  String staffRemoveAs(String role) {
+    return 'Quitar como $role';
+  }
+
+  @override
+  String staffRemoveTooltip(String name) {
+    return 'Quitar a $name';
+  }
+
+  @override
+  String staffRemoveConfirm(String name, String role) {
+    return '$name deja de ser $role en este evento. Puedes invitarle de nuevo.';
+  }
+
+  @override
+  String get staffRemoved => 'Quitado del evento';
+
+  @override
+  String get staffErrorAlready => 'Ya tiene ese papel en el evento.';
+
+  @override
+  String get staffErrorTooSoon => 'Espera un minuto antes de reenviarla.';
+
+  @override
+  String get staffErrorTooMany =>
+      'Demasiadas invitaciones pendientes: anula alguna.';
+
+  @override
+  String get staffErrorOnMat => 'Quítale antes de su tapiz.';
+
+  @override
+  String get invitationTitle => 'Invitación';
+
+  @override
+  String invitationFrom(String organizer, String role) {
+    return '$organizer te invita como $role a:';
+  }
+
+  @override
+  String get invitationAccept => 'Aceptar';
+
+  @override
+  String get invitationAccepted => 'Ya estás en el evento';
+
+  @override
+  String invitationOtherEmail(String email) {
+    return 'Esta invitación es para $email. Entra con esa cuenta para aceptarla.';
+  }
+
+  @override
+  String get invitationSwitchAccount => 'Entrar con otra cuenta';
+
+  @override
+  String get invitationInvalid =>
+      'La invitación no existe, ya se usó o ha caducado. Pide al club que te invite de nuevo.';
+
+  @override
+  String get invitationVerifyFirst =>
+      'Confirma antes tu email con el enlace que te enviamos al registrarte.';
 }

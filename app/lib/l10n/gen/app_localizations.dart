@@ -4439,6 +4439,168 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Otro motivo'**
   String get reasonOther;
+
+  /// No description provided for @invitationInvite.
+  ///
+  /// In es, this message translates to:
+  /// **'Invitar'**
+  String get invitationInvite;
+
+  /// No description provided for @invitationHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Le llega un email con un enlace. Entra, o crea su cuenta, con ese mismo email y acepta. El enlace caduca en 14 días.'**
+  String get invitationHint;
+
+  /// No description provided for @invitationEmail.
+  ///
+  /// In es, this message translates to:
+  /// **'Email'**
+  String get invitationEmail;
+
+  /// No description provided for @invitationEmailInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe un email válido'**
+  String get invitationEmailInvalid;
+
+  /// No description provided for @invitationSend.
+  ///
+  /// In es, this message translates to:
+  /// **'Enviar invitación'**
+  String get invitationSend;
+
+  /// No description provided for @invitationSent.
+  ///
+  /// In es, this message translates to:
+  /// **'Invitación enviada a {email}'**
+  String invitationSent(String email);
+
+  /// No description provided for @invitationPending.
+  ///
+  /// In es, this message translates to:
+  /// **'pendiente'**
+  String get invitationPending;
+
+  /// No description provided for @invitationExpired.
+  ///
+  /// In es, this message translates to:
+  /// **'caducada: invita de nuevo'**
+  String get invitationExpired;
+
+  /// No description provided for @invitationCancel.
+  ///
+  /// In es, this message translates to:
+  /// **'Anular invitación'**
+  String get invitationCancel;
+
+  /// No description provided for @invitationCancelled.
+  ///
+  /// In es, this message translates to:
+  /// **'Invitación anulada'**
+  String get invitationCancelled;
+
+  /// No description provided for @staffRemove.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar'**
+  String get staffRemove;
+
+  /// No description provided for @staffRemoveAs.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar como {role}'**
+  String staffRemoveAs(String role);
+
+  /// No description provided for @staffRemoveTooltip.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar a {name}'**
+  String staffRemoveTooltip(String name);
+
+  /// No description provided for @staffRemoveConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'{name} deja de ser {role} en este evento. Puedes invitarle de nuevo.'**
+  String staffRemoveConfirm(String name, String role);
+
+  /// No description provided for @staffRemoved.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitado del evento'**
+  String get staffRemoved;
+
+  /// No description provided for @staffErrorAlready.
+  ///
+  /// In es, this message translates to:
+  /// **'Ya tiene ese papel en el evento.'**
+  String get staffErrorAlready;
+
+  /// No description provided for @staffErrorTooSoon.
+  ///
+  /// In es, this message translates to:
+  /// **'Espera un minuto antes de reenviarla.'**
+  String get staffErrorTooSoon;
+
+  /// No description provided for @staffErrorTooMany.
+  ///
+  /// In es, this message translates to:
+  /// **'Demasiadas invitaciones pendientes: anula alguna.'**
+  String get staffErrorTooMany;
+
+  /// No description provided for @staffErrorOnMat.
+  ///
+  /// In es, this message translates to:
+  /// **'Quítale antes de su tapiz.'**
+  String get staffErrorOnMat;
+
+  /// No description provided for @invitationTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Invitación'**
+  String get invitationTitle;
+
+  /// No description provided for @invitationFrom.
+  ///
+  /// In es, this message translates to:
+  /// **'{organizer} te invita como {role} a:'**
+  String invitationFrom(String organizer, String role);
+
+  /// No description provided for @invitationAccept.
+  ///
+  /// In es, this message translates to:
+  /// **'Aceptar'**
+  String get invitationAccept;
+
+  /// No description provided for @invitationAccepted.
+  ///
+  /// In es, this message translates to:
+  /// **'Ya estás en el evento'**
+  String get invitationAccepted;
+
+  /// No description provided for @invitationOtherEmail.
+  ///
+  /// In es, this message translates to:
+  /// **'Esta invitación es para {email}. Entra con esa cuenta para aceptarla.'**
+  String invitationOtherEmail(String email);
+
+  /// No description provided for @invitationSwitchAccount.
+  ///
+  /// In es, this message translates to:
+  /// **'Entrar con otra cuenta'**
+  String get invitationSwitchAccount;
+
+  /// No description provided for @invitationInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'La invitación no existe, ya se usó o ha caducado. Pide al club que te invite de nuevo.'**
+  String get invitationInvalid;
+
+  /// No description provided for @invitationVerifyFirst.
+  ///
+  /// In es, this message translates to:
+  /// **'Confirma antes tu email con el enlace que te enviamos al registrarte.'**
+  String get invitationVerifyFirst;
 }
 
 class _AppLocalizationsDelegate

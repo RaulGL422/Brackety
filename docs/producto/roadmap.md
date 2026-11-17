@@ -36,8 +36,8 @@ Línea de infraestructura; puede ir en paralelo con la etapa 2 (otro worktree).
 1. F1-2 Comodín guardado como normal (crítico): arreglado en la app (2026-11-16); falta revisar los datos de la F1 en la Pi.
 2. F1-1 Inhabilitar tapiz visible y con estado.
 3. F1-3 Puntos fuera de tiempo: fusionado (#120, 2026-11-17).
-4. F1-4 Motivos de advertencia predefinidos y "Otro": en pruebas (2026-11-17).
-5. F1-5 Cuentas propias: invitaciones del club a árbitros y ayudantes (adelanto de `ayudantes-permisos`); retirar `staffNames`.
+4. F1-4 Motivos de advertencia predefinidos y "Otro": fusionado (#121, 2026-11-17).
+5. F1-5 Cuentas propias: invitaciones del club a árbitros y ayudantes (adelanto de `ayudantes-permisos`); retirar `staffNames`. En pruebas (2026-11-17).
 6. F2-1 Peso de los alumnos.
 7. F2-2 Edades mezcladas dentro de una categoría, divididas en la pantalla de crear grupos.
 8. F2-3 CSV de resultados claro en Excel.

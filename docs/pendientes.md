@@ -52,7 +52,7 @@
 - [ ] F2-3 CSV de resultados: la entidad de la liga ve confusos los puestos (1.º, 2.º, 3.º) al abrirlos en Excel. Hecho: CSV por categoría (#108) y PDF (#110). Falta rehacer el resto de CSV (Raul aún no lo ha revisado).
 - [ ] F2-4 clasificaciones configurables: la global debe ser opcional (en esta liga no sirve) y poder clasificar por peso, sexo, categoría, etc. según el deporte y el evento.
 - [ ] F1-4 advertencias: revisar la lista de tambo propuesta (prohibiciones del reglamento, cap. 3.1: proyección o golpeo, tirarse rodando, ataque de pique, exceso de potencia, conducta antideportiva). Se cambia en `Discipline` o por evento en Configuración.
-- [ ] F1-5 cuentas propias: invitación por email que lleva a crear una cuenta completa (Raul, 2026-11-17); necesita Resend.
+- [ ] F1-5 cuentas propias: hecho en `feat/f1-5-staff-invites`. Con Resend en producción, probar a mano: invitar a un email real, registrarse con él, aceptar y arbitrar un tapiz. Retirar `staffNames` cuando las cuentas tengan nombre.
 - [ ] Gestión del club (`producto/gestion-club.md`): ¿se amplía el alcance? Cambia `00-vision.md` (hoy cobros fuera de alcance).
 - [ ] Si se cobra o se factura: forma jurídica, asesor fiscal y contratos con los clubes.
 

@@ -2732,4 +2732,100 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reasonOther => 'Other reason';
+
+  @override
+  String get invitationInvite => 'Invite';
+
+  @override
+  String get invitationHint =>
+      'They get an email with a link. They sign in, or create their account, with that same email and accept. The link expires in 14 days.';
+
+  @override
+  String get invitationEmail => 'Email';
+
+  @override
+  String get invitationEmailInvalid => 'Write a valid email';
+
+  @override
+  String get invitationSend => 'Send invitation';
+
+  @override
+  String invitationSent(String email) {
+    return 'Invitation sent to $email';
+  }
+
+  @override
+  String get invitationPending => 'pending';
+
+  @override
+  String get invitationExpired => 'expired: invite again';
+
+  @override
+  String get invitationCancel => 'Cancel invitation';
+
+  @override
+  String get invitationCancelled => 'Invitation cancelled';
+
+  @override
+  String get staffRemove => 'Remove';
+
+  @override
+  String staffRemoveAs(String role) {
+    return 'Remove as $role';
+  }
+
+  @override
+  String staffRemoveTooltip(String name) {
+    return 'Remove $name';
+  }
+
+  @override
+  String staffRemoveConfirm(String name, String role) {
+    return '$name is no longer a $role in this event. You can invite them again.';
+  }
+
+  @override
+  String get staffRemoved => 'Removed from the event';
+
+  @override
+  String get staffErrorAlready => 'They already have that role in the event.';
+
+  @override
+  String get staffErrorTooSoon => 'Wait a minute before sending it again.';
+
+  @override
+  String get staffErrorTooMany => 'Too many pending invitations: cancel some.';
+
+  @override
+  String get staffErrorOnMat => 'Take them off their mat first.';
+
+  @override
+  String get invitationTitle => 'Invitation';
+
+  @override
+  String invitationFrom(String organizer, String role) {
+    return '$organizer invites you as a $role to:';
+  }
+
+  @override
+  String get invitationAccept => 'Accept';
+
+  @override
+  String get invitationAccepted => 'You are in the event';
+
+  @override
+  String invitationOtherEmail(String email) {
+    return 'This invitation is for $email. Sign in with that account to accept it.';
+  }
+
+  @override
+  String get invitationSwitchAccount => 'Sign in with another account';
+
+  @override
+  String get invitationInvalid =>
+      'The invitation does not exist, was used or has expired. Ask the club to invite you again.';
+
+  @override
+  String get invitationVerifyFirst =>
+      'Confirm your email first with the link we sent when you signed up.';
 }
