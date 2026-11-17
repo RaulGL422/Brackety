@@ -1667,6 +1667,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get categoryAgeSuffix => 'years';
 
   @override
+  String get splitByAge => 'Split by age';
+
+  @override
+  String ageHeading(int age, int count) {
+    return '$age years · $count';
+  }
+
+  @override
   String get categoryLabel => 'Category';
 
   @override

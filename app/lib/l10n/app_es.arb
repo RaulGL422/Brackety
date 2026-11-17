@@ -860,6 +860,9 @@
     }
   },
   "categoryAgeSuffix": "años",
+  "splitByAge": "Separar por edad",
+  "ageHeading": "{age} años · {count}",
+  "@ageHeading": {"placeholders": {"age": {"type": "int"}, "count": {"type": "int"}}},
   "categoryLabel": "Categoría",
   "categoryByAge": "Automática por edad",
   "importButton": "Importar alumnos",

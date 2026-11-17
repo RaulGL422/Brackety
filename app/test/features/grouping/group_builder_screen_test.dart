@@ -42,6 +42,82 @@ void main() {
   ];
 
   for (final MapEntry(key: device, value: size) in sizes.entries) {
+    testWidgets('a category mixing ages splits the list by age on $device', (
+      tester,
+    ) async {
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final repository = FakeGroupingRepository(const [
+        CategoryParticipant(
+          id: 'ana',
+          firstName: 'Ana',
+          lastName: 'Prueba',
+          age: 8,
+        ),
+        CategoryParticipant(
+          id: 'bea',
+          firstName: 'Bea',
+          lastName: 'Prueba',
+          age: 7,
+        ),
+        CategoryParticipant(
+          id: 'cris',
+          firstName: 'Cris',
+          lastName: 'Prueba',
+          age: 7,
+        ),
+      ]);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            ...sessionOverrides(FakeAuthApi(signedIn: true)),
+            groupingRepositoryProvider.overrideWithValue(repository),
+            fakeMatsOverride,
+            myEventsProvider.overrideWith(
+              (ref) async => [
+                MyEvent(
+                  id: 'e1',
+                  name: 'Fase 2',
+                  date: DateTime(2027, 1, 24),
+                  roles: const {EventRole.grouper},
+                ),
+              ],
+            ),
+          ],
+          child: const BracketyApp(),
+        ),
+      );
+      await tester.pumpAndSettle();
+      ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
+          .read(routerProvider)
+          .push('/events/e1/categories/c1', extra: '7-8');
+      await tester.pumpAndSettle();
+
+      // Youngest first, each age under its heading.
+      final headings = find.textContaining(RegExp(r'^\d+ years · \d+$'));
+      expect(tester.widgetList<Text>(headings).map((t) => t.data), [
+        '7 years · 2',
+        '8 years · 1',
+      ]);
+      final names = tester
+          .widgetList<Text>(find.textContaining(' Prueba'))
+          .map((t) => t.data)
+          .toList();
+      expect(names, ['Bea Prueba', 'Cris Prueba', 'Ana Prueba']);
+
+      // Picked, the group says whose age is whose.
+      await tester.tap(find.text('Ana Prueba'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Ana P. · 8'), findsWidgets);
+
+      await tester.tap(find.text('Split by age'));
+      await tester.pumpAndSettle();
+      expect(headings, findsNothing);
+    });
+  }
+
+  for (final MapEntry(key: device, value: size) in sizes.entries) {
     testWidgets(
       'a required weight blocks the pick until the helper writes it on $device',
       (tester) async {
