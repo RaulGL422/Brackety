@@ -50,7 +50,7 @@
 - [ ] Competición del 2026-12-20: modalidades y su puntuación, categorías, tapices y servidor; la clasificación ya está (`producto/competicion-2026-12-20.md`).
 - [ ] F1-2 comodín: arreglado en la app (2026-11-16); falta revisar en la Pi qué se apañó a mano y que la clasificación sea correcta.
 - [ ] F2-3 CSV de resultados: la entidad de la liga ve confusos los puestos (1.º, 2.º, 3.º) al abrirlos en Excel. Hecho: CSV por categoría (#108) y PDF (#110). Falta rehacer el resto de CSV (Raul aún no lo ha revisado).
-- [ ] F2-4 clasificaciones configurables: la global debe ser opcional (en esta liga no sirve) y poder clasificar por peso, sexo, categoría, etc. según el deporte y el evento.
+- [ ] F2-4: global opcional hecha (`modulos/ranking.md`). Dividir una categoría por sexo o tramos de peso: cuando una modalidad lo necesite (en la F2 la categoría es solo por edad; Raul, 2026-11-17).
 - [ ] F1-4 advertencias: revisar la lista de tambo propuesta (prohibiciones del reglamento, cap. 3.1: proyección o golpeo, tirarse rodando, ataque de pique, exceso de potencia, conducta antideportiva). Se cambia en `Discipline` o por evento en Configuración.
 - [ ] F1-5 cuentas propias: hecho en `feat/f1-5-staff-invites`. Con Resend en producción, probar a mano: invitar a un email real, registrarse con él, aceptar y arbitrar un tapiz. Retirar `staffNames` cuando las cuentas tengan nombre.
 - [ ] Gestión del club (`producto/gestion-club.md`): ¿se amplía el alcance? Cambia `00-vision.md` (hoy cobros fuera de alcance).

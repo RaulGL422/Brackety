@@ -173,7 +173,13 @@ class _StandingsState extends ConsumerState<_Standings> {
     final l10n = AppLocalizations.of(context);
     final provider = leagueStandingsProvider(widget.eventId);
     final categories = widget.league.categoryNames;
-    final category = categories.contains(_category) ? _category : null;
+    final global = widget.league.globalStandings;
+    // Without the global standings there is no "all": the first category until one is picked.
+    final category = categories.contains(_category)
+        ? _category
+        : global || categories.isEmpty
+        ? null
+        : categories.first;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -191,7 +197,7 @@ class _StandingsState extends ConsumerState<_Standings> {
               DropdownButton<String?>(
                 value: category,
                 items: [
-                  DropdownMenuItem(child: Text(l10n.allCategories)),
+                  if (global) DropdownMenuItem(child: Text(l10n.allCategories)),
                   for (final c in categories)
                     DropdownMenuItem(value: c, child: Text(c)),
                 ],

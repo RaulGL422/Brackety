@@ -25,6 +25,10 @@ public class League {
     private int podiumFirsts;
     private int podiumSeconds;
     private int podiumThirds;
+
+    /** Also every category together (F2-4); off, the standings are only per category. */
+    private boolean globalStandings;
+
     private Instant createdAt;
 
     protected League() {}
@@ -52,8 +56,13 @@ public class League {
         return new Podium(podiumFirsts, podiumSeconds, podiumThirds);
     }
 
-    public void update(String name, Podium podium) {
+    public boolean hasGlobalStandings() {
+        return globalStandings;
+    }
+
+    public void update(String name, Podium podium, boolean globalStandings) {
         this.name = name;
+        this.globalStandings = globalStandings;
         setPodium(podium);
     }
 

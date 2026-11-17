@@ -2828,4 +2828,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get invitationVerifyFirst =>
       'Confirm your email first with the link we sent when you signed up.';
+
+  @override
+  String get leagueGlobalStandings => 'Global standings';
+
+  @override
+  String get leagueGlobalStandingsHint =>
+      'Every category together in Scores and League. Off, one category at a time.';
 }

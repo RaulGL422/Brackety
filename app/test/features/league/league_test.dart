@@ -25,6 +25,7 @@ class FakeLeagueRepository extends Fake implements LeagueRepository {
   final League? saved;
   Podium? savedPodium;
   List<CategoryPodium>? savedCategoryPodiums;
+  bool? savedGlobal;
 
   @override
   Future<League> save(
@@ -32,8 +33,10 @@ class FakeLeagueRepository extends Fake implements LeagueRepository {
     required String name,
     required Podium podium,
     required List<CategoryPodium> categoryPodiums,
+    required bool globalStandings,
   }) async {
     savedPodium = podium;
+    savedGlobal = globalStandings;
     savedCategoryPodiums = categoryPodiums;
     return saved!;
   }
@@ -90,6 +93,7 @@ void main() {
     ],
     categoryNames: const ['4-7', '8-11'],
     availableDisciplines: const {Discipline.tambo},
+    globalStandings: true,
   );
 
   final standings = LeagueStandings.fromJson({
@@ -239,6 +243,35 @@ void main() {
       expect(find.text('Open the league'), findsOneWidget);
       expect(find.text('Club panel'), findsNothing);
       expect(find.text('Make groups'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('without the global standings one category shows on $device', (
+      tester,
+    ) async {
+      setSize(tester, size);
+      final perCategory = League(
+        name: league.name,
+        podium: league.podium,
+        categoryPodiums: league.categoryPodiums,
+        phases: league.phases,
+        categoryNames: league.categoryNames,
+        availableDisciplines: league.availableDisciplines,
+      );
+      await tester.pumpWidget(
+        app(
+          const Scaffold(body: LeagueTab(eventId: 'e2')),
+          overrides: [
+            leagueProvider.overrideWith((ref, _) async => perCategory),
+            leagueStandingsProvider.overrideWith((ref, _) async => standings),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('All categories'), findsNothing);
+      expect(find.text('4-7 · 1 person'), findsOneWidget);
+      expect(find.text('8-11 · 1 person'), findsNothing);
       expect(tester.takeException(), isNull);
     });
 
@@ -432,10 +465,16 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('1 gold · 1 silver · 1 bronze').last);
       await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Global standings'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Global standings'));
+      await tester.pumpAndSettle();
       await tester.ensureVisible(find.text('Save'));
       await tester.tap(find.text('Save'));
       await tester.pumpAndSettle();
 
+      // The fixture had it on.
+      expect(repository.savedGlobal, isFalse);
       final general = repository.savedPodium!;
       expect((general.firsts, general.seconds, general.thirds), (1, 1, 2));
       final own = repository.savedCategoryPodiums!.single;

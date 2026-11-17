@@ -1510,5 +1510,7 @@
   "@invitationOtherEmail": {"placeholders": {"email": {"type": "String"}}},
   "invitationSwitchAccount": "Entrar con otra cuenta",
   "invitationInvalid": "La invitación no existe, ya se usó o ha caducado. Pide al club que te invite de nuevo.",
-  "invitationVerifyFirst": "Confirma antes tu email con el enlace que te enviamos al registrarte."
+  "invitationVerifyFirst": "Confirma antes tu email con el enlace que te enviamos al registrarte.",
+  "leagueGlobalStandings": "Clasificación global",
+  "leagueGlobalStandingsHint": "Todas las categorías juntas en Puntuaciones y en Liga. Apagada, solo se ve una categoría cada vez."
 }

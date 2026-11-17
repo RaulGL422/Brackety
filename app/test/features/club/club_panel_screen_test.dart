@@ -12,6 +12,8 @@ import 'package:brackety/features/club/ui/settings_tab.dart';
 import 'package:brackety/features/club/ui/participant_form.dart';
 import 'package:brackety/features/events/data/my_event.dart';
 import 'package:brackety/features/events/state/events_providers.dart';
+import 'package:brackety/features/league/data/league_models.dart';
+import 'package:brackety/features/league/state/league_providers.dart';
 import 'package:brackety/features/staff/data/staff_repository.dart';
 import 'package:brackety/l10n/gen/app_localizations.dart';
 import 'package:brackety_core/brackety_core.dart';
@@ -241,6 +243,7 @@ void main() {
     Size size, {
     ClubRepository? repository,
     List<StandingRow>? scores,
+    bool globalStandings = true,
     FakeStaffRepository? staff,
   }) async {
     tester.view.physicalSize = size;
@@ -255,6 +258,17 @@ void main() {
             staff ?? FakeStaffRepository(),
           ),
           myEventsProvider.overrideWith((ref) async => [event]),
+          leagueProvider.overrideWith(
+            (ref, _) async => League(
+              name: 'Liga',
+              podium: const Podium(firsts: 1, seconds: 1, thirds: 2),
+              categoryPodiums: const [],
+              phases: const [],
+              categoryNames: const [],
+              availableDisciplines: const {},
+              globalStandings: globalStandings,
+            ),
+          ),
           eventSettingsProvider.overrideWith(
             (ref, _) async => repository is FakeClubRepository
                 ? repository.current
@@ -382,6 +396,18 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('4-7').last);
       await tester.pumpAndSettle();
+      expect(find.text('Bea Test'), findsOneWidget);
+      expect(find.text('Ana Test'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('without the global standings one category shows on $device', (
+      tester,
+    ) async {
+      await pumpPanel(tester, size, globalStandings: false);
+
+      expect(find.text('All categories'), findsNothing);
+      // The first category, 4-7, until another is picked.
       expect(find.text('Bea Test'), findsOneWidget);
       expect(find.text('Ana Test'), findsNothing);
       expect(tester.takeException(), isNull);

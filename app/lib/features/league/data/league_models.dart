@@ -93,11 +93,13 @@ class League {
     required this.phases,
     required this.categoryNames,
     required this.availableDisciplines,
+    this.globalStandings = false,
   });
 
   factory League.fromJson(Map<String, dynamic> json) => League(
     name: json['name'] as String,
     podium: Podium.fromJson(json['podium'] as Map<String, dynamic>),
+    globalStandings: json['globalStandings'] as bool? ?? false,
     categoryPodiums: [
       for (final c in json['categoryPodiums'] as List)
         CategoryPodium.fromJson(c as Map<String, dynamic>),
@@ -122,6 +124,9 @@ class League {
   /// Every category of every phase, youngest first.
   final List<String> categoryNames;
   final Set<Discipline> availableDisciplines;
+
+  /// Also every category together (F2-4); off, the standings are only per category.
+  final bool globalStandings;
 }
 
 /// Someone entered in another phase and not in this one, with their latest entry.

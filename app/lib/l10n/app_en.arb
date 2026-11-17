@@ -934,5 +934,7 @@
   "@invitationOtherEmail": {"placeholders": {"email": {"type": "String"}}},
   "invitationSwitchAccount": "Sign in with another account",
   "invitationInvalid": "The invitation does not exist, was used or has expired. Ask the club to invite you again.",
-  "invitationVerifyFirst": "Confirm your email first with the link we sent when you signed up."
+  "invitationVerifyFirst": "Confirm your email first with the link we sent when you signed up.",
+  "leagueGlobalStandings": "Global standings",
+  "leagueGlobalStandingsHint": "Every category together in Scores and League. Off, one category at a time."
 }
