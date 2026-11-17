@@ -286,6 +286,7 @@ public class EventPackageService {
                 modality(settings),
                 clock.instant());
         event.setOriginEventId(settings.originId());
+        event.setMeasureRequirements(settings.weightRequirement(), settings.heightRequirement());
         event = events.save(event);
         for (var member : p.staff()) {
             staff.save(new EventStaff(event.getId(), accountIds.get(member.username()), member.role()));
@@ -643,7 +644,9 @@ public class EventPackageService {
                 Objects.requireNonNullElse(event.getOriginEventId(), event.getId()),
                 event.modality().team().matchSeconds(),
                 event.modality().team().pointsLimit(),
-                event.modality().getMinRestSeconds());
+                event.modality().getMinRestSeconds(),
+                event.getOwnWeightRequirement(),
+                event.getOwnHeightRequirement());
     }
 
     /** Packages from before the team rules (schema 1 of the first F1 builds) take the tambo defaults. */

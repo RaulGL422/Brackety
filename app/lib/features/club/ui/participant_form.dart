@@ -14,6 +14,7 @@ import '../state/club_providers.dart';
 import 'club_panel_screen.dart';
 import 'measure_fields.dart';
 import 'organizations_editor.dart';
+import '../../events/data/measure_rules.dart';
 
 /// Age on [day], as the server counts it for categories.
 int ageOn(DateTime birthDate, DateTime day) {
@@ -85,7 +86,9 @@ class _ParticipantFormState extends ConsumerState<_ParticipantForm> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final locale = Localizations.localeOf(context).toLanguageTag();
-    ref.watch(myEventProvider(widget.eventId));
+    final measures =
+        ref.watch(myEventProvider(widget.eventId)).value?.measures ??
+        const MeasureRules();
     final needsConsent = _isMinor && !_consent;
     String? required(String? v) =>
         v == null || v.trim().isEmpty ? l10n.fieldRequired : null;
@@ -140,19 +143,10 @@ class _ParticipantFormState extends ConsumerState<_ParticipantForm> {
                   requiredText: l10n.fieldRequired,
                   onChanged: (sex) => _sex = sex,
                 ),
-                TextFormField(
-                  controller: _height,
-                  decoration: InputDecoration(labelText: l10n.heightOptional),
-                  keyboardType: TextInputType.number,
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) return null;
-                    final cm = int.tryParse(v.trim());
-                    return cm == null || cm < 50 || cm > 250
-                        ? l10n.heightInvalid
-                        : null;
-                  },
-                ),
-                WeightField(controller: _weight),
+                if (measures.height != MeasureRequirement.off)
+                  HeightField(controller: _height),
+                if (measures.weight != MeasureRequirement.off)
+                  WeightField(controller: _weight),
                 const SizedBox(height: AppSpacing.s),
                 CategoryChoice(
                   eventId: widget.eventId,

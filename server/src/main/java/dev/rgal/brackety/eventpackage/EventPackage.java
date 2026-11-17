@@ -3,6 +3,7 @@ package dev.rgal.brackety.eventpackage;
 import dev.rgal.brackety.event.Discipline;
 import dev.rgal.brackety.event.EventCategory;
 import dev.rgal.brackety.event.EventRole;
+import dev.rgal.brackety.event.MeasureRequirement;
 import dev.rgal.brackety.league.Podium;
 import dev.rgal.brackety.participant.Sex;
 import jakarta.validation.Valid;
@@ -75,7 +76,9 @@ public record EventPackage(
             UUID originId,
             @Min(1) Integer teamMatchSeconds,
             @Min(0) Integer teamPointsLimit,
-            @Min(0) Integer minRestSeconds) {}
+            @Min(0) Integer minRestSeconds,
+            MeasureRequirement weightRequirement,
+            MeasureRequirement heightRequirement) {}
 
     public record LeagueEntry(
             @NotBlank @Size(max = 120) String name,

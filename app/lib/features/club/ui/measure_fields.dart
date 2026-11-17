@@ -39,6 +39,28 @@ class SexField extends FormField<Sex> {
        );
 }
 
+/// Optional height in cm.
+class HeightField extends StatelessWidget {
+  const HeightField({super.key, required this.controller});
+
+  final TextEditingController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(labelText: l10n.heightOptional),
+      keyboardType: TextInputType.number,
+      validator: (v) {
+        if (v == null || v.trim().isEmpty) return null;
+        final cm = int.tryParse(v.trim());
+        return cm == null || cm < 50 || cm > 250 ? l10n.heightInvalid : null;
+      },
+    );
+  }
+}
+
 /// Optional weight in kg, written with a comma or a point ("32,5").
 class WeightField extends StatelessWidget {
   const WeightField({super.key, required this.controller});

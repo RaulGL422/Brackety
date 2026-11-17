@@ -40,6 +40,14 @@ public class Event {
     private int attendancePoints;
     private Instant createdAt;
     private UUID originEventId;
+
+    /** The event's own choice; null follows its sport. */
+    @Enumerated(EnumType.STRING)
+    private MeasureRequirement weightRequirement;
+
+    @Enumerated(EnumType.STRING)
+    private MeasureRequirement heightRequirement;
+
     private String resultsImportHash;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
@@ -78,7 +86,7 @@ public class Event {
         return new Event(ownerAccountId, leagueId, 1, Discipline.TAMBO, name, eventDate, 1, 10, Modality.tambo(), now);
     }
 
-    /** The next phase of the same league, with this one's match rules. */
+    /** The next phase of the same league, with this one's match rules and measures asked. */
     public Event nextPhase(
             int phaseNumber,
             Discipline discipline,
@@ -86,7 +94,7 @@ public class Event {
             LocalDate eventDate,
             int attendancePoints,
             Instant now) {
-        return new Event(
+        var next = new Event(
                 ownerAccountId,
                 leagueId,
                 phaseNumber,
@@ -97,6 +105,32 @@ public class Event {
                 attendancePoints,
                 modality().copy(),
                 now);
+        next.setMeasureRequirements(weightRequirement, heightRequirement);
+        return next;
+    }
+
+    /** Whether weight is asked: the event's own choice, or its sport's. */
+    public MeasureRequirement weightRequirement() {
+        return weightRequirement != null ? weightRequirement : discipline.weight();
+    }
+
+    public MeasureRequirement heightRequirement() {
+        return heightRequirement != null ? heightRequirement : discipline.height();
+    }
+
+    /** Null: as the sport says. */
+    public MeasureRequirement getOwnWeightRequirement() {
+        return weightRequirement;
+    }
+
+    public MeasureRequirement getOwnHeightRequirement() {
+        return heightRequirement;
+    }
+
+    /** Null follows the sport. */
+    public void setMeasureRequirements(MeasureRequirement weight, MeasureRequirement height) {
+        this.weightRequirement = weight;
+        this.heightRequirement = height;
     }
 
     public UUID getId() {

@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../auth/state/session_controller.dart';
 import 'club_models.dart';
 import 'sex.dart';
+import '../../events/data/measure_rules.dart';
 
 final clubRepositoryProvider = Provider<ClubRepository>(
   (ref) => ClubRepository(ref.watch(apiProvider)),
@@ -171,6 +172,16 @@ class ClubRepository {
       await _dio.put<void>('$path/$participantId', data: data);
     }
   }
+
+  /// Null follows the sport.
+  Future<void> saveMeasures(
+    String eventId, {
+    required MeasureRequirement? weight,
+    required MeasureRequirement? height,
+  }) => _dio.put<void>(
+    '/api/v1/events/$eventId/measures',
+    data: {'weight': weight?.toJson(), 'height': height?.toJson()},
+  );
 
   Future<void> deleteParticipant(String eventId, String participantId) =>
       _dio.delete<void>('/api/v1/events/$eventId/participants/$participantId');

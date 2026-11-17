@@ -9,6 +9,7 @@ import dev.rgal.brackety.event.EventOrganization;
 import dev.rgal.brackety.event.EventOrganizationRepository;
 import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventService;
+import dev.rgal.brackety.participant.dto.MeasuresRequest;
 import dev.rgal.brackety.participant.dto.ParticipantRequest;
 import dev.rgal.brackety.participant.dto.ParticipantResponse;
 import java.time.Clock;
@@ -83,6 +84,12 @@ public class ParticipantService {
                     "The birth date and category cannot change once the participant is in a group or team.");
         }
         return save(participant, request);
+    }
+
+    @Transactional
+    public void measure(UUID eventId, UUID participantId, UUID accountId, MeasuresRequest request) {
+        access.require(eventId, accountId, EventRole.CLUB, EventRole.GROUPER);
+        find(eventId, participantId).measure(request.heightCm(), request.weightKg());
     }
 
     @Transactional

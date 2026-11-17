@@ -1,5 +1,6 @@
 import '../../mat/data/mat_board.dart';
 import 'sex.dart';
+import '../../events/data/measure_rules.dart';
 
 /// A helper or referee account of the event; [personName]: who is behind it, set by the club.
 class StaffMember {
@@ -86,12 +87,17 @@ class EventSettings {
     this.teamMatchLength = const Duration(minutes: 3),
     this.teamPointsLimit = 0,
     this.minRest = const Duration(seconds: 30),
+    this.weightChoice,
+    this.heightChoice,
+    this.sportWeight = MeasureRequirement.optional,
+    this.sportHeight = MeasureRequirement.optional,
   });
 
   factory EventSettings.fromJson(Map<String, dynamic> json) {
     final mats = [
       for (final m in json['mats'] as List) m as Map<String, dynamic>,
     ]..sort((a, b) => (a['number'] as int).compareTo(b['number'] as int));
+    final measures = json['measures'] as Map<String, dynamic>?;
     return EventSettings(
       name: json['name'] as String,
       date: DateTime.parse(json['date'] as String),
@@ -120,6 +126,14 @@ class EventSettings {
       ),
       teamPointsLimit: json['teamPointsLimit'] as int? ?? 0,
       minRest: Duration(seconds: json['minRestSeconds'] as int? ?? 30),
+      weightChoice: MeasureRequirement.fromJson(measures?['weight']),
+      heightChoice: MeasureRequirement.fromJson(measures?['height']),
+      sportWeight:
+          MeasureRequirement.fromJson(measures?['sportWeight']) ??
+          MeasureRequirement.optional,
+      sportHeight:
+          MeasureRequirement.fromJson(measures?['sportHeight']) ??
+          MeasureRequirement.optional,
     );
   }
 
@@ -152,6 +166,12 @@ class EventSettings {
 
   /// The clubs taking part, in the order the club entered them.
   final List<Organization> organizations;
+
+  /// The event's own choice for weight and height; null follows the sport ([sportWeight], [sportHeight]).
+  final MeasureRequirement? weightChoice;
+  final MeasureRequirement? heightChoice;
+  final MeasureRequirement sportWeight;
+  final MeasureRequirement sportHeight;
 }
 
 /// A club taking part in the event; [id] is null until saved.

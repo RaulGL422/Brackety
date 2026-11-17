@@ -7,6 +7,8 @@ import dev.rgal.brackety.event.dto.EventSettingsResponse;
 import dev.rgal.brackety.event.dto.EventSettingsResponse.CategoryResponse;
 import dev.rgal.brackety.event.dto.EventSettingsResponse.MatSettings;
 import dev.rgal.brackety.event.dto.EventSettingsResponse.StaffMember;
+import dev.rgal.brackety.event.dto.MeasureRules;
+import dev.rgal.brackety.event.dto.MeasureRulesRequest;
 import dev.rgal.brackety.event.dto.MyEventResponse;
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -86,7 +88,9 @@ public class EventService {
                             mat.map(Mat::getNumber).orElse(null),
                             event.getLeagueId(),
                             leagueNames.computeIfAbsent(event.getLeagueId(), events::leagueName),
-                            event.getPhaseNumber());
+                            event.getPhaseNumber(),
+                            event.weightRequirement(),
+                            event.heightRequirement());
                 })
                 .toList();
     }
@@ -95,6 +99,15 @@ public class EventService {
     public EventSettingsResponse settings(UUID eventId, UUID accountId) {
         access.require(eventId, accountId, EventRole.CLUB);
         return settings(get(eventId));
+    }
+
+    /** Whether the event asks for weight and height; null follows its sport. */
+    @Transactional
+    public MeasureRules updateMeasures(UUID eventId, UUID accountId, MeasureRulesRequest request) {
+        access.require(eventId, accountId, EventRole.CLUB);
+        var event = get(eventId);
+        event.setMeasureRequirements(request.weight(), request.height());
+        return MeasureRules.of(event);
     }
 
     @Transactional
@@ -218,7 +231,8 @@ public class EventService {
                 event.getDiscipline().name(),
                 event.modality().team().matchSeconds(),
                 event.modality().team().pointsLimit(),
-                event.modality().getMinRestSeconds());
+                event.modality().getMinRestSeconds(),
+                MeasureRules.of(event));
     }
 
     private List<UUID> refereeIds(UUID eventId) {

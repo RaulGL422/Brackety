@@ -44,7 +44,7 @@ Fuente: Raul, 2026-11-16. Las tareas salen de aquí hacia `roadmap.md`.
 
 ## Peticiones para la F2 (2026-11-16)
 ### F2-1 · Peso y estatura (respuestas de Raul, 2026-11-16)
-- 2026-11-17: datos, formulario, importación y CSV hechos en M2c. Falta la configuración obligatorio/opcional por deporte y evento, con bloqueo o aviso al crear grupos.
+- 2026-11-17: datos, formulario, importación y CSV hechos en M2c. Configuración y bloqueo en pruebas (rama `feat/f2-measures-required`): cada deporte trae su nivel (tambo: opcional), el evento puede cambiarlo en Ajustes > Peso y estatura; obligatorio bloquea grupo y equipo (el ayudante lo apunta tocando al alumno), opcional avisa "sin peso"/"sin estatura", desactivado no se pide.
 - Se pesa **el mismo día**, pero queda guardado en la inscripción y en la ficha global del alumno. Igual con la estatura, relacionada con cada evento.
 - Cada dato (peso, estatura…) se configura en la **plantilla del deporte** y en el **propio evento**: desactivado, opcional u obligatorio (`modulos/eventos.md`).
 - Obligatorio: no se puede meter al alumno en un grupo ni en las llaves sin el dato.

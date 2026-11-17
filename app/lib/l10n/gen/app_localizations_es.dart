@@ -1133,6 +1133,54 @@ class AppLocalizationsEs extends AppLocalizations {
   String get weightInvalid => 'Entre 10 y 250 kg, con un decimal como mucho';
 
   @override
+  String get weightUnknown => 'sin peso';
+
+  @override
+  String get weightMissing => 'falta el peso';
+
+  @override
+  String get heightMissing => 'falta la estatura';
+
+  @override
+  String get measuresTitle => 'Peso y estatura';
+
+  @override
+  String get measuresHint =>
+      'Obligatorio: nadie entra en un grupo ni en un equipo sin el dato, y el ayudante puede apuntarlo ese día. Opcional: se avisa al crear los grupos de quién no lo tiene.';
+
+  @override
+  String get measureWeight => 'Peso';
+
+  @override
+  String get measureHeight => 'Estatura';
+
+  @override
+  String requirementSport(String value) {
+    return 'Como el deporte ($value)';
+  }
+
+  @override
+  String get requirementOff => 'No se pide';
+
+  @override
+  String get requirementOptional => 'Opcional';
+
+  @override
+  String get requirementRequired => 'Obligatorio';
+
+  @override
+  String measuresOf(String name) {
+    return 'Peso y estatura de $name';
+  }
+
+  @override
+  String get measuresWrite => 'Apuntar peso y estatura';
+
+  @override
+  String get measuresMissingError =>
+      'Falta el peso o la estatura obligatorios de alguien: apúntalo antes de agrupar.';
+
+  @override
   String weightKg(String kg) {
     return '$kg kg';
   }
