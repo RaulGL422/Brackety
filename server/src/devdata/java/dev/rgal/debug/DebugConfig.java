@@ -16,7 +16,7 @@ import org.springframework.transaction.support.TransactionOperations;
  * {@link DebugBracketyApplication} and the tests that ask for it. The clock is apart ({@link DebugClockConfig}):
  * the tests bring their own.
  */
-@Import(DebugController.class)
+@Import({DebugController.class, DebugInfoController.class})
 @ComponentScan(
         basePackages = "dev.rgal.brackety.devdata",
         useDefaultFilters = false,
@@ -30,6 +30,7 @@ public class DebugConfig {
             JdbcClient jdbc,
             TransactionOperations transactions,
             AdminAuditLog audit) {
-        return new DebugData(scenarios, clock, jdbc, transactions, audit);
+        var snapshots = new DebugSnapshots(jdbc, transactions, audit, clock);
+        return new DebugData(scenarios, clock, jdbc, transactions, audit, snapshots);
     }
 }

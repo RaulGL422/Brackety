@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:brackety_core/brackety_core.dart';
 import 'package:brackety_admin/app.dart';
 import 'package:brackety_admin/core/clock.dart';
 import 'package:brackety_admin/core/router.dart';
@@ -207,6 +208,8 @@ Future<GoRouter> pumpAdmin(
     ProviderScope(
       overrides: [
         clockProvider.overrideWithValue(() => now),
+        // Not the debug environment unless a test says so.
+        debugStatusProvider.overrideWith((ref) async => null),
         if (!realApis) ...[
           adminAuthApiProvider.overrideWithValue(auth ?? FakeAdminAuthApi()),
           locksApiProvider.overrideWithValue(locks ?? FakeLocksApi([])),

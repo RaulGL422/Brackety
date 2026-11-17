@@ -40,6 +40,14 @@ class CoreLocalizationsEs extends CoreLocalizations {
   }
 
   @override
+  String get debugNoScenario => 'sin escenario';
+
+  @override
+  String debugSimulatedDate(String date) {
+    return '$date (simulada)';
+  }
+
+  @override
   String get retry => 'Reintentar';
 
   @override

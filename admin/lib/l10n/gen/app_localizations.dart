@@ -626,6 +626,192 @@ abstract class AppLocalizations {
   /// **'Bloqueos'**
   String get navLocks;
 
+  /// No description provided for @navDebug.
+  ///
+  /// In es, this message translates to:
+  /// **'Escenarios'**
+  String get navDebug;
+
+  /// No description provided for @saved.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardado'**
+  String get saved;
+
+  /// No description provided for @debugTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Escenarios de debug'**
+  String get debugTitle;
+
+  /// No description provided for @debugScenarios.
+  ///
+  /// In es, this message translates to:
+  /// **'Escenarios'**
+  String get debugScenarios;
+
+  /// No description provided for @debugScenariosHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Cargar uno borra todos los datos y deja los del escenario, en el día de hoy o en uno simulado.'**
+  String get debugScenariosHint;
+
+  /// No description provided for @debugLoad.
+  ///
+  /// In es, this message translates to:
+  /// **'Cargar'**
+  String get debugLoad;
+
+  /// No description provided for @debugLoadTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Cargar «{name}»?'**
+  String debugLoadTitle(String name);
+
+  /// No description provided for @debugWipeWarning.
+  ///
+  /// In es, this message translates to:
+  /// **'Se borran todos los datos de debug: cuentas, eventos y sesiones. Las copias guardadas se mantienen.'**
+  String get debugWipeWarning;
+
+  /// No description provided for @debugTypeName.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe «{name}» para confirmar'**
+  String debugTypeName(String name);
+
+  /// No description provided for @debugOnToday.
+  ///
+  /// In es, this message translates to:
+  /// **'En el día de hoy'**
+  String get debugOnToday;
+
+  /// No description provided for @debugOnDay.
+  ///
+  /// In es, this message translates to:
+  /// **'El {date}'**
+  String debugOnDay(String date);
+
+  /// No description provided for @debugLoaded.
+  ///
+  /// In es, this message translates to:
+  /// **'Escenario «{name}» cargado'**
+  String debugLoaded(String name);
+
+  /// No description provided for @debugGone.
+  ///
+  /// In es, this message translates to:
+  /// **'Ya no existe: recarga la página'**
+  String get debugGone;
+
+  /// No description provided for @debugScenarioNow.
+  ///
+  /// In es, this message translates to:
+  /// **'Escenario: {name}'**
+  String debugScenarioNow(String name);
+
+  /// No description provided for @debugRealDay.
+  ///
+  /// In es, this message translates to:
+  /// **'hoy, {date}'**
+  String debugRealDay(String date);
+
+  /// No description provided for @debugSimulatedDay.
+  ///
+  /// In es, this message translates to:
+  /// **'día simulado: {date}'**
+  String debugSimulatedDay(String date);
+
+  /// No description provided for @debugMoveDay.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar el día'**
+  String get debugMoveDay;
+
+  /// No description provided for @debugBackToToday.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver a hoy'**
+  String get debugBackToToday;
+
+  /// No description provided for @debugCopies.
+  ///
+  /// In es, this message translates to:
+  /// **'Copias'**
+  String get debugCopies;
+
+  /// No description provided for @debugCopiesHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Guarda el estado de ahora para repetir una prueba sin prepararla otra vez.'**
+  String get debugCopiesHint;
+
+  /// No description provided for @debugCopyName.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre de la copia'**
+  String get debugCopyName;
+
+  /// No description provided for @debugCopyNameInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'Minúsculas, números y _ (hasta 40)'**
+  String get debugCopyNameInvalid;
+
+  /// No description provided for @debugSave.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardar'**
+  String get debugSave;
+
+  /// No description provided for @debugCopySaved.
+  ///
+  /// In es, this message translates to:
+  /// **'Copia «{name}» guardada'**
+  String debugCopySaved(String name);
+
+  /// No description provided for @debugRestore.
+  ///
+  /// In es, this message translates to:
+  /// **'Restaurar'**
+  String get debugRestore;
+
+  /// No description provided for @debugRestoreTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Restaurar «{name}»?'**
+  String debugRestoreTitle(String name);
+
+  /// No description provided for @debugRestored.
+  ///
+  /// In es, this message translates to:
+  /// **'Copia «{name}» restaurada'**
+  String debugRestored(String name);
+
+  /// No description provided for @debugDeleteCopy.
+  ///
+  /// In es, this message translates to:
+  /// **'Borrar copia'**
+  String get debugDeleteCopy;
+
+  /// No description provided for @debugDeleteTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Borrar la copia «{name}»?'**
+  String debugDeleteTitle(String name);
+
+  /// No description provided for @debugDeleteBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Los datos de ahora no cambian; solo desaparece la copia.'**
+  String get debugDeleteBody;
+
+  /// No description provided for @debugCopyDeleted.
+  ///
+  /// In es, this message translates to:
+  /// **'Copia «{name}» borrada'**
+  String debugCopyDeleted(String name);
+
   /// No description provided for @navOrganizers.
   ///
   /// In es, this message translates to:

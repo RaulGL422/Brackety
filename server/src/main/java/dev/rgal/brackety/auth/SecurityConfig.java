@@ -67,6 +67,8 @@ public class SecurityConfig {
     static final String[] PUBLIC_PATHS = {
         "/api/v1/auth/**",
         "/api/v1/info",
+        // Only the debug image answers it (docs/modulos/entornos.md): the banner, also before signing in.
+        "/api/v1/debug",
         "/api/v1/legal/**",
         "/actuator/health",
         "/error",

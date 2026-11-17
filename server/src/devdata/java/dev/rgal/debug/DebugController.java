@@ -3,12 +3,15 @@ package dev.rgal.debug;
 import dev.rgal.brackety.event.EventException;
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -48,6 +51,30 @@ class DebugController {
             throw EventException.invalid("Type the scenario's name to confirm: everything is wiped.");
         }
         return data.load(scenario, request.today());
+    }
+
+    /** {@code name}: lowercase letters, digits and _; one with the same name is replaced. */
+    record SnapshotRequest(String name) {}
+
+    @GetMapping("/snapshots")
+    List<DebugSnapshots.Snapshot> snapshots() {
+        return data.snapshots();
+    }
+
+    @PostMapping("/snapshots")
+    DebugSnapshots.Snapshot save(@RequestBody SnapshotRequest request) {
+        return data.save(request.name());
+    }
+
+    @PostMapping("/snapshots/{name}/restore")
+    DebugData.Status restore(@PathVariable String name) {
+        return data.restore(name);
+    }
+
+    @DeleteMapping("/snapshots/{name}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void deleteSnapshot(@PathVariable String name) {
+        data.deleteSnapshot(name);
     }
 
     @PutMapping("/clock")
