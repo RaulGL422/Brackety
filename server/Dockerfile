@@ -4,7 +4,10 @@ WORKDIR /src
 COPY .mvn .mvn
 COPY mvnw pom.xml ./
 COPY src/main src/main
-RUN --mount=type=cache,target=/root/.m2 ./mvnw -B -q package -Dmaven.test.skip=true \
+COPY src/devdata src/devdata
+# "debug" builds the debug image (docs/modulos/entornos.md); empty, production.
+ARG MAVEN_PROFILE=""
+RUN --mount=type=cache,target=/root/.m2 ./mvnw -B -q package -Dmaven.test.skip=true ${MAVEN_PROFILE:+-P $MAVEN_PROFILE} \
     && cp target/brackety-server-*.jar /app.jar
 
 FROM eclipse-temurin:27_35-jre

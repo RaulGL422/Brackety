@@ -69,6 +69,13 @@ class AdminControlController {
         return disabled;
     }
 
+    @PostMapping("/mats/{matId}/enable")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void enableMat(@PathVariable UUID eventId, @PathVariable UUID matId) {
+        control.enableMat(eventId, matId, null);
+        audit.control(matId, "mat back in use");
+    }
+
     @PostMapping("/matches/{matchId}/waive-rest")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void waiveRest(@PathVariable UUID eventId, @PathVariable UUID matchId) {

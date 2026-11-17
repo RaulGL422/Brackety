@@ -7,8 +7,12 @@ import dev.rgal.brackety.event.dto.EventSettingsRequest;
 import dev.rgal.brackety.event.dto.EventSettingsResponse;
 import dev.rgal.brackety.event.dto.EventSettingsResponse.CategoryResponse;
 import dev.rgal.brackety.event.dto.EventSettingsResponse.OrganizationResponse;
+import dev.rgal.brackety.event.dto.MeasureRules;
+import dev.rgal.brackety.event.dto.MeasureRulesRequest;
 import dev.rgal.brackety.event.dto.MyEventResponse;
 import dev.rgal.brackety.event.dto.OrganizationsRequest;
+import dev.rgal.brackety.event.dto.WarningReasons;
+import dev.rgal.brackety.event.dto.WarningReasonsRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 import java.util.List;
@@ -61,6 +65,20 @@ class EventController {
             @Valid @RequestBody EventSettingsRequest request,
             @AuthenticationPrincipal Jwt jwt) {
         return events.updateSettings(eventId, CurrentAccount.id(jwt), request);
+    }
+
+    @PutMapping("/{eventId}/warning-reasons")
+    WarningReasons warningReasons(
+            @PathVariable UUID eventId,
+            @Valid @RequestBody WarningReasonsRequest request,
+            @AuthenticationPrincipal Jwt jwt) {
+        return events.updateWarningReasons(eventId, CurrentAccount.id(jwt), request);
+    }
+
+    @PutMapping("/{eventId}/measures")
+    MeasureRules measures(
+            @PathVariable UUID eventId, @RequestBody MeasureRulesRequest request, @AuthenticationPrincipal Jwt jwt) {
+        return events.updateMeasures(eventId, CurrentAccount.id(jwt), request);
     }
 
     @PutMapping("/{eventId}/categories")

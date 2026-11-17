@@ -22,6 +22,8 @@ import dev.rgal.brackety.event.EventStaff;
 import dev.rgal.brackety.event.EventStaffRepository;
 import dev.rgal.brackety.event.Mat;
 import dev.rgal.brackety.event.MatRepository;
+import dev.rgal.brackety.event.Modality;
+import dev.rgal.brackety.event.OrganizationRepository;
 import dev.rgal.brackety.event.RulebookService;
 import dev.rgal.brackety.event.StaffNames;
 import dev.rgal.brackety.eventpackage.EventPackage.Category;
@@ -40,6 +42,8 @@ import dev.rgal.brackety.league.League;
 import dev.rgal.brackety.league.LeagueRepository;
 import dev.rgal.brackety.participant.Participant;
 import dev.rgal.brackety.participant.ParticipantRepository;
+import dev.rgal.brackety.participant.Person;
+import dev.rgal.brackety.participant.PersonRepository;
 import jakarta.validation.Validator;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -84,8 +88,10 @@ public class EventPackageService {
     private final EventStaffRepository staff;
     private final EventCategoryRepository categories;
     private final EventOrganizationRepository organizations;
+    private final OrganizationRepository clubs;
     private final MatRepository mats;
     private final ParticipantRepository participants;
+    private final PersonRepository people;
     private final LeagueRepository leagues;
     private final CategoryPodiumRepository podiums;
     private final AccountRepository accounts;
@@ -105,8 +111,10 @@ public class EventPackageService {
             EventStaffRepository staff,
             EventCategoryRepository categories,
             EventOrganizationRepository organizations,
+            OrganizationRepository clubs,
             MatRepository mats,
             ParticipantRepository participants,
+            PersonRepository people,
             LeagueRepository leagues,
             CategoryPodiumRepository podiums,
             AccountRepository accounts,
@@ -124,8 +132,10 @@ public class EventPackageService {
         this.staff = staff;
         this.categories = categories;
         this.organizations = organizations;
+        this.clubs = clubs;
         this.mats = mats;
         this.participants = participants;
+        this.people = people;
         this.leagues = leagues;
         this.podiums = podiums;
         this.accounts = accounts;
@@ -145,7 +155,7 @@ public class EventPackageService {
     }
 
     /** "Liga Yoseikan · Fase 1" → "liga-yoseikan-fase-1". */
-    static String slug(String name) {
+    public static String slug(String name) {
         var slug = Normalizer.normalize(name, Normalizer.Form.NFD)
                 .replaceAll("\\p{M}", "")
                 .toLowerCase(Locale.ROOT)
@@ -201,7 +211,9 @@ public class EventPackageService {
                                 p.hasGuardianConsent(),
                                 categoryNames.get(p.getCategoryId()),
                                 p.getPersonId(),
-                                organizationNames.get(p.getOrganizationId())))
+                                organizationNames.get(p.getOrganizationId()),
+                                p.getSex(),
+                                p.getWeightKg()))
                         .toList(),
                 results.export(eventId),
                 staffNames.names(eventId).entrySet().stream()
@@ -254,7 +266,8 @@ public class EventPackageService {
                         : settings.name().strip(),
                 clock.instant());
         if (leagueEntry != null) {
-            league.update(league.getName(), leagueEntry.podium());
+            // A package from before F2-4 has none: off, as every league until then.
+            league.update(league.getName(), leagueEntry.podium(), Boolean.TRUE.equals(leagueEntry.globalStandings()));
         }
         league = leagues.save(league);
         if (leagueEntry != null) {
@@ -270,16 +283,12 @@ public class EventPackageService {
                 settings.name().strip(),
                 settings.date(),
                 settings.maxGroupsPerMat(),
-                settings.matchSeconds(),
-                settings.pointsLimit(),
-                settings.changeoverSeconds(),
                 settings.attendancePoints(),
+                modality(settings),
                 clock.instant());
-        event.withTeamRules(
-                Objects.requireNonNullElse(settings.teamMatchSeconds(), event.getTeamMatchSeconds()),
-                Objects.requireNonNullElse(settings.teamPointsLimit(), event.getTeamPointsLimit()),
-                Objects.requireNonNullElse(settings.minRestSeconds(), event.getMinRestSeconds()));
         event.setOriginEventId(settings.originId());
+        event.setMeasureRequirements(settings.weightRequirement(), settings.heightRequirement());
+        event.setWarningReasons(settings.warningReasons());
         event = events.save(event);
         for (var member : p.staff()) {
             staff.save(new EventStaff(event.getId(), accountIds.get(member.username()), member.role()));
@@ -302,9 +311,10 @@ public class EventPackageService {
         }
         var organizationIds = new HashMap<String, UUID>();
         for (var o : p.organizationsOrEmpty()) {
-            var organization = organizations.save(
-                    new EventOrganization(event.getId(), o.name().strip(), blankToNull(o.shortName())));
-            organizationIds.put(organization.getName(), organization.getId());
+            var club = clubs.named(
+                    event.getOwnerAccountId(), o.name().strip(), blankToNull(o.shortName()), clock.instant());
+            var organization = organizations.save(new EventOrganization(event.getId(), club));
+            organizationIds.put(o.name().strip(), organization.getId());
         }
         for (var entry : p.participants()) {
             participants.save(newParticipant(event.getId(), entry, categoryIds, organizationIds));
@@ -455,9 +465,13 @@ public class EventPackageService {
         var newOrganizations = 0;
         for (var o : p.organizationsOrEmpty()) {
             if (!organizationIds.containsKey(o.name().strip())) {
-                var organization = organizations.save(
-                        new EventOrganization(eventId, o.name().strip(), blankToNull(o.shortName())));
-                organizationIds.put(organization.getName(), organization.getId());
+                var club = clubs.named(
+                        eventService.get(eventId).getOwnerAccountId(),
+                        o.name().strip(),
+                        blankToNull(o.shortName()),
+                        clock.instant());
+                var organization = organizations.save(new EventOrganization(eventId, club));
+                organizationIds.put(o.name().strip(), organization.getId());
                 newOrganizations++;
             }
         }
@@ -491,8 +505,12 @@ public class EventPackageService {
 
     private Participant newParticipant(
             UUID eventId, ParticipantEntry entry, Map<String, UUID> categoryIds, Map<String, UUID> organizationIds) {
-        var participant = new Participant(
-                eventId, entry.personId() != null ? entry.personId() : UUID.randomUUID(), clock.instant());
+        var now = clock.instant();
+        // A person already here (another phase) is the same row: the package, the latest, updates it.
+        var person = entry.personId() == null
+                ? new Person(UUID.randomUUID(), now)
+                : people.findById(entry.personId()).orElseGet(() -> new Person(entry.personId(), now));
+        var participant = new Participant(eventId, person, now);
         participant.update(
                 entry.firstName().strip(),
                 entry.lastName().strip(),
@@ -500,6 +518,8 @@ public class EventPackageService {
                 entry.heightCm(),
                 entry.guardianConsent(),
                 entry.categoryName() == null ? null : categoryIds.get(entry.categoryName()));
+        participant.setSex(entry.sex());
+        participant.measure(entry.heightCm(), entry.weightKg());
         participant.setOrganizationId(
                 entry.organizationName() == null
                         ? null
@@ -619,14 +639,31 @@ public class EventPackageService {
                 event.getName(),
                 event.getEventDate(),
                 event.getMaxGroupsPerMat(),
-                event.getMatchSeconds(),
-                event.getPointsLimit(),
-                event.getChangeoverSeconds(),
+                event.modality().individual().matchSeconds(),
+                event.modality().individual().pointsLimit(),
+                event.modality().getChangeoverSeconds(),
                 event.getAttendancePoints(),
                 Objects.requireNonNullElse(event.getOriginEventId(), event.getId()),
-                event.getTeamMatchSeconds(),
-                event.getTeamPointsLimit(),
-                event.getMinRestSeconds());
+                event.modality().team().matchSeconds(),
+                event.modality().team().pointsLimit(),
+                event.modality().getMinRestSeconds(),
+                event.getOwnWeightRequirement(),
+                event.getOwnHeightRequirement(),
+                event.getOwnWarningReasons());
+    }
+
+    /** Packages from before the team rules (schema 1 of the first F1 builds) take the tambo defaults. */
+    private static Modality modality(EventPackage.Settings settings) {
+        var defaults = Modality.tambo();
+        return Modality.of(
+                settings.matchSeconds(),
+                settings.pointsLimit(),
+                Objects.requireNonNullElse(
+                        settings.teamMatchSeconds(), defaults.team().matchSeconds()),
+                Objects.requireNonNullElse(
+                        settings.teamPointsLimit(), defaults.team().pointsLimit()),
+                Objects.requireNonNullElse(settings.minRestSeconds(), defaults.getMinRestSeconds()),
+                settings.changeoverSeconds());
     }
 
     private LeagueEntry league(Event event) {
@@ -638,7 +675,8 @@ public class EventPackageService {
                 league.getPodium(),
                 podiums.findByLeagueIdOrderByCategoryName(league.getId()).stream()
                         .map(c -> new CategoryPodiumEntry(c.getCategoryName(), c.getPodium()))
-                        .toList());
+                        .toList(),
+                league.hasGlobalStandings());
     }
 
     private Owner owner(UUID accountId) {

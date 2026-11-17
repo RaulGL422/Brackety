@@ -60,7 +60,9 @@ MatchView matchView({
   MatchReview? review,
   bool? started,
   DateTime? readyAt,
+  List<String> warningReasons = const [],
 }) => MatchView(
+  warningReasons: warningReasons,
   id: 'm1',
   matId: 'mat1',
   matNumber: 1,

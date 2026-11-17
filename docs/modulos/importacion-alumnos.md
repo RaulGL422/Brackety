@@ -9,12 +9,12 @@ El club sube fotos de una lista, un CSV, un Excel, un TXT o texto pegado; Claude
 ### Subir
 - Botón "Importar alumnos" en Inscripciones (solo club). Oculto si el servidor no tiene `ANTHROPIC_API_KEY`.
 - Hasta 10 fotos (JPG, PNG, WebP) a la vez, o un archivo (CSV, XLSX, TXT), o texto pegado. 10 MB por archivo.
-- Formato pedido (con plantilla CSV descargable): una fila por alumno con nombre, apellidos, fecha de nacimiento (dd/mm/aaaa), estatura en cm (opcional), categoría (opcional).
+- Formato pedido (con plantilla CSV descargable): una fila por alumno con nombre, apellidos, fecha de nacimiento (dd/mm/aaaa), sexo, estatura en cm (opcional), peso en kg (opcional), categoría (opcional). Claude solo lee el sexo si la lista lo dice; nunca lo deduce del nombre.
 - Consentimiento obligatorio antes de enviar (texto versionado, ver Legal). Cubre el "el tutor está de acuerdo" de cada menor de la lista.
 
 ### Revisar (nada se guarda aún)
 - Una fila por alumno: correcta (con su categoría), error (qué falla, en concreto) o aviso (Claude no lo leyó con seguridad).
-- Errores: falta un dato obligatorio, fecha inválida o futura, estatura fuera de 50-250 cm, sin categoría para su edad, repetido en la lista, ya inscrito (mismo nombre, apellidos y nacimiento).
+- Errores: falta un dato obligatorio (también el sexo), fecha inválida o futura, estatura fuera de 50-250 cm, peso fuera de 10-250 kg o con más de un decimal, sin categoría para su edad, repetido en la lista, ya inscrito (mismo nombre, apellidos y nacimiento).
 - Categoría escrita que no cuadra con la edad: error con dos botones, "Usar la indicada" o "Usar la de su edad"; al elegir deja de ser error.
 - El club edita cualquier fila (mismo formulario que "Añadir"), la quita o añade otra. Cada cambio se revalida.
 - "Inscribir N alumnos" solo sin errores.

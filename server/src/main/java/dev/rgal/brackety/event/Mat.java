@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -16,6 +17,12 @@ public class Mat {
     private UUID eventId;
     private int number;
     private UUID refereeAccountId;
+
+    /** Out of use since then (F1-1); null while in use. */
+    private Instant disabledAt;
+
+    /** The referee it had when put out of use: "Enable" gives it back. */
+    private UUID disabledRefereeAccountId;
 
     protected Mat() {}
 
@@ -41,12 +48,41 @@ public class Mat {
         return refereeAccountId;
     }
 
-    void assignReferee(UUID refereeAccountId) {
-        this.refereeAccountId = refereeAccountId;
+    public Instant getDisabledAt() {
+        return disabledAt;
     }
 
-    /** Out of use: without a referee it gets no groups and takes no team matches until one is assigned again. */
-    public void disable() {
+    public UUID getDisabledRefereeAccountId() {
+        return disabledRefereeAccountId;
+    }
+
+    public boolean isDisabled() {
+        return disabledAt != null;
+    }
+
+    /** A referee assigned in the settings also puts a mat out of use back in use. */
+    void assignReferee(UUID refereeAccountId) {
+        this.refereeAccountId = refereeAccountId;
+        if (refereeAccountId != null) {
+            this.disabledAt = null;
+            this.disabledRefereeAccountId = null;
+        }
+    }
+
+    /**
+     * Out of use: without a referee it gets no groups and takes no team matches until it is enabled again or gets a
+     * referee in the settings.
+     */
+    public void disable(Instant at) {
+        this.disabledRefereeAccountId = refereeAccountId;
+        this.disabledAt = at;
         this.refereeAccountId = null;
+    }
+
+    /** Back in use with the referee it had. */
+    public void enable() {
+        this.refereeAccountId = disabledRefereeAccountId;
+        this.disabledAt = null;
+        this.disabledRefereeAccountId = null;
     }
 }

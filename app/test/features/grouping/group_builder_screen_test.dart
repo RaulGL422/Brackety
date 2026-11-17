@@ -1,4 +1,5 @@
 import 'package:brackety/app.dart';
+import 'package:brackety/features/events/data/measure_rules.dart';
 import 'package:brackety/features/events/data/my_event.dart';
 import 'package:brackety/features/events/state/events_providers.dart';
 import 'package:brackety/features/grouping/data/grouping_models.dart';
@@ -39,6 +40,158 @@ void main() {
       matNumber: 2,
     ),
   ];
+
+  for (final MapEntry(key: device, value: size) in sizes.entries) {
+    testWidgets('a category mixing ages splits the list by age on $device', (
+      tester,
+    ) async {
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final repository = FakeGroupingRepository(const [
+        CategoryParticipant(
+          id: 'ana',
+          firstName: 'Ana',
+          lastName: 'Prueba',
+          age: 8,
+        ),
+        CategoryParticipant(
+          id: 'bea',
+          firstName: 'Bea',
+          lastName: 'Prueba',
+          age: 7,
+        ),
+        CategoryParticipant(
+          id: 'cris',
+          firstName: 'Cris',
+          lastName: 'Prueba',
+          age: 7,
+        ),
+      ]);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            ...sessionOverrides(FakeAuthApi(signedIn: true)),
+            groupingRepositoryProvider.overrideWithValue(repository),
+            fakeMatsOverride,
+            myEventsProvider.overrideWith(
+              (ref) async => [
+                MyEvent(
+                  id: 'e1',
+                  name: 'Fase 2',
+                  date: DateTime(2027, 1, 24),
+                  roles: const {EventRole.grouper},
+                ),
+              ],
+            ),
+          ],
+          child: const BracketyApp(),
+        ),
+      );
+      await tester.pumpAndSettle();
+      ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
+          .read(routerProvider)
+          .push('/events/e1/categories/c1', extra: '7-8');
+      await tester.pumpAndSettle();
+
+      // Youngest first, each age under its heading.
+      final headings = find.textContaining(RegExp(r'^\d+ years · \d+$'));
+      expect(tester.widgetList<Text>(headings).map((t) => t.data), [
+        '7 years · 2',
+        '8 years · 1',
+      ]);
+      final names = tester
+          .widgetList<Text>(find.textContaining(' Prueba'))
+          .map((t) => t.data)
+          .toList();
+      expect(names, ['Bea Prueba', 'Cris Prueba', 'Ana Prueba']);
+
+      // Picked, the group says whose age is whose.
+      await tester.tap(find.text('Ana Prueba'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Ana P. · 8'), findsWidgets);
+
+      await tester.tap(find.text('Split by age'));
+      await tester.pumpAndSettle();
+      expect(headings, findsNothing);
+    });
+  }
+
+  for (final MapEntry(key: device, value: size) in sizes.entries) {
+    testWidgets(
+      'a required weight blocks the pick until the helper writes it on $device',
+      (tester) async {
+        tester.view.physicalSize = size;
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        final repository = FakeGroupingRepository(const [
+          CategoryParticipant(
+            id: 'ana',
+            firstName: 'Ana',
+            lastName: 'Prueba',
+            age: 7,
+            heightCm: 130,
+            weightKg: 25,
+          ),
+          CategoryParticipant(
+            id: 'bea',
+            firstName: 'Bea',
+            lastName: 'Prueba',
+            age: 7,
+            heightCm: 129,
+          ),
+        ]);
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              ...sessionOverrides(FakeAuthApi(signedIn: true)),
+              groupingRepositoryProvider.overrideWithValue(repository),
+              fakeMatsOverride,
+              myEventsProvider.overrideWith(
+                (ref) async => [
+                  MyEvent(
+                    id: 'e1',
+                    name: 'Fase 2',
+                    date: DateTime(2027, 1, 24),
+                    roles: const {EventRole.grouper},
+                    measures: const MeasureRules(
+                      weight: MeasureRequirement.required,
+                      height: MeasureRequirement.off,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+            child: const BracketyApp(),
+          ),
+        );
+        await tester.pumpAndSettle();
+        ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
+            .read(routerProvider)
+            .push('/events/e1/categories/c1', extra: '7-8');
+        await tester.pumpAndSettle();
+
+        // Height is not asked; Ana has her weight, Bea still lacks it.
+        expect(find.textContaining('25 kg'), findsOneWidget);
+        expect(find.textContaining('weight missing'), findsOneWidget);
+        expect(find.textContaining('cm'), findsNothing);
+
+        await tester.ensureVisible(find.text('Bea Prueba'));
+        await tester.tap(find.text('Bea Prueba'));
+        await tester.pumpAndSettle();
+        expect(find.text('Weight and height of Bea Prueba'), findsOneWidget);
+        await tester.enterText(
+          find.widgetWithText(TextFormField, 'Weight in kg (optional)'),
+          '24,5',
+        );
+        await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+        await tester.pumpAndSettle();
+
+        expect(repository.measured, [('bea', 129, 24.5)]);
+      },
+    );
+  }
 
   for (final MapEntry(key: device, value: size) in sizes.entries) {
     testWidgets('a helper makes a group and sees its mat on $device', (
@@ -261,6 +414,67 @@ void main() {
     expect(group.members, ['p0', 'p1', 'p2']);
     expect(group.ghosts, ['grouped']);
   });
+
+  for (final MapEntry(key: device, value: size) in sizes.entries) {
+    testWidgets('a wildcard picked first stays a wildcard on $device (F1-2)', (
+      tester,
+    ) async {
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final repository = FakeGroupingRepository(participants);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            ...sessionOverrides(FakeAuthApi(signedIn: true)),
+            groupingRepositoryProvider.overrideWithValue(repository),
+            fakeMatsOverride,
+            myEventsProvider.overrideWith((ref) async => []),
+          ],
+          child: const BracketyApp(),
+        ),
+      );
+      await tester.pumpAndSettle();
+      ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
+          .read(routerProvider)
+          .push('/events/e1/categories/c1');
+      await tester.pumpAndSettle();
+      Finder addAs(String label) => find.descendant(
+        of: find.byType(SegmentedButton<bool>),
+        matching: find.text(label),
+      );
+      // On a phone the group's panel leaves room for a few rows: from the top, scroll to each one.
+      final list = find.byType(Scrollable).last;
+      Future<void> tapName(String name) async {
+        await tester.drag(list, const Offset(0, 2000));
+        await tester.pumpAndSettle();
+        await tester.scrollUntilVisible(
+          find.text(name).hitTestable(),
+          100,
+          scrollable: list,
+        );
+        await tester.tap(find.text(name));
+        await tester.pump();
+      }
+
+      await tester.tap(find.widgetWithText(FilterChip, 'Wildcard'));
+      await tester.pumpAndSettle();
+      await tester.tap(addAs('Wildcard'));
+      await tester.pump();
+      await tapName('Eva Prueba');
+      await tester.tap(addAs('Normal'));
+      await tester.pump();
+      for (final name in ['Ana', 'Bea', 'Carla']) {
+        await tapName('$name Prueba');
+      }
+      await tester.tap(find.text('Create group'));
+      await tester.pumpAndSettle();
+
+      final DraftGroup group = repository.created.single;
+      expect(group.members, ['p0', 'p1', 'p2']);
+      expect(group.ghosts, ['p4']);
+    });
+  }
 
   testWidgets('the slots fill as the helper picks and a tap empties one', (
     tester,

@@ -159,6 +159,7 @@ class AdminMat {
     required this.id,
     required this.number,
     this.referee,
+    this.disabled = false,
     this.plan = const [],
   });
 
@@ -166,6 +167,7 @@ class AdminMat {
     id: json['id'] as String,
     number: json['number'] as int,
     referee: json['referee'] as String?,
+    disabled: json['disabled'] as bool? ?? false,
     plan: [
       for (final p in json['plan'] as List? ?? const [])
         AdminPlannedMatch.fromJson(p as Map<String, dynamic>),
@@ -177,6 +179,9 @@ class AdminMat {
 
   /// The referee's sign-in; null when the mat has none.
   final String? referee;
+
+  /// Out of use (F1-1): "Enable" gives it back the referee it had.
+  final bool disabled;
 
   /// Its pending matches in the order they would come up if all goes as planned.
   final List<AdminPlannedMatch> plan;
@@ -423,6 +428,9 @@ class EventsApi {
     '${_control(eventId)}/mats/$matId/disable',
     data: {'groupMats': groupMats},
   );
+
+  Future<void> enableMat(String eventId, String matId) =>
+      _dio.post<void>('${_control(eventId)}/mats/$matId/enable');
 
   /// The package this hall laptop started with, to start the event again from it; null where there is none.
   Future<String?> resetPackage() async {

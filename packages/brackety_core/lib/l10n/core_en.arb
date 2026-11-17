@@ -9,6 +9,9 @@
   "connectionStatusOk": "Connected",
   "connectionStatusError": "Cannot reach the server",
   "connectionServerToday": "Server date: {date}",
+  "debugNoScenario": "no scenario",
+  "debugSimulatedDate": "{date} (simulated)",
+  "@debugSimulatedDate": {"placeholders": {"date": {"type": "String"}}},
   "retry": "Retry",
   "licenses": "Software licenses",
   "closeNotice": "Close notice"

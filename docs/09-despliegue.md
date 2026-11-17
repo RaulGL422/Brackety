@@ -45,6 +45,17 @@ Tras un reinicio todo vuelve solo: Docker arranca con el sistema y los servicios
 - El rollback **no deshace migraciones** de base de datos: hacer backup antes de desplegar una versión con migraciones (tarea 6).
 - `local` usa imágenes construidas en la máquina, sin pull ni túnel (`docker compose build && ./deploy.sh local`). Es lo que prueba el CI, rollback incluido.
 
+## Debug en la misma Pi (`modulos/entornos.md`)
+Otro proyecto de compose (`brackety-debug`) con su BD, sus puertos (8090-8092), su túnel y límites de CPU y memoria.
+1. **Cloudflare**: un **segundo túnel** con `brackety-debug` → `http://web:80`, `brackety-debug-api` → `http://api:8080`, `brackety-debug-admin` → `http://admin:80`. Una aplicación de Access que cubra **los tres** hostnames.
+2. **GitHub** (Settings → Variables): `DEBUG_API_BASE_URL=https://brackety-debug-api.rgal.dev` y `DEBUG_ADMIN_API_BASE_URL=https://brackety-debug-admin.rgal.dev`. Cada push a `development` publica las imágenes `dev` (api con escenarios, admin con la pestaña Escenarios).
+3. **Pi**: `sudo mkdir -p /mnt/ssd/brackety-debug/pgdata`, `cp .env.debug.example .env.debug`, rellenarlo (BD, `JWT_SECRET` y superadmin **propios**, token del segundo túnel, Access) y `chmod 600 .env.debug`.
+4. `./deploy.sh debug` (mismo pull, espera y rollback que producción; se niega si comparte `JWT_SECRET`).
+- **Días de evento**: `./deploy.sh debug-stop` la víspera; `./deploy.sh debug` al acabar. Parado no arranca solo tras reiniciar.
+- Actualizar: `./deploy.sh debug` tras cada fusión en `development`.
+- Comandos sueltos: `docker compose --env-file .env.debug -f docker-compose.yml -f docker-compose.debug.yml logs api`.
+- Sin backups: lo que importe, en una copia con nombre de la pestaña Escenarios.
+
 ## Backups
 `deploy/backup.sh`: `pg_dump` cifrado con [age](https://github.com/FiloSottile/age), 14 diarios + 8 semanales (domingo).
 1. **Clave** (en tu PC, una vez): `winget install FiloSottile.age` y `age-keygen -o brackety-backup.key`.
@@ -59,6 +70,19 @@ Tras un reinicio todo vuelve solo: Docker arranca con el sistema y los servicios
 - **Prueba** (no toca producción): `./restore.sh /mnt/backup/brackety/daily/<archivo>.dump.age /media/usb/brackety-backup.key` restaura en la base `restore_check`. Revisar datos y borrarla con el comando que muestra el script.
 - **Recuperación real**: añadir `brackety` como tercer argumento. Restaura primero en `brackety_restore`; solo si sale bien pide confirmación, para la api, cambia las bases y arranca la api. La anterior queda como `brackety_old_<fecha>`: borrarla cuando todo funcione.
 - Tras usar la clave privada en la Pi, retirar el USB.
+
+## Datos de la F1 a producción (`modulos/entornos.md`)
+Los datos se quedan en la BD de la Pi: la cuenta `club1` pasa a ser la de la entidad (la lleva Raul) y las genéricas se retiran.
+1. **Resultados del pabellón**: si no se importaron, en el panel del club, "Importar resultados del pabellón" con el `.zip` del portátil.
+2. **Antes de actualizar**, con la versión vieja: exportar "Todo el evento (.zip)" de cada fase y la clasificación de la liga. Son la referencia y llevan datos de menores: guardarlos cifrados y borrarlos tras la comprobación.
+3. `./backup.sh` y, en `psql`, `select person_id from participant group by person_id having count(distinct birth_date) > 1;` debe salir vacío (si no, corregir esos nacimientos antes: la migración de personas toma el último).
+4. SSD (paso 3 del primer arranque) si aún no está, `DEMO_ACCOUNTS_ENABLED=false` en `.env` y `./deploy.sh pi` con la versión nueva.
+5. **Comprobar**: la clasificación de la liga y los resultados por categoría salen con los mismos puestos y puntos que en el paso 2.
+6. `./backup.sh` y `./f1-handover.sh <email de la entidad>`: pide la contraseña nueva (≥10), enseña en seco cómo queda y aplica solo si se escribe `HANDOVER`.
+   - `club1` pasa a ese email y contraseña (mismo id: eventos, ligas, clubes y alumnos siguen siendo suyos). Se cierran sus sesiones.
+   - Cuentas sin `@` (`ayudante*`, `arbitro*`, staff del paquete): suspendidas y sin contraseña. Siguen en el historial (quién arbitró qué). Queda en la auditoría del superadmin.
+7. Entrar con el email nuevo y revisar la liga, el PDF de la clasificación y los CSV.
+- **Ceder al club** (cuando la app esté estable): desde la cuenta, Ajustes → cambiar email al del club (necesita Resend). El club pone su contraseña con "¿Olvidaste tu contraseña?".
 
 ## Portátil del pabellón (sin Internet ni Docker)
 Carpeta portable con PostgreSQL, Java, API y web: cómo generarla y usarla en `modulos/servidor-local.md`.

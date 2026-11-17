@@ -1,16 +1,28 @@
 package dev.rgal.brackety.event;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.UUID;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
+/** Its match rules live in its modalities ({@link Modality}), never here. */
 @Entity
 public class Event {
 
@@ -28,16 +40,28 @@ public class Event {
     private String name;
     private LocalDate eventDate;
     private int maxGroupsPerMat;
-    private int matchSeconds;
-    private int pointsLimit;
-    private int teamMatchSeconds;
-    private int teamPointsLimit;
-    private int changeoverSeconds;
-    private int minRestSeconds;
     private int attendancePoints;
     private Instant createdAt;
     private UUID originEventId;
+
+    /** The event's own choice; null follows its sport. */
+    @Enumerated(EnumType.STRING)
+    private MeasureRequirement weightRequirement;
+
+    @Enumerated(EnumType.STRING)
+    private MeasureRequirement heightRequirement;
+
+    /** The event's own list; null follows its sport. */
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    private List<String> warningReasons;
+
     private String resultsImportHash;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "event_id", nullable = false)
+    @OrderBy("position")
+    @BatchSize(size = 50)
+    private List<Modality> modalities = new ArrayList<>();
 
     protected Event() {}
 
@@ -49,10 +73,8 @@ public class Event {
             String name,
             LocalDate eventDate,
             int maxGroupsPerMat,
-            int matchSeconds,
-            int pointsLimit,
-            int changeoverSeconds,
             int attendancePoints,
+            Modality modality,
             Instant now) {
         this.ownerAccountId = ownerAccountId;
         this.leagueId = leagueId;
@@ -61,28 +83,17 @@ public class Event {
         this.name = name;
         this.eventDate = eventDate;
         this.maxGroupsPerMat = maxGroupsPerMat;
-        this.matchSeconds = matchSeconds;
-        this.pointsLimit = pointsLimit;
-        this.changeoverSeconds = changeoverSeconds;
         this.attendancePoints = attendancePoints;
-        this.teamMatchSeconds = DEFAULT_TEAM_MATCH_SECONDS;
-        this.minRestSeconds = DEFAULT_MIN_REST_SECONDS;
+        this.modalities.add(modality);
         this.createdAt = now;
     }
 
-    static final int DEFAULT_TEAM_MATCH_SECONDS = 180;
-    static final int DEFAULT_MIN_REST_SECONDS = 30;
-
-    /**
-     * Liga Yoseikan tambo, Fase 1 (Raul, 2026-11-13): individual 1 min and 15 points end it; teams 3 min with no
-     * points limit; 10 points for attending; 30 s of rest at least between two matches of a fighter. The club can
-     * change all of it in the settings.
-     */
+    /** Liga Yoseikan tambo, Fase 1: 10 points for attending; its match rules in {@link Modality#tambo()}. */
     public static Event tambo(UUID ownerAccountId, UUID leagueId, String name, LocalDate eventDate, Instant now) {
-        return new Event(ownerAccountId, leagueId, 1, Discipline.TAMBO, name, eventDate, 1, 60, 15, 30, 10, now);
+        return new Event(ownerAccountId, leagueId, 1, Discipline.TAMBO, name, eventDate, 1, 10, Modality.tambo(), now);
     }
 
-    /** The next phase of the same league, with this one's match settings. */
+    /** The next phase of the same league, with this one's match rules, measures asked and warning reasons. */
     public Event nextPhase(
             int phaseNumber,
             Discipline discipline,
@@ -90,28 +101,68 @@ public class Event {
             LocalDate eventDate,
             int attendancePoints,
             Instant now) {
-        return new Event(
-                        ownerAccountId,
-                        leagueId,
-                        phaseNumber,
-                        discipline,
-                        name,
-                        eventDate,
-                        maxGroupsPerMat,
-                        matchSeconds,
-                        pointsLimit,
-                        changeoverSeconds,
-                        attendancePoints,
-                        now)
-                .withTeamRules(teamMatchSeconds, teamPointsLimit, minRestSeconds);
+        var next = new Event(
+                ownerAccountId,
+                leagueId,
+                phaseNumber,
+                discipline,
+                name,
+                eventDate,
+                maxGroupsPerMat,
+                attendancePoints,
+                modality().copy(),
+                now);
+        next.setMeasureRequirements(weightRequirement, heightRequirement);
+        next.warningReasons = warningReasons == null ? null : List.copyOf(warningReasons);
+        return next;
     }
 
-    /** {@code teamPointsLimit}: 0 = none. */
-    public Event withTeamRules(int teamMatchSeconds, int teamPointsLimit, int minRestSeconds) {
-        this.teamMatchSeconds = teamMatchSeconds;
-        this.teamPointsLimit = teamPointsLimit;
-        this.minRestSeconds = minRestSeconds;
-        return this;
+    /** Whether weight is asked: the event's own choice, or its sport's. */
+    public MeasureRequirement weightRequirement() {
+        return weightRequirement != null ? weightRequirement : discipline.weight();
+    }
+
+    public MeasureRequirement heightRequirement() {
+        return heightRequirement != null ? heightRequirement : discipline.height();
+    }
+
+    /** Null: as the sport says. */
+    public MeasureRequirement getOwnWeightRequirement() {
+        return weightRequirement;
+    }
+
+    public MeasureRequirement getOwnHeightRequirement() {
+        return heightRequirement;
+    }
+
+    /** What the referee picks from: the event's own list, or its sport's. */
+    public List<String> warningReasons() {
+        return warningReasons != null ? List.copyOf(warningReasons) : discipline.warningReasons();
+    }
+
+    /** Null: as the sport says. */
+    public List<String> getOwnWarningReasons() {
+        return warningReasons == null ? null : List.copyOf(warningReasons);
+    }
+
+    /** Null follows the sport. Trimmed, without blanks nor repeats (case aside), in the order given. */
+    public void setWarningReasons(List<String> reasons) {
+        if (reasons == null) {
+            warningReasons = null;
+            return;
+        }
+        var unique = new LinkedHashMap<String, String>();
+        reasons.stream()
+                .map(String::strip)
+                .filter(r -> !r.isEmpty())
+                .forEach(r -> unique.putIfAbsent(r.toLowerCase(), r));
+        warningReasons = new ArrayList<>(unique.values());
+    }
+
+    /** Null follows the sport. */
+    public void setMeasureRequirements(MeasureRequirement weight, MeasureRequirement height) {
+        this.weightRequirement = weight;
+        this.heightRequirement = height;
     }
 
     public UUID getId() {
@@ -146,38 +197,9 @@ public class Event {
         return maxGroupsPerMat;
     }
 
-    public int getMatchSeconds() {
-        return matchSeconds;
-    }
-
-    public int getPointsLimit() {
-        return pointsLimit;
-    }
-
-    public int getTeamMatchSeconds() {
-        return teamMatchSeconds;
-    }
-
-    /** 0 = no limit. */
-    public int getTeamPointsLimit() {
-        return teamPointsLimit;
-    }
-
-    public int matchSecondsFor(boolean teams) {
-        return teams ? teamMatchSeconds : matchSeconds;
-    }
-
-    /** 0 = no limit. */
-    public int pointsLimitFor(boolean teams) {
-        return teams ? teamPointsLimit : pointsLimit;
-    }
-
-    public int getMinRestSeconds() {
-        return minRestSeconds;
-    }
-
-    public int getChangeoverSeconds() {
-        return changeoverSeconds;
+    /** Its only modality for now; the competition of 2026-12-20 will bring several. */
+    public Modality modality() {
+        return modalities.getFirst();
     }
 
     public int getAttendancePoints() {
@@ -209,18 +231,14 @@ public class Event {
             String name,
             LocalDate eventDate,
             int maxGroupsPerMat,
-            int matchSeconds,
-            int pointsLimit,
             int attendancePoints,
-            int teamMatchSeconds,
-            int teamPointsLimit,
+            Modality.FormatRules individual,
+            Modality.FormatRules team,
             int minRestSeconds) {
-        withTeamRules(teamMatchSeconds, teamPointsLimit, minRestSeconds);
         this.name = name;
         this.eventDate = eventDate;
         this.maxGroupsPerMat = maxGroupsPerMat;
-        this.matchSeconds = matchSeconds;
-        this.pointsLimit = pointsLimit;
         this.attendancePoints = attendancePoints;
+        modality().update(individual, team, minRestSeconds);
     }
 }

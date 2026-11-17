@@ -73,6 +73,9 @@ class LocalMatch {
           automatic: false,
           undone: false,
           gaveRivalPoint: false,
+          overtime:
+              op.action == MatchAction.point &&
+              before.remainingAt(at) == Duration.zero,
         ),
       );
       lastAt = at;
@@ -125,6 +128,7 @@ class LocalMatch {
             length: server.length,
             pointsLimit: server.pointsLimit,
             readyAt: server.readyAt,
+            warningReasons: server.warningReasons,
             remaining: state.remainingAt(now),
             running: state.isRunning(now),
             endReason: state.endReason(now),

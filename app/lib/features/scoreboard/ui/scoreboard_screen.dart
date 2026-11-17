@@ -173,6 +173,9 @@ class ScoreboardScreen extends ConsumerWidget {
             ? l10n.reasonApplyDisqualify
             : l10n.reasonApplyWarning,
         destructive: action == MatchAction.disqualification,
+        suggestions: action == MatchAction.oneHandWarning
+            ? const []
+            : view.warningReasons,
       );
       if (reason == null || !context.mounted) return;
     }
@@ -272,11 +275,14 @@ class _Live extends StatelessWidget {
     final locked = view.review != null;
     // Nothing scores before the clock was first started (decided with Raul, 2026-11-06).
     final scoring = view.endReason == null && !locked && view.started;
+    // The last action's point, once the clock shows 0:00 (F1-3).
+    final overtime = view.endReason == EndReason.time && !locked;
     Widget corner(Side side) => Expanded(
       child: CornerPanel(
         side: side,
         corner: view.corner(side),
-        enabled: scoring,
+        canPoint: scoring || overtime,
+        canSanction: scoring,
         // A correction: also once the time or the points ended it, not after a disqualification.
         canRemove:
             !locked &&

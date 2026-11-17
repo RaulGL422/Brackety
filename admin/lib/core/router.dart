@@ -8,6 +8,8 @@ import '../features/auth/state/admin_session.dart';
 import '../features/auth/ui/login_screen.dart';
 import '../features/auth/ui/logout_button.dart';
 import '../features/dashboard/ui/dashboard_screen.dart';
+import '../features/debug/data/debug_api.dart';
+import '../features/debug/ui/debug_screen.dart';
 import '../features/design_system/ui/design_system_screen.dart';
 import '../features/events/ui/events_screen.dart';
 import '../features/locks/ui/locks_screen.dart';
@@ -69,6 +71,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         label: (context) => AppLocalizations.of(context).navOrganizers,
         builder: (_) => const OrganizersScreen(),
       ),
+      if (debugEnvironment)
+        AdaptiveTab(
+          path: '/debug',
+          icon: Icons.science_outlined,
+          label: (context) => AppLocalizations.of(context).navDebug,
+          builder: (_) => const DebugScreen(),
+        ),
       AdaptiveTab(
         path: '/connection',
         icon: Icons.dns_outlined,

@@ -14,6 +14,9 @@ import 'draft_panel.dart';
 import 'pick_mark.dart';
 import '../../../core/up_button.dart';
 import '../../mat/ui/mat_label.dart';
+import 'measures.dart';
+import '../../events/data/measure_rules.dart';
+import 'age_sections.dart';
 
 /// A category's participants: pick 4 (or 3 and a ghost) and send them to a mat.
 /// Opened from a team category ([teamSize] set) for those left without a team, with a way back.
@@ -38,6 +41,10 @@ class GroupBuilderScreen extends ConsumerStatefulWidget {
 }
 
 class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
+  static const _splitByAge = Object();
+
+  /// Only matters when the category mixes ages (F2-2).
+  var _byAge = true;
   var _group = const DraftGroup();
   String? _matId;
   var _sort = ParticipantSort.name;
@@ -109,43 +116,71 @@ class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
       onMatChanged: (id) => setState(() => _matId = id),
       onCreate: _create,
       labelOf: (id) {
-        final p = participants.value?.where((p) => p.id == id).firstOrNull;
+        final all = participants.value ?? const <CategoryParticipant>[];
+        final p = all.where((p) => p.id == id).firstOrNull;
         if (p == null) return '';
-        return p.lastName.isEmpty
+        final name = p.lastName.isEmpty
             ? p.firstName
             : '${p.firstName} ${p.lastName.characters.first}.';
+        // Ages mixed in the category: the group shows whose age is whose (F2-2).
+        return mixesAges(all) ? '$name · ${p.age}' : name;
       },
     );
     final list = AsyncView(
       value: participants,
       onRetry: _refresh,
       data: (all) {
+        final rules = measureRulesOf(ref, widget.eventId);
         final sorted = sortParticipants(all, _sort);
+        final mixed = mixesAges(all);
+        final rows = <Object>[
+          if (mixed) _splitByAge,
+          ...(mixed && _byAge ? withAgeHeadings(sorted) : sorted),
+        ];
         return RefreshIndicator(
           onRefresh: () =>
               ref.refresh(categoryParticipantsProvider(_key).future),
           child: ListView.builder(
-            itemCount: sorted.length,
-            itemBuilder: (context, i) => _ParticipantTile(
-              participant: sorted[i],
-              group: _group,
-              onUndoGroup: sorted[i].canUndoGroup
-                  ? () => undoGroup(
-                      context,
-                      ref,
-                      eventId: widget.eventId,
-                      groupId: sorted[i].groupId!,
-                      number: sorted[i].groupNumber!,
-                      refresh: _refresh,
-                    )
-                  : null,
-              onTap: () => setState(
-                () => _group = _group.toggle(
-                  sorted[i].id,
-                  grouped: sorted[i].isTaken,
-                ),
-              ),
-            ),
+            itemCount: rows.length,
+            itemBuilder: (context, i) {
+              final row = rows[i];
+              if (row is AgeHeading) return AgeHeadingTile(heading: row);
+              if (row is! CategoryParticipant) {
+                return SplitByAgeChip(
+                  selected: _byAge,
+                  onSelected: (on) => setState(() => _byAge = on),
+                );
+              }
+              final p = row;
+              return _ParticipantTile(
+                participant: p,
+                group: _group,
+                onUndoGroup: p.canUndoGroup
+                    ? () => undoGroup(
+                        context,
+                        ref,
+                        eventId: widget.eventId,
+                        groupId: p.groupId!,
+                        number: p.groupNumber!,
+                        refresh: _refresh,
+                      )
+                    : null,
+                rules: rules,
+                onTap: blockedByMeasures(rules, p)
+                    ? () async {
+                        if (await showMeasuresDialog(
+                          context,
+                          widget.eventId,
+                          p,
+                        )) {
+                          _refresh();
+                        }
+                      }
+                    : () => setState(
+                        () => _group = _group.toggle(p.id, grouped: p.isTaken),
+                      ),
+              );
+            },
           ),
         );
       },
@@ -230,12 +265,16 @@ class _ParticipantTile extends StatelessWidget {
   const _ParticipantTile({
     required this.participant,
     required this.group,
+    required this.rules,
     required this.onTap,
     this.onUndoGroup,
   });
 
   final CategoryParticipant participant;
   final DraftGroup group;
+
+  /// A required measure missing: tapping asks for it instead of picking.
+  final MeasureRules rules;
   final VoidCallback onTap;
   final VoidCallback? onUndoGroup;
 
@@ -243,19 +282,23 @@ class _ParticipantTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final p = participant;
+    final locale = Localizations.localeOf(context).toLanguageTag();
+    final blocked = blockedByMeasures(rules, p);
     final state = group.stateOf(p.id, grouped: p.isTaken);
-    final height = p.heightCm == null
-        ? l10n.heightUnknown
-        : l10n.heightCm(p.heightCm!);
-    final details = l10n.participantDetails(p.age, height);
     return ListTile(
-      enabled: state != PickState.unavailable,
+      enabled: blocked || state != PickState.unavailable,
       onTap: onTap,
-      leading: PickMark(state: state, onTap: onTap),
+      leading: blocked
+          ? Icon(
+              Icons.monitor_weight_outlined,
+              color: Theme.of(context).colorScheme.error,
+              semanticLabel: l10n.measuresWrite,
+            )
+          : PickMark(state: state, onTap: onTap),
       title: Text(p.fullName),
       subtitle: Text(
         [
-          details,
+          participantSummary(l10n, locale, rules, p),
           if (p.teamNumber != null) l10n.teamName(p.teamNumber!),
           if (p.isGrouped)
             l10n.participantGrouped(

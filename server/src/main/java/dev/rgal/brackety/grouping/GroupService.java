@@ -133,6 +133,7 @@ class GroupService {
                             p.getFirstName(),
                             p.getLastName(),
                             p.getHeightCm(),
+                            p.getWeightKg(),
                             event.ageOf(p.getBirthDate()),
                             group == null ? null : group.getNumber(),
                             group == null || group.getMatId() == null ? null : matNumbers.get(group.getMatId()),
@@ -231,6 +232,7 @@ class GroupService {
             throw EventException.invalid("A participant can only be in one of the new groups.");
         }
         roster.requireAllIn(event, category, involved);
+        roster.requireMeasures(event, involved);
         roster.requireFree(real);
     }
 

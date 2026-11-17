@@ -49,7 +49,7 @@ class TamboMatchTest {
     }
 
     @Test
-    void whenTheTimeIsOverTheClockStopsAndOnlyFinishIsLeft() {
+    void whenTheTimeIsOverTheClockStopsAndOnlyTheLastPointOrFinishAreLeft() {
         add(START, null, 0);
         add(POINT, RED, 10);
 
@@ -59,8 +59,29 @@ class TamboMatchTest {
         assertThat(match.isRunning(at(500))).isFalse();
         assertThat(match.endReason(at(500))).contains(EndReason.TIME);
         assertThat(match.refuse(START, at(500))).isPresent();
-        assertThat(match.refuse(POINT, at(500))).isPresent();
+        // The last action's point, given at 0:00 (F1-3); sanctions are over.
+        assertThat(match.refuse(POINT, at(500))).isEmpty();
+        assertThat(match.refuse(WARNING, at(500))).contains("The match is over.");
+        assertThat(match.refuse(DISQUALIFICATION, at(500))).contains("The match is over.");
         assertThat(match.refuse(FINISH, at(500))).isEmpty();
+    }
+
+    @Test
+    void aPointAfterTheTimeCountsCanBeUndoneAndMayReachTheLimit() {
+        add(START, null, 0);
+        for (int i = 0; i < 14; i++) {
+            add(POINT, BLUE, i + 1);
+        }
+        add(POINT, BLUE, 500);
+
+        var match = replay();
+        assertThat(match.corner(BLUE).points()).isEqualTo(15);
+        assertThat(match.endReason(at(501))).contains(EndReason.POINTS);
+        assertThat(match.refuse(POINT, at(501))).contains("The match is over.");
+
+        add(UNDO, null, 502, last());
+        assertThat(replay().corner(BLUE).points()).isEqualTo(14);
+        assertThat(replay().endReason(at(503))).contains(EndReason.TIME);
     }
 
     @Test

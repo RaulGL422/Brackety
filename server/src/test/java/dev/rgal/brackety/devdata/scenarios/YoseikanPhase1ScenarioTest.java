@@ -7,6 +7,8 @@ import dev.rgal.brackety.demo.DemoSetup;
 import dev.rgal.brackety.devdata.ScenarioContext;
 import dev.rgal.brackety.event.EventCategoryRepository;
 import dev.rgal.brackety.event.EventOrganizationRepository;
+import dev.rgal.brackety.event.EventRepository;
+import dev.rgal.brackety.event.OrganizationRepository;
 import dev.rgal.brackety.participant.ParticipantRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,24 +27,32 @@ class YoseikanPhase1ScenarioTest extends AuthIntegrationTest {
     @Autowired
     EventCategoryRepository categories;
 
+    @Autowired
+    OrganizationRepository clubs;
+
+    @Autowired
+    EventRepository events;
+
     @Test
     void seedsTheDemoEventWithParticipantsInEveryChildCategory() {
-        new YoseikanPhase1Scenario(demo, participants, organizations, categories).seed(new ScenarioContext(clock));
+        new YoseikanPhase1Scenario(demo, participants, organizations, clubs, events, categories)
+                .seed(new ScenarioContext(clock));
 
         assertThat(count("participant"))
                 .isEqualTo(YoseikanPhase1Scenario.PARTICIPANTS + YoseikanPhase1Scenario.TEENS + 2);
         var categoriesInUse = jdbc.sql("""
                         select count(distinct c.id) from participant p
+                        join person pe on pe.id = p.person_id
                         join event e on e.id = p.event_id
                         join event_category c on c.event_id = e.id
-                         and extract(year from age(e.event_date, p.birth_date)) between c.min_age and c.max_age""").query(Integer.class).single();
+                         and extract(year from age(e.event_date, pe.birth_date)) between c.min_age and c.max_age""").query(Integer.class).single();
         assertThat(categoriesInUse).isGreaterThanOrEqualTo(7);
         assertThat(count("event_organization")).isEqualTo(4);
         assertThat(jdbc.sql("select count(*) from participant where organization_id is null")
                         .query(Integer.class)
                         .single())
                 .isPositive();
-        assertThat(jdbc.sql("select count(*) from participant where height_cm is null")
+        assertThat(jdbc.sql("select count(*) from person where height_cm is null")
                         .query(Integer.class)
                         .single())
                 .isPositive();

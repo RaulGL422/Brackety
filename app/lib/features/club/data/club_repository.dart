@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 
 import '../../auth/state/session_controller.dart';
 import 'club_models.dart';
+import 'sex.dart';
+import '../../events/data/measure_rules.dart';
 
 final clubRepositoryProvider = Provider<ClubRepository>(
   (ref) => ClubRepository(ref.watch(apiProvider)),
@@ -20,6 +22,16 @@ enum EventExport {
     'export/league-standings.csv',
     'clasificacion-liga.csv',
     'text/csv',
+  ),
+  categoryStandings(
+    'export/league-standings-by-category.zip',
+    'clasificacion-por-categoria.zip',
+    'application/zip',
+  ),
+  standingsPdf(
+    'export/league-standings.pdf',
+    'clasificacion-por-categoria.pdf',
+    'application/pdf',
   ),
   full('export/full', 'evento.zip', 'application/zip');
 
@@ -135,7 +147,9 @@ class ClubRepository {
     required String firstName,
     required String lastName,
     required DateTime birthDate,
+    required Sex sex,
     required int? heightCm,
+    required double? weightKg,
     required bool guardianConsent,
     String? categoryId,
     String? organizationId,
@@ -144,7 +158,9 @@ class ClubRepository {
       'firstName': firstName,
       'lastName': lastName,
       'birthDate': _day.format(birthDate),
+      'sex': sex.toJson(),
       'heightCm': heightCm,
+      'weightKg': weightKg,
       'guardianConsent': guardianConsent,
       'categoryId': categoryId,
       'organizationId': organizationId,
@@ -156,6 +172,23 @@ class ClubRepository {
       await _dio.put<void>('$path/$participantId', data: data);
     }
   }
+
+  /// Null follows the sport.
+  Future<void> saveMeasures(
+    String eventId, {
+    required MeasureRequirement? weight,
+    required MeasureRequirement? height,
+  }) => _dio.put<void>(
+    '/api/v1/events/$eventId/measures',
+    data: {'weight': weight?.toJson(), 'height': height?.toJson()},
+  );
+
+  /// Null follows the sport.
+  Future<void> saveWarningReasons(String eventId, List<String>? reasons) =>
+      _dio.put<void>(
+        '/api/v1/events/$eventId/warning-reasons',
+        data: {'reasons': reasons},
+      );
 
   Future<void> deleteParticipant(String eventId, String participantId) =>
       _dio.delete<void>('/api/v1/events/$eventId/participants/$participantId');

@@ -27,6 +27,7 @@ import dev.rgal.brackety.scoreboard.MatchEvent;
 import dev.rgal.brackety.scoreboard.MatchEventRepository;
 import dev.rgal.brackety.scoreboard.Side;
 import java.time.Clock;
+import java.time.Duration;
 import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -181,7 +182,9 @@ class EventSheets {
                             p.getLastName(),
                             SheetText.date(p.getBirthDate()),
                             age,
+                            SheetText.sex(p.getSex()),
                             p.getHeightCm(),
+                            SheetText.decimal(p.getWeightKg()),
                             d.organizationNames().get(p.getOrganizationId()),
                             category.map(EventCategory::getName).orElse("Sin categoría"),
                             p.getCategoryId() == null ? "Por edad" : "Elegida a mano",
@@ -198,7 +201,9 @@ class EventSheets {
                         "Apellidos",
                         "Fecha de nacimiento",
                         "Edad el día del evento",
+                        "Sexo",
                         "Estatura (cm)",
+                        "Peso (kg)",
                         "Club",
                         "Categoría",
                         "Cómo se asignó la categoría",
@@ -352,7 +357,7 @@ class EventSheets {
                             m.getRedScore(),
                             m.getBlueScore(),
                             winner(m, red, blue),
-                            endReason(m, d.event().pointsLimitFor(m.isTeamMatch()), red, blue),
+                            endReason(m, d.event().modality().pointsLimit(m.isTeamMatch()), red, blue),
                             SheetText.status(m.getStatus()),
                             ghostNames.isEmpty() ? null : ghostNames,
                             SheetText.date(m.getStartedAt(), zone),
@@ -426,7 +431,12 @@ class EventSheets {
                             SheetText.action(e.getType().name()),
                             SheetText.side(side),
                             fighter,
-                            e.getDeltaMs() == null ? e.getReason() : SheetText.clockAdjust(e.getDeltaMs()),
+                            e.getDeltaMs() != null
+                                    ? SheetText.clockAdjust(e.getDeltaMs())
+                                    : e.isOvertimePoint(Duration.ofSeconds(
+                                                    d.event().modality().matchSeconds(m.isTeamMatch())))
+                                            ? "Fuera de tiempo"
+                                            : e.getReason(),
                             e.isAutomatic() ? "Automático" : actors.get(e.getActorAccountId()),
                             e.getTargetEventId() == null
                                     ? null

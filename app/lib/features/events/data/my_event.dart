@@ -1,3 +1,5 @@
+import 'measure_rules.dart';
+
 enum EventRole { club, grouper, referee }
 
 /// An event where the signed-in account has a role.
@@ -12,6 +14,7 @@ class MyEvent {
     String? leagueId,
     String? leagueName,
     this.phaseNumber = 1,
+    this.measures = const MeasureRules(),
   }) : leagueId = leagueId ?? id,
        leagueName = leagueName ?? name;
 
@@ -28,6 +31,14 @@ class MyEvent {
     leagueId: json['leagueId'] as String?,
     leagueName: json['leagueName'] as String?,
     phaseNumber: json['phaseNumber'] as int? ?? 1,
+    measures: MeasureRules(
+      weight:
+          MeasureRequirement.fromJson(json['weightRequirement']) ??
+          MeasureRequirement.optional,
+      height:
+          MeasureRequirement.fromJson(json['heightRequirement']) ??
+          MeasureRequirement.optional,
+    ),
   );
 
   final String id;
@@ -43,4 +54,7 @@ class MyEvent {
   final String leagueId;
   final String leagueName;
   final int phaseNumber;
+
+  /// Whether weight and height are asked (its own choice or its sport's).
+  final MeasureRules measures;
 }

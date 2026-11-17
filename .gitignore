@@ -1,5 +1,6 @@
 # Secrets
 .env
+.env.debug
 *.env.local
 app/env/device.json
 admin/env/device.json

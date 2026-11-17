@@ -29,5 +29,8 @@ La URL de la API llega solo por `API_BASE_URL` (`--dart-define-from-file=env/<de
 ## Accesibilidad y diseño
 Seguir `docs/07-diseno.md`. Contraste suficiente, textos escalables, uso con una mano en el tapiz.
 
+## Revisión de diseño
+Toda PR que cambie una pantalla pasa la skill `frontend-design` (plugin del proyecto) y capturas con Playwright en 360×800, 800×1280 y 1440×900 antes de pedir revisión (`docs/producto/calidad.md`).
+
 ## Tests
 Widget tests por pantalla crítica y unit tests de lógica; golden tests solo si el diseño está cerrado.

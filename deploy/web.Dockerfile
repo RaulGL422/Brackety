@@ -9,12 +9,15 @@ RUN flutter config --no-analytics && flutter precache --web
 
 ARG APP
 ARG API_BASE_URL
+# true only in the debug images (docs/modulos/entornos.md): the admin's Scenarios tab.
+ARG BRACKETY_DEBUG=false
 WORKDIR /src
 COPY packages packages
 COPY ${APP} ${APP}
 WORKDIR /src/${APP}
 RUN test -n "$API_BASE_URL" || (echo "API_BASE_URL build arg is required" && exit 1)
-RUN flutter build web --release --no-web-resources-cdn --dart-define=API_BASE_URL="$API_BASE_URL"
+RUN flutter build web --release --no-web-resources-cdn --dart-define=API_BASE_URL="$API_BASE_URL" \
+    --dart-define=BRACKETY_DEBUG="$BRACKETY_DEBUG"
 
 FROM nginx:1.31.8-alpine
 ARG APP

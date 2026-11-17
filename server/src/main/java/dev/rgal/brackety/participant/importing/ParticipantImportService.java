@@ -141,6 +141,8 @@ class ParticipantImportService {
                     row.heightCm(),
                     true,
                     row.categoryId());
+            participant.setSex(row.sex());
+            participant.measure(row.heightCm(), row.weightKg());
             participants.save(participant);
         }
         imports.save(new ParticipantImport(eventId, accountId, request.rows().size(), CONSENT_VERSION, now));

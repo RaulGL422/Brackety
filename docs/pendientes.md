@@ -4,6 +4,22 @@
 - [ ] Autorizar la depuración USB en el móvil conectado (aparece como "not authorized").
 - [ ] Docker Desktop: solo hará falta para probar `deploy/` en Windows; tests y ejecución local no lo necesitan.
 
+## Por probar a mano (Raul, PR fusionadas del 2026-11-16/17)
+- [ ] #104 comodín: elegir primero un comodín y luego uno normal en un grupo de equipos; cada uno queda con su papel.
+- [ ] #105 inhabilitar tapiz: inhabilitar y habilitar desde Tapices (club) y desde el admin; el tapiz no recibe grupos mientras está inhabilitado.
+- [ ] #107 M1 reglas en la modalidad: en Ajustes cambiar duración, límite y descanso; el marcador y la previsión los usan.
+- [ ] #108 CSV por categoría: pestaña de liga, «Un CSV por categoría (.zip)», abrir uno con Excel.
+- [ ] #109 M2a alumno único: corregir un apellido en una fase y verlo en la otra; cambiar el nacimiento de alguien ya agrupado da error.
+- [ ] #109 antes de desplegar en la Pi: `select person_id from participant group by person_id having count(distinct birth_date) > 1;` debe salir vacío.
+- [ ] Datos de la F1 a producción: seguir `09-despliegue.md` («Datos de la F1 a producción») cuando estén SSD, backups y Cloudflare; elegir el email de la cuenta de la entidad.
+- [ ] #110 PDF: «Clasificación en PDF» en la pestaña de liga, imprimir una hoja.
+- [ ] #111 M2b club único: renombrar un club en la F2 y verlo en la F1.
+- [ ] #112 M2c sexo y peso: editar a alguien de la F1 (pide el sexo); importar una lista con y sin columna de sexo; peso con coma.
+- [ ] #113 F2-1: peso obligatorio en Ajustes de una fase, intentar agrupar a alguien sin peso y apuntarlo desde crear grupos.
+- [ ] #114 F2-2: categoría con varias edades; crear grupos las separa y el panel muestra la edad.
+- [ ] #115/#117 debug: con el debug desplegado, cargar `yoseikan-f1` en una fecha simulada, ver la franja en app y admin, guardar una copia, cambiar algo, restaurarla y volver a hoy.
+- [ ] Despliegue de debug: `./deploy.sh debug`, abrir los tres hostnames (piden Access), `./deploy.sh debug-stop` y comprobar que producción sigue.
+
 ## Despliegue (infra-deploy)
 - [ ] Copia de los backups en la nube (doc 05): elegir proveedor barato; se añadiría con `rclone` al final de `backup.sh`.
 - [ ] Generar la clave age de backups y guardar la privada fuera de la Pi (`09-despliegue.md`).
@@ -16,6 +32,7 @@
 - [ ] Google Cloud: crear OAuth client IDs (web + Android con SHA-1 de debug y release), ponerlos en `GOOGLE_CLIENT_ID` y probar el login real de Google en web y en Android (en local solo hay Google simulado).
 - [ ] Resend: API key y remitente verificado en `rgal.dev` antes de `feat/auth-email` (en local los emails van al log).
 - [ ] Cloudflare: regla de rate limiting sobre `/api/v1/auth/*` al desplegar.
+- [ ] Debug en la Pi (`09-despliegue.md`, «Debug en la misma Pi»): segundo túnel con los hostnames de debug, Access para los tres, variables `DEBUG_API_BASE_URL` y `DEBUG_ADMIN_API_BASE_URL` en GitHub (sin ellas falla la publicación de `development`) y `.env.debug`.
 - [ ] Producción: leer la IP real de `CF-Connecting-IP` y confiar solo en el túnel; comprobar en el despliegue real.
 - [ ] Emails de auth: pasar el envío directo (tras commit, sin reintentos) a la cola con reintentos del módulo `notificaciones`.
 - [ ] Register/forgot: queda una pequeña diferencia de tiempo de BD según exista la cuenta (enumeración por temporización, medible con muchas muestras). Aceptado por ahora; si hiciera falta, mover esas escrituras al hilo asíncrono.
@@ -28,6 +45,16 @@
 - [ ] Errores de la API sin texto en `i18n/messages*.properties` (la app traduce por `code`); `OWNS_EVENTS` sigue ese patrón. Confirmar si se quieren textos en servidor.
 - [ ] Login con Apple cuando haya cuenta Apple Developer o app iOS.
 - [ ] Login con Google en la app (botón + `REGISTRATION_REQUIRED`) cuando existan los client IDs.
+
+## Tras la Fase 1 (2026-11-16; plan en `producto/roadmap.md`)
+- [ ] Competición del 2026-12-20: modalidades y su puntuación, categorías, tapices y servidor; la clasificación ya está (`producto/competicion-2026-12-20.md`).
+- [ ] F1-2 comodín: arreglado en la app (2026-11-16); falta revisar en la Pi qué se apañó a mano y que la clasificación sea correcta.
+- [ ] F2-3 CSV de resultados: la entidad de la liga ve confusos los puestos (1.º, 2.º, 3.º) al abrirlos en Excel. Hecho: CSV por categoría (#108) y PDF (#110). Falta rehacer el resto de CSV (Raul aún no lo ha revisado).
+- [ ] F2-4: global opcional hecha (`modulos/ranking.md`). Dividir una categoría por sexo o tramos de peso: cuando una modalidad lo necesite (en la F2 la categoría es solo por edad; Raul, 2026-11-17).
+- [ ] F1-4 advertencias: revisar la lista de tambo propuesta (prohibiciones del reglamento, cap. 3.1: proyección o golpeo, tirarse rodando, ataque de pique, exceso de potencia, conducta antideportiva). Se cambia en `Discipline` o por evento en Configuración.
+- [ ] F1-5 cuentas propias: hecho en `feat/f1-5-staff-invites`. Con Resend en producción, probar a mano: invitar a un email real, registrarse con él, aceptar y arbitrar un tapiz. Retirar `staffNames` cuando las cuentas tengan nombre.
+- [ ] Gestión del club (`producto/gestion-club.md`): ¿se amplía el alcance? Cambia `00-vision.md` (hoy cobros fuera de alcance).
+- [ ] Si se cobra o se factura: forma jurídica, asesor fiscal y contratos con los clubes.
 
 ## Prototipo Fase 1 (bloquean el uso real)
 - [ ] Raul · Cloudflare para dejarlo todo listo (sin configurar el 2026-11-05). Pasos en `09-despliegue.md` (paso 8); `.env` de la Pi en `prototipo-f1.md` (Despliegue):

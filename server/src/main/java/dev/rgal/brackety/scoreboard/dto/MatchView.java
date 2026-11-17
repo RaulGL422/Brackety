@@ -31,7 +31,8 @@ public record MatchView(
         List<TimelineEntry> timeline,
         Instant serverTime,
         Review review,
-        Instant readyAt) {
+        Instant readyAt,
+        List<String> warningReasons) {
 
     /**
      * A participant ({@code participantId}) or a team ({@code teamId}, {@code teamNumber}); {@code members}
@@ -67,7 +68,8 @@ public record MatchView(
             boolean undone,
             boolean gaveRivalPoint,
             UUID opId,
-            Long deltaMs) {}
+            Long deltaMs,
+            boolean overtime) {}
 
     /**
      * {@code reason}: why the first action clashed (KNOWN_EVENTS, RULES, AGE, MAT_BUSY, FIGHTER_BUSY).

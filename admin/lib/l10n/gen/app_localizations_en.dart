@@ -63,6 +63,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'A match on this mat waits for review: resolve it first.';
 
   @override
+  String get controlEnableMat => 'Enable mat';
+
+  @override
+  String eventMatDisabled(int number) {
+    return 'Mat $number: out of use';
+  }
+
+  @override
   String get controlDisableMat => 'Disable mat';
 
   @override
@@ -72,7 +80,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get controlDisableMatBody =>
-      'Choose the mat for each group with pending matches (Automatic: the one that finishes first). Team matches are shared among the other mats. It is left without a referee: to use it again, the club assigns one in Settings.';
+      'Choose the mat for each group with pending matches (Automatic: the one that finishes first). Team matches are shared among the other mats. To use it again, \"Enable mat\" gives it back its referee.';
 
   @override
   String get controlMatAutomatic => 'Automatic';
@@ -301,6 +309,128 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get navLocks => 'Locks';
+
+  @override
+  String get navDebug => 'Scenarios';
+
+  @override
+  String get saved => 'Saved';
+
+  @override
+  String get debugTitle => 'Debug scenarios';
+
+  @override
+  String get debugScenarios => 'Scenarios';
+
+  @override
+  String get debugScenariosHint =>
+      'Loading one wipes every piece of data and leaves the scenario\'s, today or on a simulated day.';
+
+  @override
+  String get debugLoad => 'Load';
+
+  @override
+  String debugLoadTitle(String name) {
+    return 'Load “$name”?';
+  }
+
+  @override
+  String get debugWipeWarning =>
+      'Every piece of debug data goes: accounts, events and sessions. Saved copies stay.';
+
+  @override
+  String debugTypeName(String name) {
+    return 'Type “$name” to confirm';
+  }
+
+  @override
+  String get debugOnToday => 'Today';
+
+  @override
+  String debugOnDay(String date) {
+    return 'On $date';
+  }
+
+  @override
+  String debugLoaded(String name) {
+    return 'Scenario “$name” loaded';
+  }
+
+  @override
+  String get debugGone => 'It no longer exists: reload the page';
+
+  @override
+  String debugScenarioNow(String name) {
+    return 'Scenario: $name';
+  }
+
+  @override
+  String debugRealDay(String date) {
+    return 'today, $date';
+  }
+
+  @override
+  String debugSimulatedDay(String date) {
+    return 'simulated day: $date';
+  }
+
+  @override
+  String get debugMoveDay => 'Change the day';
+
+  @override
+  String get debugBackToToday => 'Back to today';
+
+  @override
+  String get debugCopies => 'Copies';
+
+  @override
+  String get debugCopiesHint =>
+      'Save the current state to repeat a test without setting it up again.';
+
+  @override
+  String get debugCopyName => 'Copy name';
+
+  @override
+  String get debugCopyNameInvalid =>
+      'Lowercase letters, digits and _ (up to 40)';
+
+  @override
+  String get debugSave => 'Save';
+
+  @override
+  String debugCopySaved(String name) {
+    return 'Copy “$name” saved';
+  }
+
+  @override
+  String get debugRestore => 'Restore';
+
+  @override
+  String debugRestoreTitle(String name) {
+    return 'Restore “$name”?';
+  }
+
+  @override
+  String debugRestored(String name) {
+    return 'Copy “$name” restored';
+  }
+
+  @override
+  String get debugDeleteCopy => 'Delete copy';
+
+  @override
+  String debugDeleteTitle(String name) {
+    return 'Delete the copy “$name”?';
+  }
+
+  @override
+  String get debugDeleteBody =>
+      'The current data does not change; only the copy goes.';
+
+  @override
+  String debugCopyDeleted(String name) {
+    return 'Copy “$name” deleted';
+  }
 
   @override
   String get navOrganizers => 'Organizers';

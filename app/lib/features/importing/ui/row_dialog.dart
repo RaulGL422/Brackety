@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
 import '../../auth/ui/widgets/birth_date_field.dart';
+import '../../club/data/sex.dart';
+import '../../club/ui/measure_fields.dart';
 import '../data/import_models.dart';
 
 /// Edits a row of the list, or adds one when [row] is null. Returns the row, or null if cancelled.
@@ -27,13 +29,18 @@ class _RowDialogState extends State<_RowDialog> {
   late final _height = TextEditingController(
     text: widget.row?.heightCm?.toString(),
   );
+  late final _weight = TextEditingController(
+    text: widget.row?.weightKg?.toString(),
+  );
   late DateTime? _birthDate = widget.row?.birthDate;
+  late Sex? _sex = widget.row?.sex;
 
   @override
   void dispose() {
     _firstName.dispose();
     _lastName.dispose();
     _height.dispose();
+    _weight.dispose();
     super.dispose();
   }
 
@@ -45,7 +52,9 @@ class _RowDialogState extends State<_RowDialog> {
         firstName: _firstName.text.trim(),
         lastName: _lastName.text.trim(),
         birthDate: _birthDate,
+        sex: _sex,
         heightCm: int.tryParse(_height.text.trim()),
+        weightKg: parseWeight(_weight.text),
       ),
     );
   }
@@ -86,18 +95,13 @@ class _RowDialogState extends State<_RowDialog> {
                   validator: (d) => d == null ? l10n.fieldRequired : null,
                   onChanged: (d) => _birthDate = d,
                 ),
-                TextFormField(
-                  controller: _height,
-                  decoration: InputDecoration(labelText: l10n.heightOptional),
-                  keyboardType: TextInputType.number,
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) return null;
-                    final cm = int.tryParse(v.trim());
-                    return cm == null || cm < 50 || cm > 250
-                        ? l10n.heightInvalid
-                        : null;
-                  },
+                SexField(
+                  initialValue: _sex,
+                  requiredText: l10n.fieldRequired,
+                  onChanged: (sex) => _sex = sex,
                 ),
+                HeightField(controller: _height),
+                WeightField(controller: _weight),
               ],
             ),
           ),

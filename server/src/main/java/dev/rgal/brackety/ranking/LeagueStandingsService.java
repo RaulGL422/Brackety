@@ -7,6 +7,7 @@ import dev.rgal.brackety.event.EventCategoryRepository;
 import dev.rgal.brackety.event.EventRepository;
 import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventService;
+import dev.rgal.brackety.eventpackage.EventPackageService;
 import dev.rgal.brackety.grouping.CompetitorDirectory;
 import dev.rgal.brackety.grouping.Match;
 import dev.rgal.brackety.grouping.MatchRepository;
@@ -21,6 +22,9 @@ import dev.rgal.brackety.ranking.dto.LeagueStandings.PhasePoints;
 import dev.rgal.brackety.ranking.dto.LeagueStandings.Row;
 import dev.rgal.brackety.ranking.dto.StandingRow;
 import dev.rgal.brackety.scoreboard.MatchSnapshots;
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -41,6 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
 class LeagueStandingsService {
 
     static final String NO_CATEGORY = "Sin categoría";
+    private static final DateTimeFormatter PDF_TIME = DateTimeFormatter.ofPattern("HH:mm");
 
     private final StandingsService standings;
     private final EventRepository events;
@@ -53,6 +58,7 @@ class LeagueStandingsService {
     private final CompetitorDirectory directory;
     private final ParticipantRepository participants;
     private final MatchSnapshots snapshots;
+    private final Clock clock;
 
     LeagueStandingsService(
             StandingsService standings,
@@ -65,7 +71,9 @@ class LeagueStandingsService {
             MatchRepository matches,
             CompetitorDirectory directory,
             ParticipantRepository participants,
-            MatchSnapshots snapshots) {
+            MatchSnapshots snapshots,
+            Clock clock) {
+        this.clock = clock;
         this.matches = matches;
         this.directory = directory;
         this.participants = participants;
@@ -251,5 +259,55 @@ class LeagueStandingsService {
                 })
                 .toList();
         return Csv.of(header, rows);
+    }
+
+    /** The league standings to print: each category on its own page. */
+    @Transactional(readOnly = true)
+    byte[] pdf(UUID eventId, UUID accountId) {
+        var result = standings(eventId, accountId);
+        var event = eventService.get(eventId);
+        var league = leagues.findById(event.getLeagueId()).orElseThrow();
+        var heading = league.getName() + " · " + event.getName() + " · " + SheetText.date(event.getEventDate());
+        var now = LocalDateTime.now(clock);
+        var generated = SheetText.date(now.toLocalDate()) + " a las " + PDF_TIME.format(now);
+        return StandingsPdf.of(result, heading, generated);
+    }
+
+    /**
+     * The league standings with one sheet per category, in the categories' order, keyed by file name
+     * ("clasificacion-9-10.csv"). Only the total of each phase: the full breakdown is in {@link #csv}.
+     */
+    @Transactional(readOnly = true)
+    Map<String, String> categoryCsvs(UUID eventId, UUID accountId) {
+        var result = standings(eventId, accountId);
+        var header = new ArrayList<>(List.of("Posición", "Medalla", "Nombre", "Apellidos", "Club"));
+        result.phases().forEach(phase -> header.add("Fase " + phase.number()));
+        header.addAll(List.of("Total liga", "Advertencias", "Descalificaciones"));
+        var sheets = new LinkedHashMap<String, String>();
+        result.rows().stream()
+                .collect(Collectors.groupingBy(Row::categoryName, LinkedHashMap::new, Collectors.toList()))
+                .forEach((category, rows) -> sheets.put(
+                        "clasificacion-" + EventPackageService.slug(category) + ".csv",
+                        Csv.of(
+                                header,
+                                rows.stream()
+                                        .map(LeagueStandingsService::categoryCells)
+                                        .toList())));
+        return sheets;
+    }
+
+    private static List<Object> categoryCells(Row r) {
+        var cells = new ArrayList<Object>();
+        // With 0 points nobody has a place yet (the app shows a dash too).
+        cells.add(r.total() > 0 ? r.position() : null);
+        cells.add(SheetText.medal(r.medal()));
+        cells.add(r.firstName());
+        cells.add(r.lastName());
+        cells.add(r.organizationName());
+        r.phases().forEach(p -> cells.add(p == null ? "No inscrito" : p.total()));
+        cells.add(r.total());
+        cells.add(r.warnings());
+        cells.add(r.disqualifications());
+        return cells;
     }
 }

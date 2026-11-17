@@ -23,7 +23,9 @@ class AdminAudit {
         USER_UNSUSPENDED,
         USER_DELETED,
         /** A change from the control panel (MatchControlService); the reason says which. */
-        CONTROL_CHANGE
+        CONTROL_CHANGE,
+        /** Debug environment only: a scenario loaded or the clock moved (docs/modulos/entornos.md). */
+        DEBUG_CHANGE
     }
 
     @Id

@@ -24,6 +24,7 @@ import dev.rgal.brackety.scoreboard.dto.MatchView.Review;
 import dev.rgal.brackety.scoreboard.dto.MatchView.ReviewOp;
 import dev.rgal.brackety.scoreboard.dto.MatchView.TimelineEntry;
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -302,19 +303,24 @@ class ScoreboardService {
                 mat == null ? null : mat.getNumber(),
                 group.getNumber(),
                 match.getStatus(),
-                event.matchSecondsFor(match.isTeamMatch()),
-                event.pointsLimitFor(match.isTeamMatch()),
+                event.modality().matchSeconds(match.isTeamMatch()),
+                event.modality().pointsLimit(match.isTeamMatch()),
                 state.remainingAt(now).toMillis(),
                 state.isRunning(now),
                 state.endReason(now).map(Enum::name).orElse(null),
                 corner(event, state, Side.RED, competitors.get(match.getRedId()), ghosts),
                 corner(event, state, Side.BLUE, competitors.get(match.getBlueId()), ghosts),
-                timeline(history, state, actors),
+                timeline(
+                        history,
+                        state,
+                        actors,
+                        Duration.ofSeconds(event.modality().matchSeconds(match.isTeamMatch()))),
                 now,
                 match.isInReview() ? review(match, pending, actors) : null,
                 match.getStatus() == Match.Status.PENDING
                         ? writer.restedAt(match, event).filter(now::isBefore).orElse(null)
-                        : null);
+                        : null,
+                event.warningReasons());
     }
 
     private Map<UUID, String> actors(Stream<UUID> ids) {
@@ -322,7 +328,8 @@ class ScoreboardService {
                 .collect(Collectors.toMap(Account::getId, Account::getEmail));
     }
 
-    private static List<TimelineEntry> timeline(List<MatchEvent> history, TamboMatch state, Map<UUID, String> actors) {
+    private static List<TimelineEntry> timeline(
+            List<MatchEvent> history, TamboMatch state, Map<UUID, String> actors, Duration length) {
         var undone = history.stream()
                 .map(MatchEvent::getTargetEventId)
                 .filter(Objects::nonNull)
@@ -340,7 +347,8 @@ class ScoreboardService {
                         undone.contains(e.getId()),
                         state.gaveAutoPoint(e.getId()),
                         e.getOpId(),
-                        e.getDeltaMs()))
+                        e.getDeltaMs(),
+                        e.isOvertimePoint(length)))
                 .toList();
     }
 

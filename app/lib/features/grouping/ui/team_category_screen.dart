@@ -22,6 +22,9 @@ import '../../control/control_ui.dart';
 import '../../events/data/my_event.dart';
 import '../../events/state/events_providers.dart';
 import '../../mat/ui/mat_label.dart';
+import 'measures.dart';
+import '../../events/data/measure_rules.dart';
+import 'age_sections.dart';
 
 /// A team category (docs/modulos/prototipo-f1-equipos.md): make teams from its participants, then
 /// group 4 teams (or 3 and a ghost team) and send them to a mat. "Individual group" opens the usual
@@ -104,6 +107,11 @@ class _TeamMaker extends ConsumerStatefulWidget {
 }
 
 class _TeamMakerState extends ConsumerState<_TeamMaker> {
+  static const _sortBar = Object();
+  static const _splitByAge = Object();
+
+  /// Only matters when the category mixes ages (F2-2).
+  var _byAge = true;
   var _picks = <String>[];
   var _sort = ParticipantSort.name;
   var _busy = false;
@@ -161,7 +169,11 @@ class _TeamMakerState extends ConsumerState<_TeamMaker> {
       final conflict = e.response?.statusCode == 409;
       if (conflict) _refresh(ref, key);
       toasts.show(
-        conflict ? l10n.teamConflict : l10n.teamError,
+        !conflict
+            ? l10n.teamError
+            : ApiError.from(e).code == 'MEASURES_MISSING'
+            ? l10n.measuresMissingError
+            : l10n.teamConflict,
         kind: ToastKind.error,
       );
     } finally {
@@ -196,6 +208,7 @@ class _TeamMakerState extends ConsumerState<_TeamMaker> {
     final participants = ref.watch(
       categoryParticipantsProvider(widget.categoryKey),
     );
+    final rules = measureRulesOf(ref, widget.categoryKey.eventId);
     final ghosts = _ghosts;
     final complete = _picks.length >= DraftGroup.minTeam;
     final list = AsyncView(
@@ -203,23 +216,53 @@ class _TeamMakerState extends ConsumerState<_TeamMaker> {
       onRetry: () => _refresh(ref, widget.categoryKey),
       data: (all) {
         final sorted = sortParticipants(all, _sort);
+        final mixed = mixesAges(all);
+        final rows = <Object>[
+          _sortBar,
+          if (mixed) _splitByAge,
+          ...(mixed && _byAge ? withAgeHeadings(sorted) : sorted),
+        ];
         return ListView.builder(
-          itemCount: sorted.length + 1,
-          itemBuilder: (context, i) => i == 0
-              ? _SortBar(
-                  sort: _sort,
-                  onChanged: (s) => setState(() => _sort = s),
-                )
-              : _PersonTile(
-                  participant: sorted[i - 1],
-                  picked: _picks.contains(sorted[i - 1].id),
-                  ghost: ghosts.contains(sorted[i - 1].id),
-                  enabled:
-                      _picks.contains(sorted[i - 1].id) ||
-                      (_picks.length < DraftGroup.maxTeam &&
-                          (_wildcards || !sorted[i - 1].isTaken)),
-                  onTap: () => _toggle(sorted[i - 1]),
-                ),
+          itemCount: rows.length,
+          itemBuilder: (context, i) {
+            final row = rows[i];
+            if (identical(row, _sortBar)) {
+              return _SortBar(
+                sort: _sort,
+                onChanged: (s) => setState(() => _sort = s),
+              );
+            }
+            if (row is AgeHeading) return AgeHeadingTile(heading: row);
+            if (row is! CategoryParticipant) {
+              return SplitByAgeChip(
+                selected: _byAge,
+                onSelected: (on) => setState(() => _byAge = on),
+              );
+            }
+            final p = row;
+            return _PersonTile(
+              participant: p,
+              rules: rules,
+              picked: _picks.contains(p.id),
+              ghost: ghosts.contains(p.id),
+              enabled:
+                  blockedByMeasures(rules, p) ||
+                  _picks.contains(p.id) ||
+                  (_picks.length < DraftGroup.maxTeam &&
+                      (_wildcards || !p.isTaken)),
+              onTap: blockedByMeasures(rules, p)
+                  ? () async {
+                      if (await showMeasuresDialog(
+                        context,
+                        widget.categoryKey.eventId,
+                        p,
+                      )) {
+                        _refresh(ref, widget.categoryKey);
+                      }
+                    }
+                  : () => _toggle(p),
+            );
+          },
         );
       },
     );
@@ -386,9 +429,10 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
     );
   }
 
-  /// A team already in another group joins this one as a wildcard team: tapped in wildcard mode.
+  /// In wildcard mode a team joins as a wildcard team if it is already in another group, or if
+  /// the helper chose "Add as wildcard" (whatever the order of the picks).
   bool _canJoinAsWildcard(Team team, List<Team> teams) =>
-      team.isTaken &&
+      (team.isTaken || _group.pickGhost) &&
       _group.canAddGhostTeam &&
       team.members.length >= DraftGroup.minTeam &&
       team.members.length <= DraftGroup.maxTeam &&
@@ -787,6 +831,7 @@ class _GhostTeamPageState extends ConsumerState<_GhostTeamPage> {
 class _PersonTile extends StatelessWidget {
   const _PersonTile({
     required this.participant,
+    required this.rules,
     required this.picked,
     required this.enabled,
     required this.onTap,
@@ -794,6 +839,9 @@ class _PersonTile extends StatelessWidget {
   });
 
   final CategoryParticipant participant;
+
+  /// A required measure missing: tapping asks for it instead of picking.
+  final MeasureRules rules;
   final bool picked;
   final bool enabled;
   final VoidCallback onTap;
@@ -805,20 +853,21 @@ class _PersonTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final p = participant;
-    final height = p.heightCm == null
-        ? l10n.heightUnknown
-        : l10n.heightCm(p.heightCm!);
+    final locale = Localizations.localeOf(context).toLanguageTag();
     return ListTile(
       enabled: enabled,
       onTap: onTap,
-      leading: Checkbox(
-        value: picked,
-        onChanged: enabled ? (_) => onTap() : null,
-      ),
+      leading: blockedByMeasures(rules, p)
+          ? Icon(
+              Icons.monitor_weight_outlined,
+              color: Theme.of(context).colorScheme.error,
+              semanticLabel: l10n.measuresWrite,
+            )
+          : Checkbox(value: picked, onChanged: enabled ? (_) => onTap() : null),
       title: Text(p.fullName),
       subtitle: Text(
         [
-          l10n.participantDetails(p.age, height),
+          participantSummary(l10n, locale, rules, p),
           if (p.teamNumber != null) l10n.teamName(p.teamNumber!),
           if (p.isGrouped)
             l10n.participantGrouped(

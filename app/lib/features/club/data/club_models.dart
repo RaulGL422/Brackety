@@ -1,4 +1,6 @@
 import '../../mat/data/mat_board.dart';
+import 'sex.dart';
+import '../../events/data/measure_rules.dart';
 
 /// A helper or referee account of the event; [personName]: who is behind it, set by the club.
 class StaffMember {
@@ -85,12 +87,20 @@ class EventSettings {
     this.teamMatchLength = const Duration(minutes: 3),
     this.teamPointsLimit = 0,
     this.minRest = const Duration(seconds: 30),
+    this.weightChoice,
+    this.heightChoice,
+    this.sportWeight = MeasureRequirement.optional,
+    this.sportHeight = MeasureRequirement.optional,
+    this.ownWarningReasons,
+    this.sportWarningReasons = const [],
   });
 
   factory EventSettings.fromJson(Map<String, dynamic> json) {
     final mats = [
       for (final m in json['mats'] as List) m as Map<String, dynamic>,
     ]..sort((a, b) => (a['number'] as int).compareTo(b['number'] as int));
+    final measures = json['measures'] as Map<String, dynamic>?;
+    final reasons = json['warningReasons'] as Map<String, dynamic>?;
     return EventSettings(
       name: json['name'] as String,
       date: DateTime.parse(json['date'] as String),
@@ -119,6 +129,21 @@ class EventSettings {
       ),
       teamPointsLimit: json['teamPointsLimit'] as int? ?? 0,
       minRest: Duration(seconds: json['minRestSeconds'] as int? ?? 30),
+      weightChoice: MeasureRequirement.fromJson(measures?['weight']),
+      heightChoice: MeasureRequirement.fromJson(measures?['height']),
+      sportWeight:
+          MeasureRequirement.fromJson(measures?['sportWeight']) ??
+          MeasureRequirement.optional,
+      sportHeight:
+          MeasureRequirement.fromJson(measures?['sportHeight']) ??
+          MeasureRequirement.optional,
+      ownWarningReasons: switch (reasons?['own']) {
+        final List<dynamic> own => [for (final r in own) r as String],
+        _ => null,
+      },
+      sportWarningReasons: [
+        for (final r in reasons?['sport'] as List? ?? const []) r as String,
+      ],
     );
   }
 
@@ -151,7 +176,20 @@ class EventSettings {
 
   /// The clubs taking part, in the order the club entered them.
   final List<Organization> organizations;
+
+  /// The event's own choice for weight and height; null follows the sport ([sportWeight], [sportHeight]).
+  final MeasureRequirement? weightChoice;
+  final MeasureRequirement? heightChoice;
+  final MeasureRequirement sportWeight;
+  final MeasureRequirement sportHeight;
+
+  /// The event's own warning reasons; null follows the sport ([sportWarningReasons]).
+  final List<String>? ownWarningReasons;
+  final List<String> sportWarningReasons;
 }
+
+/// As the server allows (WarningReasonsRequest).
+const maxWarningReasons = 20;
 
 /// A club taking part in the event; [id] is null until saved.
 class Organization {
@@ -185,7 +223,9 @@ class Participant {
     required this.birthDate,
     required this.guardianConsent,
     required this.age,
+    this.sex,
     this.heightCm,
+    this.weightKg,
     this.categoryName,
     this.chosenCategoryId,
     this.organizationId,
@@ -199,7 +239,9 @@ class Participant {
     birthDate: DateTime.parse(json['birthDate'] as String),
     guardianConsent: json['guardianConsent'] as bool,
     age: json['age'] as int,
+    sex: Sex.fromJson(json['sex']),
     heightCm: json['heightCm'] as int?,
+    weightKg: (json['weightKg'] as num?)?.toDouble(),
     categoryName: json['categoryName'] as String?,
     chosenCategoryId: json['chosenCategoryId'] as String?,
     organizationId: json['organizationId'] as String?,
@@ -214,7 +256,13 @@ class Participant {
 
   /// Age on the day of the event.
   final int age;
+
+  /// Null only for people entered before it was asked.
+  final Sex? sex;
+
+  /// Measured for this event.
   final int? heightCm;
+  final double? weightKg;
 
   /// Null when no category of the event covers the age.
   final String? categoryName;
@@ -289,6 +337,8 @@ class MatOverview {
     required this.estimatedEnd,
     this.referee,
     this.matchesInReview = 0,
+    this.disabledAt,
+    this.disabledReferee,
   });
 
   factory MatOverview.fromJson(Map<String, dynamic> json) => MatOverview(
@@ -301,6 +351,11 @@ class MatOverview {
     remaining: Duration(seconds: json['remainingSeconds'] as int),
     estimatedEnd: DateTime.parse(json['estimatedEnd'] as String).toLocal(),
     matchesInReview: json['matchesInReview'] as int? ?? 0,
+    disabledAt: switch (json['disabledAt']) {
+      final String at => DateTime.parse(at).toLocal(),
+      _ => null,
+    },
+    disabledReferee: json['disabledReferee'] as String?,
   );
 
   final String id;
@@ -314,6 +369,14 @@ class MatOverview {
 
   /// Matches waiting for the club to apply or discard what a phone sent.
   final int matchesInReview;
+
+  /// Out of use since then (F1-1); null while in use.
+  final DateTime? disabledAt;
+
+  /// The referee it had, who gets it back on enabling it.
+  final String? disabledReferee;
+
+  bool get isDisabled => disabledAt != null;
 }
 
 /// What importing the hall's results brings. [alreadyImported]: the same results came before, nothing changes.
@@ -361,7 +424,7 @@ class ParticipantRecord {
   final List<RecordMatch> matches;
 }
 
-enum IncidentKind { warning, oneHandWarning, disqualification }
+enum IncidentKind { warning, oneHandWarning, disqualification, overtimePoint }
 
 /// A warning, one-hand warning or disqualification of a match: why, when on its clock and who.
 /// [gaveRivalPoint]: a second warning that gave the rival a point.
@@ -378,6 +441,7 @@ class Incident {
     kind: switch (json['kind']) {
       'ONE_HAND_WARNING' => IncidentKind.oneHandWarning,
       'DISQUALIFICATION' => IncidentKind.disqualification,
+      'OVERTIME_POINT' => IncidentKind.overtimePoint,
       _ => IncidentKind.warning,
     },
     reason: json['reason'] as String? ?? '',

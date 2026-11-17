@@ -7,6 +7,7 @@ import '../../../core/medal.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../data/club_models.dart';
 import '../state/club_providers.dart';
+import '../../league/state/league_providers.dart';
 import 'participant_record_sheet.dart';
 
 enum StandingsOrder { points, name }
@@ -31,18 +32,31 @@ class _StandingsTabState extends ConsumerState<StandingsTab> {
     final categories =
         ref.watch(eventSettingsProvider(widget.eventId)).value?.categories ??
         const <EventCategory>[];
+    final global =
+        ref.watch(leagueProvider(widget.eventId)).value?.globalStandings ??
+        false;
     return AsyncView(
       value: ref.watch(provider),
       onRetry: () => ref.invalidate(provider),
-      data: (standings) => _content(standings, categories),
+      data: (standings) => _content(standings, categories, global),
     );
   }
 
-  Widget _content(List<StandingRow> standings, List<EventCategory> categories) {
+  /// [global]: the league also shows every category together (F2-4); without it, one category at a time.
+  Widget _content(
+    List<StandingRow> standings,
+    List<EventCategory> categories,
+    bool global,
+  ) {
     final l10n = AppLocalizations.of(context);
+    final categoryId = categories.any((c) => c.id == _categoryId)
+        ? _categoryId
+        : global || categories.isEmpty
+        ? null
+        : categories.first.id;
     final rows = [
       for (final r in standings)
-        if (_categoryId == null || r.categoryId == _categoryId) r,
+        if (categoryId == null || r.categoryId == categoryId) r,
     ];
     if (_order == StandingsOrder.name) {
       rows.sort(
@@ -61,9 +75,9 @@ class _StandingsTabState extends ConsumerState<StandingsTab> {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               DropdownButton<String?>(
-                value: _categoryId,
+                value: categoryId,
                 items: [
-                  DropdownMenuItem(child: Text(l10n.allCategories)),
+                  if (global) DropdownMenuItem(child: Text(l10n.allCategories)),
                   for (final c in categories)
                     DropdownMenuItem(value: c.id, child: Text(c.name)),
                 ],

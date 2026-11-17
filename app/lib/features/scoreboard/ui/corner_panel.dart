@@ -13,13 +13,15 @@ String cornerName(AppLocalizations l10n, Side side) =>
 
 /// One fighter: big score, +1, −1 and the warnings menu. Red and blue are fixed for this
 /// event. Every line but the score keeps to one line, so it fits with the text at 200 %.
+/// [canPoint]: +1, also when the clock already shows 0:00 (F1-3). [canSanction]: the warnings menu.
 /// [canRemove]: −1 is a correction, also once the time or the points ended the match.
 class CornerPanel extends StatelessWidget {
   const CornerPanel({
     super.key,
     required this.side,
     required this.corner,
-    required this.enabled,
+    required this.canPoint,
+    required this.canSanction,
     required this.canRemove,
     required this.onPoint,
     required this.onRemovePoint,
@@ -28,7 +30,8 @@ class CornerPanel extends StatelessWidget {
 
   final Side side;
   final Corner corner;
-  final bool enabled;
+  final bool canPoint;
+  final bool canSanction;
   final bool canRemove;
   final VoidCallback onPoint;
   final VoidCallback onRemovePoint;
@@ -113,7 +116,8 @@ class CornerPanel extends StatelessWidget {
               side: side,
               corner: corner,
               color: color,
-              enabled: enabled,
+              canPoint: canPoint,
+              canSanction: canSanction,
               canRemove: canRemove,
               onPoint: onPoint,
               onRemovePoint: onRemovePoint,
@@ -203,7 +207,8 @@ class _Buttons extends StatelessWidget {
     required this.side,
     required this.corner,
     required this.color,
-    required this.enabled,
+    required this.canPoint,
+    required this.canSanction,
     required this.canRemove,
     required this.onPoint,
     required this.onRemovePoint,
@@ -213,7 +218,8 @@ class _Buttons extends StatelessWidget {
   final Side side;
   final Corner corner;
   final CompetitorColor color;
-  final bool enabled;
+  final bool canPoint;
+  final bool canSanction;
   final bool canRemove;
   final VoidCallback onPoint;
   final VoidCallback onRemovePoint;
@@ -234,7 +240,7 @@ class _Buttons extends StatelessWidget {
               minimumSize: const Size(0, AppSizes.scoreTouchTarget),
               textStyle: Theme.of(context).textTheme.headlineMedium,
             ),
-            onPressed: enabled ? onPoint : null,
+            onPressed: canPoint ? onPoint : null,
             child: Text(
               l10n.addPoint,
               maxLines: 1,
@@ -270,12 +276,12 @@ class _Buttons extends StatelessWidget {
         ),
         const SizedBox(width: AppSpacing.s),
         PopupMenuButton<MatchAction>(
-          enabled: enabled,
+          enabled: canSanction,
           tooltip: l10n.sanctionsFor(cornerLabel),
           onSelected: onSanction,
           // Faded like the +1 button while nothing can be scored.
           child: Opacity(
-            opacity: enabled ? 1 : 0.38,
+            opacity: canSanction ? 1 : 0.38,
             child: Container(
               width: AppSizes.scoreTouchTarget,
               height: AppSizes.scoreTouchTarget,

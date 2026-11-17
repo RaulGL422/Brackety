@@ -83,6 +83,13 @@ class MatchControlController {
         return control.disableMat(eventId, matId, DisableMatRequest.chosen(request), by);
     }
 
+    @PostMapping("/mats/{matId}/enable")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void enableMat(@PathVariable UUID eventId, @PathVariable UUID matId, @AuthenticationPrincipal Jwt jwt) {
+        var by = club(eventId, jwt);
+        control.enableMat(eventId, matId, by);
+    }
+
     @PostMapping("/matches/{matchId}/waive-rest")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void waiveRest(@PathVariable UUID eventId, @PathVariable UUID matchId, @AuthenticationPrincipal Jwt jwt) {

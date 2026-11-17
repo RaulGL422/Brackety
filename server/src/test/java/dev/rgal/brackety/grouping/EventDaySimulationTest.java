@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -106,7 +107,8 @@ class EventDaySimulationTest extends EventApiTest {
         private final List<UUID> individualWildcards;
         private final List<UUID> kids;
         private final List<UUID> teens;
-        private final Map<String, List<UUID>> teamMembers = new HashMap<>();
+        // Linked: team ids are random UUIDs, and the seed must give the same day every run.
+        private final Map<String, List<UUID>> teamMembers = new LinkedHashMap<>();
         private final Set<UUID> kidsGrouped = new HashSet<>();
         private final Set<String> teamsGrouped = new HashSet<>();
         private final Map<String, Running> running = new HashMap<>();
@@ -123,9 +125,12 @@ class EventDaySimulationTest extends EventApiTest {
             this.refereed = refereed;
             this.mixed = mixed;
             jdbc.sql("delete from mat where number > 3").update();
-            jdbc.sql("update event set match_seconds = 60, team_match_seconds = 180, team_points_limit = 0,"
-                            + " min_rest_seconds = ?, changeover_seconds = 0")
+            jdbc.sql("update modality set min_rest_seconds = ?, changeover_seconds = 0")
                     .param(MIN_REST_SECONDS)
+                    .update();
+            jdbc.sql("update modality_rules set match_seconds = 60 where format = 'INDIVIDUAL'")
+                    .update();
+            jdbc.sql("update modality_rules set match_seconds = 180, points_limit = 0 where format = 'TEAM'")
                     .update();
             kids = people(28, 7);
             teens = people(30, 15);
@@ -367,13 +372,24 @@ class EventDaySimulationTest extends EventApiTest {
                 var free = new ArrayList<>(individualPeople);
                 free.removeAll(kidsGrouped);
                 Collections.shuffle(free, random);
-                var real = List.copyOf(free.subList(0, Math.min(free.size(), 2 + random.nextInt(3))));
+                var size = 2 + random.nextInt(3);
+                // Mixed: room for at least one wildcard, and the first is someone with a team.
+                var real = List.copyOf(free.subList(0, Math.min(free.size(), mixed ? Math.min(size, 3) : size)));
                 if (real.isEmpty()) {
                     return;
                 }
                 var options = new ArrayList<>(individualWildcards);
                 options.removeAll(real);
                 Collections.shuffle(options, random);
+                if (mixed) {
+                    var withTeam = options.stream()
+                            .filter(o -> teamMembers.values().stream().anyMatch(m -> m.contains(o)))
+                            .findFirst();
+                    withTeam.ifPresent(w -> {
+                        options.remove(w);
+                        options.addFirst(w);
+                    });
+                }
                 var ghosts = options.subList(0, 4 - real.size());
                 body = """
                         {"participantIds":[%s],"ghostIds":[%s]}""".formatted(quoted(ids(real)), quoted(ids(ghosts)));
@@ -395,7 +411,7 @@ class EventDaySimulationTest extends EventApiTest {
         private void undoAGroup() throws Exception {
             var candidates = jdbc.sql("select g.id from fight_group g where not exists (select 1 from fight_match f"
                             + " where f.group_id = g.id and (f.status <> 'PENDING' or exists (select 1 from match_event e"
-                            + " where e.match_id = f.id)))")
+                            + " where e.match_id = f.id))) order by g.number")
                     .query(UUID.class)
                     .list();
             if (candidates.isEmpty()) {

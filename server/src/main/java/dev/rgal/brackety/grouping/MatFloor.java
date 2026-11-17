@@ -128,7 +128,7 @@ class MatFloor {
                 if (other.getStatus() == Match.Status.IN_PROGRESS) {
                     fightingOn = matNumber(other.getMatId());
                     var end = other.getStartedAt()
-                            .plusSeconds(event.matchSecondsFor(other.isTeamMatch()))
+                            .plusSeconds(event.modality().matchSeconds(other.isTeamMatch()))
                             .plus(context.minRest());
                     freeAt = later(freeAt, end);
                 } else if (other.getStatus() == Match.Status.PENDING && other.getMatId() != null) {
@@ -185,7 +185,7 @@ class MatFloor {
                 busy,
                 Set.of(),
                 competitors.teamMembers(),
-                Duration.ofSeconds(event.getMinRestSeconds()),
+                Duration.ofSeconds(event.modality().getMinRestSeconds()),
                 eventMatches.stream()
                         .filter(Match::isRestWaived)
                         .map(Match::getId)
@@ -234,7 +234,8 @@ class MatFloor {
     }
 
     static Duration slot(Event event, boolean teams) {
-        return Duration.ofSeconds(event.matchSecondsFor(teams) + event.getChangeoverSeconds());
+        return Duration.ofSeconds(
+                event.modality().matchSeconds(teams) + event.modality().getChangeoverSeconds());
     }
 
     static Candidate candidate(Match m, FightGroup group) {

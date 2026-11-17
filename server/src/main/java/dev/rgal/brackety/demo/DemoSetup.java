@@ -12,6 +12,7 @@ import dev.rgal.brackety.event.EventStaff;
 import dev.rgal.brackety.event.EventStaffRepository;
 import dev.rgal.brackety.event.Mat;
 import dev.rgal.brackety.event.MatRepository;
+import dev.rgal.brackety.event.OrganizationRepository;
 import dev.rgal.brackety.league.League;
 import dev.rgal.brackety.league.LeagueRepository;
 import java.time.Clock;
@@ -66,6 +67,7 @@ public class DemoSetup {
     private final MatRepository mats;
     private final EventCategoryRepository categories;
     private final EventOrganizationRepository organizations;
+    private final OrganizationRepository clubs;
     private final LeagueRepository leagues;
     private final TransactionOperations transactions;
     private final Clock clock;
@@ -81,6 +83,7 @@ public class DemoSetup {
             MatRepository mats,
             EventCategoryRepository categories,
             EventOrganizationRepository organizations,
+            OrganizationRepository clubs,
             LeagueRepository leagues,
             TransactionOperations transactions,
             Clock clock,
@@ -94,6 +97,7 @@ public class DemoSetup {
         this.mats = mats;
         this.categories = categories;
         this.organizations = organizations;
+        this.clubs = clubs;
         this.leagues = leagues;
         this.transactions = transactions;
         this.clock = clock;
@@ -137,7 +141,8 @@ public class DemoSetup {
                 categories.save(new EventCategory(event.getId(), c.name(), c.minAge(), c.maxAge(), c.teamSize()));
             }
             for (var name : ORGANIZATIONS) {
-                organizations.save(new EventOrganization(event.getId(), name, null));
+                organizations.save(
+                        new EventOrganization(event.getId(), clubs.named(event.getOwnerAccountId(), name, null, now)));
             }
             return event.getId();
         });

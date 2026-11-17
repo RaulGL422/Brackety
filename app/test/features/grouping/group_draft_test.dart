@@ -71,6 +71,90 @@ void main() {
     expect(draft.isComplete, isFalse);
   });
 
+  group(
+    '"Add as wildcard" (F1-2: a wildcard picked first was saved as real)',
+    () {
+      test('a free participant picked first joins as the wildcard', () {
+        var draft = const DraftGroup().setGhostMode(true).withPickGhost(true);
+        expect(draft.addsAsGhost, isTrue);
+
+        draft = pick(draft, ['x']);
+        expect(draft.ghosts, ['x']);
+        expect(draft.members, isEmpty);
+
+        draft = pick(draft.withPickGhost(false), ['a', 'b', 'c']);
+        expect(draft.members, ['a', 'b', 'c']);
+        expect(draft.ghosts, ['x']);
+        expect(draft.isComplete, isTrue);
+      });
+
+      test('the wildcard can go in any place, not only first or last', () {
+        var draft = pick(const DraftGroup().setGhostMode(true), ['a']);
+        draft = pick(draft.withPickGhost(true), ['x']);
+        draft = pick(draft.withPickGhost(false), ['b', 'c']);
+
+        expect(draft.members, ['a', 'b', 'c']);
+        expect(draft.ghosts, ['x']);
+        expect(draft.isComplete, isTrue);
+      });
+
+      test(
+        'with 3 wildcards the 4th pick is real and the choice is locked',
+        () {
+          var draft = const DraftGroup().setGhostMode(true).withPickGhost(true);
+          draft = pick(draft, ['x', 'y', 'z']);
+
+          expect(draft.ghosts, ['x', 'y', 'z']);
+          expect(draft.roleForced, isTrue);
+          expect(draft.addsAsGhost, isFalse);
+          expect(draft.stateOf('a', grouped: false), PickState.free);
+
+          draft = pick(draft, ['a']);
+          expect(draft.members, ['a']);
+          expect(draft.isComplete, isTrue);
+        },
+      );
+
+      test('with 3 real the choice is locked on wildcard', () {
+        final draft = pick(const DraftGroup().setGhostMode(true), [
+          'a',
+          'b',
+          'c',
+        ]);
+        expect(draft.roleForced, isTrue);
+        expect(draft.addsAsGhost, isTrue);
+      });
+
+      test('turning wildcard mode off and on again starts with "Normal"', () {
+        final draft = const DraftGroup()
+            .setGhostMode(true)
+            .withPickGhost(true)
+            .setGhostMode(false)
+            .setGhostMode(true);
+        expect(draft.pickGhost, isFalse);
+        expect(draft.addsAsGhost, isFalse);
+      });
+
+      test(
+        'in a group of teams it only applies while a wildcard team fits',
+        () {
+          var draft = const DraftGroup(ofTeams: true)
+              .setGhostMode(true)
+              .withPickGhost(true);
+          expect(draft.addsAsGhost, isTrue);
+
+          draft = draft
+              .addGhostTeam(['p1', 'p2'])
+              .addGhostTeam(['p3', 'p4'])
+              .addGhostTeam(['p5', 'p6']);
+          expect(draft.canAddGhostTeam, isFalse);
+          expect(draft.addsAsGhost, isFalse);
+          expect(draft.toggle('t1', grouped: false).members, ['t1']);
+        },
+      );
+    },
+  );
+
   test('removing a member in ghost mode keeps the ghost', () {
     var draft = pick(const DraftGroup().setGhostMode(true), [
       'a',

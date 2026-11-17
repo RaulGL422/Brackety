@@ -133,6 +133,7 @@ class TimelineEntry {
     this.actor,
     this.opId,
     this.delta,
+    this.overtime = false,
   });
 
   factory TimelineEntry.fromJson(Map<String, dynamic> json) => TimelineEntry(
@@ -148,6 +149,7 @@ class TimelineEntry {
     gaveRivalPoint: json['gaveRivalPoint'] as bool,
     opId: json['opId'] as String?,
     delta: _duration(json['deltaMs']),
+    overtime: json['overtime'] as bool? ?? false,
   );
 
   /// The server's event id; for an action still in the device's queue, its `opId`.
@@ -170,6 +172,9 @@ class TimelineEntry {
   /// For a clock adjustment: the time added (negative: taken away).
   final Duration? delta;
 
+  /// A point given once the clock showed 0:00 (F1-3).
+  final bool overtime;
+
   TimelineEntry withFlags({
     required bool undone,
     required bool gaveRivalPoint,
@@ -186,6 +191,7 @@ class TimelineEntry {
     gaveRivalPoint: gaveRivalPoint,
     opId: opId,
     delta: delta,
+    overtime: overtime,
   );
 
   Map<String, dynamic> toJson() => {
@@ -201,6 +207,7 @@ class TimelineEntry {
     'gaveRivalPoint': gaveRivalPoint,
     'opId': opId,
     'deltaMs': delta?.inMilliseconds,
+    'overtime': overtime,
   };
 }
 
@@ -333,6 +340,7 @@ class MatchView {
     this.serverTime,
     this.review,
     this.readyAt,
+    this.warningReasons = const [],
   });
 
   factory MatchView.fromJson(Map<String, dynamic> json) => MatchView(
@@ -369,6 +377,9 @@ class MatchView {
       final String at => DateTime.parse(at),
       _ => null,
     },
+    warningReasons: [
+      for (final r in json['warningReasons'] as List? ?? const []) r as String,
+    ],
   );
 
   Map<String, dynamic> toJson() => {
@@ -397,6 +408,7 @@ class MatchView {
     'serverTime': serverTime?.toUtc().toIso8601String(),
     'review': review?.toJson(),
     'readyAt': readyAt?.toUtc().toIso8601String(),
+    'warningReasons': warningReasons,
   };
 
   final String id;
@@ -428,6 +440,9 @@ class MatchView {
   /// Pending and a fighter has not had the least rest yet: it cannot start before this.
   final DateTime? readyAt;
 
+  /// The event's warning reasons, picked with one tap (F1-4); "Otro" is typed.
+  final List<String> warningReasons;
+
   /// What the device counts in `knownEvents`: the automatic stops are left out.
   int get knownEvents => timeline.where((e) => !e.automatic).length;
 
@@ -450,6 +465,7 @@ class MatchView {
     serverTime: serverTime,
     review: review,
     readyAt: readyAt,
+    warningReasons: warningReasons,
   );
 
   bool get finished => status == MatchStatus.finished;

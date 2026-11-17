@@ -2,16 +2,22 @@ package dev.rgal.brackety.participant;
 
 import dev.rgal.brackety.event.Event;
 import dev.rgal.brackety.event.EventCategory;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/** A person's entry in one event: what belongs to the entry; who they are lives in {@link Person}. */
 @Entity
 public class Participant {
 
@@ -20,11 +26,16 @@ public class Participant {
     private UUID id;
 
     private UUID eventId;
-    private UUID personId;
-    private String firstName;
-    private String lastName;
-    private LocalDate birthDate;
+
+    @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "person_id")
+    private Person person;
+
+    /** Measured for this event; the person keeps the latest. */
     private Integer heightCm;
+
+    private BigDecimal weightKg;
+
     private boolean guardianConsent;
     private UUID categoryId;
     private UUID organizationId;
@@ -32,14 +43,15 @@ public class Participant {
 
     protected Participant() {}
 
+    /** A new person. */
     public Participant(UUID eventId, Instant now) {
-        this(eventId, UUID.randomUUID(), now);
+        this(eventId, new Person(UUID.randomUUID(), now), now);
     }
 
-    /** {@code personId}: the same person in another phase of the league, or a new one. */
-    public Participant(UUID eventId, UUID personId, Instant now) {
+    /** {@code person}: the same person in another phase of the league, or a new one. */
+    public Participant(UUID eventId, Person person, Instant now) {
         this.eventId = eventId;
-        this.personId = personId;
+        this.person = person;
         this.createdAt = now;
     }
 
@@ -51,9 +63,13 @@ public class Participant {
         return eventId;
     }
 
+    public Person getPerson() {
+        return person;
+    }
+
     /** The same person in every phase of a league: their points add up. */
     public UUID getPersonId() {
-        return personId;
+        return person.getId();
     }
 
     public UUID getOrganizationId() {
@@ -65,23 +81,51 @@ public class Participant {
     }
 
     public String getFirstName() {
-        return firstName;
+        return person.getFirstName();
     }
 
     public String getLastName() {
-        return lastName;
+        return person.getLastName();
     }
 
     public LocalDate getBirthDate() {
-        return birthDate;
+        return person.getBirthDate();
     }
 
+    public Sex getSex() {
+        return person.getSex();
+    }
+
+    /** Measured for this event, or null. */
     public Integer getHeightCm() {
         return heightCm;
     }
 
+    /** Measured for this event, or null. */
+    public BigDecimal getWeightKg() {
+        return weightKg;
+    }
+
+    /** Null keeps the sex they have: someone from F1 may still have none. */
+    public void setSex(Sex sex) {
+        if (sex != null) {
+            person.setSex(sex);
+        }
+    }
+
+    /** This event's height and weight; the person keeps them as their latest. */
+    public void measure(Integer heightCm, BigDecimal weightKg) {
+        this.heightCm = heightCm;
+        this.weightKg = weightKg;
+        person.measured(heightCm, weightKg);
+    }
+
     public boolean hasGuardianConsent() {
         return guardianConsent;
+    }
+
+    public void setGuardianConsent(boolean guardianConsent) {
+        this.guardianConsent = guardianConsent;
     }
 
     /** The category chosen for them, or null to follow their age. */
@@ -97,7 +141,7 @@ public class Participant {
         if (categoryId != null) {
             return categories.stream().filter(c -> c.getId().equals(categoryId)).findFirst();
         }
-        var age = event.ageOf(birthDate);
+        var age = event.ageOf(getBirthDate());
         return categories.stream().filter(c -> c.contains(age)).findFirst();
     }
 
@@ -106,6 +150,10 @@ public class Participant {
         update(firstName, lastName, birthDate, heightCm, guardianConsent, null);
     }
 
+    /**
+     * The name and birth date change for the person, so in every phase they are in; {@code heightCm} is this event's
+     * (see {@link #measure}, which also takes the weight).
+     */
     public void update(
             String firstName,
             String lastName,
@@ -113,10 +161,8 @@ public class Participant {
             Integer heightCm,
             boolean guardianConsent,
             UUID categoryId) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.birthDate = birthDate;
-        this.heightCm = heightCm;
+        person.update(firstName, lastName, birthDate);
+        measure(heightCm, weightKg);
         this.guardianConsent = guardianConsent;
         this.categoryId = categoryId;
     }

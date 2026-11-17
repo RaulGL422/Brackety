@@ -229,7 +229,13 @@ class TamboMatch {
             ? MatchRefusal.running
             : null,
       MatchAction.stop => isRunning(now) ? null : MatchRefusal.notRunning,
-      MatchAction.point ||
+      // The last action's point may come when the clock already shows 0:00 (F1-3); sanctions may not.
+      MatchAction.point =>
+        end != null && end != EndReason.time
+            ? MatchRefusal.over
+            : !_started
+            ? MatchRefusal.notStarted
+            : null,
       MatchAction.warning ||
       MatchAction.oneHandWarning ||
       MatchAction.disqualification =>

@@ -27,6 +27,7 @@ class LeagueRepository {
     required String name,
     required Podium podium,
     required List<CategoryPodium> categoryPodiums,
+    required bool globalStandings,
   }) async {
     final response = await _dio.put<Map<String, dynamic>>(
       _path(eventId),
@@ -34,6 +35,7 @@ class LeagueRepository {
         'name': name,
         'podium': podium.toJson(),
         'categoryPodiums': [for (final c in categoryPodiums) c.toJson()],
+        'globalStandings': globalStandings,
       },
     );
     return League.fromJson(response.data!);

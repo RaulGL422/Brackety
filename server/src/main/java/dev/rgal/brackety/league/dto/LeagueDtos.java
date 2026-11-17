@@ -23,6 +23,7 @@ public final class LeagueDtos {
             UUID id,
             String name,
             Podium podium,
+            boolean globalStandings,
             List<CategoryPodiumDto> categoryPodiums,
             List<PhaseResponse> phases,
             List<String> categoryNames,
@@ -41,7 +42,8 @@ public final class LeagueDtos {
     public record LeagueRequest(
             @NotBlank @Size(max = 120) String name,
             @NotNull @Valid Podium podium,
-            @NotNull @Size(max = 30) List<@NotNull @Valid CategoryPodiumDto> categoryPodiums) {}
+            @NotNull @Size(max = 30) List<@NotNull @Valid CategoryPodiumDto> categoryPodiums,
+            Boolean globalStandings) {}
 
     /** The next phase: it copies the mats with their referees, the staff, categories and organizations. */
     public record NewPhaseRequest(

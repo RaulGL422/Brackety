@@ -11,7 +11,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get draftGhostTeamPanelHint =>
-      'Wildcard teams (up to 3): tap a team of another group in the list, or make one with loose participants. They fight but do not score.';
+      'Up to 3 wildcard teams: they fight but do not score. A team of another group always is.';
 
   @override
   String get teamJoinsAsWildcard => 'Tap to join as a wildcard team';
@@ -95,7 +95,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get controlDisableMatBody =>
-      'Choose the mat for each group with pending matches (Automatic: the one that finishes first). Team matches are shared among the other mats. It is left without a referee: to use it again, assign one in Settings.';
+      'Choose the mat each group with pending matches goes to (Automatic: the one that ends first). Team matches go to the other mats. To use it again, \"Enable mat\" in Mats gives it back its referee.';
 
   @override
   String controlMatDisabled(int groups, int pool) {
@@ -118,6 +118,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get controlPickMat => 'To which mat?';
+
+  @override
+  String get controlEnableMat => 'Enable mat';
+
+  @override
+  String controlMatEnabled(int number) {
+    return 'Mat $number back in use with its referee.';
+  }
+
+  @override
+  String get controlMatNotDisabled => 'This mat is already in use.';
+
+  @override
+  String get controlMatRefereeTaken =>
+      'Its referee is no longer free: assign one in Settings.';
+
+  @override
+  String get matDisabled => 'Out of use';
+
+  @override
+  String matDisabledSince(String time) {
+    return 'Out of use since $time';
+  }
+
+  @override
+  String matDisabledReferee(String name) {
+    return 'Referee: $name';
+  }
 
   @override
   String get controlNoOtherMat => 'No other mat has a referee.';
@@ -572,7 +600,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get draftGhostHint =>
-      'Wildcards (up to 3): anyone already in a group, or your 4th pick. They fight but do not score.';
+      'Up to 3 wildcards: they fight but do not score. Anyone already in a group and the 4th pick always are.';
+
+  @override
+  String get draftAddAs => 'Add as';
+
+  @override
+  String get draftAddAsReal => 'Normal';
+
+  @override
+  String get draftAddAsGhost => 'Wildcard';
 
   @override
   String createGroup(int count) {
@@ -829,6 +866,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tlAutomatic => 'automatic';
 
   @override
+  String get tlOvertime => 'after time';
+
+  @override
   String get tlUndone => 'undone';
 
   @override
@@ -1065,6 +1105,77 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get heightInvalid => 'Between 50 and 250 cm';
+
+  @override
+  String get sexLabel => 'Sex';
+
+  @override
+  String get sexFemale => 'Female';
+
+  @override
+  String get sexMale => 'Male';
+
+  @override
+  String get sexUnknown => 'sex not declared';
+
+  @override
+  String get weightOptional => 'Weight in kg (optional)';
+
+  @override
+  String get weightInvalid => 'Between 10 and 250 kg, one decimal at most';
+
+  @override
+  String get weightUnknown => 'no weight';
+
+  @override
+  String get weightMissing => 'weight missing';
+
+  @override
+  String get heightMissing => 'height missing';
+
+  @override
+  String get measuresTitle => 'Weight and height';
+
+  @override
+  String get measuresHint =>
+      'Required: nobody goes into a group or team without it, and the helper can write it down on the day. Optional: the grouping screens say who lacks it.';
+
+  @override
+  String get measureWeight => 'Weight';
+
+  @override
+  String get measureHeight => 'Height';
+
+  @override
+  String requirementSport(String value) {
+    return 'As the sport ($value)';
+  }
+
+  @override
+  String get requirementOff => 'Not asked';
+
+  @override
+  String get requirementOptional => 'Optional';
+
+  @override
+  String get requirementRequired => 'Required';
+
+  @override
+  String measuresOf(String name) {
+    return 'Weight and height of $name';
+  }
+
+  @override
+  String get measuresWrite => 'Write down weight and height';
+
+  @override
+  String get measuresMissingError =>
+      'Someone lacks the required weight or height: write it down before grouping.';
+
+  @override
+  String weightKg(String kg) {
+    return '$kg kg';
+  }
 
   @override
   String get guardianConsent => 'The legal guardian agrees';
@@ -1559,6 +1670,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get categoryAgeSuffix => 'years';
 
   @override
+  String get splitByAge => 'Split by age';
+
+  @override
+  String ageHeading(int age, int count) {
+    return '$age years · $count';
+  }
+
+  @override
   String get categoryLabel => 'Category';
 
   @override
@@ -1671,6 +1790,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fieldHeight => 'the height';
+
+  @override
+  String get fieldSex => 'the sex';
+
+  @override
+  String get fieldWeight => 'the weight';
+
+  @override
+  String issueWeight(String kg) {
+    return 'Weight $kg: it must be between 10 and 250 kg, one decimal at most';
+  }
 
   @override
   String get fieldCategory => 'the category';
@@ -2177,6 +2307,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get leagueStandingsCsv => 'Download CSV';
 
   @override
+  String get leagueStandingsByCategory => 'One CSV per category (.zip)';
+
+  @override
+  String get leagueStandingsPdf => 'Standings as PDF';
+
+  @override
   String leaguePhasePoints(int number, int total, int attendance, int matches) {
     return 'Phase $number: $total ($attendance for attending + $matches in matches)';
   }
@@ -2501,6 +2637,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get incidentOneHand => 'One-hand warning';
 
   @override
+  String get incidentOvertimePoint => 'Point after time';
+
+  @override
   String incidentBy(String who) {
     return 'given by $who';
   }
@@ -2557,4 +2696,143 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get leagueCategoryPodiumsHint =>
       'Most use the general one; pick \"Its own\" only where other medals are given.';
+
+  @override
+  String get warningReasonsTitle => 'Warning reasons';
+
+  @override
+  String get warningReasonsSportHint =>
+      'The sport\'s. The referee picks one with a tap, or types another. Change the list for this event.';
+
+  @override
+  String get warningReasonsHint =>
+      'This event\'s. The referee picks one with a tap, or types another.';
+
+  @override
+  String get warningReasonsAdd => 'New reason';
+
+  @override
+  String get warningReasonsAddButton => 'Add';
+
+  @override
+  String warningReasonsFull(int count) {
+    return '$count reasons at most';
+  }
+
+  @override
+  String warningReasonsRemove(String reason) {
+    return 'Remove “$reason”';
+  }
+
+  @override
+  String get warningReasonsUseSport => 'Back to the sport\'s';
+
+  @override
+  String get reasonPick => 'Pick the reason. It stays in the match history.';
+
+  @override
+  String get reasonOther => 'Other reason';
+
+  @override
+  String get invitationInvite => 'Invite';
+
+  @override
+  String get invitationHint =>
+      'They get an email with a link. They sign in, or create their account, with that same email and accept. The link expires in 14 days.';
+
+  @override
+  String get invitationEmail => 'Email';
+
+  @override
+  String get invitationEmailInvalid => 'Write a valid email';
+
+  @override
+  String get invitationSend => 'Send invitation';
+
+  @override
+  String invitationSent(String email) {
+    return 'Invitation sent to $email';
+  }
+
+  @override
+  String get invitationPending => 'pending';
+
+  @override
+  String get invitationExpired => 'expired: invite again';
+
+  @override
+  String get invitationCancel => 'Cancel invitation';
+
+  @override
+  String get invitationCancelled => 'Invitation cancelled';
+
+  @override
+  String get staffRemove => 'Remove';
+
+  @override
+  String staffRemoveAs(String role) {
+    return 'Remove as $role';
+  }
+
+  @override
+  String staffRemoveTooltip(String name) {
+    return 'Remove $name';
+  }
+
+  @override
+  String staffRemoveConfirm(String name, String role) {
+    return '$name is no longer a $role in this event. You can invite them again.';
+  }
+
+  @override
+  String get staffRemoved => 'Removed from the event';
+
+  @override
+  String get staffErrorAlready => 'They already have that role in the event.';
+
+  @override
+  String get staffErrorTooSoon => 'Wait a minute before sending it again.';
+
+  @override
+  String get staffErrorTooMany => 'Too many pending invitations: cancel some.';
+
+  @override
+  String get staffErrorOnMat => 'Take them off their mat first.';
+
+  @override
+  String get invitationTitle => 'Invitation';
+
+  @override
+  String invitationFrom(String organizer, String role) {
+    return '$organizer invites you as a $role to:';
+  }
+
+  @override
+  String get invitationAccept => 'Accept';
+
+  @override
+  String get invitationAccepted => 'You are in the event';
+
+  @override
+  String invitationOtherEmail(String email) {
+    return 'This invitation is for $email. Sign in with that account to accept it.';
+  }
+
+  @override
+  String get invitationSwitchAccount => 'Sign in with another account';
+
+  @override
+  String get invitationInvalid =>
+      'The invitation does not exist, was used or has expired. Ask the club to invite you again.';
+
+  @override
+  String get invitationVerifyFirst =>
+      'Confirm your email first with the link we sent when you signed up.';
+
+  @override
+  String get leagueGlobalStandings => 'Global standings';
+
+  @override
+  String get leagueGlobalStandingsHint =>
+      'Every category together in Scores and League. Off, one category at a time.';
 }

@@ -239,6 +239,32 @@ class DisableMatButton extends ConsumerWidget {
   }
 }
 
+/// On a mat out of use: back in use with the referee it had.
+class EnableMatButton extends ConsumerWidget {
+  const EnableMatButton({super.key, required this.event, required this.mat});
+
+  final AdminEventDetail event;
+  final AdminMat mat;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: FilledButton.tonalIcon(
+        icon: const Icon(Icons.play_arrow),
+        label: Text(l10n.controlEnableMat),
+        onPressed: () => _control(
+          context,
+          () => ref
+              .read(eventDetailProvider(event.id).notifier)
+              .enableMat(mat.id),
+        ),
+      ),
+    );
+  }
+}
+
 /// Where each individual group of [mat] with matches to play goes; pops the chosen mats
 /// (group id → mat id; Automatic ones left out), or null if cancelled.
 class _DisableMatDialog extends StatefulWidget {

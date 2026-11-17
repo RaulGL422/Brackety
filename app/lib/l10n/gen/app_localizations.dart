@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @draftGhostTeamPanelHint.
   ///
   /// In es, this message translates to:
-  /// **'Equipos comodín (hasta 3): toca en la lista un equipo de otro grupo, o forma uno con alumnos sueltos. Combaten pero no puntúan.'**
+  /// **'Hasta 3 equipos comodín: combaten pero no puntúan. Uno de otro grupo lo es siempre.'**
   String get draftGhostTeamPanelHint;
 
   /// No description provided for @teamJoinsAsWildcard.
@@ -239,7 +239,7 @@ abstract class AppLocalizations {
   /// No description provided for @controlDisableMatBody.
   ///
   /// In es, this message translates to:
-  /// **'Elige a qué tapiz va cada grupo con combates pendientes (Automático: el que acabe antes). Los combates de equipos se reparten entre los demás tapices. Se queda sin árbitro: para volver a usarlo, asígnale uno en Configuración.'**
+  /// **'Elige a qué tapiz va cada grupo con combates pendientes (Automático: el que acabe antes). Los combates de equipos se reparten entre los demás tapices. Para volver a usarlo, «Reactivar tapiz» en Tapices le devuelve su árbitro.'**
   String get controlDisableMatBody;
 
   /// No description provided for @controlMatDisabled.
@@ -253,6 +253,48 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'¿A qué tapiz?'**
   String get controlPickMat;
+
+  /// No description provided for @controlEnableMat.
+  ///
+  /// In es, this message translates to:
+  /// **'Reactivar tapiz'**
+  String get controlEnableMat;
+
+  /// No description provided for @controlMatEnabled.
+  ///
+  /// In es, this message translates to:
+  /// **'Tapiz {number} reactivado con su árbitro.'**
+  String controlMatEnabled(int number);
+
+  /// No description provided for @controlMatNotDisabled.
+  ///
+  /// In es, this message translates to:
+  /// **'Este tapiz ya está en uso.'**
+  String get controlMatNotDisabled;
+
+  /// No description provided for @controlMatRefereeTaken.
+  ///
+  /// In es, this message translates to:
+  /// **'Su árbitro ya no está libre: asígnale uno en Configuración.'**
+  String get controlMatRefereeTaken;
+
+  /// No description provided for @matDisabled.
+  ///
+  /// In es, this message translates to:
+  /// **'Inhabilitado'**
+  String get matDisabled;
+
+  /// No description provided for @matDisabledSince.
+  ///
+  /// In es, this message translates to:
+  /// **'Inhabilitado desde las {time}'**
+  String matDisabledSince(String time);
+
+  /// No description provided for @matDisabledReferee.
+  ///
+  /// In es, this message translates to:
+  /// **'Árbitro: {name}'**
+  String matDisabledReferee(String name);
 
   /// No description provided for @controlNoOtherMat.
   ///
@@ -1025,8 +1067,26 @@ abstract class AppLocalizations {
   /// No description provided for @draftGhostHint.
   ///
   /// In es, this message translates to:
-  /// **'Comodines (hasta 3): quien ya tiene grupo, o el 4.º que elijas. Combaten pero no puntúan.'**
+  /// **'Hasta 3 comodines: combaten pero no puntúan. Quien ya tiene grupo y el 4.º lo son siempre.'**
   String get draftGhostHint;
+
+  /// No description provided for @draftAddAs.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir como'**
+  String get draftAddAs;
+
+  /// No description provided for @draftAddAsReal.
+  ///
+  /// In es, this message translates to:
+  /// **'Normal'**
+  String get draftAddAsReal;
+
+  /// No description provided for @draftAddAsGhost.
+  ///
+  /// In es, this message translates to:
+  /// **'Comodín'**
+  String get draftAddAsGhost;
 
   /// No description provided for @createGroup.
   ///
@@ -1430,6 +1490,12 @@ abstract class AppLocalizations {
   /// **'automático'**
   String get tlAutomatic;
 
+  /// No description provided for @tlOvertime.
+  ///
+  /// In es, this message translates to:
+  /// **'fuera de tiempo'**
+  String get tlOvertime;
+
   /// No description provided for @tlUndone.
   ///
   /// In es, this message translates to:
@@ -1813,6 +1879,132 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Entre 50 y 250 cm'**
   String get heightInvalid;
+
+  /// No description provided for @sexLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Sexo'**
+  String get sexLabel;
+
+  /// No description provided for @sexFemale.
+  ///
+  /// In es, this message translates to:
+  /// **'Mujer'**
+  String get sexFemale;
+
+  /// No description provided for @sexMale.
+  ///
+  /// In es, this message translates to:
+  /// **'Hombre'**
+  String get sexMale;
+
+  /// No description provided for @sexUnknown.
+  ///
+  /// In es, this message translates to:
+  /// **'sexo sin declarar'**
+  String get sexUnknown;
+
+  /// No description provided for @weightOptional.
+  ///
+  /// In es, this message translates to:
+  /// **'Peso en kg (opcional)'**
+  String get weightOptional;
+
+  /// No description provided for @weightInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'Entre 10 y 250 kg, con un decimal como mucho'**
+  String get weightInvalid;
+
+  /// No description provided for @weightUnknown.
+  ///
+  /// In es, this message translates to:
+  /// **'sin peso'**
+  String get weightUnknown;
+
+  /// No description provided for @weightMissing.
+  ///
+  /// In es, this message translates to:
+  /// **'falta el peso'**
+  String get weightMissing;
+
+  /// No description provided for @heightMissing.
+  ///
+  /// In es, this message translates to:
+  /// **'falta la estatura'**
+  String get heightMissing;
+
+  /// No description provided for @measuresTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Peso y estatura'**
+  String get measuresTitle;
+
+  /// No description provided for @measuresHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Obligatorio: nadie entra en un grupo ni en un equipo sin el dato, y el ayudante puede apuntarlo ese día. Opcional: se avisa al crear los grupos de quién no lo tiene.'**
+  String get measuresHint;
+
+  /// No description provided for @measureWeight.
+  ///
+  /// In es, this message translates to:
+  /// **'Peso'**
+  String get measureWeight;
+
+  /// No description provided for @measureHeight.
+  ///
+  /// In es, this message translates to:
+  /// **'Estatura'**
+  String get measureHeight;
+
+  /// No description provided for @requirementSport.
+  ///
+  /// In es, this message translates to:
+  /// **'Como el deporte ({value})'**
+  String requirementSport(String value);
+
+  /// No description provided for @requirementOff.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pide'**
+  String get requirementOff;
+
+  /// No description provided for @requirementOptional.
+  ///
+  /// In es, this message translates to:
+  /// **'Opcional'**
+  String get requirementOptional;
+
+  /// No description provided for @requirementRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'Obligatorio'**
+  String get requirementRequired;
+
+  /// No description provided for @measuresOf.
+  ///
+  /// In es, this message translates to:
+  /// **'Peso y estatura de {name}'**
+  String measuresOf(String name);
+
+  /// No description provided for @measuresWrite.
+  ///
+  /// In es, this message translates to:
+  /// **'Apuntar peso y estatura'**
+  String get measuresWrite;
+
+  /// No description provided for @measuresMissingError.
+  ///
+  /// In es, this message translates to:
+  /// **'Falta el peso o la estatura obligatorios de alguien: apúntalo antes de agrupar.'**
+  String get measuresMissingError;
+
+  /// No description provided for @weightKg.
+  ///
+  /// In es, this message translates to:
+  /// **'{kg} kg'**
+  String weightKg(String kg);
 
   /// No description provided for @guardianConsent.
   ///
@@ -2665,6 +2857,18 @@ abstract class AppLocalizations {
   /// **'años'**
   String get categoryAgeSuffix;
 
+  /// No description provided for @splitByAge.
+  ///
+  /// In es, this message translates to:
+  /// **'Separar por edad'**
+  String get splitByAge;
+
+  /// No description provided for @ageHeading.
+  ///
+  /// In es, this message translates to:
+  /// **'{age} años · {count}'**
+  String ageHeading(int age, int count);
+
   /// No description provided for @categoryLabel.
   ///
   /// In es, this message translates to:
@@ -2838,6 +3042,24 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'la estatura'**
   String get fieldHeight;
+
+  /// No description provided for @fieldSex.
+  ///
+  /// In es, this message translates to:
+  /// **'el sexo'**
+  String get fieldSex;
+
+  /// No description provided for @fieldWeight.
+  ///
+  /// In es, this message translates to:
+  /// **'el peso'**
+  String get fieldWeight;
+
+  /// No description provided for @issueWeight.
+  ///
+  /// In es, this message translates to:
+  /// **'Peso {kg}: tiene que estar entre 10 y 250 kg, con un decimal como mucho'**
+  String issueWeight(String kg);
 
   /// No description provided for @fieldCategory.
   ///
@@ -3600,6 +3822,18 @@ abstract class AppLocalizations {
   /// **'Descargar CSV'**
   String get leagueStandingsCsv;
 
+  /// No description provided for @leagueStandingsByCategory.
+  ///
+  /// In es, this message translates to:
+  /// **'Un CSV por categoría (.zip)'**
+  String get leagueStandingsByCategory;
+
+  /// No description provided for @leagueStandingsPdf.
+  ///
+  /// In es, this message translates to:
+  /// **'Clasificación en PDF'**
+  String get leagueStandingsPdf;
+
   /// No description provided for @leaguePhasePoints.
   ///
   /// In es, this message translates to:
@@ -4062,6 +4296,12 @@ abstract class AppLocalizations {
   /// **'Advertencia de una mano'**
   String get incidentOneHand;
 
+  /// No description provided for @incidentOvertimePoint.
+  ///
+  /// In es, this message translates to:
+  /// **'Punto fuera de tiempo'**
+  String get incidentOvertimePoint;
+
   /// No description provided for @incidentBy.
   ///
   /// In es, this message translates to:
@@ -4139,6 +4379,240 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Casi todas usan el general; elige \"Propio\" solo en las que den otras medallas.'**
   String get leagueCategoryPodiumsHint;
+
+  /// No description provided for @warningReasonsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Motivos de advertencia'**
+  String get warningReasonsTitle;
+
+  /// No description provided for @warningReasonsSportHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Los del deporte. El árbitro los elige con un toque; para otro, escribe el suyo. Cambia la lista para este evento.'**
+  String get warningReasonsSportHint;
+
+  /// No description provided for @warningReasonsHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Los de este evento. El árbitro los elige con un toque; para otro, escribe el suyo.'**
+  String get warningReasonsHint;
+
+  /// No description provided for @warningReasonsAdd.
+  ///
+  /// In es, this message translates to:
+  /// **'Nuevo motivo'**
+  String get warningReasonsAdd;
+
+  /// No description provided for @warningReasonsAddButton.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir'**
+  String get warningReasonsAddButton;
+
+  /// No description provided for @warningReasonsFull.
+  ///
+  /// In es, this message translates to:
+  /// **'Máximo {count} motivos'**
+  String warningReasonsFull(int count);
+
+  /// No description provided for @warningReasonsRemove.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar «{reason}»'**
+  String warningReasonsRemove(String reason);
+
+  /// No description provided for @warningReasonsUseSport.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver a los del deporte'**
+  String get warningReasonsUseSport;
+
+  /// No description provided for @reasonPick.
+  ///
+  /// In es, this message translates to:
+  /// **'Elige el motivo. Queda en el historial del combate.'**
+  String get reasonPick;
+
+  /// No description provided for @reasonOther.
+  ///
+  /// In es, this message translates to:
+  /// **'Otro motivo'**
+  String get reasonOther;
+
+  /// No description provided for @invitationInvite.
+  ///
+  /// In es, this message translates to:
+  /// **'Invitar'**
+  String get invitationInvite;
+
+  /// No description provided for @invitationHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Le llega un email con un enlace. Entra, o crea su cuenta, con ese mismo email y acepta. El enlace caduca en 14 días.'**
+  String get invitationHint;
+
+  /// No description provided for @invitationEmail.
+  ///
+  /// In es, this message translates to:
+  /// **'Email'**
+  String get invitationEmail;
+
+  /// No description provided for @invitationEmailInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe un email válido'**
+  String get invitationEmailInvalid;
+
+  /// No description provided for @invitationSend.
+  ///
+  /// In es, this message translates to:
+  /// **'Enviar invitación'**
+  String get invitationSend;
+
+  /// No description provided for @invitationSent.
+  ///
+  /// In es, this message translates to:
+  /// **'Invitación enviada a {email}'**
+  String invitationSent(String email);
+
+  /// No description provided for @invitationPending.
+  ///
+  /// In es, this message translates to:
+  /// **'pendiente'**
+  String get invitationPending;
+
+  /// No description provided for @invitationExpired.
+  ///
+  /// In es, this message translates to:
+  /// **'caducada: invita de nuevo'**
+  String get invitationExpired;
+
+  /// No description provided for @invitationCancel.
+  ///
+  /// In es, this message translates to:
+  /// **'Anular invitación'**
+  String get invitationCancel;
+
+  /// No description provided for @invitationCancelled.
+  ///
+  /// In es, this message translates to:
+  /// **'Invitación anulada'**
+  String get invitationCancelled;
+
+  /// No description provided for @staffRemove.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar'**
+  String get staffRemove;
+
+  /// No description provided for @staffRemoveAs.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar como {role}'**
+  String staffRemoveAs(String role);
+
+  /// No description provided for @staffRemoveTooltip.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar a {name}'**
+  String staffRemoveTooltip(String name);
+
+  /// No description provided for @staffRemoveConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'{name} deja de ser {role} en este evento. Puedes invitarle de nuevo.'**
+  String staffRemoveConfirm(String name, String role);
+
+  /// No description provided for @staffRemoved.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitado del evento'**
+  String get staffRemoved;
+
+  /// No description provided for @staffErrorAlready.
+  ///
+  /// In es, this message translates to:
+  /// **'Ya tiene ese papel en el evento.'**
+  String get staffErrorAlready;
+
+  /// No description provided for @staffErrorTooSoon.
+  ///
+  /// In es, this message translates to:
+  /// **'Espera un minuto antes de reenviarla.'**
+  String get staffErrorTooSoon;
+
+  /// No description provided for @staffErrorTooMany.
+  ///
+  /// In es, this message translates to:
+  /// **'Demasiadas invitaciones pendientes: anula alguna.'**
+  String get staffErrorTooMany;
+
+  /// No description provided for @staffErrorOnMat.
+  ///
+  /// In es, this message translates to:
+  /// **'Quítale antes de su tapiz.'**
+  String get staffErrorOnMat;
+
+  /// No description provided for @invitationTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Invitación'**
+  String get invitationTitle;
+
+  /// No description provided for @invitationFrom.
+  ///
+  /// In es, this message translates to:
+  /// **'{organizer} te invita como {role} a:'**
+  String invitationFrom(String organizer, String role);
+
+  /// No description provided for @invitationAccept.
+  ///
+  /// In es, this message translates to:
+  /// **'Aceptar'**
+  String get invitationAccept;
+
+  /// No description provided for @invitationAccepted.
+  ///
+  /// In es, this message translates to:
+  /// **'Ya estás en el evento'**
+  String get invitationAccepted;
+
+  /// No description provided for @invitationOtherEmail.
+  ///
+  /// In es, this message translates to:
+  /// **'Esta invitación es para {email}. Entra con esa cuenta para aceptarla.'**
+  String invitationOtherEmail(String email);
+
+  /// No description provided for @invitationSwitchAccount.
+  ///
+  /// In es, this message translates to:
+  /// **'Entrar con otra cuenta'**
+  String get invitationSwitchAccount;
+
+  /// No description provided for @invitationInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'La invitación no existe, ya se usó o ha caducado. Pide al club que te invite de nuevo.'**
+  String get invitationInvalid;
+
+  /// No description provided for @invitationVerifyFirst.
+  ///
+  /// In es, this message translates to:
+  /// **'Confirma antes tu email con el enlace que te enviamos al registrarte.'**
+  String get invitationVerifyFirst;
+
+  /// No description provided for @leagueGlobalStandings.
+  ///
+  /// In es, this message translates to:
+  /// **'Clasificación global'**
+  String get leagueGlobalStandings;
+
+  /// No description provided for @leagueGlobalStandingsHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Todas las categorías juntas en Puntuaciones y en Liga. Apagada, solo se ve una categoría cada vez.'**
+  String get leagueGlobalStandingsHint;
 }
 
 class _AppLocalizationsDelegate

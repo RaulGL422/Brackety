@@ -39,6 +39,7 @@ class CategoryParticipant {
     required this.lastName,
     required this.age,
     this.heightCm,
+    this.weightKg,
     this.groupNumber,
     this.matNumber,
     this.teamNumber,
@@ -55,6 +56,7 @@ class CategoryParticipant {
         lastName: json['lastName'] as String,
         age: json['age'] as int,
         heightCm: json['heightCm'] as int?,
+        weightKg: (json['weightKg'] as num?)?.toDouble(),
         groupNumber: json['groupNumber'] as int?,
         matNumber: json['matNumber'] as int?,
         teamNumber: json['teamNumber'] as int?,
@@ -67,7 +69,10 @@ class CategoryParticipant {
   final String firstName;
   final String lastName;
   final int age;
+
+  /// Measured for this event.
   final int? heightCm;
+  final double? weightKg;
 
   /// Set once the participant competes in a group (not as a ghost).
   final int? groupNumber;
@@ -100,6 +105,7 @@ class CategoryParticipant {
     lastName: lastName,
     age: age,
     heightCm: heightCm,
+    weightKg: weightKg,
     groupNumber: groupNumber,
     matNumber: matNumber,
     teamNumber: teamNumber,

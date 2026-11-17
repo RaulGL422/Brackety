@@ -140,6 +140,18 @@ abstract class CoreLocalizations {
   /// **'Fecha del servidor: {date}'**
   String connectionServerToday(DateTime date);
 
+  /// No description provided for @debugNoScenario.
+  ///
+  /// In es, this message translates to:
+  /// **'sin escenario'**
+  String get debugNoScenario;
+
+  /// No description provided for @debugSimulatedDate.
+  ///
+  /// In es, this message translates to:
+  /// **'{date} (simulada)'**
+  String debugSimulatedDate(String date);
+
   /// No description provided for @retry.
   ///
   /// In es, this message translates to:

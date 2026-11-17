@@ -53,6 +53,12 @@ public class AdminAuditLog {
         save(AdminAudit.Action.CONTROL_CHANGE, target, what);
     }
 
+    /** Debug environment only. {@code target}: the scenario's name or "clock". */
+    @Transactional
+    public void debug(String target, String what) {
+        audit.save(new AdminAudit(AdminAudit.Action.DEBUG_CHANGE, target, what, clock.instant()));
+    }
+
     private void save(AdminAudit.Action action, UUID target, String reason) {
         audit.save(new AdminAudit(action, target.toString(), reason, clock.instant()));
     }

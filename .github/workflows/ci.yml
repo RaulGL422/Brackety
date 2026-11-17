@@ -9,7 +9,44 @@ permissions:
   contents: read
 
 jobs:
+  # PRs to development only test the components they touch (docs/producto/calidad.md).
+  # Releases (PRs to main) and pushes run everything.
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      server: ${{ steps.pick.outputs.server }}
+      flutter: ${{ steps.pick.outputs.flutter }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - id: pick
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if [ "$EVENT" = pull_request ] && [ "$BASE_REF" != main ]; then
+            files=$(git diff --name-only "$BASE_SHA"...HEAD)
+          else
+            files=everything
+          fi
+          echo "$files"
+          touched() { [ "$files" = everything ] || echo "$files" | grep -qE "$1"; }
+          # A change to this workflow tests everything it runs.
+          all='^\.github/workflows/ci\.yml$'
+          server=false
+          touched "^server/|$all" && server=true
+          flutter=()
+          touched "^packages/|$all" && flutter+=('"packages/brackety_core"')
+          touched "^(app|packages)/|$all" && flutter+=('"app"')
+          touched "^(admin|packages)/|$all" && flutter+=('"admin"')
+          echo "server=$server" >> "$GITHUB_OUTPUT"
+          echo "flutter=[$(IFS=,; echo "${flutter[*]}")]" >> "$GITHUB_OUTPUT"
+
   server:
+    needs: changes
+    if: needs.changes.outputs.server == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -25,11 +62,13 @@ jobs:
         run: ./mvnw -B verify
 
   flutter:
+    needs: changes
+    if: needs.changes.outputs.flutter != '[]'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        project: [packages/brackety_core, app, admin]
+        project: ${{ fromJSON(needs.changes.outputs.flutter) }}
     defaults:
       run:
         working-directory: ${{ matrix.project }}
@@ -53,3 +92,17 @@ jobs:
         run: |
           long=$(find docs -name '*.md' -exec awk 'END { if (NR > 150) print FILENAME " (" NR " lines)" }' {} \;)
           if [ -n "$long" ]; then echo "Split these docs (rule in .claude/rules/docs-upkeep.md):"; echo "$long"; exit 1; fi
+
+  # The one check branch protection asks for: skipped jobs count as passed, failed or cancelled ones do not.
+  ci-ok:
+    if: always()
+    needs: [changes, server, flutter, docs]
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "$RESULTS"
+          case " $RESULTS " in
+            *" failure "*|*" cancelled "*) exit 1 ;;
+          esac

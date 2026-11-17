@@ -11,6 +11,7 @@ import '../../../core/upload/file_upload.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../club/state/club_providers.dart';
 import '../../legal/ui/legal_links.dart';
+import '../../club/ui/measure_fields.dart';
 import '../data/import_models.dart';
 import '../data/import_repository.dart';
 import 'issue_text.dart';
@@ -57,8 +58,8 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
 
   Future<void> _downloadTemplate() async {
     const template =
-        '﻿nombre;apellidos;fecha_nacimiento;estatura_cm;categoria\r\n'
-        'Lucía;García López;12/03/2016;128;\r\n';
+        '﻿nombre;apellidos;fecha_nacimiento;sexo;estatura_cm;peso_kg;categoria\r\n'
+        'Lucía;García López;12/03/2016;Mujer;128;27,5;\r\n';
     await ref.read(saveFileProvider)(
       'plantilla_alumnos.csv',
       utf8.encode(template),
@@ -351,7 +352,9 @@ class _RowCard extends StatelessWidget {
     final categoryPending = row.errors.any((e) => e.field == 'category');
     final details = [
       if (r.birthDate != null) DateFormat.yMd(locale).format(r.birthDate!),
+      sexText(l10n, r.sex),
       if (r.heightCm != null) l10n.heightCm(r.heightCm!),
+      if (r.weightKg != null) weightText(l10n, locale, r.weightKg!),
       if (row.age != null)
         categoryPending
             ? '${row.age} ${l10n.categoryAgeSuffix}'

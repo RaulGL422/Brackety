@@ -108,6 +108,11 @@ public class MatchEvent {
         return at;
     }
 
+    /** A point given once the clock showed 0:00 (F1-3): its clock is the whole match. */
+    public boolean isOvertimePoint(Duration length) {
+        return type == MatchEventType.POINT && clockMs >= length.toMillis();
+    }
+
     public long getClockMs() {
         return clockMs;
     }

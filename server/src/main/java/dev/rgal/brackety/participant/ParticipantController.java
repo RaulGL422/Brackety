@@ -2,6 +2,7 @@ package dev.rgal.brackety.participant;
 
 import dev.rgal.brackety.auth.RequiresVerifiedEmail;
 import dev.rgal.brackety.common.CurrentAccount;
+import dev.rgal.brackety.participant.dto.MeasuresRequest;
 import dev.rgal.brackety.participant.dto.ParticipantRequest;
 import dev.rgal.brackety.participant.dto.ParticipantResponse;
 import jakarta.validation.Valid;
@@ -52,6 +53,17 @@ class ParticipantController {
             @Valid @RequestBody ParticipantRequest request,
             @AuthenticationPrincipal Jwt jwt) {
         return participants.update(eventId, participantId, CurrentAccount.id(jwt), request);
+    }
+
+    /** The helper writes down the weight and height on the day; the club can too. */
+    @PutMapping("/{participantId}/measures")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void measures(
+            @PathVariable UUID eventId,
+            @PathVariable UUID participantId,
+            @Valid @RequestBody MeasuresRequest request,
+            @AuthenticationPrincipal Jwt jwt) {
+        participants.measure(eventId, participantId, CurrentAccount.id(jwt), request);
     }
 
     @DeleteMapping("/{participantId}")

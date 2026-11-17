@@ -4,6 +4,7 @@ import dev.rgal.brackety.event.Event;
 import dev.rgal.brackety.event.EventCategory;
 import dev.rgal.brackety.event.EventCategoryRepository;
 import dev.rgal.brackety.event.EventException;
+import dev.rgal.brackety.event.MeasureRequirement;
 import dev.rgal.brackety.participant.Participant;
 import dev.rgal.brackety.participant.ParticipantRepository;
 import java.util.Collection;
@@ -61,6 +62,24 @@ class CategoryRoster {
                 || !found.stream()
                         .allMatch(p -> p.getEventId().equals(event.getId()) && isIn(event, category, all, p))) {
             throw EventException.invalid("Every participant must be from this event and category.");
+        }
+    }
+
+    /** Required measures (F2-1): nobody goes into a group or team without them. */
+    void requireMeasures(Event event, Collection<UUID> ids) {
+        var weight = event.weightRequirement() == MeasureRequirement.REQUIRED;
+        var height = event.heightRequirement() == MeasureRequirement.REQUIRED;
+        if (!weight && !height) {
+            return;
+        }
+        var missing = participants.findAllById(new HashSet<>(ids)).stream()
+                .filter(p -> (weight && p.getWeightKg() == null) || (height && p.getHeightCm() == null))
+                .map(p -> p.getFirstName() + " " + p.getLastName())
+                .sorted()
+                .toList();
+        if (!missing.isEmpty()) {
+            throw EventException.conflict(
+                    "MEASURES_MISSING", "Without the weight or height required: " + String.join(", ", missing));
         }
     }
 

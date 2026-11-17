@@ -45,35 +45,39 @@ class AdminEventService {
     private static final String MATCHES = """
             select f.id, f.group_id, f.order_index, f.status, f.red_score, f.blue_score,
                    f.review_reason is not null as in_review,
-                   rp.first_name || ' ' || rp.last_name as red_name, rt.number as red_team, rt.id as red_team_id,
-                   bp.first_name || ' ' || bp.last_name as blue_name, bt.number as blue_team, bt.id as blue_team_id,
+                   rpe.first_name || ' ' || rpe.last_name as red_name, rt.number as red_team, rt.id as red_team_id,
+                   bpe.first_name || ' ' || bpe.last_name as blue_name, bt.number as blue_team, bt.id as blue_team_id,
                    exists (select 1 from group_member g where g.group_id = f.group_id and g.ghost
                            and (g.participant_id = f.red_participant_id or g.team_id = f.red_team_id)) as red_ghost,
                    exists (select 1 from group_member g where g.group_id = f.group_id and g.ghost
                            and (g.participant_id = f.blue_participant_id or g.team_id = f.blue_team_id)) as blue_ghost
             from fight_match f
             left join participant rp on rp.id = f.red_participant_id
+            left join person rpe on rpe.id = rp.person_id
             left join team rt on rt.id = f.red_team_id
             left join participant bp on bp.id = f.blue_participant_id
+            left join person bpe on bpe.id = bp.person_id
             left join team bt on bt.id = f.blue_team_id
             where f.event_id = :eventId
             order by f.order_index""";
 
     private static final String GROUP_MEMBERS = """
-            select gm.group_id, gm.ghost, p.first_name || ' ' || p.last_name as name, t.id as team_id,
+            select gm.group_id, gm.ghost, pe.first_name || ' ' || pe.last_name as name, t.id as team_id,
                    t.number as team_number
             from group_member gm
             join fight_group g on g.id = gm.group_id
             left join participant p on p.id = gm.participant_id
+            left join person pe on pe.id = p.person_id
             left join team t on t.id = gm.team_id
             where g.event_id = :eventId
             order by gm.group_id, gm.position""";
 
     private static final String TEAM_MEMBERS = """
-            select tm.team_id, p.first_name || ' ' || p.last_name as name, tm.ghost and not t.ghost as ghost
+            select tm.team_id, pe.first_name || ' ' || pe.last_name as name, tm.ghost and not t.ghost as ghost
             from team_member tm
             join team t on t.id = tm.team_id
             join participant p on p.id = tm.participant_id
+            join person pe on pe.id = p.person_id
             where t.event_id = :eventId
             order by tm.team_id, tm.position""";
 
@@ -171,10 +175,11 @@ class AdminEventService {
     private List<Team> teams(UUID eventId) {
         var members = new HashMap<UUID, List<TeamPerson>>();
         jdbc.sql("""
-                        select tm.team_id, tm.participant_id, p.first_name || ' ' || p.last_name as name, tm.ghost
+                        select tm.team_id, tm.participant_id, pe.first_name || ' ' || pe.last_name as name, tm.ghost
                         from team_member tm
                         join team t on t.id = tm.team_id
                         join participant p on p.id = tm.participant_id
+                        join person pe on pe.id = p.person_id
                         where t.event_id = :eventId and not t.ghost
                         order by tm.team_id, tm.position""").param("eventId", eventId).query(rs -> {
             members.computeIfAbsent(rs.getObject("team_id", UUID.class), k -> new ArrayList<>())
@@ -217,7 +222,7 @@ class AdminEventService {
             }
         }
         return jdbc.sql("""
-                        select m.id, m.number, m.referee_account_id from mat m
+                        select m.id, m.number, m.referee_account_id, m.disabled_at from mat m
                         where m.event_id = :eventId order by m.number""")
                 .param("eventId", eventId)
                 .query((rs, n) -> {
@@ -236,7 +241,12 @@ class AdminEventService {
                             })
                             .toList();
                     var referee = rs.getObject("referee_account_id", UUID.class);
-                    return new Mat(id, rs.getInt("number"), referee == null ? null : labels.get(referee), planned);
+                    return new Mat(
+                            id,
+                            rs.getInt("number"),
+                            referee == null ? null : labels.get(referee),
+                            rs.getObject("disabled_at") != null,
+                            planned);
                 })
                 .list();
     }

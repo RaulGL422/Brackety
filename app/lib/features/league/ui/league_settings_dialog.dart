@@ -34,6 +34,7 @@ class _LeagueSettingsDialogState extends ConsumerState<_LeagueSettingsDialog> {
   final _form = GlobalKey<FormState>();
   late final _name = TextEditingController(text: widget.league.name);
   late var _podium = widget.league.podium;
+  late var _global = widget.league.globalStandings;
 
   /// Category name → its own podium; categories left out use [_podium].
   late final _own = {
@@ -80,6 +81,14 @@ class _LeagueSettingsDialogState extends ConsumerState<_LeagueSettingsDialog> {
                   podium: _podium,
                   onChanged: (p) => setState(() => _podium = p),
                 ),
+                const SizedBox(height: AppSpacing.m),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(l10n.leagueGlobalStandings),
+                  subtitle: Text(l10n.leagueGlobalStandingsHint),
+                  value: _global,
+                  onChanged: (v) => setState(() => _global = v),
+                ),
                 if (widget.league.categoryNames.isNotEmpty) ...[
                   const SizedBox(height: AppSpacing.l),
                   Text(l10n.leagueCategoryPodiums, style: text.titleSmall),
@@ -123,6 +132,7 @@ class _LeagueSettingsDialogState extends ConsumerState<_LeagueSettingsDialog> {
             widget.eventId,
             name: _name.text.trim(),
             podium: _podium,
+            globalStandings: _global,
             categoryPodiums: [
               for (final MapEntry(:key, :value) in _own.entries)
                 CategoryPodium(categoryName: key, podium: value),

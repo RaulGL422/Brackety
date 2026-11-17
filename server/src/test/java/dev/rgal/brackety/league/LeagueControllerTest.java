@@ -3,6 +3,7 @@ package dev.rgal.brackety.league;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -13,13 +14,16 @@ import com.jayway.jsonpath.JsonPath;
 import dev.rgal.brackety.event.EventApiTest;
 import dev.rgal.brackety.participant.Participant;
 import dev.rgal.brackety.participant.ParticipantRepository;
+import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.zip.ZipInputStream;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -41,7 +45,23 @@ class LeagueControllerTest extends EventApiTest {
                 .andExpect(jsonPath("$.phases[0].number").value(1))
                 .andExpect(jsonPath("$.disciplines[0].discipline").value("TAMBO"))
                 .andExpect(jsonPath("$.disciplines[0].available").value(true))
-                .andExpect(jsonPath("$.disciplines[1].available").value(false));
+                .andExpect(jsonPath("$.disciplines[1].available").value(false))
+                .andExpect(jsonPath("$.globalStandings").value(false));
+    }
+
+    @Test
+    void theClubTurnsTheGlobalStandingsOnAndLeavingItOutKeepsIt() throws Exception {
+        var body = """
+                {"name":"Liga Yoseikan 2027","podium":{"firsts":2,"seconds":2,"thirds":3},"categoryPodiums":[]%s}""";
+        call(put(league(eventId)).content(body.formatted(",\"globalStandings\":true")), "club1")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.globalStandings").value(true));
+        call(put(league(eventId)).content(body.formatted("")), "club1")
+                .andExpect(jsonPath("$.globalStandings").value(true));
+        call(put(league(eventId)).content(body.formatted(",\"globalStandings\":false")), "club1")
+                .andExpect(jsonPath("$.globalStandings").value(false));
+        call(put(league(eventId)).content(body.formatted(",\"globalStandings\":true")), "ayudante1")
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -167,6 +187,91 @@ class LeagueControllerTest extends EventApiTest {
                 .getContentAsString(StandardCharsets.UTF_8);
         assertThat(csv).contains("Categoría;Posición;Medalla;Nombre;Apellidos;Club;Fase 1: asistencia");
         assertThat(csv).contains("9-10;1;Oro (1.º);Ana;Prueba;Club Demo Yoseikan;10;2;12;No inscrito;;;12");
+
+        // The entity asked for one file per category (2026-11-16).
+        var zip = call(get("/api/v1/events/" + phase2 + "/export/league-standings-by-category.zip"), "club1")
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsByteArray();
+        var files = new LinkedHashMap<String, String>();
+        try (var in = new ZipInputStream(new ByteArrayInputStream(zip))) {
+            for (var entry = in.getNextEntry(); entry != null; entry = in.getNextEntry()) {
+                files.put(entry.getName(), new String(in.readAllBytes(), StandardCharsets.UTF_8));
+            }
+        }
+        assertThat(files).containsOnlyKeys("clasificacion-9-10.csv");
+        assertThat(files.get("clasificacion-9-10.csv"))
+                .contains("Posición;Medalla;Nombre;Apellidos;Club;Fase 1;Fase 2;Total liga;Advertencias;"
+                        + "Descalificaciones\r\n")
+                .contains("1;Oro (1.º);Ana;Prueba;Club Demo Yoseikan;12;No inscrito;12;0;0\r\n");
+    }
+
+    @Test
+    void aPersonIsOneRowInEveryPhase() throws Exception {
+        var kids = new ArrayList<UUID>();
+        for (var name : List.of("Ana", "Bea", "Cris", "Dani")) {
+            kids.add(participant(eventId, name, 9));
+        }
+        group(eventId, kids);
+        var phase2 = newPhase();
+        call(post(league(phase2) + "/reenrol").content("""
+                        {"personIds":["%s"],"guardianConsent":true}""".formatted(person(kids.get(0)))), "club1")
+                .andExpect(status().isOk());
+        var entry = "/api/v1/events/" + phase2 + "/participants/"
+                + participants
+                        .findByEventIdOrderByFirstNameAscLastNameAsc(phase2)
+                        .getFirst()
+                        .getId();
+
+        // A surname fixed in phase 2 is fixed in phase 1 too.
+        call(put(entry).content(ana("Ruiz", "2018-03-01")), "club1").andExpect(status().isOk());
+        assertThat(participants.findById(kids.get(0)).orElseThrow().getLastName())
+                .isEqualTo("Ruiz");
+        // Her birth date set her category in phase 1, where she is in a group.
+        call(put(entry).content(ana("Ruiz", "2017-03-01")), "club1").andExpect(status().isConflict());
+        // Without her phase 2 entry she is still in phase 1.
+        call(delete(entry), "club1").andExpect(status().isNoContent());
+        assertThat(jdbc.sql("select count(*) from person where id = ?")
+                        .param(person(kids.get(0)))
+                        .query(Integer.class)
+                        .single())
+                .isOne();
+    }
+
+    private static String ana(String lastName, String birthDate) {
+        return """
+                {"firstName":"Ana","lastName":"%s","birthDate":"%s","sex":"FEMALE","heightCm":130,"guardianConsent":true}""".formatted(lastName, birthDate);
+    }
+
+    @Test
+    void aClubIsOneRowInEveryPhase() throws Exception {
+        var clubs = jdbc.sql("select count(*) from organization")
+                .query(Integer.class)
+                .single();
+        var phase2 = newPhase();
+        // The new phase links the same clubs: none is copied.
+        assertThat(jdbc.sql("select count(*) from organization")
+                        .query(Integer.class)
+                        .single())
+                .isEqualTo(clubs);
+        var settings = call(get("/api/v1/events/" + phase2 + "/settings"), "club1")
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        String id = JsonPath.read(settings, "$.organizations[0].id");
+        String other = JsonPath.read(settings, "$.organizations[1].id");
+        String otherName = JsonPath.read(settings, "$.organizations[1].name");
+
+        call(put("/api/v1/events/" + phase2 + "/organizations").content("""
+                        {"organizations":[{"id":"%s","name":"Club Demo Yoseikan Sevilla","shortName":"CDY"},
+                                          {"id":"%s","name":"%s","shortName":null}]}""".formatted(id, other, otherName)), "club1")
+                .andExpect(status().isOk());
+
+        // Renamed in phase 2, renamed in phase 1 too.
+        call(get("/api/v1/events/" + eventId + "/settings"), "club1")
+                .andExpect(jsonPath("$.organizations[0].name").value("Club Demo Yoseikan Sevilla"))
+                .andExpect(jsonPath("$.organizations[0].shortName").value("CDY"));
     }
 
     @Test
@@ -193,7 +298,9 @@ class LeagueControllerTest extends EventApiTest {
     }
 
     private UUID participant(UUID event, String firstName, int age) {
-        var organization = jdbc.sql("select id from event_organization where event_id = ? order by name limit 1")
+        var organization = jdbc.sql(
+                        "select eo.id from event_organization eo join organization o on o.id = eo.organization_id"
+                                + " where eo.event_id = ? order by o.name limit 1")
                 .param(event)
                 .query(UUID.class)
                 .single();

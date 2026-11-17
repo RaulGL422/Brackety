@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface EventOrganizationRepository extends JpaRepository<EventOrganization, UUID> {
 
+    @Query("select o from EventOrganization o join fetch o.organization c where o.eventId = :eventId"
+            + " order by c.name")
     List<EventOrganization> findByEventIdOrderByName(UUID eventId);
 
     // Native so this package does not depend on participant, which depends on it.

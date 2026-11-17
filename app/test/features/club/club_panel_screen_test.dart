@@ -4,6 +4,7 @@ import 'package:brackety/core/download/file_download.dart';
 import 'package:brackety/features/club/data/club_models.dart';
 import 'package:brackety/features/mat/data/mat_board.dart';
 import 'package:brackety/features/club/data/club_repository.dart';
+import 'package:brackety/features/club/data/sex.dart';
 import 'package:brackety/features/club/state/club_providers.dart';
 import 'package:brackety/core/upload/file_upload.dart';
 import 'package:brackety/features/club/ui/club_panel_screen.dart';
@@ -11,12 +12,17 @@ import 'package:brackety/features/club/ui/settings_tab.dart';
 import 'package:brackety/features/club/ui/participant_form.dart';
 import 'package:brackety/features/events/data/my_event.dart';
 import 'package:brackety/features/events/state/events_providers.dart';
+import 'package:brackety/features/league/data/league_models.dart';
+import 'package:brackety/features/league/state/league_providers.dart';
+import 'package:brackety/features/staff/data/staff_repository.dart';
 import 'package:brackety/l10n/gen/app_localizations.dart';
 import 'package:brackety_core/brackety_core.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../../support/staff_fakes.dart';
 
 /// Saves settings like the server would, or refuses them with [refuseWith].
 class FakeClubRepository extends Fake implements ClubRepository {
@@ -38,7 +44,16 @@ class FakeClubRepository extends Fake implements ClubRepository {
   final savedCategories = <List<EventCategory>>[];
   final savedParticipantCategories = <String?>[];
   final savedParticipantOrganizations = <String?>[];
+  final savedParticipantSexes = <Sex>[];
+  final savedParticipantWeights = <double?>[];
   final savedOrganizations = <List<Organization>>[];
+  final savedWarningReasons = <List<String>?>[];
+
+  @override
+  Future<void> saveWarningReasons(
+    String eventId,
+    List<String>? reasons,
+  ) async => savedWarningReasons.add(reasons);
 
   @override
   Future<void> saveParticipant(
@@ -47,11 +62,15 @@ class FakeClubRepository extends Fake implements ClubRepository {
     required String firstName,
     required String lastName,
     required DateTime birthDate,
+    required Sex sex,
     required int? heightCm,
+    required double? weightKg,
     required bool guardianConsent,
     String? categoryId,
     String? organizationId,
   }) async {
+    savedParticipantSexes.add(sex);
+    savedParticipantWeights.add(weightKg);
     savedParticipantCategories.add(categoryId);
     savedParticipantOrganizations.add(organizationId);
   }
@@ -174,6 +193,7 @@ void main() {
     matchLength: const Duration(minutes: 3),
     pointsLimit: 15,
     attendancePoints: 10,
+    sportWarningReasons: const ['Ataque de pique', 'Exceso de potencia'],
     categories: const [
       EventCategory(id: 'c1', name: '4-7', minAge: 4, maxAge: 7),
       EventCategory(id: 'c2', name: '8-11', minAge: 8, maxAge: 11),
@@ -223,6 +243,8 @@ void main() {
     Size size, {
     ClubRepository? repository,
     List<StandingRow>? scores,
+    bool globalStandings = true,
+    FakeStaffRepository? staff,
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
@@ -232,7 +254,21 @@ void main() {
         overrides: [
           if (repository != null)
             clubRepositoryProvider.overrideWithValue(repository),
+          staffRepositoryProvider.overrideWithValue(
+            staff ?? FakeStaffRepository(),
+          ),
           myEventsProvider.overrideWith((ref) async => [event]),
+          leagueProvider.overrideWith(
+            (ref, _) async => League(
+              name: 'Liga',
+              podium: const Podium(firsts: 1, seconds: 1, thirds: 2),
+              categoryPodiums: const [],
+              phases: const [],
+              categoryNames: const [],
+              availableDisciplines: const {},
+              globalStandings: globalStandings,
+            ),
+          ),
           eventSettingsProvider.overrideWith(
             (ref, _) async => repository is FakeClubRepository
                 ? repository.current
@@ -365,6 +401,18 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    testWidgets('without the global standings one category shows on $device', (
+      tester,
+    ) async {
+      await pumpPanel(tester, size, globalStandings: false);
+
+      expect(find.text('All categories'), findsNothing);
+      // The first category, 4-7, until another is picked.
+      expect(find.text('Bea Test'), findsOneWidget);
+      expect(find.text('Ana Test'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('the club opens a participant and sees each match on $device', (
       tester,
     ) async {
@@ -491,13 +539,150 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('8-11').last);
     await tester.pumpAndSettle();
+    // Entered before the sex was asked: nothing is saved until the club picks it.
+    await tester.tap(find.text('The legal guardian agrees'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+    await tester.pumpAndSettle();
+    expect(repository.savedParticipantCategories, isEmpty);
+    await tester.tap(find.text('The legal guardian agrees'));
+    await tester.ensureVisible(find.text('Female'));
+    await tester.tap(find.text('Female'));
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Weight in kg (optional)'),
+      '32,5',
+    );
+    await tester.pumpAndSettle();
     await tester.tap(find.text('The legal guardian agrees'));
     await tester.pump();
     await tester.tap(find.widgetWithText(FilledButton, 'Save'));
     await tester.pumpAndSettle();
 
     expect(repository.savedParticipantCategories, ['c2']);
+    expect(repository.savedParticipantSexes, [Sex.female]);
+    expect(repository.savedParticipantWeights, [32.5]);
   });
+
+  for (final MapEntry(key: device, value: size) in sizes.entries) {
+    testWidgets('the club changes the warning reasons on $device', (
+      tester,
+    ) async {
+      final repository = FakeClubRepository(settings);
+      await pumpPanel(tester, size, repository: repository);
+      await tester.tap(find.text('Settings').last);
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text('New reason'),
+        200,
+        scrollable: find
+            .descendant(
+              of: find.byType(ListView),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      expect(find.text('Ataque de pique'), findsOneWidget);
+
+      final remove = find.byTooltip('Remove “Ataque de pique”');
+      await tester.ensureVisible(remove);
+      await tester.pumpAndSettle();
+      await tester.tap(remove);
+      await tester.pumpAndSettle();
+      final field = find.widgetWithText(TextField, 'New reason');
+      await tester.ensureVisible(field);
+      await tester.enterText(field, 'Salida de zona');
+      final add = find.widgetWithText(FilledButton, 'Add');
+      await tester.ensureVisible(add);
+      await tester.pumpAndSettle();
+      await tester.tap(add);
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text("Back to the sport's"));
+      await tester.tap(find.text("Back to the sport's"));
+      await tester.pumpAndSettle();
+
+      expect(repository.savedWarningReasons, [
+        ['Exceso de potencia'],
+        ['Exceso de potencia', 'Salida de zona'],
+        null,
+      ]);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  for (final MapEntry(key: device, value: size) in sizes.entries) {
+    testWidgets('the club invites, cancels and removes staff on $device', (
+      tester,
+    ) async {
+      final staff = FakeStaffRepository(
+        pending: const [
+          Invitation(
+            id: 'old',
+            email: 'vieja@example.test',
+            role: StaffRole.grouper,
+            expired: true,
+          ),
+        ],
+      );
+      await pumpPanel(
+        tester,
+        size,
+        repository: FakeClubRepository(settings),
+        staff: staff,
+      );
+      await tester.tap(find.text('Settings').last);
+      await tester.pumpAndSettle();
+      final list = find
+          .descendant(
+            of: find.byType(ListView),
+            matching: find.byType(Scrollable),
+          )
+          .first;
+      await tester.scrollUntilVisible(
+        find.text('Invite'),
+        200,
+        scrollable: list,
+      );
+      expect(find.textContaining('expired'), findsOneWidget);
+
+      final invite = find.widgetWithText(OutlinedButton, 'Invite');
+      await tester.ensureVisible(invite);
+      await tester.pumpAndSettle();
+      await tester.tap(invite);
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Email'),
+        'ana@example.test',
+      );
+      await tester.tap(find.widgetWithText(FilledButton, 'Send invitation'));
+      await tester.pumpAndSettle();
+      expect(staff.calls, ['invite ana@example.test REFEREE']);
+      expect(find.text('ana@example.test'), findsOneWidget);
+
+      // Centred in the list: at its edges the bottom navigation covers them.
+      Future<void> centre(Finder finder) async {
+        await Scrollable.ensureVisible(tester.element(finder), alignment: 0.5);
+        await tester.pumpAndSettle();
+      }
+
+      final cancel = find.byTooltip('Cancel invitation').first;
+      await centre(cancel);
+      await tester.tap(cancel);
+      await tester.pumpAndSettle();
+      expect(staff.calls.last, 'cancel old');
+
+      final remove = find.byTooltip('Remove ayudante1');
+      await tester.scrollUntilVisible(remove, -200, scrollable: list);
+      await centre(remove);
+      await tester.tap(remove);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Remove as helper').last);
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, 'Remove'));
+      await tester.pumpAndSettle();
+      expect(staff.calls.last, 'remove h1 GROUPER');
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   testWidgets('the club adds the clubs taking part in Settings', (
     tester,
@@ -566,6 +751,9 @@ void main() {
     await tester.tap(find.text('No club'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Club Yoseikan Sevilla').last);
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Male'));
+    await tester.tap(find.text('Male'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('The legal guardian agrees'));
     await tester.pump();

@@ -1,5 +1,6 @@
 package dev.rgal.brackety.participant;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -10,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.jayway.jsonpath.JsonPath;
 import dev.rgal.brackety.event.EventApiTest;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 // The demo event is today (AuthTestConfig.START, 2027-03-10), so birth dates below set the age.
@@ -33,6 +35,33 @@ class ParticipantControllerTest extends EventApiTest {
     }
 
     @Test
+    void sexIsRequiredAndTheMeasuresOfTheDayStayWithTheEntryAndThePerson() throws Exception {
+        call(post(participants()).content(ADULT.replace("\"sex\":\"FEMALE\",", "")), "club1")
+                .andExpect(status().isBadRequest());
+        var body = call(
+                        post(participants())
+                                .content(ADULT.replace("\"heightCm\":165", "\"heightCm\":165,\"weightKg\":58.5")),
+                        "club1")
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.sex").value("FEMALE"))
+                .andExpect(jsonPath("$.weightKg").value(58.5))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        // The person keeps the latest height and weight measured.
+        assertThat(jdbc.sql("select height_cm || ' ' || weight_kg from person where id = ?")
+                        .param(UUID.fromString(JsonPath.read(body, "$.personId")))
+                        .query(String.class)
+                        .single())
+                .isEqualTo("165 58.5");
+        call(
+                        post(participants())
+                                .content(ADULT.replace("\"heightCm\":165", "\"heightCm\":165,\"weightKg\":58.55")),
+                        "club1")
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void aMinorNeedsTheGuardianConsent() throws Exception {
         call(post(participants()).content(participant("Leo", "Gómez", "2015-01-15", 140, false)), "club1")
                 .andExpect(status().isBadRequest());
@@ -49,8 +78,13 @@ class ParticipantControllerTest extends EventApiTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.lastName").value("Ruiz"))
                 .andExpect(jsonPath("$.heightCm").value(170));
+        var people =
+                jdbc.sql("select count(*) from person").query(Integer.class).single();
         call(delete(participants() + "/" + id), "club1").andExpect(status().isNoContent());
         call(get(participants()), "club1").andExpect(jsonPath("$", hasSize(0)));
+        // Their only entry: the student goes too.
+        assertThat(jdbc.sql("select count(*) from person").query(Integer.class).single())
+                .isEqualTo(people - 1);
     }
 
     @Test
@@ -79,6 +113,6 @@ class ParticipantControllerTest extends EventApiTest {
 
     private static String participant(String first, String last, String birthDate, Integer height, boolean consent) {
         return """
-                {"firstName":"%s","lastName":"%s","birthDate":"%s","heightCm":%s,"guardianConsent":%s}""".formatted(first, last, birthDate, height, consent);
+                {"firstName":"%s","lastName":"%s","birthDate":"%s","sex":"FEMALE","heightCm":%s,"guardianConsent":%s}""".formatted(first, last, birthDate, height, consent);
     }
 }

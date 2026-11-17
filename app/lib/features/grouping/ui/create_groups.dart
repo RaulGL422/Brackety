@@ -99,9 +99,11 @@ Future<bool> createGroup(
     if (conflict) refresh();
     toasts.show(
       conflict
-          ? (ApiError.from(e).code == 'SAME_FIGHTER'
-                ? l10n.teamOverlapTitle
-                : l10n.groupsConflict)
+          ? switch (ApiError.from(e).code) {
+              'SAME_FIGHTER' => l10n.teamOverlapTitle,
+              'MEASURES_MISSING' => l10n.measuresMissingError,
+              _ => l10n.groupsConflict,
+            }
           : l10n.groupsError,
       kind: ToastKind.error,
     );

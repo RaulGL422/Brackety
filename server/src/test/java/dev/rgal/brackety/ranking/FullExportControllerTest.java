@@ -40,7 +40,8 @@ class FullExportControllerTest extends EventApiTest {
     @BeforeEach
     void playAMatch() throws Exception {
         kids = new ArrayList<>();
-        var club = jdbc.sql("select id from event_organization where name = 'Club Demo Yoseikan'")
+        var club = jdbc.sql("select eo.id from event_organization eo join organization o on o.id = eo.organization_id"
+                        + " where o.name = 'Club Demo Yoseikan'")
                 .query(UUID.class)
                 .single();
         for (var name : List.of("Ana", "Bea", "Cris", "Dani")) {
@@ -91,10 +92,13 @@ class FullExportControllerTest extends EventApiTest {
                         "linea-de-tiempo.csv",
                         "clasificacion-fase.csv",
                         "clasificacion-liga.csv",
+                        "clasificacion-por-categoria/clasificacion-9-10.csv",
+                        "clasificacion-por-categoria.pdf",
                         "evento.brackety");
         assertThat(files.get("participantes.csv"))
-                .startsWith(Csv.BOM + "Nombre;Apellidos;Fecha de nacimiento;Edad el día del evento")
-                .contains("Ana;Prueba;15/01/2018;9;130;Club Demo Yoseikan;9-10;Por edad;Sí;;1;1;");
+                .startsWith(Csv.BOM
+                        + "Nombre;Apellidos;Fecha de nacimiento;Edad el día del evento;Sexo;Estatura (cm);Peso (kg)")
+                .contains("Ana;Prueba;15/01/2018;9;Sin declarar;130;;Club Demo Yoseikan;9-10;Por edad;Sí;;1;1;");
         assertThat(files.get("categorias.csv")).contains("9-10;9;10;Individual;;4;4;1;2;2;3");
         assertThat(files.get("tapices.csv")).contains("1;arbitro1;1;6;1");
         assertThat(files.get("grupos.csv")).contains(";ayudante1;1;Ana Prueba;;Club Demo Yoseikan;No");
@@ -105,6 +109,9 @@ class FullExportControllerTest extends EventApiTest {
                 .contains(";Punto;Azul;Bea Prueba;;arbitro1;;Sí")
                 .contains(";Deshacer;;;;arbitro1;Deshace la acción 6;No");
         assertThat(files.get("clasificacion-liga.csv")).contains("9-10;1;Oro (1.º);Ana;Prueba;Club Demo Yoseikan;10;3");
+        assertThat(files.get("clasificacion-por-categoria/clasificacion-9-10.csv"))
+                .startsWith(Csv.BOM + "Posición;Medalla;Nombre;Apellidos;Club;Fase 1;Total liga;Advertencias")
+                .contains("1;Oro (1.º);Ana;Prueba;Club Demo Yoseikan;13;13;");
         assertThat(files.get("LEEME.txt")).contains("participantes.csv", "evento.brackety");
         assertThat(files.get("evento.brackety")).contains("\"schemaVersion\" : 2", "\"originId\"");
     }
@@ -178,9 +185,9 @@ class FullExportControllerTest extends EventApiTest {
         importResults(zip, false).andExpect(status().isOk());
 
         assertThat(jdbc.sql("""
-                        select p.first_name from team_member m join team t on t.id = m.team_id
-                        join participant p on p.id = m.participant_id
-                        where t.event_id = ? and m.ghost order by p.first_name""").param(eventId).query(String.class).list()).containsExactly("Eva", "Fran");
+                        select pe.first_name from team_member m join team t on t.id = m.team_id
+                        join participant p on p.id = m.participant_id join person pe on pe.id = p.person_id
+                        where t.event_id = ? and m.ghost order by pe.first_name""").param(eventId).query(String.class).list()).containsExactly("Eva", "Fran");
     }
 
     @Test
