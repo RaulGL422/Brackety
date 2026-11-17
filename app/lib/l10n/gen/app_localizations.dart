@@ -2851,6 +2851,18 @@ abstract class AppLocalizations {
   /// **'años'**
   String get categoryAgeSuffix;
 
+  /// No description provided for @splitByAge.
+  ///
+  /// In es, this message translates to:
+  /// **'Separar por edad'**
+  String get splitByAge;
+
+  /// No description provided for @ageHeading.
+  ///
+  /// In es, this message translates to:
+  /// **'{age} años · {count}'**
+  String ageHeading(int age, int count);
+
   /// No description provided for @categoryLabel.
   ///
   /// In es, this message translates to:

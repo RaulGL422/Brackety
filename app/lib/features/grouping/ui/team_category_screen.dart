@@ -24,6 +24,7 @@ import '../../events/state/events_providers.dart';
 import '../../mat/ui/mat_label.dart';
 import 'measures.dart';
 import '../../events/data/measure_rules.dart';
+import 'age_sections.dart';
 
 /// A team category (docs/modulos/prototipo-f1-equipos.md): make teams from its participants, then
 /// group 4 teams (or 3 and a ghost team) and send them to a mat. "Individual group" opens the usual
@@ -106,6 +107,11 @@ class _TeamMaker extends ConsumerStatefulWidget {
 }
 
 class _TeamMakerState extends ConsumerState<_TeamMaker> {
+  static const _sortBar = Object();
+  static const _splitByAge = Object();
+
+  /// Only matters when the category mixes ages (F2-2).
+  var _byAge = true;
   var _picks = <String>[];
   var _sort = ParticipantSort.name;
   var _busy = false;
@@ -210,35 +216,53 @@ class _TeamMakerState extends ConsumerState<_TeamMaker> {
       onRetry: () => _refresh(ref, widget.categoryKey),
       data: (all) {
         final sorted = sortParticipants(all, _sort);
+        final mixed = mixesAges(all);
+        final rows = <Object>[
+          _sortBar,
+          if (mixed) _splitByAge,
+          ...(mixed && _byAge ? withAgeHeadings(sorted) : sorted),
+        ];
         return ListView.builder(
-          itemCount: sorted.length + 1,
-          itemBuilder: (context, i) => i == 0
-              ? _SortBar(
-                  sort: _sort,
-                  onChanged: (s) => setState(() => _sort = s),
-                )
-              : _PersonTile(
-                  participant: sorted[i - 1],
-                  rules: rules,
-                  picked: _picks.contains(sorted[i - 1].id),
-                  ghost: ghosts.contains(sorted[i - 1].id),
-                  enabled:
-                      blockedByMeasures(rules, sorted[i - 1]) ||
-                      _picks.contains(sorted[i - 1].id) ||
-                      (_picks.length < DraftGroup.maxTeam &&
-                          (_wildcards || !sorted[i - 1].isTaken)),
-                  onTap: blockedByMeasures(rules, sorted[i - 1])
-                      ? () async {
-                          if (await showMeasuresDialog(
-                            context,
-                            widget.categoryKey.eventId,
-                            sorted[i - 1],
-                          )) {
-                            _refresh(ref, widget.categoryKey);
-                          }
-                        }
-                      : () => _toggle(sorted[i - 1]),
-                ),
+          itemCount: rows.length,
+          itemBuilder: (context, i) {
+            final row = rows[i];
+            if (identical(row, _sortBar)) {
+              return _SortBar(
+                sort: _sort,
+                onChanged: (s) => setState(() => _sort = s),
+              );
+            }
+            if (row is AgeHeading) return AgeHeadingTile(heading: row);
+            if (row is! CategoryParticipant) {
+              return SplitByAgeChip(
+                selected: _byAge,
+                onSelected: (on) => setState(() => _byAge = on),
+              );
+            }
+            final p = row;
+            return _PersonTile(
+              participant: p,
+              rules: rules,
+              picked: _picks.contains(p.id),
+              ghost: ghosts.contains(p.id),
+              enabled:
+                  blockedByMeasures(rules, p) ||
+                  _picks.contains(p.id) ||
+                  (_picks.length < DraftGroup.maxTeam &&
+                      (_wildcards || !p.isTaken)),
+              onTap: blockedByMeasures(rules, p)
+                  ? () async {
+                      if (await showMeasuresDialog(
+                        context,
+                        widget.categoryKey.eventId,
+                        p,
+                      )) {
+                        _refresh(ref, widget.categoryKey);
+                      }
+                    }
+                  : () => _toggle(p),
+            );
+          },
         );
       },
     );

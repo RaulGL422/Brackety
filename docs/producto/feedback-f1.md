@@ -55,6 +55,7 @@ Fuente: Raul, 2026-11-16. Las tareas salen de aquí hacia `roadmap.md`.
 - Una categoría puede juntar varias edades, pero cada alumno debe salir **distinguido por su edad**.
 - Alcance (Raul, 2026-11-16): **la pantalla de crear grupos**. Se reorganiza para sacar esa división por edad llegado el momento (alumnos agrupados por edad, la edad bien visible).
 - Encaja con la reordenación de esa pantalla de `calidad.md` y `eventos-ux.md`.
+- 2026-11-17, en pruebas (rama `feat/f2-ages-in-category`): si la categoría mezcla edades, crear grupos y crear equipos separan la lista por edad («7 años · 6», la menor primero) con un interruptor «Separar por edad», y el panel del grupo muestra la edad de cada uno («Ana P. · 8»).
 
 ### F2-3 · CSV de resultados confuso
 - Abierto en Excel, la entidad de la liga no entiende bien los puestos (1.º, 2.º, 3.º). Rehacer todo el CSV para que se lea claro: una hoja o bloque por categoría, columnas con nombre y sin datos mezclados en una celda.
