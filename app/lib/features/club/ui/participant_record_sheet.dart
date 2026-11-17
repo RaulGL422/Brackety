@@ -216,6 +216,7 @@ class _IncidentTile extends StatelessWidget {
       IncidentKind.warning => l10n.incidentWarning,
       IncidentKind.oneHandWarning => l10n.incidentOneHand,
       IncidentKind.disqualification => l10n.recordDisqualified,
+      IncidentKind.overtimePoint => l10n.incidentOvertimePoint,
     };
     return ListTile(
       contentPadding: EdgeInsets.zero,

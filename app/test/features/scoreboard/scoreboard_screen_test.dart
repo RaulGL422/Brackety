@@ -193,6 +193,38 @@ void main() {
     await tester.pumpWidget(const SizedBox());
   });
 
+  for (final MapEntry(key: device, value: size) in sizes.entries) {
+    testWidgets(
+      'at 0:00 the last point still counts but no warning on $device',
+      (tester) async {
+        tester.view.physicalSize = size;
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        final (repository, _) = await open(
+          tester,
+          matchView(
+            status: MatchStatus.inProgress,
+            remaining: Duration.zero,
+            endReason: EndReason.time,
+          ),
+        );
+
+        final menu = tester.widget<PopupMenuButton<MatchAction>>(
+          find.byType(PopupMenuButton<MatchAction>).first,
+        );
+        expect(menu.enabled, isFalse);
+        await tester.tap(find.widgetWithText(FilledButton, '+1').last);
+        await settle(tester);
+
+        expect(repository.sent.single.$1, MatchAction.point);
+        expect(repository.sent.single.$2, Side.blue);
+        expect(tester.takeException(), isNull);
+
+        await tester.pumpWidget(const SizedBox());
+      },
+    );
+  }
+
   testWidgets('going back from a match that is over finishes it', (
     tester,
   ) async {

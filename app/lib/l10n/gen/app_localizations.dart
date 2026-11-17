@@ -1490,6 +1490,12 @@ abstract class AppLocalizations {
   /// **'automático'**
   String get tlAutomatic;
 
+  /// No description provided for @tlOvertime.
+  ///
+  /// In es, this message translates to:
+  /// **'fuera de tiempo'**
+  String get tlOvertime;
+
   /// No description provided for @tlUndone.
   ///
   /// In es, this message translates to:
@@ -4289,6 +4295,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Advertencia de una mano'**
   String get incidentOneHand;
+
+  /// No description provided for @incidentOvertimePoint.
+  ///
+  /// In es, this message translates to:
+  /// **'Punto fuera de tiempo'**
+  String get incidentOvertimePoint;
 
   /// No description provided for @incidentBy.
   ///

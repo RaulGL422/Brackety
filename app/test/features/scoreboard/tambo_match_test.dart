@@ -65,7 +65,7 @@ void main() {
     expect(match.refuse(MatchAction.finish, at(60)), MatchRefusal.notOver);
   });
 
-  test('when the time is over the clock stops and only finish is left', () {
+  test('when the time is over the clock stops and only the last point or finish are left', () {
     add(MatchAction.start, null, 0);
     add(MatchAction.point, Side.red, 10);
 
@@ -75,9 +75,35 @@ void main() {
     expect(match.isRunning(at(500)), isFalse);
     expect(match.endReason(at(500)), EndReason.time);
     expect(match.refuse(MatchAction.start, at(500)), isNotNull);
-    expect(match.refuse(MatchAction.point, at(500)), isNotNull);
+    // The last action's point, given at 0:00 (F1-3); sanctions are over.
+    expect(match.refuse(MatchAction.point, at(500)), isNull);
+    expect(match.refuse(MatchAction.warning, at(500)), MatchRefusal.over);
+    expect(
+      match.refuse(MatchAction.disqualification, at(500)),
+      MatchRefusal.over,
+    );
     expect(match.refuse(MatchAction.finish, at(500)), isNull);
   });
+
+  test(
+    'a point after the time counts, can be undone and may reach the limit',
+    () {
+      add(MatchAction.start, null, 0);
+      for (var i = 0; i < 14; i++) {
+        add(MatchAction.point, Side.blue, i + 1);
+      }
+      final last = add(MatchAction.point, Side.blue, 500);
+
+      final match = replay();
+      expect(match.points(Side.blue), 15);
+      expect(match.endReason(at(501)), EndReason.points);
+      expect(match.refuse(MatchAction.point, at(501)), MatchRefusal.over);
+
+      add(MatchAction.undo, null, 502, last);
+      expect(replay().points(Side.blue), 14);
+      expect(replay().endReason(at(503)), EndReason.time);
+    },
+  );
 
   test('fifteen points end the match and undoing the last one reopens it', () {
     add(MatchAction.start, null, 0);

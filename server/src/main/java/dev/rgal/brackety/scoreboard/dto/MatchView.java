@@ -67,7 +67,8 @@ public record MatchView(
             boolean undone,
             boolean gaveRivalPoint,
             UUID opId,
-            Long deltaMs) {}
+            Long deltaMs,
+            boolean overtime) {}
 
     /**
      * {@code reason}: why the first action clashed (KNOWN_EVENTS, RULES, AGE, MAT_BUSY, FIGHTER_BUSY).

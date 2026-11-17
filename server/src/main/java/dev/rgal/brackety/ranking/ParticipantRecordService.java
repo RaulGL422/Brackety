@@ -31,6 +31,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 class ParticipantRecordService {
 
+    /** The incident kind of a point given once the clock showed 0:00 (F1-3). */
+    static final String OVERTIME_POINT = "OVERTIME_POINT";
+
     private static final Set<MatchEventType> INCIDENTS =
             Set.of(MatchEventType.WARNING, MatchEventType.ONE_HAND_WARNING, MatchEventType.DISQUALIFICATION);
 
@@ -148,8 +151,13 @@ class ParticipantRecordService {
             }
         }
         return timeline.subList(lastCancel + 1, timeline.size()).stream()
-                .filter(e -> INCIDENTS.contains(e.type()) && e.side() == side && !e.undone())
-                .map(e -> new Incident(e.type().name(), e.reason(), e.clockMs(), e.actor(), e.gaveRivalPoint()))
+                .filter(e -> (INCIDENTS.contains(e.type()) || e.overtime()) && e.side() == side && !e.undone())
+                .map(e -> new Incident(
+                        e.overtime() ? OVERTIME_POINT : e.type().name(),
+                        e.reason(),
+                        e.clockMs(),
+                        e.actor(),
+                        e.gaveRivalPoint()))
                 .toList();
     }
 }
