@@ -1,6 +1,6 @@
 # Usage: ./deploy.ps1 [-Mode windows|pi|local]
 # windows/pi: pull the published images and start the tunnel. local: use images already built on this machine.
-# Same steps as deploy.sh; keep both in sync.
+# Same steps as deploy.sh; keep both in sync. The debug environment lives on the Pi only: deploy.sh debug.
 param(
     [ValidateSet('windows', 'pi', 'local')]
     [string]$Mode = 'windows'

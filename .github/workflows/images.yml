@@ -3,7 +3,8 @@ name: Images
 on:
   pull_request:
   push:
-    branches: [main]
+    # development publishes the debug images (tag dev, docs/modulos/entornos.md); main and v* production's.
+    branches: [main, development]
     tags: ["v*"]
   workflow_dispatch:
 
@@ -88,12 +89,52 @@ jobs:
         if: always()
         run: docker compose down -v
 
+  debug-smoke:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: deploy
+    env:
+      DEBUG_COMPOSE: docker compose --env-file .env.debug -f docker-compose.yml -f docker-compose.debug.yml
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Test environment
+        run: |
+          cp .env.debug.example .env.debug
+          sed -i 's/^DB_USER=.*/DB_USER=brackety/; s/^DB_PASSWORD=.*/DB_PASSWORD=ci-only-password/; s#^DB_DATA=.*#DB_DATA=pgdata#' .env.debug
+          sed -i "s#^JWT_SECRET=.*#JWT_SECRET=$(openssl rand -base64 48 | tr -d '\n')#; s/^CLOUDFLARE_TUNNEL_TOKEN=.*/CLOUDFLARE_TUNNEL_TOKEN=ci/" .env.debug
+      - name: Deploy refuses production's JWT_SECRET
+        run: |
+          grep '^JWT_SECRET=' .env.debug > .env
+          if ./deploy.sh debug 2> "$RUNNER_TEMP/deploy.err"; then echo "debug sharing JWT_SECRET should fail"; exit 1; fi
+          grep -q "must not share JWT_SECRET" "$RUNNER_TEMP/deploy.err"
+          rm .env
+      - name: Build and start the debug api
+        run: |
+          $DEBUG_COMPOSE build api
+          $DEBUG_COMPOSE up -d --wait --wait-timeout 300 db api
+      - name: Check debug api
+        run: |
+          curl -fsS http://127.0.0.1:8090/api/v1/debug | grep -q '"simulated"'
+          # Its own project: nothing of production's runs.
+          test -z "$(docker ps -q --filter label=com.docker.compose.project=brackety)"
+          test "$(docker inspect --format '{{.HostConfig.Memory}}' "$($DEBUG_COMPOSE ps -q api)")" = 1073741824
+      - name: Logs on failure
+        if: failure()
+        run: $DEBUG_COMPOSE logs
+      - name: Stop
+        if: always()
+        run: $DEBUG_COMPOSE down -v
+
   publish:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+    env:
+      DEBUG: ${{ github.ref == 'refs/heads/development' }}
     strategy:
       matrix:
         include:
@@ -117,6 +158,23 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build arguments
+        id: args
+        env:
+          APP: ${{ matrix.app }}
+          PROD_API: ${{ vars.API_BASE_URL }}
+          PROD_ADMIN_API: ${{ vars.ADMIN_API_BASE_URL }}
+          DEBUG_API: ${{ vars.DEBUG_API_BASE_URL }}
+          DEBUG_ADMIN_API: ${{ vars.DEBUG_ADMIN_API_BASE_URL }}
+        # Debug never falls back to production's URLs: a debug admin must not reach the production API.
+        run: |
+          if [ "$DEBUG" = true ]; then
+            api=$DEBUG_API admin=$DEBUG_ADMIN_API profile=debug
+          else
+            api=$PROD_API admin=${PROD_ADMIN_API:-$PROD_API} profile=
+          fi
+          if [ "$APP" = admin ]; then api=$admin; fi
+          { echo "api=$api"; echo "profile=$profile"; } >> "$GITHUB_OUTPUT"
       - id: meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
@@ -124,7 +182,8 @@ jobs:
           tags: |
             type=semver,pattern={{version}}
             type=raw,value=latest,enable={{is_default_branch}}
-            type=sha
+            type=raw,value=dev,enable=${{ env.DEBUG == 'true' }}
+            type=sha,enable=${{ env.DEBUG != 'true' }}
       - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: ${{ matrix.context }}
@@ -135,6 +194,8 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             APP=${{ matrix.app }}
-            API_BASE_URL=${{ matrix.app == 'admin' && vars.ADMIN_API_BASE_URL || vars.API_BASE_URL }}
-          cache-from: type=gha,scope=${{ matrix.image }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.image }}
+            API_BASE_URL=${{ steps.args.outputs.api }}
+            MAVEN_PROFILE=${{ steps.args.outputs.profile }}
+            BRACKETY_DEBUG=${{ env.DEBUG }}
+          cache-from: type=gha,scope=${{ matrix.image }}-${{ env.DEBUG }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image }}-${{ env.DEBUG }}

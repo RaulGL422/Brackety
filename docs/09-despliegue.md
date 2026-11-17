@@ -45,6 +45,17 @@ Tras un reinicio todo vuelve solo: Docker arranca con el sistema y los servicios
 - El rollback **no deshace migraciones** de base de datos: hacer backup antes de desplegar una versión con migraciones (tarea 6).
 - `local` usa imágenes construidas en la máquina, sin pull ni túnel (`docker compose build && ./deploy.sh local`). Es lo que prueba el CI, rollback incluido.
 
+## Debug en la misma Pi (`modulos/entornos.md`)
+Otro proyecto de compose (`brackety-debug`) con su BD, sus puertos (8090-8092), su túnel y límites de CPU y memoria.
+1. **Cloudflare**: un **segundo túnel** con `brackety-debug` → `http://web:80`, `brackety-debug-api` → `http://api:8080`, `brackety-debug-admin` → `http://admin:80`. Una aplicación de Access que cubra **los tres** hostnames.
+2. **GitHub** (Settings → Variables): `DEBUG_API_BASE_URL=https://brackety-debug-api.rgal.dev` y `DEBUG_ADMIN_API_BASE_URL=https://brackety-debug-admin.rgal.dev`. Cada push a `development` publica las imágenes `dev` (api con escenarios, admin con la pestaña Escenarios).
+3. **Pi**: `sudo mkdir -p /mnt/ssd/brackety-debug/pgdata`, `cp .env.debug.example .env.debug`, rellenarlo (BD, `JWT_SECRET` y superadmin **propios**, token del segundo túnel, Access) y `chmod 600 .env.debug`.
+4. `./deploy.sh debug` (mismo pull, espera y rollback que producción; se niega si comparte `JWT_SECRET`).
+- **Días de evento**: `./deploy.sh debug-stop` la víspera; `./deploy.sh debug` al acabar. Parado no arranca solo tras reiniciar.
+- Actualizar: `./deploy.sh debug` tras cada fusión en `development`.
+- Comandos sueltos: `docker compose --env-file .env.debug -f docker-compose.yml -f docker-compose.debug.yml logs api`.
+- Sin backups: lo que importe, en una copia con nombre de la pestaña Escenarios.
+
 ## Backups
 `deploy/backup.sh`: `pg_dump` cifrado con [age](https://github.com/FiloSottile/age), 14 diarios + 8 semanales (domingo).
 1. **Clave** (en tu PC, una vez): `winget install FiloSottile.age` y `age-keygen -o brackety-backup.key`.
