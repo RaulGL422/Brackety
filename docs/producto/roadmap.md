@@ -41,13 +41,13 @@ Línea de infraestructura; puede ir en paralelo con la etapa 2 (otro worktree).
 6. F2-1 Peso de los alumnos.
 7. F2-2 Edades mezcladas dentro de una categoría, divididas en la pantalla de crear grupos.
 8. F2-3 CSV de resultados claro en Excel.
-9. F2-4 Clasificaciones configurables: global opcional en pruebas (2026-11-17); dividir por sexo o peso, cuando una modalidad lo pida.
+9. F2-4 Clasificaciones configurables: global opcional fusionada (#123, 2026-11-17); dividir por sexo o peso, cuando una modalidad lo pida.
 
 ## Después · Etapa 2b: competición del 2026-12-20 (`competicion-2026-12-20.md`)
 - Torneo con grupos de 4 y 3 modalidades seguidas. Diseño en cuanto lleguen los detalles; prueba in situ hacia el 13-12.
 
 ## Después · Etapa 3: calidad (`calidad.md`)
-1. CI por componentes con `ci-ok` y batería completa en releases.
+1. CI por componentes con `ci-ok` y batería completa en releases: en pruebas (2026-11-17).
 2. Inventario del código con números.
 3. Refactor por módulo con tests de caracterización, empezando por marcador, grupos y tablero.
 4. Revisión de diseño completa con `frontend-design` y lista priorizada.

@@ -2,6 +2,8 @@ name: Images
 
 on:
   pull_request:
+    # Docs never change an image; releases always touch code, so they still build.
+    paths-ignore: ['docs/**', '**/*.md']
   push:
     # development publishes the debug images (tag dev, docs/modulos/entornos.md); main and v* production's.
     branches: [main, development]
