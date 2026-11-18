@@ -28,7 +28,8 @@ Pedido de Raul: buscar a fondo el código enrevesado, repetido u optimizable ant
 - `club_models.dart` (554): 13 clases de 5 temas distintos en un archivo.
 
 ### 3. Ciclos entre features de la app
-- `scoreboard ↔ mat`, `scoreboard ↔ offline`, `mat ↔ offline`, `club ↔ league`, `auth ↔ offline`.
+- Directos: `scoreboard ↔ mat`, `scoreboard ↔ offline`, `mat ↔ offline`, `club ↔ league`, `auth ↔ offline`.
+- Contando los indirectos, **las 14 features de la app se alcanzan unas a otras**: un solo ciclo (`tools/code_metrics.py`).
 - Causa: el modelo del combate (`Corner`, `MatchView`, `Side`) vive en `scoreboard`, y `offline` es infraestructura pero está como feature.
 - Efecto: no se puede tocar el marcador sin arrastrar tablero y cola offline; los tests necesitan muchos fakes.
 
@@ -72,4 +73,4 @@ Pedido de Raul: buscar a fondo el código enrevesado, repetido u optimizable ant
 - Tests en 3 tamaños: solo en 15 de 54 archivos de test de front.
 
 ## Cómo repetir la medición
-`python tools/code_metrics.py` (a crear en la fase L0 de `plan-limpieza.md`), que saca las cifras de esta página. Se repite al cerrar cada fase.
+`python tools/code_metrics.py` (fase L0, PR #137) saca las cifras de esta página; el CI no deja que empeoren. Se repite al cerrar cada fase.

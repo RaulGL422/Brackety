@@ -71,8 +71,8 @@ Ver `diseno-revision.md`. Regla al tocar una pantalla: `build` ≤ 60 líneas, a
 | Medida | Hoy | Meta |
 |---|---|---|
 | Archivos Dart > 400 / Java > 300 | 13 / 8 | 0 / 0 (salvo generados) |
-| Métodos y `build` ≥ 60 líneas | 68 | < 10 |
-| Ciclos entre features de la app | 5 | 0 (lo vigila el CI) |
+| Métodos y `build` ≥ 60 líneas | 67 | < 10 |
+| Features de la app en un ciclo de imports | 14 de 14 | 0 (lo vigila el CI) |
 | Ramas individual/equipos en el servidor | 70 | < 10 (tras M3) |
 | Panel de control escrito | 2 veces | 1 |
 | Errores 4xx con `code` | 17 de ~127 | todos |
