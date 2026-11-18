@@ -2,6 +2,7 @@ package dev.rgal.brackety.eventpackage;
 
 import dev.rgal.brackety.event.Discipline;
 import dev.rgal.brackety.event.EventCategory;
+import dev.rgal.brackety.event.EventPermission;
 import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.MeasureRequirement;
 import dev.rgal.brackety.league.Podium;
@@ -18,6 +19,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -39,7 +41,8 @@ public record EventPackage(
         @NotNull List<@NotNull @Valid ParticipantEntry> participants,
         @Valid EventResults results,
         @Size(max = 100) List<@NotNull @Valid StaffName> staffNames,
-        @Valid RulebookEntry rulebook) {
+        @Valid RulebookEntry rulebook,
+        @Size(max = 100) List<@NotNull @Valid StaffPermissions> staffPermissions) {
 
     public static final int SCHEMA_VERSION = 2;
 
@@ -52,6 +55,18 @@ public record EventPackage(
     public record StaffName(
             @NotBlank @Size(max = 254) String username,
             @NotBlank @Size(max = 80) String name) {}
+
+    /**
+     * What the club chose for a helper or referee in «Personal»; whoever is missing keeps the defaults of their roles.
+     * Absent in files from before the choice existed.
+     */
+    public record StaffPermissions(
+            @NotBlank @Size(max = 254) String username,
+            @NotNull Set<@NotNull EventPermission> permissions) {}
+
+    public List<StaffPermissions> staffPermissionsOrEmpty() {
+        return staffPermissions == null ? List.of() : staffPermissions;
+    }
 
     public List<StaffName> staffNamesOrEmpty() {
         return staffNames == null ? List.of() : staffNames;
