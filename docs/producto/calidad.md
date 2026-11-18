@@ -19,7 +19,7 @@ Que cualquier pantalla o servicio se entienda sin haberlo escrito. El prototipo 
 2. **Primero tests de caracterización** de lo que se toca (fijan lo que hace hoy), después refactor.
 3. Una PR por módulo, **sin cambios de comportamiento** (lo que cambie el comportamiento va en otra PR).
 4. Orden: lo que más se va a tocar después (marcador, grupos, tablero, configuración del evento).
-5. Reglas automáticas para que no vuelva a pasar (propuesta): lints más estrictos en Flutter, un test que prohíba dependencias entre features en Java (ArchUnit) y un aviso del CI por archivo de más de 400 líneas.
+5. Reglas automáticas para que no vuelva a pasar: `tools/code_metrics.py` (hecho, 2026-11-18) mide archivos largos, métodos de 60 líneas o más, features de la app en un ciclo de imports y código duplicado; el CI (trabajo `metrics`) falla si una cifra supera su límite en `tools/code_metrics.json`, y los límites solo bajan. Después: lints más estrictos en Flutter y ArchUnit en Java (fase L0 de `plan-limpieza.md`).
 
 ## 2. Pantallas ordenadas y revisión de diseño
 - Toda PR que cambie una pantalla pasa **la skill `frontend-design`** (plugin del proyecto) y capturas con Playwright en 360×800, 800×1280 y 1440×900 antes de pedir revisión (`.claude/rules/frontend-flutter.md`).
