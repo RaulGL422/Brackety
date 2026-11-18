@@ -14,6 +14,21 @@ Avisos por email (Resend) y push (Firebase).
 - Raul (2026-11-18): aprovechar mucho el correo como herramienta. Proponerle una lista de avisos útiles y que elija.
 - Raul (2026-11-18): enviar resultados (PDF/CSV) a una o varias direcciones desde el panel del club (`pendientes.md`).
 
+## Propuesta a Raul (2026-11-18, sin respuesta aún)
+Avisos por correo para que elija cuáles y en qué orden:
+1. Fase cerrada sola o que no se pudo cerrar (hecho, #129) · club.
+2. Invitación al personal y aviso de aceptada · invitado / club.
+3. Resumen al terminar la fase: combates, revisiones pendientes, enlaces a PDF y CSV · club.
+4. Revisión de combate pendiente más de X minutos · club y quien tenga «Revisiones».
+5. Recordatorio el día antes: hora, tapiz asignado y enlace · personal y árbitros.
+6. Te han asignado un tapiz o cambiado los permisos · esa persona.
+7. Fase reabierta, con el motivo · club y personal.
+8. Envío de resultados a direcciones que escribe el club.
+9. Copia de seguridad hecha o fallida (Pi) · superadmin.
+10. Organizador nuevo pendiente de validar · superadmin.
+
+Para el 8 (lleva nombres de menores), propuesta: solo el PDF de la clasificación, sin nacimientos ni contactos, y una casilla del club confirmando que las direcciones son de la entidad organizadora.
+
 ## Datos
 `notification`, `device_token`, `notification_preference`.
 

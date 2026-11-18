@@ -56,7 +56,7 @@
 - [ ] F1-7: probar a mano en debug la PR B (fusionada, #129): comenzar, crear grupos, finalizar con pendientes, reabrir con motivo y el correo del día siguiente. PR C (permisos, rama `feat/event-staff-permissions`): dar y quitar permisos en «Personal» y comprobar que el ayudante ve o pierde sus botones.
 - [ ] F1-7 C2 (rama `feat/staff-panel-access`): probar a mano en debug un ayudante solo de mirar, otro solo de alumnos y un árbitro que además hace grupos.
 - [ ] F1-7 C permisos en el portátil (rama `feat/package-staff-permissions`): probar a mano exportar con un ayudante en un tapiz, cargarlo en el portátil y entrar con él.
-- [ ] Correo como herramienta (Raul, 2026-11-18): lista de avisos útiles por email para que Raul elija (`modulos/notificaciones.md`).
+- [ ] Correo como herramienta (Raul, 2026-11-18): Raul elige de la lista propuesta en `modulos/notificaciones.md` (sección «Propuesta a Raul»), y si vale la propuesta para enviar resultados.
 - [ ] Nombres descriptivos en las descargas (rama `feat/descriptive-download-names`): probar a mano que cada descarga del panel lleva liga, fase y qué es (`modulos/ranking.md`).
 - [ ] Compartir resultados por correo (Raul, 2026-11-18): enviar la clasificación o los resultados (PDF/CSV) a una o varias direcciones que escribe el club, desde el panel. Ojo: llevan datos de menores (`06-legal-rgpd.md`); decidir qué se puede enviar y a quién.
 - [ ] Gestión del club (`producto/gestion-club.md`): ¿se amplía el alcance? Cambia `00-vision.md` (hoy cobros fuera de alcance).
