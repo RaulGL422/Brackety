@@ -6,8 +6,8 @@ import dev.rgal.brackety.auth.account.AccountRepository;
 import dev.rgal.brackety.auth.account.AuthEmails;
 import dev.rgal.brackety.auth.dto.DeletionResponse;
 import dev.rgal.brackety.auth.session.SessionService;
-import dev.rgal.brackety.event.EventRepository;
 import java.time.Clock;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,25 +17,25 @@ import org.springframework.transaction.annotation.Transactional;
 public class AccountDeletionService {
 
     private final AccountRepository accounts;
-    private final EventRepository events;
+    private final List<AccountDeletionBlocker> blockers;
     private final SessionService sessions;
     private final AuthEmails authEmails;
     private final Clock clock;
 
     AccountDeletionService(
             AccountRepository accounts,
-            EventRepository events,
+            List<AccountDeletionBlocker> blockers,
             SessionService sessions,
             AuthEmails authEmails,
             Clock clock) {
         this.accounts = accounts;
-        this.events = events;
+        this.blockers = blockers;
         this.sessions = sessions;
         this.authEmails = authEmails;
         this.clock = clock;
     }
 
-    // An owned event holds other people's data: it is handed over or deleted first, never left without owner.
+    // What the account owns for others (its events) is handed over or deleted first.
     @Transactional
     DeletionResponse delete(UUID accountId) {
         var account = accounts.lockById(accountId).filter(Account::isActive).orElseThrow(AuthException::invalidSession);
@@ -45,7 +45,7 @@ public class AccountDeletionService {
     /** For the owner or the superadmin: {@code account} is active and locked by the caller. */
     @Transactional
     public DeletionResponse schedule(Account account) {
-        if (events.existsByOwnerAccountId(account.getId())) {
+        if (blockers.stream().anyMatch(blocker -> blocker.blocksDeletion(account.getId()))) {
             throw AuthException.ownsEvents();
         }
         account.markDeleted(clock.instant());

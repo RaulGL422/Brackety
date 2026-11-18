@@ -1,10 +1,5 @@
-package dev.rgal.brackety.demo;
+package dev.rgal.brackety.auth.account;
 
-import dev.rgal.brackety.auth.account.Account;
-import dev.rgal.brackety.auth.account.AccountRepository;
-import dev.rgal.brackety.auth.account.Profile;
-import dev.rgal.brackety.auth.account.ProfileRepository;
-import dev.rgal.brackety.auth.account.ProfileType;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -16,14 +11,15 @@ import org.springframework.stereotype.Component;
  * and the staff an event package brings, with the password it chooses (docs/modulos/servidor-local.md).
  */
 @Component
-public class DemoAccounts {
+public class VerifiedAccounts {
 
     private final AccountRepository accounts;
     private final ProfileRepository profiles;
     private final PasswordEncoder passwordEncoder;
     private final Clock clock;
 
-    DemoAccounts(AccountRepository accounts, ProfileRepository profiles, PasswordEncoder passwordEncoder, Clock clock) {
+    VerifiedAccounts(
+            AccountRepository accounts, ProfileRepository profiles, PasswordEncoder passwordEncoder, Clock clock) {
         this.accounts = accounts;
         this.profiles = profiles;
         this.passwordEncoder = passwordEncoder;

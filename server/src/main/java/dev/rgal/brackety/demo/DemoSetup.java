@@ -1,6 +1,7 @@
 package dev.rgal.brackety.demo;
 
 import dev.rgal.brackety.auth.account.AccountRepository;
+import dev.rgal.brackety.auth.account.VerifiedAccounts;
 import dev.rgal.brackety.event.Event;
 import dev.rgal.brackety.event.EventCategory;
 import dev.rgal.brackety.event.EventCategoryRepository;
@@ -61,7 +62,7 @@ public class DemoSetup {
     private static final Logger log = LoggerFactory.getLogger(DemoSetup.class);
 
     private final AccountRepository accounts;
-    private final DemoAccounts demoAccounts;
+    private final VerifiedAccounts verifiedAccounts;
     private final EventRepository events;
     private final EventStaffRepository staff;
     private final MatRepository mats;
@@ -77,7 +78,7 @@ public class DemoSetup {
 
     DemoSetup(
             AccountRepository accounts,
-            DemoAccounts demoAccounts,
+            VerifiedAccounts verifiedAccounts,
             EventRepository events,
             EventStaffRepository staff,
             MatRepository mats,
@@ -91,7 +92,7 @@ public class DemoSetup {
             @Value("${brackety.demo.event-date}") String eventDate,
             @Value("${brackety.package}") String eventPackage) {
         this.accounts = accounts;
-        this.demoAccounts = demoAccounts;
+        this.verifiedAccounts = verifiedAccounts;
         this.events = events;
         this.staff = staff;
         this.mats = mats;
@@ -123,17 +124,17 @@ public class DemoSetup {
                 return null;
             }
             var now = clock.instant();
-            var club = demoAccounts.club(CLUB, DEMO_CLUB_NAME, DEMO_CLUB_CIF);
+            var club = verifiedAccounts.club(CLUB, DEMO_CLUB_NAME, DEMO_CLUB_CIF);
             var date = eventDate.isBlank() ? LocalDate.now(clock) : LocalDate.parse(eventDate);
             var league = leagues.save(new League(club, "Liga Yoseikan 2027", now));
             var event =
                     events.save(Event.tambo(club, league.getId(), "Liga Yoseikan 2027 · Fase 1 · Tambo", date, now));
             staff.save(new EventStaff(event.getId(), club, EventRole.CLUB));
             for (var grouper : GROUPERS) {
-                staff.save(new EventStaff(event.getId(), demoAccounts.helper(grouper), EventRole.GROUPER));
+                staff.save(new EventStaff(event.getId(), verifiedAccounts.helper(grouper), EventRole.GROUPER));
             }
             for (int i = 0; i < REFEREES.size(); i++) {
-                var referee = demoAccounts.helper(REFEREES.get(i));
+                var referee = verifiedAccounts.helper(REFEREES.get(i));
                 staff.save(new EventStaff(event.getId(), referee, EventRole.REFEREE));
                 mats.save(new Mat(event.getId(), i + 1, referee));
             }

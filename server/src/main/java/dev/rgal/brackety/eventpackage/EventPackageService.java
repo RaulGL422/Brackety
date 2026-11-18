@@ -5,8 +5,8 @@ import dev.rgal.brackety.auth.account.AccountRepository;
 import dev.rgal.brackety.auth.account.Cif;
 import dev.rgal.brackety.auth.account.Profile;
 import dev.rgal.brackety.auth.account.ProfileRepository;
+import dev.rgal.brackety.auth.account.VerifiedAccounts;
 import dev.rgal.brackety.common.crypto.Sha256;
-import dev.rgal.brackety.demo.DemoAccounts;
 import dev.rgal.brackety.event.Discipline;
 import dev.rgal.brackety.event.Event;
 import dev.rgal.brackety.event.EventAccess;
@@ -97,7 +97,7 @@ public class EventPackageService {
     private final CategoryPodiumRepository podiums;
     private final AccountRepository accounts;
     private final ProfileRepository profiles;
-    private final DemoAccounts demoAccounts;
+    private final VerifiedAccounts verifiedAccounts;
     private final EventResultsTransfer results;
     private final JsonMapper json;
     private final Validator validator;
@@ -120,7 +120,7 @@ public class EventPackageService {
             CategoryPodiumRepository podiums,
             AccountRepository accounts,
             ProfileRepository profiles,
-            DemoAccounts demoAccounts,
+            VerifiedAccounts verifiedAccounts,
             EventResultsTransfer results,
             JsonMapper json,
             Validator validator,
@@ -141,7 +141,7 @@ public class EventPackageService {
         this.podiums = podiums;
         this.accounts = accounts;
         this.profiles = profiles;
-        this.demoAccounts = demoAccounts;
+        this.verifiedAccounts = verifiedAccounts;
         this.results = results;
         this.json = json;
         this.validator = validator;
@@ -612,7 +612,7 @@ public class EventPackageService {
         ids.put(
                 owner,
                 existing(owner)
-                        .orElseGet(() -> demoAccounts.club(
+                        .orElseGet(() -> verifiedAccounts.club(
                                 owner,
                                 blankToNull(p.owner().organizationName()),
                                 Cif.normalize(p.owner().taxId()),
@@ -622,7 +622,7 @@ public class EventPackageService {
             ids.computeIfAbsent(
                     username,
                     u -> existing(u)
-                            .orElseGet(() -> demoAccounts.helper(u, newPassword(u, passwords, usernamePasswords))));
+                            .orElseGet(() -> verifiedAccounts.helper(u, newPassword(u, passwords, usernamePasswords))));
         }
         return ids;
     }
