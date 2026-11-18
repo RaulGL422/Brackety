@@ -2835,4 +2835,8 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get leagueGlobalStandingsHint =>
       'Every category together in Scores and League. Off, one category at a time.';
+
+  @override
+  String get settingsMatHasGroups =>
+      'That mat already has groups and keeps where they were played: it cannot be removed. If it is done, use \"Disable mat\" in the mats tab.';
 }

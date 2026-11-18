@@ -10,6 +10,8 @@ Avisos por email (Resend) y push (Firebase).
 - Push con tokens por dispositivo; web push opcional. Sin datos sensibles en el texto del push.
 - Cola simple en base de datos con reintentos; sin broker.
 - Sin envío masivo a menores sin cuenta: solo a tutores.
+- Fase cerrada sola al día siguiente, o que no se pudo cerrar por combates pendientes: correo al club (F1-7).
+- Raul (2026-11-18): aprovechar mucho el correo como herramienta. Proponerle una lista de avisos útiles y que elija.
 
 ## Datos
 `notification`, `device_token`, `notification_preference`.

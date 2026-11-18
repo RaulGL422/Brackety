@@ -231,7 +231,8 @@ class GroupControllerTest extends EventApiTest {
         call(put(event() + "/settings").content(settings("2027-03-11", referees)), "club1")
                 .andExpect(status().isConflict());
         call(put(event() + "/settings").content(settings("2027-03-10", referees.subList(1, 2))), "club1")
-                .andExpect(status().isConflict());
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("MAT_HAS_GROUPS"));
         call(delete(event() + "/participants/" + sevens.get(0)), "club1").andExpect(status().isConflict());
         call(delete(event() + "/participants/" + sevens.get(9)), "club1").andExpect(status().isNoContent());
     }
