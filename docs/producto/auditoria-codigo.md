@@ -12,7 +12,7 @@ Pedido de Raul: buscar a fondo el código enrevesado, repetido u optimizable ant
 | Migraciones | 35 | 660 | – |
 
 ## Veredicto
-- **Bien**: tokens de diseño respetados (4 colores sueltos en toda la app, 2 `fontSize`), sin textos fijos en widgets, servidor sin ciclos entre paquetes, un solo sitio para permisos (`EventAccess`) y errores tipados (`EventException`), tests de servicio y controller con BD real, CI por componentes.
+- **Bien**: tokens de diseño respetados (4 colores sueltos en toda la app, 2 `fontSize`), sin textos fijos en widgets, servidor con un solo ciclo entre paquetes (`auth ↔ event`, lo encontró ArchUnit y se arregla en #138), un solo sitio para permisos (`EventAccess`) y errores tipados (`EventException`), tests de servicio y controller con BD real, CI por componentes.
 - **Mal**: pantallas gigantes, dos caminos para todo (individual y equipos), ciclos entre features de la app, el panel de control escrito dos veces (app y admin), cada deporte escrito en código, y reglas del backend que el código no cumple.
 
 ## Hallazgos por orden de impacto
