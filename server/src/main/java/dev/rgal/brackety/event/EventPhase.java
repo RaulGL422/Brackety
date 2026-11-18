@@ -66,7 +66,8 @@ public class EventPhase {
 
     @Transactional
     public PhaseView start(UUID eventId, UUID accountId) {
-        var event = clubLocks(eventId, accountId);
+        access.require(eventId, accountId, EventPermission.PHASE);
+        var event = lock(eventId);
         if (event.phaseState() != PhaseState.NOT_STARTED) {
             throw EventException.conflict("PHASE_ALREADY_STARTED", "The phase has already started.");
         }
@@ -79,7 +80,8 @@ public class EventPhase {
     /** Pending matches stay unplayed (the app asks first); never with a match in progress or in review. */
     @Transactional
     public PhaseView finish(UUID eventId, UUID accountId) {
-        var event = clubLocks(eventId, accountId);
+        access.require(eventId, accountId, EventPermission.PHASE);
+        var event = lock(eventId);
         requireInProgress(event.phaseState());
         if (events.hasMatchInProgressOrReview(eventId)) {
             throw EventException.conflict(
@@ -91,7 +93,8 @@ public class EventPhase {
 
     @Transactional
     public PhaseView reopen(UUID eventId, UUID accountId, String reason) {
-        var event = clubLocks(eventId, accountId);
+        access.require(eventId, accountId, EventRole.CLUB);
+        var event = lock(eventId);
         if (event.phaseState() != PhaseState.FINISHED) {
             throw EventException.conflict("PHASE_NOT_FINISHED", "The phase is not finished.");
         }
@@ -109,8 +112,7 @@ public class EventPhase {
         log.info("Phase {} finished ({}), {} matches unplayed", event.getId(), action, unplayed);
     }
 
-    private Event clubLocks(UUID eventId, UUID accountId) {
-        access.require(eventId, accountId, EventRole.CLUB);
+    private Event lock(UUID eventId) {
         return events.lockById(eventId).orElseThrow(EventException::notFound);
     }
 

@@ -1,3 +1,4 @@
+import 'package:brackety/features/events/data/my_event.dart';
 import 'package:brackety/features/staff/data/staff_repository.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -57,6 +58,17 @@ class FakeStaffRepository extends Fake implements StaffRepository {
   Future<void> remove(String eventId, String accountId, StaffRole role) async {
     _maybeRefuse();
     calls.add('remove $accountId ${role.wire}');
+  }
+
+  @override
+  Future<void> setPermissions(
+    String eventId,
+    String accountId,
+    Set<EventPermission> permissions,
+  ) async {
+    _maybeRefuse();
+    final wires = [for (final p in permissions) p.wire]..sort();
+    calls.add('permissions $accountId ${wires.join(',')}');
   }
 
   @override

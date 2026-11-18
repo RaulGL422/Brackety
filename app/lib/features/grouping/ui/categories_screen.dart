@@ -6,8 +6,6 @@ import 'package:go_router/go_router.dart';
 import '../../../core/async_view.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../state/grouping_providers.dart';
-import '../../events/data/my_event.dart';
-import '../../events/state/events_providers.dart';
 import '../../phase/ui/phase_bar.dart';
 import '../../../core/up_button.dart';
 
@@ -21,13 +19,6 @@ class CategoriesScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final provider = categoriesProvider(eventId);
-    final isClub =
-        ref
-            .watch(myEventProvider(eventId))
-            .value
-            ?.roles
-            .contains(EventRole.club) ??
-        false;
     return Scaffold(
       appBar: AppBar(
         leading: UpButton(label: l10n.eventsTitle, fallback: '/'),
@@ -36,7 +27,7 @@ class CategoriesScreen extends ConsumerWidget {
       ),
       body: Column(
         children: [
-          PhaseBar(eventId: eventId, isClub: isClub),
+          PhaseBar(eventId: eventId),
           Expanded(
             child: AsyncView(
               value: ref.watch(provider),

@@ -2,6 +2,7 @@ package dev.rgal.brackety.grouping;
 
 import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventException;
+import dev.rgal.brackety.event.EventPermission;
 import dev.rgal.brackety.event.EventPhase;
 import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventService;
@@ -80,9 +81,9 @@ public class MatchControlService {
         this.schedule = schedule;
     }
 
-    /** Only the club of the event; the superadmin's API checks its own access. */
-    public void requireClub(UUID eventId, UUID accountId) {
-        access.require(eventId, accountId, EventRole.CLUB);
+    /** The club or a helper with the control panel; the superadmin's API checks its own access. */
+    public void requireControl(UUID eventId, UUID accountId) {
+        access.require(eventId, accountId, EventPermission.CONTROL);
     }
 
     /** An individual group and its pending matches go to another mat; the played ones stay where they were. */
@@ -126,7 +127,7 @@ public class MatchControlService {
     public void moveMatchAsReferee(UUID matchId, UUID matId, UUID accountId) {
         var match = matches.findById(matchId).orElseThrow(EventException::notFound);
         var eventId = match.getEventId();
-        access.require(eventId, accountId, EventRole.REFEREE);
+        access.require(eventId, accountId, EventPermission.OWN_MAT);
         phase.requireInProgress(eventId);
         var own = mats.findByEventIdAndRefereeAccountIdOrderByNumber(eventId, accountId).stream()
                 .map(Mat::getId)

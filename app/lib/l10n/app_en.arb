@@ -951,5 +951,18 @@
   "phaseReopenTitle": "Why do you reopen the phase?",
   "phaseNotStartedError": "The phase has not started: the club has to start it.",
   "phaseFinishedError": "The phase is finished: the club has to reopen it to change anything.",
-  "phaseMatchInProgressError": "A match is in progress or waits for review: finish it first."
+  "phaseMatchInProgressError": "A match is in progress or waits for review: finish it first.",
+  "permissionsTooltip": "Permissions of {name}",
+  "permissionsTitle": "What {name} may do",
+  "permissionsHint": "The club may always do everything. Reopening a phase and managing the staff are the club's alone.",
+  "permissionsSaved": "Permissions saved",
+  "permissionGroups": "Create and undo groups",
+  "permissionTeams": "Form teams",
+  "permissionMeasures": "Record weights and heights",
+  "permissionOwnMat": "Referee their mat",
+  "permissionPhase": "Start and finish the phase",
+  "permissionControl": "Control panel: move groups and matches, reorder, skip the rest, disable mats",
+  "permissionReviews": "Resolve matches in review",
+  "permissionDeviceImport": "Import a device's actions (CSV)",
+  "permissionParticipants": "Add and edit participants"
 }

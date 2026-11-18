@@ -1528,5 +1528,20 @@
   "phaseReopenTitle": "¿Por qué reabres la fase?",
   "phaseNotStartedError": "La fase no ha comenzado: el club tiene que comenzarla.",
   "phaseFinishedError": "La fase está finalizada: el club tiene que reabrirla para cambiar algo.",
-  "phaseMatchInProgressError": "Hay un combate en curso o pendiente de revisión: termínalo antes."
+  "phaseMatchInProgressError": "Hay un combate en curso o pendiente de revisión: termínalo antes.",
+  "permissionsTooltip": "Permisos de {name}",
+  "@permissionsTooltip": {"placeholders": {"name": {"type": "String"}}},
+  "permissionsTitle": "Qué puede hacer {name}",
+  "@permissionsTitle": {"placeholders": {"name": {"type": "String"}}},
+  "permissionsHint": "El club siempre puede hacerlo todo. Reabrir una fase y gestionar el personal son solo del club.",
+  "permissionsSaved": "Permisos guardados",
+  "permissionGroups": "Crear y deshacer grupos",
+  "permissionTeams": "Formar equipos",
+  "permissionMeasures": "Registrar pesos y estaturas",
+  "permissionOwnMat": "Arbitrar su tapiz",
+  "permissionPhase": "Comenzar y finalizar la fase",
+  "permissionControl": "Panel de control: mover grupos y combates, reordenar, saltar el descanso, inhabilitar tapices",
+  "permissionReviews": "Resolver combates en revisión",
+  "permissionDeviceImport": "Importar las acciones de un dispositivo (CSV)",
+  "permissionParticipants": "Dar de alta y editar alumnos"
 }

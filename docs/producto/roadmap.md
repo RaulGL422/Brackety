@@ -42,7 +42,7 @@ Línea de infraestructura; puede ir en paralelo con la etapa 2 (otro worktree).
 7. F2-2 Edades mezcladas dentro de una categoría, divididas en la pantalla de crear grupos.
 8. F2-3 CSV de resultados claro en Excel.
 9. F2-4 Clasificaciones configurables: global opcional fusionada (#123, 2026-11-17); dividir por sexo o peso, cuando una modalidad lo pida.
-10. F1-7 (`feedback-f1.md`): A aviso «Inhabilitar tapiz» al quitar un tapiz con grupos (fusionado, #127); B comenzar, finalizar y reabrir fase, cierre automático con correo (en pruebas, 2026-11-18); C permisos por ayudante en «Personal».
+10. F1-7 (`feedback-f1.md`): A aviso «Inhabilitar tapiz» al quitar un tapiz con grupos (fusionado, #127); B comenzar, finalizar y reabrir fase, cierre automático con correo (fusionado, #129); C permisos por persona en «Personal» (en pruebas); C2 panel para ayudantes con permiso.
 
 ## Después · Etapa 2b: competición del 2026-12-20 (`competicion-2026-12-20.md`)
 - Torneo con grupos de 4 y 3 modalidades seguidas. Diseño en cuanto lleguen los detalles; prueba in situ hacia el 13-12.

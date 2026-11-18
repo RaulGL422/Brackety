@@ -85,6 +85,7 @@ public class EventService {
                             event.getName(),
                             event.getEventDate(),
                             rolesByEvent.get(event.getId()),
+                            access.permissions(event.getId(), accountId, rolesByEvent.get(event.getId())),
                             event.getMaxGroupsPerMat(),
                             mat.map(Mat::getId).orElse(null),
                             mat.map(Mat::getNumber).orElse(null),
@@ -219,7 +220,8 @@ public class EventService {
                         a.getId(),
                         a.getEmail(),
                         names.get(a.getId()),
-                        rolesByAccount.get(a.getId()).stream().sorted().toList()))
+                        rolesByAccount.get(a.getId()).stream().sorted().toList(),
+                        access.permissions(event.getId(), a.getId(), EnumSet.copyOf(rolesByAccount.get(a.getId())))))
                 .toList();
         var referees = people.stream()
                 .filter(p -> p.roles().contains(EventRole.REFEREE))

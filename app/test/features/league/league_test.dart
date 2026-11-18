@@ -59,11 +59,17 @@ void main() {
     'desktop': Size(1440, 900),
   };
 
-  MyEvent phase(String id, int number, Set<EventRole> roles) => MyEvent(
+  MyEvent phase(
+    String id,
+    int number,
+    Set<EventRole> roles, {
+    Set<EventPermission> permissions = const {},
+  }) => MyEvent(
     id: id,
     name: 'Liga Yoseikan · Fase $number',
     date: DateTime(2026, 11, 14).add(Duration(days: 28 * (number - 1))),
     roles: roles,
+    permissions: permissions,
     leagueId: 'l1',
     leagueName: 'Liga Yoseikan',
     phaseNumber: number,
@@ -225,7 +231,12 @@ void main() {
             myEventsProvider.overrideWith(
               (ref) async => [
                 phase('e2', 2, {EventRole.club}),
-                phase('e1', 1, {EventRole.club, EventRole.grouper}),
+                phase(
+                  'e1',
+                  1,
+                  {EventRole.club, EventRole.grouper},
+                  permissions: {...EventPermission.values},
+                ),
               ],
             ),
           ],

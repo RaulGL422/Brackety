@@ -7,26 +7,30 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../../auth/data/api_error.dart';
 import '../../auth/ui/widgets/confirm_dialog.dart';
 import '../../scoreboard/ui/reason_dialog.dart';
+import '../../events/data/my_event.dart';
+import '../../events/state/events_providers.dart';
 import '../data/phase_repository.dart';
 
 /// The phase's state on top of the club panel, the helper's categories and the referee's mat (F1-7).
-/// The club starts, finishes and reopens it here; the others only see it.
+/// The club and whoever it allows start and finish it here; only the club reopens it.
 class PhaseBar extends ConsumerWidget {
-  const PhaseBar({super.key, required this.eventId, required this.isClub});
+  const PhaseBar({super.key, required this.eventId});
 
   final String eventId;
-  final bool isClub;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final phase = ref.watch(phaseProvider(eventId)).value;
     if (phase == null) return const SizedBox.shrink();
+    final me = ref.watch(myEventProvider(eventId)).value;
+    final canChange = me?.can(EventPermission.phase) ?? false;
+    final canReopen = me?.roles.contains(EventRole.club) ?? false;
     final scheme = Theme.of(context).colorScheme;
     final (icon, text, background) = switch (phase.state) {
       PhaseState.notStarted => (
         Icons.hourglass_empty,
-        isClub ? l10n.phaseNotStartedClub : l10n.phaseNotStarted,
+        canChange ? l10n.phaseNotStartedClub : l10n.phaseNotStarted,
         scheme.secondaryContainer,
       ),
       PhaseState.inProgress => (
@@ -52,7 +56,7 @@ class PhaseBar extends ConsumerWidget {
             Icon(icon, size: 20),
             const SizedBox(width: AppSpacing.s),
             Expanded(child: Text(text)),
-            if (isClub)
+            if (phase.state == PhaseState.finished ? canReopen : canChange)
               switch (phase.state) {
                 PhaseState.notStarted => FilledButton(
                   onPressed: () => _run(context, ref, (r) => r.start(eventId)),

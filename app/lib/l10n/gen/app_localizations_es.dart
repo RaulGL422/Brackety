@@ -2929,4 +2929,50 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get phaseMatchInProgressError =>
       'Hay un combate en curso o pendiente de revisión: termínalo antes.';
+
+  @override
+  String permissionsTooltip(String name) {
+    return 'Permisos de $name';
+  }
+
+  @override
+  String permissionsTitle(String name) {
+    return 'Qué puede hacer $name';
+  }
+
+  @override
+  String get permissionsHint =>
+      'El club siempre puede hacerlo todo. Reabrir una fase y gestionar el personal son solo del club.';
+
+  @override
+  String get permissionsSaved => 'Permisos guardados';
+
+  @override
+  String get permissionGroups => 'Crear y deshacer grupos';
+
+  @override
+  String get permissionTeams => 'Formar equipos';
+
+  @override
+  String get permissionMeasures => 'Registrar pesos y estaturas';
+
+  @override
+  String get permissionOwnMat => 'Arbitrar su tapiz';
+
+  @override
+  String get permissionPhase => 'Comenzar y finalizar la fase';
+
+  @override
+  String get permissionControl =>
+      'Panel de control: mover grupos y combates, reordenar, saltar el descanso, inhabilitar tapices';
+
+  @override
+  String get permissionReviews => 'Resolver combates en revisión';
+
+  @override
+  String get permissionDeviceImport =>
+      'Importar las acciones de un dispositivo (CSV)';
+
+  @override
+  String get permissionParticipants => 'Dar de alta y editar alumnos';
 }

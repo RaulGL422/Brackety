@@ -5,8 +5,8 @@ import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventCategory;
 import dev.rgal.brackety.event.EventCategoryRepository;
 import dev.rgal.brackety.event.EventException;
+import dev.rgal.brackety.event.EventPermission;
 import dev.rgal.brackety.event.EventPhase;
-import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.event.Mat;
 import dev.rgal.brackety.event.MatRepository;
@@ -89,7 +89,7 @@ class GroupService {
     /** Categories with participants, youngest first. */
     @Transactional(readOnly = true)
     List<CategorySummary> categories(UUID eventId, UUID accountId) {
-        access.require(eventId, accountId, EventRole.CLUB, EventRole.GROUPER);
+        access.require(eventId, accountId, EventPermission.GROUPS, EventPermission.TEAMS, EventPermission.MEASURES);
         var event = events.get(eventId);
         var grouped = roster.groupedIds(eventId);
         var teamNumbers = directory.teamNumbers(eventId);
@@ -120,7 +120,7 @@ class GroupService {
     /** A category's participants by name; those already in a group or team say which one and where. */
     @Transactional(readOnly = true)
     List<CategoryParticipant> categoryParticipants(UUID eventId, UUID categoryId, UUID accountId) {
-        access.require(eventId, accountId, EventRole.CLUB, EventRole.GROUPER);
+        access.require(eventId, accountId, EventPermission.GROUPS, EventPermission.TEAMS, EventPermission.MEASURES);
         var event = events.get(eventId);
         var category = roster.category(eventId, categoryId);
         var grouped = roster.groupedIds(eventId);
@@ -151,7 +151,7 @@ class GroupService {
 
     @Transactional
     CreateGroupsResponse create(UUID eventId, UUID accountId, CreateGroupsRequest request) {
-        access.require(eventId, accountId, EventRole.CLUB, EventRole.GROUPER);
+        access.require(eventId, accountId, EventPermission.GROUPS);
         phase.requireInProgress(eventId);
         var event = events.lock(eventId);
         if (request.groups().size() > event.getMaxGroupsPerMat()) {
@@ -189,7 +189,7 @@ class GroupService {
      */
     @Transactional
     void undo(UUID eventId, UUID groupId, UUID accountId) {
-        access.require(eventId, accountId, EventRole.CLUB, EventRole.GROUPER);
+        access.require(eventId, accountId, EventPermission.GROUPS);
         phase.requireInProgress(eventId);
         // Matches first, then the event: the same order as a match's first start, which locks both.
         var groupMatches = matches.lockByGroupId(groupId);

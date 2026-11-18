@@ -2,6 +2,7 @@ package dev.rgal.brackety.staff;
 
 import dev.rgal.brackety.auth.RequiresVerifiedEmail;
 import dev.rgal.brackety.common.CurrentAccount;
+import dev.rgal.brackety.event.EventPermission;
 import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.staff.dto.InvitationResponse;
 import dev.rgal.brackety.staff.dto.InvitationView;
@@ -11,6 +12,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -37,6 +40,8 @@ class StaffController {
     record InviteRequest(
             @NotBlank @Email @Size(max = 254) String email,
             @NotNull EventRole role) {}
+
+    record PermissionsRequest(@NotNull Set<EventPermission> permissions) {}
 
     record TokenRequest(@NotBlank @Size(max = 100) String token) {}
 
@@ -68,6 +73,15 @@ class StaffController {
             @RequestParam EventRole role,
             @AuthenticationPrincipal Jwt jwt) {
         service.remove(eventId, CurrentAccount.id(jwt), accountId, role);
+    }
+
+    @PutMapping("/api/v1/events/{eventId}/staff/{accountId}/permissions")
+    Set<EventPermission> permissions(
+            @PathVariable UUID eventId,
+            @PathVariable UUID accountId,
+            @Valid @RequestBody PermissionsRequest request,
+            @AuthenticationPrincipal Jwt jwt) {
+        return service.permissions(eventId, CurrentAccount.id(jwt), accountId, request.permissions());
     }
 
     @PostMapping("/api/v1/invitations/view")

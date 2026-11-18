@@ -5,8 +5,8 @@ import dev.rgal.brackety.auth.account.AccountRepository;
 import dev.rgal.brackety.event.Event;
 import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventException;
+import dev.rgal.brackety.event.EventPermission;
 import dev.rgal.brackety.event.EventPhase;
-import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.event.Mat;
 import dev.rgal.brackety.event.MatRepository;
@@ -131,8 +131,10 @@ class ScoreboardService {
         }
         // A team match in the pool can go to any mat: every referee may open it.
         var mat = matOrNull(match);
-        var allowed = roles.contains(EventRole.CLUB)
-                || (mat == null ? roles.contains(EventRole.REFEREE) : isReferee(mat, accountId, roles));
+        var granted = access.permissions(match.getEventId(), accountId, roles);
+        var allowed = granted.contains(EventPermission.CONTROL)
+                || granted.contains(EventPermission.REVIEWS)
+                || (mat == null ? granted.contains(EventPermission.OWN_MAT) : isReferee(mat, accountId, granted));
         if (!allowed) {
             throw EventException.forbidden();
         }
@@ -151,7 +153,7 @@ class ScoreboardService {
             throw EventException.notFound();
         }
         var mat = match.getMatId() == null ? refereeMatOf(match, accountId).orElse(null) : mat(match);
-        if (mat == null || !isReferee(mat, accountId, roles)) {
+        if (mat == null || !isReferee(mat, accountId, access.permissions(match.getEventId(), accountId, roles))) {
             throw EventException.forbidden();
         }
         phase.requireInProgress(match.getEventId());
@@ -391,8 +393,8 @@ class ScoreboardService {
                 fighter.memberNames());
     }
 
-    private static boolean isReferee(Mat mat, UUID accountId, Set<EventRole> roles) {
-        return roles.contains(EventRole.REFEREE) && accountId.equals(mat.getRefereeAccountId());
+    private static boolean isReferee(Mat mat, UUID accountId, Set<EventPermission> granted) {
+        return granted.contains(EventPermission.OWN_MAT) && accountId.equals(mat.getRefereeAccountId());
     }
 
     /** Null for a team match in the pool. */

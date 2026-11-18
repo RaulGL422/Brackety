@@ -114,3 +114,4 @@ Las de octubre de 2026, en `decisiones-2026-10.md`.
 - 2026-11-18 · Un tapiz con grupos no se quita en Configuración: se inhabilita (sus grupos guardan dónde se jugaron) · Raul, «basta con inhabilitar».
 - 2026-11-18 · Fase: comenzar/finalizar por el club o ayudante con permiso; finalizada = solo lectura, el club reabre con motivo; cierre automático al día siguiente con correo · Raul.
 - 2026-11-18 · Fase: comenzar obligatorio; finalizar con pendientes avisando, nunca con combate en curso o en revisión; finalizada también para el club (salvo ajustes, alumnos y descargas) · Raul.
+- 2026-11-18 · Permisos por persona y evento (9, lista aprobada por Raul); por defecto los del rol, el club lo puede todo, reabrir fase y personal solo el club · Raul.

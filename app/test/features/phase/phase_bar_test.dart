@@ -1,3 +1,5 @@
+import 'package:brackety/features/events/data/my_event.dart';
+import 'package:brackety/features/events/state/events_providers.dart';
 import 'package:brackety/features/phase/data/phase_repository.dart';
 import 'package:brackety/features/phase/ui/phase_bar.dart';
 import 'package:brackety/l10n/gen/app_localizations.dart';
@@ -45,11 +47,22 @@ class FakePhaseRepository extends PhaseRepository {
 Future<void> pumpBar(
   WidgetTester tester,
   FakePhaseRepository phases, {
-  bool isClub = true,
+  Set<EventRole> roles = const {EventRole.club},
+  Set<EventPermission> permissions = const {...EventPermission.values},
 }) async {
+  final me = MyEvent(
+    id: 'e1',
+    name: 'Fase 1',
+    date: DateTime(2027, 3, 10),
+    roles: roles,
+    permissions: permissions,
+  );
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [phaseRepositoryProvider.overrideWithValue(phases)],
+      overrides: [
+        phaseRepositoryProvider.overrideWithValue(phases),
+        myEventsProvider.overrideWith((ref) async => [me]),
+      ],
       child: MaterialApp(
         builder: (_, child) => ToastHost(child: child!),
         theme: lightTheme(),
@@ -58,9 +71,7 @@ Future<void> pumpBar(
           ...coreLocalizationsDelegates,
         ],
         supportedLocales: AppLocalizations.supportedLocales,
-        home: Scaffold(
-          body: PhaseBar(eventId: 'e1', isClub: isClub),
-        ),
+        home: Scaffold(body: PhaseBar(eventId: 'e1')),
       ),
     ),
   );
@@ -107,11 +118,38 @@ void main() {
     await pumpBar(
       tester,
       FakePhaseRepository(const Phase(state: PhaseState.finished)),
-      isClub: false,
+      roles: {EventRole.grouper},
+      permissions: {EventPermission.groups},
     );
 
     expect(find.text('Phase finished: read only'), findsOneWidget);
     expect(find.byType(TextButton), findsNothing);
     expect(find.byType(FilledButton), findsNothing);
   });
+
+  testWidgets(
+    'a helper the club allows starts the phase but never reopens it',
+    (tester) async {
+      final phases = FakePhaseRepository(
+        const Phase(state: PhaseState.notStarted),
+      );
+      await pumpBar(
+        tester,
+        phases,
+        roles: {EventRole.grouper},
+        permissions: {EventPermission.phase},
+      );
+
+      await tester.tap(find.text('Start phase'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Finish phase'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, 'Finish phase'));
+      await tester.pumpAndSettle();
+
+      expect(phases.calls, ['start', 'finish']);
+      expect(find.text('Phase finished: read only'), findsOneWidget);
+      expect(find.text('Reopen phase'), findsNothing);
+    },
+  );
 }

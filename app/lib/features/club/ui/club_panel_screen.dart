@@ -74,7 +74,7 @@ class _ClubPanelScreenState extends ConsumerState<ClubPanelScreen> {
       onSelected: (i) => setState(() => _tab = i),
       body: Column(
         children: [
-          PhaseBar(eventId: widget.eventId, isClub: true),
+          PhaseBar(eventId: widget.eventId),
           Expanded(
             child: switch (_tab) {
               0 => StandingsTab(eventId: widget.eventId),

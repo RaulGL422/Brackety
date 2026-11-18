@@ -111,7 +111,7 @@ class MatBoardScreen extends ConsumerWidget {
           children: [
             if (!readOnly)
               if (board.value?.eventId case final eventId?)
-                PhaseBar(eventId: eventId, isClub: false),
+                PhaseBar(eventId: eventId),
             Expanded(
               child: AsyncView(
                 value: board,

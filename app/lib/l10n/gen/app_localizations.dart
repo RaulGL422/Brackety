@@ -4703,6 +4703,84 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Hay un combate en curso o pendiente de revisión: termínalo antes.'**
   String get phaseMatchInProgressError;
+
+  /// No description provided for @permissionsTooltip.
+  ///
+  /// In es, this message translates to:
+  /// **'Permisos de {name}'**
+  String permissionsTooltip(String name);
+
+  /// No description provided for @permissionsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Qué puede hacer {name}'**
+  String permissionsTitle(String name);
+
+  /// No description provided for @permissionsHint.
+  ///
+  /// In es, this message translates to:
+  /// **'El club siempre puede hacerlo todo. Reabrir una fase y gestionar el personal son solo del club.'**
+  String get permissionsHint;
+
+  /// No description provided for @permissionsSaved.
+  ///
+  /// In es, this message translates to:
+  /// **'Permisos guardados'**
+  String get permissionsSaved;
+
+  /// No description provided for @permissionGroups.
+  ///
+  /// In es, this message translates to:
+  /// **'Crear y deshacer grupos'**
+  String get permissionGroups;
+
+  /// No description provided for @permissionTeams.
+  ///
+  /// In es, this message translates to:
+  /// **'Formar equipos'**
+  String get permissionTeams;
+
+  /// No description provided for @permissionMeasures.
+  ///
+  /// In es, this message translates to:
+  /// **'Registrar pesos y estaturas'**
+  String get permissionMeasures;
+
+  /// No description provided for @permissionOwnMat.
+  ///
+  /// In es, this message translates to:
+  /// **'Arbitrar su tapiz'**
+  String get permissionOwnMat;
+
+  /// No description provided for @permissionPhase.
+  ///
+  /// In es, this message translates to:
+  /// **'Comenzar y finalizar la fase'**
+  String get permissionPhase;
+
+  /// No description provided for @permissionControl.
+  ///
+  /// In es, this message translates to:
+  /// **'Panel de control: mover grupos y combates, reordenar, saltar el descanso, inhabilitar tapices'**
+  String get permissionControl;
+
+  /// No description provided for @permissionReviews.
+  ///
+  /// In es, this message translates to:
+  /// **'Resolver combates en revisión'**
+  String get permissionReviews;
+
+  /// No description provided for @permissionDeviceImport.
+  ///
+  /// In es, this message translates to:
+  /// **'Importar las acciones de un dispositivo (CSV)'**
+  String get permissionDeviceImport;
+
+  /// No description provided for @permissionParticipants.
+  ///
+  /// In es, this message translates to:
+  /// **'Dar de alta y editar alumnos'**
+  String get permissionParticipants;
 }
 
 class _AppLocalizationsDelegate
