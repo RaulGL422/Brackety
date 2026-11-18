@@ -7,6 +7,7 @@ import dev.rgal.brackety.event.EventCategoryRepository;
 import dev.rgal.brackety.event.EventException;
 import dev.rgal.brackety.event.EventOrganization;
 import dev.rgal.brackety.event.EventOrganizationRepository;
+import dev.rgal.brackety.event.EventPhase;
 import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.participant.dto.MeasuresRequest;
@@ -27,6 +28,7 @@ public class ParticipantService {
     public static final int ADULT_AGE = 18;
 
     private final ParticipantRepository participants;
+    private final EventPhase phase;
     private final PersonRepository people;
     private final EventCategoryRepository categories;
     private final EventOrganizationRepository organizations;
@@ -41,7 +43,9 @@ public class ParticipantService {
             EventOrganizationRepository organizations,
             EventService events,
             EventAccess access,
-            Clock clock) {
+            Clock clock,
+            EventPhase phase) {
+        this.phase = phase;
         this.participants = participants;
         this.people = people;
         this.categories = categories;
@@ -89,6 +93,7 @@ public class ParticipantService {
     @Transactional
     public void measure(UUID eventId, UUID participantId, UUID accountId, MeasuresRequest request) {
         access.require(eventId, accountId, EventRole.CLUB, EventRole.GROUPER);
+        phase.requireNotFinished(eventId);
         find(eventId, participantId).measure(request.heightCm(), request.weightKg());
     }
 

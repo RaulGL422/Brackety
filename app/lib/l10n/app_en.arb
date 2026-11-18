@@ -937,5 +937,19 @@
   "invitationVerifyFirst": "Confirm your email first with the link we sent when you signed up.",
   "leagueGlobalStandings": "Global standings",
   "leagueGlobalStandingsHint": "Every category together in Scores and League. Off, one category at a time.",
-  "settingsMatHasGroups": "That mat already has groups and keeps where they were played: it cannot be removed. If it is done, use \"Disable mat\" in the mats tab."
+  "settingsMatHasGroups": "That mat already has groups and keeps where they were played: it cannot be removed. If it is done, use \"Disable mat\" in the mats tab.",
+  "phaseNotStarted": "The phase has not started yet: the club has to press \"Start phase\".",
+  "phaseNotStartedClub": "The phase has not started yet: without it, no groups are created and nothing is refereed.",
+  "phaseInProgress": "Phase in progress",
+  "phaseFinished": "Phase finished: read only",
+  "phaseStart": "Start phase",
+  "phaseFinish": "Finish phase",
+  "phaseReopen": "Reopen phase",
+  "phaseFinishTitle": "Finish the phase?",
+  "phaseFinishBody": "Nobody will be able to create groups, score or move matches. You can reopen it with a reason.",
+  "phaseFinishPending": "{count} matches are left to play and will stay unplayed in the history. Nobody will be able to create groups, score or move matches. You can reopen it with a reason.",
+  "phaseReopenTitle": "Why do you reopen the phase?",
+  "phaseNotStartedError": "The phase has not started: the club has to start it.",
+  "phaseFinishedError": "The phase is finished: the club has to reopen it to change anything.",
+  "phaseMatchInProgressError": "A match is in progress or waits for review: finish it first."
 }

@@ -2839,4 +2839,54 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsMatHasGroups =>
       'That mat already has groups and keeps where they were played: it cannot be removed. If it is done, use \"Disable mat\" in the mats tab.';
+
+  @override
+  String get phaseNotStarted =>
+      'The phase has not started yet: the club has to press \"Start phase\".';
+
+  @override
+  String get phaseNotStartedClub =>
+      'The phase has not started yet: without it, no groups are created and nothing is refereed.';
+
+  @override
+  String get phaseInProgress => 'Phase in progress';
+
+  @override
+  String get phaseFinished => 'Phase finished: read only';
+
+  @override
+  String get phaseStart => 'Start phase';
+
+  @override
+  String get phaseFinish => 'Finish phase';
+
+  @override
+  String get phaseReopen => 'Reopen phase';
+
+  @override
+  String get phaseFinishTitle => 'Finish the phase?';
+
+  @override
+  String get phaseFinishBody =>
+      'Nobody will be able to create groups, score or move matches. You can reopen it with a reason.';
+
+  @override
+  String phaseFinishPending(int count) {
+    return '$count matches are left to play and will stay unplayed in the history. Nobody will be able to create groups, score or move matches. You can reopen it with a reason.';
+  }
+
+  @override
+  String get phaseReopenTitle => 'Why do you reopen the phase?';
+
+  @override
+  String get phaseNotStartedError =>
+      'The phase has not started: the club has to start it.';
+
+  @override
+  String get phaseFinishedError =>
+      'The phase is finished: the club has to reopen it to change anything.';
+
+  @override
+  String get phaseMatchInProgressError =>
+      'A match is in progress or waits for review: finish it first.';
 }

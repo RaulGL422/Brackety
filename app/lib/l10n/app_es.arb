@@ -1513,5 +1513,20 @@
   "invitationVerifyFirst": "Confirma antes tu email con el enlace que te enviamos al registrarte.",
   "leagueGlobalStandings": "Clasificación global",
   "leagueGlobalStandingsHint": "Todas las categorías juntas en Puntuaciones y en Liga. Apagada, solo se ve una categoría cada vez.",
-  "settingsMatHasGroups": "Ese tapiz ya tiene grupos y guarda dónde se jugaron: no se puede quitar. Si ha terminado, usa «Inhabilitar tapiz» en la pestaña de tapices."
+  "settingsMatHasGroups": "Ese tapiz ya tiene grupos y guarda dónde se jugaron: no se puede quitar. Si ha terminado, usa «Inhabilitar tapiz» en la pestaña de tapices.",
+  "phaseNotStarted": "La fase aún no ha comenzado: el club tiene que pulsar «Comenzar fase».",
+  "phaseNotStartedClub": "La fase aún no ha comenzado: sin comenzarla no se crean grupos ni se arbitra.",
+  "phaseInProgress": "Fase en curso",
+  "phaseFinished": "Fase finalizada: solo lectura",
+  "phaseStart": "Comenzar fase",
+  "phaseFinish": "Finalizar fase",
+  "phaseReopen": "Reabrir fase",
+  "phaseFinishTitle": "¿Finalizar la fase?",
+  "phaseFinishBody": "Nadie podrá crear grupos, puntuar ni mover combates. Podrás reabrirla con un motivo.",
+  "phaseFinishPending": "Quedan {count} combates sin jugar y así quedarán en el historial. Nadie podrá crear grupos, puntuar ni mover combates. Podrás reabrirla con un motivo.",
+  "@phaseFinishPending": {"placeholders": {"count": {"type": "int"}}},
+  "phaseReopenTitle": "¿Por qué reabres la fase?",
+  "phaseNotStartedError": "La fase no ha comenzado: el club tiene que comenzarla.",
+  "phaseFinishedError": "La fase está finalizada: el club tiene que reabrirla para cambiar algo.",
+  "phaseMatchInProgressError": "Hay un combate en curso o pendiente de revisión: termínalo antes."
 }

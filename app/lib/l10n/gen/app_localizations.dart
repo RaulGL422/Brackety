@@ -4619,6 +4619,90 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Ese tapiz ya tiene grupos y guarda dónde se jugaron: no se puede quitar. Si ha terminado, usa «Inhabilitar tapiz» en la pestaña de tapices.'**
   String get settingsMatHasGroups;
+
+  /// No description provided for @phaseNotStarted.
+  ///
+  /// In es, this message translates to:
+  /// **'La fase aún no ha comenzado: el club tiene que pulsar «Comenzar fase».'**
+  String get phaseNotStarted;
+
+  /// No description provided for @phaseNotStartedClub.
+  ///
+  /// In es, this message translates to:
+  /// **'La fase aún no ha comenzado: sin comenzarla no se crean grupos ni se arbitra.'**
+  String get phaseNotStartedClub;
+
+  /// No description provided for @phaseInProgress.
+  ///
+  /// In es, this message translates to:
+  /// **'Fase en curso'**
+  String get phaseInProgress;
+
+  /// No description provided for @phaseFinished.
+  ///
+  /// In es, this message translates to:
+  /// **'Fase finalizada: solo lectura'**
+  String get phaseFinished;
+
+  /// No description provided for @phaseStart.
+  ///
+  /// In es, this message translates to:
+  /// **'Comenzar fase'**
+  String get phaseStart;
+
+  /// No description provided for @phaseFinish.
+  ///
+  /// In es, this message translates to:
+  /// **'Finalizar fase'**
+  String get phaseFinish;
+
+  /// No description provided for @phaseReopen.
+  ///
+  /// In es, this message translates to:
+  /// **'Reabrir fase'**
+  String get phaseReopen;
+
+  /// No description provided for @phaseFinishTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Finalizar la fase?'**
+  String get phaseFinishTitle;
+
+  /// No description provided for @phaseFinishBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Nadie podrá crear grupos, puntuar ni mover combates. Podrás reabrirla con un motivo.'**
+  String get phaseFinishBody;
+
+  /// No description provided for @phaseFinishPending.
+  ///
+  /// In es, this message translates to:
+  /// **'Quedan {count} combates sin jugar y así quedarán en el historial. Nadie podrá crear grupos, puntuar ni mover combates. Podrás reabrirla con un motivo.'**
+  String phaseFinishPending(int count);
+
+  /// No description provided for @phaseReopenTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Por qué reabres la fase?'**
+  String get phaseReopenTitle;
+
+  /// No description provided for @phaseNotStartedError.
+  ///
+  /// In es, this message translates to:
+  /// **'La fase no ha comenzado: el club tiene que comenzarla.'**
+  String get phaseNotStartedError;
+
+  /// No description provided for @phaseFinishedError.
+  ///
+  /// In es, this message translates to:
+  /// **'La fase está finalizada: el club tiene que reabrirla para cambiar algo.'**
+  String get phaseFinishedError;
+
+  /// No description provided for @phaseMatchInProgressError.
+  ///
+  /// In es, this message translates to:
+  /// **'Hay un combate en curso o pendiente de revisión: termínalo antes.'**
+  String get phaseMatchInProgressError;
 }
 
 class _AppLocalizationsDelegate

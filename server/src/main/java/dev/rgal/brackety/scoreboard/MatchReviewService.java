@@ -2,6 +2,7 @@ package dev.rgal.brackety.scoreboard;
 
 import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventException;
+import dev.rgal.brackety.event.EventPhase;
 import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.grouping.FightGroupRepository;
@@ -24,6 +25,7 @@ class MatchReviewService {
     private static final Logger log = LoggerFactory.getLogger(MatchReviewService.class);
 
     private final MatchRepository matches;
+    private final EventPhase phase;
     private final FightGroupRepository groups;
     private final MatchEventRepository matchEvents;
     private final RejectedOpRepository rejectedOps;
@@ -42,7 +44,9 @@ class MatchReviewService {
             EventAccess access,
             MatchWriter writer,
             ScoreboardService scoreboard,
-            Clock clock) {
+            Clock clock,
+            EventPhase phase) {
+        this.phase = phase;
         this.matches = matches;
         this.groups = groups;
         this.matchEvents = matchEvents;
@@ -62,6 +66,7 @@ class MatchReviewService {
     ReviewResponse review(UUID matchId, UUID accountId, ReviewRequest request) {
         var match = matches.lockById(matchId).orElseThrow(EventException::notFound);
         access.require(match.getEventId(), accountId, EventRole.CLUB);
+        phase.requireInProgress(match.getEventId());
         if (!match.isInReview()) {
             throw EventException.conflict("MATCH_NOT_IN_REVIEW", "The match is not in review.");
         }

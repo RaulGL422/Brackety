@@ -2879,4 +2879,54 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get settingsMatHasGroups =>
       'Ese tapiz ya tiene grupos y guarda dónde se jugaron: no se puede quitar. Si ha terminado, usa «Inhabilitar tapiz» en la pestaña de tapices.';
+
+  @override
+  String get phaseNotStarted =>
+      'La fase aún no ha comenzado: el club tiene que pulsar «Comenzar fase».';
+
+  @override
+  String get phaseNotStartedClub =>
+      'La fase aún no ha comenzado: sin comenzarla no se crean grupos ni se arbitra.';
+
+  @override
+  String get phaseInProgress => 'Fase en curso';
+
+  @override
+  String get phaseFinished => 'Fase finalizada: solo lectura';
+
+  @override
+  String get phaseStart => 'Comenzar fase';
+
+  @override
+  String get phaseFinish => 'Finalizar fase';
+
+  @override
+  String get phaseReopen => 'Reabrir fase';
+
+  @override
+  String get phaseFinishTitle => '¿Finalizar la fase?';
+
+  @override
+  String get phaseFinishBody =>
+      'Nadie podrá crear grupos, puntuar ni mover combates. Podrás reabrirla con un motivo.';
+
+  @override
+  String phaseFinishPending(int count) {
+    return 'Quedan $count combates sin jugar y así quedarán en el historial. Nadie podrá crear grupos, puntuar ni mover combates. Podrás reabrirla con un motivo.';
+  }
+
+  @override
+  String get phaseReopenTitle => '¿Por qué reabres la fase?';
+
+  @override
+  String get phaseNotStartedError =>
+      'La fase no ha comenzado: el club tiene que comenzarla.';
+
+  @override
+  String get phaseFinishedError =>
+      'La fase está finalizada: el club tiene que reabrirla para cambiar algo.';
+
+  @override
+  String get phaseMatchInProgressError =>
+      'Hay un combate en curso o pendiente de revisión: termínalo antes.';
 }

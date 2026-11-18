@@ -18,6 +18,7 @@ import '../../scoreboard/ui/match_corrections.dart';
 import '../data/mat_board.dart';
 import '../state/mat_providers.dart';
 import 'fighter_text.dart';
+import '../../phase/ui/phase_bar.dart';
 import '../../../core/up_button.dart';
 
 /// The referee's mat: what to do now first (the match in progress, the next one), then
@@ -108,6 +109,9 @@ class MatBoardScreen extends ConsumerWidget {
         ),
         body: Column(
           children: [
+            if (!readOnly)
+              if (board.value?.eventId case final eventId?)
+                PhaseBar(eventId: eventId, isClub: false),
             Expanded(
               child: AsyncView(
                 value: board,
