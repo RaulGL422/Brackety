@@ -5,21 +5,21 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/app_bar_action.dart';
 import '../../../core/async_view.dart';
+import '../../../core/up_button.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../events/data/measure_rules.dart';
+import '../../events/data/my_event.dart';
+import '../../events/state/events_providers.dart';
+import '../../mat/ui/mat_label.dart';
 import '../data/grouping_models.dart';
 import '../state/group_draft.dart';
 import '../state/grouping_providers.dart';
+import 'age_sections.dart';
 import 'create_groups.dart';
 import 'draft_panel.dart';
-import 'pick_mark.dart';
-import '../../../core/up_button.dart';
-import '../../mat/ui/mat_label.dart';
 import 'measures.dart';
-import '../../events/data/measure_rules.dart';
-import 'age_sections.dart';
+import 'pick_mark.dart';
 import 'read_only_notice.dart';
-import '../../events/data/my_event.dart';
-import '../../events/state/events_providers.dart';
 
 /// A category's participants: pick 4 (or 3 and a ghost) and send them to a mat.
 /// Opened from a team category ([teamSize] set) for those left without a team, with a way back.

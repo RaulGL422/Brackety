@@ -1,13 +1,9 @@
 import 'package:brackety/features/club/data/club_models.dart';
-
-import 'package:brackety/features/events/state/events_providers.dart';
-import 'package:brackety/features/events/data/my_event.dart';
-
-import '../../support/fakes.dart';
-
 import 'package:brackety/features/club/state/club_providers.dart';
 import 'package:brackety/features/club/ui/mats_tab.dart';
 import 'package:brackety/features/control/control_repository.dart';
+import 'package:brackety/features/events/data/my_event.dart';
+import 'package:brackety/features/events/state/events_providers.dart';
 import 'package:brackety/features/mat/data/mat_board.dart';
 import 'package:brackety/features/mat/state/mat_providers.dart';
 import 'package:brackety/features/mat/ui/mat_board_screen.dart';
@@ -18,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/fakes.dart';
 import '../../support/offline_fakes.dart';
 
 class _FakeControl extends ControlRepository {

@@ -1,7 +1,4 @@
 import 'package:brackety/features/mat/data/mat_board.dart';
-
-import '../../support/fakes.dart';
-
 import 'package:brackety/features/mat/state/mat_providers.dart';
 import 'package:brackety/features/mat/ui/mat_board_screen.dart';
 import 'package:brackety/l10n/gen/app_localizations.dart';
@@ -12,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/board_finders.dart';
+import '../../support/fakes.dart';
 import '../../support/offline_fakes.dart';
 
 void main() {

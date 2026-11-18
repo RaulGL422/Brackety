@@ -159,13 +159,13 @@ class LiveConnection {
         _attempt = 0;
         _authenticated = true;
         _sendWatch(now: true);
-      case {'type': 'watching', 'topics': final List topics}:
+      case {'type': 'watching', 'topics': final List<Object?> topics}:
         final before = _confirmed;
         _confirmed = {for (final t in topics) t as String};
         for (final follow in _follows.toList()) {
           if (follow.topics.any((t) => !before.contains(t))) follow._onChange();
         }
-      case {'type': 'changed', 'topics': final List topics}:
+      case {'type': 'changed', 'topics': final List<Object?> topics}:
         final changed = {for (final t in topics) t as String};
         for (final follow in _follows.toList()) {
           if (follow.topics.any(changed.contains)) follow._onChange();

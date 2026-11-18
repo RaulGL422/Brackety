@@ -28,7 +28,7 @@ class DashboardScreen extends ConsumerWidget {
             child: AsyncView(
               value: metrics,
               onRetry: refresh,
-              data: (m) => _Sections(m),
+              data: _Sections.new,
             ),
           ),
         ],

@@ -4,10 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/async_view.dart';
-import '../../../l10n/gen/app_localizations.dart';
-import '../state/grouping_providers.dart';
-import '../../phase/ui/phase_bar.dart';
 import '../../../core/up_button.dart';
+import '../../../l10n/gen/app_localizations.dart';
+import '../../phase/ui/phase_bar.dart';
+import '../state/grouping_providers.dart';
 
 /// Categories with participants, youngest first (the server sends them in that order).
 class CategoriesScreen extends ConsumerWidget {

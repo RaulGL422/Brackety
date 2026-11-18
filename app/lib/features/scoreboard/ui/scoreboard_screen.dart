@@ -5,9 +5,11 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/async_view.dart';
 import '../../../core/keep_screen_on.dart';
+import '../../../core/up_button.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../mat/state/mat_providers.dart';
 import '../../mat/ui/fighter_text.dart';
+import '../../mat/ui/mat_label.dart';
 import '../../offline/ui/sync_status_icon.dart';
 import '../data/match_view.dart';
 import '../data/tambo_match.dart';
@@ -20,8 +22,6 @@ import 'match_corrections.dart';
 import 'reason_dialog.dart';
 import 'timeline_list.dart';
 import 'undo_text.dart';
-import '../../../core/up_button.dart';
-import '../../mat/ui/mat_label.dart';
 
 /// How long the "undone" message stays.
 const undoneNotice = Duration(seconds: 3);

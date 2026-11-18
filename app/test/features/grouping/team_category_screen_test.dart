@@ -1,7 +1,6 @@
 import 'package:brackety/app.dart';
 import 'package:brackety/core/app_bar_action.dart';
 import 'package:brackety/core/up_button.dart';
-import 'package:brackety/core/router.dart';
 import 'package:brackety/features/grouping/data/grouping_models.dart';
 import 'package:brackety/features/grouping/data/grouping_repository.dart';
 import 'package:flutter/material.dart';
@@ -66,9 +65,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
-        .read(routerProvider)
-        .push('/events/e1/categories/c1/teams?name=15-16&size=3');
+    pushRoute(tester, '/events/e1/categories/c1/teams?name=15-16&size=3');
     await tester.pumpAndSettle();
     return repository;
   }
@@ -208,9 +205,7 @@ void main() {
           ),
         );
         await tester.pumpAndSettle();
-        ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
-            .read(routerProvider)
-            .push('/events/e1/categories/c1/teams?name=15-16&size=3');
+        pushRoute(tester, '/events/e1/categories/c1/teams?name=15-16&size=3');
         await tester.pumpAndSettle();
         await tester.tap(find.text('Teams'));
         await tester.pumpAndSettle();
@@ -298,9 +293,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
-        .read(routerProvider)
-        .push('/events/e1/categories/c1/teams?name=15-16&size=3');
+    pushRoute(tester, '/events/e1/categories/c1/teams?name=15-16&size=3');
     await tester.pumpAndSettle();
     await tester.tap(find.text('Teams'));
     await tester.pumpAndSettle();
@@ -384,9 +377,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
-        .read(routerProvider)
-        .push('/events/e1/categories/c1/teams?name=15-16&size=3');
+    pushRoute(tester, '/events/e1/categories/c1/teams?name=15-16&size=3');
     await tester.pumpAndSettle();
     await tester.tap(find.text('Teams'));
     await tester.pumpAndSettle();

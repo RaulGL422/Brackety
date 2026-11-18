@@ -6,25 +6,25 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/app_bar_action.dart';
 import '../../../core/async_view.dart';
-import '../../../l10n/gen/app_localizations.dart';
-import '../data/grouping_models.dart';
-import '../data/grouping_repository.dart';
-import '../../auth/data/api_error.dart';
-import '../state/group_draft.dart';
-import '../state/helper_queue.dart';
-import '../state/grouping_providers.dart';
-import 'create_groups.dart';
-import 'draft_panel.dart';
-import 'pick_mark.dart';
 import '../../../core/up_button.dart';
+import '../../../l10n/gen/app_localizations.dart';
+import '../../auth/data/api_error.dart';
 import '../../control/control_repository.dart';
 import '../../control/control_ui.dart';
+import '../../events/data/measure_rules.dart';
 import '../../events/data/my_event.dart';
 import '../../events/state/events_providers.dart';
 import '../../mat/ui/mat_label.dart';
-import 'measures.dart';
-import '../../events/data/measure_rules.dart';
+import '../data/grouping_models.dart';
+import '../data/grouping_repository.dart';
+import '../state/group_draft.dart';
+import '../state/grouping_providers.dart';
+import '../state/helper_queue.dart';
 import 'age_sections.dart';
+import 'create_groups.dart';
+import 'draft_panel.dart';
+import 'measures.dart';
+import 'pick_mark.dart';
 import 'read_only_notice.dart';
 
 /// A team category (docs/modulos/prototipo-f1-equipos.md): make teams from its participants, then

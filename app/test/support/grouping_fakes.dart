@@ -1,9 +1,15 @@
-import 'package:dio/dio.dart';
+import 'dart:async';
+
+import 'package:brackety/app.dart';
+import 'package:brackety/core/router.dart';
 import 'package:brackety/features/club/data/club_models.dart';
 import 'package:brackety/features/club/state/club_providers.dart';
 import 'package:brackety/features/grouping/data/grouping_models.dart';
 import 'package:brackety/features/grouping/data/grouping_repository.dart';
 import 'package:brackety/features/grouping/state/group_draft.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 /// Mat 1 with a referee, mat 2 without one.
 final fakeMatsOverride = matsOverviewProvider.overrideWith(
@@ -113,4 +119,14 @@ class FakeGroupingRepository implements GroupingRepository {
   @override
   Future<void> deleteTeam(String eventId, String teamId) async =>
       deletedTeams.add(teamId);
+}
+
+/// Opens [location] over the current screen, as a tap would. Not awaited: a push only completes when the screen is
+/// popped.
+void pushRoute(WidgetTester tester, String location, {Object? extra}) {
+  unawaited(
+    ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
+        .read(routerProvider)
+        .push<void>(location, extra: extra),
+  );
 }

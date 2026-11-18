@@ -7,16 +7,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/download/file_download.dart';
+import '../../../core/up_button.dart';
 import '../../../core/upload/file_upload.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../club/state/club_providers.dart';
-import '../../legal/ui/legal_links.dart';
 import '../../club/ui/measure_fields.dart';
+import '../../legal/ui/legal_links.dart';
 import '../data/import_models.dart';
 import '../data/import_repository.dart';
 import 'issue_text.dart';
 import 'row_dialog.dart';
-import '../../../core/up_button.dart';
 
 const _maxFiles = 10;
 
@@ -262,7 +262,9 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
                         context,
                         row: rows[i].row,
                       );
-                      if (edited != null) _change([...edit]..[i] = edited);
+                      if (edited != null) {
+                        await _change([...edit]..[i] = edited);
+                      }
                     },
                     onRemove: () => _change([...edit]..removeAt(i)),
                     onCategory: (id) =>
@@ -300,7 +302,9 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
                             ? null
                             : () async {
                                 final added = await showRowDialog(context);
-                                if (added != null) _change([...edit, added]);
+                                if (added != null) {
+                                  await _change([...edit, added]);
+                                }
                               },
                       ),
                       FilledButton(
