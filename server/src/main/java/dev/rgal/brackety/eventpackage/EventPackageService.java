@@ -150,10 +150,6 @@ public class EventPackageService {
     }
 
     /** "liga-yoseikan-fase-1-2027-03-10": a file name for the event's exports. */
-    public static String fileName(Event event) {
-        return slug(event.getName()) + "-" + event.getEventDate();
-    }
-
     /** "Liga Yoseikan · Fase 1" → "liga-yoseikan-fase-1". */
     public static String slug(String name) {
         var slug = Normalizer.normalize(name, Normalizer.Form.NFD)
