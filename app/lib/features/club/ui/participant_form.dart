@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
+import '../../events/data/measure_rules.dart';
 import '../../events/state/events_providers.dart';
 import '../../legal/ui/legal_links.dart';
 import '../data/club_models.dart';
@@ -14,7 +15,6 @@ import '../state/club_providers.dart';
 import 'club_panel_screen.dart';
 import 'measure_fields.dart';
 import 'organizations_editor.dart';
-import '../../events/data/measure_rules.dart';
 
 /// Age on [day], as the server counts it for categories.
 int ageOn(DateTime birthDate, DateTime day) {

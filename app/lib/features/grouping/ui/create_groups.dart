@@ -3,14 +3,14 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../phase/ui/phase_bar.dart';
 import '../../../l10n/gen/app_localizations.dart';
-import '../../auth/ui/widgets/confirm_dialog.dart';
 import '../../auth/data/api_error.dart';
-import '../data/grouping_repository.dart';
-import '../state/helper_queue.dart';
-import '../state/group_draft.dart';
+import '../../auth/ui/widgets/confirm_dialog.dart';
 import '../../mat/ui/mat_label.dart';
+import '../../phase/ui/phase_bar.dart';
+import '../data/grouping_repository.dart';
+import '../state/group_draft.dart';
+import '../state/helper_queue.dart';
 
 /// Sends the group to [matId], or to the mat the server picks if null, and shows which one. Calls
 /// [refresh] after creating it or on a conflict (someone else took a participant or team, or the

@@ -362,8 +362,8 @@ void main() {
             leagueProvider.overrideWith((ref, _) async => league),
             leagueStandingsProvider.overrideWith((ref, _) async => standings),
             participantRecordProvider.overrideWith(
-              (ref, key) async => ParticipantRecord(
-                standing: const StandingRow(
+              (ref, key) async => const ParticipantRecord(
+                standing: StandingRow(
                   position: 1,
                   participantId: 'pz',
                   firstName: 'Zoe',
@@ -375,7 +375,7 @@ void main() {
                   total: 15,
                   matches: 1,
                 ),
-                matches: const [],
+                matches: [],
               ),
             ),
             leagueRecordProvider.overrideWith((ref, key) async {

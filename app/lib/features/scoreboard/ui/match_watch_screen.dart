@@ -1,25 +1,23 @@
 import 'dart:async';
 
 import 'package:brackety_core/brackety_core.dart';
-
-import '../../events/data/my_event.dart';
-import '../../events/state/events_providers.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/async_view.dart';
+import '../../../core/up_button.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../events/data/my_event.dart';
+import '../../events/state/events_providers.dart';
 import '../../mat/data/mat_board.dart';
-import '../data/match_view.dart';
+import '../../mat/ui/mat_label.dart';
 import '../../offline/state/offline_sync.dart';
+import '../data/match_view.dart';
 import '../state/match_review.dart';
 import 'clock_bar.dart';
 import 'final_score.dart';
 import 'review_panel.dart';
 import 'timeline_list.dart';
-import '../../../core/up_button.dart';
-import '../../mat/ui/mat_label.dart';
 
 /// A match seen by the club or a helper: score and timeline, without controls. In review, what the
 /// phone sent and, for whoever resolves reviews, the buttons to apply or discard it.

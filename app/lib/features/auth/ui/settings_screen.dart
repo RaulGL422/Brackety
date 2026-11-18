@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/up_button.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../data/account.dart';
 import '../data/api_error.dart';
@@ -17,7 +18,6 @@ import 'settings/legal_section.dart';
 import 'settings/profiles_section.dart';
 import 'settings/sign_in_methods_section.dart';
 import 'widgets/form_message.dart';
-import '../../../core/up_button.dart';
 
 /// Account settings. They need the server (Offline rule): without it, an error and a retry.
 class SettingsScreen extends ConsumerStatefulWidget {

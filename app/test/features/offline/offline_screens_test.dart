@@ -1,7 +1,4 @@
 import 'package:brackety/features/auth/state/session_controller.dart';
-
-import '../../support/fakes.dart';
-
 import 'package:brackety/features/mat/ui/mat_board_screen.dart';
 import 'package:brackety/features/offline/data/offline_op.dart';
 import 'package:brackety/features/scoreboard/data/match_view.dart';
@@ -16,6 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/board_finders.dart';
+import '../../support/fakes.dart';
 import '../../support/match_fakes.dart';
 import '../../support/offline_fakes.dart';
 
@@ -149,7 +147,7 @@ void main() {
     };
     store.docs['queue'] = {
       'ops': [for (final op in ops) op.toJson()],
-      'heldForReview': [],
+      'heldForReview': <String>[],
     };
   }
 

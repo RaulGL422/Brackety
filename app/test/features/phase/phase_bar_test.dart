@@ -71,7 +71,7 @@ Future<void> pumpBar(
           ...coreLocalizationsDelegates,
         ],
         supportedLocales: AppLocalizations.supportedLocales,
-        home: Scaffold(body: PhaseBar(eventId: 'e1')),
+        home: const Scaffold(body: PhaseBar(eventId: 'e1')),
       ),
     ),
   );

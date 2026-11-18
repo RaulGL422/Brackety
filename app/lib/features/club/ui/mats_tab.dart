@@ -1,9 +1,5 @@
 import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
-
-import '../../events/data/my_event.dart';
-import '../../events/state/events_providers.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -11,6 +7,8 @@ import 'package:intl/intl.dart';
 import '../../../core/async_view.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../control/control_ui.dart';
+import '../../events/data/my_event.dart';
+import '../../events/state/events_providers.dart';
 import '../../mat/state/mat_providers.dart';
 import '../data/club_models.dart';
 import '../state/club_providers.dart';

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:brackety_core/brackety_core.dart';
 import 'package:brackety/core/live/live_connection.dart';
 import 'package:brackety/features/auth/data/account.dart';
 import 'package:brackety/features/auth/data/account_api.dart';
@@ -11,6 +10,7 @@ import 'package:brackety/features/auth/data/registration.dart';
 import 'package:brackety/features/auth/state/session_controller.dart';
 import 'package:brackety/features/events/data/my_event.dart';
 import 'package:brackety/features/events/state/events_providers.dart';
+import 'package:brackety_core/brackety_core.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/misc.dart';
 

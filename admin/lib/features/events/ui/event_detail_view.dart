@@ -49,11 +49,7 @@ class EventDetailView extends ConsumerWidget {
         ),
         const SizedBox(height: AppSpacing.m),
         Expanded(
-          child: AsyncView(
-            value: detail,
-            onRetry: refresh,
-            data: (event) => _Detail(event),
-          ),
+          child: AsyncView(value: detail, onRetry: refresh, data: _Detail.new),
         ),
       ],
     );

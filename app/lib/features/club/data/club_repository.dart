@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../auth/state/session_controller.dart';
+import '../../events/data/measure_rules.dart';
 import 'club_models.dart';
 import 'sex.dart';
-import '../../events/data/measure_rules.dart';
 
 final clubRepositoryProvider = Provider<ClubRepository>(
   (ref) => ClubRepository(ref.watch(apiProvider)),

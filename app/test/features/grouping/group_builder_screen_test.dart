@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:brackety/app.dart';
+import 'package:brackety/core/router.dart';
 import 'package:brackety/features/events/data/measure_rules.dart';
 import 'package:brackety/features/events/data/my_event.dart';
 import 'package:brackety/features/events/state/events_providers.dart';
@@ -6,7 +9,6 @@ import 'package:brackety/features/grouping/data/grouping_models.dart';
 import 'package:brackety/features/grouping/data/grouping_repository.dart';
 import 'package:brackety/features/grouping/state/group_draft.dart';
 import 'package:brackety/features/grouping/state/grouping_providers.dart';
-import 'package:brackety/core/router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -94,9 +96,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
-          .read(routerProvider)
-          .push('/events/e1/categories/c1', extra: '7-8');
+      pushRoute(tester, '/events/e1/categories/c1', extra: '7-8');
       await tester.pumpAndSettle();
 
       // Youngest first, each age under its heading.
@@ -177,9 +177,7 @@ void main() {
           ),
         );
         await tester.pumpAndSettle();
-        ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
-            .read(routerProvider)
-            .push('/events/e1/categories/c1', extra: '7-8');
+        pushRoute(tester, '/events/e1/categories/c1', extra: '7-8');
         await tester.pumpAndSettle();
 
         // Height is not asked; Ana has her weight, Bea still lacks it.
@@ -241,9 +239,11 @@ void main() {
       final container = ProviderScope.containerOf(
         tester.element(find.byType(BracketyApp)),
       );
-      container
-          .read(routerProvider)
-          .push('/events/e1/categories/c1', extra: '7-8');
+      unawaited(
+        container
+            .read(routerProvider)
+            .push<void>('/events/e1/categories/c1', extra: '7-8'),
+      );
       await tester.pumpAndSettle();
 
       // On a phone the list starts below the group's slots: Zoe is further down.
@@ -326,9 +326,7 @@ void main() {
           ),
         );
         await tester.pumpAndSettle();
-        ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
-            .read(routerProvider)
-            .push('/events/e1/categories/c1', extra: '7-8');
+        pushRoute(tester, '/events/e1/categories/c1', extra: '7-8');
         await tester.pumpAndSettle();
 
         expect(find.textContaining('You can only look'), findsOneWidget);
@@ -363,9 +361,11 @@ void main() {
       final container = ProviderScope.containerOf(
         tester.element(find.byType(BracketyApp)),
       );
-      container
-          .read(routerProvider)
-          .push('/events/e1/categories/c1', extra: '7-8');
+      unawaited(
+        container
+            .read(routerProvider)
+            .push<void>('/events/e1/categories/c1', extra: '7-8'),
+      );
       await tester.pumpAndSettle();
       await tester.tap(find.text('Ana Prueba'));
       await tester.tap(find.text('Bea Prueba'));
@@ -417,9 +417,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
-        .read(routerProvider)
-        .push('/events/e1/categories/c1');
+    pushRoute(tester, '/events/e1/categories/c1');
     await tester.pumpAndSettle();
     for (final name in ['Ana', 'Bea', 'Carla', 'Diego']) {
       await tester.tap(find.text('$name Prueba'));
@@ -452,9 +450,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
-        .read(routerProvider)
-        .push('/events/e1/categories/c1');
+    pushRoute(tester, '/events/e1/categories/c1');
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Wildcard'));
@@ -490,9 +486,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
-          .read(routerProvider)
-          .push('/events/e1/categories/c1');
+      pushRoute(tester, '/events/e1/categories/c1');
       await tester.pumpAndSettle();
       Finder addAs(String label) => find.descendant(
         of: find.byType(SegmentedButton<bool>),
@@ -551,9 +545,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
-        .read(routerProvider)
-        .push('/events/e1/categories/c1');
+    pushRoute(tester, '/events/e1/categories/c1');
     await tester.pumpAndSettle();
 
     expect(find.textContaining('4 to go', findRichText: true), findsOneWidget);
@@ -598,9 +590,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
-          .read(routerProvider)
-          .push('/events/e1/categories/c1');
+      pushRoute(tester, '/events/e1/categories/c1');
       await tester.pumpAndSettle();
 
       expect(find.text('Automatic'), findsWidgets);
@@ -663,9 +653,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
-        .read(routerProvider)
-        .push('/events/e1/categories/c1');
+    pushRoute(tester, '/events/e1/categories/c1');
     await tester.pumpAndSettle();
     return repository;
   }
