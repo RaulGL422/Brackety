@@ -30,6 +30,29 @@ public record EventSettingsResponse(
         MeasureRules measures,
         WarningReasons warningReasons) {
 
+    /** For a helper: everything but who the staff are and their sign-ins. */
+    public EventSettingsResponse withoutStaff() {
+        return new EventSettingsResponse(
+                name,
+                date,
+                maxGroupsPerMat,
+                matchSeconds,
+                pointsLimit,
+                mats,
+                List.of(),
+                List.of(),
+                categories,
+                organizations,
+                attendancePoints,
+                phaseNumber,
+                discipline,
+                teamMatchSeconds,
+                teamPointsLimit,
+                minRestSeconds,
+                measures,
+                warningReasons);
+    }
+
     public record OrganizationResponse(UUID id, String name, String shortName) {
 
         public static OrganizationResponse of(EventOrganization o) {

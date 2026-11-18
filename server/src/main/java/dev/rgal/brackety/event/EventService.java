@@ -100,7 +100,11 @@ public class EventService {
 
     @Transactional(readOnly = true)
     public EventSettingsResponse settings(UUID eventId, UUID accountId) {
-        access.require(eventId, accountId, EventRole.CLUB);
+        // Whoever adds participants needs the categories; the staff and their emails are the club's alone.
+        access.require(eventId, accountId, EventPermission.PARTICIPANTS);
+        if (!access.roles(eventId, accountId).contains(EventRole.CLUB)) {
+            return settings(get(eventId)).withoutStaff();
+        }
         return settings(get(eventId));
     }
 
@@ -224,7 +228,7 @@ public class EventService {
                         access.permissions(event.getId(), a.getId(), EnumSet.copyOf(rolesByAccount.get(a.getId())))))
                 .toList();
         var referees = people.stream()
-                .filter(p -> p.roles().contains(EventRole.REFEREE))
+                .filter(p -> p.permissions().contains(EventPermission.OWN_MAT))
                 .toList();
         return new EventSettingsResponse(
                 event.getName(),
@@ -252,8 +256,12 @@ public class EventService {
     }
 
     private List<UUID> refereeIds(UUID eventId) {
-        return staff.findByEventIdAndRole(eventId, EventRole.REFEREE).stream()
+        // Whoever may referee their mat, not only those invited as referees; never the club itself.
+        return staff.findByEventId(eventId).stream()
                 .map(EventStaff::getAccountId)
+                .distinct()
+                .filter(id -> !access.roles(eventId, id).contains(EventRole.CLUB))
+                .filter(id -> access.has(eventId, id, EventPermission.OWN_MAT))
                 .toList();
     }
 }

@@ -22,6 +22,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/fakes.dart';
 import '../../support/staff_fakes.dart';
 
 /// Saves settings like the server would, or refuses them with [refuseWith].
@@ -169,6 +170,7 @@ void main() {
     name: 'Fase 1',
     date: DateTime(2026, 11, 14),
     roles: {EventRole.club},
+    permissions: {...EventPermission.values},
   );
 
   final settings = EventSettings(
@@ -258,6 +260,7 @@ void main() {
     List<StandingRow>? scores,
     bool globalStandings = true,
     FakeStaffRepository? staff,
+    MyEvent? me,
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
@@ -270,7 +273,7 @@ void main() {
           staffRepositoryProvider.overrideWithValue(
             staff ?? FakeStaffRepository(),
           ),
-          myEventsProvider.overrideWith((ref) async => [event]),
+          myEventsProvider.overrideWith((ref) async => [me ?? event]),
           leagueProvider.overrideWith(
             (ref, _) async => League(
               name: 'Liga',
@@ -689,9 +692,19 @@ void main() {
       await centre(permissions);
       await tester.tap(permissions);
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Create and undo groups'));
-      await tester.tap(find.text('Start and finish the phase'));
-      await tester.pump();
+      for (final name in [
+        'Create and undo groups',
+        'Start and finish the phase',
+      ]) {
+        final box = find.descendant(
+          of: find.widgetWithText(CheckboxListTile, name),
+          matching: find.byType(Checkbox),
+        );
+        // Centred: at the top the toast of the cancel above still covers it.
+        await centre(box);
+        await tester.tap(box);
+        await tester.pump();
+      }
       await tester.tap(find.widgetWithText(FilledButton, 'Save'));
       await tester.pumpAndSettle();
       expect(staff.calls.last, 'permissions h1 MEASURES,PHASE,TEAMS');
@@ -709,6 +722,47 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  for (final MapEntry(key: device, value: size) in sizes.entries) {
+    testWidgets(
+      'a helper sees only the tabs their permissions open on $device',
+      (tester) async {
+        await pumpPanel(
+          tester,
+          size,
+          repository: FakeClubRepository(settings),
+          me: helperEvent({EventPermission.view, EventPermission.participants}),
+        );
+
+        expect(find.text('Mats'), findsWidgets);
+        expect(find.text('Entries'), findsWidgets);
+        expect(find.text('Scores'), findsNothing);
+        expect(find.text('Settings'), findsNothing);
+
+        await tester.tap(find.text('Entries').last);
+        await tester.pumpAndSettle();
+        expect(find.text('Add student'), findsOneWidget);
+        // Re-enrolling from another phase and reading lists stay the club's.
+        expect(find.text('Import participants'), findsNothing);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
+  testWidgets('a helper with one place in the panel gets no navigation', (
+    tester,
+  ) async {
+    await pumpPanel(
+      tester,
+      const Size(360, 800),
+      repository: FakeClubRepository(settings),
+      me: helperEvent({EventPermission.participants}),
+    );
+
+    expect(find.byType(NavigationBar), findsNothing);
+    expect(find.text('Add student'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('the club adds the clubs taking part in Settings', (
     tester,

@@ -1,4 +1,7 @@
 import 'package:brackety/features/auth/state/session_controller.dart';
+
+import '../../support/fakes.dart';
+
 import 'package:brackety/features/mat/ui/mat_board_screen.dart';
 import 'package:brackety/features/offline/data/offline_op.dart';
 import 'package:brackety/features/scoreboard/data/match_view.dart';
@@ -67,6 +70,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          clubEventsOverride,
           ...offlineOverrides(store: store, clock: clock, repository: server),
           bellProvider.overrideWithValue(FakeBell()),
           apiProvider.overrideWithValue(

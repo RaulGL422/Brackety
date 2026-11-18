@@ -25,6 +25,7 @@ import '../../mat/ui/mat_label.dart';
 import 'measures.dart';
 import '../../events/data/measure_rules.dart';
 import 'age_sections.dart';
+import 'read_only_notice.dart';
 
 /// A team category (docs/modulos/prototipo-f1-equipos.md): make teams from its participants, then
 /// group 4 teams (or 3 and a ghost team) and send them to a mat. "Individual group" opens the usual
@@ -204,6 +205,7 @@ class _TeamMakerState extends ConsumerState<_TeamMaker> {
 
   @override
   Widget build(BuildContext context) {
+    final can = ref.watch(myPermissionsProvider(widget.categoryKey.eventId));
     final l10n = AppLocalizations.of(context);
     final participants = ref.watch(
       categoryParticipantsProvider(widget.categoryKey),
@@ -251,65 +253,82 @@ class _TeamMakerState extends ConsumerState<_TeamMaker> {
                   (_picks.length < DraftGroup.maxTeam &&
                       (_wildcards || !p.isTaken)),
               onTap: blockedByMeasures(rules, p)
-                  ? () async {
-                      if (await showMeasuresDialog(
-                        context,
-                        widget.categoryKey.eventId,
-                        p,
-                      )) {
-                        _refresh(ref, widget.categoryKey);
-                      }
-                    }
+                  ? !can.contains(EventPermission.measures)
+                        ? null
+                        : () async {
+                            if (await showMeasuresDialog(
+                              context,
+                              widget.categoryKey.eventId,
+                              p,
+                            )) {
+                              _refresh(ref, widget.categoryKey);
+                            }
+                          }
+                  : !can.contains(EventPermission.teams)
+                  ? null
                   : () => _toggle(p),
             );
           },
         );
       },
     );
-    final panel = Material(
-      elevation: 3,
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.m),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      l10n.newTeamCount(_picks.length, DraftGroup.maxTeam),
-                      style: Theme.of(context).textTheme.titleMedium,
+    final panel = !can.contains(EventPermission.teams)
+        ? null
+        : Material(
+            elevation: 3,
+            child: SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.m),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            l10n.newTeamCount(
+                              _picks.length,
+                              DraftGroup.maxTeam,
+                            ),
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ),
+                        FilterChip(
+                          label: Text(l10n.teamPickWildcards),
+                          selected: _wildcards,
+                          onSelected: _setWildcards,
+                        ),
+                      ],
                     ),
-                  ),
-                  FilterChip(
-                    label: Text(l10n.teamPickWildcards),
-                    selected: _wildcards,
-                    onSelected: _setWildcards,
-                  ),
-                ],
-              ),
-              if (_wildcards || ghosts.isNotEmpty)
-                Text(
-                  l10n.teamGhostHint,
-                  style: Theme.of(context).textTheme.bodySmall,
+                    if (_wildcards || ghosts.isNotEmpty)
+                      Text(
+                        l10n.teamGhostHint,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    const SizedBox(height: AppSpacing.s),
+                    FilledButton(
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size.fromHeight(
+                          AppSizes.touchTarget,
+                        ),
+                      ),
+                      onPressed: complete && !_busy ? _create : null,
+                      child: Text(l10n.createTeam),
+                    ),
+                  ],
                 ),
-              const SizedBox(height: AppSpacing.s),
-              FilledButton(
-                style: FilledButton.styleFrom(
-                  minimumSize: const Size.fromHeight(AppSizes.touchTarget),
-                ),
-                onPressed: complete && !_busy ? _create : null,
-                child: Text(l10n.createTeam),
               ),
-            ],
-          ),
-        ),
-      ),
+            ),
+          );
+    return _ListWithPanel(
+      list: list,
+      panel: panel,
+      readOnly:
+          !can.contains(EventPermission.teams) &&
+          !can.contains(EventPermission.measures),
     );
-    return _ListWithPanel(list: list, panel: panel);
   }
 }
 
@@ -556,6 +575,7 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
 
   @override
   Widget build(BuildContext context) {
+    final can = ref.watch(myPermissionsProvider(widget.categoryKey.eventId));
     final l10n = AppLocalizations.of(context);
     final key = widget.categoryKey;
     // As with participants: a team another helper grouped (or deleted) leaves the draft at once.
@@ -577,16 +597,7 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
       }
     });
     final teams = ref.watch(categoryTeamsProvider(key));
-    // The club also moves people between teams whose group has not started (control panel).
-    final club =
-        ref
-            .watch(myEventsProvider)
-            .value
-            ?.where((e) => e.id == key.eventId)
-            .firstOrNull
-            ?.roles
-            .contains(EventRole.club) ??
-        false;
+    final groups = can.contains(EventPermission.groups);
     final list = AsyncView(
       value: teams,
       onRetry: () => _refresh(ref, key),
@@ -602,12 +613,16 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
                     : _canJoinAsWildcard(all[i], all)
                     ? PickState.free
                     : null,
-                onTap: () => _tapTeam(all[i], all),
-                onDelete: all[i].isTaken ? null : () => _delete(all[i]),
-                onMoveMember: club && all.length > 1
+                onTap: groups ? () => _tapTeam(all[i], all) : null,
+                onDelete: all[i].isTaken || !can.contains(EventPermission.teams)
+                    ? null
+                    : () => _delete(all[i]),
+                // The control panel also moves people between teams whose group has not started.
+                onMoveMember:
+                    can.contains(EventPermission.control) && all.length > 1
                     ? () => _moveMember(all[i], all)
                     : null,
-                onUndoGroup: all[i].canUndoGroup
+                onUndoGroup: groups && all[i].canUndoGroup
                     ? () => undoGroup(
                         context,
                         ref,
@@ -620,23 +635,25 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
               ),
             ),
     );
-    final panel = DraftPanel(
-      eventId: key.eventId,
-      group: _group,
-      matId: _matId,
-      busy: _busy,
-      onChanged: _change,
-      onMatChanged: (id) => setState(() => _matId = id),
-      onCreate: _create,
-      labelOf: (id) {
-        final team = teams.value?.where((t) => t.id == id).firstOrNull;
-        return team == null ? '' : l10n.teamName(team.number);
-      },
-      onPickGhostTeam: () => _pickGhostTeam(teams.value ?? const []),
-      ghostTeamLabel: (people) =>
-          _ghostTeamLabel(people, teams.value ?? const []),
-    );
-    return _ListWithPanel(list: list, panel: panel);
+    final panel = !groups
+        ? null
+        : DraftPanel(
+            eventId: key.eventId,
+            group: _group,
+            matId: _matId,
+            busy: _busy,
+            onChanged: _change,
+            onMatChanged: (id) => setState(() => _matId = id),
+            onCreate: _create,
+            labelOf: (id) {
+              final team = teams.value?.where((t) => t.id == id).firstOrNull;
+              return team == null ? '' : l10n.teamName(team.number);
+            },
+            onPickGhostTeam: () => _pickGhostTeam(teams.value ?? const []),
+            ghostTeamLabel: (people) =>
+                _ghostTeamLabel(people, teams.value ?? const []),
+          );
+    return _ListWithPanel(list: list, panel: panel, readOnly: !groups);
   }
 }
 
@@ -657,7 +674,9 @@ class _TeamTile extends StatelessWidget {
   /// In wildcard mode, a team of another group: [PickState.ghost] if it is in this draft as a
   /// wildcard team, [PickState.free] if it can join as one; null otherwise.
   final PickState? wildcard;
-  final VoidCallback onTap;
+
+  /// Null for whoever may not build groups.
+  final VoidCallback? onTap;
   final VoidCallback? onDelete;
   final VoidCallback? onUndoGroup;
 
@@ -680,7 +699,7 @@ class _TeamTile extends StatelessWidget {
     return ListTile(
       enabled: state != PickState.unavailable,
       onTap: onTap,
-      leading: PickMark(state: state, onTap: onTap),
+      leading: onTap == null ? null : PickMark(state: state, onTap: onTap!),
       title: Text(l10n.teamName(team.number)),
       subtitle: Text(
         [
@@ -844,7 +863,9 @@ class _PersonTile extends StatelessWidget {
   final MeasureRules rules;
   final bool picked;
   final bool enabled;
-  final VoidCallback onTap;
+
+  /// Null for whoever may not form teams (nor measure, when blocked).
+  final VoidCallback? onTap;
 
   /// Picked while competing elsewhere: joins the team as a ghost.
   final bool ghost;
@@ -863,7 +884,12 @@ class _PersonTile extends StatelessWidget {
               color: Theme.of(context).colorScheme.error,
               semanticLabel: l10n.measuresWrite,
             )
-          : Checkbox(value: picked, onChanged: enabled ? (_) => onTap() : null),
+          : onTap == null
+          ? null
+          : Checkbox(
+              value: picked,
+              onChanged: enabled ? (_) => onTap!() : null,
+            ),
       title: Text(p.fullName),
       subtitle: Text(
         [
@@ -920,13 +946,31 @@ class _SortBar extends StatelessWidget {
 
 /// List and panel side by side on wide screens, panel under the list otherwise.
 class _ListWithPanel extends StatelessWidget {
-  const _ListWithPanel({required this.list, required this.panel});
+  const _ListWithPanel({
+    required this.list,
+    required this.panel,
+    this.readOnly = false,
+  });
 
   final Widget list;
-  final Widget panel;
+
+  /// Null for whoever may not use it.
+  final Widget? panel;
+
+  /// Nothing here for them to change: says so on top.
+  final bool readOnly;
 
   @override
   Widget build(BuildContext context) {
+    final panel = this.panel;
+    if (panel == null) {
+      return Column(
+        children: [
+          if (readOnly) const ReadOnlyNotice(),
+          Expanded(child: list),
+        ],
+      );
+    }
     if (WindowSize.of(context) == WindowSize.expanded) {
       return Row(
         children: [

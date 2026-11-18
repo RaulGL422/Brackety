@@ -4,6 +4,7 @@ enum EventRole { club, grouper, referee }
 
 /// What a helper or referee may do in an event, as the club chose (F1-7 C); the club may do all.
 enum EventPermission {
+  view('VIEW'),
   groups('GROUPS'),
   teams('TEAMS'),
   measures('MEASURES'),
@@ -76,11 +77,26 @@ class MyEvent {
 
   bool can(EventPermission permission) => permissions.contains(permission);
 
-  /// Groups, teams or measures: the categories screen has something for them.
+  bool get isClub => roles.contains(EventRole.club);
+
+  /// Groups, teams, measures or only looking: the categories screen has something for them.
   bool get buildsGroups =>
       can(EventPermission.groups) ||
       can(EventPermission.teams) ||
-      can(EventPermission.measures);
+      can(EventPermission.measures) ||
+      can(EventPermission.view);
+
+  /// Every mat and match: the control panel, the reviews or only looking.
+  bool get watchesMats =>
+      can(EventPermission.control) ||
+      can(EventPermission.reviews) ||
+      can(EventPermission.view);
+
+  /// A helper with something in the event's panel: its mats, its participants or a device's CSV.
+  bool get opensPanel =>
+      watchesMats ||
+      can(EventPermission.participants) ||
+      can(EventPermission.deviceImport);
 
   /// The referee's mat, if any.
   final String? matId;

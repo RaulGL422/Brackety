@@ -2975,4 +2975,18 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get permissionParticipants => 'Dar de alta y editar alumnos';
+
+  @override
+  String get eventStaffPanel => 'Panel del evento';
+
+  @override
+  String get staffPanelOnlyImport =>
+      'Desde aquí puedes importar las acciones de un dispositivo con el botón de arriba.';
+
+  @override
+  String get permissionView => 'Ver grupos, tapices y combates (solo lectura)';
+
+  @override
+  String get permissionsReadOnly =>
+      'Solo puedes mirar: el club no te ha dado permiso para cambiar nada aquí.';
 }

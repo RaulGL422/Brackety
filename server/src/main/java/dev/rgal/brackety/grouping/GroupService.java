@@ -31,6 +31,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 class GroupService {
 
+    /** Whoever groups, forms teams, measures or only looks reads the categories and who is in them. */
+    static final EventPermission[] READ_CATEGORIES = {
+        EventPermission.GROUPS, EventPermission.TEAMS, EventPermission.MEASURES, EventPermission.VIEW
+    };
+
     private final FightGroupRepository groups;
     private final EventPhase phase;
     private final GroupMemberRepository members;
@@ -89,7 +94,7 @@ class GroupService {
     /** Categories with participants, youngest first. */
     @Transactional(readOnly = true)
     List<CategorySummary> categories(UUID eventId, UUID accountId) {
-        access.require(eventId, accountId, EventPermission.GROUPS, EventPermission.TEAMS, EventPermission.MEASURES);
+        access.require(eventId, accountId, READ_CATEGORIES);
         var event = events.get(eventId);
         var grouped = roster.groupedIds(eventId);
         var teamNumbers = directory.teamNumbers(eventId);
@@ -120,7 +125,7 @@ class GroupService {
     /** A category's participants by name; those already in a group or team say which one and where. */
     @Transactional(readOnly = true)
     List<CategoryParticipant> categoryParticipants(UUID eventId, UUID categoryId, UUID accountId) {
-        access.require(eventId, accountId, EventPermission.GROUPS, EventPermission.TEAMS, EventPermission.MEASURES);
+        access.require(eventId, accountId, READ_CATEGORIES);
         var event = events.get(eventId);
         var category = roster.category(eventId, categoryId);
         var grouped = roster.groupedIds(eventId);

@@ -68,6 +68,7 @@ List<Override> quietQueueOverrides() => [
 MatchView stamped(MatchView view, DateTime at, {MatchReview? review}) =>
     MatchView(
       id: view.id,
+      eventId: view.eventId,
       matId: view.matId,
       matNumber: view.matNumber,
       groupNumber: view.groupNumber,
@@ -90,6 +91,7 @@ MatchView serverMatch(String id, {DateTime? at}) {
   return stamped(
     MatchView(
       id: id,
+      eventId: base.eventId,
       matId: base.matId,
       matNumber: base.matNumber,
       groupNumber: base.groupNumber,
@@ -205,6 +207,7 @@ class FakeMatchServer implements ScoreboardRepository {
     final view = views[matchId]!;
     views[matchId] = MatchView(
       id: view.id,
+      eventId: view.eventId,
       matId: view.matId,
       matNumber: view.matNumber,
       groupNumber: view.groupNumber,

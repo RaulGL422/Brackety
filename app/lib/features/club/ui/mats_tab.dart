@@ -1,5 +1,9 @@
 import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
+
+import '../../events/data/my_event.dart';
+import '../../events/state/events_providers.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -48,6 +52,9 @@ class _MatCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (mat.isDisabled) return _DisabledMatCard(eventId: eventId, mat: mat);
+    final controls = ref
+        .watch(myPermissionsProvider(eventId))
+        .contains(EventPermission.control);
     final l10n = AppLocalizations.of(context);
     final time = DateFormat.Hm(Localizations.localeOf(context).toLanguageTag());
     final scheme = Theme.of(context).colorScheme;
@@ -92,7 +99,7 @@ class _MatCard extends ConsumerWidget {
             onTap: () =>
                 context.push('/club/mats/${mat.id}?number=${mat.number}'),
           ),
-          if (mat.referee != null)
+          if (mat.referee != null && controls)
             Padding(
               padding: const EdgeInsets.fromLTRB(
                 AppSpacing.l,
@@ -162,21 +169,24 @@ class _DisabledMatCard extends ConsumerWidget {
                 ].join('\n'),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.l),
-              child: Align(
-                alignment: AlignmentDirectional.centerEnd,
-                child: FilledButton.tonalIcon(
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size(0, AppSizes.touchTarget),
+            if (ref
+                .watch(myPermissionsProvider(eventId))
+                .contains(EventPermission.control))
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.l),
+                child: Align(
+                  alignment: AlignmentDirectional.centerEnd,
+                  child: FilledButton.tonalIcon(
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size(0, AppSizes.touchTarget),
+                    ),
+                    icon: const Icon(Icons.play_arrow),
+                    label: Text(l10n.controlEnableMat),
+                    onPressed: () =>
+                        enableMat(context, ref, eventId: eventId, mat: mat),
                   ),
-                  icon: const Icon(Icons.play_arrow),
-                  label: Text(l10n.controlEnableMat),
-                  onPressed: () =>
-                      enableMat(context, ref, eventId: eventId, mat: mat),
                 ),
               ),
-            ),
           ],
         ),
       ),

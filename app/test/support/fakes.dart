@@ -9,6 +9,8 @@ import 'package:brackety/features/auth/data/auth_api.dart';
 import 'package:brackety/features/auth/data/refresh_token_store.dart';
 import 'package:brackety/features/auth/data/registration.dart';
 import 'package:brackety/features/auth/state/session_controller.dart';
+import 'package:brackety/features/events/data/my_event.dart';
+import 'package:brackety/features/events/state/events_providers.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/misc.dart';
 
@@ -367,4 +369,27 @@ Account testAccount({
   locale: locale,
   profiles: profiles,
   signInMethods: signInMethods,
+);
+
+/// The club of event [id]: it may do everything there (F1-7 C).
+MyEvent clubEvent([String id = 'e1']) => MyEvent(
+  id: id,
+  name: 'Fase 1',
+  date: DateTime(2026, 11, 14),
+  roles: const {EventRole.club},
+  permissions: const {...EventPermission.values},
+);
+
+/// The signed-in account is the club of event e1.
+final clubEventsOverride = myEventsProvider.overrideWith(
+  (ref) async => [clubEvent()],
+);
+
+/// A helper of event e1 who may do only [permissions].
+MyEvent helperEvent(Set<EventPermission> permissions) => MyEvent(
+  id: 'e1',
+  name: 'Fase 1',
+  date: DateTime(2026, 11, 14),
+  roles: const {EventRole.grouper},
+  permissions: permissions,
 );

@@ -1,4 +1,7 @@
 import 'package:brackety/features/mat/data/mat_board.dart';
+
+import '../../support/fakes.dart';
+
 import 'package:brackety/features/mat/state/mat_providers.dart';
 import 'package:brackety/features/mat/ui/mat_board_screen.dart';
 import 'package:brackety/l10n/gen/app_localizations.dart';
@@ -77,6 +80,7 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
+              clubEventsOverride,
               ...quietQueueOverrides(),
               cachedBoardProvider.overrideWith((ref, matId) async => board),
             ],
@@ -154,6 +158,7 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
+              clubEventsOverride,
               ...quietQueueOverrides(),
               cachedBoardProvider.overrideWith((ref, matId) async => live),
             ],
@@ -242,6 +247,7 @@ void main() {
       ProviderScope(
         retry: (_, _) => null,
         overrides: [
+          clubEventsOverride,
           ...quietQueueOverrides(),
           cachedBoardProvider.overrideWith(
             (ref, matId) async => throw Exception('down'),
@@ -271,7 +277,10 @@ void main() {
   ) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [matBoardProvider.overrideWith((ref, matId) async => board)],
+        overrides: [
+          clubEventsOverride,
+          matBoardProvider.overrideWith((ref, matId) async => board),
+        ],
         child: MaterialApp(
           builder: (_, child) => ToastHost(child: child!),
           theme: lightTheme(),
@@ -303,6 +312,7 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
+              clubEventsOverride,
               matBoardProvider.overrideWith((ref, matId) async {
                 loads++;
                 return MatBoard(
@@ -404,6 +414,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            clubEventsOverride,
             ...quietQueueOverrides(),
             cachedBoardProvider.overrideWith((ref, matId) async => teamBoard),
           ],

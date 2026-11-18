@@ -1,6 +1,10 @@
 import 'dart:async';
 
 import 'package:brackety_core/brackety_core.dart';
+
+import '../../events/data/my_event.dart';
+import '../../events/state/events_providers.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -17,8 +21,8 @@ import 'timeline_list.dart';
 import '../../../core/up_button.dart';
 import '../../mat/ui/mat_label.dart';
 
-/// A match seen by the club: score and timeline, without controls. In review, what the phone
-/// sent and the buttons to apply or discard it.
+/// A match seen by the club or a helper: score and timeline, without controls. In review, what the
+/// phone sent and, for whoever resolves reviews, the buttons to apply or discard it.
 class MatchWatchScreen extends ConsumerWidget {
   const MatchWatchScreen({super.key, required this.matchId});
 
@@ -48,9 +52,14 @@ class MatchWatchScreen extends ConsumerWidget {
           null => l10n.timeline,
         }),
       ),
-      persistentFooterButtons: match.value?.review == null
-          ? null
-          : [ReviewButtons(matchId: matchId)],
+      persistentFooterButtons: switch (match.value) {
+        MatchView(review: _?, eventId: final eventId?)
+            when ref
+                .watch(myPermissionsProvider(eventId))
+                .contains(EventPermission.reviews) =>
+          [ReviewButtons(matchId: matchId)],
+        _ => null,
+      },
       body: AsyncView(
         value: match,
         onRetry: () => ref.invalidate(provider),

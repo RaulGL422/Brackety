@@ -81,6 +81,11 @@ void main() {
                   name: 'Fase 2',
                   date: DateTime(2027, 1, 24),
                   roles: const {EventRole.grouper},
+                  permissions: const {
+                    EventPermission.groups,
+                    EventPermission.teams,
+                    EventPermission.measures,
+                  },
                 ),
               ],
             ),
@@ -155,6 +160,11 @@ void main() {
                     name: 'Fase 2',
                     date: DateTime(2027, 1, 24),
                     roles: const {EventRole.grouper},
+                    permissions: const {
+                      EventPermission.groups,
+                      EventPermission.teams,
+                      EventPermission.measures,
+                    },
                     measures: const MeasureRules(
                       weight: MeasureRequirement.required,
                       height: MeasureRequirement.off,
@@ -215,6 +225,11 @@ void main() {
                   name: 'Fase 1',
                   date: DateTime(2027, 3, 10),
                   roles: const {EventRole.grouper},
+                  permissions: const {
+                    EventPermission.groups,
+                    EventPermission.teams,
+                    EventPermission.measures,
+                  },
                 ),
               ],
             ),
@@ -286,6 +301,46 @@ void main() {
     });
   }
 
+  for (final MapEntry(key: device, value: size) in sizes.entries) {
+    testWidgets(
+      'a helper who only watches sees the groups but builds none on $device',
+      (tester) async {
+        tester.view.physicalSize = size;
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              ...sessionOverrides(FakeAuthApi(signedIn: true)),
+              groupingRepositoryProvider.overrideWithValue(
+                FakeGroupingRepository([...participants]),
+              ),
+              fakeMatsOverride,
+              myEventsProvider.overrideWith(
+                (ref) async => [
+                  helperEvent({EventPermission.view}),
+                ],
+              ),
+            ],
+            child: const BracketyApp(),
+          ),
+        );
+        await tester.pumpAndSettle();
+        ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
+            .read(routerProvider)
+            .push('/events/e1/categories/c1', extra: '7-8');
+        await tester.pumpAndSettle();
+
+        expect(find.textContaining('You can only look'), findsOneWidget);
+        expect(find.text('Ana Prueba'), findsOneWidget);
+        expect(find.byType(Checkbox), findsNothing);
+        expect(find.text('Create group'), findsNothing);
+        expect(find.byIcon(Icons.undo), findsNothing);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
   testWidgets(
     'someone another helper groups meanwhile leaves the draft with a notice',
     (tester) async {
@@ -299,7 +354,7 @@ void main() {
             ...sessionOverrides(FakeAuthApi(signedIn: true)),
             groupingRepositoryProvider.overrideWithValue(repository),
             fakeMatsOverride,
-            myEventsProvider.overrideWith((ref) async => []),
+            clubEventsOverride,
           ],
           child: const BracketyApp(),
         ),
@@ -356,7 +411,7 @@ void main() {
           ...sessionOverrides(FakeAuthApi(signedIn: true)),
           groupingRepositoryProvider.overrideWithValue(repository),
           fakeMatsOverride,
-          myEventsProvider.overrideWith((ref) async => []),
+          clubEventsOverride,
         ],
         child: const BracketyApp(),
       ),
@@ -391,7 +446,7 @@ void main() {
           ...sessionOverrides(FakeAuthApi(signedIn: true)),
           groupingRepositoryProvider.overrideWithValue(repository),
           fakeMatsOverride,
-          myEventsProvider.overrideWith((ref) async => []),
+          clubEventsOverride,
         ],
         child: const BracketyApp(),
       ),
@@ -429,7 +484,7 @@ void main() {
             ...sessionOverrides(FakeAuthApi(signedIn: true)),
             groupingRepositoryProvider.overrideWithValue(repository),
             fakeMatsOverride,
-            myEventsProvider.overrideWith((ref) async => []),
+            clubEventsOverride,
           ],
           child: const BracketyApp(),
         ),
@@ -490,7 +545,7 @@ void main() {
             FakeGroupingRepository(participants),
           ),
           fakeMatsOverride,
-          myEventsProvider.overrideWith((ref) async => []),
+          clubEventsOverride,
         ],
         child: const BracketyApp(),
       ),
@@ -537,7 +592,7 @@ void main() {
             ...sessionOverrides(FakeAuthApi(signedIn: true)),
             groupingRepositoryProvider.overrideWithValue(repository),
             fakeMatsOverride,
-            myEventsProvider.overrideWith((ref) async => []),
+            clubEventsOverride,
           ],
           child: const BracketyApp(),
         ),
@@ -602,7 +657,7 @@ void main() {
           ...sessionOverrides(FakeAuthApi(signedIn: true)),
           groupingRepositoryProvider.overrideWithValue(repository),
           fakeMatsOverride,
-          myEventsProvider.overrideWith((ref) async => []),
+          clubEventsOverride,
         ],
         child: const BracketyApp(),
       ),

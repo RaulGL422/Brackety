@@ -151,6 +151,7 @@ class StaffRemoveButton extends ConsumerWidget {
 }
 
 String permissionName(AppLocalizations l10n, EventPermission p) => switch (p) {
+  EventPermission.view => l10n.permissionView,
   EventPermission.groups => l10n.permissionGroups,
   EventPermission.teams => l10n.permissionTeams,
   EventPermission.measures => l10n.permissionMeasures,

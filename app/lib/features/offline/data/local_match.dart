@@ -116,6 +116,7 @@ class LocalMatch {
         ? _serverAt(server, now)
         : MatchView(
             id: server.id,
+            eventId: server.eventId,
             matId: server.matId,
             matNumber: server.matNumber,
             groupNumber: server.groupNumber,

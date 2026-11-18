@@ -4,7 +4,6 @@ import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventException;
 import dev.rgal.brackety.event.EventPermission;
 import dev.rgal.brackety.event.EventPhase;
-import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.event.Mat;
 import dev.rgal.brackety.event.MatRepository;
@@ -308,7 +307,7 @@ public class MatchControlService {
             throw EventException.conflict("MAT_NOT_DISABLED", "This mat is in use.");
         }
         var referee = mat.getDisabledRefereeAccountId();
-        if (referee == null || !access.roles(eventId, referee).contains(EventRole.REFEREE)) {
+        if (referee == null || !access.has(eventId, referee, EventPermission.OWN_MAT)) {
             throw EventException.conflict(
                     "REFEREE_GONE", "Its referee is no longer one of the event's: assign one in the settings.");
         }

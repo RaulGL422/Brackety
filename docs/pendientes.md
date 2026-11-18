@@ -54,7 +54,7 @@
 - [ ] F1-4 advertencias: revisar la lista de tambo propuesta (prohibiciones del reglamento, cap. 3.1: proyección o golpeo, tirarse rodando, ataque de pique, exceso de potencia, conducta antideportiva). Se cambia en `Discipline` o por evento en Configuración.
 - [ ] F1-5 cuentas propias: hecho en `feat/f1-5-staff-invites`. Con Resend en producción, probar a mano: invitar a un email real, registrarse con él, aceptar y arbitrar un tapiz. Retirar `staffNames` cuando las cuentas tengan nombre.
 - [ ] F1-7: probar a mano en debug la PR B (fusionada, #129): comenzar, crear grupos, finalizar con pendientes, reabrir con motivo y el correo del día siguiente. PR C (permisos, rama `feat/event-staff-permissions`): dar y quitar permisos en «Personal» y comprobar que el ayudante ve o pierde sus botones.
-- [ ] F1-7 C2: entrada al panel para el ayudante con «Panel de control», «Resolver revisiones», «Importar CSV» o «Alumnos» (hoy el servidor ya le deja, pero la app solo abre el panel al club).
+- [ ] F1-7 C2 (rama `feat/staff-panel-access`): probar a mano en debug un ayudante solo de mirar, otro solo de alumnos y un árbitro que además hace grupos.
 - [ ] F1-7 C: el paquete del portátil del pabellón no lleva los permisos elegidos; allí cada persona vuelve a los de su rol. Decidir si se incluyen.
 - [ ] Correo como herramienta (Raul, 2026-11-18): lista de avisos útiles por email para que Raul elija (`modulos/notificaciones.md`).
 - [ ] Nombres descriptivos en las descargas (Raul, 2026-11-18): cada PDF y CSV con liga, fase, categoría y qué es (p. ej. `liga-yoseikan-2027_fase-2_clasificacion_7-8.pdf`), nunca un nombre genérico.

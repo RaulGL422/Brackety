@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import dev.rgal.brackety.event.EventApiTest;
+import java.util.UUID;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +23,7 @@ class StaffPermissionsTest extends EventApiTest {
         call(get("/api/v1/events"), "arbitro1")
                 .andExpect(jsonPath("$[0].permissions[0]").value("OWN_MAT"));
         call(get("/api/v1/events"), "club1")
-                .andExpect(jsonPath("$[0].permissions.length()").value(9));
+                .andExpect(jsonPath("$[0].permissions.length()").value(10));
 
         call(get(mats()), "ayudante1").andExpect(status().isOk());
         call(get(participants()), "ayudante1").andExpect(status().isForbidden());
@@ -85,6 +86,50 @@ class StaffPermissionsTest extends EventApiTest {
         assertThat(saved()).isEqualTo(3);
     }
 
+    @Test
+    void aViewerSeesGroupsAndMatsButChangesNothing() throws Exception {
+        call(put(permissions(accountId("ayudante1"))).content("{\"permissions\":[\"VIEW\"]}"), "club1")
+                .andExpect(status().isOk());
+
+        call(get("/api/v1/events/" + eventId + "/categories"), "ayudante1").andExpect(status().isOk());
+        call(get(mats()), "ayudante1").andExpect(status().isOk());
+        call(get("/api/v1/mats/" + mat(2) + "/board"), "ayudante1").andExpect(status().isOk());
+        call(
+                        post("/api/v1/events/" + eventId + "/groups")
+                                .content("{\"categoryId\":\"%s\",\"groups\":[{\"participantIds\":[\"%s\",\"%s\"]}]}"
+                                        .formatted(eventId, UUID.randomUUID(), UUID.randomUUID())),
+                        "ayudante1")
+                .andExpect(status().isForbidden());
+        call(post("/api/v1/events/" + eventId + "/control/mats/" + mat(2) + "/disable"), "ayudante1")
+                .andExpect(status().isForbidden());
+        call(get(participants()), "ayudante1").andExpect(status().isForbidden());
+    }
+
+    @Test
+    void whoeverManagesParticipantsReadsTheCategoriesButNotTheStaff() throws Exception {
+        call(put(permissions(accountId("ayudante1"))).content("{\"permissions\":[\"PARTICIPANTS\"]}"), "club1")
+                .andExpect(status().isOk());
+
+        call(get("/api/v1/events/" + eventId + "/settings"), "ayudante1")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.categories").isNotEmpty())
+                .andExpect(jsonPath("$.staff").isEmpty())
+                .andExpect(jsonPath("$.referees").isEmpty());
+        call(get("/api/v1/events/" + eventId + "/settings"), "arbitro1").andExpect(status().isForbidden());
+    }
+
+    @Test
+    void aHelperWhoMayRefereeCanBeOnAMat() throws Exception {
+        call(get("/api/v1/events/" + eventId + "/settings"), "club1")
+                .andExpect(jsonPath("$.referees[?(@.username == 'ayudante1')]").isEmpty());
+
+        call(put(permissions(accountId("ayudante1"))).content("{\"permissions\":[\"GROUPS\",\"OWN_MAT\"]}"), "club1")
+                .andExpect(status().isOk());
+
+        call(get("/api/v1/events/" + eventId + "/settings"), "club1")
+                .andExpect(jsonPath("$.referees[?(@.username == 'ayudante1')]").isNotEmpty());
+    }
+
     private int saved() {
         return jdbc.sql("select count(*) from event_staff_permissions")
                 .query(Integer.class)
@@ -94,11 +139,11 @@ class StaffPermissionsTest extends EventApiTest {
     private Object mat(int number) {
         return jdbc.sql("select id from mat where event_id = ? and number = ?")
                 .params(eventId, number)
-                .query(java.util.UUID.class)
+                .query(UUID.class)
                 .single();
     }
 
-    private String permissions(java.util.UUID member) {
+    private String permissions(UUID member) {
         return "/api/v1/events/" + eventId + "/staff/" + member + "/permissions";
     }
 

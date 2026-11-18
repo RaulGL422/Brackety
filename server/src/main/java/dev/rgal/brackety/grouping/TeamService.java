@@ -74,7 +74,7 @@ class TeamService {
 
     @Transactional(readOnly = true)
     List<TeamResponse> list(UUID eventId, UUID categoryId, UUID accountId) {
-        access.require(eventId, accountId, EventPermission.TEAMS, EventPermission.GROUPS);
+        access.require(eventId, accountId, GroupService.READ_CATEGORIES);
         roster.category(eventId, categoryId);
         var categoryTeams = teams.findByCategoryIdAndGhostFalseOrderByNumber(categoryId);
         var people = participants.findByEventIdOrderByFirstNameAscLastNameAsc(eventId).stream()

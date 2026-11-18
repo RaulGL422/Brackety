@@ -58,7 +58,7 @@ Fuente: Raul, 2026-11-16. Las tareas salen de aquí hacia `roadmap.md`.
 - Plan: PR A (aviso del tapiz, #127), PR B (comenzar, finalizar y reabrir fase, cierre automático y correo), PR C (permisos por ayudante en «Personal»; la lista de permisos se enseña a Raul antes de programar).
 - Más respuestas de Raul (2026-11-18) para la PR B: **comenzar es obligatorio** (sin él no se crean grupos ni se arbitra); se puede finalizar con combates sin jugar, avisando cuántos (nunca con uno en curso o en revisión); finalizada, **también el club** queda en solo lectura de la competición hasta reabrir (ajustes, alumnos y descargas siguen libres).
 - Hecho en la PR B (#129): ver `modulos/eventos.md`, «Adelanto F1-7».
-- PR C: Raul aprueba la lista de permisos tal cual (2026-11-18). Hecho en `feat/event-staff-permissions`: ver `modulos/ayudantes-permisos.md`, «Adelanto F1-7 C».
+- PR C: Raul aprueba la lista de permisos tal cual (2026-11-18); fusionada (#130). C2: el personal es configurable del todo (solo mirar, solo arbitrar, solo grupos o combinaciones); ver `modulos/ayudantes-permisos.md`, «Adelanto F1-7 C».
 
 ## Peticiones para la F2 (2026-11-16)
 ### F2-1 · Peso y estatura (respuestas de Raul, 2026-11-16)
