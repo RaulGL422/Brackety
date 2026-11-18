@@ -26,7 +26,8 @@ import java.util.UUID;
  * The {@code .brackety} file (docs/modulos/servidor-local.md): an event ready to run on another server. Accounts are
  * named by username (their login); no passwords or other account data. Version 2 adds the league, the organizations,
  * a stable id per person and the results (groups, teams, matches and their actions), all optional so version 1 files
- * still load.
+ * still load. Version 3 drops {@code event.maxGroupsPerMat} (no multigroup); older files still load and it is
+ * ignored, while an older server refuses a version 3 file instead of misreading it.
  */
 public record EventPackage(
         int schemaVersion,
@@ -44,7 +45,7 @@ public record EventPackage(
         @Valid RulebookEntry rulebook,
         @Size(max = 100) List<@NotNull @Valid StaffPermissions> staffPermissions) {
 
-    public static final int SCHEMA_VERSION = 2;
+    public static final int SCHEMA_VERSION = 3;
 
     /** The phase's rulebook PDF, in base64; absent when it has none or in files from before rulebooks. */
     public record RulebookEntry(
@@ -83,7 +84,6 @@ public record EventPackage(
     public record Settings(
             @NotBlank @Size(max = 120) String name,
             @NotNull LocalDate date,
-            @Min(1) @Max(4) int maxGroupsPerMat,
             @Min(1) int matchSeconds,
             @Min(1) int pointsLimit,
             @Min(0) int changeoverSeconds,

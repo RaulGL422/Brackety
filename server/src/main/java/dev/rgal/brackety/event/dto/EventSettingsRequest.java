@@ -19,7 +19,6 @@ import java.util.UUID;
 public record EventSettingsRequest(
         @NotBlank @Size(max = 120) String name,
         @NotNull LocalDate date,
-        @Min(1) @Max(4) int maxGroupsPerMat,
         @NotEmpty @Size(max = 20) List<UUID> matReferees,
         @Min(30) @Max(1200) Integer matchSeconds,
         @Min(1) @Max(99) Integer pointsLimit,

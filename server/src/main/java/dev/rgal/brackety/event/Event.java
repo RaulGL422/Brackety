@@ -39,7 +39,6 @@ public class Event {
 
     private String name;
     private LocalDate eventDate;
-    private int maxGroupsPerMat;
     private int attendancePoints;
     private Instant createdAt;
     private UUID originEventId;
@@ -78,7 +77,6 @@ public class Event {
             Discipline discipline,
             String name,
             LocalDate eventDate,
-            int maxGroupsPerMat,
             int attendancePoints,
             Modality modality,
             Instant now) {
@@ -88,7 +86,6 @@ public class Event {
         this.discipline = discipline;
         this.name = name;
         this.eventDate = eventDate;
-        this.maxGroupsPerMat = maxGroupsPerMat;
         this.attendancePoints = attendancePoints;
         this.modalities.add(modality);
         this.createdAt = now;
@@ -96,7 +93,7 @@ public class Event {
 
     /** Liga Yoseikan tambo, Fase 1: 10 points for attending; its match rules in {@link Modality#tambo()}. */
     public static Event tambo(UUID ownerAccountId, UUID leagueId, String name, LocalDate eventDate, Instant now) {
-        return new Event(ownerAccountId, leagueId, 1, Discipline.TAMBO, name, eventDate, 1, 10, Modality.tambo(), now);
+        return new Event(ownerAccountId, leagueId, 1, Discipline.TAMBO, name, eventDate, 10, Modality.tambo(), now);
     }
 
     /** The next phase of the same league, with this one's match rules, measures asked and warning reasons. */
@@ -114,7 +111,6 @@ public class Event {
                 discipline,
                 name,
                 eventDate,
-                maxGroupsPerMat,
                 attendancePoints,
                 modality().copy(),
                 now);
@@ -249,10 +245,6 @@ public class Event {
         return eventDate;
     }
 
-    public int getMaxGroupsPerMat() {
-        return maxGroupsPerMat;
-    }
-
     /** Its only modality for now; the competition of 2026-12-20 will bring several. */
     public Modality modality() {
         return modalities.getFirst();
@@ -286,14 +278,12 @@ public class Event {
     void update(
             String name,
             LocalDate eventDate,
-            int maxGroupsPerMat,
             int attendancePoints,
             Modality.FormatRules individual,
             Modality.FormatRules team,
             int minRestSeconds) {
         this.name = name;
         this.eventDate = eventDate;
-        this.maxGroupsPerMat = maxGroupsPerMat;
         this.attendancePoints = attendancePoints;
         modality().update(individual, team, minRestSeconds);
     }

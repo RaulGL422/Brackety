@@ -9,7 +9,6 @@ import java.util.UUID;
 
 /**
  * An event where the caller has a role; {@code permissions}: what they may do there (F1-7 C). {@code matId} is set for a referee with a mat.
- * {@code maxGroupsPerMat}: how many groups a helper can send to a mat at once.
  * {@code leagueId}, {@code leagueName} and {@code phaseNumber}: the league the event is a phase of.
  * {@code weightRequirement} and {@code heightRequirement}: whether the event asks for them (its own or its sport's).
  */
@@ -19,7 +18,6 @@ public record MyEventResponse(
         LocalDate date,
         Set<EventRole> roles,
         Set<EventPermission> permissions,
-        int maxGroupsPerMat,
         UUID matId,
         Integer matNumber,
         UUID leagueId,

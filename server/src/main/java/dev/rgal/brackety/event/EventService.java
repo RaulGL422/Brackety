@@ -86,7 +86,6 @@ public class EventService {
                             event.getEventDate(),
                             rolesByEvent.get(event.getId()),
                             access.permissions(event.getId(), accountId, rolesByEvent.get(event.getId())),
-                            event.getMaxGroupsPerMat(),
                             mat.map(Mat::getId).orElse(null),
                             mat.map(Mat::getNumber).orElse(null),
                             event.getLeagueId(),
@@ -191,14 +190,7 @@ public class EventService {
         }
         var attendancePoints =
                 request.attendancePoints() != null ? request.attendancePoints() : event.getAttendancePoints();
-        event.update(
-                request.name().strip(),
-                request.date(),
-                request.maxGroupsPerMat(),
-                attendancePoints,
-                individual,
-                team,
-                minRestSeconds);
+        event.update(request.name().strip(), request.date(), attendancePoints, individual, team, minRestSeconds);
         for (int i = 0; i < request.matReferees().size(); i++) {
             var referee = request.matReferees().get(i);
             if (i < current.size()) {
@@ -233,7 +225,6 @@ public class EventService {
         return new EventSettingsResponse(
                 event.getName(),
                 event.getEventDate(),
-                event.getMaxGroupsPerMat(),
                 event.modality().individual().matchSeconds(),
                 event.modality().individual().pointsLimit(),
                 mats.findByEventIdOrderByNumber(event.getId()).stream()

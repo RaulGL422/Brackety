@@ -13,7 +13,6 @@ import java.util.UUID;
 public record EventSettingsResponse(
         String name,
         LocalDate date,
-        int maxGroupsPerMat,
         int matchSeconds,
         int pointsLimit,
         List<MatSettings> mats,
@@ -35,7 +34,6 @@ public record EventSettingsResponse(
         return new EventSettingsResponse(
                 name,
                 date,
-                maxGroupsPerMat,
                 matchSeconds,
                 pointsLimit,
                 mats,

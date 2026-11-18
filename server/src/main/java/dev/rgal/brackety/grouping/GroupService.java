@@ -159,9 +159,6 @@ class GroupService {
         access.require(eventId, accountId, EventPermission.GROUPS);
         phase.requireInProgress(eventId);
         var event = events.lock(eventId);
-        if (request.groups().size() > event.getMaxGroupsPerMat()) {
-            throw EventException.invalid("At most " + event.getMaxGroupsPerMat() + " groups go to a mat at once.");
-        }
         var category = roster.category(eventId, request.categoryId());
         checkParticipantGroups(event, category, request.groups());
         checkTeamGroups(event, category, request.groups());

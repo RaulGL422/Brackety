@@ -113,7 +113,7 @@ class FullExportControllerTest extends EventApiTest {
                 .startsWith(Csv.BOM + "Posición;Medalla;Nombre;Apellidos;Club;Fase 1;Total liga;Advertencias")
                 .contains("1;Oro (1.º);Ana;Prueba;Club Demo Yoseikan;13;13;");
         assertThat(files.get("LEEME.txt")).contains("participantes.csv", "evento.brackety");
-        assertThat(files.get("evento.brackety")).contains("\"schemaVersion\" : 2", "\"originId\"");
+        assertThat(files.get("evento.brackety")).contains("\"schemaVersion\" : 3", "\"originId\"");
     }
 
     @Test

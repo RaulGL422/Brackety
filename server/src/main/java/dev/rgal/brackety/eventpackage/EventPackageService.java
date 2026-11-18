@@ -285,7 +285,6 @@ public class EventPackageService {
                 leagueEntry != null ? leagueEntry.discipline() : Discipline.TAMBO,
                 settings.name().strip(),
                 settings.date(),
-                settings.maxGroupsPerMat(),
                 settings.attendancePoints(),
                 modality(settings),
                 clock.instant());
@@ -646,7 +645,6 @@ public class EventPackageService {
         return new Settings(
                 event.getName(),
                 event.getEventDate(),
-                event.getMaxGroupsPerMat(),
                 event.modality().individual().matchSeconds(),
                 event.modality().individual().pointsLimit(),
                 event.modality().getChangeoverSeconds(),

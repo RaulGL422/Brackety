@@ -67,8 +67,7 @@ class EventPackageServiceTest extends EventApiTest {
                     age == 13 ? teamCategory : null);
             participants.save(participant);
         }
-        jdbc.sql("update event set max_groups_per_mat = 2, attendance_points = 5")
-                .update();
+        jdbc.sql("update event set attendance_points = 5").update();
         jdbc.sql("update modality set changeover_seconds = 20").update();
         jdbc.sql("update modality_rules set match_seconds = 90, points_limit = 12 where format = 'INDIVIDUAL'")
                 .update();
@@ -241,6 +240,17 @@ class EventPackageServiceTest extends EventApiTest {
     }
 
     @Test
+    void aVersion2FileWithMultigroupStillLoads() {
+        var file = edit(root -> {
+            root.put("schemaVersion", 2);
+            root.withObject("event").put("maxGroupsPerMat", 2);
+        });
+        emptyDatabase();
+
+        assertThat(packages.load(file).eventId()).isNotNull();
+    }
+
+    @Test
     void refusesAnUnknownSchemaVersion() {
         var unknown = EventPackage.SCHEMA_VERSION + 1;
         var file = edit(root -> root.put("schemaVersion", unknown));
@@ -266,7 +276,7 @@ class EventPackageServiceTest extends EventApiTest {
                 new Case(r -> chosen(r, "arbitro1"), "mats[0].refereeUsername"),
                 new Case(r -> chosen(r, "club1"), "staffPermissions[0].username"),
                 new Case(r -> r.withObject("owner").put("username", "arbitro1"), "owner: must be in staff"),
-                new Case(r -> r.withObject("event").put("maxGroupsPerMat", 9), "event.maxGroupsPerMat"),
+                new Case(r -> r.withObject("event").put("matchSeconds", 0), "event.matchSeconds"),
                 new Case(r -> ((ObjectNode) r.get("categories").get(0)).put("teamSize", 3), "categories[0]"));
         var files = cases.stream().map(c -> edit(c.change())).toList();
         emptyDatabase();
