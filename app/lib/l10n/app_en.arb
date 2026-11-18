@@ -936,5 +936,6 @@
   "invitationInvalid": "The invitation does not exist, was used or has expired. Ask the club to invite you again.",
   "invitationVerifyFirst": "Confirm your email first with the link we sent when you signed up.",
   "leagueGlobalStandings": "Global standings",
-  "leagueGlobalStandingsHint": "Every category together in Scores and League. Off, one category at a time."
+  "leagueGlobalStandingsHint": "Every category together in Scores and League. Off, one category at a time.",
+  "settingsMatHasGroups": "That mat already has groups and keeps where they were played: it cannot be removed. If it is done, use \"Disable mat\" in the mats tab."
 }

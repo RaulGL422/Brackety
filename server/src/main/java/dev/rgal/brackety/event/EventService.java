@@ -170,7 +170,9 @@ public class EventService {
                 : List.<Mat>of();
         if (!removed.isEmpty()
                 && events.hasGroupsOnMats(removed.stream().map(Mat::getId).toList())) {
-            throw EventException.conflict("A mat with groups cannot be removed.");
+            // Its groups say where they were played: a mat that is done goes out of use instead (Raul, 2026-11-18).
+            throw EventException.conflict(
+                    "MAT_HAS_GROUPS", "A mat with groups cannot be removed: disable it in the control panel.");
         }
         // Nobody would ever play the matches of a mat left without its referee (Raul, 2026-11-13).
         for (int i = 0; i < Math.min(current.size(), request.matReferees().size()); i++) {

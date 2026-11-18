@@ -436,14 +436,13 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
         duration: const Duration(seconds: 1),
       );
     } on DioException catch (e) {
-      toasts.show(
-        ApiError.from(e).code == 'MAT_HAS_MATCHES'
-            ? l10n.settingsMatNeedsReferee
-            : rulesChanged && e.response?.statusCode == 409
-            ? l10n.settingsMatchRulesConflict
-            : saveErrorMessage(l10n, e),
-        kind: ToastKind.error,
-      );
+      toasts.show(switch (ApiError.from(e).code) {
+        'MAT_HAS_MATCHES' => l10n.settingsMatNeedsReferee,
+        'MAT_HAS_GROUPS' => l10n.settingsMatHasGroups,
+        _ when rulesChanged && e.response?.statusCode == 409 =>
+          l10n.settingsMatchRulesConflict,
+        _ => saveErrorMessage(l10n, e),
+      }, kind: ToastKind.error);
       if (mounted) _showSaved();
     } finally {
       _saving = false;

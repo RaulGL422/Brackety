@@ -111,3 +111,5 @@ Las de octubre de 2026, en `decisiones-2026-10.md`.
 - 2026-11-17 · F1-5: la invitación solo se acepta con una cuenta del email invitado (un enlace reenviado no sirve a otro); el token va en el cuerpo, nunca en una URL del servidor; `staffNames` sigue hasta que las cuentas tengan nombre · el enlace prueba el email, y sin nombre en la cuenta los tapices solo mostrarían emails.
 - 2026-11-17 · F2-4: la clasificación global es una opción de la liga (todas sus fases igual), apagada por defecto; la categoría es solo por edad y no se divide por sexo ni peso hasta que una modalidad lo pida · Raul.
 - 2026-11-17 · CI: filtro por ruta con `git diff` en un trabajo propio (sin acciones de terceros) y `ci-ok` como único check; los pushes a development y main corren todo · red de seguridad tras cada fusión sin alargar las PR.
+- 2026-11-18 · Un tapiz con grupos no se quita en Configuración: se inhabilita (sus grupos guardan dónde se jugaron) · Raul, «basta con inhabilitar».
+- 2026-11-18 · Fase: comenzar/finalizar por el club o ayudante con permiso; finalizada = solo lectura, el club reabre con motivo; cierre automático al día siguiente con correo · Raul.
