@@ -24,6 +24,10 @@ ENV HOME=/home/brackety \
     DISABLE_AUTOUPDATER=1
 RUN curl -fsSL https://claude.ai/install.sh | bash -s "$CLAUDE_CODE_VERSION" \
     && claude --version
+# Last, so a new version or commit does not rebuild the layers above.
+ARG BRACKETY_VERSION=local
+ARG BRACKETY_COMMIT=""
+ENV BRACKETY_VERSION=$BRACKETY_VERSION BRACKETY_COMMIT=$BRACKETY_COMMIT
 COPY --from=build /app.jar /app/app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75", "-jar", "/app/app.jar"]

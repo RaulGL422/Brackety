@@ -405,6 +405,10 @@ function Set-ApiEnvironment([hashtable]$secrets, [string]$mode, [string]$package
     # could pick its own IP and dodge the sign-in lockout and the rate limiter.
     $env:SERVER_FORWARD_HEADERS_STRATEGY = "none"
     $env:WEB_DIR = $webDir
+    $versionFile = Join-Path $here "api\version.txt"
+    if (Test-Path $versionFile) {
+        $env:BRACKETY_VERSION, $env:BRACKETY_COMMIT = (Get-Content $versionFile -TotalCount 1).Split(" ")
+    }
     $env:LEGAL_OWNER_NAME = $owner
     $env:PRIVACY_CONTACT_EMAIL = $privacy
     # Only the demo data folder creates demo accounts: a package brings its own and must not get a second event.
