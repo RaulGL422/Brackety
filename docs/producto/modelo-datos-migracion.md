@@ -19,7 +19,7 @@ Cómo pasar de lo actual al objetivo ligero de `modelo-datos.md` (un dato en un 
 | M3 | `entry`, `entry_member` y `group_slot` con papel: individual = entrada de 1; fuera `team`, `team_member`, `group_member` y las marcas `ghost` | Un solo camino en marcador, tablero, clasificación y CSV | L |
 | M4 | `location` con estado y `location_override_id` en el combate: fuera `pinned`, `fight_match.mat_id` y `fight_match.event_id` | Simplificar reparto, previsión y panel de control | M |
 | M5 | `competition_category`: categorías una vez por liga; fuera `league_category_podium` | CSV claro (F2-3) y podios sin unir por nombre | M |
-| M6 | Limpieza y datos calculados: fuera `event_staff_name`, `max_groups_per_mat` y lo viejo de M1-M5; puntos y reloj del combate calculados de `match_event` salvo caché medida | – | S |
+| M6 | Limpieza y datos calculados: fuera `event_staff_name` y lo viejo de M1-M5; puntos y reloj del combate calculados de `match_event` salvo caché medida | – | S |
 
 ## Calendario propuesto
 - **Antes del 20-12**: M1 (sin él, las 3 modalidades serían más columnas en `event`).

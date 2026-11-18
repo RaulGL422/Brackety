@@ -92,15 +92,9 @@ class GroupControllerTest extends EventApiTest {
     }
 
     @Test
-    void multigroupSendsEveryGroupToOneMatOnlyWhenTheEventAllowsIt() throws Exception {
+    void oneGroupGoesToAMatAtATime() throws Exception {
         createGroups(group(0, 1, 2, 3), group(4, 5, 6, 7)).andExpect(status().isBadRequest());
-        jdbc.sql("update event set max_groups_per_mat = 2").update();
-
-        createGroups(group(0, 1, 2, 3), group(4, 5, 6, 7))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.matNumber").value(1))
-                .andExpect(jsonPath("$.groupNumbers", contains(1, 2)));
-        assertThat(count("fight_match")).isEqualTo(12);
+        assertThat(count("fight_group")).isZero();
     }
 
     @Test
@@ -354,7 +348,7 @@ class GroupControllerTest extends EventApiTest {
 
     private static String settings(String date, List<String> referees) {
         return """
-                {"name":"Fase 1","date":"%s","maxGroupsPerMat":1,"matReferees":[%s]}""".formatted(date, String.join(",", referees));
+                {"name":"Fase 1","date":"%s","matReferees":[%s]}""".formatted(date, String.join(",", referees));
     }
 
     private String event() {

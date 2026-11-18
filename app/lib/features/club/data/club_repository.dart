@@ -75,8 +75,6 @@ class ClubRepository {
       data: {
         'name': name,
         'date': _day.format(date),
-        // No multigroup any more (docs/decisiones.md, 2026-11-07); the server still asks for it.
-        'maxGroupsPerMat': 1,
         'matReferees': matReferees,
         'matchSeconds': matchLength.inSeconds,
         'pointsLimit': pointsLimit,

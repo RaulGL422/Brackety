@@ -12,7 +12,7 @@ import java.util.UUID;
  * one, otherwise the one that will be free first.
  */
 public record CreateGroupsRequest(
-        @NotNull UUID categoryId, @NotEmpty @Size(max = 4) List<@Valid @NotNull GroupRequest> groups, UUID matId) {
+        @NotNull UUID categoryId, @NotEmpty @Size(max = 1) List<@Valid @NotNull GroupRequest> groups, UUID matId) {
 
     /**
      * A group of 4 participants ({@code participantIds} plus up to 3 {@code ghostIds}) or, in a team category, of 4

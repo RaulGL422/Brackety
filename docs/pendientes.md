@@ -114,7 +114,6 @@
 - [ ] Web sin conexión (offline), después de la F1, en dos pasos. 1) Con la pestaña abierta: cola del marcador guardada en el navegador y enviada al volver la red (vale en http y https). 2) Completa por https (`brackety.rgal.dev`): la app se guarda en el navegador y abre sin red. En http (pabellón) el navegador no permite el paso 2. Útil sobre todo para iPhone. Aprobado por Raul el 2026-11-08.
 - [ ] "Tapiz" fijo en los textos: en otros deportes será Pista, Campo… Debe salir del nombre de la ubicación del evento (módulo `eventos`).
 - [ ] Lector de pantalla: la lista de Puntuaciones se lee como un único bloque; una fila por alumno.
-- [ ] Quitar `maxGroupsPerMat` del servidor (BD, API, paquete con nueva `schemaVersion`) y del límite de grupos por petición; la app ya no lo usa.
 
 ## Producto
 - [ ] Grupo con sobrante: opciones (promedio por combate / puntos brutos / decidir caso a caso) y respuesta final del organizador; será opción del evento.

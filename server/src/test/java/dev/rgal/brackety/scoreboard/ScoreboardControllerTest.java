@@ -313,7 +313,7 @@ class ScoreboardControllerTest extends ScoreboardApiTest {
 
     private static String refereesJson(java.util.List<String> referees) {
         return """
-                {"name":"Fase 1","date":"2027-03-10","maxGroupsPerMat":1,"matReferees":[%s]}""".formatted(String.join(",", referees));
+                {"name":"Fase 1","date":"2027-03-10","matReferees":[%s]}""".formatted(String.join(",", referees));
     }
 
     private String settings() {
@@ -325,7 +325,7 @@ class ScoreboardControllerTest extends ScoreboardApiTest {
                 .mapToObj(i -> "\"" + accountId("arbitro" + i) + "\"")
                 .collect(java.util.stream.Collectors.joining(","));
         return """
-                {"name":"Fase 1","date":"2027-03-10","maxGroupsPerMat":1,"matReferees":[%s],
+                {"name":"Fase 1","date":"2027-03-10","matReferees":[%s],
                  "matchSeconds":%s,"pointsLimit":%s}""".formatted(referees, matchSeconds, pointsLimit);
     }
 

@@ -11,7 +11,7 @@ Que cualquier pantalla o servicio se entienda sin haberlo escrito. El prototipo 
 - Pantallas largas: `team_category_screen.dart` (586 líneas) y el resto de pantallas del club.
 - Duplicados: nombre del competidor en 3 servicios; comprobación "club o árbitro del tapiz" repetida.
 - La vista del combate carga todo el directorio del evento, cuando solo necesita a 2 competidores.
-- Textos fijos en el servidor ("Equipo ") y `maxGroupsPerMat` sin uso.
+- Textos fijos en el servidor ("Equipo "); `maxGroupsPerMat` ya quitado (rama `chore/drop-max-groups-per-mat`, 2026-11-18).
 - Código del prototipo en `features/` provisionales que solapan con `eventos`, `puntuacion`, `liga-fases` y `marcador-tapiz`.
 
 ### Método
