@@ -1512,5 +1512,6 @@
   "invitationInvalid": "La invitación no existe, ya se usó o ha caducado. Pide al club que te invite de nuevo.",
   "invitationVerifyFirst": "Confirma antes tu email con el enlace que te enviamos al registrarte.",
   "leagueGlobalStandings": "Clasificación global",
-  "leagueGlobalStandingsHint": "Todas las categorías juntas en Puntuaciones y en Liga. Apagada, solo se ve una categoría cada vez."
+  "leagueGlobalStandingsHint": "Todas las categorías juntas en Puntuaciones y en Liga. Apagada, solo se ve una categoría cada vez.",
+  "settingsMatHasGroups": "Ese tapiz ya tiene grupos y guarda dónde se jugaron: no se puede quitar. Si ha terminado, usa «Inhabilitar tapiz» en la pestaña de tapices."
 }

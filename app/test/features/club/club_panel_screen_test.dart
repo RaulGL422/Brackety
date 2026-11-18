@@ -38,6 +38,9 @@ class FakeClubRepository extends Fake implements ClubRepository {
     String name,
   ) async => savedStaffNames.add((accountId, name));
   int? refuseWith;
+
+  /// The `code` of the refusal, as the server's problem+json sends it.
+  String? refuseCode;
   final savedMatReferees = <List<String?>>[];
   final savedRules = <(Duration, int)>[];
   final savedAttendance = <int>[];
@@ -114,6 +117,7 @@ class FakeClubRepository extends Fake implements ClubRepository {
         response: Response(
           requestOptions: RequestOptions(),
           statusCode: refuseWith,
+          data: {'code': ?refuseCode},
         ),
       );
     }
@@ -843,6 +847,28 @@ void main() {
     expect(repository.savedMatReferees, [
       ['r1'],
     ]);
+  });
+
+  testWidgets('a mat with groups is not removed: it points to disabling it', (
+    tester,
+  ) async {
+    final repository = FakeClubRepository(settings)
+      ..refuseWith = 409
+      ..refuseCode = 'MAT_HAS_GROUPS';
+    await pumpPanel(tester, const Size(800, 1280), repository: repository);
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Remove the last mat'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Remove the last mat'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.textContaining('use "Disable mat" in the mats tab'),
+      findsOneWidget,
+    );
+    expect(find.text('Mat 2 · Referee'), findsOneWidget);
   });
 
   testWidgets('a refused change explains why and shows the saved value', (

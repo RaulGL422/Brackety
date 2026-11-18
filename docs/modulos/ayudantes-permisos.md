@@ -11,6 +11,7 @@ Roles de evento, ubicaciones y permisos del staff.
 - Toda comprobación en servidor, por permiso y por evento/ubicación.
 - Registro de auditoría de cambios de permisos.
 - Detalle fino de permisos: se define al construir el módulo.
+- Los árbitros también son ayudantes: en «Personal» (Configuración del evento) se elige qué puede hacer cada uno (Raul, 2026-11-18). Permiso nuevo: comenzar y finalizar la fase (F1-7). La lista se enseña a Raul antes de la PR C.
 
 ## Datos
 `event_role`, `role_permission`, `staff_member`, `staff_location`, `permission_audit`.

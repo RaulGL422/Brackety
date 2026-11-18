@@ -16,6 +16,7 @@ Crear y configurar eventos (Liga, Liga en fases, Torneo) con sus ajustes comunes
 - Colores de los competidores por ubicación, elegidos de la paleta común `CompetitorColor` (`07-diseno.md`).
 - Visibilidad del evento y de resultados: todos, clubes, inscritos, nadie. Modificable en cualquier momento.
 - Estados: borrador → publicado → en curso → finalizado (+ bloqueado por superadmin).
+- Adelanto F1-7 (Raul, 2026-11-18), por fase: comenzar y finalizar desde el panel del club y desde crear grupos (club o ayudante con permiso). Finalizada: solo lectura para el staff; el club reabre con motivo (auditado). Sin finalizar, se cierra sola al día siguiente si no quedan combates y avisa al club por correo (`producto/feedback-f1.md`).
 
 ## Reglas
 - Publicar y empezar fase requieren puerta legal (`legal-paginas.md`).
