@@ -4613,6 +4613,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Todas las categorías juntas en Puntuaciones y en Liga. Apagada, solo se ve una categoría cada vez.'**
   String get leagueGlobalStandingsHint;
+
+  /// No description provided for @settingsMatHasGroups.
+  ///
+  /// In es, this message translates to:
+  /// **'Ese tapiz ya tiene grupos y guarda dónde se jugaron: no se puede quitar. Si ha terminado, usa «Inhabilitar tapiz» en la pestaña de tapices.'**
+  String get settingsMatHasGroups;
 }
 
 class _AppLocalizationsDelegate

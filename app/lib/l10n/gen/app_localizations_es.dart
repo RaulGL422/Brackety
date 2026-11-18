@@ -2875,4 +2875,8 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get leagueGlobalStandingsHint =>
       'Todas las categorías juntas en Puntuaciones y en Liga. Apagada, solo se ve una categoría cada vez.';
+
+  @override
+  String get settingsMatHasGroups =>
+      'Ese tapiz ya tiene grupos y guarda dónde se jugaron: no se puede quitar. Si ha terminado, usa «Inhabilitar tapiz» en la pestaña de tapices.';
 }
