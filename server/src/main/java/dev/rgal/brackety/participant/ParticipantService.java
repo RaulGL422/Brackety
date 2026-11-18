@@ -7,8 +7,8 @@ import dev.rgal.brackety.event.EventCategoryRepository;
 import dev.rgal.brackety.event.EventException;
 import dev.rgal.brackety.event.EventOrganization;
 import dev.rgal.brackety.event.EventOrganizationRepository;
+import dev.rgal.brackety.event.EventPermission;
 import dev.rgal.brackety.event.EventPhase;
-import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.participant.dto.MeasuresRequest;
 import dev.rgal.brackety.participant.dto.ParticipantRequest;
@@ -57,7 +57,7 @@ public class ParticipantService {
 
     @Transactional(readOnly = true)
     public List<ParticipantResponse> list(UUID eventId, UUID accountId) {
-        access.require(eventId, accountId, EventRole.CLUB);
+        access.require(eventId, accountId, EventPermission.PARTICIPANTS);
         var event = events.get(eventId);
         var eventCategories = categories.findByEventIdOrderByMinAge(eventId);
         var organizationNames = organizationNames(organizations, eventId);
@@ -68,14 +68,14 @@ public class ParticipantService {
 
     @Transactional
     public ParticipantResponse create(UUID eventId, UUID accountId, ParticipantRequest request) {
-        access.require(eventId, accountId, EventRole.CLUB);
+        access.require(eventId, accountId, EventPermission.PARTICIPANTS);
         var participant = new Participant(eventId, clock.instant());
         return save(participant, request);
     }
 
     @Transactional
     public ParticipantResponse update(UUID eventId, UUID participantId, UUID accountId, ParticipantRequest request) {
-        access.require(eventId, accountId, EventRole.CLUB);
+        access.require(eventId, accountId, EventPermission.PARTICIPANTS);
         var participant = find(eventId, participantId);
         // The birth date and the chosen category set the category their group or team was made for.
         var changesCategory = !request.birthDate().equals(participant.getBirthDate())
@@ -92,14 +92,14 @@ public class ParticipantService {
 
     @Transactional
     public void measure(UUID eventId, UUID participantId, UUID accountId, MeasuresRequest request) {
-        access.require(eventId, accountId, EventRole.CLUB, EventRole.GROUPER);
+        access.require(eventId, accountId, EventPermission.MEASURES);
         phase.requireNotFinished(eventId);
         find(eventId, participantId).measure(request.heightCm(), request.weightKg());
     }
 
     @Transactional
     public void delete(UUID eventId, UUID participantId, UUID accountId) {
-        access.require(eventId, accountId, EventRole.CLUB);
+        access.require(eventId, accountId, EventPermission.PARTICIPANTS);
         var participant = find(eventId, participantId);
         if (participants.isInAGroupOrTeam(participantId)) {
             throw EventException.conflict("A participant in a group or team cannot be removed.");

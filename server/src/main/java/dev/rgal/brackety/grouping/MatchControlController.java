@@ -39,7 +39,7 @@ class MatchControlController {
             @PathVariable UUID groupId,
             @Valid @RequestBody MoveRequest request,
             @AuthenticationPrincipal Jwt jwt) {
-        var by = club(eventId, jwt);
+        var by = controller(eventId, jwt);
         control.moveGroup(eventId, groupId, request.matId(), by);
     }
 
@@ -50,7 +50,7 @@ class MatchControlController {
             @PathVariable UUID matchId,
             @Valid @RequestBody MoveRequest request,
             @AuthenticationPrincipal Jwt jwt) {
-        var by = club(eventId, jwt);
+        var by = controller(eventId, jwt);
         control.moveMatch(eventId, matchId, request.matId(), by);
     }
 
@@ -61,7 +61,7 @@ class MatchControlController {
             @PathVariable UUID groupId,
             @Valid @RequestBody OrderRequest request,
             @AuthenticationPrincipal Jwt jwt) {
-        var by = club(eventId, jwt);
+        var by = controller(eventId, jwt);
         control.reorder(eventId, groupId, request.matchIds(), by);
     }
 
@@ -69,7 +69,7 @@ class MatchControlController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void moveTeamMember(
             @PathVariable UUID eventId, @Valid @RequestBody TeamMoveRequest request, @AuthenticationPrincipal Jwt jwt) {
-        var by = club(eventId, jwt);
+        var by = controller(eventId, jwt);
         control.moveTeamMember(eventId, request.participantId(), request.fromTeamId(), request.toTeamId(), by);
     }
 
@@ -79,27 +79,27 @@ class MatchControlController {
             @PathVariable UUID matId,
             @Valid @RequestBody(required = false) DisableMatRequest request,
             @AuthenticationPrincipal Jwt jwt) {
-        var by = club(eventId, jwt);
+        var by = controller(eventId, jwt);
         return control.disableMat(eventId, matId, DisableMatRequest.chosen(request), by);
     }
 
     @PostMapping("/mats/{matId}/enable")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void enableMat(@PathVariable UUID eventId, @PathVariable UUID matId, @AuthenticationPrincipal Jwt jwt) {
-        var by = club(eventId, jwt);
+        var by = controller(eventId, jwt);
         control.enableMat(eventId, matId, by);
     }
 
     @PostMapping("/matches/{matchId}/waive-rest")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void waiveRest(@PathVariable UUID eventId, @PathVariable UUID matchId, @AuthenticationPrincipal Jwt jwt) {
-        var by = club(eventId, jwt);
+        var by = controller(eventId, jwt);
         control.waiveRest(eventId, matchId, by);
     }
 
-    private UUID club(UUID eventId, Jwt jwt) {
+    private UUID controller(UUID eventId, Jwt jwt) {
         var account = CurrentAccount.id(jwt);
-        control.requireClub(eventId, account);
+        control.requireControl(eventId, account);
         return account;
     }
 }

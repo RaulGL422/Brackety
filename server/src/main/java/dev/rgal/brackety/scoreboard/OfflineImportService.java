@@ -2,8 +2,8 @@ package dev.rgal.brackety.scoreboard;
 
 import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventException;
+import dev.rgal.brackety.event.EventPermission;
 import dev.rgal.brackety.event.EventPhase;
-import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.grouping.MatchRepository;
 import dev.rgal.brackety.scoreboard.dto.MatchEventRequest;
 import dev.rgal.brackety.scoreboard.dto.OfflineImportResponse;
@@ -49,7 +49,7 @@ class OfflineImportService {
     }
 
     Outcome importCsv(UUID eventId, UUID accountId, String csv) {
-        access.require(eventId, accountId, EventRole.CLUB);
+        access.require(eventId, accountId, EventPermission.DEVICE_IMPORT);
         phase.requireInProgress(eventId);
         var rows = OfflineOpsCsv.parse(csv);
         // Every row checked before any is applied: a wrong file changes nothing.

@@ -319,6 +319,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
                     member: member,
                   ),
                 ),
+                StaffPermissionsButton(eventId: widget.eventId, member: member),
                 StaffRemoveButton(eventId: widget.eventId, member: member),
               ],
             ),

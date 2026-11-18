@@ -16,8 +16,8 @@ Crear y configurar eventos (Liga, Liga en fases, Torneo) con sus ajustes comunes
 - Colores de los competidores por ubicación, elegidos de la paleta común `CompetitorColor` (`07-diseno.md`).
 - Visibilidad del evento y de resultados: todos, clubes, inscritos, nadie. Modificable en cualquier momento.
 - Estados: borrador → publicado → en curso → finalizado (+ bloqueado por superadmin).
-- Adelanto F1-7 (Raul, 2026-11-18; rama `feat/event-phase-lifecycle`), por fase:
-  - Estados: sin comenzar → en curso → finalizada. Barra con el estado arriba del panel del club, de las categorías del ayudante y del tapiz del árbitro; botones solo para el club (los ayudantes con permiso, en la PR C).
+- Adelanto F1-7 (Raul, 2026-11-18; #129), por fase:
+  - Estados: sin comenzar → en curso → finalizada. Barra con el estado arriba del panel del club, de las categorías del ayudante y del tapiz del árbitro; comenzar y finalizar: el club y quien tenga ese permiso (F1-7 C); reabrir: solo el club.
   - Sin comenzar: no se crean grupos ni se puntúa (`PHASE_NOT_STARTED`). Equipos, pesos y tapices se pueden preparar.
   - Finalizar: nunca con un combate en curso o en revisión; los pendientes quedan sin jugar (la app avisa cuántos).
   - Finalizada: nadie crea ni deshace grupos, puntúa, mueve combates, cambia equipos, pesos ni tapices (`PHASE_FINISHED`), tampoco el club. Ajustes, alumnos y descargas siguen libres. El club reabre con motivo.

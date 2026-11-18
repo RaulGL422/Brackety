@@ -132,6 +132,8 @@ public class LeagueService {
         for (var member : staff.findByEventId(eventId)) {
             staff.save(new EventStaff(phase.getId(), member.getAccountId(), member.getRole()));
         }
+        staff.flush();
+        access.copyPermissions(eventId, phase.getId());
         for (var mat : mats.findByEventIdOrderByNumber(eventId)) {
             mats.save(new Mat(phase.getId(), mat.getNumber(), mat.getRefereeAccountId()));
         }

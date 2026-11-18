@@ -2889,4 +2889,49 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get phaseMatchInProgressError =>
       'A match is in progress or waits for review: finish it first.';
+
+  @override
+  String permissionsTooltip(String name) {
+    return 'Permissions of $name';
+  }
+
+  @override
+  String permissionsTitle(String name) {
+    return 'What $name may do';
+  }
+
+  @override
+  String get permissionsHint =>
+      'The club may always do everything. Reopening a phase and managing the staff are the club\'s alone.';
+
+  @override
+  String get permissionsSaved => 'Permissions saved';
+
+  @override
+  String get permissionGroups => 'Create and undo groups';
+
+  @override
+  String get permissionTeams => 'Form teams';
+
+  @override
+  String get permissionMeasures => 'Record weights and heights';
+
+  @override
+  String get permissionOwnMat => 'Referee their mat';
+
+  @override
+  String get permissionPhase => 'Start and finish the phase';
+
+  @override
+  String get permissionControl =>
+      'Control panel: move groups and matches, reorder, skip the rest, disable mats';
+
+  @override
+  String get permissionReviews => 'Resolve matches in review';
+
+  @override
+  String get permissionDeviceImport => 'Import a device\'s actions (CSV)';
+
+  @override
+  String get permissionParticipants => 'Add and edit participants';
 }

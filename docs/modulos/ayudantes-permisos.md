@@ -34,5 +34,14 @@ Cada permiso permitido/denegado, delegación de un nivel, cambios en directo, au
 - El nombre por evento (`staffNames`) sigue hasta que las cuentas tengan nombre (`perfiles-menores`/M6): hoy es lo único que pone nombre a un email en los tapices.
 - Tests: `StaffInvitationTest`; app: Configuración y pantalla de la invitación en 3 tamaños.
 
+## Adelanto F1-7 C: permisos por persona (2026-11-18, rama `feat/event-staff-permissions`)
+- Lista aprobada por Raul: crear y deshacer grupos (`GROUPS`), formar equipos (`TEAMS`), pesos y estaturas (`MEASURES`), arbitrar su tapiz (`OWN_MAT`), comenzar y finalizar la fase (`PHASE`), panel de control (`CONTROL`: mover, reordenar, saltar descanso, inhabilitar tapices), resolver revisiones (`REVIEWS`), importar CSV de un dispositivo (`DEVICE_IMPORT`), alumnos (`PARTICIPANTS`).
+- El club lo puede todo. Reabrir una fase y gestionar el personal y sus permisos: solo el club.
+- Por defecto: ayudante = grupos, equipos y medidas; árbitro = su tapiz (lo de antes). Con los dos roles, la suma.
+- El club los marca por persona en Configuración → Personal (icono junto a cada una). Al quitar a alguien del todo, vuelve a los de su rol. Una fase nueva copia los de la anterior.
+- Datos: `event_staff_permissions` (evento, cuenta, lista); sin fila = los del rol. API: `PUT /events/{id}/staff/{cuenta}/permissions {permissions}` (club); `permissions` en «mis eventos» y en el personal de Configuración.
+- La app enseña «Hacer grupos», «Mi tapiz» y los botones de la fase según los permisos. Pendiente C2: que el ayudante con panel, revisiones, CSV o alumnos entre al panel (`pendientes.md`).
+- Tests: `StaffPermissionsTest`; app: Personal y barra de fase.
+
 ## Estado
-Adelanto F1-5 en pruebas. El resto (roles libres, permisos, ubicaciones) pendiente; duda abierta: cuándo se pide el detalle de permisos.
+Adelantos F1-5 y F1-7 C en pruebas. Pendiente: roles libres, ubicaciones, delegación y auditoría.

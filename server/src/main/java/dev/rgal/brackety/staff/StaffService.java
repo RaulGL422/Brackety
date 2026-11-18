@@ -9,6 +9,7 @@ import dev.rgal.brackety.common.crypto.Sha256;
 import dev.rgal.brackety.event.Event;
 import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventException;
+import dev.rgal.brackety.event.EventPermission;
 import dev.rgal.brackety.event.EventRepository;
 import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventStaff;
@@ -20,6 +21,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -171,6 +173,25 @@ public class StaffService {
             throw EventException.conflict("REFEREE_ON_MAT", "Take them off their mat first.");
         }
         staff.delete(member);
+        if (access.roles(eventId, memberId).isEmpty()) {
+            access.clearPermissions(eventId, memberId);
+        }
+    }
+
+    /** What a helper or referee may do; the club's own permissions are not for changing. */
+    @Transactional
+    public Set<EventPermission> permissions(
+            UUID eventId, UUID accountId, UUID memberId, Set<EventPermission> permissions) {
+        access.require(eventId, accountId, EventRole.CLUB);
+        var roles = access.roles(eventId, memberId);
+        if (roles.isEmpty()) {
+            throw EventException.notFound();
+        }
+        if (roles.contains(EventRole.CLUB)) {
+            throw EventException.invalid("The club may do everything in its event.");
+        }
+        access.setPermissions(eventId, memberId, permissions);
+        return access.permissions(eventId, memberId, roles);
     }
 
     private StaffInvitation usable(String token) {

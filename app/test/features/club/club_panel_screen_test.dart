@@ -186,7 +186,16 @@ void main() {
       ),
     ],
     staff: const [
-      StaffMember(id: 'h1', username: 'ayudante1', roles: ['GROUPER']),
+      StaffMember(
+        id: 'h1',
+        username: 'ayudante1',
+        roles: ['GROUPER'],
+        permissions: {
+          EventPermission.groups,
+          EventPermission.teams,
+          EventPermission.measures,
+        },
+      ),
       StaffMember(
         id: 'r1',
         username: 'arbitro1',
@@ -673,6 +682,19 @@ void main() {
       await tester.tap(cancel);
       await tester.pumpAndSettle();
       expect(staff.calls.last, 'cancel old');
+
+      // The helper no longer groups but starts and finishes the phase.
+      final permissions = find.byTooltip('Permissions of ayudante1');
+      await tester.scrollUntilVisible(permissions, -200, scrollable: list);
+      await centre(permissions);
+      await tester.tap(permissions);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Create and undo groups'));
+      await tester.tap(find.text('Start and finish the phase'));
+      await tester.pump();
+      await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+      await tester.pumpAndSettle();
+      expect(staff.calls.last, 'permissions h1 MEASURES,PHASE,TEAMS');
 
       final remove = find.byTooltip('Remove ayudante1');
       await tester.scrollUntilVisible(remove, -200, scrollable: list);
