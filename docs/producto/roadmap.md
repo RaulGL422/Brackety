@@ -59,6 +59,7 @@ Línea de infraestructura; puede ir en paralelo con la etapa 2 (otro worktree).
 - Rediseño de eventos (`eventos-ux.md`): maquetas, prueba con 6 tareas y, después, por secciones.
 - Cerrar los módulos que el prototipo adelantó: `eventos`, `inscripciones`, `ayudantes-permisos`, `puntuacion`, `liga-fases`, `marcador-tapiz`, `offline`.
 - Módulos por empezar: `perfiles-menores`, `liga`, `torneo`, `ranking`, `notificaciones`, `superadmin-reportes` (resto).
+- Exportaciones a medida: campos, orden, filtros, formato y plantillas guardadas (`exportaciones.md`); las descargas de hoy pasan a ser plantillas incluidas. Paso 1 junto a L5 de `plan-limpieza.md`.
 - Plantillas de deporte y arbitraje creadas en la app, duplicables y compartibles (`plantillas-deporte.md`), sobre el motor de reglas por datos (L7 de `plan-limpieza.md`).
 - **Ojo con el calendario de la liga**: F2 (armas) y sobre todo F3 (expresión técnica, puntuada por jueces con escala aún sin definir) necesitan su plantilla en `puntuacion` antes de su fecha (`reglamentos/yoseikan-2027.md`).
 

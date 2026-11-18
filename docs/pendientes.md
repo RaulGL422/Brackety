@@ -49,7 +49,7 @@
 ## Tras la Fase 1 (2026-11-16; plan en `producto/roadmap.md`)
 - [ ] Competición del 2026-12-20: modalidades y su puntuación, categorías, tapices y servidor; la clasificación ya está (`producto/competicion-2026-12-20.md`).
 - [ ] F1-2 comodín: arreglado en la app (2026-11-16); falta revisar en la Pi qué se apañó a mano y que la clasificación sea correcta.
-- [ ] F2-3 CSV de resultados: la entidad de la liga ve confusos los puestos (1.º, 2.º, 3.º) al abrirlos en Excel. Hecho: CSV por categoría (#108) y PDF (#110). Falta rehacer el resto de CSV (Raul aún no lo ha revisado).
+- [ ] F2-3 CSV de resultados: la entidad de la liga ve confusos los puestos (1.º, 2.º, 3.º) al abrirlos en Excel. Hecho: CSV por categoría (#108) y PDF (#110). Falta rehacer el resto de CSV (Raul aún no lo ha revisado); con `producto/exportaciones.md` cada uno elige el formato del puesto.
 - [ ] F2-4: global opcional hecha (`modulos/ranking.md`). Dividir una categoría por sexo o tramos de peso: cuando una modalidad lo necesite (en la F2 la categoría es solo por edad; Raul, 2026-11-17).
 - [ ] F1-4 advertencias: revisar la lista de tambo propuesta (prohibiciones del reglamento, cap. 3.1: proyección o golpeo, tirarse rodando, ataque de pique, exceso de potencia, conducta antideportiva). Se cambia en `Discipline` o por evento en Configuración.
 - [ ] F1-5 cuentas propias: hecho en `feat/f1-5-staff-invites`. Con Resend en producción, probar a mano: invitar a un email real, registrarse con él, aceptar y arbitrar un tapiz. Retirar `staffNames` cuando las cuentas tengan nombre.
@@ -122,6 +122,7 @@
 - [ ] Plantillas de deporte adicionales (judo, karate, taekwondo, fútbol…): investigar al llegar a `puntuacion`.
 - [ ] Plantillas creadas en la app (`producto/plantillas-deporte.md`): ¿dueño la cuenta o el club? ¿galería pública desde el principio o primero compartir por enlace? ¿moderación previa o solo denuncias? ¿autor visible o anónimo?
 - [ ] Reglas del backend que el código no cumple (`producto/auditoria-codigo.md`, punto 8): ¿borrado lógico de eventos? ¿paginación solo en los listados del superadmin? Si no, se quitan de `.claude/rules/backend-java.md`.
+- [ ] Exportaciones a medida (`producto/exportaciones.md`): ¿quién puede descargar datos personales (permiso nuevo o solo el club)? ¿`.xlsx` además de CSV y PDF (añade una librería al servidor)? ¿plantillas de exportación compartibles entre clubes?
 - [ ] Diseño (`producto/diseno-revision.md`): ¿un color de acento solo para navegación y enlaces, fuera de los colores de competidor?
 - [ ] Doble eliminación y repesca (judo, taekwondo, karate): investigar al llegar a `torneo`.
 - [ ] Registro de tratamientos y plantilla de registro de brechas.
