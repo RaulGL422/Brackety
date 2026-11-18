@@ -28,4 +28,5 @@ Cada ámbito, empates, anonimizado, recálculo, categorías por fecha de corte.
 - Por evento y por liga, con los puestos dentro de cada categoría (prototipo F1, `liga.md`).
 - F2-4 (2026-11-17, rama `feat/f2-4-standings-config`): la liga decide si hay **clasificación global** (`league.global_standings`, apagada por defecto). Apagada, Puntuaciones y Liga no ofrecen «Todas las categorías»: una categoría cada vez, la primera de entrada. Se cambia en «Editar liga» y viaja en el paquete del pabellón.
 - La categoría es solo por edad. Sexo y peso son informativos (Raul, 2026-11-17): dividir una categoría por ellos llegará cuando una modalidad lo pida.
+- Descargas con nombre (Raul, 2026-11-18): liga, fase y qué es, p. ej. `liga-yoseikan-2027_fase-2_combates.csv`; los CSV por categoría añaden la categoría (`…_clasificacion_7-8.csv`) y la exportación completa es `…_exportacion-completa.zip`. Dentro del .zip completo, las hojas conservan su nombre corto (lo explica `LEEME.txt`).
 - Resto (temporada, club, global de la app, visibilidad, anonimizado): pendiente.

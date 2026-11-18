@@ -287,7 +287,7 @@ class LeagueStandingsService {
         result.rows().stream()
                 .collect(Collectors.groupingBy(Row::categoryName, LinkedHashMap::new, Collectors.toList()))
                 .forEach((category, rows) -> sheets.put(
-                        "clasificacion-" + EventPackageService.slug(category) + ".csv",
+                        "clasificacion_" + EventPackageService.slug(category) + ".csv",
                         Csv.of(
                                 header,
                                 rows.stream()

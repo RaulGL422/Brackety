@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -191,6 +192,9 @@ class LeagueControllerTest extends EventApiTest {
         // The entity asked for one file per category (2026-11-16).
         var zip = call(get("/api/v1/events/" + phase2 + "/export/league-standings-by-category.zip"), "club1")
                 .andExpect(status().isOk())
+                .andExpect(header().string(
+                                "Content-Disposition",
+                                "attachment; filename=\"liga-yoseikan-2027_fase-2_clasificacion-por-categoria.zip\""))
                 .andReturn()
                 .getResponse()
                 .getContentAsByteArray();
@@ -200,8 +204,8 @@ class LeagueControllerTest extends EventApiTest {
                 files.put(entry.getName(), new String(in.readAllBytes(), StandardCharsets.UTF_8));
             }
         }
-        assertThat(files).containsOnlyKeys("clasificacion-9-10.csv");
-        assertThat(files.get("clasificacion-9-10.csv"))
+        assertThat(files).containsOnlyKeys("liga-yoseikan-2027_fase-2_clasificacion_9-10.csv");
+        assertThat(files.get("liga-yoseikan-2027_fase-2_clasificacion_9-10.csv"))
                 .contains("Posición;Medalla;Nombre;Apellidos;Club;Fase 1;Fase 2;Total liga;Advertencias;"
                         + "Descalificaciones\r\n")
                 .contains("1;Oro (1.º);Ana;Prueba;Club Demo Yoseikan;12;No inscrito;12;0;0\r\n");

@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-Última actualización: 2026-11-16. **Fase 1 hecha (2026-11-14) con éxito**: puntuaciones correctas y casi sin fallos. Ahora, pausa para organizarse; plan en `producto/roadmap.md` (retrospectiva en `producto/feedback-f1.md`). Próximo: competición el 2026-12-20 y F2 el 2027-01-24.
+Última actualización: 2026-11-18. **Fase 1 hecha (2026-11-14) con éxito**: puntuaciones correctas y casi sin fallos. Ahora, pausa para organizarse; plan en `producto/roadmap.md` (retrospectiva en `producto/feedback-f1.md`). Próximo: competición el 2026-12-20 y F2 el 2027-01-24.
 
 | Módulo | Doc | Estado | Rama activa |
 |---|---|---|---|
@@ -75,6 +75,7 @@ Estados: pendiente · en curso · en pruebas · cerrado.
 | F1-1: inhabilitar tapiz visible y con estado (fallo de la F1) | modulos/prototipo-f1.md | en pruebas: estado guardado en el tapiz, «Inhabilitar» y «Reactivar» en la pestaña Tapices del club y en el superadmin; tests de servidor, app y admin; falta prueba manual de Raul (2026-11-16) | fix/proto-f1-disable-mat |
 | marcador web: doble pulsación (pedido de Raul) | modulos/offline.md | cerrado: `knownEvents` obligatorio, 409 `MATCH_STALE` en la web, envío de una en una; probado a mano por Raul con dos pestañas (#59, 2026-11-09) | – |
 | CSV de clasificación por categoría (petición urgente de la entidad, 2026-11-16) | producto/feedback-f1.md | en pruebas: un CSV por categoría en .zip (pestaña de liga, solo web) y en la exportación completa; falta la prueba a mano de Raul (2026-11-16) | feat/ranking-category-csv |
+| Descargas con nombre (pedido de Raul, 2026-11-18) | modulos/ranking.md | en pruebas: cada CSV, PDF y .zip lleva liga, fase y qué es; los CSV por categoría, también la categoría (2026-11-18) | feat/descriptive-download-names |
 | Clasificación por categoría en PDF (pedido de Raul, 2026-11-17) | producto/feedback-f1.md | en pruebas: PDF con una página por categoría (pestaña de liga, solo web) y en la exportación completa; falta la prueba a mano de Raul (2026-11-17) | feat/ranking-standings-pdf |
 
 ## Hasta la Fase 1 (14-11)

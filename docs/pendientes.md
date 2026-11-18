@@ -57,7 +57,7 @@
 - [ ] F1-7 C2 (rama `feat/staff-panel-access`): probar a mano en debug un ayudante solo de mirar, otro solo de alumnos y un árbitro que además hace grupos.
 - [ ] F1-7 C: el paquete del portátil del pabellón no lleva los permisos elegidos; allí cada persona vuelve a los de su rol. Decidir si se incluyen.
 - [ ] Correo como herramienta (Raul, 2026-11-18): lista de avisos útiles por email para que Raul elija (`modulos/notificaciones.md`).
-- [ ] Nombres descriptivos en las descargas (Raul, 2026-11-18): cada PDF y CSV con liga, fase, categoría y qué es (p. ej. `liga-yoseikan-2027_fase-2_clasificacion_7-8.pdf`), nunca un nombre genérico.
+- [ ] Nombres descriptivos en las descargas (rama `feat/descriptive-download-names`): probar a mano que cada descarga del panel lleva liga, fase y qué es (`modulos/ranking.md`).
 - [ ] Compartir resultados por correo (Raul, 2026-11-18): enviar la clasificación o los resultados (PDF/CSV) a una o varias direcciones que escribe el club, desde el panel. Ojo: llevan datos de menores (`06-legal-rgpd.md`); decidir qué se puede enviar y a quién.
 - [ ] Gestión del club (`producto/gestion-club.md`): ¿se amplía el alcance? Cambia `00-vision.md` (hoy cobros fuera de alcance).
 - [ ] Si se cobra o se factura: forma jurídica, asesor fiscal y contratos con los clubes.
