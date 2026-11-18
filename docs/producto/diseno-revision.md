@@ -5,7 +5,10 @@ Pedido de Raul (2026-11-18): todo mucho más pulido, accesible e intuitivo (pale
 ## Diagnóstico (desde el código y las revisiones con Playwright)
 - **La base es buena**: tokens respetados, tipografía legible (Atkinson + Saira), contraste AA probado en `theme_test.dart`, táctil de 48/72, diálogos desplazables.
 - **El problema es de estructura, no de estilo**: pantallas que hacen 3-5 cosas a la vez. `settings_tab` (545 líneas, un formulario de 7 temas), `team_category_screen` (992, hace equipos, grupos y comodines), `mat_board_screen` (915, combate destacado, cola, grupos y avisos).
-- Escritorio desaprovechado: pantallas del club a todo el ancho, sin lista + detalle (`pendientes.md`, Diseño tras la F1).
+- Escritorio desaprovechado: Configuración, Puntuaciones y Tapices a todo el ancho, sin lista + detalle ni los anchos de formulario (480) y lectura (720).
+- Maquetas del canvas (2026-11-09) por aplicar: mesa del club con pestañas arriba y totales; tabla de tapices (combate en curso con marcador, siguiente, grupo con avance, árbitro, hora de fin); "Pendiente de ti"; avance por categoría y últimos resultados; crear grupo con tabla de alumnos y huecos con edad y estatura.
+- Sistema neutro solo en las pantallas de la F1; faltan inicio, login, mesa del club, inscripciones, ajustes y admin.
+- Detalles de la revisión de la F1: "(3)" sin explicar en Puntuaciones, tarjetas de eventos sin separación, enlaces legales del login pequeños.
 - Textos con punto medio ("6 años · 132 cm") en vez de columnas con etiqueta.
 - Lector de pantalla: 7 `Semantics` en toda la app; listas que se leen como un bloque; el marcador no anuncia los cambios de puntos.
 - Pestañas que no son rutas: recargar pierde dónde estabas (`auditoria-codigo.md`, punto 7).

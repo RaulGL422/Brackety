@@ -120,3 +120,4 @@ Las de octubre de 2026, en `decisiones-2026-10.md`.
 - 2026-11-18 · Descargas con nombre `liga_fase-N_que.ext` (y la categoría en los CSV por categoría); dentro del .zip completo, nombres cortos explicados en LEEME · Raul: nunca un nombre genérico.
 - 2026-11-18 · Personal configurable del todo: el rol solo da los permisos iniciales; permiso nuevo «Ver» (solo lectura); se asigna a un tapiz quien tenga «Arbitrar su tapiz» · Raul.
 - 2026-11-18 · Plan de limpieza del código por fases L0-L8 (`producto/plan-limpieza.md`); L0-L1 empiezan ya, en paralelo a la competición del 20-12; no se refactoriza a fondo `TamboMatch` (lo sustituye el motor de reglas por datos) · Raul.
+- 2026-11-19 · Exportaciones a medida (`producto/exportaciones.md`): los datos personales solo con un permiso propio «Descargar datos personales»; `.xlsx` además de CSV y PDF; las plantillas de exportación no se comparten entre clubes · Raul.
