@@ -1,96 +1,54 @@
 # Estado del proyecto
 
-Última actualización: 2026-11-18. **Fase 1 hecha (2026-11-14) con éxito**: puntuaciones correctas y casi sin fallos. Ahora, pausa para organizarse; plan en `producto/roadmap.md` (retrospectiva en `producto/feedback-f1.md`). Próximo: competición el 2026-12-20 y F2 el 2027-01-24.
+Última actualización: 2026-11-19. Única fuente de "qué está hecho". El detalle de cada cosa vive en su doc; aquí solo el estado.
 
-| Módulo | Doc | Estado | Rama activa |
-|---|---|---|---|
-| infra-deploy | modulos/infra-deploy.md | cerrado (2026-10-30) | – |
-| entornos (producción y debug) | modulos/entornos.md | en curso: servidor (#115), copias, pestaña Escenarios y franja (#117) fusionados; despliegue en la Pi y CI de imágenes `dev` (#118) fusionados; guía y script de datos de la F1 a producción en pruebas (2026-11-17) | feat/f1-handover |
-| auth | modulos/auth.md | en pruebas: tareas 1-9/9 hechas; falta la prueba manual del módulo completo de Raul (registro, login, sesión, bloqueo, limitador; verificación, recuperación, purga, avisos por email; login Google, sustitución de cuenta sin verificar, vincular y desvincular; `/me`, perfiles, reauth, cambio de email, borrado lógico con restaurar y purga, exportación; corte de tokens al cerrar sesiones, bloqueo de borrado a dueños de eventos; superadmin por entorno tras Cloudflare Access verificado en la API, bloqueos y validación de organizadores con auditoría; app: login con bloqueo y restaurar cuenta, registro, verificación pendiente, verificar email, recuperar y cambiar contraseña, sesión con refresh seguro en Android y sin red; entrar tras registrarse, perfiles Club y Ayudante; registro de organizadores con CIF; ajustes de cuenta: idioma de app y emails, perfiles, cambio de email, exportar, borrar, Google ya vinculado; admin: login de superadmin con token en memoria, bloqueos con revocar, organizadores con filtro y validar) (2026-11-02) | feat/auth-admin-login |
-| perfiles-menores | modulos/perfiles-menores.md | pendiente | – |
-| legal-paginas | modulos/legal-paginas.md | en pruebas: pasos 1-2 hechos (back: textos ES/EN en ficheros, `GET /api/v1/legal` y `/{tipo}`, versiones validadas en registro; app: páginas `/legal/<tipo>`, casilla del registro con enlaces y versiones del servidor, pie, ajustes, licencias, aviso en alumno e importación); falta prueba manual de Raul y la puerta `LEGAL_GATE` cuando existan publicar eventos y pasar de fase (2026-11-04) | feat/legal-front |
-| eventos | modulos/eventos.md | pendiente | – |
-| inscripciones | modulos/inscripciones.md | pendiente | – |
-| ayudantes-permisos | modulos/ayudantes-permisos.md | pendiente | – |
-| puntuacion | modulos/puntuacion.md | pendiente | – |
-| liga | modulos/liga.md | pendiente | – |
-| liga-fases | modulos/liga-fases.md | en pruebas: servidor (#75), pantallas y reinscripción (#81), puntos por asistir (#86); liga primero en el panel del club y podios de un toque en la PR #89; falta la prueba a mano (2026-11-12) | feat/league-first-dev |
-| torneo | modulos/torneo.md | pendiente | – |
-| marcador-tapiz | modulos/marcador-tapiz.md | pendiente | – |
-| tiempo-real | modulos/tiempo-real.md | en pruebas: WebSocket de avisos "esto cambió" (marcador, tablero, Tapices, Puntuaciones) con sondeo de respaldo (2026-11-11) | feat/realtime-offline-web |
-| offline | modulos/offline.md | pendiente | – |
-| ranking | modulos/ranking.md | pendiente | – |
-| notificaciones | modulos/notificaciones.md | pendiente | – |
-| superadmin-reportes | modulos/superadmin-reportes.md | en curso: operaciones de evento (#64, en la Pi con la v0.3.1), métricas (#67) y usuarios (buscar, suspender, borrar) en pruebas; faltan reportes y el resto de eventos (2026-11-10) | feat/superadmin-users |
+- **Momento**: Fase 1 de la liga jugada el 2026-11-14 con éxito. Pausa para organizarse y limpiar (`producto/roadmap.md`).
+- **Próximos hitos**: competición el 2026-12-20 y Fase 2 el 2027-01-24.
+- **Producción**: v0.7.0 en la Pi (`brackety.rgal.dev`). Todo lo de abajo está fusionado en `development` salvo que diga otra cosa.
 
-Estados: pendiente · en curso · en pruebas · cerrado.
+Estados: **pendiente** · **en curso** · **en pruebas** (hecho; falta la prueba a mano de Raul, lista en `pendientes.md`) · **cerrado**.
 
-## Orden de construcción propuesto
-1. Repo, CI, `deploy/` y esqueletos (server, app, admin) → `infra-deploy`.
-2. `auth` → `perfiles-menores` → `legal-paginas` (incluye puerta `PRIVACY_CONTACT_EMAIL`).
-3. `eventos` → `inscripciones` → `ayudantes-permisos`.
-4. `puntuacion` (motor) con el reglamento Yoseikan como primera plantilla.
-5. `liga-fases` (es el caso real de la Liga Yoseikan) → `liga` → `torneo`.
-6. `marcador-tapiz` + `tiempo-real` + `offline`.
-7. `ranking`, `notificaciones`, `superadmin-reportes`.
-8. Exploración de diseño (`07-diseno.md`) justo antes de la primera pantalla real de cada bloque.
+## Ahora
+- Calidad, fase L0 (`producto/plan-limpieza.md`): métricas en el CI (#137), ArchUnit (#138) y lints estrictos (#139) hechos; faltan los casos de reglas compartidos Java/Dart y la comprobación de oro.
+- Exportaciones a medida (`producto/exportaciones.md`): aprobadas en lo básico, por programar.
+- Esperando a Raul: detalles de la competición del 20-12, puntuación de la F2 y las preguntas de `pendientes.md`.
 
-## Imprevistos (fuera del orden)
-| Tarea | Doc | Estado | Rama activa |
-|---|---|---|---|
-| sistema de diseño: tokens + página dev en admin | 07-diseno.md | cerrado (2026-10-30) | chore/design-system |
-| rediseño neutro multideporte (pedido de Raul) | 07-diseno.md | en pruebas: tema neutro claro y oscuro (fijable en Ajustes), Atkinson Hyperlegible Next + Saira Condensed, tablero del árbitro (grupos en tinta), marcador y crear grupo con huecos (#57); resto de pantallas en `pendientes.md` (2026-11-08) | feat/design-neutral-groups |
-| prototipo Fase 1 Yoseikan (uso real ≈ 2026-11-14) | modulos/prototipo-f1.md | en curso: back completo (pasos 1-3/7); front pasos 4-6/7 (login de `auth`, mis eventos, crear grupos; tablero del tapiz y marcador con campana; panel del club con puntuaciones, tapices, inscripciones, configuración y CSV). Probado a mano en Chrome (ayudante, árbitro y club). Paso 7 en curso: release `v0.1.0` fusionada y etiquetada (#36, 2026-11-04); release `v0.3.0` (#61) desplegada en la Pi el 2026-11-10 (`brackety.rgal.dev`, en la SD); falta el ensayo con varios dispositivos | – |
-| prototipo F1: categorías por equipos | modulos/prototipo-f1-equipos.md | en pruebas: pasos 8-11 hechos (back, ayudante, árbitro, club con categorías editables). Falta: prueba manual de Raul (2026-11-02) | feat/proto-f1-teams-club |
-| prototipo F1: importación masiva de alumnos | modulos/importacion-alumnos.md | en pruebas: pasos 1-3 hechos; `ANTHROPIC_API_KEY` puesta en la Pi y botón visible (2026-11-10). Falta: confirmar el DPA, una lectura real en la Pi y la prueba manual de Raul | – |
-| servidor del pabellón (portátil Windows) y paquete del evento | modulos/servidor-local.md | en curso: pasos 1-3/4 hechos (APK con selector de servidor; 2026-11-05). Endurecido tras la revisión (`revision-f1.md`, servidor y pabellón): contraseñas aleatorias del paquete, sin puntuar antes de iniciar, refresh idempotente, acceso de 12 h, sin `X-Forwarded-For`, firewall solo del punto de acceso, bloqueo de evento al primer inicio, inscritos solo para el club, CSV, BitLocker e `icacls` (2026-11-06) | fix/f1-hardening-server |
-| offline: adelanto F1 (marcador del árbitro) | modulos/offline.md | en pruebas: servidor (`opId`, `at`, `knownEvents`, revisión del club con `/review`) y app (cola y caché en el APK, tablero sin red, indicador, Aplicar/Descartar del club) hechos; falta la prueba manual de Raul y el escenario con un combate en revisión (2026-11-05) | feat/offline-f1-scoreboard |
-| herramientas: plugins `playwright` y `frontend-design` + semántica para navegador automatizado | 08-ejecucion-local.md | cerrado: plugins del proyecto y `enableSemanticsForAutomation` en app y admin (#54). Revisión de F1 con Playwright en 3 tamaños: flujos de club, ayudante y árbitro sin fallos; arreglados etiquetas por esquina del marcador para lector de pantalla y plural de Tapices; el resto de diseño, en `pendientes.md` (2026-11-07) | – |
-| modelo de datos: estado actual, objetivo y plan de migración (pedido de Raul, 2026-11-16) | producto/modelo-datos.md | aprobado; M1, M2a, M2b y M2c fusionados; falta M2d (club del alumno) (2026-11-17) | – |
-| F2-1 peso y estatura obligatorios u opcionales (pedido de Raul, 2026-11-16) | producto/feedback-f1.md | fusionado (#113): nivel por deporte y por evento (Ajustes), bloqueo al agrupar si es obligatorio, aviso si es opcional, el ayudante apunta las medidas el día; falta la prueba a mano de Raul (2026-11-17) | – |
-| F2-2 edades mezcladas en una categoría (pedido de Raul, 2026-11-16) | producto/feedback-f1.md | en pruebas: crear grupos y equipos separan por edad cuando la categoría las mezcla, con interruptor; el grupo muestra la edad de cada uno; falta la prueba a mano de Raul (2026-11-17) | feat/f2-ages-in-category |
-| prototipo F1: crear grupos (pedido de Raul) | modulos/prototipo-f1.md | en pruebas: sin multigrupo (Configuración y borrador), casilla en lugar del círculo con número, desplegable de tapiz Automático o a mano junto a "Crear grupo" (`matId` en la API), vuelta "Grupo por equipos" desde el grupo individual; falta prueba manual de Raul (2026-11-07) | feat/proto-f1-group-mat |
-| F1: superadmin en el portátil, export .zip, resultados a la Pi y clubes (pedido de Raul, 2026-11-11) | modulos/servidor-local.md | en pruebas: superadmin solo en el portátil, todo el evento en .zip con CSV legibles, importar resultados en la Pi, clubes participantes; servidor de liga, fases y podios hecho, sus pantallas después de la F1; falta la prueba a mano (2026-11-11) | feat/league-phases |
-| marcador F1: reglas y mesa (pedido de Raul, 2026-11-11) | modulos/prototipo-f1.md | en pruebas: descalificación 15-0, −1, ajuste de reloj, deshacer más claro, campana de ring y aviso de 10 s en la web, duración y límite en Configuración (F1 3:00), tablero con recomendado/en espera, deshacer grupo y simulaciones del recomendador; falta la prueba a mano (2026-11-11) | feat/scoreboard-f1-rules |
-| F1 solo web en el pabellón (pedido de Raul, 2026-11-11) | modulos/offline.md | en pruebas: la web usa la cola offline (guardada en el navegador, sobrevive a recargas), sesión que aguanta recargas en http del pabellón, rescate de acciones por CSV (exportar en el dispositivo, importar en el club), paquete sin APK por defecto; falta la prueba a mano en portátil y Pi (2026-11-11) | feat/realtime-offline-web |
-| pruebas F1: portátil, offline y reconexiones (pedido de Raul, 2026-11-12) | pruebas-f1.md | rondas 1 y 2 hechas (#87, #88): API, web sin red, caída de la API y apagón del portátil, vuelta a la Pi, liga; arreglos y peticiones de Raul incluidos. Estable para la F1; abierto en pruebas-f1.md (Pendiente antes del 14) | – |
-| F1: fantasmas sin límite (pedido de Raul, 2026-11-12) | modulos/prototipo-f1.md | en pruebas: grupo individual con hasta 3 fantasmas, equipos enteros de fantasmas, tablero, marcador, clasificación y CSV con varios fantasmas; falta la prueba a mano (2026-11-13) | feat/proto-f1-free-ghosts |
-| F1: feedback in situ (pedido de Raul, 2026-11-13) | modulos/prototipo-f1-equipos.md | en pruebas: Comodín en vez de fantasma; individual 1:00/15 y equipos 3:00 sin límite; +1 al rival cada 2 advertencias; descanso mínimo configurable; equipos de 2 o 3, hasta 3 equipos comodín y sin alumnos repetidos; bote de combates de equipos repartido entre tapices libres; ayudantes sin red (listas y cola); sin red las pantallas leen lo guardado al instante; advertencias y descalificaciones de la liga por alumno; reglamento PDF por fase en el tapiz; clasificación de liga por categoría; falta la prueba a mano (2026-11-13) | feat/f1-onsite-feedback |
-| F1: endurecer reparto y panel de control (pedido de Raul, 2026-11-13) | modulos/prototipo-f1.md | en pruebas: descanso obligatorio en marcador y servidor; tapiz con combates no queda sin árbitro; jornadas completas simuladas al azar por la API; panel de control en club y superadmin (mover grupos y combates, reordenar, cambiar alumnos de equipo, saltar el descanso, auditado); cola prevista por tapiz; comodines y equipos de otros grupos; avisos de la liga; aviso de una mano 4-8; reinicio del evento desde el paquete en el superadmin del portátil; probado a mano por Raul, escenario real de la F1 preparado (fuera del repo) | fix/f1-scheduling-hardening |
-| F1: versión de la app a la vista (pedido de Raul, 2026-11-14) | 07-diseno.md | fusionado (#102, 2026-11-14): "Versión X (build)" en las pantallas sin sesión (app y admin), al pie del panel lateral, en Conexión y en el menú de cuenta de la app | – |
-| F1: propuestas estables y "Sincronizando combates" al cambiar tapices (pedido de Raul, 2026-11-14) | modulos/prototipo-f1-equipos.md | fusionado (#100, 2026-11-14): el tapiz conserva su combate propuesto; aviso con los tapices que aún no tienen el cambio; falta prueba manual de Raul | – |
-| F1: advertencias en la ficha del alumno (pedido de Raul, 2026-11-14) | modulos/prototipo-f1.md | fusionado (#99, 2026-11-14): cifra junto a los puntos y desplegable con combate, minuto, motivo y árbitro; en la liga, de todas las fases; falta prueba manual de Raul | – |
-| F1: vaciar competición con solo equipos y diálogos desplazables (pedido de Raul, 2026-11-14) | 07-diseno.md | fusionado (#98, 2026-11-14): el superadmin puede vaciar con equipos sin grupo; todos los diálogos de app y admin con `scrollable: true`; falta prueba manual de Raul en móvil | – |
-| F1-2: comodín elegido antes que los normales (fallo de la F1) | modulos/prototipo-f1.md | en pruebas: «Añadir como: Normal | Comodín» en el grupo individual y en el de equipos; tests en 3 tamaños; falta prueba manual de Raul y revisar los datos de la F1 en la Pi (2026-11-16) | fix/proto-f1-wildcard-first |
-| F1: inhabilitar tapiz (pedido de Raul, 2026-11-14) | modulos/prototipo-f1.md | fusionado (#97, 2026-11-14): botón en el tablero del club y en el superadmin, destino por grupo o Automático, equipos al bote; falta prueba manual de Raul | – |
-| Servidor: banner y estado al arrancar (pedido de Raul, 2026-11-18) | 09-despliegue.md | en pruebas: banner BRACKETY con versión y commit; bloque "is ready" con modo, BD y esquema, y qué está activo o falta; versión en `/api/v1/info`; imágenes y portátil la llevan | feat/server-startup-banner |
-| F1-7 C: permisos por persona en «Personal» (pedido de Raul, 2026-11-18) | modulos/ayudantes-permisos.md | C fusionada (#130); C2 en pruebas: permiso «Ver», panel del ayudante por permisos, cada acción según su permiso, tapiz para cualquiera con «Arbitrar su tapiz» | feat/staff-panel-access |
-| F1-7 B: comenzar, finalizar y reabrir la fase (pedido de Raul, 2026-11-18) | modulos/eventos.md | fusionado (#129): comenzar obligatorio; finalizada = solo lectura para todos hasta reabrir con motivo; cierre automático al día siguiente con correo; barra en club, categorías y tapiz | development |
-| F1-7 A: quitar un tapiz con grupos lleva a «Inhabilitar tapiz» (pedido de Raul, 2026-11-18) | producto/feedback-f1.md | fusionado (#127): código `MAT_HAS_GROUPS` y aviso en Configuración; B (fase) y C (permisos) pendientes | – |
-| Etapa 3.2: auditoría del código, plan de limpieza, revisión de diseño y plantillas de deporte (pedido de Raul, 2026-11-18) | producto/auditoria-codigo.md | plan aprobado (2026-11-18), L0 en curso; diseño (`diseno-revision.md`) e idea de plantillas (`plantillas-deporte.md`) a la espera de las respuestas en `pendientes.md` | docs/code-audit |
-| Exportaciones a medida (pedido de Raul, 2026-11-19) | producto/exportaciones.md | propuesta: pantalla con datos, columnas, orden, filtros, formato y plantillas guardadas; las descargas de hoy como plantillas incluidas; falta la respuesta de Raul en `pendientes.md` | docs/custom-exports |
-| Etapa 3.1: CI por componentes | producto/calidad.md | en pruebas: las PR a development solo prueban server/core/app/admin si los tocan; `ci-ok` resume; releases y pushes, todo (2026-11-17) | chore/ci-components |
-| F2-4: clasificación global opcional (pedido de la F2) | modulos/ranking.md | fusionado (#123): «Clasificación global» en Editar liga (apagada por defecto); sin ella, Puntuaciones y Liga muestran una categoría cada vez; en el paquete; tests en 3 tamaños (2026-11-17) | – |
-| F1-5: cuentas propias para el staff (pedido de la F1) | modulos/ayudantes-permisos.md | fusionado (#122): el club invita por email como ayudante o árbitro, se acepta con una cuenta del mismo email, pendientes/anular/quitar en Configuración; tests en 3 tamaños (2026-11-17) | – |
-| F1-4: motivos de advertencia en un toque (pedido de la F1) | modulos/prototipo-f1.md | fusionado (#121): lista del deporte editable por evento en Configuración; botones en el diálogo del marcador (advertencia en un toque, descalificación con confirmación, "Otro motivo"); en el paquete y sin conexión; tests en 3 tamaños (2026-11-17) | – |
-| F1-3: puntos fuera de tiempo (pedido de la F1) | modulos/prototipo-f1.md | fusionado (#120): a 0:00 el árbitro sigue dando +1/−1 hasta Finalizar (avisos no); marcado "fuera de tiempo" en línea de tiempo, ficha y CSV; también sin conexión; tests en 3 tamaños (2026-11-17) | – |
-| F1-1: inhabilitar tapiz visible y con estado (fallo de la F1) | modulos/prototipo-f1.md | en pruebas: estado guardado en el tapiz, «Inhabilitar» y «Reactivar» en la pestaña Tapices del club y en el superadmin; tests de servidor, app y admin; falta prueba manual de Raul (2026-11-16) | fix/proto-f1-disable-mat |
-| marcador web: doble pulsación (pedido de Raul) | modulos/offline.md | cerrado: `knownEvents` obligatorio, 409 `MATCH_STALE` en la web, envío de una en una; probado a mano por Raul con dos pestañas (#59, 2026-11-09) | – |
-| CSV de clasificación por categoría (petición urgente de la entidad, 2026-11-16) | producto/feedback-f1.md | en pruebas: un CSV por categoría en .zip (pestaña de liga, solo web) y en la exportación completa; falta la prueba a mano de Raul (2026-11-16) | feat/ranking-category-csv |
-| Fuera `maxGroupsPerMat` (pendiente de diseño tras la F1) | producto/calidad.md | fusionado (#134): sin columna, API ni campo del paquete (`schemaVersion` 3; las 1 y 2 siguen cargando); un grupo por petición (2026-11-18) | – |
-| Permisos en el portátil del pabellón (pedido de Raul, 2026-11-18) | modulos/ayudantes-permisos.md | fusionado (#133): el paquete lleva los permisos elegidos en «Personal» y admite en un tapiz a quien tenga «Arbitrar su tapiz» (2026-11-18) | – |
-| Descargas con nombre (pedido de Raul, 2026-11-18) | modulos/ranking.md | fusionado (#132): cada CSV, PDF y .zip lleva liga, fase y qué es; los CSV por categoría, también la categoría (2026-11-18) | – |
-| Clasificación por categoría en PDF (pedido de Raul, 2026-11-17) | producto/feedback-f1.md | en pruebas: PDF con una página por categoría (pestaña de liga, solo web) y en la exportación completa; falta la prueba a mano de Raul (2026-11-17) | feat/ranking-standings-pdf |
+## Módulos
+| Módulo | Estado | Nota |
+|---|---|---|
+| `infra-deploy` | cerrado (2026-10-30) | |
+| `entornos` | en curso | Producción y debug en la Pi; falta pasar los datos de la F1 a producción |
+| `auth` | en pruebas | Tareas 1-9 de 9 |
+| `perfiles-menores` | pendiente | |
+| `legal-paginas` | en pruebas | Pasos 1-2; falta la puerta legal al publicar y pasar de fase |
+| `eventos` | pendiente | Adelantado: comenzar, finalizar y reabrir la fase (#129); rediseño en `producto/eventos-ux.md` |
+| `inscripciones` | pendiente | Adelantado por el prototipo y la importación |
+| `ayudantes-permisos` | pendiente | Adelantado: invitaciones (#122) y permisos por persona (#130, #131, #133) |
+| `puntuacion` | pendiente | Solo tambo, en código; plantillas en `producto/plantillas-deporte.md` |
+| `liga` | pendiente | |
+| `liga-fases` | en pruebas | Fases, reinscripción, puntos por asistir, podios |
+| `torneo` | pendiente | Lo pide la competición del 20-12 |
+| `marcador-tapiz` | pendiente | Adelantado por el prototipo |
+| `tiempo-real` | en pruebas | Avisos por WebSocket con sondeo de respaldo |
+| `offline` | pendiente | Adelanto de la F1 (marcador, web del pabellón) en pruebas |
+| `ranking` | pendiente | Adelantado: global opcional (#123), CSV y PDF por categoría, nombres de archivo (#132) |
+| `notificaciones` | pendiente | Propuesta de correos a Raul |
+| `superadmin-reportes` | en curso | Operaciones de evento, métricas y usuarios; faltan reportes |
 
-## Hasta la Fase 1 (14-11)
-Orden acordado con Raul el 2026-11-04 (una PR abierta cada vez):
-1. Release `v0.1.0` y despliegue en la Pi.
-2. `legal-paginas` pasos 1-2 (adelantado: datos reales de menores en la fase).
-3. `servidor-local` pasos 1-3.
-4. Offline: adelanto F1.
-5. Ensayo general (`servidor-local` paso 4).
-- Motivo prototipo: Raul necesita usar la app en la Fase 1 real en 15 días; adelanta versiones mínimas de eventos, inscripciones, grupos, marcador y ranking.
-- Motivo sistema de diseño: fijar colores, tipografía, espaciado y componentes antes de la primera pantalla real (`auth`), para no repartir valores sueltos por el código.
-
-## Bloqueos
-Ver `pendientes.md`. Ninguno bloquea la fase 0.
+## Fuera de los módulos
+| Qué | Doc | Estado |
+|---|---|---|
+| Sistema de diseño (tokens, página Diseño) | `07-diseno.md` | cerrado (2026-10-30) |
+| Diseño neutro multideporte | `07-diseno.md` | en pruebas: pantallas de la F1; el resto, en `producto/diseno-revision.md` |
+| Prototipo F1 (grupos, tablero, marcador, panel del club) | `modulos/prototipo-f1.md` | en pruebas; usado en la F1 |
+| Prototipo F1: equipos y comodines | `modulos/prototipo-f1-equipos.md` | en pruebas |
+| Importación masiva de alumnos | `modulos/importacion-alumnos.md` | en pruebas; falta el DPA |
+| Servidor del pabellón y paquete del evento | `modulos/servidor-local.md` | en curso: pasos 1-3 de 4; falta el ensayo con varios dispositivos |
+| Arreglos tras la F1 (F1-1 a F1-7, F2-1, F2-2, F2-4) | `producto/feedback-f1.md` | en pruebas; F2-3 pasa a exportaciones |
+| Modelo de datos | `producto/modelo-datos.md` | M1 y M2a-c hechos; falta M2d; M3-M6 en la etapa 3 |
+| CI por componentes | `producto/calidad.md` | cerrado (#124) |
+| Auditoría y plan de limpieza | `producto/auditoria-codigo.md` | L0 en curso |
+| Servidor: banner y estado al arrancar | `09-despliegue.md` | en pruebas (#128) |
+| Fuera `maxGroupsPerMat` | `producto/calidad.md` | cerrado (#134) |
+| Plugins `playwright` y `frontend-design` | `08-ejecucion-local.md` | cerrado (#54) |
+| Plantillas de deporte y arbitraje | `producto/plantillas-deporte.md` | idea, preguntas en `pendientes.md` |

@@ -25,6 +25,8 @@ SOURCES = [
     ('packages/brackety_core/lib', '.dart'),
 ]
 MAX_FILE_LINES = {'.dart': 400, '.java': 300}
+# Lines are capped by the docs CI job; long lines hide a long doc, so characters are capped too.
+MAX_DOC_CHARS = 12000
 MAX_METHOD_LINES = 60
 DUPLICATE_WINDOW = 8
 # The formatters (dart format, Spotless) put class members at this indentation.
@@ -169,6 +171,21 @@ def strongly_connected(graph):
     return groups
 
 
+def long_docs():
+    found = []
+    for directory, _, names in os.walk(os.path.join(ROOT, 'docs')):
+        for name in sorted(names):
+            path = os.path.join(directory, name)
+            relative = os.path.relpath(path, ROOT).replace(os.sep, '/')
+            if not name.endswith('.md') or relative.startswith('docs/historico/'):
+                continue
+            with open(path, encoding='utf8') as file:
+                size = len(file.read())
+            if size > MAX_DOC_CHARS:
+                found.append(f'{relative} ({size})')
+    return sorted(found)
+
+
 def measure():
     """Each metric: its name, the number the limit applies to and the details that explain it."""
     files = [(path, ext, read_lines(path)) for path, ext in source_files()]
@@ -179,6 +196,7 @@ def measure():
             big_files[ext].append(f'{path} ({len(lines)})')
         methods += long_methods(path, ext, lines)
     cycles = feature_cycles('app', 'brackety') + feature_cycles('admin', 'brackety_admin')
+    docs = long_docs()
     duplicates = duplicate_windows([(path, lines) for path, _, lines in files])
     return [
         (f'Dart files over {MAX_FILE_LINES[".dart"]} lines', len(big_files['.dart']), big_files['.dart']),
@@ -194,6 +212,7 @@ def measure():
             sum(count for count, _ in duplicates),
             [f'{count} windows: {paths}' for count, paths in duplicates[:20]],
         ),
+        (f'Docs over {MAX_DOC_CHARS} characters', len(docs), docs),
     ]
 
 
