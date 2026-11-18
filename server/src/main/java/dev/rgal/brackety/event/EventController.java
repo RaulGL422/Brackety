@@ -11,6 +11,8 @@ import dev.rgal.brackety.event.dto.MeasureRules;
 import dev.rgal.brackety.event.dto.MeasureRulesRequest;
 import dev.rgal.brackety.event.dto.MyEventResponse;
 import dev.rgal.brackety.event.dto.OrganizationsRequest;
+import dev.rgal.brackety.event.dto.PhaseView;
+import dev.rgal.brackety.event.dto.ReopenPhaseRequest;
 import dev.rgal.brackety.event.dto.WarningReasons;
 import dev.rgal.brackety.event.dto.WarningReasonsRequest;
 import jakarta.validation.Valid;
@@ -22,6 +24,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,13 +40,16 @@ class EventController {
     private final EventCategoryService categories;
     private final EventOrganizationService organizations;
     private final StaffNames staffNames;
+    private final EventPhase phase;
 
     EventController(
             EventService events,
             EventCategoryService categories,
             EventOrganizationService organizations,
-            StaffNames staffNames) {
+            StaffNames staffNames,
+            EventPhase phase) {
         this.staffNames = staffNames;
+        this.phase = phase;
         this.events = events;
         this.categories = categories;
         this.organizations = organizations;
@@ -52,6 +58,29 @@ class EventController {
     @GetMapping
     List<MyEventResponse> myEvents(@AuthenticationPrincipal Jwt jwt) {
         return events.myEvents(CurrentAccount.id(jwt));
+    }
+
+    @GetMapping("/{eventId}/phase")
+    PhaseView phase(@PathVariable UUID eventId, @AuthenticationPrincipal Jwt jwt) {
+        return phase.view(eventId, CurrentAccount.id(jwt));
+    }
+
+    @PostMapping("/{eventId}/phase/start")
+    PhaseView startPhase(@PathVariable UUID eventId, @AuthenticationPrincipal Jwt jwt) {
+        return phase.start(eventId, CurrentAccount.id(jwt));
+    }
+
+    @PostMapping("/{eventId}/phase/finish")
+    PhaseView finishPhase(@PathVariable UUID eventId, @AuthenticationPrincipal Jwt jwt) {
+        return phase.finish(eventId, CurrentAccount.id(jwt));
+    }
+
+    @PostMapping("/{eventId}/phase/reopen")
+    PhaseView reopenPhase(
+            @PathVariable UUID eventId,
+            @Valid @RequestBody ReopenPhaseRequest request,
+            @AuthenticationPrincipal Jwt jwt) {
+        return phase.reopen(eventId, CurrentAccount.id(jwt), request.reason());
     }
 
     @GetMapping("/{eventId}/settings")

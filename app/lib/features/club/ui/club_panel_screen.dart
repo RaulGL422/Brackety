@@ -11,6 +11,7 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../../events/state/events_providers.dart';
 import '../../league/ui/phase_switcher.dart';
 import '../../offline/ui/import_ops_button.dart';
+import '../../phase/ui/phase_bar.dart';
 import '../data/club_repository.dart';
 import 'export_download.dart';
 import 'mats_tab.dart';
@@ -71,12 +72,19 @@ class _ClubPanelScreenState extends ConsumerState<ClubPanelScreen> {
       ],
       selectedIndex: _tab,
       onSelected: (i) => setState(() => _tab = i),
-      body: switch (_tab) {
-        0 => StandingsTab(eventId: widget.eventId),
-        1 => MatsTab(eventId: widget.eventId),
-        2 => ParticipantsTab(eventId: widget.eventId),
-        _ => SettingsTab(eventId: widget.eventId),
-      },
+      body: Column(
+        children: [
+          PhaseBar(eventId: widget.eventId, isClub: true),
+          Expanded(
+            child: switch (_tab) {
+              0 => StandingsTab(eventId: widget.eventId),
+              1 => MatsTab(eventId: widget.eventId),
+              2 => ParticipantsTab(eventId: widget.eventId),
+              _ => SettingsTab(eventId: widget.eventId),
+            },
+          ),
+        ],
+      ),
     );
   }
 }
@@ -194,6 +202,7 @@ Future<void> _importResults(
 
 /// The message for a failed save: 409 means groups depend on what changed.
 String saveErrorMessage(AppLocalizations l10n, DioException error) =>
+    phaseErrorMessage(l10n, error) ??
     switch (error.response?.statusCode) {
       409 => l10n.saveConflict,
       400 => l10n.saveInvalid,

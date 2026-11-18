@@ -113,3 +113,4 @@ Las de octubre de 2026, en `decisiones-2026-10.md`.
 - 2026-11-17 · CI: filtro por ruta con `git diff` en un trabajo propio (sin acciones de terceros) y `ci-ok` como único check; los pushes a development y main corren todo · red de seguridad tras cada fusión sin alargar las PR.
 - 2026-11-18 · Un tapiz con grupos no se quita en Configuración: se inhabilita (sus grupos guardan dónde se jugaron) · Raul, «basta con inhabilitar».
 - 2026-11-18 · Fase: comenzar/finalizar por el club o ayudante con permiso; finalizada = solo lectura, el club reabre con motivo; cierre automático al día siguiente con correo · Raul.
+- 2026-11-18 · Fase: comenzar obligatorio; finalizar con pendientes avisando, nunca con combate en curso o en revisión; finalizada también para el club (salvo ajustes, alumnos y descargas) · Raul.

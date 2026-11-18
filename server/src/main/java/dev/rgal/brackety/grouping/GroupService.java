@@ -5,6 +5,7 @@ import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventCategory;
 import dev.rgal.brackety.event.EventCategoryRepository;
 import dev.rgal.brackety.event.EventException;
+import dev.rgal.brackety.event.EventPhase;
 import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.event.Mat;
@@ -31,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 class GroupService {
 
     private final FightGroupRepository groups;
+    private final EventPhase phase;
     private final GroupMemberRepository members;
     private final MatchRepository matches;
     private final TeamRepository teams;
@@ -63,7 +65,9 @@ class GroupService {
             MatSchedule schedule,
             CompetitionCleanup cleanup,
             Clock clock,
-            StaffNames staffNames) {
+            StaffNames staffNames,
+            EventPhase phase) {
+        this.phase = phase;
         this.groups = groups;
         this.members = members;
         this.matches = matches;
@@ -148,6 +152,7 @@ class GroupService {
     @Transactional
     CreateGroupsResponse create(UUID eventId, UUID accountId, CreateGroupsRequest request) {
         access.require(eventId, accountId, EventRole.CLUB, EventRole.GROUPER);
+        phase.requireInProgress(eventId);
         var event = events.lock(eventId);
         if (request.groups().size() > event.getMaxGroupsPerMat()) {
             throw EventException.invalid("At most " + event.getMaxGroupsPerMat() + " groups go to a mat at once.");
@@ -185,6 +190,7 @@ class GroupService {
     @Transactional
     void undo(UUID eventId, UUID groupId, UUID accountId) {
         access.require(eventId, accountId, EventRole.CLUB, EventRole.GROUPER);
+        phase.requireInProgress(eventId);
         // Matches first, then the event: the same order as a match's first start, which locks both.
         var groupMatches = matches.lockByGroupId(groupId);
         var group = groups.findById(groupId)

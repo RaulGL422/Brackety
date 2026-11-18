@@ -1,6 +1,8 @@
 package dev.rgal.brackety.event;
 
 import jakarta.persistence.LockModeType;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +33,25 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
             value = "select exists(select 1 from fight_match where event_id = :eventId and status = :status)",
             nativeQuery = true)
     boolean hasMatchIn(UUID eventId, String status);
+
+    /** Matches nobody will play once the phase finishes: pending, never started. */
+    @Query(
+            value = "select count(*) from fight_match where event_id = :eventId and status = 'PENDING'",
+            nativeQuery = true)
+    int countPendingMatches(UUID eventId);
+
+    @Query(
+            value = "select exists(select 1 from fight_match where event_id = :eventId"
+                    + " and (status = 'IN_PROGRESS' or review_reason is not null))",
+            nativeQuery = true)
+    boolean hasMatchInProgressOrReview(UUID eventId);
+
+    @Query(value = "select min(created_at) from fight_group where event_id = :eventId", nativeQuery = true)
+    Instant firstGroupAt(UUID eventId);
+
+    /** Started phases whose day is over and that nobody finished. */
+    @Query("select e from Event e where e.startedAt is not null and e.finishedAt is null and e.eventDate < :today")
+    List<Event> findOpenBefore(LocalDate today);
 
     @Query(
             value = "select exists(select 1 from fight_match where event_id = :eventId and status <> 'PENDING')",

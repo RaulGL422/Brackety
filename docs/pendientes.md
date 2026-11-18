@@ -53,8 +53,10 @@
 - [ ] F2-4: global opcional hecha (`modulos/ranking.md`). Dividir una categoría por sexo o tramos de peso: cuando una modalidad lo necesite (en la F2 la categoría es solo por edad; Raul, 2026-11-17).
 - [ ] F1-4 advertencias: revisar la lista de tambo propuesta (prohibiciones del reglamento, cap. 3.1: proyección o golpeo, tirarse rodando, ataque de pique, exceso de potencia, conducta antideportiva). Se cambia en `Discipline` o por evento en Configuración.
 - [ ] F1-5 cuentas propias: hecho en `feat/f1-5-staff-invites`. Con Resend en producción, probar a mano: invitar a un email real, registrarse con él, aceptar y arbitrar un tapiz. Retirar `staffNames` cuando las cuentas tengan nombre.
-- [ ] F1-7 fase que nunca se cierra (`producto/feedback-f1.md`): PR B comenzar/finalizar/reabrir fase con cierre automático y correo; PR C permisos por ayudante en «Personal». Antes de la PR C, Raul aprueba la lista de permisos.
+- [ ] F1-7: PR B (fase) en `feat/event-phase-lifecycle`; probar a mano en debug: comenzar, crear grupos, finalizar con pendientes, reabrir con motivo y el correo del día siguiente. PR C permisos por ayudante en «Personal»: antes, Raul aprueba la lista de permisos.
 - [ ] Correo como herramienta (Raul, 2026-11-18): lista de avisos útiles por email para que Raul elija (`modulos/notificaciones.md`).
+- [ ] Nombres descriptivos en las descargas (Raul, 2026-11-18): cada PDF y CSV con liga, fase, categoría y qué es (p. ej. `liga-yoseikan-2027_fase-2_clasificacion_7-8.pdf`), nunca un nombre genérico.
+- [ ] Compartir resultados por correo (Raul, 2026-11-18): enviar la clasificación o los resultados (PDF/CSV) a una o varias direcciones que escribe el club, desde el panel. Ojo: llevan datos de menores (`06-legal-rgpd.md`); decidir qué se puede enviar y a quién.
 - [ ] Gestión del club (`producto/gestion-club.md`): ¿se amplía el alcance? Cambia `00-vision.md` (hoy cobros fuera de alcance).
 - [ ] Si se cobra o se factura: forma jurídica, asesor fiscal y contratos con los clubes.
 

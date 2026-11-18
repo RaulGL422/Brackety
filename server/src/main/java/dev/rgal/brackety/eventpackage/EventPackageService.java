@@ -333,6 +333,7 @@ public class EventPackageService {
             mats.flush();
             results.write(event.getId(), p.results(), Map.of());
             event.setResultsImportHash(hash(p.results()));
+            event.startedElsewhere(events.firstGroupAt(event.getId()));
         }
         log.info(
                 "Event package loaded: {} staff, {} categories, {} mats, {} participants, {} new accounts",
@@ -386,6 +387,7 @@ public class EventPackageService {
             throw EventException.invalid("Not a valid event file: " + e.getMessage());
         }
         event.setResultsImportHash(hash);
+        event.startedElsewhere(events.firstGroupAt(eventId));
         if (dryRun) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         } else {

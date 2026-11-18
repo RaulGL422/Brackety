@@ -57,6 +57,12 @@ public class Event {
 
     private String resultsImportHash;
 
+    /** F1-7: groups and scoring only between start and finish; finished, read-only until the club reopens it. */
+    private Instant startedAt;
+
+    private Instant finishedAt;
+    private Instant autoCloseWarnedAt;
+
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "event_id", nullable = false)
     @OrderBy("position")
@@ -115,6 +121,56 @@ public class Event {
         next.setMeasureRequirements(weightRequirement, heightRequirement);
         next.warningReasons = warningReasons == null ? null : List.copyOf(warningReasons);
         return next;
+    }
+
+    public enum PhaseState {
+        NOT_STARTED,
+        IN_PROGRESS,
+        FINISHED
+    }
+
+    public PhaseState phaseState() {
+        if (finishedAt != null) {
+            return PhaseState.FINISHED;
+        }
+        return startedAt == null ? PhaseState.NOT_STARTED : PhaseState.IN_PROGRESS;
+    }
+
+    public Instant getStartedAt() {
+        return startedAt;
+    }
+
+    public Instant getFinishedAt() {
+        return finishedAt;
+    }
+
+    public Instant getAutoCloseWarnedAt() {
+        return autoCloseWarnedAt;
+    }
+
+    void start(Instant now) {
+        startedAt = now;
+    }
+
+    /** Results played elsewhere (the hall's laptop) came in: the phase started with their first group. */
+    public void startedElsewhere(Instant firstGroupAt) {
+        if (startedAt == null) {
+            startedAt = firstGroupAt;
+        }
+    }
+
+    void finish(Instant now) {
+        finishedAt = now;
+    }
+
+    /** Back in progress; a later day without finishing warns again. */
+    void reopen() {
+        finishedAt = null;
+        autoCloseWarnedAt = null;
+    }
+
+    void autoCloseWarned(Instant now) {
+        autoCloseWarnedAt = now;
     }
 
     /** Whether weight is asked: the event's own choice, or its sport's. */

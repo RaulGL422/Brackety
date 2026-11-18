@@ -12,6 +12,7 @@ Avisos por email (Resend) y push (Firebase).
 - Sin envío masivo a menores sin cuenta: solo a tutores.
 - Fase cerrada sola al día siguiente, o que no se pudo cerrar por combates pendientes: correo al club (F1-7).
 - Raul (2026-11-18): aprovechar mucho el correo como herramienta. Proponerle una lista de avisos útiles y que elija.
+- Raul (2026-11-18): enviar resultados (PDF/CSV) a una o varias direcciones desde el panel del club (`pendientes.md`).
 
 ## Datos
 `notification`, `device_token`, `notification_preference`.

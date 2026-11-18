@@ -55,7 +55,9 @@ Fuente: Raul, 2026-11-16. Las tareas salen de aquí hacia `roadmap.md`.
   - Si nadie la finaliza: se cierra sola al día siguiente si no quedan combates por jugar, y **manda un correo** al club (si quedan, le avisa).
   - Cuándo: ya, antes de la etapa 3, para llegar probado a la F2.
 - Idea de Raul: aprovechar mucho más el **correo** como herramienta (`modulos/notificaciones.md`).
-- Plan: PR A (aviso del tapiz), PR B (comenzar, finalizar y reabrir fase, cierre automático y correo), PR C (permisos por ayudante en «Personal»; la lista de permisos se enseña a Raul antes de programar).
+- Plan: PR A (aviso del tapiz, #127), PR B (comenzar, finalizar y reabrir fase, cierre automático y correo), PR C (permisos por ayudante en «Personal»; la lista de permisos se enseña a Raul antes de programar).
+- Más respuestas de Raul (2026-11-18) para la PR B: **comenzar es obligatorio** (sin él no se crean grupos ni se arbitra); se puede finalizar con combates sin jugar, avisando cuántos (nunca con uno en curso o en revisión); finalizada, **también el club** queda en solo lectura de la competición hasta reabrir (ajustes, alumnos y descargas siguen libres).
+- Hecho en la PR B (rama `feat/event-phase-lifecycle`): ver `modulos/eventos.md`, «Adelanto F1-7».
 
 ## Peticiones para la F2 (2026-11-16)
 ### F2-1 · Peso y estatura (respuestas de Raul, 2026-11-16)

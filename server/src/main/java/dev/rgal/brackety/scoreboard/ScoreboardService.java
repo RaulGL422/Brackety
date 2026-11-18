@@ -5,6 +5,7 @@ import dev.rgal.brackety.auth.account.AccountRepository;
 import dev.rgal.brackety.event.Event;
 import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventException;
+import dev.rgal.brackety.event.EventPhase;
 import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.event.Mat;
@@ -69,6 +70,7 @@ class ScoreboardService {
     record Recorded(MatchView view, String conflictCode) {}
 
     private final MatchRepository matches;
+    private final EventPhase phase;
     private final MatchEventRepository matchEvents;
     private final RejectedOpRepository rejectedOps;
     private final MatRepository mats;
@@ -93,7 +95,9 @@ class ScoreboardService {
             EventService events,
             EventAccess access,
             MatchWriter writer,
-            Clock clock) {
+            Clock clock,
+            EventPhase phase) {
+        this.phase = phase;
         this.matches = matches;
         this.matchEvents = matchEvents;
         this.rejectedOps = rejectedOps;
@@ -150,6 +154,7 @@ class ScoreboardService {
         if (mat == null || !isReferee(mat, accountId, roles)) {
             throw EventException.forbidden();
         }
+        phase.requireInProgress(match.getEventId());
         return apply(match, mat, accountId, request);
     }
 
@@ -166,6 +171,7 @@ class ScoreboardService {
     @Transactional
     Recorded recordImported(UUID matchId, UUID actorId, MatchEventRequest request) {
         var match = matches.lockById(matchId).orElseThrow(EventException::notFound);
+        phase.requireInProgress(match.getEventId());
         var mat = match.getMatId() == null
                 ? refereeMatOf(match, actorId)
                         .orElseThrow(() -> EventException.conflict("The referee of this action has no mat now."))

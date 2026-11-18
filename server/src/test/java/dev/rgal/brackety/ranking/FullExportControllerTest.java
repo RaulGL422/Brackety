@@ -127,6 +127,9 @@ class FullExportControllerTest extends EventApiTest {
                 "select count(*) from match_event e join fight_match m on m.id = e.match_id" + " where m.event_id = ?");
         // The club's server before the hall: the same event and entries, no competition.
         jdbc.sql("delete from fight_group where event_id = ?").param(eventId).update();
+        jdbc.sql("update event set started_at = null where id = ?")
+                .param(eventId)
+                .update();
 
         importResults(zip, true)
                 .andExpect(status().isOk())
@@ -141,6 +144,9 @@ class FullExportControllerTest extends EventApiTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.alreadyImported").value(false));
         assertThat(standings()).isEqualTo(standings);
+        // Played in the hall: the phase is started here too (F1-7).
+        assertThat(eventCount("select count(*) from event where id = ? and started_at is not null"))
+                .isOne();
         assertThat(eventCount("select count(*) from match_event e join fight_match m on m.id = e.match_id"
                         + " where m.event_id = ? and e.target_event_id is not null"))
                 .isOne();

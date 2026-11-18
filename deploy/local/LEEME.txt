@@ -40,6 +40,8 @@ ARRANCAR (las veces siguientes)
 4. Cuando ponga "Brackety listo":
    - Móviles conectados al punto de acceso del portátil: http://192.168.137.1:8080
    - Este portátil: http://localhost:8080
+5. El club entra y pulsa "Comenzar fase" (barra de arriba del panel): sin ella no se crean grupos ni se arbitra.
+   Al acabar, "Finalizar fase": todo queda en solo lectura (el club puede reabrir con un motivo).
 
 MÓVILES Y TABLETS (WEB)
 - Árbitros, ayudantes y club usan el navegador (Chrome) en http://192.168.137.1:8080, sin instalar nada.
