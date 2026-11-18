@@ -176,7 +176,10 @@ jobs:
             api=$PROD_API admin=${PROD_ADMIN_API:-$PROD_API} profile=
           fi
           if [ "$APP" = admin ]; then api=$admin; fi
-          { echo "api=$api"; echo "profile=$profile"; } >> "$GITHUB_OUTPUT"
+          # The server logs the release it runs: the apps' version (app/pubspec.yaml) and the commit.
+          version=$(sed -n 's/^version: *//p' app/pubspec.yaml)
+          if [ "$DEBUG" = true ]; then version="$version-dev"; fi
+          { echo "api=$api"; echo "profile=$profile"; echo "version=$version"; echo "commit=${GITHUB_SHA::7}"; } >> "$GITHUB_OUTPUT"
       - id: meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
@@ -199,5 +202,7 @@ jobs:
             API_BASE_URL=${{ steps.args.outputs.api }}
             MAVEN_PROFILE=${{ steps.args.outputs.profile }}
             BRACKETY_DEBUG=${{ env.DEBUG }}
+            BRACKETY_VERSION=${{ steps.args.outputs.version }}
+            BRACKETY_COMMIT=${{ steps.args.outputs.commit }}
           cache-from: type=gha,scope=${{ matrix.image }}-${{ env.DEBUG }}
           cache-to: type=gha,mode=max,scope=${{ matrix.image }}-${{ env.DEBUG }}

@@ -51,6 +51,10 @@ Invoke-Checked "el build de la API" { & "$root\server\mvnw.cmd" -q -B -f "$root\
 $jar = Get-ChildItem "$root\server\target" -Filter "brackety-server-*.jar" | Select-Object -First 1
 New-Item -ItemType Directory -Force -Path "$bundle\api" | Out-Null
 Copy-Item $jar.FullName "$bundle\api\brackety.jar"
+# The API logs it on start (StartupReport): the apps' version and the commit the bundle was built from.
+$version = (Select-String -Path "$root\app\pubspec.yaml" -Pattern '^version:\s*(\S+)').Matches[0].Groups[1].Value
+$commit = (& git -C $root rev-parse --short HEAD)
+Set-Content -Encoding ascii -Path "$bundle\api\version.txt" -Value "$version $commit"
 
 Write-Host "2/6 Web: build de Flutter servida por la propia API"
 Push-Location "$root\app"
