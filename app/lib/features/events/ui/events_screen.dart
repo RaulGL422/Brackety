@@ -114,6 +114,12 @@ class _PhaseRow extends StatelessWidget {
           label: Text(l10n.eventMakeGroups),
           onPressed: () => context.push('/events/${event.id}/categories'),
         ),
+      if (event.opensPanel && !event.isClub)
+        FilledButton.tonalIcon(
+          icon: const Icon(Icons.dashboard_outlined),
+          label: Text(l10n.eventStaffPanel),
+          onPressed: () => context.push('/events/${event.id}/club'),
+        ),
       if (event.can(EventPermission.ownMat) && event.matNumber != null)
         FilledButton.icon(
           icon: const Icon(Icons.sports_martial_arts),

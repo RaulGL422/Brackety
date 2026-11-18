@@ -132,8 +132,7 @@ class ScoreboardService {
         // A team match in the pool can go to any mat: every referee may open it.
         var mat = matOrNull(match);
         var granted = access.permissions(match.getEventId(), accountId, roles);
-        var allowed = granted.contains(EventPermission.CONTROL)
-                || granted.contains(EventPermission.REVIEWS)
+        var allowed = EventPermission.watchesMats(granted)
                 || (mat == null ? granted.contains(EventPermission.OWN_MAT) : isReferee(mat, accountId, granted));
         if (!allowed) {
             throw EventException.forbidden();
@@ -307,6 +306,7 @@ class ScoreboardService {
                 pending.stream().map(RejectedOp::getActorAccountId)));
         return new MatchView(
                 match.getId(),
+                match.getEventId(),
                 mat == null ? null : mat.getId(),
                 mat == null ? null : mat.getNumber(),
                 group.getNumber(),

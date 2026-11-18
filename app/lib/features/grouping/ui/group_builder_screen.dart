@@ -17,6 +17,9 @@ import '../../mat/ui/mat_label.dart';
 import 'measures.dart';
 import '../../events/data/measure_rules.dart';
 import 'age_sections.dart';
+import 'read_only_notice.dart';
+import '../../events/data/my_event.dart';
+import '../../events/state/events_providers.dart';
 
 /// A category's participants: pick 4 (or 3 and a ghost) and send them to a mat.
 /// Opened from a team category ([teamSize] set) for those left without a team, with a way back.
@@ -107,25 +110,30 @@ class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
       ).show(l10n.draftTakenElsewhere(taken.length, taken.values.join(', ')));
     });
     final participants = ref.watch(categoryParticipantsProvider(_key));
-    final panel = DraftPanel(
-      eventId: widget.eventId,
-      group: _group,
-      matId: _matId,
-      busy: _busy,
-      onChanged: (change) => setState(() => _group = change(_group)),
-      onMatChanged: (id) => setState(() => _matId = id),
-      onCreate: _create,
-      labelOf: (id) {
-        final all = participants.value ?? const <CategoryParticipant>[];
-        final p = all.where((p) => p.id == id).firstOrNull;
-        if (p == null) return '';
-        final name = p.lastName.isEmpty
-            ? p.firstName
-            : '${p.firstName} ${p.lastName.characters.first}.';
-        // Ages mixed in the category: the group shows whose age is whose (F2-2).
-        return mixesAges(all) ? '$name · ${p.age}' : name;
-      },
-    );
+    final can = ref.watch(myPermissionsProvider(widget.eventId));
+    final groups = can.contains(EventPermission.groups);
+    final measures = can.contains(EventPermission.measures);
+    final panel = !groups
+        ? null
+        : DraftPanel(
+            eventId: widget.eventId,
+            group: _group,
+            matId: _matId,
+            busy: _busy,
+            onChanged: (change) => setState(() => _group = change(_group)),
+            onMatChanged: (id) => setState(() => _matId = id),
+            onCreate: _create,
+            labelOf: (id) {
+              final all = participants.value ?? const <CategoryParticipant>[];
+              final p = all.where((p) => p.id == id).firstOrNull;
+              if (p == null) return '';
+              final name = p.lastName.isEmpty
+                  ? p.firstName
+                  : '${p.firstName} ${p.lastName.characters.first}.';
+              // Ages mixed in the category: the group shows whose age is whose (F2-2).
+              return mixesAges(all) ? '$name · ${p.age}' : name;
+            },
+          );
     final list = AsyncView(
       value: participants,
       onRetry: _refresh,
@@ -155,7 +163,7 @@ class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
               return _ParticipantTile(
                 participant: p,
                 group: _group,
-                onUndoGroup: p.canUndoGroup
+                onUndoGroup: groups && p.canUndoGroup
                     ? () => undoGroup(
                         context,
                         ref,
@@ -167,15 +175,19 @@ class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
                     : null,
                 rules: rules,
                 onTap: blockedByMeasures(rules, p)
-                    ? () async {
-                        if (await showMeasuresDialog(
-                          context,
-                          widget.eventId,
-                          p,
-                        )) {
-                          _refresh();
-                        }
-                      }
+                    ? !measures
+                          ? null
+                          : () async {
+                              if (await showMeasuresDialog(
+                                context,
+                                widget.eventId,
+                                p,
+                              )) {
+                                _refresh();
+                              }
+                            }
+                    : !groups
+                    ? null
                     : () => setState(
                         () => _group = _group.toggle(p.id, grouped: p.isTaken),
                       ),
@@ -241,22 +253,32 @@ class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
           ),
         ),
       ),
-      body: wide
-          ? Row(
-              children: [
-                Expanded(flex: 3, child: list),
-                Expanded(
-                  flex: 2,
-                  child: Align(alignment: Alignment.topCenter, child: panel),
-                ),
-              ],
-            )
-          : Column(
-              children: [
-                Expanded(child: list),
-                panel,
-              ],
-            ),
+      body: Column(
+        children: [
+          if (!groups && !measures) const ReadOnlyNotice(),
+          Expanded(
+            child: wide && panel != null
+                ? Row(
+                    children: [
+                      Expanded(flex: 3, child: list),
+                      Expanded(
+                        flex: 2,
+                        child: Align(
+                          alignment: Alignment.topCenter,
+                          child: panel,
+                        ),
+                      ),
+                    ],
+                  )
+                : Column(
+                    children: [
+                      Expanded(child: list),
+                      ?panel,
+                    ],
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -275,7 +297,9 @@ class _ParticipantTile extends StatelessWidget {
 
   /// A required measure missing: tapping asks for it instead of picking.
   final MeasureRules rules;
-  final VoidCallback onTap;
+
+  /// Null for whoever may not pick (nor measure, when blocked).
+  final VoidCallback? onTap;
   final VoidCallback? onUndoGroup;
 
   @override
@@ -294,7 +318,9 @@ class _ParticipantTile extends StatelessWidget {
               color: Theme.of(context).colorScheme.error,
               semanticLabel: l10n.measuresWrite,
             )
-          : PickMark(state: state, onTap: onTap),
+          : onTap == null
+          ? null
+          : PickMark(state: state, onTap: onTap!),
       title: Text(p.fullName),
       subtitle: Text(
         [

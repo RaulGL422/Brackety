@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * A match as the scoreboard shows it. The client counts {@code remainingMs} down while
+ * A match as the scoreboard shows it, in event {@code eventId}. The client counts {@code remainingMs} down while
  * {@code running} and resyncs on every poll. {@code endReason}: POINTS, TIME, DISQUALIFICATION or null.
  * {@code serverTime}: the instant the view is computed at, so the device can correct its clock.
  * {@code review}: null unless an offline action clashed and the club has to review it. {@code matId} and
@@ -17,6 +17,7 @@ import java.util.UUID;
  */
 public record MatchView(
         UUID id,
+        UUID eventId,
         UUID matId,
         Integer matNumber,
         int groupNumber,

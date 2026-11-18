@@ -64,6 +64,7 @@ MatchView matchView({
 }) => MatchView(
   warningReasons: warningReasons,
   id: 'm1',
+  eventId: 'e1',
   matId: 'mat1',
   matNumber: 1,
   groupNumber: 3,

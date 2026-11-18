@@ -964,5 +964,9 @@
   "permissionControl": "Control panel: move groups and matches, reorder, skip the rest, disable mats",
   "permissionReviews": "Resolve matches in review",
   "permissionDeviceImport": "Import a device's actions (CSV)",
-  "permissionParticipants": "Add and edit participants"
+  "permissionParticipants": "Add and edit participants",
+  "eventStaffPanel": "Event panel",
+  "staffPanelOnlyImport": "From here you can import a device's actions with the button above.",
+  "permissionView": "See groups, mats and matches (read only)",
+  "permissionsReadOnly": "You can only look: the club has not let you change anything here."
 }

@@ -4781,6 +4781,30 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Dar de alta y editar alumnos'**
   String get permissionParticipants;
+
+  /// No description provided for @eventStaffPanel.
+  ///
+  /// In es, this message translates to:
+  /// **'Panel del evento'**
+  String get eventStaffPanel;
+
+  /// No description provided for @staffPanelOnlyImport.
+  ///
+  /// In es, this message translates to:
+  /// **'Desde aquí puedes importar las acciones de un dispositivo con el botón de arriba.'**
+  String get staffPanelOnlyImport;
+
+  /// No description provided for @permissionView.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver grupos, tapices y combates (solo lectura)'**
+  String get permissionView;
+
+  /// No description provided for @permissionsReadOnly.
+  ///
+  /// In es, this message translates to:
+  /// **'Solo puedes mirar: el club no te ha dado permiso para cambiar nada aquí.'**
+  String get permissionsReadOnly;
 }
 
 class _AppLocalizationsDelegate

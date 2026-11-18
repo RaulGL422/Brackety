@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'dart:math';
 
+import '../../events/data/my_event.dart';
+import '../../events/state/events_providers.dart';
+
 import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -51,6 +54,16 @@ class MatBoardScreen extends ConsumerWidget {
         ? ref.watch(localBoardProvider(matId))
         : ref.watch(provider);
     final number = board.value?.matNumber ?? matNumber;
+    // The referee moves matches on their own mat; watching, only the control panel changes anything.
+    final controls =
+        !readOnly ||
+        switch (board.value?.eventId) {
+          final eventId? =>
+            ref
+                .watch(myPermissionsProvider(eventId))
+                .contains(EventPermission.control),
+          null => false,
+        };
     final toPlay = board.value?.matches
         .where((m) => m.status != MatchStatus.finished)
         .length;
@@ -86,7 +99,7 @@ class MatBoardScreen extends ConsumerWidget {
             if (board.value?.eventId case final eventId?)
               RulebookButton(eventId: eventId, color: colors.onBand),
             if (queued) const SyncStatusIcon(),
-            if (readOnly)
+            if (readOnly && controls)
               if (board.value case final b?
                   when b.eventId != null &&
                       b.mats.any((m) => m.id == matId && m.hasReferee))
@@ -123,8 +136,11 @@ class MatBoardScreen extends ConsumerWidget {
                         child: _BoardList(
                           board: board,
                           readOnly: readOnly,
+                          onRefresh: () => ref.invalidate(provider),
                           // Club (control panel) and referee (move a match): after a change, the board again.
-                          onControl: () => ref.invalidate(provider),
+                          onControl: controls
+                              ? () => ref.invalidate(provider)
+                              : null,
                         ),
                       ),
               ),
@@ -140,11 +156,15 @@ class _BoardList extends StatelessWidget {
   const _BoardList({
     required this.board,
     required this.readOnly,
+    required this.onRefresh,
     this.onControl,
   });
 
   final MatBoard board;
   final bool readOnly;
+
+  /// Loads the board again: for everyone, also whoever only watches.
+  final VoidCallback onRefresh;
 
   /// Pending matches get a menu: the control panel's for the club, moving to another mat for
   /// the referee; groups only for the club.
@@ -192,7 +212,7 @@ class _BoardList extends StatelessWidget {
               ),
             ),
           if (board.syncingMats.isNotEmpty && !board.offline)
-            _SyncingNotice(mats: board.syncingMats, onRecheck: onControl),
+            _SyncingNotice(mats: board.syncingMats, onRecheck: onRefresh),
           if (board.teamPool)
             Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.m),

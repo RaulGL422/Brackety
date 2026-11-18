@@ -1543,5 +1543,9 @@
   "permissionControl": "Panel de control: mover grupos y combates, reordenar, saltar el descanso, inhabilitar tapices",
   "permissionReviews": "Resolver combates en revisión",
   "permissionDeviceImport": "Importar las acciones de un dispositivo (CSV)",
-  "permissionParticipants": "Dar de alta y editar alumnos"
+  "permissionParticipants": "Dar de alta y editar alumnos",
+  "eventStaffPanel": "Panel del evento",
+  "staffPanelOnlyImport": "Desde aquí puedes importar las acciones de un dispositivo con el botón de arriba.",
+  "permissionView": "Ver grupos, tapices y combates (solo lectura)",
+  "permissionsReadOnly": "Solo puedes mirar: el club no te ha dado permiso para cambiar nada aquí."
 }

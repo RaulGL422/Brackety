@@ -29,6 +29,7 @@ class ParticipantsTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final provider = participantsProvider(eventId);
+    final isClub = ref.watch(myEventProvider(eventId)).value?.isClub ?? false;
     return AsyncView(
       value: ref.watch(provider),
       onRetry: () => ref.invalidate(provider),
@@ -53,17 +54,19 @@ class ParticipantsTab extends ConsumerWidget {
                     label: Text(l10n.participantAdd),
                     onPressed: () => showParticipantForm(context, eventId),
                   ),
-                  if ((ref.watch(clubPhasesProvider(eventId)).value?.length ??
-                          0) >
-                      1)
+                  if (isClub &&
+                      (ref.watch(clubPhasesProvider(eventId)).value?.length ??
+                              0) >
+                          1)
                     OutlinedButton.icon(
                       icon: const Icon(Icons.group_add_outlined),
                       label: Text(l10n.reenrolButton),
                       onPressed: () => showReenrolDialog(context, eventId),
                     ),
                   // Only when this server can read lists (it has an Anthropic key).
-                  if (ref.watch(importAvailableProvider(eventId)).value ??
-                      false)
+                  if (isClub &&
+                      (ref.watch(importAvailableProvider(eventId)).value ??
+                          false))
                     OutlinedButton.icon(
                       icon: const Icon(Icons.document_scanner_outlined),
                       label: Text(l10n.importButton),

@@ -74,7 +74,13 @@ class MatBoardService {
      */
     @Transactional(readOnly = true)
     List<MatOverview> overview(UUID eventId, UUID accountId) {
-        access.require(eventId, accountId, EventPermission.GROUPS, EventPermission.CONTROL, EventPermission.REVIEWS);
+        access.require(
+                eventId,
+                accountId,
+                EventPermission.GROUPS,
+                EventPermission.CONTROL,
+                EventPermission.REVIEWS,
+                EventPermission.VIEW);
         var now = clock.instant();
         var event = events.get(eventId);
         var states = schedule.states(event, now);
@@ -258,7 +264,7 @@ class MatBoardService {
         }
         var granted = access.permissions(mat.getEventId(), accountId, roles);
         var ownMat = granted.contains(EventPermission.OWN_MAT) && accountId.equals(mat.getRefereeAccountId());
-        if (!granted.contains(EventPermission.CONTROL) && !granted.contains(EventPermission.REVIEWS) && !ownMat) {
+        if (!EventPermission.watchesMats(granted) && !ownMat) {
             throw EventException.forbidden();
         }
     }

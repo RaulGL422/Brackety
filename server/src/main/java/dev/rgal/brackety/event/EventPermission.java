@@ -5,6 +5,8 @@ import java.util.Set;
 
 /** What a helper or referee may do in an event (F1-7 C); the club may do everything. */
 public enum EventPermission {
+    /** Sees categories, groups, mats and matches without changing anything. */
+    VIEW,
     GROUPS,
     TEAMS,
     MEASURES,
@@ -14,6 +16,11 @@ public enum EventPermission {
     REVIEWS,
     DEVICE_IMPORT,
     PARTICIPANTS;
+
+    /** Sees every mat and match: the control panel, the reviews or plain viewing. */
+    public static boolean watchesMats(Set<EventPermission> granted) {
+        return granted.contains(CONTROL) || granted.contains(REVIEWS) || granted.contains(VIEW);
+    }
 
     /** Until the club chooses: a helper builds groups, teams and measures; a referee runs their mat. */
     static Set<EventPermission> defaults(Set<EventRole> roles) {
