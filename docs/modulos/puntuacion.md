@@ -11,6 +11,7 @@ Motor de puntuación configurable por plantilla de deporte, modalidad, fase y ca
 - Reglas por **modalidad + fase + categoría**; cada combinación puede tener su variante (tambo de 4-7 años distinto).
 - Configuración en JSON versionado, con editor simple en la UI (sin lenguaje propio).
 - Resultado de combate puede ser puntos por participante, ganador/empate o ambos.
+- Plantillas creadas, duplicadas y compartidas desde la app, con su arbitraje: `../producto/plantillas-deporte.md`.
 
 ## Grupos incompletos o con sobrante
 - Falta 1: un alumno de otro grupo completa; sus puntos de ese grupo **no cuentan** en la tabla de ese grupo, pero sí en su propio grupo.

@@ -43,4 +43,4 @@ Que cualquier pantalla o servicio se entienda sin haberlo escrito. El prototipo 
 - E2E con **Playwright** sobre la web (Raul, 2026-11-16): login, inscripción, crear grupo, marcador con y sin red, sincronización. Usan el árbol de semántica de Flutter web (`08-ejecucion-local.md`) y corren solo en la batería completa de cada release, no en cada PR.
 
 ## Estado
-Tarea 1 (CI por componentes) en pruebas (2026-11-17). Resto pendiente; tareas en `roadmap.md`, etapa 3.
+Tarea 1 (CI por componentes) en pruebas (2026-11-17). Tarea 2 (inventario) hecha: `auditoria-codigo.md` (2026-11-18), con el plan por fases en `plan-limpieza.md` y la revisión de diseño en `diseno-revision.md` (propuestas). Resto pendiente; tareas en `roadmap.md`, etapa 3.

@@ -120,6 +120,9 @@
 - [ ] Modelo exacto de equipos en torneos por equipos (plantilla, suplentes, entrenadores).
 - [ ] Prototipo por equipos: categorías reales (cuáles van por equipos y edades), tamaños reales de equipo/grupo y si hay ranking de equipos además del de alumnos (`prototipo-f1-equipos.md`).
 - [ ] Plantillas de deporte adicionales (judo, karate, taekwondo, fútbol…): investigar al llegar a `puntuacion`.
+- [ ] Plantillas creadas en la app (`producto/plantillas-deporte.md`): ¿dueño la cuenta o el club? ¿galería pública desde el principio o primero compartir por enlace? ¿moderación previa o solo denuncias? ¿autor visible o anónimo?
+- [ ] Reglas del backend que el código no cumple (`producto/auditoria-codigo.md`, punto 8): ¿borrado lógico de eventos? ¿paginación solo en los listados del superadmin? Si no, se quitan de `.claude/rules/backend-java.md`.
+- [ ] Diseño (`producto/diseno-revision.md`): ¿un color de acento solo para navegación y enlaces, fuera de los colores de competidor?
 - [ ] Doble eliminación y repesca (judo, taekwondo, karate): investigar al llegar a `torneo`.
 - [ ] Registro de tratamientos y plantilla de registro de brechas.
 
