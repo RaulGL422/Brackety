@@ -2,11 +2,9 @@ import 'package:brackety_core/brackety_core.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../../core/async_view.dart';
-
 import 'package:go_router/go_router.dart';
 
+import '../../../core/async_view.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../events/state/events_providers.dart';
 import '../../importing/data/import_repository.dart';

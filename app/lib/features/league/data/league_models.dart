@@ -105,7 +105,7 @@ class League {
         CategoryPodium.fromJson(c as Map<String, dynamic>),
     ],
     phases: [
-      for (final p in json['phases'] as List)
+      for (final p in (json['phases'] as List).cast<Map<String, dynamic>?>())
         LeaguePhase.fromJson(p as Map<String, dynamic>),
     ],
     categoryNames: [for (final n in json['categoryNames'] as List) n as String],
@@ -192,7 +192,8 @@ class LeagueStandingRow {
         lastName: json['lastName'] as String,
         organizationName: json['organizationName'] as String?,
         phasePoints: [
-          for (final p in json['phases'] as List)
+          for (final p
+              in (json['phases'] as List).cast<Map<String, dynamic>?>())
             p == null
                 ? null
                 : (
@@ -237,7 +238,8 @@ class LeagueStandings {
   factory LeagueStandings.fromJson(Map<String, dynamic> json) =>
       LeagueStandings(
         phaseNumbers: [
-          for (final p in json['phases'] as List)
+          for (final p
+              in (json['phases'] as List).cast<Map<String, dynamic>?>())
             (p as Map<String, dynamic>)['number'] as int,
         ],
         rows: [

@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:brackety/features/auth/state/session_controller.dart';
-import 'package:brackety/features/offline/data/offline_store_io.dart';
 import 'package:brackety/features/mat/data/mat_board.dart';
+import 'package:brackety/features/offline/data/offline_store_io.dart';
 import 'package:brackety/features/offline/state/offline_sync.dart';
 import 'package:brackety/features/scoreboard/data/match_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -347,7 +347,7 @@ void main() {
       () async => Directory('${folder.path}${Platform.pathSeparator}offline'),
     );
 
-    await files.write('queue', {'ops': []});
+    await files.write('queue', {'ops': <Object?>[]});
     await files.write('queue', {
       'ops': [1, 2],
     });
@@ -361,7 +361,7 @@ void main() {
     ).list().toList()).map((f) => f.uri.pathSegments.last);
     expect(names, ['queue.json']);
 
-    await files.write('views', {'views': {}});
+    await files.write('views', {'views': <String, Object?>{}});
     await files.clear(keep: {'queue'});
     expect(await files.read('views'), isNull);
     expect(await files.read('queue'), isNotNull);

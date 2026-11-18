@@ -5,9 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/async_view.dart';
 import '../../../core/medal.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../league/state/league_providers.dart';
 import '../data/club_models.dart';
 import '../state/club_providers.dart';
-import '../../league/state/league_providers.dart';
 import 'participant_record_sheet.dart';
 
 enum StandingsOrder { points, name }

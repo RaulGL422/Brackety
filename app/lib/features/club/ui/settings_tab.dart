@@ -7,20 +7,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/async_view.dart';
-import '../../rulebook/rulebook_ui.dart';
-import '../../auth/data/api_error.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../auth/data/api_error.dart';
 import '../../auth/ui/widgets/confirm_dialog.dart';
 import '../../events/state/events_providers.dart';
 import '../../league/state/league_providers.dart';
+import '../../rulebook/rulebook_ui.dart';
+import '../../staff/ui/staff_section.dart';
 import '../data/club_models.dart';
 import '../data/club_repository.dart';
 import '../state/club_providers.dart';
 import 'categories_editor.dart';
 import 'club_panel_screen.dart';
-import 'organizations_editor.dart';
 import 'measures_editor.dart';
-import '../../staff/ui/staff_section.dart';
+import 'organizations_editor.dart';
 import 'warning_reasons_editor.dart';
 
 const maxMats = 20;

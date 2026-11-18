@@ -10,8 +10,8 @@ import 'package:brackety/l10n/gen/app_localizations.dart';
 import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../support/match_fakes.dart';
 import '../../support/offline_fakes.dart';

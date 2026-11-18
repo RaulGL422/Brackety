@@ -4,22 +4,22 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/up_button.dart';
 import '../../../core/upload/file_upload.dart';
-import '../../auth/ui/widgets/confirm_dialog.dart';
-import '../state/club_providers.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../auth/ui/widgets/confirm_dialog.dart';
 import '../../events/data/my_event.dart';
 import '../../events/state/events_providers.dart';
 import '../../league/ui/phase_switcher.dart';
 import '../../offline/ui/import_ops_button.dart';
 import '../../phase/ui/phase_bar.dart';
 import '../data/club_repository.dart';
+import '../state/club_providers.dart';
 import 'export_download.dart';
 import 'mats_tab.dart';
 import 'participants_tab.dart';
 import 'settings_tab.dart';
 import 'standings_tab.dart';
-import '../../../core/up_button.dart';
 
 /// What the club sees of a phase: live scores, mats, entries and settings; and its league. A helper
 /// sees the tabs their permissions open (F1-7 C): the mats to watch, control or review, and the

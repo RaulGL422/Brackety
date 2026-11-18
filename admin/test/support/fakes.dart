@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:brackety_core/brackety_core.dart';
 import 'package:brackety_admin/app.dart';
 import 'package:brackety_admin/core/clock.dart';
 import 'package:brackety_admin/core/router.dart';
@@ -13,6 +12,7 @@ import 'package:brackety_admin/features/locks/data/locks_api.dart';
 import 'package:brackety_admin/features/locks/state/locks_controller.dart';
 import 'package:brackety_admin/features/organizers/data/organizers_api.dart';
 import 'package:brackety_admin/features/organizers/state/organizers_controller.dart';
+import 'package:brackety_core/brackety_core.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

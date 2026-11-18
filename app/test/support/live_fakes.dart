@@ -22,7 +22,7 @@ class FakeLiveServer {
   FakeSocket connect(Uri uri) {
     final socket = FakeSocket._(this, uri);
     sockets.add(socket);
-    if (down) scheduleMicrotask(() => socket.closeFromServer());
+    if (down) scheduleMicrotask(socket.closeFromServer);
     return socket;
   }
 
@@ -54,7 +54,7 @@ class FakeLiveServer {
         } else {
           socket.receive({'type': 'ready'});
         }
-      case {'type': 'watch', 'topics': final List topics}:
+      case {'type': 'watch', 'topics': final List<Object?> topics}:
         socket.watching = {for (final t in topics) t as String};
         socket.receive({
           'type': 'watching',
@@ -78,6 +78,7 @@ class FakeSocket with StreamChannelMixin<dynamic> implements WebSocketChannel {
   Stream<dynamic> get stream => _incoming.stream;
 
   @override
+  // ignore: close_sinks, a fake: the client under test closes the socket.
   late final WebSocketSink sink = _FakeSink(this);
 
   @override
@@ -140,12 +141,14 @@ WebSocketChannel _silent(Uri uri) => _SilentSocket();
 class _SilentSocket
     with StreamChannelMixin<dynamic>
     implements WebSocketChannel {
+  // ignore: close_sinks, a fake that never answers: nothing to close.
   final _incoming = StreamController<dynamic>();
 
   @override
   Stream<dynamic> get stream => _incoming.stream;
 
   @override
+  // ignore: close_sinks, a fake: the client under test closes the socket.
   late final WebSocketSink sink = _SilentSink(_incoming);
 
   @override

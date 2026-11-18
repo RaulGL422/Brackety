@@ -48,11 +48,7 @@ class UserDetailView extends ConsumerWidget {
         ),
         const SizedBox(height: AppSpacing.m),
         Expanded(
-          child: AsyncView(
-            value: detail,
-            onRetry: refresh,
-            data: (user) => _Detail(user),
-          ),
+          child: AsyncView(value: detail, onRetry: refresh, data: _Detail.new),
         ),
       ],
     );
@@ -189,7 +185,7 @@ class _Detail extends ConsumerWidget {
     await runAction(
       context,
       () => _controller(ref).delete(reason),
-      done: (deletesOn) => l10n.userDeleted(deletesOn),
+      done: l10n.userDeleted,
       notFound: l10n.userChanged,
       explain: (error) =>
           error.code == 'OWNS_EVENTS' ? l10n.userOwnsEvents : null,

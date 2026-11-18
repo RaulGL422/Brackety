@@ -1,7 +1,7 @@
-import '../../mat/data/mat_board.dart';
-import 'sex.dart';
 import '../../events/data/measure_rules.dart';
 import '../../events/data/my_event.dart';
+import '../../mat/data/mat_board.dart';
+import 'sex.dart';
 
 /// A helper or referee account of the event; [personName]: who is behind it, set by the club.
 class StaffMember {

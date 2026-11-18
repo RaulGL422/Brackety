@@ -14,7 +14,7 @@ class ApiError {
   factory ApiError.from(DioException error) {
     final response = error.response;
     final body = response?.data;
-    final json = body is Map ? body : const {};
+    final json = body is Map ? body : const <String, Object?>{};
     final deletesOn = json['deletesOn'];
     final retryAfter = int.tryParse(
       response?.headers.value('retry-after') ?? '',

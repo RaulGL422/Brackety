@@ -1,19 +1,19 @@
 import 'dart:typed_data';
 
 import 'package:brackety/core/download/file_download.dart';
+import 'package:brackety/core/upload/file_upload.dart';
 import 'package:brackety/features/club/data/club_models.dart';
-import 'package:brackety/features/mat/data/mat_board.dart';
 import 'package:brackety/features/club/data/club_repository.dart';
 import 'package:brackety/features/club/data/sex.dart';
 import 'package:brackety/features/club/state/club_providers.dart';
-import 'package:brackety/core/upload/file_upload.dart';
 import 'package:brackety/features/club/ui/club_panel_screen.dart';
-import 'package:brackety/features/club/ui/settings_tab.dart';
 import 'package:brackety/features/club/ui/participant_form.dart';
+import 'package:brackety/features/club/ui/settings_tab.dart';
 import 'package:brackety/features/events/data/my_event.dart';
 import 'package:brackety/features/events/state/events_providers.dart';
 import 'package:brackety/features/league/data/league_models.dart';
 import 'package:brackety/features/league/state/league_providers.dart';
+import 'package:brackety/features/mat/data/mat_board.dart';
 import 'package:brackety/features/staff/data/staff_repository.dart';
 import 'package:brackety/l10n/gen/app_localizations.dart';
 import 'package:brackety_core/brackety_core.dart';
@@ -1150,7 +1150,7 @@ void main() {
       tester,
       const Size(800, 1280),
       scores: [
-        StandingRow(
+        const StandingRow(
           position: 4,
           participantId: 'teen',
           firstName: 'Teo',
