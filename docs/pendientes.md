@@ -55,7 +55,7 @@
 - [ ] F1-5 cuentas propias: hecho en `feat/f1-5-staff-invites`. Con Resend en producción, probar a mano: invitar a un email real, registrarse con él, aceptar y arbitrar un tapiz. Retirar `staffNames` cuando las cuentas tengan nombre.
 - [ ] F1-7: probar a mano en debug la PR B (fusionada, #129): comenzar, crear grupos, finalizar con pendientes, reabrir con motivo y el correo del día siguiente. PR C (permisos, rama `feat/event-staff-permissions`): dar y quitar permisos en «Personal» y comprobar que el ayudante ve o pierde sus botones.
 - [ ] F1-7 C2 (rama `feat/staff-panel-access`): probar a mano en debug un ayudante solo de mirar, otro solo de alumnos y un árbitro que además hace grupos.
-- [ ] F1-7 C: el paquete del portátil del pabellón no lleva los permisos elegidos; allí cada persona vuelve a los de su rol. Decidir si se incluyen.
+- [ ] F1-7 C permisos en el portátil (rama `feat/package-staff-permissions`): probar a mano exportar con un ayudante en un tapiz, cargarlo en el portátil y entrar con él.
 - [ ] Correo como herramienta (Raul, 2026-11-18): lista de avisos útiles por email para que Raul elija (`modulos/notificaciones.md`).
 - [ ] Nombres descriptivos en las descargas (rama `feat/descriptive-download-names`): probar a mano que cada descarga del panel lleva liga, fase y qué es (`modulos/ranking.md`).
 - [ ] Compartir resultados por correo (Raul, 2026-11-18): enviar la clasificación o los resultados (PDF/CSV) a una o varias direcciones que escribe el club, desde el panel. Ojo: llevan datos de menores (`06-legal-rgpd.md`); decidir qué se puede enviar y a quién.

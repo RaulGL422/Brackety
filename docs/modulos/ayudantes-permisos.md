@@ -46,7 +46,8 @@ Cada permiso permitido/denegado, delegación de un nivel, cambios en directo, au
 - Panel del ayudante: pestaña Tapices (ver, control o revisiones) y Alumnos (alumnos); clasificación y configuración, solo el club. Con una sola pestaña, sin barra de navegación.
 - Cada acción según su permiso: inhabilitar y mover (control), aplicar o descartar una revisión (revisiones), crear y deshacer grupos (grupos), formar y borrar equipos (equipos), medir (medidas). Sin nada que cambiar, aviso «Solo puedes mirar».
 - Alumnos para el ayudante: alta, edición, ficha y categorías (la configuración le llega sin el personal ni sus emails). Inscribir desde otras fases y leer listas, solo el club.
-- Tests: `StaffPermissionsTest`; app: Personal, barra de fase, panel del ayudante, tapices y grupos en solo lectura.
+- Portátil del pabellón (rama `feat/package-staff-permissions`): el paquete lleva lo elegido (`staffPermissions`, opcional); allí cada persona tiene lo mismo que en el servidor del club y un ayudante con «Arbitrar su tapiz» puede ir en un tapiz. Paquetes anteriores: los del rol.
+- Tests: `StaffPermissionsTest`, `EventPackageServiceTest`; app: Personal, barra de fase, panel del ayudante, tapices y grupos en solo lectura.
 
 ## Estado
 Adelantos F1-5 y F1-7 C en pruebas. Pendiente: roles libres, ubicaciones, delegación y auditoría.

@@ -2,6 +2,7 @@ package dev.rgal.brackety.event;
 
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -70,6 +71,17 @@ public class EventAccess {
         jdbc.sql("""
                         insert into event_staff_permissions (event_id, account_id, permissions) values (?, ?, ?)
                         on conflict (event_id, account_id) do update set permissions = excluded.permissions""").params(eventId, accountId, joined).update();
+    }
+
+    /** The choices the club made in this event, by account; whoever is missing has their roles' defaults. */
+    public Map<UUID, Set<EventPermission>> savedPermissions(UUID eventId) {
+        return jdbc
+                .sql("select account_id, permissions from event_staff_permissions where event_id = ?")
+                .params(eventId)
+                .query((rs, row) -> Map.entry(rs.getObject(1, UUID.class), parse(rs.getString(2))))
+                .list()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     /** Back to the defaults: for whoever leaves the event, so returning starts afresh. */

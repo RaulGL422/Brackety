@@ -57,6 +57,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.zip.ZipInputStream;
@@ -221,7 +222,13 @@ public class EventPackageService {
                         .find(eventId)
                         .map(r -> new EventPackage.RulebookEntry(
                                 r.getFileName(), Base64.getEncoder().encodeToString(r.getContent())))
-                        .orElse(null));
+                        .orElse(null),
+                access.savedPermissions(eventId).entrySet().stream()
+                        .filter(e -> usernames.containsKey(e.getKey()))
+                        .map(e -> new EventPackage.StaffPermissions(
+                                usernames.get(e.getKey()), new TreeSet<>(e.getValue())))
+                        .sorted(Comparator.comparing(EventPackage.StaffPermissions::username))
+                        .toList());
         log.info(
                 "Event package exported: {} staff, {} categories, {} mats, {} participants, {}",
                 result.staff().size(),
@@ -291,6 +298,9 @@ public class EventPackageService {
         }
         // The names go in by SQL: the event and its staff must be written first.
         staff.flush();
+        for (var chosen : p.staffPermissionsOrEmpty()) {
+            access.setPermissions(event.getId(), accountIds.get(chosen.username()), chosen.permissions());
+        }
         for (var name : p.staffNamesOrEmpty()) {
             if (accountIds.containsKey(name.username())) {
                 staffNames.put(event.getId(), accountIds.get(name.username()), name.name());

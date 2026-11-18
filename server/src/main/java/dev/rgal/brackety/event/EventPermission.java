@@ -23,7 +23,7 @@ public enum EventPermission {
     }
 
     /** Until the club chooses: a helper builds groups, teams and measures; a referee runs their mat. */
-    static Set<EventPermission> defaults(Set<EventRole> roles) {
+    public static Set<EventPermission> defaults(Set<EventRole> roles) {
         var permissions = EnumSet.noneOf(EventPermission.class);
         if (roles.contains(EventRole.CLUB)) {
             return EnumSet.allOf(EventPermission.class);
