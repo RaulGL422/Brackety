@@ -1,5 +1,6 @@
 package dev.rgal.brackety.league;
 
+import dev.rgal.brackety.common.Names;
 import dev.rgal.brackety.event.Discipline;
 import dev.rgal.brackety.event.Event;
 import dev.rgal.brackety.event.EventAccess;
@@ -184,8 +185,8 @@ public class LeagueService {
                                     .orElse(null),
                             phase.getPhaseNumber());
                 })
-                .sorted(Comparator.comparing(Candidate::firstName, String.CASE_INSENSITIVE_ORDER)
-                        .thenComparing(Candidate::lastName, String.CASE_INSENSITIVE_ORDER))
+                .sorted(Comparator.comparing(Candidate::firstName, Names.ORDER)
+                        .thenComparing(Candidate::lastName, Names.ORDER))
                 .toList();
     }
 
