@@ -1,0 +1,32 @@
+﻿Exportación completa de un evento de Brackety
+==============================================
+
+Los ficheros .csv se abren con Excel (doble clic) o LibreOffice: columnas separadas por punto y coma,
+UTF-8 con BOM, fechas dd/mm/aaaa y tiempos en m:ss.
+
+participantes.csv       Un alumno por fila: datos, club, edad el día del evento, categoría,
+                        consentimiento del tutor, equipo, grupo y tapiz.
+categorias.csv          Categorías con sus edades, formato, inscritos, grupos y podio
+                        (cuántos primeros, segundos y terceros).
+tapices.csv             Tapices con su árbitro y cuántos grupos y combates tuvieron.
+grupos.csv              Una fila por miembro de cada grupo (alumno o equipo), en su orden,
+                        con el comodín marcado.
+combates.csv            Cada combate: grupo, tapiz, rojo y azul con su club, puntos, ganador,
+                        cómo acabó, horas y tiempo de combate.
+linea-de-tiempo.csv     Cada acción del árbitro en cada combate, en orden, con la hora y el
+                        reloj del combate; las deshechas están marcadas.
+clasificacion-fase.csv  Puntuación de esta fase: asistencia + puntos en combates.
+clasificacion-liga.csv  Puntuación acumulada de la liga por categoría, con una columna por
+                        fase, el total y la medalla según el podio configurado.
+clasificacion-por-categoria/
+                        La misma clasificación de la liga, un fichero por categoría: posición,
+                        medalla, alumno, club, total de cada fase y total de la liga.
+                        Cada nombre lleva la liga, la fase y la categoría.
+clasificacion-por-categoria.pdf
+                        La misma clasificación para imprimir: cada categoría en su página.
+evento.brackety         El evento completo en JSON (configuración, inscritos y resultados):
+                        sirve para arrancar el servidor del pabellón
+                        (start-event.ps1 -Package <este .zip>) o para importar los
+                        resultados en el servidor del club (Panel del club > Importar resultados).
+
+Contiene datos personales de menores: guárdalo solo donde haga falta y bórralo cuando ya no.

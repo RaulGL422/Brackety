@@ -1,0 +1,2398 @@
+{
+  "schemaVersion" : 3,
+  "exportedAt" : "2027-03-10T11:02:56Z",
+  "event" : {
+    "name" : "Liga Yoseikan 2027 · Fase 1 · Tambo",
+    "date" : "2027-03-10",
+    "matchSeconds" : 60,
+    "pointsLimit" : 15,
+    "changeoverSeconds" : 30,
+    "attendancePoints" : 10,
+    "originId" : "id-1",
+    "teamMatchSeconds" : 180,
+    "teamPointsLimit" : 0,
+    "minRestSeconds" : 30,
+    "weightRequirement" : null,
+    "heightRequirement" : null,
+    "warningReasons" : null
+  },
+  "league" : {
+    "name" : "Liga Yoseikan 2027",
+    "phaseNumber" : 1,
+    "discipline" : "TAMBO",
+    "podium" : {
+      "firsts" : 2,
+      "seconds" : 2,
+      "thirds" : 3
+    },
+    "categoryPodiums" : [ ],
+    "globalStandings" : false
+  },
+  "owner" : {
+    "username" : "club1",
+    "organizationName" : "Club Demo Yoseikan",
+    "taxId" : "G12345674"
+  },
+  "staff" : [ {
+    "username" : "club1",
+    "role" : "CLUB"
+  }, {
+    "username" : "ayudante1",
+    "role" : "GROUPER"
+  }, {
+    "username" : "ayudante2",
+    "role" : "GROUPER"
+  }, {
+    "username" : "arbitro1",
+    "role" : "REFEREE"
+  }, {
+    "username" : "arbitro2",
+    "role" : "REFEREE"
+  }, {
+    "username" : "arbitro3",
+    "role" : "REFEREE"
+  }, {
+    "username" : "arbitro4",
+    "role" : "REFEREE"
+  }, {
+    "username" : "arbitro5",
+    "role" : "REFEREE"
+  } ],
+  "categories" : [ {
+    "name" : "4-6",
+    "minAge" : 4,
+    "maxAge" : 6,
+    "format" : "INDIVIDUAL",
+    "teamSize" : null
+  }, {
+    "name" : "7-8",
+    "minAge" : 7,
+    "maxAge" : 8,
+    "format" : "INDIVIDUAL",
+    "teamSize" : null
+  }, {
+    "name" : "9-10",
+    "minAge" : 9,
+    "maxAge" : 10,
+    "format" : "INDIVIDUAL",
+    "teamSize" : null
+  }, {
+    "name" : "11-12",
+    "minAge" : 11,
+    "maxAge" : 12,
+    "format" : "INDIVIDUAL",
+    "teamSize" : null
+  }, {
+    "name" : "13-14",
+    "minAge" : 13,
+    "maxAge" : 14,
+    "format" : "INDIVIDUAL",
+    "teamSize" : null
+  }, {
+    "name" : "15-16",
+    "minAge" : 15,
+    "maxAge" : 16,
+    "format" : "TEAM",
+    "teamSize" : 3
+  }, {
+    "name" : "17-19",
+    "minAge" : 17,
+    "maxAge" : 19,
+    "format" : "TEAM",
+    "teamSize" : 3
+  }, {
+    "name" : "20-25",
+    "minAge" : 20,
+    "maxAge" : 25,
+    "format" : "TEAM",
+    "teamSize" : 3
+  }, {
+    "name" : "26+",
+    "minAge" : 26,
+    "maxAge" : 120,
+    "format" : "TEAM",
+    "teamSize" : 3
+  } ],
+  "organizations" : [ {
+    "name" : "Club Demo Yoseikan",
+    "shortName" : null
+  }, {
+    "name" : "Escuela Yoseikan Sur",
+    "shortName" : null
+  } ],
+  "mats" : [ {
+    "number" : 1,
+    "refereeUsername" : "arbitro1"
+  }, {
+    "number" : 2,
+    "refereeUsername" : "arbitro2"
+  }, {
+    "number" : 3,
+    "refereeUsername" : "arbitro3"
+  }, {
+    "number" : 4,
+    "refereeUsername" : "arbitro4"
+  }, {
+    "number" : 5,
+    "refereeUsername" : "arbitro5"
+  } ],
+  "participants" : [ {
+    "firstName" : "Adrián",
+    "lastName" : "Prueba 15-7",
+    "birthDate" : "2012-03-01",
+    "heightCm" : 162,
+    "guardianConsent" : true,
+    "categoryName" : null,
+    "personId" : "id-2",
+    "organizationName" : null,
+    "sex" : null,
+    "weightKg" : null
+  }, {
+    "firstName" : "Alba",
+    "lastName" : "Prueba 15-10",
+    "birthDate" : "2012-03-01",
+    "heightCm" : 165,
+    "guardianConsent" : true,
+    "categoryName" : null,
+    "personId" : "id-3",
+    "organizationName" : null,
+    "sex" : null,
+    "weightKg" : null
+  }, {
+    "firstName" : "Álvaro",
+    "lastName" : "Prueba 15-3",
+    "birthDate" : "2012-03-01",
+    "heightCm" : 158,
+    "guardianConsent" : true,
+    "categoryName" : null,
+    "personId" : "id-4",
+    "organizationName" : null,
+    "sex" : null,
+    "weightKg" : null
+  }, {
+    "firstName" : "Carla",
+    "lastName" : "Prueba 15-6",
+    "birthDate" : "2012-03-01",
+    "heightCm" : 161,
+    "guardianConsent" : true,
+    "categoryName" : null,
+    "personId" : "id-5",
+    "organizationName" : null,
+    "sex" : null,
+    "weightKg" : null
+  }, {
+    "firstName" : "Daniel",
+    "lastName" : "Prueba 7-7",
+    "birthDate" : "2020-03-01",
+    "heightCm" : 138,
+    "guardianConsent" : true,
+    "categoryName" : null,
+    "personId" : "id-6",
+    "organizationName" : null,
+    "sex" : null,
+    "weightKg" : null
+  }, {
+    "firstName" : "Diego",
+    "lastName" : "Prueba 15-11",
+    "birthDate" : "2012-03-01",
+    "heightCm" : 166,
+    "guardianConsent" : true,
+    "categoryName" : null,
+    "personId" : "id-7",
+    "organizationName" : null,
+    "sex" : null,
+    "weightKg" : null
+  }, {
+    "firstName" : "Emma",
+    "lastName" : "Prueba 15-4",
+    "birthDate" : "2012-03-01",
+    "heightCm" : 159,
+    "guardianConsent" : true,
+    "categoryName" : null,
+    "personId" : "id-8",
+    "organizationName" : null,
+    "sex" : null,
+    "weightKg" : null
+  }, {
+    "firstName" : "Hugo",
+    "lastName" : "Prueba 7-1",
+    "birthDate" : "2020-03-01",
+    "heightCm" : 132,
+    "guardianConsent" : true,
+    "categoryName" : null,
+    "personId" : "id-9",
+    "organizationName" : null,
+    "sex" : null,
+    "weightKg" : null
+  }, {
+    "firstName" : "Julia",
+    "lastName" : "Prueba 7-6",
+    "birthDate" : "2020-03-01",
+    "heightCm" : 137,
+    "guardianConsent" : true,
+    "categoryName" : null,
+    "personId" : "id-10",
+    "organizationName" : null,
+    "sex" : null,
+    "weightKg" : null
+  }, {
+    "firstName" : "Leo",
+    "lastName" : "Prueba 7-5",
+    "birthDate" : "2020-03-01",
+    "heightCm" : 136,
+    "guardianConsent" : true,
+    "categoryName" : null,
+    "personId" : "id-11",
+    "organizationName" : null,
+    "sex" : null,
+    "weightKg" : null
+  }, {
+    "firstName" : "Lucía",
+    "lastName" : "Prueba 7-0",
+    "birthDate" : "2020-03-01",
+    "heightCm" : 131,
+    "guardianConsent" : true,
+    "categoryName" : null,
+    "personId" : "id-12",
+    "organizationName" : null,
+    "sex" : null,
+    "weightKg" : null
+  }, {
+    "firstName" : "Manuel",
+    "lastName" : "Prueba 15-5",
+    "birthDate" : "2012-03-01",
+    "heightCm" : 160,
+    "guardianConsent" : true,
+    "categoryName" : null,
+    "personId" : "id-13",
+    "organizationName" : null,
+    "sex" : null,
+    "weightKg" : null
+  }, {
+    "firstName" : "Mario",
+    "lastName" : "Prueba 15-9",
+    "birthDate" : "2012-03-01",
+    "heightCm" : 164,
+    "guardianConsent" : true,
+    "categoryName" : null,
+    "personId" : "id-14",
+    "organizationName" : null,
+    "sex" : null,
+    "weightKg" : null
+  }, {
+    "firstName" : "Martina",
+    "lastName" : "Prueba 7-2",
+    "birthDate" : "2020-03-01",
+    "heightCm" : 133,
+    "guardianConsent" : true,
+    "categoryName" : null,
+    "personId" : "id-15",
+    "organizationName" : null,
+    "sex" : null,
+    "weightKg" : null
+  }, {
+    "firstName" : "Mateo",
+    "lastName" : "Prueba 7-3",
+    "birthDate" : "2020-03-01",
+    "heightCm" : 134,
+    "guardianConsent" : true,
+    "categoryName" : null,
+    "personId" : "id-16",
+    "organizationName" : null,
+    "sex" : null,
+    "weightKg" : null
+  }, {
+    "firstName" : "Noa",
+    "lastName" : "Prueba 15-8",
+    "birthDate" : "2012-03-01",
+    "heightCm" : 163,
+    "guardianConsent" : true,
+    "categoryName" : null,
+    "personId" : "id-17",
+    "organizationName" : null,
+    "sex" : null,
+    "weightKg" : null
+  }, {
+    "firstName" : "Pablo",
+    "lastName" : "Prueba 15-1",
+    "birthDate" : "2012-03-01",
+    "heightCm" : 156,
+    "guardianConsent" : true,
+    "categoryName" : null,
+    "personId" : "id-18",
+    "organizationName" : null,
+    "sex" : null,
+    "weightKg" : null
+  }, {
+    "firstName" : "Paula",
+    "lastName" : "Prueba 15-0",
+    "birthDate" : "2012-03-01",
+    "heightCm" : 155,
+    "guardianConsent" : true,
+    "categoryName" : null,
+    "personId" : "id-19",
+    "organizationName" : null,
+    "sex" : null,
+    "weightKg" : null
+  }, {
+    "firstName" : "Sofía",
+    "lastName" : "Prueba 7-4",
+    "birthDate" : "2020-03-01",
+    "heightCm" : 135,
+    "guardianConsent" : true,
+    "categoryName" : null,
+    "personId" : "id-20",
+    "organizationName" : null,
+    "sex" : null,
+    "weightKg" : null
+  }, {
+    "firstName" : "Valeria",
+    "lastName" : "Prueba 15-2",
+    "birthDate" : "2012-03-01",
+    "heightCm" : 157,
+    "guardianConsent" : true,
+    "categoryName" : null,
+    "personId" : "id-21",
+    "organizationName" : null,
+    "sex" : null,
+    "weightKg" : null
+  } ],
+  "results" : {
+    "teams" : [ {
+      "number" : 1,
+      "categoryName" : "15-16",
+      "ghost" : false,
+      "createdBy" : "ayudante1",
+      "createdAt" : "2027-03-10T09:00:00Z",
+      "memberPersonIds" : [ "id-19", "id-18", "id-21" ],
+      "ghostMemberPersonIds" : [ ]
+    }, {
+      "number" : 2,
+      "categoryName" : "15-16",
+      "ghost" : false,
+      "createdBy" : "ayudante1",
+      "createdAt" : "2027-03-10T09:00:00Z",
+      "memberPersonIds" : [ "id-4", "id-8", "id-13" ],
+      "ghostMemberPersonIds" : [ ]
+    }, {
+      "number" : 3,
+      "categoryName" : "15-16",
+      "ghost" : false,
+      "createdBy" : "ayudante1",
+      "createdAt" : "2027-03-10T09:00:00Z",
+      "memberPersonIds" : [ "id-5", "id-2", "id-17" ],
+      "ghostMemberPersonIds" : [ ]
+    }, {
+      "number" : 4,
+      "categoryName" : "15-16",
+      "ghost" : true,
+      "createdBy" : "ayudante1",
+      "createdAt" : "2027-03-10T09:00:00Z",
+      "memberPersonIds" : [ "id-14", "id-3", "id-7" ],
+      "ghostMemberPersonIds" : [ ]
+    } ],
+    "groups" : [ {
+      "number" : 1,
+      "categoryName" : "7-8",
+      "matNumber" : 1,
+      "createdBy" : "ayudante1",
+      "createdAt" : "2027-03-10T09:00:00Z",
+      "members" : [ {
+        "position" : 0,
+        "ghost" : false,
+        "personId" : "id-12",
+        "teamNumber" : null
+      }, {
+        "position" : 1,
+        "ghost" : false,
+        "personId" : "id-9",
+        "teamNumber" : null
+      }, {
+        "position" : 2,
+        "ghost" : false,
+        "personId" : "id-15",
+        "teamNumber" : null
+      }, {
+        "position" : 3,
+        "ghost" : false,
+        "personId" : "id-16",
+        "teamNumber" : null
+      } ]
+    }, {
+      "number" : 2,
+      "categoryName" : "7-8",
+      "matNumber" : 2,
+      "createdBy" : "ayudante1",
+      "createdAt" : "2027-03-10T09:00:00Z",
+      "members" : [ {
+        "position" : 0,
+        "ghost" : false,
+        "personId" : "id-20",
+        "teamNumber" : null
+      }, {
+        "position" : 1,
+        "ghost" : false,
+        "personId" : "id-11",
+        "teamNumber" : null
+      }, {
+        "position" : 2,
+        "ghost" : false,
+        "personId" : "id-10",
+        "teamNumber" : null
+      }, {
+        "position" : 3,
+        "ghost" : true,
+        "personId" : "id-12",
+        "teamNumber" : null
+      } ]
+    }, {
+      "number" : 3,
+      "categoryName" : "15-16",
+      "matNumber" : null,
+      "createdBy" : "ayudante1",
+      "createdAt" : "2027-03-10T09:00:00Z",
+      "members" : [ {
+        "position" : 0,
+        "ghost" : false,
+        "personId" : null,
+        "teamNumber" : 1
+      }, {
+        "position" : 1,
+        "ghost" : false,
+        "personId" : null,
+        "teamNumber" : 2
+      }, {
+        "position" : 2,
+        "ghost" : false,
+        "personId" : null,
+        "teamNumber" : 3
+      }, {
+        "position" : 3,
+        "ghost" : true,
+        "personId" : null,
+        "teamNumber" : 4
+      } ]
+    } ],
+    "matches" : [ {
+      "groupNumber" : 1,
+      "orderIndex" : 0,
+      "matNumber" : 1,
+      "red" : {
+        "personId" : "id-12",
+        "teamNumber" : null
+      },
+      "blue" : {
+        "personId" : "id-9",
+        "teamNumber" : null
+      },
+      "status" : "FINISHED",
+      "redScore" : 3,
+      "blueScore" : 1,
+      "startedAt" : "2027-03-10T09:00:00Z",
+      "finishedAt" : "2027-03-10T09:01:20Z",
+      "elapsedMs" : 60000,
+      "runningSince" : null,
+      "disqualifiedSide" : null,
+      "reviewReason" : null,
+      "actions" : [ {
+        "position" : 0,
+        "type" : "START",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:00:00Z",
+        "clockMs" : 0
+      }, {
+        "position" : 1,
+        "type" : "POINT",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:00:04Z",
+        "clockMs" : 4000
+      }, {
+        "position" : 2,
+        "type" : "POINT",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:00:08Z",
+        "clockMs" : 8000
+      }, {
+        "position" : 3,
+        "type" : "POINT",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:00:12Z",
+        "clockMs" : 12000
+      }, {
+        "position" : 4,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:00:16Z",
+        "clockMs" : 16000
+      }, {
+        "position" : 5,
+        "type" : "FINISH",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:01:20Z",
+        "clockMs" : 60000
+      } ]
+    }, {
+      "groupNumber" : 1,
+      "orderIndex" : 1,
+      "matNumber" : 1,
+      "red" : {
+        "personId" : "id-15",
+        "teamNumber" : null
+      },
+      "blue" : {
+        "personId" : "id-16",
+        "teamNumber" : null
+      },
+      "status" : "FINISHED",
+      "redScore" : 0,
+      "blueScore" : 15,
+      "startedAt" : "2027-03-10T09:06:24Z",
+      "finishedAt" : "2027-03-10T09:07:28Z",
+      "elapsedMs" : 60000,
+      "runningSince" : null,
+      "disqualifiedSide" : null,
+      "reviewReason" : null,
+      "actions" : [ {
+        "position" : 0,
+        "type" : "START",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:06:24Z",
+        "clockMs" : 0
+      }, {
+        "position" : 1,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:06:28Z",
+        "clockMs" : 4000
+      }, {
+        "position" : 2,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:06:32Z",
+        "clockMs" : 8000
+      }, {
+        "position" : 3,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:06:36Z",
+        "clockMs" : 12000
+      }, {
+        "position" : 4,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:06:40Z",
+        "clockMs" : 16000
+      }, {
+        "position" : 5,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:06:44Z",
+        "clockMs" : 20000
+      }, {
+        "position" : 6,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:06:48Z",
+        "clockMs" : 24000
+      }, {
+        "position" : 7,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:06:52Z",
+        "clockMs" : 28000
+      }, {
+        "position" : 8,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:06:56Z",
+        "clockMs" : 32000
+      }, {
+        "position" : 9,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:07:00Z",
+        "clockMs" : 36000
+      }, {
+        "position" : 10,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:07:04Z",
+        "clockMs" : 40000
+      }, {
+        "position" : 11,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:07:08Z",
+        "clockMs" : 44000
+      }, {
+        "position" : 12,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:07:12Z",
+        "clockMs" : 48000
+      }, {
+        "position" : 13,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:07:16Z",
+        "clockMs" : 52000
+      }, {
+        "position" : 14,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:07:20Z",
+        "clockMs" : 56000
+      }, {
+        "position" : 15,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:07:24Z",
+        "clockMs" : 60000
+      }, {
+        "position" : 16,
+        "type" : "FINISH",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:07:28Z",
+        "clockMs" : 60000
+      } ]
+    }, {
+      "groupNumber" : 1,
+      "orderIndex" : 2,
+      "matNumber" : 1,
+      "red" : {
+        "personId" : "id-12",
+        "teamNumber" : null
+      },
+      "blue" : {
+        "personId" : "id-15",
+        "teamNumber" : null
+      },
+      "status" : "FINISHED",
+      "redScore" : 0,
+      "blueScore" : 2,
+      "startedAt" : "2027-03-10T09:12:32Z",
+      "finishedAt" : "2027-03-10T09:13:48Z",
+      "elapsedMs" : 60000,
+      "runningSince" : null,
+      "disqualifiedSide" : null,
+      "reviewReason" : null,
+      "actions" : [ {
+        "position" : 0,
+        "type" : "START",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:12:32Z",
+        "clockMs" : 0
+      }, {
+        "position" : 1,
+        "type" : "WARNING",
+        "side" : "RED",
+        "reason" : "Exceso de potencia",
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:12:36Z",
+        "clockMs" : 4000
+      }, {
+        "position" : 2,
+        "type" : "WARNING",
+        "side" : "RED",
+        "reason" : "Exceso de potencia",
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:12:40Z",
+        "clockMs" : 8000
+      }, {
+        "position" : 3,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:12:44Z",
+        "clockMs" : 12000
+      }, {
+        "position" : 4,
+        "type" : "FINISH",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:13:48Z",
+        "clockMs" : 60000
+      } ]
+    }, {
+      "groupNumber" : 1,
+      "orderIndex" : 3,
+      "matNumber" : 1,
+      "red" : {
+        "personId" : "id-9",
+        "teamNumber" : null
+      },
+      "blue" : {
+        "personId" : "id-16",
+        "teamNumber" : null
+      },
+      "status" : "FINISHED",
+      "redScore" : 15,
+      "blueScore" : 0,
+      "startedAt" : "2027-03-10T09:18:52Z",
+      "finishedAt" : "2027-03-10T09:19:08Z",
+      "elapsedMs" : 12000,
+      "runningSince" : null,
+      "disqualifiedSide" : "BLUE",
+      "reviewReason" : null,
+      "actions" : [ {
+        "position" : 0,
+        "type" : "START",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:18:52Z",
+        "clockMs" : 0
+      }, {
+        "position" : 1,
+        "type" : "POINT",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:18:56Z",
+        "clockMs" : 4000
+      }, {
+        "position" : 2,
+        "type" : "POINT",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:19:00Z",
+        "clockMs" : 8000
+      }, {
+        "position" : 3,
+        "type" : "DISQUALIFICATION",
+        "side" : "BLUE",
+        "reason" : "Exceso de potencia",
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:19:04Z",
+        "clockMs" : 12000
+      }, {
+        "position" : 4,
+        "type" : "STOP",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : true,
+        "at" : "2027-03-10T09:19:04Z",
+        "clockMs" : 12000
+      }, {
+        "position" : 5,
+        "type" : "FINISH",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:19:08Z",
+        "clockMs" : 12000
+      } ]
+    }, {
+      "groupNumber" : 1,
+      "orderIndex" : 4,
+      "matNumber" : 1,
+      "red" : {
+        "personId" : "id-12",
+        "teamNumber" : null
+      },
+      "blue" : {
+        "personId" : "id-16",
+        "teamNumber" : null
+      },
+      "status" : "FINISHED",
+      "redScore" : 1,
+      "blueScore" : 1,
+      "startedAt" : "2027-03-10T09:24:12Z",
+      "finishedAt" : "2027-03-10T09:25:40Z",
+      "elapsedMs" : 60000,
+      "runningSince" : null,
+      "disqualifiedSide" : null,
+      "reviewReason" : null,
+      "actions" : [ {
+        "position" : 0,
+        "type" : "START",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:24:12Z",
+        "clockMs" : 0
+      }, {
+        "position" : 1,
+        "type" : "POINT",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:24:16Z",
+        "clockMs" : 4000
+      }, {
+        "position" : 2,
+        "type" : "POINT",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:24:20Z",
+        "clockMs" : 8000
+      }, {
+        "position" : 3,
+        "type" : "POINT_REMOVED",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:24:24Z",
+        "clockMs" : 12000
+      }, {
+        "position" : 4,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:24:28Z",
+        "clockMs" : 16000
+      }, {
+        "position" : 5,
+        "type" : "UNDO",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : 4,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:24:32Z",
+        "clockMs" : 20000
+      }, {
+        "position" : 6,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:24:36Z",
+        "clockMs" : 24000
+      }, {
+        "position" : 7,
+        "type" : "FINISH",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:25:40Z",
+        "clockMs" : 60000
+      } ]
+    }, {
+      "groupNumber" : 1,
+      "orderIndex" : 5,
+      "matNumber" : 1,
+      "red" : {
+        "personId" : "id-9",
+        "teamNumber" : null
+      },
+      "blue" : {
+        "personId" : "id-15",
+        "teamNumber" : null
+      },
+      "status" : "FINISHED",
+      "redScore" : 1,
+      "blueScore" : 2,
+      "startedAt" : "2027-03-10T09:30:56Z",
+      "finishedAt" : "2027-03-10T09:32:12Z",
+      "elapsedMs" : 60000,
+      "runningSince" : null,
+      "disqualifiedSide" : null,
+      "reviewReason" : null,
+      "actions" : [ {
+        "position" : 0,
+        "type" : "START",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:30:44Z",
+        "clockMs" : 0
+      }, {
+        "position" : 1,
+        "type" : "POINT",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:30:48Z",
+        "clockMs" : 4000
+      }, {
+        "position" : 2,
+        "type" : "CANCEL",
+        "side" : null,
+        "reason" : "Empezado por error",
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:30:52Z",
+        "clockMs" : 8000
+      }, {
+        "position" : 3,
+        "type" : "START",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:30:56Z",
+        "clockMs" : 0
+      }, {
+        "position" : 4,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:31:00Z",
+        "clockMs" : 4000
+      }, {
+        "position" : 5,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:31:04Z",
+        "clockMs" : 8000
+      }, {
+        "position" : 6,
+        "type" : "POINT",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:32:08Z",
+        "clockMs" : 60000
+      }, {
+        "position" : 7,
+        "type" : "FINISH",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T09:32:12Z",
+        "clockMs" : 60000
+      } ]
+    }, {
+      "groupNumber" : 2,
+      "orderIndex" : 0,
+      "matNumber" : 2,
+      "red" : {
+        "personId" : "id-20",
+        "teamNumber" : null
+      },
+      "blue" : {
+        "personId" : "id-11",
+        "teamNumber" : null
+      },
+      "status" : "FINISHED",
+      "redScore" : 3,
+      "blueScore" : 1,
+      "startedAt" : "2027-03-10T09:37:16Z",
+      "finishedAt" : "2027-03-10T09:38:36Z",
+      "elapsedMs" : 60000,
+      "runningSince" : null,
+      "disqualifiedSide" : null,
+      "reviewReason" : null,
+      "actions" : [ {
+        "position" : 0,
+        "type" : "START",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:37:16Z",
+        "clockMs" : 0
+      }, {
+        "position" : 1,
+        "type" : "POINT",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:37:20Z",
+        "clockMs" : 4000
+      }, {
+        "position" : 2,
+        "type" : "POINT",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:37:24Z",
+        "clockMs" : 8000
+      }, {
+        "position" : 3,
+        "type" : "POINT",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:37:28Z",
+        "clockMs" : 12000
+      }, {
+        "position" : 4,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:37:32Z",
+        "clockMs" : 16000
+      }, {
+        "position" : 5,
+        "type" : "FINISH",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:38:36Z",
+        "clockMs" : 60000
+      } ]
+    }, {
+      "groupNumber" : 2,
+      "orderIndex" : 1,
+      "matNumber" : 2,
+      "red" : {
+        "personId" : "id-10",
+        "teamNumber" : null
+      },
+      "blue" : {
+        "personId" : "id-12",
+        "teamNumber" : null
+      },
+      "status" : "FINISHED",
+      "redScore" : 0,
+      "blueScore" : 15,
+      "startedAt" : "2027-03-10T09:43:40Z",
+      "finishedAt" : "2027-03-10T09:44:44Z",
+      "elapsedMs" : 60000,
+      "runningSince" : null,
+      "disqualifiedSide" : null,
+      "reviewReason" : null,
+      "actions" : [ {
+        "position" : 0,
+        "type" : "START",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:43:40Z",
+        "clockMs" : 0
+      }, {
+        "position" : 1,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:43:44Z",
+        "clockMs" : 4000
+      }, {
+        "position" : 2,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:43:48Z",
+        "clockMs" : 8000
+      }, {
+        "position" : 3,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:43:52Z",
+        "clockMs" : 12000
+      }, {
+        "position" : 4,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:43:56Z",
+        "clockMs" : 16000
+      }, {
+        "position" : 5,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:44:00Z",
+        "clockMs" : 20000
+      }, {
+        "position" : 6,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:44:04Z",
+        "clockMs" : 24000
+      }, {
+        "position" : 7,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:44:08Z",
+        "clockMs" : 28000
+      }, {
+        "position" : 8,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:44:12Z",
+        "clockMs" : 32000
+      }, {
+        "position" : 9,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:44:16Z",
+        "clockMs" : 36000
+      }, {
+        "position" : 10,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:44:20Z",
+        "clockMs" : 40000
+      }, {
+        "position" : 11,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:44:24Z",
+        "clockMs" : 44000
+      }, {
+        "position" : 12,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:44:28Z",
+        "clockMs" : 48000
+      }, {
+        "position" : 13,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:44:32Z",
+        "clockMs" : 52000
+      }, {
+        "position" : 14,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:44:36Z",
+        "clockMs" : 56000
+      }, {
+        "position" : 15,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:44:40Z",
+        "clockMs" : 60000
+      }, {
+        "position" : 16,
+        "type" : "FINISH",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:44:44Z",
+        "clockMs" : 60000
+      } ]
+    }, {
+      "groupNumber" : 2,
+      "orderIndex" : 2,
+      "matNumber" : 2,
+      "red" : {
+        "personId" : "id-20",
+        "teamNumber" : null
+      },
+      "blue" : {
+        "personId" : "id-10",
+        "teamNumber" : null
+      },
+      "status" : "FINISHED",
+      "redScore" : 0,
+      "blueScore" : 2,
+      "startedAt" : "2027-03-10T09:49:48Z",
+      "finishedAt" : "2027-03-10T09:51:04Z",
+      "elapsedMs" : 60000,
+      "runningSince" : null,
+      "disqualifiedSide" : null,
+      "reviewReason" : null,
+      "actions" : [ {
+        "position" : 0,
+        "type" : "START",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:49:48Z",
+        "clockMs" : 0
+      }, {
+        "position" : 1,
+        "type" : "WARNING",
+        "side" : "RED",
+        "reason" : "Exceso de potencia",
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:49:52Z",
+        "clockMs" : 4000
+      }, {
+        "position" : 2,
+        "type" : "WARNING",
+        "side" : "RED",
+        "reason" : "Exceso de potencia",
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:49:56Z",
+        "clockMs" : 8000
+      }, {
+        "position" : 3,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:50:00Z",
+        "clockMs" : 12000
+      }, {
+        "position" : 4,
+        "type" : "FINISH",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:51:04Z",
+        "clockMs" : 60000
+      } ]
+    }, {
+      "groupNumber" : 2,
+      "orderIndex" : 3,
+      "matNumber" : 2,
+      "red" : {
+        "personId" : "id-11",
+        "teamNumber" : null
+      },
+      "blue" : {
+        "personId" : "id-12",
+        "teamNumber" : null
+      },
+      "status" : "FINISHED",
+      "redScore" : 15,
+      "blueScore" : 0,
+      "startedAt" : "2027-03-10T09:56:08Z",
+      "finishedAt" : "2027-03-10T09:56:24Z",
+      "elapsedMs" : 12000,
+      "runningSince" : null,
+      "disqualifiedSide" : "BLUE",
+      "reviewReason" : null,
+      "actions" : [ {
+        "position" : 0,
+        "type" : "START",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:56:08Z",
+        "clockMs" : 0
+      }, {
+        "position" : 1,
+        "type" : "POINT",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:56:12Z",
+        "clockMs" : 4000
+      }, {
+        "position" : 2,
+        "type" : "POINT",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:56:16Z",
+        "clockMs" : 8000
+      }, {
+        "position" : 3,
+        "type" : "DISQUALIFICATION",
+        "side" : "BLUE",
+        "reason" : "Exceso de potencia",
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:56:20Z",
+        "clockMs" : 12000
+      }, {
+        "position" : 4,
+        "type" : "STOP",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : true,
+        "at" : "2027-03-10T09:56:20Z",
+        "clockMs" : 12000
+      }, {
+        "position" : 5,
+        "type" : "FINISH",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T09:56:24Z",
+        "clockMs" : 12000
+      } ]
+    }, {
+      "groupNumber" : 2,
+      "orderIndex" : 4,
+      "matNumber" : 2,
+      "red" : {
+        "personId" : "id-20",
+        "teamNumber" : null
+      },
+      "blue" : {
+        "personId" : "id-12",
+        "teamNumber" : null
+      },
+      "status" : "FINISHED",
+      "redScore" : 1,
+      "blueScore" : 1,
+      "startedAt" : "2027-03-10T10:01:28Z",
+      "finishedAt" : "2027-03-10T10:02:56Z",
+      "elapsedMs" : 60000,
+      "runningSince" : null,
+      "disqualifiedSide" : null,
+      "reviewReason" : null,
+      "actions" : [ {
+        "position" : 0,
+        "type" : "START",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:01:28Z",
+        "clockMs" : 0
+      }, {
+        "position" : 1,
+        "type" : "POINT",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:01:32Z",
+        "clockMs" : 4000
+      }, {
+        "position" : 2,
+        "type" : "POINT",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:01:36Z",
+        "clockMs" : 8000
+      }, {
+        "position" : 3,
+        "type" : "POINT_REMOVED",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:01:40Z",
+        "clockMs" : 12000
+      }, {
+        "position" : 4,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:01:44Z",
+        "clockMs" : 16000
+      }, {
+        "position" : 5,
+        "type" : "UNDO",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : 4,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:01:48Z",
+        "clockMs" : 20000
+      }, {
+        "position" : 6,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:01:52Z",
+        "clockMs" : 24000
+      }, {
+        "position" : 7,
+        "type" : "FINISH",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:02:56Z",
+        "clockMs" : 60000
+      } ]
+    }, {
+      "groupNumber" : 2,
+      "orderIndex" : 5,
+      "matNumber" : 2,
+      "red" : {
+        "personId" : "id-11",
+        "teamNumber" : null
+      },
+      "blue" : {
+        "personId" : "id-10",
+        "teamNumber" : null
+      },
+      "status" : "FINISHED",
+      "redScore" : 1,
+      "blueScore" : 2,
+      "startedAt" : "2027-03-10T10:08:12Z",
+      "finishedAt" : "2027-03-10T10:09:28Z",
+      "elapsedMs" : 60000,
+      "runningSince" : null,
+      "disqualifiedSide" : null,
+      "reviewReason" : null,
+      "actions" : [ {
+        "position" : 0,
+        "type" : "START",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:08:00Z",
+        "clockMs" : 0
+      }, {
+        "position" : 1,
+        "type" : "POINT",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:08:04Z",
+        "clockMs" : 4000
+      }, {
+        "position" : 2,
+        "type" : "CANCEL",
+        "side" : null,
+        "reason" : "Empezado por error",
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:08:08Z",
+        "clockMs" : 8000
+      }, {
+        "position" : 3,
+        "type" : "START",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:08:12Z",
+        "clockMs" : 0
+      }, {
+        "position" : 4,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:08:16Z",
+        "clockMs" : 4000
+      }, {
+        "position" : 5,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:08:20Z",
+        "clockMs" : 8000
+      }, {
+        "position" : 6,
+        "type" : "POINT",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:09:24Z",
+        "clockMs" : 60000
+      }, {
+        "position" : 7,
+        "type" : "FINISH",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:09:28Z",
+        "clockMs" : 60000
+      } ]
+    }, {
+      "groupNumber" : 3,
+      "orderIndex" : 0,
+      "matNumber" : 1,
+      "red" : {
+        "personId" : null,
+        "teamNumber" : 1
+      },
+      "blue" : {
+        "personId" : null,
+        "teamNumber" : 2
+      },
+      "status" : "FINISHED",
+      "redScore" : 3,
+      "blueScore" : 1,
+      "startedAt" : "2027-03-10T10:14:32Z",
+      "finishedAt" : "2027-03-10T10:17:52Z",
+      "elapsedMs" : 180000,
+      "runningSince" : null,
+      "disqualifiedSide" : null,
+      "reviewReason" : null,
+      "actions" : [ {
+        "position" : 0,
+        "type" : "START",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T10:14:32Z",
+        "clockMs" : 0
+      }, {
+        "position" : 1,
+        "type" : "POINT",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T10:14:36Z",
+        "clockMs" : 4000
+      }, {
+        "position" : 2,
+        "type" : "POINT",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T10:14:40Z",
+        "clockMs" : 8000
+      }, {
+        "position" : 3,
+        "type" : "POINT",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T10:14:44Z",
+        "clockMs" : 12000
+      }, {
+        "position" : 4,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T10:14:48Z",
+        "clockMs" : 16000
+      }, {
+        "position" : 5,
+        "type" : "FINISH",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T10:17:52Z",
+        "clockMs" : 180000
+      } ]
+    }, {
+      "groupNumber" : 3,
+      "orderIndex" : 1,
+      "matNumber" : 2,
+      "red" : {
+        "personId" : null,
+        "teamNumber" : 3
+      },
+      "blue" : {
+        "personId" : null,
+        "teamNumber" : 4
+      },
+      "status" : "FINISHED",
+      "redScore" : 0,
+      "blueScore" : 17,
+      "startedAt" : "2027-03-10T10:22:56Z",
+      "finishedAt" : "2027-03-10T10:27:08Z",
+      "elapsedMs" : 180000,
+      "runningSince" : null,
+      "disqualifiedSide" : null,
+      "reviewReason" : null,
+      "actions" : [ {
+        "position" : 0,
+        "type" : "START",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:22:56Z",
+        "clockMs" : 0
+      }, {
+        "position" : 1,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:23:00Z",
+        "clockMs" : 4000
+      }, {
+        "position" : 2,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:23:04Z",
+        "clockMs" : 8000
+      }, {
+        "position" : 3,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:23:08Z",
+        "clockMs" : 12000
+      }, {
+        "position" : 4,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:23:12Z",
+        "clockMs" : 16000
+      }, {
+        "position" : 5,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:23:16Z",
+        "clockMs" : 20000
+      }, {
+        "position" : 6,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:23:20Z",
+        "clockMs" : 24000
+      }, {
+        "position" : 7,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:23:24Z",
+        "clockMs" : 28000
+      }, {
+        "position" : 8,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:23:28Z",
+        "clockMs" : 32000
+      }, {
+        "position" : 9,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:23:32Z",
+        "clockMs" : 36000
+      }, {
+        "position" : 10,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:23:36Z",
+        "clockMs" : 40000
+      }, {
+        "position" : 11,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:23:40Z",
+        "clockMs" : 44000
+      }, {
+        "position" : 12,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:23:44Z",
+        "clockMs" : 48000
+      }, {
+        "position" : 13,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:23:48Z",
+        "clockMs" : 52000
+      }, {
+        "position" : 14,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:23:52Z",
+        "clockMs" : 56000
+      }, {
+        "position" : 15,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:23:56Z",
+        "clockMs" : 60000
+      }, {
+        "position" : 16,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:24:00Z",
+        "clockMs" : 64000
+      }, {
+        "position" : 17,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:24:04Z",
+        "clockMs" : 68000
+      }, {
+        "position" : 18,
+        "type" : "FINISH",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:27:08Z",
+        "clockMs" : 180000
+      } ]
+    }, {
+      "groupNumber" : 3,
+      "orderIndex" : 2,
+      "matNumber" : 1,
+      "red" : {
+        "personId" : null,
+        "teamNumber" : 1
+      },
+      "blue" : {
+        "personId" : null,
+        "teamNumber" : 3
+      },
+      "status" : "FINISHED",
+      "redScore" : 0,
+      "blueScore" : 2,
+      "startedAt" : "2027-03-10T10:32:12Z",
+      "finishedAt" : "2027-03-10T10:35:28Z",
+      "elapsedMs" : 180000,
+      "runningSince" : null,
+      "disqualifiedSide" : null,
+      "reviewReason" : null,
+      "actions" : [ {
+        "position" : 0,
+        "type" : "START",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T10:32:12Z",
+        "clockMs" : 0
+      }, {
+        "position" : 1,
+        "type" : "WARNING",
+        "side" : "RED",
+        "reason" : "Exceso de potencia",
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T10:32:16Z",
+        "clockMs" : 4000
+      }, {
+        "position" : 2,
+        "type" : "WARNING",
+        "side" : "RED",
+        "reason" : "Exceso de potencia",
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T10:32:20Z",
+        "clockMs" : 8000
+      }, {
+        "position" : 3,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T10:32:24Z",
+        "clockMs" : 12000
+      }, {
+        "position" : 4,
+        "type" : "FINISH",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T10:35:28Z",
+        "clockMs" : 180000
+      } ]
+    }, {
+      "groupNumber" : 3,
+      "orderIndex" : 3,
+      "matNumber" : 2,
+      "red" : {
+        "personId" : null,
+        "teamNumber" : 2
+      },
+      "blue" : {
+        "personId" : null,
+        "teamNumber" : 4
+      },
+      "status" : "FINISHED",
+      "redScore" : 15,
+      "blueScore" : 0,
+      "startedAt" : "2027-03-10T10:40:32Z",
+      "finishedAt" : "2027-03-10T10:40:48Z",
+      "elapsedMs" : 12000,
+      "runningSince" : null,
+      "disqualifiedSide" : "BLUE",
+      "reviewReason" : null,
+      "actions" : [ {
+        "position" : 0,
+        "type" : "START",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:40:32Z",
+        "clockMs" : 0
+      }, {
+        "position" : 1,
+        "type" : "POINT",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:40:36Z",
+        "clockMs" : 4000
+      }, {
+        "position" : 2,
+        "type" : "POINT",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:40:40Z",
+        "clockMs" : 8000
+      }, {
+        "position" : 3,
+        "type" : "DISQUALIFICATION",
+        "side" : "BLUE",
+        "reason" : "Exceso de potencia",
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:40:44Z",
+        "clockMs" : 12000
+      }, {
+        "position" : 4,
+        "type" : "STOP",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : true,
+        "at" : "2027-03-10T10:40:44Z",
+        "clockMs" : 12000
+      }, {
+        "position" : 5,
+        "type" : "FINISH",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:40:48Z",
+        "clockMs" : 12000
+      } ]
+    }, {
+      "groupNumber" : 3,
+      "orderIndex" : 4,
+      "matNumber" : 1,
+      "red" : {
+        "personId" : null,
+        "teamNumber" : 1
+      },
+      "blue" : {
+        "personId" : null,
+        "teamNumber" : 4
+      },
+      "status" : "FINISHED",
+      "redScore" : 1,
+      "blueScore" : 1,
+      "startedAt" : "2027-03-10T10:45:52Z",
+      "finishedAt" : "2027-03-10T10:49:20Z",
+      "elapsedMs" : 180000,
+      "runningSince" : null,
+      "disqualifiedSide" : null,
+      "reviewReason" : null,
+      "actions" : [ {
+        "position" : 0,
+        "type" : "START",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T10:45:52Z",
+        "clockMs" : 0
+      }, {
+        "position" : 1,
+        "type" : "POINT",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T10:45:56Z",
+        "clockMs" : 4000
+      }, {
+        "position" : 2,
+        "type" : "POINT",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T10:46:00Z",
+        "clockMs" : 8000
+      }, {
+        "position" : 3,
+        "type" : "POINT_REMOVED",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T10:46:04Z",
+        "clockMs" : 12000
+      }, {
+        "position" : 4,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T10:46:08Z",
+        "clockMs" : 16000
+      }, {
+        "position" : 5,
+        "type" : "UNDO",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : 4,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T10:46:12Z",
+        "clockMs" : 20000
+      }, {
+        "position" : 6,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T10:46:16Z",
+        "clockMs" : 24000
+      }, {
+        "position" : 7,
+        "type" : "FINISH",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro1",
+        "automatic" : false,
+        "at" : "2027-03-10T10:49:20Z",
+        "clockMs" : 180000
+      } ]
+    }, {
+      "groupNumber" : 3,
+      "orderIndex" : 5,
+      "matNumber" : 2,
+      "red" : {
+        "personId" : null,
+        "teamNumber" : 2
+      },
+      "blue" : {
+        "personId" : null,
+        "teamNumber" : 3
+      },
+      "status" : "FINISHED",
+      "redScore" : 1,
+      "blueScore" : 2,
+      "startedAt" : "2027-03-10T10:54:36Z",
+      "finishedAt" : "2027-03-10T10:57:52Z",
+      "elapsedMs" : 180000,
+      "runningSince" : null,
+      "disqualifiedSide" : null,
+      "reviewReason" : null,
+      "actions" : [ {
+        "position" : 0,
+        "type" : "START",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:54:24Z",
+        "clockMs" : 0
+      }, {
+        "position" : 1,
+        "type" : "POINT",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:54:28Z",
+        "clockMs" : 4000
+      }, {
+        "position" : 2,
+        "type" : "CANCEL",
+        "side" : null,
+        "reason" : "Empezado por error",
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:54:32Z",
+        "clockMs" : 8000
+      }, {
+        "position" : 3,
+        "type" : "START",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:54:36Z",
+        "clockMs" : 0
+      }, {
+        "position" : 4,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:54:40Z",
+        "clockMs" : 4000
+      }, {
+        "position" : 5,
+        "type" : "POINT",
+        "side" : "BLUE",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:54:44Z",
+        "clockMs" : 8000
+      }, {
+        "position" : 6,
+        "type" : "POINT",
+        "side" : "RED",
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:57:48Z",
+        "clockMs" : 180000
+      }, {
+        "position" : 7,
+        "type" : "FINISH",
+        "side" : null,
+        "reason" : null,
+        "undoesPosition" : null,
+        "actor" : "arbitro2",
+        "automatic" : false,
+        "at" : "2027-03-10T10:57:52Z",
+        "clockMs" : 180000
+      } ]
+    } ],
+    "empty" : false
+  },
+  "staffNames" : [ ],
+  "rulebook" : null,
+  "staffPermissions" : [ ]
+}
