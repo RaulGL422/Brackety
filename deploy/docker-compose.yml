@@ -97,7 +97,7 @@ services:
     healthcheck: *nginx-health
 
   tunnel:
-    image: cloudflare/cloudflared:2026.10.7
+    image: cloudflare/cloudflared:2026.11.0
     profiles: [pi, windows]
     restart: unless-stopped
     command: tunnel --no-autoupdate run
