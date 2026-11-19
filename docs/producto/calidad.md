@@ -6,7 +6,7 @@ Pedido de Raul (2026-11-16): optimizar mucho el código para que se lea mejor, o
 ### Objetivo
 Que cualquier pantalla o servicio se entienda sin haberlo escrito. El prototipo F1 se hizo con prisa: hay que convertirlo en los módulos reales.
 
-### Puntos conocidos (`revision-f1.md` y F1)
+### Puntos conocidos (`../historico/revision-f1.md` y F1)
 - Servicios largos: `MatBoardService.board` (~100 líneas), `LocalMatch.project` (~120), `StandingsService` (con el CSV dentro).
 - Pantallas largas: `team_category_screen.dart` (586 líneas) y el resto de pantallas del club.
 - Duplicados: nombre del competidor en 3 servicios; comprobación "club o árbitro del tapiz" repetida.

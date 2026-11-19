@@ -25,6 +25,14 @@
 - Antes de abrir producción al club (de `pendientes.md`): SSD, backups cifrados con restauración probada, `PRIVACY_CONTACT_EMAIL`, Resend, Google OAuth, túnel con rate limiting y `DEMO_ACCOUNTS_ENABLED=false`.
 - Datos de la F1 (Raul, 2026-11-16): pasan **todos** a producción, en una cuenta privada de la entidad que lleva Raul. Cuando la app esté estable, se cede al club (p. ej. cambiando el email de la cuenta al del club).
 
+### La Pi de Raul (producción)
+Pasos generales en `../09-despliegue.md`; aquí lo propio de esta Pi.
+- Puertos `API_PORT=38080`, `WEB_PORT=38081`, `ADMIN_PORT=38082` (8080-8082 los usa otra app). El túnel no los usa: va por la red de Docker.
+- `.env`, además de lo obligatorio: `IMAGE_TAG` de la release, `CORS_ALLOWED_ORIGINS` y `PUBLIC_BASE_URL` = `https://brackety.rgal.dev`, `API_BASE_URL=https://brackety-api.rgal.dev`, `ADMIN_API_BASE_URL=https://brackety-admin.rgal.dev`.
+- En la F1: `DEMO_ACCOUNTS_ENABLED=true` y `DEMO_EVENT_DATE=2026-11-14`; Resend, Google, superadmin y Access vacíos. En producción de verdad, cuentas demo fuera.
+- Sin SSD aún: `DB_DATA=pgdata` (volumen en la SD). Copia tras cada jornada: en la Pi `docker compose exec -T db sh -c 'pg_dump -U "$POSTGRES_USER" -d brackety -Fc' > ~/brackety-$(date +%F).dump`; en el PC `scp` (no `ssh … >` en PowerShell: estropea el binario).
+- Accesos: clave SSH de despliegue de solo lectura (alias `github-brackety`) y `docker login ghcr.io` con un token classic solo `read:packages`.
+
 ## Escenarios en el superadmin de debug
 - Pestaña **Escenarios** (solo en la imagen de debug):
   - Lista del catálogo de `08-ejecucion-local.md` con su descripción.
