@@ -36,7 +36,7 @@ Que cualquier pantalla o servicio se entienda sin haberlo escrito. El prototipo 
 | Cierre de módulo | Suite completa del componente + checklist de `04-testing.md` |
 
 ### Cambios en el CI (hecho, 2026-11-17, rama `chore/ci-components`)
-- Trabajo `changes`: mira qué archivos cambia la PR. `server/**` → server; `packages/**` → core, app y admin; `app/**` → app; `admin/**` → admin. Tocar `ci.yml` prueba todo.
+- Trabajo `changes`: mira qué archivos cambia la PR. `server/**` → server; `spec/**` (casos compartidos) → server y app; `packages/**` → core, app y admin; `app/**` → app; `admin/**` → admin. Tocar `ci.yml` prueba todo.
 - `docs` corre siempre (es rápido). Las imágenes (`images.yml`) no se construyen en PRs solo de docs.
 - Trabajo final `ci-ok`: los saltados cuentan como verdes, los fallidos o cancelados no. Es el único check que debe pedir la protección de rama.
 - PRs hacia `main` (releases) y pushes: sin filtros, corre todo. Los E2E llegarán con la tarea 5 de la etapa 3.
