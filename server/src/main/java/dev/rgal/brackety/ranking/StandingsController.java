@@ -35,14 +35,17 @@ class StandingsController {
     private final EventSheets sheets;
     private final FullExportService fullExport;
     private final ParticipantRecordService records;
+    private final DownloadNames names;
 
     StandingsController(
             StandingsService standings,
             LeagueStandingsService leagueStandings,
             EventSheets sheets,
             FullExportService fullExport,
-            ParticipantRecordService records) {
+            ParticipantRecordService records,
+            DownloadNames names) {
         this.records = records;
+        this.names = names;
         this.standings = standings;
         this.leagueStandings = leagueStandings;
         this.sheets = sheets;
@@ -75,12 +78,12 @@ class StandingsController {
 
     @GetMapping("/export/standings.csv")
     ResponseEntity<byte[]> standingsCsv(@PathVariable UUID eventId, @AuthenticationPrincipal Jwt jwt) {
-        return file("clasificacion-fase.csv", CSV, standings.standingsCsv(eventId, CurrentAccount.id(jwt)));
+        return file(eventId, "clasificacion-fase.csv", CSV, standings.standingsCsv(eventId, CurrentAccount.id(jwt)));
     }
 
     @GetMapping("/export/league-standings.csv")
     ResponseEntity<byte[]> leagueStandingsCsv(@PathVariable UUID eventId, @AuthenticationPrincipal Jwt jwt) {
-        return file("clasificacion-liga.csv", CSV, leagueStandings.csv(eventId, CurrentAccount.id(jwt)));
+        return file(eventId, "clasificacion-liga.csv", CSV, leagueStandings.csv(eventId, CurrentAccount.id(jwt)));
     }
 
     /** One CSV of the league standings per category, in a .zip. */
@@ -89,42 +92,48 @@ class StandingsController {
         var files = new LinkedHashMap<String, byte[]>();
         leagueStandings
                 .categoryCsvs(eventId, CurrentAccount.id(jwt))
-                .forEach((name, csv) -> files.put(name, Zip.text(csv)));
-        return file("clasificacion-por-categoria.zip", ZIP, Zip.of(files));
+                .forEach((name, csv) -> files.put(names.of(eventId, name), Zip.text(csv)));
+        return file(eventId, "clasificacion-por-categoria.zip", ZIP, Zip.of(files));
     }
 
     @GetMapping("/export/league-standings.pdf")
     ResponseEntity<byte[]> standingsPdf(@PathVariable UUID eventId, @AuthenticationPrincipal Jwt jwt) {
-        return file("clasificacion-por-categoria.pdf", PDF, leagueStandings.pdf(eventId, CurrentAccount.id(jwt)));
+        return file(
+                eventId, "clasificacion-por-categoria.pdf", PDF, leagueStandings.pdf(eventId, CurrentAccount.id(jwt)));
     }
 
     @GetMapping("/export/matches.csv")
     ResponseEntity<byte[]> matchesCsv(@PathVariable UUID eventId, @AuthenticationPrincipal Jwt jwt) {
-        return file("combates.csv", CSV, sheets.matchesCsv(eventId, CurrentAccount.id(jwt)));
+        return file(eventId, "combates.csv", CSV, sheets.matchesCsv(eventId, CurrentAccount.id(jwt)));
     }
 
     @GetMapping("/export/timeline.csv")
     ResponseEntity<byte[]> timelineCsv(@PathVariable UUID eventId, @AuthenticationPrincipal Jwt jwt) {
-        return file("linea-de-tiempo.csv", CSV, sheets.timelineCsv(eventId, CurrentAccount.id(jwt)));
+        return file(eventId, "linea-de-tiempo.csv", CSV, sheets.timelineCsv(eventId, CurrentAccount.id(jwt)));
     }
 
     @GetMapping("/export/participants.csv")
     ResponseEntity<byte[]> participantsCsv(@PathVariable UUID eventId, @AuthenticationPrincipal Jwt jwt) {
-        return file("participantes.csv", CSV, sheets.participantsCsv(eventId, CurrentAccount.id(jwt)));
+        return file(eventId, "participantes.csv", CSV, sheets.participantsCsv(eventId, CurrentAccount.id(jwt)));
     }
 
     /** Every sheet, the event package and a LEEME.txt in one .zip. */
     @GetMapping("/export/full")
     ResponseEntity<byte[]> full(@PathVariable UUID eventId, @AuthenticationPrincipal Jwt jwt) {
         var export = fullExport.export(eventId, CurrentAccount.id(jwt));
-        return file(export.filename(), ZIP, export.zip());
+        return attachment(export.filename(), ZIP, export.zip());
     }
 
-    private static ResponseEntity<byte[]> file(String filename, MediaType type, String body) {
-        return file(filename, type, body.getBytes(StandardCharsets.UTF_8));
+    // The body comes first: it checks the account may download it before the name reads the event.
+    private ResponseEntity<byte[]> file(UUID eventId, String what, MediaType type, String body) {
+        return file(eventId, what, type, body.getBytes(StandardCharsets.UTF_8));
     }
 
-    private static ResponseEntity<byte[]> file(String filename, MediaType type, byte[] body) {
+    private ResponseEntity<byte[]> file(UUID eventId, String what, MediaType type, byte[] body) {
+        return attachment(names.of(eventId, what), type, body);
+    }
+
+    private static ResponseEntity<byte[]> attachment(String filename, MediaType type, byte[] body) {
         return ResponseEntity.ok()
                 .contentType(type)
                 .header(

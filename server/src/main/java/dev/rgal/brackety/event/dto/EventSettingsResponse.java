@@ -3,15 +3,17 @@ package dev.rgal.brackety.event.dto;
 import dev.rgal.brackety.event.EventCategory;
 import dev.rgal.brackety.event.EventCategory.Format;
 import dev.rgal.brackety.event.EventOrganization;
+import dev.rgal.brackety.event.EventPermission;
 import dev.rgal.brackety.event.EventRole;
+import dev.rgal.brackety.event.ScoringRules;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public record EventSettingsResponse(
         String name,
         LocalDate date,
-        int maxGroupsPerMat,
         int matchSeconds,
         int pointsLimit,
         List<MatSettings> mats,
@@ -26,7 +28,31 @@ public record EventSettingsResponse(
         int teamPointsLimit,
         int minRestSeconds,
         MeasureRules measures,
-        WarningReasons warningReasons) {
+        WarningReasons warningReasons,
+        ScoringRules scoring) {
+
+    /** For a helper: everything but who the staff are and their sign-ins. */
+    public EventSettingsResponse withoutStaff() {
+        return new EventSettingsResponse(
+                name,
+                date,
+                matchSeconds,
+                pointsLimit,
+                mats,
+                List.of(),
+                List.of(),
+                categories,
+                organizations,
+                attendancePoints,
+                phaseNumber,
+                discipline,
+                teamMatchSeconds,
+                teamPointsLimit,
+                minRestSeconds,
+                measures,
+                warningReasons,
+                scoring);
+    }
 
     public record OrganizationResponse(UUID id, String name, String shortName) {
 
@@ -39,13 +65,21 @@ public record EventSettingsResponse(
 
     /**
      * {@code personName}: who is behind the account in this event, set by the club; null until then. {@code roles}:
-     * the account's roles in the event.
+     * the account's roles in the event. {@code permissions}: what the club lets them do (F1-7 C).
      */
-    public record StaffMember(UUID id, String username, String personName, List<EventRole> roles) {}
+    public record StaffMember(
+            UUID id, String username, String personName, List<EventRole> roles, Set<EventPermission> permissions) {}
 
     /** {@code teamSize} is null in an individual category. */
     public record CategoryResponse(
-            UUID id, String name, int minAge, int maxAge, Format format, Integer teamSize, int groupSize) {
+            UUID id,
+            String name,
+            int minAge,
+            int maxAge,
+            Format format,
+            Integer teamSize,
+            int groupSize,
+            Integer matchSeconds) {
 
         public static CategoryResponse of(EventCategory c) {
             return new CategoryResponse(
@@ -55,7 +89,8 @@ public record EventSettingsResponse(
                     c.getMaxAge(),
                     c.getFormat(),
                     c.getTeamSize(),
-                    c.getGroupSize());
+                    c.getGroupSize(),
+                    c.getMatchSeconds());
         }
     }
 }

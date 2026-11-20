@@ -17,10 +17,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /**
  * What an event is fought in, with its rules (docs/producto/modelo-datos.md): the rest and the changeover between
- * matches, and the length and points limit of a match per format. The only place match rules live.
+ * matches, the length and points limit of a match per format, and how its sport scores. The only place match rules
+ * live; a category may have its own length.
  */
 @Entity
 public class Modality {
@@ -45,12 +48,22 @@ public class Modality {
     @BatchSize(size = 50)
     private Map<Format, FormatRules> rules = new HashMap<>();
 
+    @JdbcTypeCode(SqlTypes.JSON)
+    private ScoringRules scoring;
+
     protected Modality() {}
 
-    Modality(int position, FormatRules individual, FormatRules team, int minRestSeconds, int changeoverSeconds) {
+    Modality(
+            int position,
+            FormatRules individual,
+            FormatRules team,
+            int minRestSeconds,
+            int changeoverSeconds,
+            ScoringRules scoring) {
         this.position = position;
         this.minRestSeconds = minRestSeconds;
         this.changeoverSeconds = changeoverSeconds;
+        this.scoring = scoring;
         rules.put(Format.INDIVIDUAL, individual);
         rules.put(Format.TEAM, team);
     }
@@ -61,7 +74,15 @@ public class Modality {
      * all of it in the settings.
      */
     public static Modality tambo() {
-        return new Modality(1, new FormatRules(60, 15), new FormatRules(180, 0), 30, 30);
+        return new Modality(1, new FormatRules(60, 15), new FormatRules(180, 0), 30, 30, ScoringRules.TAMBO);
+    }
+
+    /**
+     * FELODA grappling (docs/reglamentos/grappling-feloda-2025.md): 5 min with no points limit (a 15-point difference
+     * ends it); categories of 4 min set their own length. Rest and changeover as in tambo until the club says.
+     */
+    public static Modality grappling() {
+        return new Modality(1, new FormatRules(300, 0), new FormatRules(300, 0), 30, 30, ScoringRules.GRAPPLING);
     }
 
     public static Modality of(
@@ -70,18 +91,20 @@ public class Modality {
             int teamMatchSeconds,
             int teamPointsLimit,
             int minRestSeconds,
-            int changeoverSeconds) {
+            int changeoverSeconds,
+            ScoringRules scoring) {
         return new Modality(
                 1,
                 new FormatRules(matchSeconds, pointsLimit),
                 new FormatRules(teamMatchSeconds, teamPointsLimit),
                 minRestSeconds,
-                changeoverSeconds);
+                changeoverSeconds,
+                scoring);
     }
 
     /** The same rules, for the next phase of a league. */
     Modality copy() {
-        return new Modality(position, individual(), team(), minRestSeconds, changeoverSeconds);
+        return new Modality(position, individual(), team(), minRestSeconds, changeoverSeconds, scoring);
     }
 
     public UUID getId() {
@@ -115,6 +138,10 @@ public class Modality {
     /** 0 = no limit. */
     public int pointsLimit(boolean teams) {
         return rules(teams).pointsLimit();
+    }
+
+    public ScoringRules scoring() {
+        return scoring;
     }
 
     public FormatRules individual() {

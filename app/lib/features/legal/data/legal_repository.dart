@@ -45,7 +45,8 @@ class LegalVersions {
 
   factory LegalVersions.fromJson(Map<String, dynamic> json) {
     final versions = {
-      for (final document in json['documents'] as List<dynamic>)
+      for (final document
+          in (json['documents'] as List).cast<Map<String, dynamic>>())
         document['type'] as String: document['version'] as String,
     };
     return LegalVersions(

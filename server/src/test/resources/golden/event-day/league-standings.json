@@ -1,0 +1,348 @@
+{
+  "phases" : [ {
+    "eventId" : "id-1",
+    "number" : 1,
+    "name" : "Liga Yoseikan 2027 · Fase 1 · Tambo"
+  } ],
+  "rows" : [ {
+    "categoryName" : "7-8",
+    "position" : 1,
+    "medal" : 1,
+    "personId" : "id-9",
+    "firstName" : "Hugo",
+    "lastName" : "Prueba 7-1",
+    "organizationName" : null,
+    "phases" : [ {
+      "attendancePoints" : 10,
+      "matchPoints" : 17
+    } ],
+    "total" : 27,
+    "warnings" : 0,
+    "disqualifications" : 0,
+    "eventId" : "id-1",
+    "participantId" : "id-22"
+  }, {
+    "categoryName" : "7-8",
+    "position" : 1,
+    "medal" : 1,
+    "personId" : "id-11",
+    "firstName" : "Leo",
+    "lastName" : "Prueba 7-5",
+    "organizationName" : null,
+    "phases" : [ {
+      "attendancePoints" : 10,
+      "matchPoints" : 17
+    } ],
+    "total" : 27,
+    "warnings" : 0,
+    "disqualifications" : 0,
+    "eventId" : "id-1",
+    "participantId" : "id-23"
+  }, {
+    "categoryName" : "7-8",
+    "position" : 3,
+    "medal" : 2,
+    "personId" : "id-16",
+    "firstName" : "Mateo",
+    "lastName" : "Prueba 7-3",
+    "organizationName" : null,
+    "phases" : [ {
+      "attendancePoints" : 10,
+      "matchPoints" : 16
+    } ],
+    "total" : 26,
+    "warnings" : 0,
+    "disqualifications" : 1,
+    "eventId" : "id-1",
+    "participantId" : "id-24"
+  }, {
+    "categoryName" : "7-8",
+    "position" : 4,
+    "medal" : 2,
+    "personId" : "id-10",
+    "firstName" : "Julia",
+    "lastName" : "Prueba 7-6",
+    "organizationName" : null,
+    "phases" : [ {
+      "attendancePoints" : 10,
+      "matchPoints" : 4
+    } ],
+    "total" : 14,
+    "warnings" : 0,
+    "disqualifications" : 0,
+    "eventId" : "id-1",
+    "participantId" : "id-25"
+  }, {
+    "categoryName" : "7-8",
+    "position" : 4,
+    "medal" : 2,
+    "personId" : "id-12",
+    "firstName" : "Lucía",
+    "lastName" : "Prueba 7-0",
+    "organizationName" : null,
+    "phases" : [ {
+      "attendancePoints" : 10,
+      "matchPoints" : 4
+    } ],
+    "total" : 14,
+    "warnings" : 2,
+    "disqualifications" : 1,
+    "eventId" : "id-1",
+    "participantId" : "id-26"
+  }, {
+    "categoryName" : "7-8",
+    "position" : 4,
+    "medal" : 2,
+    "personId" : "id-15",
+    "firstName" : "Martina",
+    "lastName" : "Prueba 7-2",
+    "organizationName" : null,
+    "phases" : [ {
+      "attendancePoints" : 10,
+      "matchPoints" : 4
+    } ],
+    "total" : 14,
+    "warnings" : 0,
+    "disqualifications" : 0,
+    "eventId" : "id-1",
+    "participantId" : "id-27"
+  }, {
+    "categoryName" : "7-8",
+    "position" : 4,
+    "medal" : 2,
+    "personId" : "id-20",
+    "firstName" : "Sofía",
+    "lastName" : "Prueba 7-4",
+    "organizationName" : null,
+    "phases" : [ {
+      "attendancePoints" : 10,
+      "matchPoints" : 4
+    } ],
+    "total" : 14,
+    "warnings" : 2,
+    "disqualifications" : 0,
+    "eventId" : "id-1",
+    "participantId" : "id-28"
+  }, {
+    "categoryName" : "7-8",
+    "position" : 8,
+    "medal" : null,
+    "personId" : "id-6",
+    "firstName" : "Daniel",
+    "lastName" : "Prueba 7-7",
+    "organizationName" : null,
+    "phases" : [ {
+      "attendancePoints" : 0,
+      "matchPoints" : 0
+    } ],
+    "total" : 0,
+    "warnings" : 0,
+    "disqualifications" : 0,
+    "eventId" : "id-1",
+    "participantId" : "id-29"
+  }, {
+    "categoryName" : "15-16",
+    "position" : 1,
+    "medal" : 1,
+    "personId" : "id-4",
+    "firstName" : "Álvaro",
+    "lastName" : "Prueba 15-3",
+    "organizationName" : null,
+    "phases" : [ {
+      "attendancePoints" : 10,
+      "matchPoints" : 17
+    } ],
+    "total" : 27,
+    "warnings" : 0,
+    "disqualifications" : 0,
+    "eventId" : "id-1",
+    "participantId" : "id-30"
+  }, {
+    "categoryName" : "15-16",
+    "position" : 1,
+    "medal" : 1,
+    "personId" : "id-8",
+    "firstName" : "Emma",
+    "lastName" : "Prueba 15-4",
+    "organizationName" : null,
+    "phases" : [ {
+      "attendancePoints" : 10,
+      "matchPoints" : 17
+    } ],
+    "total" : 27,
+    "warnings" : 0,
+    "disqualifications" : 0,
+    "eventId" : "id-1",
+    "participantId" : "id-31"
+  }, {
+    "categoryName" : "15-16",
+    "position" : 1,
+    "medal" : 1,
+    "personId" : "id-13",
+    "firstName" : "Manuel",
+    "lastName" : "Prueba 15-5",
+    "organizationName" : null,
+    "phases" : [ {
+      "attendancePoints" : 10,
+      "matchPoints" : 17
+    } ],
+    "total" : 27,
+    "warnings" : 0,
+    "disqualifications" : 0,
+    "eventId" : "id-1",
+    "participantId" : "id-32"
+  }, {
+    "categoryName" : "15-16",
+    "position" : 4,
+    "medal" : 2,
+    "personId" : "id-2",
+    "firstName" : "Adrián",
+    "lastName" : "Prueba 15-7",
+    "organizationName" : null,
+    "phases" : [ {
+      "attendancePoints" : 10,
+      "matchPoints" : 4
+    } ],
+    "total" : 14,
+    "warnings" : 0,
+    "disqualifications" : 0,
+    "eventId" : "id-1",
+    "participantId" : "id-33"
+  }, {
+    "categoryName" : "15-16",
+    "position" : 4,
+    "medal" : 2,
+    "personId" : "id-5",
+    "firstName" : "Carla",
+    "lastName" : "Prueba 15-6",
+    "organizationName" : null,
+    "phases" : [ {
+      "attendancePoints" : 10,
+      "matchPoints" : 4
+    } ],
+    "total" : 14,
+    "warnings" : 0,
+    "disqualifications" : 0,
+    "eventId" : "id-1",
+    "participantId" : "id-34"
+  }, {
+    "categoryName" : "15-16",
+    "position" : 4,
+    "medal" : 2,
+    "personId" : "id-17",
+    "firstName" : "Noa",
+    "lastName" : "Prueba 15-8",
+    "organizationName" : null,
+    "phases" : [ {
+      "attendancePoints" : 10,
+      "matchPoints" : 4
+    } ],
+    "total" : 14,
+    "warnings" : 0,
+    "disqualifications" : 0,
+    "eventId" : "id-1",
+    "participantId" : "id-35"
+  }, {
+    "categoryName" : "15-16",
+    "position" : 4,
+    "medal" : 2,
+    "personId" : "id-18",
+    "firstName" : "Pablo",
+    "lastName" : "Prueba 15-1",
+    "organizationName" : null,
+    "phases" : [ {
+      "attendancePoints" : 10,
+      "matchPoints" : 4
+    } ],
+    "total" : 14,
+    "warnings" : 2,
+    "disqualifications" : 0,
+    "eventId" : "id-1",
+    "participantId" : "id-36"
+  }, {
+    "categoryName" : "15-16",
+    "position" : 4,
+    "medal" : 2,
+    "personId" : "id-19",
+    "firstName" : "Paula",
+    "lastName" : "Prueba 15-0",
+    "organizationName" : null,
+    "phases" : [ {
+      "attendancePoints" : 10,
+      "matchPoints" : 4
+    } ],
+    "total" : 14,
+    "warnings" : 2,
+    "disqualifications" : 0,
+    "eventId" : "id-1",
+    "participantId" : "id-37"
+  }, {
+    "categoryName" : "15-16",
+    "position" : 4,
+    "medal" : 2,
+    "personId" : "id-21",
+    "firstName" : "Valeria",
+    "lastName" : "Prueba 15-2",
+    "organizationName" : null,
+    "phases" : [ {
+      "attendancePoints" : 10,
+      "matchPoints" : 4
+    } ],
+    "total" : 14,
+    "warnings" : 2,
+    "disqualifications" : 0,
+    "eventId" : "id-1",
+    "participantId" : "id-38"
+  }, {
+    "categoryName" : "15-16",
+    "position" : 10,
+    "medal" : null,
+    "personId" : "id-3",
+    "firstName" : "Alba",
+    "lastName" : "Prueba 15-10",
+    "organizationName" : null,
+    "phases" : [ {
+      "attendancePoints" : 0,
+      "matchPoints" : 0
+    } ],
+    "total" : 0,
+    "warnings" : 0,
+    "disqualifications" : 1,
+    "eventId" : "id-1",
+    "participantId" : "id-39"
+  }, {
+    "categoryName" : "15-16",
+    "position" : 10,
+    "medal" : null,
+    "personId" : "id-7",
+    "firstName" : "Diego",
+    "lastName" : "Prueba 15-11",
+    "organizationName" : null,
+    "phases" : [ {
+      "attendancePoints" : 0,
+      "matchPoints" : 0
+    } ],
+    "total" : 0,
+    "warnings" : 0,
+    "disqualifications" : 1,
+    "eventId" : "id-1",
+    "participantId" : "id-40"
+  }, {
+    "categoryName" : "15-16",
+    "position" : 10,
+    "medal" : null,
+    "personId" : "id-14",
+    "firstName" : "Mario",
+    "lastName" : "Prueba 15-9",
+    "organizationName" : null,
+    "phases" : [ {
+      "attendancePoints" : 0,
+      "matchPoints" : 0
+    } ],
+    "total" : 0,
+    "warnings" : 0,
+    "disqualifications" : 1,
+    "eventId" : "id-1",
+    "participantId" : "id-41"
+  } ]
+}

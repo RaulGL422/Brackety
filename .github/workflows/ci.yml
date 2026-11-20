@@ -36,10 +36,11 @@ jobs:
           # A change to this workflow tests everything it runs.
           all='^\.github/workflows/ci\.yml$'
           server=false
-          touched "^server/|$all" && server=true
+          # spec/ holds cases both the server and the app pass.
+          touched "^(server|spec)/|$all" && server=true
           flutter=()
           touched "^packages/|$all" && flutter+=('"packages/brackety_core"')
-          touched "^(app|packages)/|$all" && flutter+=('"app"')
+          touched "^(app|packages|spec)/|$all" && flutter+=('"app"')
           touched "^(admin|packages)/|$all" && flutter+=('"admin"')
           echo "server=$server" >> "$GITHUB_OUTPUT"
           echo "flutter=[$(IFS=,; echo "${flutter[*]}")]" >> "$GITHUB_OUTPUT"
@@ -53,7 +54,7 @@ jobs:
         working-directory: server
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
         with:
           distribution: temurin
           java-version: '25'
@@ -93,10 +94,20 @@ jobs:
           long=$(find docs -name '*.md' -exec awk 'END { if (NR > 150) print FILENAME " (" NR " lines)" }' {} \;)
           if [ -n "$long" ]; then echo "Split these docs (rule in .claude/rules/docs-upkeep.md):"; echo "$long"; exit 1; fi
 
+  # Size and structure limits that only go down (tools/code_metrics.py, docs/producto/plan-limpieza.md).
+  metrics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Code metrics stay within their limits
+        run: |
+          set -o pipefail
+          python3 tools/code_metrics.py --check | tee -a "$GITHUB_STEP_SUMMARY"
+
   # The one check branch protection asks for: skipped jobs count as passed, failed or cancelled ones do not.
   ci-ok:
     if: always()
-    needs: [changes, server, flutter, docs]
+    needs: [changes, server, flutter, docs, metrics]
     runs-on: ubuntu-latest
     steps:
       - env:

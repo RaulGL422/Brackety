@@ -4,13 +4,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import dev.rgal.brackety.auth.account.ProfileType;
+import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventApiTest;
+import dev.rgal.brackety.event.EventPermission;
 import dev.rgal.brackety.event.RulebookService;
+import dev.rgal.brackety.event.ScoringRules;
 import dev.rgal.brackety.participant.Participant;
 import dev.rgal.brackety.participant.ParticipantRepository;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -43,6 +47,9 @@ class EventPackageServiceTest extends EventApiTest {
     @Autowired
     RulebookService rulebooks;
 
+    @Autowired
+    EventAccess access;
+
     @BeforeEach
     void yoseikanParticipantsAndOwnSettings() {
         var random = new Random(2027);
@@ -61,8 +68,7 @@ class EventPackageServiceTest extends EventApiTest {
                     age == 13 ? teamCategory : null);
             participants.save(participant);
         }
-        jdbc.sql("update event set max_groups_per_mat = 2, attendance_points = 5")
-                .update();
+        jdbc.sql("update event set attendance_points = 5").update();
         jdbc.sql("update modality set changeover_seconds = 20").update();
         jdbc.sql("update modality_rules set match_seconds = 90, points_limit = 12 where format = 'INDIVIDUAL'")
                 .update();
@@ -97,6 +103,36 @@ class EventPackageServiceTest extends EventApiTest {
         // The referees on the laptop read the same rulebook.
         assertThat(loaded.rulebook()).isEqualTo(exported.rulebook());
         assertThat(loaded.rulebook().fileName()).isEqualTo("Reglamento F1.pdf");
+    }
+
+    @Test
+    void theClubsChoicesInStaffTravelAndAHelperCanRefereeOnTheLaptop() {
+        access.setPermissions(
+                eventId, accountId("ayudante1"), EnumSet.of(EventPermission.VIEW, EventPermission.OWN_MAT));
+        access.setPermissions(eventId, accountId("arbitro5"), EnumSet.noneOf(EventPermission.class));
+        jdbc.sql("update mat set referee_account_id = ? where number = 5")
+                .param(accountId("ayudante1"))
+                .update();
+        var exported = packages.export(eventId, accountId("club1"));
+        assertThat(exported.staffPermissions())
+                .containsExactly(
+                        new EventPackage.StaffPermissions("arbitro5", EnumSet.noneOf(EventPermission.class)),
+                        new EventPackage.StaffPermissions(
+                                "ayudante1", EnumSet.of(EventPermission.VIEW, EventPermission.OWN_MAT)));
+        var file = json.writeValueAsBytes(exported);
+        emptyDatabase();
+
+        var loaded = packages.load(file).eventId();
+
+        assertThat(access.permissions(loaded, accountId("ayudante1"), access.roles(loaded, accountId("ayudante1"))))
+                .containsExactlyInAnyOrder(EventPermission.VIEW, EventPermission.OWN_MAT);
+        assertThat(access.has(loaded, accountId("arbitro5"), EventPermission.OWN_MAT))
+                .isFalse();
+        // Nobody else was chosen for: they keep their role's defaults.
+        assertThat(access.has(loaded, accountId("arbitro1"), EventPermission.OWN_MAT))
+                .isTrue();
+        assertThat(packages.export(loaded, accountId("club1")).mats().get(4).refereeUsername())
+                .isEqualTo("ayudante1");
     }
 
     @Test
@@ -205,6 +241,54 @@ class EventPackageServiceTest extends EventApiTest {
     }
 
     @Test
+    void aVersion2FileWithMultigroupStillLoads() {
+        var file = edit(root -> {
+            root.put("schemaVersion", 2);
+            root.withObject("event").put("maxGroupsPerMat", 2);
+        });
+        emptyDatabase();
+
+        assertThat(packages.load(file).eventId()).isNotNull();
+    }
+
+    // The laptop scores grappling as grappling: the rules and each category's length travel (schema 4).
+    @Test
+    void aGrapplingEventTravelsWithItsRulesAndLengths() {
+        jdbc.sql("update modality set scoring = ?::jsonb where event_id = ?")
+                .params(json.writeValueAsString(ScoringRules.GRAPPLING), eventId)
+                .update();
+        jdbc.sql("update event_category set match_seconds = 240 where event_id = ? and name = '7-8'")
+                .param(eventId)
+                .update();
+        var exported = packages.export(eventId, accountId("club1"));
+        emptyDatabase();
+
+        var loaded =
+                packages.export(packages.load(json.writeValueAsBytes(exported)).eventId(), accountId("club1"));
+
+        assertThat(loaded.event().scoring()).isEqualTo(ScoringRules.GRAPPLING);
+        assertThat(loaded.categories())
+                .filteredOn(c -> c.name().equals("7-8"))
+                .singleElement()
+                .extracting(EventPackage.Category::matchSeconds)
+                .isEqualTo(240);
+    }
+
+    @Test
+    void aVersion3FileWithoutRulesLoadsAsTambo() {
+        var file = edit(root -> {
+            root.put("schemaVersion", 3);
+            root.withObject("event").remove("scoring");
+            root.get("categories").forEach(c -> ((ObjectNode) c).remove("matchSeconds"));
+        });
+        emptyDatabase();
+
+        var loaded = packages.export(packages.load(file).eventId(), accountId("club1"));
+
+        assertThat(loaded.event().scoring()).isEqualTo(ScoringRules.TAMBO);
+    }
+
+    @Test
     void refusesAnUnknownSchemaVersion() {
         var unknown = EventPackage.SCHEMA_VERSION + 1;
         var file = edit(root -> root.put("schemaVersion", unknown));
@@ -227,8 +311,10 @@ class EventPackageServiceTest extends EventApiTest {
                 new Case(r -> participant(r, 2).put("birthDate", "2020-13-40"), "participants[2].birthDate"),
                 new Case(r -> mat(r, 1).put("number", 1), "mats: numbers"),
                 new Case(r -> mat(r, 0).put("refereeUsername", "ayudante1"), "mats[0].refereeUsername"),
+                new Case(r -> chosen(r, "arbitro1"), "mats[0].refereeUsername"),
+                new Case(r -> chosen(r, "club1"), "staffPermissions[0].username"),
                 new Case(r -> r.withObject("owner").put("username", "arbitro1"), "owner: must be in staff"),
-                new Case(r -> r.withObject("event").put("maxGroupsPerMat", 9), "event.maxGroupsPerMat"),
+                new Case(r -> r.withObject("event").put("matchSeconds", 0), "event.matchSeconds"),
                 new Case(r -> ((ObjectNode) r.get("categories").get(0)).put("teamSize", 3), "categories[0]"));
         var files = cases.stream().map(c -> edit(c.change())).toList();
         emptyDatabase();
@@ -290,6 +376,13 @@ class EventPackageServiceTest extends EventApiTest {
         var root = (ObjectNode) json.readTree(exportFile());
         change.accept(root);
         return json.writeValueAsBytes(root);
+    }
+
+    /** The club takes every permission from this account. */
+    private static void chosen(ObjectNode root, String username) {
+        var entry = root.putArray("staffPermissions").addObject();
+        entry.put("username", username);
+        entry.putArray("permissions");
     }
 
     private static ObjectNode participant(JsonNode root, int index) {

@@ -15,6 +15,7 @@ paths: ["app/**", "admin/**", "packages/**"]
 - Cero strings fijos: todo por i18n (`es`, `en`). Fechas y números con `intl`.
 - Listas largas con `ListView.builder`. Imágenes con tamaño y caché. Evitar rebuilds amplios (`select` en Riverpod).
 - Peso del bundle web: sin paquetes que no se usen; revisar tamaño en cada release.
+- Lints estrictos compartidos en `packages/brackety_core/lib/analysis_options.yaml` (app y admin lo incluyen): reglas nuevas ahí, nunca en una sola app. Un `// ignore:` siempre con el motivo.
 
 ## Rendimiento (motivo de elegir esto sobre la experiencia previa)
 - Medir antes de optimizar, pero prohibido: setState global, providers que reconstruyen pantallas enteras, listas sin builder.

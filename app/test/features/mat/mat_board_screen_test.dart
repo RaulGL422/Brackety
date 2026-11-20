@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/board_finders.dart';
+import '../../support/fakes.dart';
 import '../../support/offline_fakes.dart';
 
 void main() {
@@ -77,6 +78,7 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
+              clubEventsOverride,
               ...quietQueueOverrides(),
               cachedBoardProvider.overrideWith((ref, matId) async => board),
             ],
@@ -105,7 +107,7 @@ void main() {
           ),
         );
         expect(
-          find.text('Group 3, ages 7-8', skipOffstage: false),
+          find.text('Group 3 · 7-8', skipOffstage: false),
           findsNWidgets(2),
         );
         expect(find.text('Recommended match'), findsOneWidget);
@@ -154,6 +156,7 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
+              clubEventsOverride,
               ...quietQueueOverrides(),
               cachedBoardProvider.overrideWith((ref, matId) async => live),
             ],
@@ -242,6 +245,7 @@ void main() {
       ProviderScope(
         retry: (_, _) => null,
         overrides: [
+          clubEventsOverride,
           ...quietQueueOverrides(),
           cachedBoardProvider.overrideWith(
             (ref, matId) async => throw Exception('down'),
@@ -271,7 +275,10 @@ void main() {
   ) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [matBoardProvider.overrideWith((ref, matId) async => board)],
+        overrides: [
+          clubEventsOverride,
+          matBoardProvider.overrideWith((ref, matId) async => board),
+        ],
         child: MaterialApp(
           builder: (_, child) => ToastHost(child: child!),
           theme: lightTheme(),
@@ -303,6 +310,7 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
+              clubEventsOverride,
               matBoardProvider.overrideWith((ref, matId) async {
                 loads++;
                 return MatBoard(
@@ -404,6 +412,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            clubEventsOverride,
             ...quietQueueOverrides(),
             cachedBoardProvider.overrideWith((ref, matId) async => teamBoard),
           ],

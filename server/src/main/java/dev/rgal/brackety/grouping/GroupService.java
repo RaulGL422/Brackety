@@ -5,7 +5,8 @@ import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventCategory;
 import dev.rgal.brackety.event.EventCategoryRepository;
 import dev.rgal.brackety.event.EventException;
-import dev.rgal.brackety.event.EventRole;
+import dev.rgal.brackety.event.EventPermission;
+import dev.rgal.brackety.event.EventPhase;
 import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.event.Mat;
 import dev.rgal.brackety.event.MatRepository;
@@ -30,7 +31,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 class GroupService {
 
+    /** Whoever groups, forms teams, measures or only looks reads the categories and who is in them. */
+    static final EventPermission[] READ_CATEGORIES = {
+        EventPermission.GROUPS, EventPermission.TEAMS, EventPermission.MEASURES, EventPermission.VIEW
+    };
+
     private final FightGroupRepository groups;
+    private final EventPhase phase;
     private final GroupMemberRepository members;
     private final MatchRepository matches;
     private final TeamRepository teams;
@@ -63,7 +70,9 @@ class GroupService {
             MatSchedule schedule,
             CompetitionCleanup cleanup,
             Clock clock,
-            StaffNames staffNames) {
+            StaffNames staffNames,
+            EventPhase phase) {
+        this.phase = phase;
         this.groups = groups;
         this.members = members;
         this.matches = matches;
@@ -85,7 +94,7 @@ class GroupService {
     /** Categories with participants, youngest first. */
     @Transactional(readOnly = true)
     List<CategorySummary> categories(UUID eventId, UUID accountId) {
-        access.require(eventId, accountId, EventRole.CLUB, EventRole.GROUPER);
+        access.require(eventId, accountId, READ_CATEGORIES);
         var event = events.get(eventId);
         var grouped = roster.groupedIds(eventId);
         var teamNumbers = directory.teamNumbers(eventId);
@@ -116,7 +125,7 @@ class GroupService {
     /** A category's participants by name; those already in a group or team say which one and where. */
     @Transactional(readOnly = true)
     List<CategoryParticipant> categoryParticipants(UUID eventId, UUID categoryId, UUID accountId) {
-        access.require(eventId, accountId, EventRole.CLUB, EventRole.GROUPER);
+        access.require(eventId, accountId, READ_CATEGORIES);
         var event = events.get(eventId);
         var category = roster.category(eventId, categoryId);
         var grouped = roster.groupedIds(eventId);
@@ -147,11 +156,9 @@ class GroupService {
 
     @Transactional
     CreateGroupsResponse create(UUID eventId, UUID accountId, CreateGroupsRequest request) {
-        access.require(eventId, accountId, EventRole.CLUB, EventRole.GROUPER);
+        access.require(eventId, accountId, EventPermission.GROUPS);
+        phase.requireInProgress(eventId);
         var event = events.lock(eventId);
-        if (request.groups().size() > event.getMaxGroupsPerMat()) {
-            throw EventException.invalid("At most " + event.getMaxGroupsPerMat() + " groups go to a mat at once.");
-        }
         var category = roster.category(eventId, request.categoryId());
         checkParticipantGroups(event, category, request.groups());
         checkTeamGroups(event, category, request.groups());
@@ -184,7 +191,8 @@ class GroupService {
      */
     @Transactional
     void undo(UUID eventId, UUID groupId, UUID accountId) {
-        access.require(eventId, accountId, EventRole.CLUB, EventRole.GROUPER);
+        access.require(eventId, accountId, EventPermission.GROUPS);
+        phase.requireInProgress(eventId);
         // Matches first, then the event: the same order as a match's first start, which locks both.
         var groupMatches = matches.lockByGroupId(groupId);
         var group = groups.findById(groupId)

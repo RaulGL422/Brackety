@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../auth/state/session_controller.dart';
+import '../../events/data/my_event.dart';
 
 final staffRepositoryProvider = Provider<StaffRepository>(
   (ref) => StaffRepository(ref.watch(apiProvider)),
@@ -101,6 +102,17 @@ class StaffRepository {
         '/api/v1/events/$eventId/staff/$accountId',
         queryParameters: {'role': role.wire},
       );
+
+  Future<void> setPermissions(
+    String eventId,
+    String accountId,
+    Set<EventPermission> permissions,
+  ) => _dio.put<void>(
+    '/api/v1/events/$eventId/staff/$accountId/permissions',
+    data: {
+      'permissions': [for (final p in permissions) p.wire],
+    },
+  );
 
   /// The token goes in the body: never in a URL the server logs keep.
   Future<InvitationOffer> offer(String token) async {

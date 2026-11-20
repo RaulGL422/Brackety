@@ -1,6 +1,8 @@
 package dev.rgal.brackety.participant;
 
+import dev.rgal.brackety.common.Names;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,9 +10,16 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface ParticipantRepository extends JpaRepository<Participant, UUID> {
 
-    @Query("select p from Participant p join fetch p.person pe where p.eventId = :eventId"
-            + " order by pe.firstName, pe.lastName")
-    List<Participant> findByEventIdOrderByFirstNameAscLastNameAsc(UUID eventId);
+    @Query("select p from Participant p join fetch p.person pe where p.eventId = :eventId")
+    List<Participant> findWithPersonByEventId(UUID eventId);
+
+    /** By first name, then last name, the Spanish way on every server ({@link Names#ORDER}). */
+    default List<Participant> findByEventIdOrderByFirstNameAscLastNameAsc(UUID eventId) {
+        return findWithPersonByEventId(eventId).stream()
+                .sorted(Comparator.comparing(Participant::getFirstName, Names.ORDER)
+                        .thenComparing(Participant::getLastName, Names.ORDER))
+                .toList();
+    }
 
     List<Participant> findByEventIdIn(Collection<UUID> eventIds);
 

@@ -3,7 +3,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
 import '../../club/ui/settings_tab.dart';
@@ -11,7 +10,7 @@ import '../../events/state/events_providers.dart';
 import '../data/league_models.dart';
 import '../data/league_repository.dart';
 import '../state/league_providers.dart';
-import 'league_tab.dart';
+import 'event_fields.dart';
 
 /// Creates the next phase from [eventId]'s settings and opens its panel.
 Future<void> showNewPhaseDialog(
@@ -68,7 +67,6 @@ class _NewPhaseDialogState extends ConsumerState<_NewPhaseDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final locale = Localizations.localeOf(context).toLanguageTag();
     return AlertDialog(
       scrollable: true,
       actionsOverflowDirection: VerticalDirection.up,
@@ -93,33 +91,15 @@ class _NewPhaseDialogState extends ConsumerState<_NewPhaseDialog> {
                       v == null || v.trim().isEmpty ? l10n.fieldRequired : null,
                 ),
                 const SizedBox(height: AppSpacing.s),
-                InkWell(
-                  onTap: _pickDate,
-                  child: InputDecorator(
-                    decoration: InputDecoration(
-                      labelText: l10n.settingsDate,
-                      suffixIcon: const Icon(Icons.calendar_today_outlined),
-                    ),
-                    child: Text(DateFormat.yMMMMd(locale).format(_date)),
-                  ),
+                DateField(
+                  date: _date,
+                  onChanged: (d) => setState(() => _date = d),
                 ),
                 const SizedBox(height: AppSpacing.m),
-                DropdownButtonFormField<Discipline>(
-                  initialValue: _discipline,
-                  decoration: InputDecoration(labelText: l10n.leagueDiscipline),
-                  items: [
-                    for (final d in Discipline.values)
-                      DropdownMenuItem(
-                        value: d,
-                        enabled: widget.league.availableDisciplines.contains(d),
-                        child: Text(
-                          widget.league.availableDisciplines.contains(d)
-                              ? disciplineName(l10n, d)
-                              : l10n.disciplineSoon(disciplineName(l10n, d)),
-                        ),
-                      ),
-                  ],
-                  onChanged: (d) => setState(() => _discipline = d!),
+                SportField(
+                  value: _discipline,
+                  available: widget.league.availableDisciplines,
+                  onChanged: (d) => setState(() => _discipline = d),
                 ),
                 const SizedBox(height: AppSpacing.m),
                 TextFormField(
@@ -148,16 +128,6 @@ class _NewPhaseDialogState extends ConsumerState<_NewPhaseDialog> {
         ),
       ],
     );
-  }
-
-  Future<void> _pickDate() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _date,
-      firstDate: DateTime(_date.year - 1),
-      lastDate: DateTime(_date.year + 2),
-    );
-    if (picked != null) setState(() => _date = picked);
   }
 
   Future<void> _create() async {

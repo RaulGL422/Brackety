@@ -1,8 +1,6 @@
 import 'package:brackety/app.dart';
 import 'package:brackety/core/app_bar_action.dart';
 import 'package:brackety/core/up_button.dart';
-import 'package:brackety/core/router.dart';
-import 'package:brackety/features/events/state/events_providers.dart';
 import 'package:brackety/features/grouping/data/grouping_models.dart';
 import 'package:brackety/features/grouping/data/grouping_repository.dart';
 import 'package:flutter/material.dart';
@@ -61,15 +59,13 @@ void main() {
           ...sessionOverrides(FakeAuthApi(signedIn: true)),
           groupingRepositoryProvider.overrideWithValue(repository),
           fakeMatsOverride,
-          myEventsProvider.overrideWith((ref) async => []),
+          clubEventsOverride,
         ],
         child: const BracketyApp(),
       ),
     );
     await tester.pumpAndSettle();
-    ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
-        .read(routerProvider)
-        .push('/events/e1/categories/c1/teams?name=15-16&size=3');
+    pushRoute(tester, '/events/e1/categories/c1/teams?name=15-16&size=3');
     await tester.pumpAndSettle();
     return repository;
   }
@@ -130,6 +126,8 @@ void main() {
       await tester.pumpAndSettle();
 
       for (final team in ['Team 1', 'Team 2', 'Team 3']) {
+        await tester.ensureVisible(find.text(team));
+        await tester.pumpAndSettle();
         await tester.tap(find.text(team));
         await tester.pump();
       }
@@ -201,15 +199,13 @@ void main() {
               ...sessionOverrides(FakeAuthApi(signedIn: true)),
               groupingRepositoryProvider.overrideWithValue(repository),
               fakeMatsOverride,
-              myEventsProvider.overrideWith((ref) async => []),
+              clubEventsOverride,
             ],
             child: const BracketyApp(),
           ),
         );
         await tester.pumpAndSettle();
-        ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
-            .read(routerProvider)
-            .push('/events/e1/categories/c1/teams?name=15-16&size=3');
+        pushRoute(tester, '/events/e1/categories/c1/teams?name=15-16&size=3');
         await tester.pumpAndSettle();
         await tester.tap(find.text('Teams'));
         await tester.pumpAndSettle();
@@ -291,15 +287,13 @@ void main() {
           ...sessionOverrides(FakeAuthApi(signedIn: true)),
           groupingRepositoryProvider.overrideWithValue(repository),
           fakeMatsOverride,
-          myEventsProvider.overrideWith((ref) async => []),
+          clubEventsOverride,
         ],
         child: const BracketyApp(),
       ),
     );
     await tester.pumpAndSettle();
-    ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
-        .read(routerProvider)
-        .push('/events/e1/categories/c1/teams?name=15-16&size=3');
+    pushRoute(tester, '/events/e1/categories/c1/teams?name=15-16&size=3');
     await tester.pumpAndSettle();
     await tester.tap(find.text('Teams'));
     await tester.pumpAndSettle();
@@ -377,15 +371,13 @@ void main() {
           ...sessionOverrides(FakeAuthApi(signedIn: true)),
           groupingRepositoryProvider.overrideWithValue(repository),
           fakeMatsOverride,
-          myEventsProvider.overrideWith((ref) async => []),
+          clubEventsOverride,
         ],
         child: const BracketyApp(),
       ),
     );
     await tester.pumpAndSettle();
-    ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
-        .read(routerProvider)
-        .push('/events/e1/categories/c1/teams?name=15-16&size=3');
+    pushRoute(tester, '/events/e1/categories/c1/teams?name=15-16&size=3');
     await tester.pumpAndSettle();
     await tester.tap(find.text('Teams'));
     await tester.pumpAndSettle();

@@ -140,7 +140,7 @@ class _ReviewOpTile extends StatelessWidget {
       dense: true,
       contentPadding: EdgeInsets.zero,
       textColor: colors.onWarningContainer,
-      title: Text(actionLabel(l10n, op.action)),
+      title: Text(actionLabel(l10n, op.action, points: op.points)),
       subtitle: Text([?who, ?op.reason, ?op.actor].join(' · ')),
       trailing: Text(time.format(op.at.toLocal())),
     );

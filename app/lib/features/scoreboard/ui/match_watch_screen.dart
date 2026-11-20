@@ -5,20 +5,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/async_view.dart';
+import '../../../core/up_button.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../events/data/my_event.dart';
+import '../../events/state/events_providers.dart';
 import '../../mat/data/mat_board.dart';
-import '../data/match_view.dart';
+import '../../mat/ui/mat_label.dart';
 import '../../offline/state/offline_sync.dart';
+import '../data/match_view.dart';
 import '../state/match_review.dart';
 import 'clock_bar.dart';
 import 'final_score.dart';
 import 'review_panel.dart';
 import 'timeline_list.dart';
-import '../../../core/up_button.dart';
-import '../../mat/ui/mat_label.dart';
 
-/// A match seen by the club: score and timeline, without controls. In review, what the phone
-/// sent and the buttons to apply or discard it.
+/// A match seen by the club or a helper: score and timeline, without controls. In review, what the
+/// phone sent and, for whoever resolves reviews, the buttons to apply or discard it.
 class MatchWatchScreen extends ConsumerWidget {
   const MatchWatchScreen({super.key, required this.matchId});
 
@@ -48,9 +50,14 @@ class MatchWatchScreen extends ConsumerWidget {
           null => l10n.timeline,
         }),
       ),
-      persistentFooterButtons: match.value?.review == null
-          ? null
-          : [ReviewButtons(matchId: matchId)],
+      persistentFooterButtons: switch (match.value) {
+        MatchView(review: _?, eventId: final eventId?)
+            when ref
+                .watch(myPermissionsProvider(eventId))
+                .contains(EventPermission.reviews) =>
+          [ReviewButtons(matchId: matchId)],
+        _ => null,
+      },
       body: AsyncView(
         value: match,
         onRetry: () => ref.invalidate(provider),
@@ -126,13 +133,7 @@ class _WatchClockState extends ConsumerState<_WatchClock> {
     return Column(
       children: [
         Text(
-          over
-              ? switch (view.endReason) {
-                  EndReason.points => l10n.endPoints,
-                  EndReason.disqualification => l10n.endDisqualification,
-                  _ => l10n.endTime,
-                }
-              : clockLabel(left),
+          over ? endLabel(l10n, view.endReason) : clockLabel(left),
           style: text.displayMedium,
         ),
         if (!over)

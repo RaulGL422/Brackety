@@ -7,20 +7,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/async_view.dart';
-import '../../rulebook/rulebook_ui.dart';
-import '../../auth/data/api_error.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../auth/data/api_error.dart';
 import '../../auth/ui/widgets/confirm_dialog.dart';
 import '../../events/state/events_providers.dart';
 import '../../league/state/league_providers.dart';
+import '../../rulebook/rulebook_ui.dart';
+import '../../staff/ui/staff_section.dart';
 import '../data/club_models.dart';
 import '../data/club_repository.dart';
 import '../state/club_providers.dart';
 import 'categories_editor.dart';
 import 'club_panel_screen.dart';
-import 'organizations_editor.dart';
 import 'measures_editor.dart';
-import '../../staff/ui/staff_section.dart';
+import 'organizations_editor.dart';
 import 'warning_reasons_editor.dart';
 
 const maxMats = 20;
@@ -319,6 +319,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
                     member: member,
                   ),
                 ),
+                StaffPermissionsButton(eventId: widget.eventId, member: member),
                 StaffRemoveButton(eventId: widget.eventId, member: member),
               ],
             ),
@@ -436,14 +437,13 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
         duration: const Duration(seconds: 1),
       );
     } on DioException catch (e) {
-      toasts.show(
-        ApiError.from(e).code == 'MAT_HAS_MATCHES'
-            ? l10n.settingsMatNeedsReferee
-            : rulesChanged && e.response?.statusCode == 409
-            ? l10n.settingsMatchRulesConflict
-            : saveErrorMessage(l10n, e),
-        kind: ToastKind.error,
-      );
+      toasts.show(switch (ApiError.from(e).code) {
+        'MAT_HAS_MATCHES' => l10n.settingsMatNeedsReferee,
+        'MAT_HAS_GROUPS' => l10n.settingsMatHasGroups,
+        _ when rulesChanged && e.response?.statusCode == 409 =>
+          l10n.settingsMatchRulesConflict,
+        _ => saveErrorMessage(l10n, e),
+      }, kind: ToastKind.error);
       if (mounted) _showSaved();
     } finally {
       _saving = false;

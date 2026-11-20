@@ -1,15 +1,23 @@
 /// What a phase competes in; only those in [League.availableDisciplines] have a scoreboard.
-enum Discipline { tambo, ground, throws, technicalExpression }
+enum Discipline { tambo, grappling, ground, throws, technicalExpression }
 
 Discipline _discipline(String value) => switch (value) {
+  'GRAPPLING' => Discipline.grappling,
   'GROUND' => Discipline.ground,
   'THROWS' => Discipline.throws,
   'TECHNICAL_EXPRESSION' => Discipline.technicalExpression,
   _ => Discipline.tambo,
 };
 
+/// The sports with a scoreboard today, from the server's list of `{discipline, available}`.
+Set<Discipline> disciplinesWithScoreboard(List<dynamic> json) => {
+  for (final d in json.cast<Map<String, dynamic>>())
+    if (d['available'] == true) _discipline(d['discipline'] as String),
+};
+
 String disciplineJson(Discipline d) => switch (d) {
   Discipline.tambo => 'TAMBO',
+  Discipline.grappling => 'GRAPPLING',
   Discipline.ground => 'GROUND',
   Discipline.throws => 'THROWS',
   Discipline.technicalExpression => 'TECHNICAL_EXPRESSION',
@@ -105,15 +113,13 @@ class League {
         CategoryPodium.fromJson(c as Map<String, dynamic>),
     ],
     phases: [
-      for (final p in json['phases'] as List)
+      for (final p in (json['phases'] as List).cast<Map<String, dynamic>?>())
         LeaguePhase.fromJson(p as Map<String, dynamic>),
     ],
     categoryNames: [for (final n in json['categoryNames'] as List) n as String],
-    availableDisciplines: {
-      for (final d in json['disciplines'] as List)
-        if ((d as Map<String, dynamic>)['available'] == true)
-          _discipline(d['discipline'] as String),
-    },
+    availableDisciplines: disciplinesWithScoreboard(
+      json['disciplines'] as List,
+    ),
   );
 
   final String name;
@@ -192,7 +198,8 @@ class LeagueStandingRow {
         lastName: json['lastName'] as String,
         organizationName: json['organizationName'] as String?,
         phasePoints: [
-          for (final p in json['phases'] as List)
+          for (final p
+              in (json['phases'] as List).cast<Map<String, dynamic>?>())
             p == null
                 ? null
                 : (
@@ -237,7 +244,8 @@ class LeagueStandings {
   factory LeagueStandings.fromJson(Map<String, dynamic> json) =>
       LeagueStandings(
         phaseNumbers: [
-          for (final p in json['phases'] as List)
+          for (final p
+              in (json['phases'] as List).cast<Map<String, dynamic>?>())
             (p as Map<String, dynamic>)['number'] as int,
         ],
         rows: [

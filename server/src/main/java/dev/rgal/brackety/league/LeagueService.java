@@ -1,5 +1,6 @@
 package dev.rgal.brackety.league;
 
+import dev.rgal.brackety.common.Names;
 import dev.rgal.brackety.event.Discipline;
 import dev.rgal.brackety.event.Event;
 import dev.rgal.brackety.event.EventAccess;
@@ -132,12 +133,13 @@ public class LeagueService {
         for (var member : staff.findByEventId(eventId)) {
             staff.save(new EventStaff(phase.getId(), member.getAccountId(), member.getRole()));
         }
+        staff.flush();
+        access.copyPermissions(eventId, phase.getId());
         for (var mat : mats.findByEventIdOrderByNumber(eventId)) {
             mats.save(new Mat(phase.getId(), mat.getNumber(), mat.getRefereeAccountId()));
         }
         for (var c : categories.findByEventIdOrderByMinAge(eventId)) {
-            categories.save(
-                    new EventCategory(phase.getId(), c.getName(), c.getMinAge(), c.getMaxAge(), c.getTeamSize()));
+            categories.save(c.copyFor(phase.getId()));
         }
         for (var o : organizations.findByEventIdOrderByName(eventId)) {
             organizations.save(new EventOrganization(phase.getId(), o.getOrganization()));
@@ -182,8 +184,8 @@ public class LeagueService {
                                     .orElse(null),
                             phase.getPhaseNumber());
                 })
-                .sorted(Comparator.comparing(Candidate::firstName, String.CASE_INSENSITIVE_ORDER)
-                        .thenComparing(Candidate::lastName, String.CASE_INSENSITIVE_ORDER))
+                .sorted(Comparator.comparing(Candidate::firstName, Names.ORDER)
+                        .thenComparing(Candidate::lastName, Names.ORDER))
                 .toList();
     }
 

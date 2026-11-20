@@ -5,9 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/async_view.dart';
 import '../../../core/medal.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../league/state/league_providers.dart';
 import '../data/club_models.dart';
 import '../state/club_providers.dart';
-import '../../league/state/league_providers.dart';
 import 'participant_record_sheet.dart';
 
 enum StandingsOrder { points, name }
@@ -130,6 +130,15 @@ class _StandingTile extends StatelessWidget {
       row.categoryName ?? l10n.noCategory,
       row.age,
     );
+    // Grappling ranks by wins and classification points (FELODA), not by the points scored.
+    final classification = row.classificationPoints;
+    final detail = classification == null
+        ? l10n.standingsDetail(
+            row.attendancePoints,
+            row.matchPoints,
+            row.matches,
+          )
+        : l10n.standingsWinsDetail(row.wins ?? 0, row.matchPoints, row.matches);
     return ListTile(
       onTap: () => showParticipantRecord(
         context,
@@ -141,11 +150,13 @@ class _StandingTile extends StatelessWidget {
       title: Text('${row.firstName} ${row.lastName}'),
       subtitle: Text(
         '${row.teamNumber == null ? placeAge : l10n.standingTeam(l10n.teamName(row.teamNumber!), placeAge)}\n'
-        '${l10n.standingsDetail(row.attendancePoints, row.matchPoints, row.matches)}',
+        '$detail',
       ),
       isThreeLine: true,
       trailing: Text(
-        l10n.standingsTotal(row.total),
+        classification == null
+            ? l10n.standingsTotal(row.total)
+            : l10n.standingsClassification(classification),
         style: Theme.of(context).textTheme.titleLarge,
       ),
     );

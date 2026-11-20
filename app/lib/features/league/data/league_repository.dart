@@ -61,6 +61,33 @@ class LeagueRepository {
     return LeaguePhase.fromJson(response.data!);
   }
 
+  /// A standalone event: a league of one phase with [mats] mats, whose club is the caller.
+  Future<LeaguePhase> createEvent({
+    required String name,
+    required DateTime date,
+    required Discipline discipline,
+    required int mats,
+  }) async {
+    final response = await _dio.post<Map<String, dynamic>>(
+      '/api/v1/events',
+      data: {
+        'name': name,
+        'date': DateFormat('yyyy-MM-dd').format(date),
+        'discipline': disciplineJson(discipline),
+        'mats': mats,
+      },
+    );
+    return LeaguePhase.fromJson(response.data!);
+  }
+
+  /// The sports with a scoreboard today.
+  Future<Set<Discipline>> disciplines() async {
+    final response = await _dio.get<List<dynamic>>(
+      '/api/v1/events/disciplines',
+    );
+    return disciplinesWithScoreboard(response.data!);
+  }
+
   Future<List<LeagueCandidate>> candidates(String eventId) async {
     final response = await _dio.get<List<dynamic>>(
       '${_path(eventId)}/candidates',

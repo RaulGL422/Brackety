@@ -2,8 +2,8 @@ package dev.rgal.brackety.ranking;
 
 import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventException;
+import dev.rgal.brackety.event.EventPermission;
 import dev.rgal.brackety.event.EventRepository;
-import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.grouping.CompetitorDirectory;
 import dev.rgal.brackety.grouping.Match;
@@ -70,7 +70,7 @@ class ParticipantRecordService {
 
     @Transactional(readOnly = true)
     ParticipantRecord record(UUID eventId, UUID participantId, UUID accountId) {
-        access.require(eventId, accountId, EventRole.CLUB);
+        access.require(eventId, accountId, EventPermission.PARTICIPANTS);
         var event = events.get(eventId);
         var standing = standings.rows(event).stream()
                 .filter(r -> r.participantId().equals(participantId))
@@ -82,7 +82,7 @@ class ParticipantRecordService {
     /** The person's matches in every phase of the event's league they entered, phase by phase. */
     @Transactional(readOnly = true)
     LeagueRecord leagueRecord(UUID eventId, UUID personId, UUID accountId) {
-        access.require(eventId, accountId, EventRole.CLUB);
+        access.require(eventId, accountId, EventPermission.PARTICIPANTS);
         var event = events.get(eventId);
         var phases = eventRepository.findByLeagueIdOrderByPhaseNumber(event.getLeagueId()).stream()
                 .flatMap(phase -> participants.findByEventIdOrderByFirstNameAscLastNameAsc(phase.getId()).stream()
@@ -141,7 +141,7 @@ class ParticipantRecordService {
                 .toList();
     }
 
-    // Those of their side that stand: a cancel starts the match over, as the scoreboard does (TamboMatch).
+    // Those of their side that stand: a cancel starts the match over, as the scoreboard does (MatchState).
     private static List<Incident> incidents(List<TimelineEntry> timeline, Side side) {
         var lastCancel = -1;
         for (int i = 0; i < timeline.size(); i++) {

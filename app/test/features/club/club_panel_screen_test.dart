@@ -1,19 +1,19 @@
 import 'dart:typed_data';
 
 import 'package:brackety/core/download/file_download.dart';
+import 'package:brackety/core/upload/file_upload.dart';
 import 'package:brackety/features/club/data/club_models.dart';
-import 'package:brackety/features/mat/data/mat_board.dart';
 import 'package:brackety/features/club/data/club_repository.dart';
 import 'package:brackety/features/club/data/sex.dart';
 import 'package:brackety/features/club/state/club_providers.dart';
-import 'package:brackety/core/upload/file_upload.dart';
 import 'package:brackety/features/club/ui/club_panel_screen.dart';
-import 'package:brackety/features/club/ui/settings_tab.dart';
 import 'package:brackety/features/club/ui/participant_form.dart';
+import 'package:brackety/features/club/ui/settings_tab.dart';
 import 'package:brackety/features/events/data/my_event.dart';
 import 'package:brackety/features/events/state/events_providers.dart';
 import 'package:brackety/features/league/data/league_models.dart';
 import 'package:brackety/features/league/state/league_providers.dart';
+import 'package:brackety/features/mat/data/mat_board.dart';
 import 'package:brackety/features/staff/data/staff_repository.dart';
 import 'package:brackety/l10n/gen/app_localizations.dart';
 import 'package:brackety_core/brackety_core.dart';
@@ -22,6 +22,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/fakes.dart';
 import '../../support/staff_fakes.dart';
 
 /// Saves settings like the server would, or refuses them with [refuseWith].
@@ -38,6 +39,9 @@ class FakeClubRepository extends Fake implements ClubRepository {
     String name,
   ) async => savedStaffNames.add((accountId, name));
   int? refuseWith;
+
+  /// The `code` of the refusal, as the server's problem+json sends it.
+  String? refuseCode;
   final savedMatReferees = <List<String?>>[];
   final savedRules = <(Duration, int)>[];
   final savedAttendance = <int>[];
@@ -103,6 +107,7 @@ class FakeClubRepository extends Fake implements ClubRepository {
           minAge: c.minAge,
           maxAge: c.maxAge,
           teamSize: c.teamSize,
+          matchLength: c.matchLength,
         ),
     ];
   }
@@ -114,6 +119,7 @@ class FakeClubRepository extends Fake implements ClubRepository {
         response: Response(
           requestOptions: RequestOptions(),
           statusCode: refuseWith,
+          data: {'code': ?refuseCode},
         ),
       );
     }
@@ -165,6 +171,7 @@ void main() {
     name: 'Fase 1',
     date: DateTime(2026, 11, 14),
     roles: {EventRole.club},
+    permissions: {...EventPermission.values},
   );
 
   final settings = EventSettings(
@@ -182,7 +189,16 @@ void main() {
       ),
     ],
     staff: const [
-      StaffMember(id: 'h1', username: 'ayudante1', roles: ['GROUPER']),
+      StaffMember(
+        id: 'h1',
+        username: 'ayudante1',
+        roles: ['GROUPER'],
+        permissions: {
+          EventPermission.groups,
+          EventPermission.teams,
+          EventPermission.measures,
+        },
+      ),
       StaffMember(
         id: 'r1',
         username: 'arbitro1',
@@ -245,6 +261,7 @@ void main() {
     List<StandingRow>? scores,
     bool globalStandings = true,
     FakeStaffRepository? staff,
+    MyEvent? me,
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
@@ -257,7 +274,7 @@ void main() {
           staffRepositoryProvider.overrideWithValue(
             staff ?? FakeStaffRepository(),
           ),
-          myEventsProvider.overrideWith((ref) async => [event]),
+          myEventsProvider.overrideWith((ref) async => [me ?? event]),
           leagueProvider.overrideWith(
             (ref, _) async => League(
               name: 'Liga',
@@ -398,6 +415,42 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Bea Test'), findsOneWidget);
       expect(find.text('Ana Test'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    // Grappling ranks by wins and FELODA classification points, and says so.
+    testWidgets('grappling standings show wins and classification on $device', (
+      tester,
+    ) async {
+      StandingRow grappler(int position, String name, int wins, int points) =>
+          StandingRow(
+            position: position,
+            participantId: name,
+            firstName: name,
+            lastName: 'Test',
+            age: 9,
+            categoryId: 'c2',
+            categoryName: '8-11',
+            attendancePoints: 0,
+            matchPoints: 21,
+            total: 21,
+            matches: 3,
+            wins: wins,
+            classificationPoints: points,
+          );
+      await pumpPanel(
+        tester,
+        size,
+        scores: [grappler(1, 'Ana', 2, 10), grappler(2, 'Dani', 2, 5)],
+      );
+
+      // The first row (the second may be below the fold on a phone).
+      expect(find.text('10 class. pts'), findsOneWidget);
+      expect(
+        find.textContaining('Wins 2 · Technical points 21 (3)'),
+        findsWidgets,
+      );
+      expect(find.textContaining('Attendance'), findsNothing);
       expect(tester.takeException(), isNull);
     });
 
@@ -670,6 +723,29 @@ void main() {
       await tester.pumpAndSettle();
       expect(staff.calls.last, 'cancel old');
 
+      // The helper no longer groups but starts and finishes the phase.
+      final permissions = find.byTooltip('Permissions of ayudante1');
+      await tester.scrollUntilVisible(permissions, -200, scrollable: list);
+      await centre(permissions);
+      await tester.tap(permissions);
+      await tester.pumpAndSettle();
+      for (final name in [
+        'Create and undo groups',
+        'Start and finish the phase',
+      ]) {
+        final box = find.descendant(
+          of: find.widgetWithText(CheckboxListTile, name),
+          matching: find.byType(Checkbox),
+        );
+        // Centred: at the top the toast of the cancel above still covers it.
+        await centre(box);
+        await tester.tap(box);
+        await tester.pump();
+      }
+      await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+      await tester.pumpAndSettle();
+      expect(staff.calls.last, 'permissions h1 MEASURES,PHASE,TEAMS');
+
       final remove = find.byTooltip('Remove ayudante1');
       await tester.scrollUntilVisible(remove, -200, scrollable: list);
       await centre(remove);
@@ -683,6 +759,47 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  for (final MapEntry(key: device, value: size) in sizes.entries) {
+    testWidgets(
+      'a helper sees only the tabs their permissions open on $device',
+      (tester) async {
+        await pumpPanel(
+          tester,
+          size,
+          repository: FakeClubRepository(settings),
+          me: helperEvent({EventPermission.view, EventPermission.participants}),
+        );
+
+        expect(find.text('Mats'), findsWidgets);
+        expect(find.text('Entries'), findsWidgets);
+        expect(find.text('Scores'), findsNothing);
+        expect(find.text('Settings'), findsNothing);
+
+        await tester.tap(find.text('Entries').last);
+        await tester.pumpAndSettle();
+        expect(find.text('Add student'), findsOneWidget);
+        // Re-enrolling from another phase and reading lists stay the club's.
+        expect(find.text('Import participants'), findsNothing);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
+  testWidgets('a helper with one place in the panel gets no navigation', (
+    tester,
+  ) async {
+    await pumpPanel(
+      tester,
+      const Size(360, 800),
+      repository: FakeClubRepository(settings),
+      me: helperEvent({EventPermission.participants}),
+    );
+
+    expect(find.byType(NavigationBar), findsNothing);
+    expect(find.text('Add student'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('the club adds the clubs taking part in Settings', (
     tester,
@@ -843,6 +960,28 @@ void main() {
     expect(repository.savedMatReferees, [
       ['r1'],
     ]);
+  });
+
+  testWidgets('a mat with groups is not removed: it points to disabling it', (
+    tester,
+  ) async {
+    final repository = FakeClubRepository(settings)
+      ..refuseWith = 409
+      ..refuseCode = 'MAT_HAS_GROUPS';
+    await pumpPanel(tester, const Size(800, 1280), repository: repository);
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Remove the last mat'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Remove the last mat'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.textContaining('use "Disable mat" in the mats tab'),
+      findsOneWidget,
+    );
+    expect(find.text('Mat 2 · Referee'), findsOneWidget);
   });
 
   testWidgets('a refused change explains why and shows the saved value', (
@@ -1007,6 +1146,35 @@ void main() {
     });
   }
 
+  // Grappling: U15 fight 4 minutes in an event of 5.
+  testWidgets('a category takes its own match length', (tester) async {
+    final repository = FakeClubRepository(settings);
+    await pumpPanel(tester, const Size(800, 1280), repository: repository);
+    await openCategories(tester);
+    await tester.tap(find.text('Add category'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.widgetWithText(TextFormField, 'Name'), 'U15');
+    await tester.enterText(find.widgetWithText(TextFormField, 'From'), '14');
+    await tester.enterText(find.widgetWithText(TextFormField, 'To'), '15');
+    final length = find.widgetWithText(
+      TextFormField,
+      'Own match length (min:s)',
+    );
+    await tester.enterText(length, '9:99');
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+    expect(repository.savedCategories, isEmpty);
+
+    await tester.enterText(length, '4:00');
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+
+    final saved = repository.savedCategories.single;
+    expect(saved.last.matchLength, const Duration(minutes: 4));
+    expect(saved.last.toJson()['matchSeconds'], 240);
+    expect(find.textContaining('4:00 per match'), findsOneWidget);
+  });
+
   testWidgets('a category with ages the wrong way round is not saved', (
     tester,
   ) async {
@@ -1048,7 +1216,7 @@ void main() {
       tester,
       const Size(800, 1280),
       scores: [
-        StandingRow(
+        const StandingRow(
           position: 4,
           participantId: 'teen',
           firstName: 'Teo',

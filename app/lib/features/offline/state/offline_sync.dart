@@ -170,11 +170,11 @@ class OfflineSync extends Notifier<OfflineState> {
       // Until the session says whose they are.
       hidden: stored,
       heldForReview: {
-        if (queue case {'heldForReview': final List ids})
+        if (queue case {'heldForReview': final List<Object?> ids})
           for (final id in ids) id as String,
       },
       views: {
-        if (saved case {'views': final Map views})
+        if (saved case {'views': final Map<Object?, Object?> views})
           for (final MapEntry(:key, :value) in views.entries)
             key as String: MatchView.fromJson(value as Map<String, dynamic>),
       },
@@ -282,6 +282,7 @@ class OfflineSync extends Notifier<OfflineState> {
     Side? side,
     String? reason,
     Duration? delta,
+    int points = 1,
   }) async {
     if (!_loaded) await ready;
     final view = ref.mounted ? state.views[matchId] : null;
@@ -293,6 +294,7 @@ class OfflineSync extends Notifier<OfflineState> {
       side: side,
       reason: reason,
       delta: delta,
+      points: points,
       at: now(),
       account: _account,
       knownEvents:
@@ -556,7 +558,7 @@ class OfflineSync extends Notifier<OfflineState> {
   }
 
   static List<OfflineOp> _storedOps(Object? queue) => [
-    if (queue case {'ops': final List ops})
+    if (queue case {'ops': final List<Object?> ops})
       for (final op in ops) OfflineOp.fromJson(op as Map<String, dynamic>),
   ];
 

@@ -2,7 +2,8 @@ package dev.rgal.brackety.grouping;
 
 import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventException;
-import dev.rgal.brackety.event.EventRole;
+import dev.rgal.brackety.event.EventPermission;
+import dev.rgal.brackety.event.EventPhase;
 import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.event.Mat;
 import dev.rgal.brackety.event.MatRepository;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 class TeamService {
 
     private final TeamRepository teams;
+    private final EventPhase phase;
     private final TeamMemberRepository teamMembers;
     private final GroupMemberRepository groupMembers;
     private final FightGroupRepository groups;
@@ -49,7 +51,9 @@ class TeamService {
             EventService events,
             EventAccess access,
             Clock clock,
-            StaffNames staffNames) {
+            StaffNames staffNames,
+            EventPhase phase) {
+        this.phase = phase;
         this.teams = teams;
         this.teamMembers = teamMembers;
         this.groupMembers = groupMembers;
@@ -70,7 +74,7 @@ class TeamService {
 
     @Transactional(readOnly = true)
     List<TeamResponse> list(UUID eventId, UUID categoryId, UUID accountId) {
-        access.require(eventId, accountId, EventRole.CLUB, EventRole.GROUPER);
+        access.require(eventId, accountId, GroupService.READ_CATEGORIES);
         roster.category(eventId, categoryId);
         var categoryTeams = teams.findByCategoryIdAndGhostFalseOrderByNumber(categoryId);
         var people = participants.findByEventIdOrderByFirstNameAscLastNameAsc(eventId).stream()
@@ -110,7 +114,8 @@ class TeamService {
 
     @Transactional
     TeamResponse create(UUID eventId, UUID categoryId, UUID accountId, CreateTeamRequest request) {
-        access.require(eventId, accountId, EventRole.CLUB, EventRole.GROUPER);
+        access.require(eventId, accountId, EventPermission.TEAMS);
+        phase.requireNotFinished(eventId);
         var event = events.lock(eventId);
         var category = roster.category(eventId, categoryId);
         if (!category.isTeam()) {
@@ -143,7 +148,8 @@ class TeamService {
     /** Undoes a team made by mistake; once in a group it stays. */
     @Transactional
     void delete(UUID eventId, UUID teamId, UUID accountId) {
-        access.require(eventId, accountId, EventRole.CLUB, EventRole.GROUPER);
+        access.require(eventId, accountId, EventPermission.TEAMS);
+        phase.requireNotFinished(eventId);
         events.lock(eventId);
         var team = teams.findById(teamId)
                 .filter(t -> t.getEventId().equals(eventId) && !t.isGhost())

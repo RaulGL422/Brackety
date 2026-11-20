@@ -21,6 +21,13 @@ final myEventProvider = FutureProvider.autoDispose.family<MyEvent, String>((
   return events.firstWhere((e) => e.id == eventId);
 });
 
+/// What the signed-in account may do in an event; nothing while it loads or if it has no role.
+final myPermissionsProvider = Provider.autoDispose
+    .family<Set<EventPermission>, String>(
+      (ref, eventId) =>
+          ref.watch(myEventProvider(eventId)).value?.permissions ?? const {},
+    );
+
 /// The events grouped by league, the league with the latest phase first; phases in order.
 List<List<MyEvent>> byLeague(List<MyEvent> events) {
   final leagues = <String, List<MyEvent>>{};

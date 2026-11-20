@@ -2,8 +2,8 @@ import 'package:brackety/features/mat/data/mat_board.dart';
 import 'package:brackety/features/offline/data/local_board.dart';
 import 'package:brackety/features/offline/data/local_match.dart';
 import 'package:brackety/features/offline/data/offline_op.dart';
+import 'package:brackety/features/scoreboard/data/match_state.dart';
 import 'package:brackety/features/scoreboard/data/match_view.dart';
-import 'package:brackety/features/scoreboard/data/tambo_match.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/offline_fakes.dart';
@@ -22,6 +22,74 @@ void main() {
   );
 
   DateTime at(int second) => t0.add(Duration(seconds: second));
+
+  // Without network the device scores by the rules the server sent with the match.
+  test("the queue follows the match's sport: four warnings disqualify in grappling", () {
+    const grappling = Scoring(
+      actions: [ScoringAction(value: 1, label: 'Salida o ataque')],
+      warningPoints: [1],
+      warningsToDisqualify: 4,
+      superiorityGap: 15,
+      pointsAfterTime: false,
+      disqualificationScores: false,
+      oneHandWarnings: false,
+      finishes: ['Sumisión'],
+      tiebreaks: [
+        Tiebreak.bestAction,
+        Tiebreak.fewerWarnings,
+        Tiebreak.extraTime,
+      ],
+    );
+    final view = LocalMatch.project(serverMatch('m1', scoring: grappling), [
+      op(MatchAction.start, 0),
+      for (var i = 1; i <= 4; i++) op(MatchAction.warning, i, side: Side.red),
+    ], at(10)).view;
+
+    expect(view.endReason, EndReason.warnings);
+    expect(view.blue.points, 4);
+    expect(view.red.disqualified, isTrue);
+  });
+
+  // Without network a +4 counts four and says so in the timeline; a value no button has is
+  // left out, as the server would refuse it.
+  test('a queued point keeps its value', () {
+    const grappling = Scoring(
+      actions: [
+        ScoringAction(value: 2, label: 'Derribo'),
+        ScoringAction(value: 4, label: 'Montada o espalda'),
+      ],
+      warningPoints: [1],
+      warningsToDisqualify: 4,
+      superiorityGap: 15,
+      pointsAfterTime: false,
+      disqualificationScores: false,
+      oneHandWarnings: false,
+      finishes: ['Sumisión'],
+      tiebreaks: [
+        Tiebreak.bestAction,
+        Tiebreak.fewerWarnings,
+        Tiebreak.extraTime,
+      ],
+    );
+    OfflineOp point(String id, int second, int points) => OfflineOp(
+      opId: id,
+      matchId: 'm1',
+      action: MatchAction.point,
+      side: Side.red,
+      points: points,
+      at: at(second),
+      knownEvents: 0,
+    );
+
+    final view = LocalMatch.project(serverMatch('m1', scoring: grappling), [
+      op(MatchAction.start, 0),
+      point('four', 1, 4),
+      point('three', 2, 3),
+    ], at(10)).view;
+
+    expect(view.red.points, 4);
+    expect(view.timeline.map((e) => e.points), [1, 4]);
+  });
 
   group('a match with queued actions', () {
     test('replays them on the server view with the device clock', () {

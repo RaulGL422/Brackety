@@ -7,3 +7,5 @@ mvnw text eol=lf
 *.jar binary
 *.png binary
 .githooks/* text eol=lf
+# Golden files are compared byte for byte (CSV with BOM and CRLF for Excel): never converted.
+server/src/test/resources/golden/** -text

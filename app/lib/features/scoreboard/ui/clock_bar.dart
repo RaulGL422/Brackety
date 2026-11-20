@@ -9,6 +9,7 @@ import '../../mat/data/mat_board.dart';
 import '../data/match_view.dart';
 import '../state/bell.dart';
 import '../state/match_controller.dart';
+import 'timeline_list.dart';
 import 'undo_text.dart';
 
 /// The last seconds show in the warning colour, and the clapper knocks once when they start.
@@ -261,11 +262,7 @@ class _Clock extends StatelessWidget {
     final ending = !over && left <= clockWarningFrom;
     return FittedBox(
       child: over
-          ? Text(switch (view.endReason) {
-              EndReason.points => l10n.endPoints,
-              EndReason.disqualification => l10n.endDisqualification,
-              _ => l10n.endTime,
-            }, style: text.headlineMedium)
+          ? Text(endLabel(l10n, view.endReason), style: text.headlineMedium)
           : Text(
               clockLabel(left),
               style: text.displayLarge?.copyWith(

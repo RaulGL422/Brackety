@@ -51,6 +51,6 @@ Salen `event_staff_name`, `league_category_podium`, `team`, `team_member` y `gro
 
 ## En el código
 - **Sin "¿es de equipos?"**: con `entry` hay un solo camino para el marcador, el tablero, la clasificación y los CSV.
-- Un solo dueño por cálculo: nombre del competidor, tapiz efectivo, reglas que aplican a un combate, puntos de un combate y permiso "club o árbitro del tapiz" (hoy repetidos en varios servicios, `revision-f1.md`).
+- Un solo dueño por cálculo: nombre del competidor, tapiz efectivo, reglas que aplican a un combate, puntos de un combate y permiso "club o árbitro del tapiz" (hoy repetidos en varios servicios, `../historico/revision-f1.md`).
 - Las reglas del marcador existen en Java y en Dart (hace falta para el modo offline): un solo juego de casos JSON que pasan los dos.
 - La caché offline de la app no cuenta como dato repetido: es una copia del servidor que se reemplaza entera.

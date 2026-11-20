@@ -39,7 +39,6 @@ public class Event {
 
     private String name;
     private LocalDate eventDate;
-    private int maxGroupsPerMat;
     private int attendancePoints;
     private Instant createdAt;
     private UUID originEventId;
@@ -57,6 +56,12 @@ public class Event {
 
     private String resultsImportHash;
 
+    /** F1-7: groups and scoring only between start and finish; finished, read-only until the club reopens it. */
+    private Instant startedAt;
+
+    private Instant finishedAt;
+    private Instant autoCloseWarnedAt;
+
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "event_id", nullable = false)
     @OrderBy("position")
@@ -72,7 +77,6 @@ public class Event {
             Discipline discipline,
             String name,
             LocalDate eventDate,
-            int maxGroupsPerMat,
             int attendancePoints,
             Modality modality,
             Instant now) {
@@ -82,7 +86,6 @@ public class Event {
         this.discipline = discipline;
         this.name = name;
         this.eventDate = eventDate;
-        this.maxGroupsPerMat = maxGroupsPerMat;
         this.attendancePoints = attendancePoints;
         this.modalities.add(modality);
         this.createdAt = now;
@@ -90,10 +93,13 @@ public class Event {
 
     /** Liga Yoseikan tambo, Fase 1: 10 points for attending; its match rules in {@link Modality#tambo()}. */
     public static Event tambo(UUID ownerAccountId, UUID leagueId, String name, LocalDate eventDate, Instant now) {
-        return new Event(ownerAccountId, leagueId, 1, Discipline.TAMBO, name, eventDate, 1, 10, Modality.tambo(), now);
+        return new Event(ownerAccountId, leagueId, 1, Discipline.TAMBO, name, eventDate, 10, Modality.tambo(), now);
     }
 
-    /** The next phase of the same league, with this one's match rules, measures asked and warning reasons. */
+    /**
+     * The next phase of the same league. In the same sport it keeps this one's match rules, measures asked and warning
+     * reasons; in another sport it starts from that sport's (a tambo phase does not hand its rules to grappling).
+     */
     public Event nextPhase(
             int phaseNumber,
             Discipline discipline,
@@ -108,13 +114,64 @@ public class Event {
                 discipline,
                 name,
                 eventDate,
-                maxGroupsPerMat,
                 attendancePoints,
-                modality().copy(),
+                discipline == this.discipline ? modality().copy() : discipline.defaultModality(),
                 now);
-        next.setMeasureRequirements(weightRequirement, heightRequirement);
-        next.warningReasons = warningReasons == null ? null : List.copyOf(warningReasons);
+        if (discipline == this.discipline) {
+            next.setMeasureRequirements(weightRequirement, heightRequirement);
+            next.warningReasons = warningReasons == null ? null : List.copyOf(warningReasons);
+        }
         return next;
+    }
+
+    public enum PhaseState {
+        NOT_STARTED,
+        IN_PROGRESS,
+        FINISHED
+    }
+
+    public PhaseState phaseState() {
+        if (finishedAt != null) {
+            return PhaseState.FINISHED;
+        }
+        return startedAt == null ? PhaseState.NOT_STARTED : PhaseState.IN_PROGRESS;
+    }
+
+    public Instant getStartedAt() {
+        return startedAt;
+    }
+
+    public Instant getFinishedAt() {
+        return finishedAt;
+    }
+
+    public Instant getAutoCloseWarnedAt() {
+        return autoCloseWarnedAt;
+    }
+
+    void start(Instant now) {
+        startedAt = now;
+    }
+
+    /** Results played elsewhere (the hall's laptop) came in: the phase started with their first group. */
+    public void startedElsewhere(Instant firstGroupAt) {
+        if (startedAt == null) {
+            startedAt = firstGroupAt;
+        }
+    }
+
+    void finish(Instant now) {
+        finishedAt = now;
+    }
+
+    /** Back in progress; a later day without finishing warns again. */
+    void reopen() {
+        finishedAt = null;
+        autoCloseWarnedAt = null;
+    }
+
+    void autoCloseWarned(Instant now) {
+        autoCloseWarnedAt = now;
     }
 
     /** Whether weight is asked: the event's own choice, or its sport's. */
@@ -193,10 +250,6 @@ public class Event {
         return eventDate;
     }
 
-    public int getMaxGroupsPerMat() {
-        return maxGroupsPerMat;
-    }
-
     /** Its only modality for now; the competition of 2026-12-20 will bring several. */
     public Modality modality() {
         return modalities.getFirst();
@@ -230,14 +283,12 @@ public class Event {
     void update(
             String name,
             LocalDate eventDate,
-            int maxGroupsPerMat,
             int attendancePoints,
             Modality.FormatRules individual,
             Modality.FormatRules team,
             int minRestSeconds) {
         this.name = name;
         this.eventDate = eventDate;
-        this.maxGroupsPerMat = maxGroupsPerMat;
         this.attendancePoints = attendancePoints;
         modality().update(individual, team, minRestSeconds);
     }

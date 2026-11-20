@@ -1,5 +1,6 @@
 package dev.rgal.brackety.event.dto;
 
+import dev.rgal.brackety.event.EventPermission;
 import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.MeasureRequirement;
 import java.time.LocalDate;
@@ -7,8 +8,7 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * An event where the caller has a role; {@code matId} is set for a referee with a mat.
- * {@code maxGroupsPerMat}: how many groups a helper can send to a mat at once.
+ * An event where the caller has a role; {@code permissions}: what they may do there (F1-7 C). {@code matId} is set for a referee with a mat.
  * {@code leagueId}, {@code leagueName} and {@code phaseNumber}: the league the event is a phase of.
  * {@code weightRequirement} and {@code heightRequirement}: whether the event asks for them (its own or its sport's).
  */
@@ -17,7 +17,7 @@ public record MyEventResponse(
         String name,
         LocalDate date,
         Set<EventRole> roles,
-        int maxGroupsPerMat,
+        Set<EventPermission> permissions,
         UUID matId,
         Integer matNumber,
         UUID leagueId,

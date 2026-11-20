@@ -5,8 +5,8 @@ import dev.rgal.brackety.auth.account.AccountRepository;
 import dev.rgal.brackety.auth.account.Cif;
 import dev.rgal.brackety.auth.account.Profile;
 import dev.rgal.brackety.auth.account.ProfileRepository;
+import dev.rgal.brackety.auth.account.VerifiedAccounts;
 import dev.rgal.brackety.common.crypto.Sha256;
-import dev.rgal.brackety.demo.DemoAccounts;
 import dev.rgal.brackety.event.Discipline;
 import dev.rgal.brackety.event.Event;
 import dev.rgal.brackety.event.EventAccess;
@@ -25,6 +25,7 @@ import dev.rgal.brackety.event.MatRepository;
 import dev.rgal.brackety.event.Modality;
 import dev.rgal.brackety.event.OrganizationRepository;
 import dev.rgal.brackety.event.RulebookService;
+import dev.rgal.brackety.event.ScoringRules;
 import dev.rgal.brackety.event.StaffNames;
 import dev.rgal.brackety.eventpackage.EventPackage.Category;
 import dev.rgal.brackety.eventpackage.EventPackage.CategoryPodiumEntry;
@@ -57,6 +58,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.zip.ZipInputStream;
@@ -96,7 +98,7 @@ public class EventPackageService {
     private final CategoryPodiumRepository podiums;
     private final AccountRepository accounts;
     private final ProfileRepository profiles;
-    private final DemoAccounts demoAccounts;
+    private final VerifiedAccounts verifiedAccounts;
     private final EventResultsTransfer results;
     private final JsonMapper json;
     private final Validator validator;
@@ -119,7 +121,7 @@ public class EventPackageService {
             CategoryPodiumRepository podiums,
             AccountRepository accounts,
             ProfileRepository profiles,
-            DemoAccounts demoAccounts,
+            VerifiedAccounts verifiedAccounts,
             EventResultsTransfer results,
             JsonMapper json,
             Validator validator,
@@ -140,7 +142,7 @@ public class EventPackageService {
         this.podiums = podiums;
         this.accounts = accounts;
         this.profiles = profiles;
-        this.demoAccounts = demoAccounts;
+        this.verifiedAccounts = verifiedAccounts;
         this.results = results;
         this.json = json;
         this.validator = validator;
@@ -150,10 +152,6 @@ public class EventPackageService {
     }
 
     /** "liga-yoseikan-fase-1-2027-03-10": a file name for the event's exports. */
-    public static String fileName(Event event) {
-        return slug(event.getName()) + "-" + event.getEventDate();
-    }
-
     /** "Liga Yoseikan · Fase 1" → "liga-yoseikan-fase-1". */
     public static String slug(String name) {
         var slug = Normalizer.normalize(name, Normalizer.Form.NFD)
@@ -193,8 +191,13 @@ public class EventPackageService {
                         .sorted(Comparator.comparing(StaffMember::role).thenComparing(StaffMember::username))
                         .toList(),
                 eventCategories.stream()
-                        .map(c ->
-                                new Category(c.getName(), c.getMinAge(), c.getMaxAge(), c.getFormat(), c.getTeamSize()))
+                        .map(c -> new Category(
+                                c.getName(),
+                                c.getMinAge(),
+                                c.getMaxAge(),
+                                c.getFormat(),
+                                c.getTeamSize(),
+                                c.getMatchSeconds()))
                         .toList(),
                 eventOrganizations.stream()
                         .map(o -> new OrganizationEntry(o.getName(), o.getShortName()))
@@ -225,7 +228,13 @@ public class EventPackageService {
                         .find(eventId)
                         .map(r -> new EventPackage.RulebookEntry(
                                 r.getFileName(), Base64.getEncoder().encodeToString(r.getContent())))
-                        .orElse(null));
+                        .orElse(null),
+                access.savedPermissions(eventId).entrySet().stream()
+                        .filter(e -> usernames.containsKey(e.getKey()))
+                        .map(e -> new EventPackage.StaffPermissions(
+                                usernames.get(e.getKey()), new TreeSet<>(e.getValue())))
+                        .sorted(Comparator.comparing(EventPackage.StaffPermissions::username))
+                        .toList());
         log.info(
                 "Event package exported: {} staff, {} categories, {} mats, {} participants, {}",
                 result.staff().size(),
@@ -282,7 +291,6 @@ public class EventPackageService {
                 leagueEntry != null ? leagueEntry.discipline() : Discipline.TAMBO,
                 settings.name().strip(),
                 settings.date(),
-                settings.maxGroupsPerMat(),
                 settings.attendancePoints(),
                 modality(settings),
                 clock.instant());
@@ -295,6 +303,9 @@ public class EventPackageService {
         }
         // The names go in by SQL: the event and its staff must be written first.
         staff.flush();
+        for (var chosen : p.staffPermissionsOrEmpty()) {
+            access.setPermissions(event.getId(), accountIds.get(chosen.username()), chosen.permissions());
+        }
         for (var name : p.staffNamesOrEmpty()) {
             if (accountIds.containsKey(name.username())) {
                 staffNames.put(event.getId(), accountIds.get(name.username()), name.name());
@@ -305,8 +316,7 @@ public class EventPackageService {
         }
         var categoryIds = new HashMap<String, UUID>();
         for (var c : p.categories()) {
-            var category = categories.save(
-                    new EventCategory(event.getId(), c.name().strip(), c.minAge(), c.maxAge(), c.teamSize()));
+            var category = categories.save(c.toCategory(event.getId()));
             categoryIds.put(category.getName(), category.getId());
         }
         var organizationIds = new HashMap<String, UUID>();
@@ -333,6 +343,7 @@ public class EventPackageService {
             mats.flush();
             results.write(event.getId(), p.results(), Map.of());
             event.setResultsImportHash(hash(p.results()));
+            event.startedElsewhere(events.firstGroupAt(event.getId()));
         }
         log.info(
                 "Event package loaded: {} staff, {} categories, {} mats, {} participants, {} new accounts",
@@ -386,6 +397,7 @@ public class EventPackageService {
             throw EventException.invalid("Not a valid event file: " + e.getMessage());
         }
         event.setResultsImportHash(hash);
+        event.startedElsewhere(events.firstGroupAt(eventId));
         if (dryRun) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         } else {
@@ -444,8 +456,7 @@ public class EventPackageService {
         var newCategories = 0;
         for (var c : p.categories()) {
             if (!categoryIds.containsKey(c.name().strip())) {
-                var category = categories.save(
-                        new EventCategory(eventId, c.name().strip(), c.minAge(), c.maxAge(), c.teamSize()));
+                var category = categories.save(c.toCategory(eventId));
                 categoryIds.put(category.getName(), category.getId());
                 newCategories++;
             }
@@ -605,7 +616,7 @@ public class EventPackageService {
         ids.put(
                 owner,
                 existing(owner)
-                        .orElseGet(() -> demoAccounts.club(
+                        .orElseGet(() -> verifiedAccounts.club(
                                 owner,
                                 blankToNull(p.owner().organizationName()),
                                 Cif.normalize(p.owner().taxId()),
@@ -615,7 +626,7 @@ public class EventPackageService {
             ids.computeIfAbsent(
                     username,
                     u -> existing(u)
-                            .orElseGet(() -> demoAccounts.helper(u, newPassword(u, passwords, usernamePasswords))));
+                            .orElseGet(() -> verifiedAccounts.helper(u, newPassword(u, passwords, usernamePasswords))));
         }
         return ids;
     }
@@ -638,7 +649,6 @@ public class EventPackageService {
         return new Settings(
                 event.getName(),
                 event.getEventDate(),
-                event.getMaxGroupsPerMat(),
                 event.modality().individual().matchSeconds(),
                 event.modality().individual().pointsLimit(),
                 event.modality().getChangeoverSeconds(),
@@ -649,10 +659,14 @@ public class EventPackageService {
                 event.modality().getMinRestSeconds(),
                 event.getOwnWeightRequirement(),
                 event.getOwnHeightRequirement(),
-                event.getOwnWarningReasons());
+                event.getOwnWarningReasons(),
+                event.modality().scoring());
     }
 
-    /** Packages from before the team rules (schema 1 of the first F1 builds) take the tambo defaults. */
+    /**
+     * Packages from before the team rules (schema 1 of the first F1 builds) take the tambo defaults; those from before
+     * the scoring rules (schema 3 and before), tambo's.
+     */
     private static Modality modality(EventPackage.Settings settings) {
         var defaults = Modality.tambo();
         return Modality.of(
@@ -663,7 +677,8 @@ public class EventPackageService {
                 Objects.requireNonNullElse(
                         settings.teamPointsLimit(), defaults.team().pointsLimit()),
                 Objects.requireNonNullElse(settings.minRestSeconds(), defaults.getMinRestSeconds()),
-                settings.changeoverSeconds());
+                settings.changeoverSeconds(),
+                Objects.requireNonNullElse(settings.scoring(), ScoringRules.TAMBO));
     }
 
     private LeagueEntry league(Event event) {

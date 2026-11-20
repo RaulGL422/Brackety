@@ -11,6 +11,7 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../../club/data/club_repository.dart';
 import '../../club/ui/export_download.dart';
 import '../../club/ui/participant_record_sheet.dart';
+import '../../events/data/my_event.dart';
 import '../../events/state/events_providers.dart';
 import '../data/league_models.dart';
 import '../state/league_providers.dart';
@@ -92,7 +93,8 @@ class _Phases extends ConsumerWidget {
     final locale = Localizations.localeOf(context).toLanguageTag();
     // Only the phases this account runs as club can be opened.
     final clubPhases = {
-      for (final p in ref.watch(clubPhasesProvider(eventId)).value ?? const [])
+      for (final p
+          in ref.watch(clubPhasesProvider(eventId)).value ?? const <MyEvent>[])
         p.id,
     };
     return Column(
@@ -149,6 +151,7 @@ class _Phases extends ConsumerWidget {
 
 String disciplineName(AppLocalizations l10n, Discipline d) => switch (d) {
   Discipline.tambo => l10n.disciplineTambo,
+  Discipline.grappling => l10n.disciplineGrappling,
   Discipline.ground => l10n.disciplineGround,
   Discipline.throws => l10n.disciplineThrows,
   Discipline.technicalExpression => l10n.disciplineTechnicalExpression,

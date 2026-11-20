@@ -36,6 +36,7 @@ Tras un reinicio todo vuelve solo: Docker arranca con el sistema y los servicios
 - `cd ~/brackety && git pull && ./deploy/deploy.sh pi`.
 - `git pull` trae los cambios de compose y scripts; las imágenes nuevas las descarga el script.
 - Versión concreta: `IMAGE_TAG=1.2.0` en `.env`. `latest` = último `main`.
+- Qué corre: `docker compose logs api | grep -A10 "is ready"` muestra la versión (la de `app/pubspec.yaml`, con `-dev` en debug), el commit, la BD con su esquema y qué está activo o falta (email, Google, superadmin, contacto de privacidad, importación, cuentas demo). Sin secretos ni emails. `GET /api/v1/info` también da la versión. El portátil del pabellón la lee de `api/version.txt`.
 
 ## Qué hace `deploy.sh` / `deploy.ps1`
 1. Etiqueta como `rollback` las imágenes que están corriendo.

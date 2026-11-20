@@ -36,6 +36,13 @@ public final class LeagueDtos {
     public record PhaseResponse(
             UUID eventId, int number, String name, LocalDate date, Discipline discipline, int participants) {}
 
+    /** A standalone event: a league of one phase, with {@code mats} mats and no referee yet. */
+    public record NewEventRequest(
+            @NotBlank @Size(max = 120) String name,
+            @NotNull LocalDate date,
+            @NotNull Discipline discipline,
+            @Min(1) @Max(20) int mats) {}
+
     /** {@code available}: has a scoreboard today; the others are declared for later. */
     public record DisciplineResponse(Discipline discipline, boolean available) {}
 

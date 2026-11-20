@@ -204,7 +204,9 @@ class StandingsControllerTest extends EventApiTest {
         var standings = call(get("/api/v1/events/" + eventId + "/export/standings.csv"), "club1")
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(new MediaType("text", "csv")))
-                .andExpect(header().string("Content-Disposition", "attachment; filename=\"clasificacion-fase.csv\""))
+                .andExpect(header().string(
+                                "Content-Disposition",
+                                "attachment; filename=\"liga-yoseikan-2027_fase-1_clasificacion-fase.csv\""))
                 .andReturn()
                 .getResponse()
                 .getContentAsString(StandardCharsets.UTF_8);

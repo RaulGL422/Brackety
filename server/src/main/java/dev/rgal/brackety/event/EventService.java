@@ -85,7 +85,7 @@ public class EventService {
                             event.getName(),
                             event.getEventDate(),
                             rolesByEvent.get(event.getId()),
-                            event.getMaxGroupsPerMat(),
+                            access.permissions(event.getId(), accountId, rolesByEvent.get(event.getId())),
                             mat.map(Mat::getId).orElse(null),
                             mat.map(Mat::getNumber).orElse(null),
                             event.getLeagueId(),
@@ -99,7 +99,11 @@ public class EventService {
 
     @Transactional(readOnly = true)
     public EventSettingsResponse settings(UUID eventId, UUID accountId) {
-        access.require(eventId, accountId, EventRole.CLUB);
+        // Whoever adds participants needs the categories; the staff and their emails are the club's alone.
+        access.require(eventId, accountId, EventPermission.PARTICIPANTS);
+        if (!access.roles(eventId, accountId).contains(EventRole.CLUB)) {
+            return settings(get(eventId)).withoutStaff();
+        }
         return settings(get(eventId));
     }
 
@@ -170,7 +174,9 @@ public class EventService {
                 : List.<Mat>of();
         if (!removed.isEmpty()
                 && events.hasGroupsOnMats(removed.stream().map(Mat::getId).toList())) {
-            throw EventException.conflict("A mat with groups cannot be removed.");
+            // Its groups say where they were played: a mat that is done goes out of use instead (Raul, 2026-11-18).
+            throw EventException.conflict(
+                    "MAT_HAS_GROUPS", "A mat with groups cannot be removed: disable it in the control panel.");
         }
         // Nobody would ever play the matches of a mat left without its referee (Raul, 2026-11-13).
         for (int i = 0; i < Math.min(current.size(), request.matReferees().size()); i++) {
@@ -184,14 +190,7 @@ public class EventService {
         }
         var attendancePoints =
                 request.attendancePoints() != null ? request.attendancePoints() : event.getAttendancePoints();
-        event.update(
-                request.name().strip(),
-                request.date(),
-                request.maxGroupsPerMat(),
-                attendancePoints,
-                individual,
-                team,
-                minRestSeconds);
+        event.update(request.name().strip(), request.date(), attendancePoints, individual, team, minRestSeconds);
         for (int i = 0; i < request.matReferees().size(); i++) {
             var referee = request.matReferees().get(i);
             if (i < current.size()) {
@@ -217,15 +216,15 @@ public class EventService {
                         a.getId(),
                         a.getEmail(),
                         names.get(a.getId()),
-                        rolesByAccount.get(a.getId()).stream().sorted().toList()))
+                        rolesByAccount.get(a.getId()).stream().sorted().toList(),
+                        access.permissions(event.getId(), a.getId(), EnumSet.copyOf(rolesByAccount.get(a.getId())))))
                 .toList();
         var referees = people.stream()
-                .filter(p -> p.roles().contains(EventRole.REFEREE))
+                .filter(p -> p.permissions().contains(EventPermission.OWN_MAT))
                 .toList();
         return new EventSettingsResponse(
                 event.getName(),
                 event.getEventDate(),
-                event.getMaxGroupsPerMat(),
                 event.modality().individual().matchSeconds(),
                 event.modality().individual().pointsLimit(),
                 mats.findByEventIdOrderByNumber(event.getId()).stream()
@@ -244,12 +243,17 @@ public class EventService {
                 event.modality().team().pointsLimit(),
                 event.modality().getMinRestSeconds(),
                 MeasureRules.of(event),
-                WarningReasons.of(event));
+                WarningReasons.of(event),
+                event.modality().scoring());
     }
 
     private List<UUID> refereeIds(UUID eventId) {
-        return staff.findByEventIdAndRole(eventId, EventRole.REFEREE).stream()
+        // Whoever may referee their mat, not only those invited as referees; never the club itself.
+        return staff.findByEventId(eventId).stream()
                 .map(EventStaff::getAccountId)
+                .distinct()
+                .filter(id -> !access.roles(eventId, id).contains(EventRole.CLUB))
+                .filter(id -> access.has(eventId, id, EventPermission.OWN_MAT))
                 .toList();
     }
 }

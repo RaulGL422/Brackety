@@ -75,7 +75,7 @@ class FullExportControllerTest extends EventApiTest {
                 .andExpect(status().isOk())
                 .andExpect(header().string(
                                 "Content-Disposition",
-                                "attachment; filename=\"liga-yoseikan-2027-fase-1-tambo-2027-03-10.zip\""))
+                                "attachment; filename=\"liga-yoseikan-2027_fase-1_exportacion-completa.zip\""))
                 .andReturn()
                 .getResponse();
         assertThat(response.getContentType()).isEqualTo("application/zip");
@@ -92,7 +92,7 @@ class FullExportControllerTest extends EventApiTest {
                         "linea-de-tiempo.csv",
                         "clasificacion-fase.csv",
                         "clasificacion-liga.csv",
-                        "clasificacion-por-categoria/clasificacion-9-10.csv",
+                        "clasificacion-por-categoria/liga-yoseikan-2027_fase-1_clasificacion_9-10.csv",
                         "clasificacion-por-categoria.pdf",
                         "evento.brackety");
         assertThat(files.get("participantes.csv"))
@@ -109,11 +109,11 @@ class FullExportControllerTest extends EventApiTest {
                 .contains(";Punto;Azul;Bea Prueba;;arbitro1;;Sí")
                 .contains(";Deshacer;;;;arbitro1;Deshace la acción 6;No");
         assertThat(files.get("clasificacion-liga.csv")).contains("9-10;1;Oro (1.º);Ana;Prueba;Club Demo Yoseikan;10;3");
-        assertThat(files.get("clasificacion-por-categoria/clasificacion-9-10.csv"))
+        assertThat(files.get("clasificacion-por-categoria/liga-yoseikan-2027_fase-1_clasificacion_9-10.csv"))
                 .startsWith(Csv.BOM + "Posición;Medalla;Nombre;Apellidos;Club;Fase 1;Total liga;Advertencias")
                 .contains("1;Oro (1.º);Ana;Prueba;Club Demo Yoseikan;13;13;");
         assertThat(files.get("LEEME.txt")).contains("participantes.csv", "evento.brackety");
-        assertThat(files.get("evento.brackety")).contains("\"schemaVersion\" : 2", "\"originId\"");
+        assertThat(files.get("evento.brackety")).contains("\"schemaVersion\" : 4", "\"originId\"");
     }
 
     @Test
@@ -127,6 +127,9 @@ class FullExportControllerTest extends EventApiTest {
                 "select count(*) from match_event e join fight_match m on m.id = e.match_id" + " where m.event_id = ?");
         // The club's server before the hall: the same event and entries, no competition.
         jdbc.sql("delete from fight_group where event_id = ?").param(eventId).update();
+        jdbc.sql("update event set started_at = null where id = ?")
+                .param(eventId)
+                .update();
 
         importResults(zip, true)
                 .andExpect(status().isOk())
@@ -141,6 +144,9 @@ class FullExportControllerTest extends EventApiTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.alreadyImported").value(false));
         assertThat(standings()).isEqualTo(standings);
+        // Played in the hall: the phase is started here too (F1-7).
+        assertThat(eventCount("select count(*) from event where id = ? and started_at is not null"))
+                .isOne();
         assertThat(eventCount("select count(*) from match_event e join fight_match m on m.id = e.match_id"
                         + " where m.event_id = ? and e.target_event_id is not null"))
                 .isOne();

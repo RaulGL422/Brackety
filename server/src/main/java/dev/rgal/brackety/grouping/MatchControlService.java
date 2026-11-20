@@ -2,7 +2,8 @@ package dev.rgal.brackety.grouping;
 
 import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventException;
-import dev.rgal.brackety.event.EventRole;
+import dev.rgal.brackety.event.EventPermission;
+import dev.rgal.brackety.event.EventPhase;
 import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.event.Mat;
 import dev.rgal.brackety.event.MatRepository;
@@ -34,6 +35,7 @@ public class MatchControlService {
     private static final Logger log = LoggerFactory.getLogger(MatchControlService.class);
 
     private final MatchRepository matches;
+    private final EventPhase phase;
     private final FightGroupRepository groups;
     private final MatRepository mats;
     private final TeamRepository teams;
@@ -60,7 +62,9 @@ public class MatchControlService {
             Clock clock,
             MatPlanner planner,
             MatSchedule schedule,
-            MatSync matSync) {
+            MatSync matSync,
+            EventPhase phase) {
+        this.phase = phase;
         this.matSync = matSync;
         this.matches = matches;
         this.groups = groups;
@@ -76,14 +80,15 @@ public class MatchControlService {
         this.schedule = schedule;
     }
 
-    /** Only the club of the event; the superadmin's API checks its own access. */
-    public void requireClub(UUID eventId, UUID accountId) {
-        access.require(eventId, accountId, EventRole.CLUB);
+    /** The club or a helper with the control panel; the superadmin's API checks its own access. */
+    public void requireControl(UUID eventId, UUID accountId) {
+        access.require(eventId, accountId, EventPermission.CONTROL);
     }
 
     /** An individual group and its pending matches go to another mat; the played ones stay where they were. */
     @Transactional
     public void moveGroup(UUID eventId, UUID groupId, UUID matId, UUID by) {
+        phase.requireInProgress(eventId);
         var groupMatches = matches.lockByGroupId(groupId);
         var group = group(eventId, groupId);
         events.lock(eventId);
@@ -105,6 +110,7 @@ public class MatchControlService {
      */
     @Transactional
     public void moveMatch(UUID eventId, UUID matchId, UUID matId, UUID by) {
+        phase.requireInProgress(eventId);
         var match = pending(eventId, matchId);
         events.lock(eventId);
         var mat = refereedMat(eventId, matId);
@@ -120,7 +126,8 @@ public class MatchControlService {
     public void moveMatchAsReferee(UUID matchId, UUID matId, UUID accountId) {
         var match = matches.findById(matchId).orElseThrow(EventException::notFound);
         var eventId = match.getEventId();
-        access.require(eventId, accountId, EventRole.REFEREE);
+        access.require(eventId, accountId, EventPermission.OWN_MAT);
+        phase.requireInProgress(eventId);
         var own = mats.findByEventIdAndRefereeAccountIdOrderByNumber(eventId, accountId).stream()
                 .map(Mat::getId)
                 .toList();
@@ -142,6 +149,7 @@ public class MatchControlService {
      */
     @Transactional
     public void reorder(UUID eventId, UUID groupId, List<UUID> pendingOrder, UUID by) {
+        phase.requireInProgress(eventId);
         var groupMatches = matches.lockByGroupId(groupId);
         group(eventId, groupId);
         events.lock(eventId);
@@ -173,6 +181,7 @@ public class MatchControlService {
      */
     @Transactional
     public void moveTeamMember(UUID eventId, UUID participantId, UUID fromTeamId, UUID toTeamId, UUID by) {
+        phase.requireNotFinished(eventId);
         events.lock(eventId);
         var from = realTeam(eventId, fromTeamId);
         var to = realTeam(eventId, toTeamId);
@@ -229,6 +238,7 @@ public class MatchControlService {
      */
     @Transactional
     public DisabledMat disableMat(UUID eventId, UUID matId, Map<UUID, UUID> chosen, UUID by) {
+        phase.requireNotFinished(eventId);
         var event = events.lock(eventId);
         var mat =
                 mats.findById(matId).filter(m -> m.getEventId().equals(eventId)).orElseThrow(EventException::notFound);
@@ -289,6 +299,7 @@ public class MatchControlService {
      */
     @Transactional
     public void enableMat(UUID eventId, UUID matId, UUID by) {
+        phase.requireNotFinished(eventId);
         events.lock(eventId);
         var mat =
                 mats.findById(matId).filter(m -> m.getEventId().equals(eventId)).orElseThrow(EventException::notFound);
@@ -296,7 +307,7 @@ public class MatchControlService {
             throw EventException.conflict("MAT_NOT_DISABLED", "This mat is in use.");
         }
         var referee = mat.getDisabledRefereeAccountId();
-        if (referee == null || !access.roles(eventId, referee).contains(EventRole.REFEREE)) {
+        if (referee == null || !access.has(eventId, referee, EventPermission.OWN_MAT)) {
             throw EventException.conflict(
                     "REFEREE_GONE", "Its referee is no longer one of the event's: assign one in the settings.");
         }
@@ -312,6 +323,7 @@ public class MatchControlService {
     /** The referee may start it although someone in it has not had the least rest. Recorded with who and when. */
     @Transactional
     public void waiveRest(UUID eventId, UUID matchId, UUID by) {
+        phase.requireInProgress(eventId);
         var match = pending(eventId, matchId);
         events.lock(eventId);
         match.waiveRest(by, clock.instant());

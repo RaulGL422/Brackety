@@ -42,13 +42,14 @@ Línea de infraestructura; puede ir en paralelo con la etapa 2 (otro worktree).
 7. F2-2 Edades mezcladas dentro de una categoría, divididas en la pantalla de crear grupos.
 8. F2-3 CSV de resultados claro en Excel.
 9. F2-4 Clasificaciones configurables: global opcional fusionada (#123, 2026-11-17); dividir por sexo o peso, cuando una modalidad lo pida.
+10. F1-7 (`feedback-f1.md`): A aviso «Inhabilitar tapiz» al quitar un tapiz con grupos (fusionado, #127); B comenzar, finalizar y reabrir fase, cierre automático con correo (fusionado, #129); C permisos por persona en «Personal» (fusionado, #130); C2 panel para ayudantes y personal configurable del todo (en pruebas).
 
 ## Después · Etapa 2b: competición del 2026-12-20 (`competicion-2026-12-20.md`)
 - Torneo con grupos de 4 y 3 modalidades seguidas. Diseño en cuanto lleguen los detalles; prueba in situ hacia el 13-12.
 
 ## Después · Etapa 3: calidad (`calidad.md`)
 1. CI por componentes con `ci-ok` y batería completa en releases: en pruebas (2026-11-17).
-2. Inventario del código con números.
+2. Inventario del código con números: hecho (`auditoria-codigo.md`); arreglo por fases L0-L8 en `plan-limpieza.md` (L0-L1 pueden ir ya, en paralelo).
 3. Refactor por módulo con tests de caracterización, empezando por marcador, grupos y tablero.
 4. Revisión de diseño completa con `frontend-design` y lista priorizada.
 5. E2E con Playwright sobre la web de los flujos críticos (login, crear grupo, marcador con y sin red, sincronización), solo en la batería completa de cada release.
@@ -58,6 +59,8 @@ Línea de infraestructura; puede ir en paralelo con la etapa 2 (otro worktree).
 - Rediseño de eventos (`eventos-ux.md`): maquetas, prueba con 6 tareas y, después, por secciones.
 - Cerrar los módulos que el prototipo adelantó: `eventos`, `inscripciones`, `ayudantes-permisos`, `puntuacion`, `liga-fases`, `marcador-tapiz`, `offline`.
 - Módulos por empezar: `perfiles-menores`, `liga`, `torneo`, `ranking`, `notificaciones`, `superadmin-reportes` (resto).
+- Exportaciones a medida: campos, orden, filtros, formato y plantillas guardadas (`exportaciones.md`); las descargas de hoy pasan a ser plantillas incluidas. Paso 1 junto a L5 de `plan-limpieza.md`.
+- Plantillas de deporte y arbitraje creadas en la app, duplicables y compartibles (`plantillas-deporte.md`), sobre el motor de reglas por datos (L7 de `plan-limpieza.md`).
 - **Ojo con el calendario de la liga**: F2 (armas) y sobre todo F3 (expresión técnica, puntuada por jueces con escala aún sin definir) necesitan su plantilla en `puntuacion` antes de su fecha (`reglamentos/yoseikan-2027.md`).
 
 ## Más tarde · Etapa 5: gestión del club (`gestion-club.md`)

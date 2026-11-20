@@ -14,10 +14,8 @@ import static dev.rgal.brackety.scoreboard.Side.BLUE;
 import static dev.rgal.brackety.scoreboard.Side.RED;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import dev.rgal.brackety.scoreboard.TamboMatch.Corner;
-import dev.rgal.brackety.scoreboard.TamboMatch.EndReason;
-import dev.rgal.brackety.scoreboard.TamboMatch.Entry;
-import dev.rgal.brackety.scoreboard.TamboMatch.Rules;
+import dev.rgal.brackety.scoreboard.MatchState.Corner;
+import dev.rgal.brackety.scoreboard.MatchState.Entry;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -25,11 +23,11 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
-class TamboMatchTest {
+class MatchStateTest {
 
     private static final Instant T0 = Instant.parse("2027-03-10T09:00:00Z");
-    private static final Rules RULES = new Rules(Duration.ofMinutes(2), 15);
-    private static final Rules TEAMS = new Rules(Duration.ofMinutes(3), 0);
+    private static final MatchRules RULES = new MatchRules(Duration.ofMinutes(2), 15);
+    private static final MatchRules TEAMS = new MatchRules(Duration.ofMinutes(3), 0);
 
     private final List<Entry> entries = new ArrayList<>();
 
@@ -143,7 +141,7 @@ class TamboMatchTest {
             add(POINT, RED, i);
         }
 
-        var match = TamboMatch.replay(TEAMS, entries);
+        var match = MatchState.replay(TEAMS, entries);
         assertThat(match.corner(RED).points()).isEqualTo(30);
         assertThat(match.endReason(at(31))).isEmpty();
         assertThat(match.endReason(at(180))).contains(EndReason.TIME);
@@ -155,7 +153,7 @@ class TamboMatchTest {
         add(POINT, RED, 1);
         add(POINT, RED, 2);
         add(DISQUALIFICATION, BLUE, 3);
-        var match = TamboMatch.replay(TEAMS, entries);
+        var match = MatchState.replay(TEAMS, entries);
         assertThat(match.corner(RED).points()).isEqualTo(15);
         assertThat(match.endReason(at(4))).contains(EndReason.DISQUALIFICATION);
 
@@ -165,8 +163,8 @@ class TamboMatchTest {
             add(POINT, RED, i);
         }
         add(DISQUALIFICATION, BLUE, 21);
-        assertThat(TamboMatch.replay(TEAMS, entries).corner(RED).points()).isEqualTo(20);
-        assertThat(TamboMatch.replay(TEAMS, entries).corner(BLUE).points()).isZero();
+        assertThat(MatchState.replay(TEAMS, entries).corner(RED).points()).isEqualTo(20);
+        assertThat(MatchState.replay(TEAMS, entries).corner(BLUE).points()).isZero();
     }
 
     @Test
@@ -224,7 +222,7 @@ class TamboMatchTest {
     void nothingIsScoredBeforeTheFirstStart() {
         var match = replay();
         for (var type : List.of(POINT, WARNING, ONE_HAND_WARNING, DISQUALIFICATION)) {
-            assertThat(match.refuse(type, T0)).contains(TamboMatch.NOT_STARTED);
+            assertThat(match.refuse(type, T0)).contains(MatchRefusals.NOT_STARTED);
         }
         assertThat(match.refuse(START, T0)).isEmpty();
         assertThat(match.refuse(UNDO, T0)).contains("Nothing to undo.");
@@ -278,7 +276,7 @@ class TamboMatchTest {
 
     @Test
     void aPointCanBeTakenBackOnceTheTimeOrThePointsEndedTheMatchButNotAfterADisqualification() {
-        assertThat(replay().refuse(POINT_REMOVED, RED, 0, T0)).contains(TamboMatch.NOT_STARTED);
+        assertThat(replay().refuse(POINT_REMOVED, RED, 0, T0)).contains(MatchRefusals.NOT_STARTED);
         add(START, null, 0);
         for (int i = 0; i < 15; i++) {
             add(POINT, BLUE, i + 1);
@@ -373,8 +371,8 @@ class TamboMatchTest {
         return entries.getLast().id();
     }
 
-    private TamboMatch replay() {
-        return TamboMatch.replay(RULES, entries);
+    private MatchState replay() {
+        return MatchState.replay(RULES, entries);
     }
 
     private static Instant at(int second) {

@@ -57,7 +57,7 @@ class TimelineList extends StatelessWidget {
           selected: next,
           leading: Text(clockText(e.clock)),
           title: Text(
-            actionLabel(l10n, e.action),
+            actionLabel(l10n, e.action, points: e.points),
             style: e.undone
                 ? const TextStyle(decoration: TextDecoration.lineThrough)
                 : next
@@ -74,24 +74,42 @@ class TimelineList extends StatelessWidget {
   }
 }
 
-String actionLabel(AppLocalizations l10n, MatchAction action) =>
-    switch (action) {
-      MatchAction.start => l10n.tlStart,
-      MatchAction.stop => l10n.tlStop,
-      MatchAction.point => l10n.tlPoint,
-      MatchAction.pointRemoved => l10n.tlPointRemoved,
-      MatchAction.clockAdjust => l10n.tlClockAdjust,
-      MatchAction.warning => l10n.actionWarning,
-      MatchAction.oneHandWarning => l10n.actionOneHand,
-      MatchAction.disqualification => l10n.actionDisqualify,
-      MatchAction.undo => l10n.tlUndo,
-      MatchAction.finish => l10n.tlFinish,
-      MatchAction.cancel => l10n.tlCancel,
-      MatchAction.reopen => l10n.tlReopen,
-    };
+/// [points]: what a point (added or removed) was worth; said when it is more than one.
+String actionLabel(
+  AppLocalizations l10n,
+  MatchAction action, {
+  int points = 1,
+}) => switch (action) {
+  MatchAction.start => l10n.tlStart,
+  MatchAction.stop => l10n.tlStop,
+  MatchAction.point => points > 1 ? l10n.tlPoints(points) : l10n.tlPoint,
+  MatchAction.pointRemoved =>
+    points > 1 ? l10n.tlPointsRemoved(points) : l10n.tlPointRemoved,
+  MatchAction.clockAdjust => l10n.tlClockAdjust,
+  MatchAction.warning => l10n.actionWarning,
+  MatchAction.oneHandWarning => l10n.actionOneHand,
+  MatchAction.disqualification => l10n.actionDisqualify,
+  MatchAction.undo => l10n.tlUndo,
+  MatchAction.finish => l10n.tlFinish,
+  MatchAction.cancel => l10n.tlCancel,
+  MatchAction.reopen => l10n.tlReopen,
+  MatchAction.submission => l10n.tlSubmission,
+  MatchAction.extraTime => l10n.tlExtraTime,
+};
 
 String? sideLabel(AppLocalizations l10n, Side? side) => switch (side) {
   Side.red => l10n.cornerRed,
   Side.blue => l10n.cornerBlue,
   null => null,
+};
+
+/// How the match ended, where the clock was.
+String endLabel(AppLocalizations l10n, EndReason? reason) => switch (reason) {
+  EndReason.points => l10n.endPoints,
+  EndReason.superiority => l10n.endSuperiority,
+  EndReason.disqualification => l10n.endDisqualification,
+  EndReason.warnings => l10n.endWarnings,
+  EndReason.submission => l10n.endSubmission,
+  EndReason.extraTime => l10n.endExtraTime,
+  EndReason.time || null => l10n.endTime,
 };

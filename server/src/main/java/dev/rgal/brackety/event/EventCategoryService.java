@@ -55,7 +55,9 @@ class EventCategoryService {
         for (var c : requested) {
             var teamSize = c.format() == Format.TEAM ? c.teamSize() : null;
             if (c.id() == null) {
-                categories.save(new EventCategory(eventId, c.name().strip(), c.minAge(), c.maxAge(), teamSize));
+                var created = new EventCategory(eventId, c.name().strip(), c.minAge(), c.maxAge(), teamSize);
+                created.setMatchSeconds(c.matchSeconds());
+                categories.save(created);
                 continue;
             }
             var category = current.get(c.id());
@@ -63,6 +65,7 @@ class EventCategoryService {
                 throw EventException.conflict("A category with groups or teams only changes its name.");
             }
             category.update(c.name().strip(), c.minAge(), c.maxAge(), teamSize);
+            category.setMatchSeconds(c.matchSeconds());
         }
         return categories.findByEventIdOrderByMinAge(eventId).stream()
                 .map(CategoryResponse::of)

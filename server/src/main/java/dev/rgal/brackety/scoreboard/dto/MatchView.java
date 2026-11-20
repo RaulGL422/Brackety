@@ -1,5 +1,6 @@
 package dev.rgal.brackety.scoreboard.dto;
 
+import dev.rgal.brackety.event.ScoringRules;
 import dev.rgal.brackety.grouping.Match;
 import dev.rgal.brackety.scoreboard.MatchEventType;
 import dev.rgal.brackety.scoreboard.Side;
@@ -8,15 +9,19 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * A match as the scoreboard shows it. The client counts {@code remainingMs} down while
+ * A match as the scoreboard shows it, in event {@code eventId}. The client counts {@code remainingMs} down while
  * {@code running} and resyncs on every poll. {@code endReason}: POINTS, TIME, DISQUALIFICATION or null.
  * {@code serverTime}: the instant the view is computed at, so the device can correct its clock.
  * {@code review}: null unless an offline action clashed and the club has to review it. {@code matId} and
  * {@code matNumber}: null for a team match in the pool, until a mat starts it. {@code readyAt}: a pending match whose
- * fighters have not had the least rest yet, until when; the device refuses to start it before.
+ * fighters have not had the least rest yet, until when; the device refuses to start it before. {@code scoring}: how
+ * the match's sport scores (the referee's buttons and rules), so the device needs no copy of them. {@code winner}:
+ * RED or BLUE once the match is decided, by the sport's rules and tiebreaks; null while it goes on or on a draw.
+ * {@code needsExtraTime}: the time ended on a tie no tiebreak settles, and the referee must say who won the extra time.
  */
 public record MatchView(
         UUID id,
+        UUID eventId,
         UUID matId,
         Integer matNumber,
         int groupNumber,
@@ -32,7 +37,10 @@ public record MatchView(
         Instant serverTime,
         Review review,
         Instant readyAt,
-        List<String> warningReasons) {
+        List<String> warningReasons,
+        ScoringRules scoring,
+        Side winner,
+        boolean needsExtraTime) {
 
     /**
      * A participant ({@code participantId}) or a team ({@code teamId}, {@code teamNumber}); {@code members}
@@ -55,6 +63,7 @@ public record MatchView(
     /**
      * {@code gaveRivalPoint}: a second one-hand warning that gave the rival a point. {@code opId}: the device
      * action it came from, or null. {@code deltaMs}: for a CLOCK_ADJUST, the time added (negative: taken).
+     * {@code points}: what a POINT or POINT_REMOVED was worth (grappling: 1 to 4), else 1.
      */
     public record TimelineEntry(
             UUID id,
@@ -69,7 +78,8 @@ public record MatchView(
             boolean gaveRivalPoint,
             UUID opId,
             Long deltaMs,
-            boolean overtime) {}
+            boolean overtime,
+            int points) {}
 
     /**
      * {@code reason}: why the first action clashed (KNOWN_EVENTS, RULES, AGE, MAT_BUSY, FIGHTER_BUSY).
@@ -87,5 +97,6 @@ public record MatchView(
             Instant at,
             Instant receivedAt,
             String cause,
-            Long deltaMs) {}
+            Long deltaMs,
+            int points) {}
 }

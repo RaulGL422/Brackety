@@ -8,6 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.core.util.DefaultIndenter;
+import tools.jackson.core.util.DefaultPrettyPrinter;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
@@ -41,6 +43,7 @@ class FullExportService {
             clasificacion-por-categoria/
                                     La misma clasificación de la liga, un fichero por categoría: posición,
                                     medalla, alumno, club, total de cada fase y total de la liga.
+                                    Cada nombre lleva la liga, la fase y la categoría.
             clasificacion-por-categoria.pdf
                                     La misma clasificación para imprimir: cada categoría en su página.
             evento.brackety         El evento completo en JSON (configuración, inscritos y resultados):
@@ -53,11 +56,16 @@ class FullExportService {
 
     private static final String CATEGORY_FOLDER = "clasificacion-por-categoria/";
 
+    // The same file from the hall's Windows laptop and from the Pi: lines end in \n, not in the system's separator.
+    private static final DefaultPrettyPrinter PACKAGE_FORMAT =
+            new DefaultPrettyPrinter().withObjectIndenter(new DefaultIndenter("  ", "\n"));
+
     private final EventSheets sheets;
     private final StandingsService standings;
     private final LeagueStandingsService leagueStandings;
     private final EventPackageService packages;
     private final EventService events;
+    private final DownloadNames names;
     private final JsonMapper json;
 
     FullExportService(
@@ -66,7 +74,9 @@ class FullExportService {
             LeagueStandingsService leagueStandings,
             EventPackageService packages,
             EventService events,
+            DownloadNames names,
             JsonMapper json) {
+        this.names = names;
         this.sheets = sheets;
         this.standings = standings;
         this.leagueStandings = leagueStandings;
@@ -95,12 +105,11 @@ class FullExportService {
         files.put("clasificacion-liga.csv", text(leagueStandings.csv(eventId, accountId)));
         leagueStandings
                 .categoryCsvs(eventId, accountId)
-                .forEach((name, csv) -> files.put(CATEGORY_FOLDER + name, text(csv)));
+                .forEach((name, csv) -> files.put(CATEGORY_FOLDER + names.of(eventId, name), text(csv)));
         files.put("clasificacion-por-categoria.pdf", leagueStandings.pdf(eventId, accountId));
         files.put(
                 EventPackageService.ZIP_ENTRY,
-                json.writerWithDefaultPrettyPrinter().writeValueAsBytes(eventPackage));
-        var filename = EventPackageService.fileName(event) + ".zip";
-        return new Export(filename, Zip.of(files));
+                json.writer().with(PACKAGE_FORMAT).writeValueAsBytes(eventPackage));
+        return new Export(names.of(eventId, "exportacion-completa.zip"), Zip.of(files));
     }
 }

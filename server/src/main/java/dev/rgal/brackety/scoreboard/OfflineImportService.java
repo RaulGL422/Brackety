@@ -2,7 +2,8 @@ package dev.rgal.brackety.scoreboard;
 
 import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventException;
-import dev.rgal.brackety.event.EventRole;
+import dev.rgal.brackety.event.EventPermission;
+import dev.rgal.brackety.event.EventPhase;
 import dev.rgal.brackety.grouping.MatchRepository;
 import dev.rgal.brackety.scoreboard.dto.MatchEventRequest;
 import dev.rgal.brackety.scoreboard.dto.OfflineImportResponse;
@@ -26,6 +27,7 @@ class OfflineImportService {
     record Outcome(OfflineImportResponse response, Set<UUID> changedMatches) {}
 
     private final ScoreboardService scoreboard;
+    private final EventPhase phase;
     private final MatchRepository matches;
     private final MatchEventRepository matchEvents;
     private final RejectedOpRepository rejectedOps;
@@ -36,7 +38,9 @@ class OfflineImportService {
             MatchRepository matches,
             MatchEventRepository matchEvents,
             RejectedOpRepository rejectedOps,
-            EventAccess access) {
+            EventAccess access,
+            EventPhase phase) {
+        this.phase = phase;
         this.scoreboard = scoreboard;
         this.matches = matches;
         this.matchEvents = matchEvents;
@@ -45,7 +49,8 @@ class OfflineImportService {
     }
 
     Outcome importCsv(UUID eventId, UUID accountId, String csv) {
-        access.require(eventId, accountId, EventRole.CLUB);
+        access.require(eventId, accountId, EventPermission.DEVICE_IMPORT);
+        phase.requireInProgress(eventId);
         var rows = OfflineOpsCsv.parse(csv);
         // Every row checked before any is applied: a wrong file changes nothing.
         for (var row : rows) {
@@ -66,7 +71,14 @@ class OfflineImportService {
                 continue;
             }
             var request = new MatchEventRequest(
-                    row.type(), row.side(), row.reason(), row.opId(), row.at(), row.knownEvents(), row.deltaMs());
+                    row.type(),
+                    row.side(),
+                    row.reason(),
+                    row.opId(),
+                    row.at(),
+                    row.knownEvents(),
+                    row.deltaMs(),
+                    row.points());
             try {
                 var recorded =
                         scoreboard.recordImported(row.matchId(), actor(eventId, row.actor(), accountId), request);

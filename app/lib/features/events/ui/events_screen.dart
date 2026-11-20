@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/async_view.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../league/ui/new_event_dialog.dart';
 import '../../offline/ui/confirm_sign_out.dart';
 import '../data/my_event.dart';
 import '../state/events_providers.dart';
@@ -23,6 +24,11 @@ class EventsScreen extends ConsumerWidget {
           _AccountMenu(),
           SizedBox(width: AppSpacing.s),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        icon: const Icon(Icons.add),
+        label: Text(l10n.newEventButton),
+        onPressed: () => showNewEventDialog(context),
       ),
       body: AsyncView(
         value: ref.watch(myEventsProvider),
@@ -105,13 +111,22 @@ class _PhaseRow extends StatelessWidget {
     final locale = Localizations.localeOf(context).toLanguageTag();
     final text = Theme.of(context).textTheme;
     final buttons = [
-      if (event.roles.contains(EventRole.grouper))
+      // The club has its panel; it sees this only if it is a helper too.
+      if (event.buildsGroups &&
+          (event.roles.contains(EventRole.grouper) ||
+              !event.roles.contains(EventRole.club)))
         FilledButton.icon(
           icon: const Icon(Icons.group_add_outlined),
           label: Text(l10n.eventMakeGroups),
           onPressed: () => context.push('/events/${event.id}/categories'),
         ),
-      if (event.roles.contains(EventRole.referee) && event.matNumber != null)
+      if (event.opensPanel && !event.isClub)
+        FilledButton.tonalIcon(
+          icon: const Icon(Icons.dashboard_outlined),
+          label: Text(l10n.eventStaffPanel),
+          onPressed: () => context.push('/events/${event.id}/club'),
+        ),
+      if (event.can(EventPermission.ownMat) && event.matNumber != null)
         FilledButton.icon(
           icon: const Icon(Icons.sports_martial_arts),
           label: Text(l10n.eventMyMat(event.matNumber!)),

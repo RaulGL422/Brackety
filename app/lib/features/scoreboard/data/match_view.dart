@@ -1,8 +1,22 @@
 import '../../mat/data/mat_board.dart';
+import 'scoring.dart';
 
 enum Side { red, blue }
 
-enum EndReason { points, time, disqualification }
+enum EndReason {
+  /// Reached the points limit (tambo).
+  points,
+
+  /// Reached the points difference (grappling's technical superiority).
+  superiority,
+  time,
+  disqualification,
+
+  /// The last warning a sport allows (grappling: the 4th).
+  warnings,
+  submission,
+  extraTime,
+}
 
 Side? sideFromJson(Object? value) => switch (value) {
   'RED' => Side.red,
@@ -11,6 +25,28 @@ Side? sideFromJson(Object? value) => switch (value) {
 };
 
 String? sideToJson(Side? side) => side?.name.toUpperCase();
+
+EndReason? endReasonFromJson(Object? value) => switch (value) {
+  'POINTS' => EndReason.points,
+  'SUPERIORITY' => EndReason.superiority,
+  'TIME' => EndReason.time,
+  'DISQUALIFICATION' => EndReason.disqualification,
+  'WARNINGS' => EndReason.warnings,
+  'SUBMISSION' => EndReason.submission,
+  'EXTRA_TIME' => EndReason.extraTime,
+  _ => null,
+};
+
+String? endReasonToJson(EndReason? reason) => switch (reason) {
+  EndReason.points => 'POINTS',
+  EndReason.superiority => 'SUPERIORITY',
+  EndReason.time => 'TIME',
+  EndReason.disqualification => 'DISQUALIFICATION',
+  EndReason.warnings => 'WARNINGS',
+  EndReason.submission => 'SUBMISSION',
+  EndReason.extraTime => 'EXTRA_TIME',
+  null => null,
+};
 
 enum MatchAction {
   start,
@@ -28,12 +64,33 @@ enum MatchAction {
   cancel,
 
   /// A finished match opens again to correct it (with a reason).
-  reopen;
+  reopen,
+
+  /// The side that made the other give up; ends the match (grappling).
+  submission,
+
+  /// The side that won the extra time of a match tied after every tiebreaker (grappling).
+  extraTime;
+
+  /// What an UNDO can take back: the referee's scoring actions, not the clock's start and
+  /// stop nor the outcome.
+  bool get undoable => switch (this) {
+    point ||
+    pointRemoved ||
+    clockAdjust ||
+    warning ||
+    oneHandWarning ||
+    disqualification ||
+    submission ||
+    extraTime => true,
+    start || stop || finish || cancel || reopen || undo => false,
+  };
 
   String get wire => switch (this) {
     oneHandWarning => 'ONE_HAND_WARNING',
     pointRemoved => 'POINT_REMOVED',
     clockAdjust => 'CLOCK_ADJUST',
+    extraTime => 'EXTRA_TIME',
     _ => name.toUpperCase(),
   };
 
@@ -134,6 +191,7 @@ class TimelineEntry {
     this.opId,
     this.delta,
     this.overtime = false,
+    this.points = 1,
   });
 
   factory TimelineEntry.fromJson(Map<String, dynamic> json) => TimelineEntry(
@@ -150,6 +208,7 @@ class TimelineEntry {
     opId: json['opId'] as String?,
     delta: _duration(json['deltaMs']),
     overtime: json['overtime'] as bool? ?? false,
+    points: json['points'] as int? ?? 1,
   );
 
   /// The server's event id; for an action still in the device's queue, its `opId`.
@@ -175,6 +234,9 @@ class TimelineEntry {
   /// A point given once the clock showed 0:00 (F1-3).
   final bool overtime;
 
+  /// What a point (added or removed) was worth (grappling: 1 to 4).
+  final int points;
+
   TimelineEntry withFlags({
     required bool undone,
     required bool gaveRivalPoint,
@@ -192,6 +254,7 @@ class TimelineEntry {
     opId: opId,
     delta: delta,
     overtime: overtime,
+    points: points,
   );
 
   Map<String, dynamic> toJson() => {
@@ -208,6 +271,7 @@ class TimelineEntry {
     'opId': opId,
     'deltaMs': delta?.inMilliseconds,
     'overtime': overtime,
+    'points': points,
   };
 }
 
@@ -237,6 +301,7 @@ class ReviewOp {
     this.reason,
     this.actor,
     this.delta,
+    this.points = 1,
   });
 
   factory ReviewOp.fromJson(Map<String, dynamic> json) => ReviewOp(
@@ -249,6 +314,7 @@ class ReviewOp {
     receivedAt: DateTime.parse(json['receivedAt'] as String),
     cause: json['cause'] as String,
     delta: _duration(json['deltaMs']),
+    points: json['points'] as int? ?? 1,
   );
 
   final String opId;
@@ -260,6 +326,7 @@ class ReviewOp {
   final DateTime receivedAt;
   final String cause;
   final Duration? delta;
+  final int points;
 
   Map<String, dynamic> toJson() => {
     'opId': opId,
@@ -271,6 +338,7 @@ class ReviewOp {
     'receivedAt': receivedAt.toUtc().toIso8601String(),
     'cause': cause,
     'deltaMs': delta?.inMilliseconds,
+    'points': points,
   };
 }
 
@@ -325,6 +393,7 @@ class ReviewOutcome {
 class MatchView {
   const MatchView({
     required this.id,
+    this.eventId,
     this.matId,
     this.matNumber,
     required this.groupNumber,
@@ -341,10 +410,15 @@ class MatchView {
     this.review,
     this.readyAt,
     this.warningReasons = const [],
+    this.scoring = Scoring.tambo,
+    this.ruledWinner,
+    this.winnerRuled = false,
+    this.needsExtraTime = false,
   });
 
   factory MatchView.fromJson(Map<String, dynamic> json) => MatchView(
     id: json['id'] as String,
+    eventId: json['eventId'] as String?,
     matId: json['matId'] as String?,
     matNumber: json['matNumber'] as int?,
     groupNumber: json['groupNumber'] as int,
@@ -353,12 +427,7 @@ class MatchView {
     pointsLimit: json['pointsLimit'] as int,
     remaining: Duration(milliseconds: json['remainingMs'] as int),
     running: json['running'] as bool,
-    endReason: switch (json['endReason']) {
-      'POINTS' => EndReason.points,
-      'TIME' => EndReason.time,
-      'DISQUALIFICATION' => EndReason.disqualification,
-      _ => null,
-    },
+    endReason: endReasonFromJson(json['endReason']),
     red: Corner.fromJson(json['red'] as Map<String, dynamic>),
     blue: Corner.fromJson(json['blue'] as Map<String, dynamic>),
     timeline: [
@@ -380,10 +449,15 @@ class MatchView {
     warningReasons: [
       for (final r in json['warningReasons'] as List? ?? const []) r as String,
     ],
+    scoring: Scoring.fromJson(json['scoring'] as Map<String, dynamic>?),
+    ruledWinner: sideFromJson(json['winner']),
+    winnerRuled: json.containsKey('winner'),
+    needsExtraTime: json['needsExtraTime'] as bool? ?? false,
   );
 
   Map<String, dynamic> toJson() => {
     'id': id,
+    'eventId': eventId,
     'matId': matId,
     'matNumber': matNumber,
     'groupNumber': groupNumber,
@@ -396,12 +470,9 @@ class MatchView {
     'pointsLimit': pointsLimit,
     'remainingMs': remaining.inMilliseconds,
     'running': running,
-    'endReason': switch (endReason) {
-      EndReason.points => 'POINTS',
-      EndReason.time => 'TIME',
-      EndReason.disqualification => 'DISQUALIFICATION',
-      null => null,
-    },
+    'endReason': endReasonToJson(endReason),
+    if (winnerRuled) 'winner': sideToJson(ruledWinner),
+    'needsExtraTime': needsExtraTime,
     'red': red.toJson(),
     'blue': blue.toJson(),
     'timeline': [for (final e in timeline) e.toJson()],
@@ -409,9 +480,11 @@ class MatchView {
     'review': review?.toJson(),
     'readyAt': readyAt?.toUtc().toIso8601String(),
     'warningReasons': warningReasons,
+    'scoring': scoring.toJson(),
   };
 
   final String id;
+  final String? eventId;
 
   /// Null for a team match in the pool, until a mat starts it.
   final String? matId;
@@ -443,6 +516,18 @@ class MatchView {
   /// The event's warning reasons, picked with one tap (F1-4); "Otro" is typed.
   final List<String> warningReasons;
 
+  /// How the match's sport scores (the referee's buttons and rules), from the server.
+  final Scoring scoring;
+
+  /// Who won by the sport's rules and tiebreaks, as the server or the device's replay says;
+  /// null while it goes on or on a draw. Only when [winnerRuled]: views from an older server
+  /// had no winner, and [winner] works it out from the points.
+  final Side? ruledWinner;
+  final bool winnerRuled;
+
+  /// The time ended on a tie no tiebreak settles: the referee says who won the extra time.
+  final bool needsExtraTime;
+
   /// What the device counts in `knownEvents`: the automatic stops are left out.
   int get knownEvents => timeline.where((e) => !e.automatic).length;
 
@@ -450,6 +535,7 @@ class MatchView {
 
   MatchView withRemaining(Duration remaining) => MatchView(
     id: id,
+    eventId: eventId,
     matId: matId,
     matNumber: matNumber,
     groupNumber: groupNumber,
@@ -466,6 +552,10 @@ class MatchView {
     review: review,
     readyAt: readyAt,
     warningReasons: warningReasons,
+    scoring: scoring,
+    ruledWinner: ruledWinner,
+    winnerRuled: winnerRuled,
+    needsExtraTime: needsExtraTime,
   );
 
   bool get finished => status == MatchStatus.finished;
@@ -483,25 +573,13 @@ class MatchView {
   /// disqualification or clock adjustment in force.
   TimelineEntry? get lastUndoable => finished
       ? null
-      : _sinceCancel
-            .where(
-              (e) =>
-                  !e.undone &&
-                  const {
-                    MatchAction.point,
-                    MatchAction.pointRemoved,
-                    MatchAction.warning,
-                    MatchAction.oneHandWarning,
-                    MatchAction.disqualification,
-                    MatchAction.clockAdjust,
-                  }.contains(e.action),
-            )
-            .lastOrNull;
+      : _sinceCancel.where((e) => !e.undone && e.action.undoable).lastOrNull;
 
   bool get canUndo => lastUndoable != null;
 
-  /// The rival of a disqualified fighter, else the one with more points; null on a draw.
+  /// Who won; null while it goes on or on a draw.
   Side? get winner {
+    if (winnerRuled) return ruledWinner;
     if (red.disqualified) return Side.blue;
     if (blue.disqualified) return Side.red;
     if (red.points == blue.points) return null;

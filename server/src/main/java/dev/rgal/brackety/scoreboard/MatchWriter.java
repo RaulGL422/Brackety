@@ -8,7 +8,6 @@ import dev.rgal.brackety.grouping.Match;
 import dev.rgal.brackety.grouping.MatchRepository;
 import dev.rgal.brackety.participant.ParticipantRepository;
 import dev.rgal.brackety.scoreboard.RejectedOp.Cause;
-import dev.rgal.brackety.scoreboard.TamboMatch.Rules;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -25,8 +24,12 @@ class MatchWriter {
     static final int ONE_HAND_MIN_AGE = 4;
     static final int ONE_HAND_MAX_AGE = 8;
 
-    /** {@code deltaMs}: only for a CLOCK_ADJUST. {@code opId}: the device's id, or null from the web. */
-    record Action(MatchEventType type, Side side, String reason, Long deltaMs, UUID opId, UUID actorAccountId) {}
+    /**
+     * {@code deltaMs}: only for a CLOCK_ADJUST. {@code opId}: the device's id, or null from the web. {@code points}:
+     * what a POINT or POINT_REMOVED is worth, else 1.
+     */
+    record Action(
+            MatchEventType type, Side side, String reason, Long deltaMs, UUID opId, UUID actorAccountId, int points) {}
 
     record Refusal(Cause cause, String detail) {}
 
@@ -35,18 +38,21 @@ class MatchWriter {
     private final ParticipantRepository participants;
     private final CompetitorDirectory directory;
     private final EventService events;
+    private final MatchRulesService rules;
 
     MatchWriter(
             MatchRepository matches,
             MatchEventRepository matchEvents,
             ParticipantRepository participants,
             CompetitorDirectory directory,
-            EventService events) {
+            EventService events,
+            MatchRulesService rules) {
         this.matches = matches;
         this.matchEvents = matchEvents;
         this.participants = participants;
         this.directory = directory;
         this.events = events;
+        this.rules = rules;
     }
 
     /**
@@ -83,7 +89,8 @@ class MatchWriter {
                 now,
                 state.elapsedAt(now),
                 action.opId(),
-                action.deltaMs())));
+                action.deltaMs(),
+                action.points())));
         stopIfOverAndSnapshot(match, event, history, action, now);
         return Optional.empty();
     }
@@ -113,26 +120,24 @@ class MatchWriter {
         return age >= ONE_HAND_MIN_AGE && age <= ONE_HAND_MAX_AGE;
     }
 
-    static TamboMatch replay(Event event, Match match, List<MatchEvent> history) {
-        var teams = match.isTeamMatch();
-        return TamboMatch.replay(
-                new Rules(
-                        Duration.ofSeconds(event.modality().matchSeconds(teams)),
-                        event.modality().pointsLimit(teams)),
+    MatchState replay(Event event, Match match, List<MatchEvent> history) {
+        return MatchState.replay(
+                rules.of(event, match),
                 history.stream().map(MatchEvent::toEntry).toList());
     }
 
     private Optional<Refusal> refusal(
             Match match,
             Event event,
-            TamboMatch state,
+            MatchState state,
             Action action,
             Instant now,
             boolean checkOtherMats,
             boolean checkRest) {
-        var rules = state.refuse(action.type(), action.side(), action.deltaMs() == null ? 0 : action.deltaMs(), now);
-        if (rules.isPresent()) {
-            return Optional.of(new Refusal(Cause.RULES, rules.get()));
+        var refused = state.refuse(
+                action.type(), action.side(), action.deltaMs() == null ? 0 : action.deltaMs(), action.points(), now);
+        if (refused.isPresent()) {
+            return Optional.of(new Refusal(Cause.RULES, refused.get()));
         }
         // Reopening takes the mat and the fighters again, as a first start does.
         if ((action.type() == MatchEventType.START && !state.isStarted()) || action.type() == MatchEventType.REOPEN) {
@@ -204,8 +209,7 @@ class MatchWriter {
     // Points or a disqualification end the match: the clock stops here and stays stopped after an undo.
     private void stopIfOverAndSnapshot(Match match, Event event, List<MatchEvent> history, Action action, Instant now) {
         var state = replay(event, match, history);
-        var endsNow =
-                state.endReason(now).filter(r -> r != TamboMatch.EndReason.TIME).isPresent();
+        var endsNow = state.endReason(now).filter(r -> r != EndReason.TIME).isPresent();
         if (endsNow && state.isRunning(now)) {
             history.add(matchEvents.save(new MatchEvent(
                     match.getId(),
@@ -219,7 +223,8 @@ class MatchWriter {
                     now,
                     state.elapsedAt(now),
                     null,
-                    null)));
+                    null,
+                    1)));
             state = replay(event, match, history);
         }
         match.updateFromScoreboard(
@@ -228,6 +233,8 @@ class MatchWriter {
                 state.elapsedAt(now),
                 state.isRunning(now) ? now : null,
                 state.disqualified() == null ? null : state.disqualified().name(),
+                state.winner(now).map(Enum::name).orElse(null),
+                state.endReason(now).map(Enum::name).orElse(null),
                 state.isStarted(),
                 state.isFinished(),
                 now);

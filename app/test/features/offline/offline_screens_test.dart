@@ -13,6 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/board_finders.dart';
+import '../../support/fakes.dart';
 import '../../support/match_fakes.dart';
 import '../../support/offline_fakes.dart';
 
@@ -67,6 +68,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          clubEventsOverride,
           ...offlineOverrides(store: store, clock: clock, repository: server),
           bellProvider.overrideWithValue(FakeBell()),
           apiProvider.overrideWithValue(
@@ -145,7 +147,7 @@ void main() {
     };
     store.docs['queue'] = {
       'ops': [for (final op in ops) op.toJson()],
-      'heldForReview': [],
+      'heldForReview': <String>[],
     };
   }
 

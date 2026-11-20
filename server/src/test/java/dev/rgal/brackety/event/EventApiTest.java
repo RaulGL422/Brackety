@@ -33,6 +33,14 @@ public abstract class EventApiTest extends AuthIntegrationTest {
     @BeforeEach
     void seedDemo() {
         eventId = demo.seed();
+        // The club started the phase (F1-7): groups and scoring need it. Tests of the start itself undo it.
+        startPhase(eventId);
+    }
+
+    protected void startPhase(UUID event) {
+        jdbc.sql("update event set started_at = now() where id = ?")
+                .param(event)
+                .update();
     }
 
     /** What a referee's screen knows of the match: its non-automatic actions so far. */

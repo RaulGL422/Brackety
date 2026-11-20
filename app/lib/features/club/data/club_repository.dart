@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../auth/state/session_controller.dart';
+import '../../events/data/measure_rules.dart';
 import 'club_models.dart';
 import 'sex.dart';
-import '../../events/data/measure_rules.dart';
 
 final clubRepositoryProvider = Provider<ClubRepository>(
   (ref) => ClubRepository(ref.watch(apiProvider)),
@@ -75,8 +75,6 @@ class ClubRepository {
       data: {
         'name': name,
         'date': _day.format(date),
-        // No multigroup any more (docs/decisiones.md, 2026-11-07); the server still asks for it.
-        'maxGroupsPerMat': 1,
         'matReferees': matReferees,
         'matchSeconds': matchLength.inSeconds,
         'pointsLimit': pointsLimit,

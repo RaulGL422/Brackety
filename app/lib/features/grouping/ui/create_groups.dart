@@ -4,12 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
-import '../../auth/ui/widgets/confirm_dialog.dart';
 import '../../auth/data/api_error.dart';
-import '../data/grouping_repository.dart';
-import '../state/helper_queue.dart';
-import '../state/group_draft.dart';
+import '../../auth/ui/widgets/confirm_dialog.dart';
 import '../../mat/ui/mat_label.dart';
+import '../../phase/ui/phase_bar.dart';
+import '../data/grouping_repository.dart';
+import '../state/group_draft.dart';
+import '../state/helper_queue.dart';
 
 /// Sends the group to [matId], or to the mat the server picks if null, and shows which one. Calls
 /// [refresh] after creating it or on a conflict (someone else took a participant or team, or the
@@ -102,6 +103,8 @@ Future<bool> createGroup(
           ? switch (ApiError.from(e).code) {
               'SAME_FIGHTER' => l10n.teamOverlapTitle,
               'MEASURES_MISSING' => l10n.measuresMissingError,
+              'PHASE_NOT_STARTED' => l10n.phaseNotStartedError,
+              'PHASE_FINISHED' => l10n.phaseFinishedError,
               _ => l10n.groupsConflict,
             }
           : l10n.groupsError,
@@ -152,9 +155,10 @@ Future<void> undoGroup(
     toasts.show(l10n.undoGroupDone(number), kind: ToastKind.success);
   } on DioException catch (e) {
     toasts.show(
-      e.response?.statusCode == 409
-          ? l10n.undoGroupStarted
-          : l10n.undoGroupError,
+      phaseErrorMessage(l10n, e) ??
+          (e.response?.statusCode == 409
+              ? l10n.undoGroupStarted
+              : l10n.undoGroupError),
       kind: ToastKind.error,
     );
   }

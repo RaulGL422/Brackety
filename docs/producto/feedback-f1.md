@@ -45,6 +45,21 @@ Fuente: Raul, 2026-11-16. Las tareas salen de aquí hacia `roadmap.md`.
 ### F1-6 · Eventos poco intuitivos
 - La configuración y gran parte de la interfaz del evento no se entienden a la primera. Plan en `eventos-ux.md`.
 
+### F1-7 · Tapiz terminado y fase que nunca se cierra (Raul, 2026-11-18)
+- Pedido: un grupo terminado deja libres su tapiz y su árbitro, y el historial guarda dónde se jugó y quién arbitró. En la F1, para quitar un tapiz con grupos terminados hubo que trasladar grupos.
+- Ya cubierto por «Inhabilitar tapiz» (F1-1, v0.6.0, que en la F1 aún no existía): solo mueve los grupos con combates por jugar; los terminados se quedan donde se jugaron. Quitarlo del todo en Configuración sigue bloqueado si tuvo grupos; ahora el aviso lleva a inhabilitarlo (`MAT_HAS_GROUPS`; Raul: basta con inhabilitar).
+- Pedido: **comenzar y finalizar** el evento o la fase, también desde la pantalla de crear grupos. Una semana después de la F1 aún se podían crear grupos.
+- Respuestas de Raul (2026-11-18):
+  - Quién: el club, o los ayudantes con ese permiso. Los árbitros también son ayudantes. En «Personal» (Configuración del evento) se elige qué puede hacer cada ayudante.
+  - Finalizada: solo lectura para ayudantes y árbitros (ven grupos, resultados y fichas; no crean grupos, no puntúan, no mueven). El club puede **reabrir** con motivo, auditado.
+  - Si nadie la finaliza: se cierra sola al día siguiente si no quedan combates por jugar, y **manda un correo** al club (si quedan, le avisa).
+  - Cuándo: ya, antes de la etapa 3, para llegar probado a la F2.
+- Idea de Raul: aprovechar mucho más el **correo** como herramienta (`modulos/notificaciones.md`).
+- Plan: PR A (aviso del tapiz, #127), PR B (comenzar, finalizar y reabrir fase, cierre automático y correo), PR C (permisos por ayudante en «Personal»; la lista de permisos se enseña a Raul antes de programar).
+- Más respuestas de Raul (2026-11-18) para la PR B: **comenzar es obligatorio** (sin él no se crean grupos ni se arbitra); se puede finalizar con combates sin jugar, avisando cuántos (nunca con uno en curso o en revisión); finalizada, **también el club** queda en solo lectura de la competición hasta reabrir (ajustes, alumnos y descargas siguen libres).
+- Hecho en la PR B (#129): ver `modulos/eventos.md`, «Adelanto F1-7».
+- PR C: Raul aprueba la lista de permisos tal cual (2026-11-18); fusionada (#130). C2: el personal es configurable del todo (solo mirar, solo arbitrar, solo grupos o combinaciones); ver `modulos/ayudantes-permisos.md`, «Adelanto F1-7 C».
+
 ## Peticiones para la F2 (2026-11-16)
 ### F2-1 · Peso y estatura (respuestas de Raul, 2026-11-16)
 - 2026-11-17: datos, formulario, importación y CSV hechos en M2c. Configuración y bloqueo en pruebas (rama `feat/f2-measures-required`): cada deporte trae su nivel (tambo: opcional), el evento puede cambiarlo en Ajustes > Peso y estatura; obligatorio bloquea grupo y equipo (el ayudante lo apunta tocando al alumno), opcional avisa "sin peso"/"sin estatura", desactivado no se pide.

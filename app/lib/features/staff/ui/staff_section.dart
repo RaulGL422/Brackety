@@ -7,6 +7,7 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../../auth/ui/widgets/confirm_dialog.dart';
 import '../../club/data/club_models.dart';
 import '../../club/state/club_providers.dart';
+import '../../events/data/my_event.dart';
 import '../data/staff_repository.dart';
 
 String staffRoleName(AppLocalizations l10n, StaffRole role) => switch (role) {
@@ -145,6 +146,107 @@ class StaffRemoveButton extends ConsumerWidget {
         }
         ref.invalidate(eventSettingsProvider(eventId));
       },
+    );
+  }
+}
+
+String permissionName(AppLocalizations l10n, EventPermission p) => switch (p) {
+  EventPermission.view => l10n.permissionView,
+  EventPermission.groups => l10n.permissionGroups,
+  EventPermission.teams => l10n.permissionTeams,
+  EventPermission.measures => l10n.permissionMeasures,
+  EventPermission.ownMat => l10n.permissionOwnMat,
+  EventPermission.phase => l10n.permissionPhase,
+  EventPermission.control => l10n.permissionControl,
+  EventPermission.reviews => l10n.permissionReviews,
+  EventPermission.deviceImport => l10n.permissionDeviceImport,
+  EventPermission.participants => l10n.permissionParticipants,
+};
+
+/// What a helper or referee may do in the event (F1-7 C): the club ticks it here.
+class StaffPermissionsButton extends ConsumerWidget {
+  const StaffPermissionsButton({
+    super.key,
+    required this.eventId,
+    required this.member,
+  });
+
+  final String eventId;
+  final StaffMember member;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    return IconButton(
+      tooltip: l10n.permissionsTooltip(member.username),
+      icon: const Icon(Icons.admin_panel_settings_outlined),
+      onPressed: () async {
+        final toasts = Toasts.of(context);
+        final chosen = await showDialog<Set<EventPermission>>(
+          context: context,
+          builder: (_) => _PermissionsDialog(member: member),
+        );
+        if (chosen == null) return;
+        try {
+          await ref
+              .read(staffRepositoryProvider)
+              .setPermissions(eventId, member.id, chosen);
+          toasts.show(l10n.permissionsSaved, kind: ToastKind.success);
+        } on DioException catch (e) {
+          toasts.show(staffErrorMessage(l10n, e), kind: ToastKind.error);
+        }
+        ref.invalidate(eventSettingsProvider(eventId));
+      },
+    );
+  }
+}
+
+class _PermissionsDialog extends StatefulWidget {
+  const _PermissionsDialog({required this.member});
+
+  final StaffMember member;
+
+  @override
+  State<_PermissionsDialog> createState() => _PermissionsDialogState();
+}
+
+class _PermissionsDialogState extends State<_PermissionsDialog> {
+  late final _chosen = {...widget.member.permissions};
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return AlertDialog(
+      scrollable: true,
+      title: Text(l10n.permissionsTitle(widget.member.label)),
+      content: SizedBox(
+        width: 400,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(l10n.permissionsHint),
+            for (final p in EventPermission.values)
+              CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
+                value: _chosen.contains(p),
+                title: Text(permissionName(l10n, p)),
+                onChanged: (on) =>
+                    setState(() => on! ? _chosen.add(p) : _chosen.remove(p)),
+              ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n.cancel),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, _chosen),
+          child: Text(l10n.save),
+        ),
+      ],
     );
   }
 }

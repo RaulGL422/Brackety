@@ -186,6 +186,15 @@
   "resetRequestNew": "Pedir otro enlace",
   "logout": "Salir",
   "eventsTitle": "Mis eventos",
+  "newEventButton": "Nuevo evento",
+  "newEventTitle": "Nuevo evento",
+  "newEventHint": "Un evento suelto, con sus tapices. Las categorías, los inscritos y los árbitros se añaden después desde su panel.",
+  "newEventName": "Nombre del evento",
+  "newEventMats": "Tapices",
+  "newEventMatsInvalid": "Entre 1 y {max}",
+  "@newEventMatsInvalid": {"placeholders": {"max": {"type": "int"}}},
+  "newEventCreate": "Crear evento",
+  "newEventDone": "Evento creado",
   "eventsEmpty": "No tienes eventos asignados.",
   "roleClub": "Club",
   "roleGrouper": "Ayudante",
@@ -210,14 +219,6 @@
       },
       "grouped": {
         "type": "int"
-      }
-    }
-  },
-  "categoryAges": "{name} años",
-  "@categoryAges": {
-    "placeholders": {
-      "name": {
-        "type": "String"
       }
     }
   },
@@ -308,7 +309,7 @@
     }
   },
   "matEmpty": "Todavía no hay grupos en este tapiz.",
-  "matGroupHeader": "Grupo {number}, de {category} años",
+  "matGroupHeader": "Grupo {number} · {category}",
   "@matGroupHeader": {
     "placeholders": {
       "number": {
@@ -367,6 +368,18 @@
   "undo": "Deshacer",
   "timeline": "Línea de tiempo",
   "addPoint": "+1",
+  "addPointsFor": "+{points} {corner}: {labels}",
+  "@addPointsFor": {"placeholders": {"points": {"type": "int"}, "corner": {"type": "String"}, "labels": {"type": "String"}}},
+  "removePointsValue": "{points, plural, =1{Quitar 1 punto} other{Quitar {points} puntos}}",
+  "@removePointsValue": {"placeholders": {"points": {"type": "int"}}},
+  "extraTimeWon": "Gana la prórroga",
+  "extraTimeWonBy": "{corner} gana la prórroga",
+  "@extraTimeWonBy": {"placeholders": {"corner": {"type": "String"}}},
+  "winConfirmTitle": "¿{what}?",
+  "@winConfirmTitle": {"placeholders": {"what": {"type": "String"}}},
+  "winConfirmBody": "Gana {corner} y el combate termina. Se puede deshacer.",
+  "@winConfirmBody": {"placeholders": {"corner": {"type": "String"}}},
+  "winConfirm": "Dar la victoria",
   "addPointFor": "+1 {corner}",
   "@addPointFor": {
     "placeholders": {
@@ -420,6 +433,10 @@
   "endPoints": "Fin por puntos",
   "endTime": "Fin del tiempo",
   "endDisqualification": "Fin por descalificación",
+  "endSuperiority": "Fin por superioridad",
+  "endWarnings": "Fin por amonestaciones",
+  "endSubmission": "Fin por sumisión",
+  "endExtraTime": "Fin en la prórroga",
   "actionRefused": "No se ha podido registrar. {detail}",
   "@actionRefused": {
     "placeholders": {
@@ -430,6 +447,10 @@
   },
   "tlStart": "Inicio del tiempo",
   "tlStop": "Parada",
+  "tlPoints": "{points} puntos",
+  "@tlPoints": {"placeholders": {"points": {"type": "int"}}},
+  "tlPointsRemoved": "{points} puntos quitados",
+  "@tlPointsRemoved": {"placeholders": {"points": {"type": "int"}}},
   "tlPoint": "Punto",
   "tlUndo": "Deshacer",
   "tlFinish": "Fin del combate",
@@ -440,8 +461,8 @@
   "removePoint": "−1",
   "removePointFor": "Quitar un punto a {corner}",
   "@removePointFor": {"placeholders": {"corner": {"type": "String"}}},
-  "whatPointRemoved": "−1 {corner}",
-  "@whatPointRemoved": {"placeholders": {"corner": {"type": "String"}}},
+  "whatPointRemoved": "−{points} {corner}",
+  "@whatPointRemoved": {"placeholders": {"points": {"type": "int"}, "corner": {"type": "String"}}},
   "whatClockAdjust": "{delta} s al reloj",
   "@whatClockAdjust": {"placeholders": {"delta": {"type": "String"}}},
   "clockAdjustBy": "{delta} s",
@@ -458,6 +479,10 @@
   "refusalNoPoints": "No tiene puntos que quitar.",
   "refusalClockRunning": "Para el reloj antes de ajustarlo.",
   "refusalClockLimit": "El reloj no puede ir más allá.",
+  "refusalNotInThisSport": "Esta acción no existe en este deporte.",
+  "refusalInvalidValue": "Ninguna acción de este deporte vale eso.",
+  "refusalNoExtraTime": "La prórroga es solo para un empate al final que no resuelve ningún desempate.",
+  "refusalExtraTimePending": "Empate tras todos los desempates: primero la prórroga.",
   "settingsMatchRules": "Combates",
   "settingsMatchLength": "Individual: duración del combate (min:s)",
   "settingsTeamMatchLength": "Equipos: duración del combate (min:s)",
@@ -493,6 +518,10 @@
   "noCategory": "Sin categoría",
   "sortByPoints": "Puntos",
   "standingsEmpty": "Todavía no hay puntuaciones.",
+  "standingsClassification": "{points} pts clas.",
+  "@standingsClassification": {"placeholders": {"points": {"type": "int"}}},
+  "standingsWinsDetail": "Victorias {wins} · Puntos técnicos {points} ({matches})",
+  "@standingsWinsDetail": {"placeholders": {"wins": {"type": "int"}, "points": {"type": "int"}, "matches": {"type": "int"}}},
   "standingsTotal": "{total} pts",
   "@standingsTotal": {
     "placeholders": {
@@ -837,6 +866,10 @@
   "categoryNameLabel": "Nombre",
   "categoryMinAge": "Desde",
   "categoryMaxAge": "Hasta",
+  "categoryOwnLength": "{length} por combate",
+  "@categoryOwnLength": {"placeholders": {"length": {"type": "String"}}},
+  "categoryMatchLength": "Duración propia (min:s)",
+  "categoryMatchLengthHint": "Vacía: la del evento. En grappling, 4:00 para U13, U15 y veteranos.",
   "categoryByTeams": "Por equipos",
   "categoryGroupSize": "Grupos de {size}",
   "@categoryGroupSize": {
@@ -1157,14 +1190,10 @@
       }
     }
   },
-  "whatPoint": "+1 {corner}",
-  "@whatPoint": {
-    "placeholders": {
-      "corner": {
-        "type": "String"
-      }
-    }
-  },
+  "whatPoint": "+{points} {corner}",
+  "@whatPoint": {"placeholders": {"points": {"type": "int"}, "corner": {"type": "String"}}},
+  "whatFinish": "{what} {corner}",
+  "@whatFinish": {"placeholders": {"what": {"type": "String"}, "corner": {"type": "String"}}},
   "whatWarning": "advertencia {corner}",
   "@whatWarning": {
     "placeholders": {
@@ -1282,6 +1311,7 @@
   },
   "leagueCurrentPhase": "Esta fase",
   "disciplineTambo": "Tambo",
+  "disciplineGrappling": "Grappling",
   "disciplineGround": "Suelo",
   "disciplineThrows": "Derribos",
   "disciplineTechnicalExpression": "Expresión técnica",
@@ -1416,6 +1446,8 @@
   "refusalNotFinished": "El combate no está finalizado.",
   "tlCancel": "Combate cancelado",
   "tlReopen": "Combate reabierto",
+  "tlSubmission": "Sumisión",
+  "tlExtraTime": "Prórroga ganada",
   "matOneAtATime": "Hay un combate en curso: el siguiente se podrá empezar cuando acabe.",
   "matQueued": "Pendientes",
   "keepMatch": "Seguir con el combate",
@@ -1512,5 +1544,40 @@
   "invitationInvalid": "La invitación no existe, ya se usó o ha caducado. Pide al club que te invite de nuevo.",
   "invitationVerifyFirst": "Confirma antes tu email con el enlace que te enviamos al registrarte.",
   "leagueGlobalStandings": "Clasificación global",
-  "leagueGlobalStandingsHint": "Todas las categorías juntas en Puntuaciones y en Liga. Apagada, solo se ve una categoría cada vez."
+  "leagueGlobalStandingsHint": "Todas las categorías juntas en Puntuaciones y en Liga. Apagada, solo se ve una categoría cada vez.",
+  "settingsMatHasGroups": "Ese tapiz ya tiene grupos y guarda dónde se jugaron: no se puede quitar. Si ha terminado, usa «Inhabilitar tapiz» en la pestaña de tapices.",
+  "phaseNotStarted": "La fase aún no ha comenzado: el club tiene que pulsar «Comenzar fase».",
+  "phaseNotStartedClub": "La fase aún no ha comenzado: sin comenzarla no se crean grupos ni se arbitra.",
+  "phaseInProgress": "Fase en curso",
+  "phaseFinished": "Fase finalizada: solo lectura",
+  "phaseStart": "Comenzar fase",
+  "phaseFinish": "Finalizar fase",
+  "phaseReopen": "Reabrir fase",
+  "phaseFinishTitle": "¿Finalizar la fase?",
+  "phaseFinishBody": "Nadie podrá crear grupos, puntuar ni mover combates. Podrás reabrirla con un motivo.",
+  "phaseFinishPending": "Quedan {count} combates sin jugar y así quedarán en el historial. Nadie podrá crear grupos, puntuar ni mover combates. Podrás reabrirla con un motivo.",
+  "@phaseFinishPending": {"placeholders": {"count": {"type": "int"}}},
+  "phaseReopenTitle": "¿Por qué reabres la fase?",
+  "phaseNotStartedError": "La fase no ha comenzado: el club tiene que comenzarla.",
+  "phaseFinishedError": "La fase está finalizada: el club tiene que reabrirla para cambiar algo.",
+  "phaseMatchInProgressError": "Hay un combate en curso o pendiente de revisión: termínalo antes.",
+  "permissionsTooltip": "Permisos de {name}",
+  "@permissionsTooltip": {"placeholders": {"name": {"type": "String"}}},
+  "permissionsTitle": "Qué puede hacer {name}",
+  "@permissionsTitle": {"placeholders": {"name": {"type": "String"}}},
+  "permissionsHint": "El club siempre puede hacerlo todo. Reabrir una fase y gestionar el personal son solo del club.",
+  "permissionsSaved": "Permisos guardados",
+  "permissionGroups": "Crear y deshacer grupos",
+  "permissionTeams": "Formar equipos",
+  "permissionMeasures": "Registrar pesos y estaturas",
+  "permissionOwnMat": "Arbitrar su tapiz",
+  "permissionPhase": "Comenzar y finalizar la fase",
+  "permissionControl": "Panel de control: mover grupos y combates, reordenar, saltar el descanso, inhabilitar tapices",
+  "permissionReviews": "Resolver combates en revisión",
+  "permissionDeviceImport": "Importar las acciones de un dispositivo (CSV)",
+  "permissionParticipants": "Dar de alta y editar alumnos",
+  "eventStaffPanel": "Panel del evento",
+  "staffPanelOnlyImport": "Desde aquí puedes importar las acciones de un dispositivo con el botón de arriba.",
+  "permissionView": "Ver grupos, tapices y combates (solo lectura)",
+  "permissionsReadOnly": "Solo puedes mirar: el club no te ha dado permiso para cambiar nada aquí."
 }

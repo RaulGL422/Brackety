@@ -5,12 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/async_view.dart';
+import '../../../core/up_button.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../data/legal_repository.dart';
 import '../state/legal_providers.dart';
 import 'external_link.dart';
 import 'legal_links.dart';
-import '../../../core/up_button.dart';
 
 /// `/legal/<slug>`, open with or without a session, in the app's language.
 class LegalPageScreen extends StatelessWidget {

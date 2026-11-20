@@ -128,7 +128,9 @@ class EventResultsTransfer {
                                     usernames.get(uuid(rs, "actor_account_id")),
                                     rs.getBoolean("automatic"),
                                     instant(rs, "at"),
-                                    rs.getLong("clock_ms")));
+                                    rs.getLong("clock_ms"),
+                                    rs.getObject("delta_ms", Long.class),
+                                    rs.getInt("points")));
                 });
         var matches = jdbc
                 .sql("select * from fight_match where event_id = ?")
@@ -148,7 +150,9 @@ class EventResultsTransfer {
                         instant(rs, "running_since"),
                         rs.getString("disqualified_side"),
                         rs.getString("review_reason"),
-                        actions.getOrDefault(uuid(rs, "id"), List.of())))
+                        actions.getOrDefault(uuid(rs, "id"), List.of()),
+                        rs.getString("winner_side"),
+                        rs.getString("end_reason")))
                 .list()
                 .stream()
                 .sorted((a, b) -> a.groupNumber() != b.groupNumber()
@@ -242,8 +246,9 @@ class EventResultsTransfer {
             var id = UUID.randomUUID();
             jdbc.sql("insert into fight_match (id, event_id, group_id, mat_id, order_index, red_participant_id,"
                             + " blue_participant_id, red_team_id, blue_team_id, status, red_score, blue_score,"
-                            + " started_at, finished_at, elapsed_ms, running_since, disqualified_side, review_reason)"
-                            + " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+                            + " started_at, finished_at, elapsed_ms, running_since, disqualified_side, review_reason,"
+                            + " winner_side, end_reason)"
+                            + " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
                     .params(
                             id,
                             eventId,
@@ -262,15 +267,17 @@ class EventResultsTransfer {
                             m.elapsedMs(),
                             timestamp(m.runningSince()),
                             m.disqualifiedSide(),
-                            m.reviewReason())
+                            m.reviewReason(),
+                            m.winnerSide(),
+                            m.endReason())
                     .update();
             var actionIds = new HashMap<Integer, UUID>();
             for (var a : m.actions()) {
                 var actionId = UUID.randomUUID();
                 actionIds.put(a.position(), actionId);
-                jdbc.sql(
-                                "insert into match_event (id, match_id, position, type, side, reason, target_event_id,"
-                                        + " actor_account_id, automatic, at, clock_ms) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+                jdbc.sql("insert into match_event (id, match_id, position, type, side, reason, target_event_id,"
+                                + " actor_account_id, automatic, at, clock_ms, delta_ms, points)"
+                                + " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
                         .params(
                                 actionId,
                                 id,
@@ -284,7 +291,9 @@ class EventResultsTransfer {
                                 accounts.get(a.actor()),
                                 a.automatic(),
                                 timestamp(a.at()),
-                                a.clockMs())
+                                a.clockMs(),
+                                a.deltaMs(),
+                                a.points() == null ? 1 : a.points())
                         .update();
             }
         }

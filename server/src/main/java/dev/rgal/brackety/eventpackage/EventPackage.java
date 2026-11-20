@@ -2,8 +2,10 @@ package dev.rgal.brackety.eventpackage;
 
 import dev.rgal.brackety.event.Discipline;
 import dev.rgal.brackety.event.EventCategory;
+import dev.rgal.brackety.event.EventPermission;
 import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.MeasureRequirement;
+import dev.rgal.brackety.event.ScoringRules;
 import dev.rgal.brackety.league.Podium;
 import dev.rgal.brackety.participant.Sex;
 import jakarta.validation.Valid;
@@ -18,13 +20,15 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
  * The {@code .brackety} file (docs/modulos/servidor-local.md): an event ready to run on another server. Accounts are
  * named by username (their login); no passwords or other account data. Version 2 adds the league, the organizations,
  * a stable id per person and the results (groups, teams, matches and their actions), all optional so version 1 files
- * still load.
+ * still load. Version 3 drops {@code event.maxGroupsPerMat} (no multigroup); older files still load and it is
+ * ignored, while an older server refuses a version 3 file instead of misreading it.
  */
 public record EventPackage(
         int schemaVersion,
@@ -39,9 +43,14 @@ public record EventPackage(
         @NotNull List<@NotNull @Valid ParticipantEntry> participants,
         @Valid EventResults results,
         @Size(max = 100) List<@NotNull @Valid StaffName> staffNames,
-        @Valid RulebookEntry rulebook) {
+        @Valid RulebookEntry rulebook,
+        @Size(max = 100) List<@NotNull @Valid StaffPermissions> staffPermissions) {
 
-    public static final int SCHEMA_VERSION = 2;
+    /**
+     * 4: the modality's scoring rules and each category's own match length (grappling, 2026-11-20); an older server
+     * refuses it instead of scoring grappling as tambo. 3 and before load as tambo.
+     */
+    public static final int SCHEMA_VERSION = 4;
 
     /** The phase's rulebook PDF, in base64; absent when it has none or in files from before rulebooks. */
     public record RulebookEntry(
@@ -52,6 +61,18 @@ public record EventPackage(
     public record StaffName(
             @NotBlank @Size(max = 254) String username,
             @NotBlank @Size(max = 80) String name) {}
+
+    /**
+     * What the club chose for a helper or referee in «Personal»; whoever is missing keeps the defaults of their roles.
+     * Absent in files from before the choice existed.
+     */
+    public record StaffPermissions(
+            @NotBlank @Size(max = 254) String username,
+            @NotNull Set<@NotNull EventPermission> permissions) {}
+
+    public List<StaffPermissions> staffPermissionsOrEmpty() {
+        return staffPermissions == null ? List.of() : staffPermissions;
+    }
 
     public List<StaffName> staffNamesOrEmpty() {
         return staffNames == null ? List.of() : staffNames;
@@ -68,9 +89,8 @@ public record EventPackage(
     public record Settings(
             @NotBlank @Size(max = 120) String name,
             @NotNull LocalDate date,
-            @Min(1) @Max(4) int maxGroupsPerMat,
             @Min(1) int matchSeconds,
-            @Min(1) int pointsLimit,
+            @Min(0) int pointsLimit,
             @Min(0) int changeoverSeconds,
             @Min(0) int attendancePoints,
             UUID originId,
@@ -79,7 +99,8 @@ public record EventPackage(
             @Min(0) Integer minRestSeconds,
             MeasureRequirement weightRequirement,
             MeasureRequirement heightRequirement,
-            @Size(max = 20) List<@NotBlank @Size(max = 60) String> warningReasons) {}
+            @Size(max = 20) List<@NotBlank @Size(max = 60) String> warningReasons,
+            @Valid ScoringRules scoring) {}
 
     public record LeagueEntry(
             @NotBlank @Size(max = 120) String name,
@@ -103,13 +124,21 @@ public record EventPackage(
             @NotBlank @Size(max = 254) String username,
             @NotNull EventRole role) {}
 
-    /** {@code teamSize}: null for an individual category. */
+    /** {@code teamSize}: null for an individual category. {@code matchSeconds}: null follows the modality. */
     public record Category(
             @NotBlank @Size(max = 40) String name,
             @Min(0) @Max(120) int minAge,
             @Min(0) @Max(120) int maxAge,
             @NotNull EventCategory.Format format,
-            @Min(2) @Max(5) Integer teamSize) {}
+            @Min(2) @Max(5) Integer teamSize,
+            @Min(30) @Max(1200) Integer matchSeconds) {
+
+        EventCategory toCategory(UUID eventId) {
+            var category = new EventCategory(eventId, name.strip(), minAge, maxAge, teamSize);
+            category.setMatchSeconds(matchSeconds);
+            return category;
+        }
+    }
 
     public record OrganizationEntry(
             @NotBlank @Size(max = 120) String name,

@@ -5,7 +5,7 @@ import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventCategory;
 import dev.rgal.brackety.event.EventCategoryRepository;
 import dev.rgal.brackety.event.EventException;
-import dev.rgal.brackety.event.EventRole;
+import dev.rgal.brackety.event.EventPermission;
 import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.event.Mat;
 import dev.rgal.brackety.event.MatRepository;
@@ -74,7 +74,13 @@ class MatBoardService {
      */
     @Transactional(readOnly = true)
     List<MatOverview> overview(UUID eventId, UUID accountId) {
-        access.require(eventId, accountId, EventRole.CLUB, EventRole.GROUPER);
+        access.require(
+                eventId,
+                accountId,
+                EventPermission.GROUPS,
+                EventPermission.CONTROL,
+                EventPermission.REVIEWS,
+                EventPermission.VIEW);
         var now = clock.instant();
         var event = events.get(eventId);
         var states = schedule.states(event, now);
@@ -256,8 +262,9 @@ class MatBoardService {
         if (roles.isEmpty()) {
             throw EventException.notFound();
         }
-        var ownMat = roles.contains(EventRole.REFEREE) && accountId.equals(mat.getRefereeAccountId());
-        if (!roles.contains(EventRole.CLUB) && !ownMat) {
+        var granted = access.permissions(mat.getEventId(), accountId, roles);
+        var ownMat = granted.contains(EventPermission.OWN_MAT) && accountId.equals(mat.getRefereeAccountId());
+        if (!EventPermission.watchesMats(granted) && !ownMat) {
             throw EventException.forbidden();
         }
     }

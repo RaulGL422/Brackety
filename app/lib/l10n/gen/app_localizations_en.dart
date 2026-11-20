@@ -528,6 +528,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get eventsTitle => 'My events';
 
   @override
+  String get newEventButton => 'New event';
+
+  @override
+  String get newEventTitle => 'New event';
+
+  @override
+  String get newEventHint =>
+      'A standalone event, with its mats. Categories, entries and referees are added later from its panel.';
+
+  @override
+  String get newEventName => 'Event name';
+
+  @override
+  String get newEventMats => 'Mats';
+
+  @override
+  String newEventMatsInvalid(int max) {
+    return 'From 1 to $max';
+  }
+
+  @override
+  String get newEventCreate => 'Create event';
+
+  @override
+  String get newEventDone => 'Event created';
+
+  @override
   String get eventsEmpty => 'You have no events assigned.';
 
   @override
@@ -559,11 +586,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String categoryCounts(int participants, int grouped) {
     return '$participants registered · $grouped in groups';
-  }
-
-  @override
-  String categoryAges(String name) {
-    return 'Ages $name';
   }
 
   @override
@@ -687,7 +709,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String matGroupHeader(int number, String category) {
-    return 'Group $number, ages $category';
+    return 'Group $number · $category';
   }
 
   @override
@@ -787,6 +809,43 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addPoint => '+1';
 
   @override
+  String addPointsFor(int points, String corner, String labels) {
+    return '+$points $corner: $labels';
+  }
+
+  @override
+  String removePointsValue(int points) {
+    String _temp0 = intl.Intl.pluralLogic(
+      points,
+      locale: localeName,
+      other: 'Take back $points points',
+      one: 'Take back 1 point',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get extraTimeWon => 'Won the extra time';
+
+  @override
+  String extraTimeWonBy(String corner) {
+    return '$corner won the extra time';
+  }
+
+  @override
+  String winConfirmTitle(String what) {
+    return '$what?';
+  }
+
+  @override
+  String winConfirmBody(String corner) {
+    return '$corner wins and the match ends. It can be undone.';
+  }
+
+  @override
+  String get winConfirm => 'Give the win';
+
+  @override
   String addPointFor(String corner) {
     return '+1 $corner';
   }
@@ -843,6 +902,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get endDisqualification => 'Ended by disqualification';
 
   @override
+  String get endSuperiority => 'Ended by superiority';
+
+  @override
+  String get endWarnings => 'Ended by warnings';
+
+  @override
+  String get endSubmission => 'Ended by submission';
+
+  @override
+  String get endExtraTime => 'Ended in extra time';
+
+  @override
   String actionRefused(String detail) {
     return 'Could not record it. $detail';
   }
@@ -852,6 +923,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tlStop => 'Stop';
+
+  @override
+  String tlPoints(int points) {
+    return '$points points';
+  }
+
+  @override
+  String tlPointsRemoved(int points) {
+    return '$points points taken back';
+  }
 
   @override
   String get tlPoint => 'Point';
@@ -883,8 +964,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String whatPointRemoved(String corner) {
-    return '−1 $corner';
+  String whatPointRemoved(int points, String corner) {
+    return '−$points $corner';
   }
 
   @override
@@ -930,6 +1011,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get refusalClockLimit => 'The clock cannot go further.';
+
+  @override
+  String get refusalNotInThisSport =>
+      'This action does not exist in this sport.';
+
+  @override
+  String get refusalInvalidValue => 'No action of this sport is worth that.';
+
+  @override
+  String get refusalNoExtraTime =>
+      'Extra time is only for a tie at the end that no tiebreaker settles.';
+
+  @override
+  String get refusalExtraTimePending =>
+      'Tied after every tiebreaker: extra time first.';
 
   @override
   String get settingsMatchRules => 'Matches';
@@ -1040,6 +1136,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get standingsEmpty => 'No scores yet.';
+
+  @override
+  String standingsClassification(int points) {
+    return '$points class. pts';
+  }
+
+  @override
+  String standingsWinsDetail(int wins, int points, int matches) {
+    return 'Wins $wins · Technical points $points ($matches)';
+  }
 
   @override
   String standingsTotal(int total) {
@@ -1642,6 +1748,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get categoryMaxAge => 'To';
 
   @override
+  String categoryOwnLength(String length) {
+    return '$length per match';
+  }
+
+  @override
+  String get categoryMatchLength => 'Own match length (min:s)';
+
+  @override
+  String get categoryMatchLengthHint =>
+      'Empty: the event\'s. In grappling, 4:00 for U13, U15 and veterans.';
+
+  @override
   String get categoryByTeams => 'By teams';
 
   @override
@@ -2150,8 +2268,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String whatPoint(String corner) {
-    return '+1 $corner';
+  String whatPoint(int points, String corner) {
+    return '+$points $corner';
+  }
+
+  @override
+  String whatFinish(String what, String corner) {
+    return '$what $corner';
   }
 
   @override
@@ -2285,6 +2408,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get disciplineTambo => 'Tambo';
+
+  @override
+  String get disciplineGrappling => 'Grappling';
 
   @override
   String get disciplineGround => 'Ground';
@@ -2526,6 +2652,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tlReopen => 'Match reopened';
+
+  @override
+  String get tlSubmission => 'Submission';
+
+  @override
+  String get tlExtraTime => 'Extra time won';
 
   @override
   String get matOneAtATime =>
@@ -2835,4 +2967,117 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get leagueGlobalStandingsHint =>
       'Every category together in Scores and League. Off, one category at a time.';
+
+  @override
+  String get settingsMatHasGroups =>
+      'That mat already has groups and keeps where they were played: it cannot be removed. If it is done, use \"Disable mat\" in the mats tab.';
+
+  @override
+  String get phaseNotStarted =>
+      'The phase has not started yet: the club has to press \"Start phase\".';
+
+  @override
+  String get phaseNotStartedClub =>
+      'The phase has not started yet: without it, no groups are created and nothing is refereed.';
+
+  @override
+  String get phaseInProgress => 'Phase in progress';
+
+  @override
+  String get phaseFinished => 'Phase finished: read only';
+
+  @override
+  String get phaseStart => 'Start phase';
+
+  @override
+  String get phaseFinish => 'Finish phase';
+
+  @override
+  String get phaseReopen => 'Reopen phase';
+
+  @override
+  String get phaseFinishTitle => 'Finish the phase?';
+
+  @override
+  String get phaseFinishBody =>
+      'Nobody will be able to create groups, score or move matches. You can reopen it with a reason.';
+
+  @override
+  String phaseFinishPending(int count) {
+    return '$count matches are left to play and will stay unplayed in the history. Nobody will be able to create groups, score or move matches. You can reopen it with a reason.';
+  }
+
+  @override
+  String get phaseReopenTitle => 'Why do you reopen the phase?';
+
+  @override
+  String get phaseNotStartedError =>
+      'The phase has not started: the club has to start it.';
+
+  @override
+  String get phaseFinishedError =>
+      'The phase is finished: the club has to reopen it to change anything.';
+
+  @override
+  String get phaseMatchInProgressError =>
+      'A match is in progress or waits for review: finish it first.';
+
+  @override
+  String permissionsTooltip(String name) {
+    return 'Permissions of $name';
+  }
+
+  @override
+  String permissionsTitle(String name) {
+    return 'What $name may do';
+  }
+
+  @override
+  String get permissionsHint =>
+      'The club may always do everything. Reopening a phase and managing the staff are the club\'s alone.';
+
+  @override
+  String get permissionsSaved => 'Permissions saved';
+
+  @override
+  String get permissionGroups => 'Create and undo groups';
+
+  @override
+  String get permissionTeams => 'Form teams';
+
+  @override
+  String get permissionMeasures => 'Record weights and heights';
+
+  @override
+  String get permissionOwnMat => 'Referee their mat';
+
+  @override
+  String get permissionPhase => 'Start and finish the phase';
+
+  @override
+  String get permissionControl =>
+      'Control panel: move groups and matches, reorder, skip the rest, disable mats';
+
+  @override
+  String get permissionReviews => 'Resolve matches in review';
+
+  @override
+  String get permissionDeviceImport => 'Import a device\'s actions (CSV)';
+
+  @override
+  String get permissionParticipants => 'Add and edit participants';
+
+  @override
+  String get eventStaffPanel => 'Event panel';
+
+  @override
+  String get staffPanelOnlyImport =>
+      'From here you can import a device\'s actions with the button above.';
+
+  @override
+  String get permissionView => 'See groups, mats and matches (read only)';
+
+  @override
+  String get permissionsReadOnly =>
+      'You can only look: the club has not let you change anything here.';
 }

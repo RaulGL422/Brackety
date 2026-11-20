@@ -2,6 +2,8 @@ import 'package:brackety/features/club/data/club_models.dart';
 import 'package:brackety/features/club/state/club_providers.dart';
 import 'package:brackety/features/club/ui/mats_tab.dart';
 import 'package:brackety/features/control/control_repository.dart';
+import 'package:brackety/features/events/data/my_event.dart';
+import 'package:brackety/features/events/state/events_providers.dart';
 import 'package:brackety/features/mat/data/mat_board.dart';
 import 'package:brackety/features/mat/state/mat_providers.dart';
 import 'package:brackety/features/mat/ui/mat_board_screen.dart';
@@ -12,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/fakes.dart';
 import '../../support/offline_fakes.dart';
 
 class _FakeControl extends ControlRepository {
@@ -131,6 +134,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          clubEventsOverride,
           matBoardProvider.overrideWith((ref, matId) async => shown ?? board),
           controlRepositoryProvider.overrideWithValue(control),
           matsOverviewProvider.overrideWith(
@@ -220,6 +224,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            clubEventsOverride,
             ...quietQueueOverrides(),
             cachedBoardProvider.overrideWith(
               (ref, matId) async => refereeBoard,
@@ -285,13 +290,14 @@ void main() {
       'desktop': Size(1440, 900),
     };
 
-    Future<void> openMats(WidgetTester tester, Size size) async {
+    Future<void> openMats(WidgetTester tester, Size size, {MyEvent? me}) async {
       tester.view.physicalSize = size;
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            myEventsProvider.overrideWith((ref) async => [me ?? clubEvent()]),
             matBoardProvider.overrideWith((ref, matId) async => withMats),
             controlRepositoryProvider.overrideWithValue(control),
             matsOverviewProvider.overrideWith(
@@ -358,6 +364,18 @@ void main() {
         await tester.pumpAndSettle();
         expect(control.calls.last, 'disableMat e1 mat2 {}');
       });
+
+      testWidgets(
+        'a helper who only watches cannot disable nor enable on $device',
+        (tester) async {
+          await openMats(tester, size, me: helperEvent({EventPermission.view}));
+
+          expect(find.text('Mat 3 · Out of use'), findsOneWidget);
+          expect(find.text('Disable mat'), findsNothing);
+          expect(find.text('Enable mat'), findsNothing);
+          expect(tester.takeException(), isNull);
+        },
+      );
     }
   });
 

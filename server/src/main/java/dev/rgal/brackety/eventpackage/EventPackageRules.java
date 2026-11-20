@@ -3,12 +3,15 @@ package dev.rgal.brackety.eventpackage;
 import dev.rgal.brackety.auth.account.Account;
 import dev.rgal.brackety.auth.account.Cif;
 import dev.rgal.brackety.event.EventCategory;
+import dev.rgal.brackety.event.EventPermission;
 import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.participant.ParticipantService;
 import jakarta.validation.Validator;
 import java.time.Period;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -28,6 +31,7 @@ final class EventPackageRules {
         }
         checkOwner(p);
         checkStaff(p.staff());
+        checkStaffPermissions(p);
         checkCategories(p.categories());
         checkOrganizations(p.organizationsOrEmpty());
         checkMats(p);
@@ -55,6 +59,36 @@ final class EventPackageRules {
                 throw invalid("staff[" + i + "]: repeats an account with the same role");
             }
         }
+    }
+
+    private static void checkStaffPermissions(EventPackage p) {
+        var seen = new HashSet<String>();
+        for (int i = 0; i < p.staffPermissionsOrEmpty().size(); i++) {
+            var username = p.staffPermissionsOrEmpty().get(i).username();
+            var roles = roles(p, username);
+            if (roles.isEmpty() || roles.contains(EventRole.CLUB)) {
+                throw invalid("staffPermissions[" + i + "].username: not a helper or referee in staff");
+            }
+            if (!seen.add(username)) {
+                throw invalid("staffPermissions[" + i + "].username: repeated");
+            }
+        }
+    }
+
+    /** As on the club's server: the club's choice, or the defaults of their roles. */
+    private static Set<EventPermission> permissions(EventPackage p, String username) {
+        return p.staffPermissionsOrEmpty().stream()
+                .filter(s -> s.username().equals(username))
+                .map(EventPackage.StaffPermissions::permissions)
+                .findFirst()
+                .orElseGet(() -> EventPermission.defaults(roles(p, username)));
+    }
+
+    private static Set<EventRole> roles(EventPackage p, String username) {
+        return p.staff().stream()
+                .filter(s -> s.username().equals(username))
+                .map(EventPackage.StaffMember::role)
+                .collect(Collectors.toCollection(() -> EnumSet.noneOf(EventRole.class)));
     }
 
     private static void checkCategories(List<EventPackage.Category> categories) {
@@ -94,8 +128,9 @@ final class EventPackageRules {
             if (referee == null) {
                 continue;
             }
-            if (!p.staff().contains(new EventPackage.StaffMember(referee, EventRole.REFEREE))) {
-                throw invalid("mats[" + i + "].refereeUsername: not in staff with role REFEREE");
+            var roles = roles(p, referee);
+            if (roles.contains(EventRole.CLUB) || !permissions(p, referee).contains(EventPermission.OWN_MAT)) {
+                throw invalid("mats[" + i + "].refereeUsername: not in staff with permission OWN_MAT");
             }
             if (!referees.add(referee)) {
                 throw invalid("mats[" + i + "].refereeUsername: already on another mat");

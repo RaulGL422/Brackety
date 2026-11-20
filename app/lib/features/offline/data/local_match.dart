@@ -1,6 +1,6 @@
 import '../../mat/data/mat_board.dart';
+import '../../scoreboard/data/match_state.dart';
 import '../../scoreboard/data/match_view.dart';
-import '../../scoreboard/data/tambo_match.dart';
 import 'offline_op.dart';
 
 /// A match as the device shows it: the last view from the server with the queued actions
@@ -17,22 +17,24 @@ class LocalMatch {
     bool heldForReview = false,
   }) {
     // The server's timeline already says what is undone, so its undos are not needed again.
-    final entries = <TamboEntry>[
+    final entries = <MatchEntry>[
       for (final (i, e) in server.timeline.indexed)
         if (e.action != MatchAction.undo && !e.undone)
-          TamboEntry(
+          MatchEntry(
             id: e.id ?? 'server-$i',
             action: e.action,
             side: e.side,
             at: e.at,
             delta: e.delta ?? Duration.zero,
+            value: e.points,
           ),
     ];
     final timeline = [...server.timeline];
     var lastAt = server.timeline.lastOrNull?.at;
-    TamboMatch replay() => TamboMatch.replay(
+    MatchState replay() => MatchState.replay(
       length: server.length,
       pointsLimit: server.pointsLimit,
+      scoring: server.scoring,
       entries: entries,
     );
     for (final op in pending) {
@@ -44,17 +46,19 @@ class LocalMatch {
             at,
             side: op.side,
             delta: op.delta ?? Duration.zero,
+            value: op.points,
           ) !=
           null) {
         continue;
       }
       entries.add(
-        TamboEntry(
+        MatchEntry(
           id: op.opId,
           action: op.action,
           side: op.side,
           at: at,
           delta: op.delta ?? Duration.zero,
+          value: op.points,
           target: op.action == MatchAction.undo
               ? before.lastUndoable!.id
               : null,
@@ -68,6 +72,7 @@ class LocalMatch {
           side: op.side,
           reason: op.reason,
           delta: op.delta,
+          points: op.points,
           at: at,
           clock: before.elapsedAt(at),
           automatic: false,
@@ -84,7 +89,7 @@ class LocalMatch {
       final end = after.endReason(at);
       if (end != null && end != EndReason.time && after.isRunning(at)) {
         entries.add(
-          TamboEntry(id: 'stop-${op.opId}', action: MatchAction.stop, at: at),
+          MatchEntry(id: 'stop-${op.opId}', action: MatchAction.stop, at: at),
         );
         timeline.add(
           TimelineEntry(
@@ -116,6 +121,7 @@ class LocalMatch {
         ? _serverAt(server, now)
         : MatchView(
             id: server.id,
+            eventId: server.eventId,
             matId: server.matId,
             matNumber: server.matNumber,
             groupNumber: server.groupNumber,
@@ -129,9 +135,13 @@ class LocalMatch {
             pointsLimit: server.pointsLimit,
             readyAt: server.readyAt,
             warningReasons: server.warningReasons,
+            scoring: server.scoring,
             remaining: state.remainingAt(now),
             running: state.isRunning(now),
             endReason: state.endReason(now),
+            ruledWinner: state.winner(now),
+            winnerRuled: true,
+            needsExtraTime: state.needsExtraTime(now),
             red: corner(Side.red),
             blue: corner(Side.blue),
             timeline: [
@@ -161,7 +171,7 @@ class LocalMatch {
   }
 
   final MatchView view;
-  final TamboMatch _state;
+  final MatchState _state;
   final DateTime? _lastAt;
 
   /// Why the referee cannot do [action] now, checked here before it goes into the queue.
@@ -170,6 +180,7 @@ class LocalMatch {
     Side? side,
     DateTime now, {
     Duration delta = Duration.zero,
+    int points = 1,
   }) {
     if (view.review != null) return MatchRefusal.inReview;
     if (action == MatchAction.oneHandWarning &&
@@ -183,6 +194,7 @@ class LocalMatch {
       lastAt != null && now.isBefore(lastAt) ? lastAt : now,
       side: side,
       delta: delta,
+      value: points,
     );
   }
 }
