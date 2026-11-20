@@ -4,7 +4,7 @@ public enum MatchEventType {
     START,
     STOP,
     POINT,
-    /** Takes one point off a fighter, never below 0: the referee's manual correction. */
+    /** Takes points off a fighter (its value, 1 by default), never below 0: the referee's manual correction. */
     POINT_REMOVED,
     WARNING,
     /** Only for fighters aged 4 to 7. */
@@ -12,7 +12,7 @@ public enum MatchEventType {
     DISQUALIFICATION,
     /** Adds (or, negative, takes) time on the stopped clock; the event carries the delta. */
     CLOCK_ADJUST,
-    /** Cancels the last point, point removed, warning, disqualification or clock adjustment still in force. */
+    /** Cancels the last {@link #undoable()} action still in force. */
     UNDO,
     FINISH,
     /**
@@ -21,5 +21,24 @@ public enum MatchEventType {
      */
     CANCEL,
     /** A finished match opens again to correct it, with what it had; with a reason and nothing else on the mat. */
-    REOPEN
+    REOPEN,
+    /** The side that made the other give up; ends the match. Only in sports with submissions (grappling). */
+    SUBMISSION,
+    /** The side that won the extra time of a match tied after every tiebreaker (grappling). */
+    EXTRA_TIME;
+
+    /** What an UNDO can take back: the referee's scoring actions, not the clock's start and stop nor the outcome. */
+    boolean undoable() {
+        return switch (this) {
+            case POINT,
+                    POINT_REMOVED,
+                    CLOCK_ADJUST,
+                    WARNING,
+                    ONE_HAND_WARNING,
+                    DISQUALIFICATION,
+                    SUBMISSION,
+                    EXTRA_TIME -> true;
+            case START, STOP, FINISH, CANCEL, REOPEN, UNDO -> false;
+        };
+    }
 }

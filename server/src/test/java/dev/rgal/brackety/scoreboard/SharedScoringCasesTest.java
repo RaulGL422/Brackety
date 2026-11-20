@@ -3,7 +3,6 @@ package dev.rgal.brackety.scoreboard;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.rgal.brackety.scoreboard.MatchState.Entry;
-import dev.rgal.brackety.scoreboard.MatchState.Rules;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,17 +19,19 @@ import org.junit.jupiter.api.TestFactory;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
-/** The scoring cases shared with the app (spec/scoring/tambo.json): both MatchState must agree on every one. */
+/** The scoring cases shared with the app (spec/scoring/*.json): both MatchState must agree on every one. */
 class SharedScoringCasesTest {
 
-    private static final Path CASES = Path.of("..", "spec", "scoring", "tambo.json");
+    private static final List<String> SPORTS = List.of("tambo", "grappling");
     private static final Instant T0 = Instant.parse("2027-03-10T09:00:00Z");
+    private static final Map<String, MatchRules.Scoring> SCORINGS =
+            Map.of("TAMBO", MatchRules.Scoring.TAMBO, "GRAPPLING", MatchRules.Scoring.GRAPPLING);
 
     // The app names each refusal; the server words it. Both must mean the same.
     private static final Map<String, String> REFUSALS = Map.ofEntries(
             Map.entry("The match is finished.", "finished"),
             Map.entry("The match is over.", "over"),
-            Map.entry(MatchState.NOT_STARTED, "notStarted"),
+            Map.entry(MatchRefusals.NOT_STARTED, "notStarted"),
             Map.entry("The clock is already running.", "running"),
             Map.entry("The clock is not running.", "notRunning"),
             Map.entry("Nothing to undo.", "nothingToUndo"),
@@ -38,15 +39,23 @@ class SharedScoringCasesTest {
             Map.entry("The match is not finished.", "notFinished"),
             Map.entry("No points to take back.", "noPoints"),
             Map.entry("Stop the clock first.", "clockRunning"),
-            Map.entry("The clock cannot go further.", "clockLimit"));
+            Map.entry("The clock cannot go further.", "clockLimit"),
+            Map.entry("Not in this sport.", "notInThisSport"),
+            Map.entry("This sport has no such value.", "invalidValue"),
+            Map.entry("No extra time: the match is not tied at the end.", "noExtraTime"),
+            Map.entry("Tied after every tiebreaker: play the extra time first.", "extraTimePending"));
 
     @TestFactory
     Stream<DynamicTest> everySharedCase() throws Exception {
-        var root = JsonMapper.builder().build().readTree(Files.readString(CASES, StandardCharsets.UTF_8));
-        var defaults = root.get("rules");
         var cases = new ArrayList<DynamicTest>();
-        for (var testCase : root.get("cases")) {
-            cases.add(DynamicTest.dynamicTest(testCase.get("name").asString(), () -> check(defaults, testCase)));
+        for (var sport : SPORTS) {
+            var file = Path.of("..", "spec", "scoring", sport + ".json");
+            var root = JsonMapper.builder().build().readTree(Files.readString(file, StandardCharsets.UTF_8));
+            var defaults = root.get("rules");
+            for (var testCase : root.get("cases")) {
+                cases.add(DynamicTest.dynamicTest(
+                        sport + ": " + testCase.get("name").asString(), () -> check(defaults, testCase)));
+            }
         }
         return cases.stream();
     }
@@ -60,7 +69,9 @@ class SharedScoringCasesTest {
         for (var entry : testCase.get("entries")) {
             entries.add(entry(entry));
         }
-        var match = MatchState.replay(new Rules(Duration.ofSeconds(length), limit), List.copyOf(entries));
+        var scoring = (rules.has("scoring") ? rules : defaults).path("scoring").asString("TAMBO");
+        var match = MatchState.replay(
+                new MatchRules(Duration.ofSeconds(length), limit, SCORINGS.get(scoring)), List.copyOf(entries));
         var now = at(testCase.get("at"));
         var expect = testCase.get("expect");
 
@@ -109,6 +120,16 @@ class SharedScoringCasesTest {
                     .as("end reason")
                     .isEqualTo(text(expect.get("endReason")));
         }
+        if (expect.has("winner")) {
+            assertThat(match.winner(now).map(Enum::name).orElse(null))
+                    .as("winner")
+                    .isEqualTo(text(expect.get("winner")));
+        }
+        if (expect.has("needsExtraTime")) {
+            assertThat(match.needsExtraTime(now))
+                    .as("needs extra time")
+                    .isEqualTo(expect.get("needsExtraTime").asBoolean());
+        }
         if (expect.has("disqualified")) {
             assertThat(
                             match.disqualified() == null
@@ -137,7 +158,8 @@ class SharedScoringCasesTest {
                         refusal.has("side") ? Side.valueOf(refusal.get("side").asString()) : null;
                 var deltaMs =
                         refusal.has("delta") ? duration(refusal.get("delta")).toMillis() : 0;
-                var actual = match.refuse(type, side, deltaMs, now).map(REFUSALS::get);
+                var value = refusal.path("value").asInt(1);
+                var actual = match.refuse(type, side, deltaMs, value, now).map(REFUSALS::get);
                 assertThat(actual.orElse(null)).as("refuse " + refusal).isEqualTo(text(refusal.get("expect")));
             }
         }
@@ -148,7 +170,8 @@ class SharedScoringCasesTest {
         var side = entry.has("side") ? Side.valueOf(entry.get("side").asString()) : null;
         var target = entry.has("target") ? id(entry.get("target").asString()) : null;
         var deltaMs = entry.has("delta") ? duration(entry.get("delta")).toMillis() : 0;
-        return new Entry(id(entry.get("id").asString()), type, side, at(entry.get("at")), target, deltaMs);
+        var value = entry.path("value").asInt(1);
+        return new Entry(id(entry.get("id").asString()), type, side, at(entry.get("at")), target, deltaMs, value);
     }
 
     private static UUID id(String name) {

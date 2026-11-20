@@ -1,0 +1,412 @@
+{
+  "_about": "Grappling scoring cases (FELODA national rules, November 2025; docs/reglamentos/grappling-feloda-2025.md) that MatchState passes in Java (server) and in Dart (app). Times in seconds from the first entry; \"value\" is the points of a POINT or POINT_REMOVED. Refusals use the names of MatchRefusal (Dart). Only the keys present in \"expect\" are checked.",
+  "rules": {"length": 300, "pointsLimit": 0, "scoring": "GRAPPLING"},
+  "cases": [
+    {
+      "name": "each action adds its value (art. 38)",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "r1", "action": "POINT", "at": 1, "side": "RED", "value": 2},
+        {"id": "r2", "action": "POINT", "at": 2, "side": "RED", "value": 4},
+        {"id": "b1", "action": "POINT", "at": 3, "side": "BLUE", "value": 3}
+      ],
+      "at": 10,
+      "expect": {
+        "red": {"points": 6},
+        "blue": {"points": 3},
+        "endReason": null,
+        "winner": null,
+        "lastUndoable": "b1"
+      }
+    },
+    {
+      "name": "there are no actions worth 0 nor more than 4",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0}
+      ],
+      "at": 5,
+      "expect": {
+        "refuse": [
+          {"action": "POINT", "expect": "invalidValue", "value": 5},
+          {"action": "POINT", "expect": "invalidValue", "value": 0},
+          {"action": "POINT", "expect": null, "value": 4},
+          {"action": "POINT", "expect": null, "value": 1}
+        ]
+      }
+    },
+    {
+      "name": "every warning gives the rival a point (art. 44)",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "w1", "action": "WARNING", "at": 1, "side": "RED"},
+        {"id": "w2", "action": "WARNING", "at": 2, "side": "RED"}
+      ],
+      "at": 5,
+      "expect": {
+        "red": {"points": 0, "warnings": 2},
+        "blue": {"points": 2},
+        "autoPoint": {"w1": true, "w2": true}
+      }
+    },
+    {
+      "name": "the fourth warning disqualifies (art. 31)",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "r1", "action": "POINT", "at": 1, "side": "RED", "value": 2},
+        {"id": "w1", "action": "WARNING", "at": 2, "side": "RED"},
+        {"id": "w2", "action": "WARNING", "at": 3, "side": "RED"},
+        {"id": "w3", "action": "WARNING", "at": 4, "side": "RED"},
+        {"id": "w4", "action": "WARNING", "at": 5, "side": "RED"}
+      ],
+      "at": 10,
+      "expect": {
+        "red": {"points": 2, "warnings": 4},
+        "blue": {"points": 4},
+        "endReason": "WARNINGS",
+        "disqualified": "RED",
+        "winner": "BLUE",
+        "refuse": [
+          {"action": "POINT", "expect": "over", "value": 2},
+          {"action": "WARNING", "expect": "over"},
+          {"action": "FINISH", "expect": null}
+        ]
+      }
+    },
+    {
+      "name": "undoing the fourth warning lets the match go on",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "w1", "action": "WARNING", "at": 1, "side": "RED"},
+        {"id": "w2", "action": "WARNING", "at": 2, "side": "RED"},
+        {"id": "w3", "action": "WARNING", "at": 3, "side": "RED"},
+        {"id": "w4", "action": "WARNING", "at": 4, "side": "RED"},
+        {"id": "u1", "action": "UNDO", "at": 6, "target": "w4"}
+      ],
+      "at": 7,
+      "expect": {
+        "blue": {"points": 3},
+        "endReason": null,
+        "disqualified": null,
+        "winner": null
+      }
+    },
+    {
+      "name": "a difference of 15 ends the match by superiority (art. 40)",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "b1", "action": "POINT", "at": 1, "side": "BLUE", "value": 2},
+        {"id": "r1", "action": "POINT", "at": 2, "side": "RED", "value": 4},
+        {"id": "r2", "action": "POINT", "at": 3, "side": "RED", "value": 4},
+        {"id": "r3", "action": "POINT", "at": 4, "side": "RED", "value": 4},
+        {"id": "r4", "action": "POINT", "at": 5, "side": "RED", "value": 3},
+        {"id": "r5", "action": "POINT", "at": 6, "side": "RED", "value": 2}
+      ],
+      "at": 10,
+      "expect": {
+        "red": {"points": 17},
+        "blue": {"points": 2},
+        "endReason": "SUPERIORITY",
+        "winner": "RED",
+        "refuse": [
+          {"action": "POINT", "expect": "over", "value": 1},
+          {"action": "FINISH", "expect": null}
+        ]
+      }
+    },
+    {
+      "name": "15 points without a difference of 15 go on",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "b1", "action": "POINT", "at": 1, "side": "BLUE", "value": 1},
+        {"id": "r1", "action": "POINT", "at": 2, "side": "RED", "value": 4},
+        {"id": "r2", "action": "POINT", "at": 3, "side": "RED", "value": 4},
+        {"id": "r3", "action": "POINT", "at": 4, "side": "RED", "value": 4},
+        {"id": "r4", "action": "POINT", "at": 5, "side": "RED", "value": 3}
+      ],
+      "at": 10,
+      "expect": {
+        "red": {"points": 15},
+        "blue": {"points": 1},
+        "endReason": null,
+        "refuse": [
+          {"action": "POINT", "expect": null, "value": 2}
+        ]
+      }
+    },
+    {
+      "name": "a submission ends the match (art. 31)",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "r1", "action": "POINT", "at": 1, "side": "RED", "value": 2},
+        {"id": "sub", "action": "SUBMISSION", "at": 30, "side": "BLUE"}
+      ],
+      "at": 31,
+      "expect": {
+        "endReason": "SUBMISSION",
+        "winner": "BLUE",
+        "red": {"points": 2},
+        "refuse": [
+          {"action": "POINT", "expect": "over", "value": 1},
+          {"action": "WARNING", "expect": "over"},
+          {"action": "POINT_REMOVED", "expect": "over", "side": "RED"},
+          {"action": "FINISH", "expect": null}
+        ]
+      }
+    },
+    {
+      "name": "undoing a submission lets the match go on",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "sub", "action": "SUBMISSION", "at": 30, "side": "BLUE"},
+        {"id": "u1", "action": "UNDO", "at": 31, "target": "sub"}
+      ],
+      "at": 32,
+      "expect": {
+        "endReason": null,
+        "winner": null,
+        "lastUndoable": null
+      }
+    },
+    {
+      "name": "nothing scores once the time is over (art. 29)",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "r1", "action": "POINT", "at": 1, "side": "RED", "value": 2}
+      ],
+      "at": 301,
+      "expect": {
+        "endReason": "TIME",
+        "elapsed": 300,
+        "refuse": [
+          {"action": "POINT", "expect": "over", "value": 1},
+          {"action": "WARNING", "expect": "over"},
+          {"action": "SUBMISSION", "expect": "over"},
+          {"action": "POINT_REMOVED", "expect": null, "side": "RED", "value": 2}
+        ]
+      }
+    },
+    {
+      "name": "at the end of the time more points win",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "r1", "action": "POINT", "at": 1, "side": "RED", "value": 4},
+        {"id": "b1", "action": "POINT", "at": 2, "side": "BLUE", "value": 2}
+      ],
+      "at": 301,
+      "expect": {
+        "winner": "RED",
+        "needsExtraTime": false,
+        "refuse": [
+          {"action": "FINISH", "expect": null},
+          {"action": "EXTRA_TIME", "expect": "noExtraTime"}
+        ]
+      }
+    },
+    {
+      "name": "tie 6-6: a 4 beats three 2s (art. 31, example 1)",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "r1", "action": "POINT", "at": 1, "side": "RED", "value": 2},
+        {"id": "r2", "action": "POINT", "at": 2, "side": "RED", "value": 4},
+        {"id": "b1", "action": "POINT", "at": 3, "side": "BLUE", "value": 2},
+        {"id": "b2", "action": "POINT", "at": 4, "side": "BLUE", "value": 2},
+        {"id": "b3", "action": "POINT", "at": 5, "side": "BLUE", "value": 2}
+      ],
+      "at": 301,
+      "expect": {
+        "red": {"points": 6},
+        "blue": {"points": 6},
+        "winner": "RED",
+        "needsExtraTime": false
+      }
+    },
+    {
+      "name": "tie 4-4: two 2s beat one 2 and two attacks (art. 31, example 2)",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "r1", "action": "POINT", "at": 1, "side": "RED", "value": 2},
+        {"id": "r2", "action": "POINT", "at": 2, "side": "RED", "value": 2},
+        {"id": "b1", "action": "POINT", "at": 3, "side": "BLUE", "value": 2},
+        {"id": "b2", "action": "POINT", "at": 4, "side": "BLUE", "value": 1},
+        {"id": "b3", "action": "POINT", "at": 5, "side": "BLUE", "value": 1}
+      ],
+      "at": 301,
+      "expect": {
+        "red": {"points": 4},
+        "blue": {"points": 4},
+        "winner": "RED"
+      }
+    },
+    {
+      "name": "tie 2-2: the points of the rival's warnings are no action (art. 31, example 3)",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "r1", "action": "POINT", "at": 1, "side": "RED", "value": 2},
+        {"id": "w1", "action": "WARNING", "at": 2, "side": "RED"},
+        {"id": "w2", "action": "WARNING", "at": 3, "side": "RED"}
+      ],
+      "at": 301,
+      "expect": {
+        "red": {"points": 2},
+        "blue": {"points": 2},
+        "winner": "RED"
+      }
+    },
+    {
+      "name": "tie 3-3: same best action, fewer warnings win (art. 31, example 4)",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "r1", "action": "POINT", "at": 1, "side": "RED", "value": 2},
+        {"id": "r2", "action": "POINT", "at": 2, "side": "RED", "value": 1},
+        {"id": "b1", "action": "POINT", "at": 3, "side": "BLUE", "value": 2},
+        {"id": "w1", "action": "WARNING", "at": 4, "side": "RED"}
+      ],
+      "at": 301,
+      "expect": {
+        "red": {"points": 3},
+        "blue": {"points": 3},
+        "winner": "BLUE"
+      }
+    },
+    {
+      "name": "a tie after every tiebreaker waits for the extra time (art. 32)",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "r1", "action": "POINT", "at": 1, "side": "RED", "value": 2},
+        {"id": "b1", "action": "POINT", "at": 2, "side": "BLUE", "value": 2}
+      ],
+      "at": 301,
+      "expect": {
+        "winner": null,
+        "needsExtraTime": true,
+        "refuse": [
+          {"action": "FINISH", "expect": "extraTimePending"},
+          {"action": "EXTRA_TIME", "expect": null},
+          {"action": "POINT", "expect": "over", "value": 1}
+        ]
+      }
+    },
+    {
+      "name": "the extra time gives the winner",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "r1", "action": "POINT", "at": 1, "side": "RED", "value": 2},
+        {"id": "b1", "action": "POINT", "at": 2, "side": "BLUE", "value": 2},
+        {"id": "x", "action": "EXTRA_TIME", "at": 330, "side": "BLUE"}
+      ],
+      "at": 331,
+      "expect": {
+        "endReason": "EXTRA_TIME",
+        "winner": "BLUE",
+        "needsExtraTime": false,
+        "lastUndoable": "x",
+        "refuse": [
+          {"action": "FINISH", "expect": null},
+          {"action": "EXTRA_TIME", "expect": "noExtraTime"}
+        ]
+      }
+    },
+    {
+      "name": "no extra time while the match goes on",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0}
+      ],
+      "at": 10,
+      "expect": {
+        "refuse": [
+          {"action": "EXTRA_TIME", "expect": "noExtraTime"},
+          {"action": "FINISH", "expect": "notOver"}
+        ]
+      }
+    },
+    {
+      "name": "a 0-0 at the end also goes to extra time",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0}
+      ],
+      "at": 301,
+      "expect": {
+        "needsExtraTime": true,
+        "winner": null
+      }
+    },
+    {
+      "name": "a disqualification keeps the real points (art. 44)",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "r1", "action": "POINT", "at": 1, "side": "RED", "value": 3},
+        {"id": "b1", "action": "POINT", "at": 2, "side": "BLUE", "value": 1},
+        {"id": "d", "action": "DISQUALIFICATION", "at": 3, "side": "RED"}
+      ],
+      "at": 4,
+      "expect": {
+        "red": {"points": 3},
+        "blue": {"points": 1},
+        "endReason": "DISQUALIFICATION",
+        "winner": "BLUE"
+      }
+    },
+    {
+      "name": "a correction takes off the value of the action",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "r1", "action": "POINT", "at": 1, "side": "RED", "value": 4},
+        {"id": "r2", "action": "POINT", "at": 2, "side": "RED", "value": 1},
+        {"id": "c", "action": "POINT_REMOVED", "at": 3, "side": "RED", "value": 4}
+      ],
+      "at": 4,
+      "expect": {
+        "red": {"points": 1},
+        "refuse": [
+          {"action": "POINT_REMOVED", "expect": "noPoints", "side": "RED", "value": 2},
+          {"action": "POINT_REMOVED", "expect": null, "side": "RED", "value": 1}
+        ]
+      }
+    },
+    {
+      "name": "a corrected action no longer counts for the tiebreak",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "r1", "action": "POINT", "at": 1, "side": "RED", "value": 4},
+        {"id": "r2", "action": "POINT", "at": 2, "side": "RED", "value": 2},
+        {"id": "c", "action": "POINT_REMOVED", "at": 3, "side": "RED", "value": 4},
+        {"id": "b1", "action": "POINT", "at": 4, "side": "BLUE", "value": 2}
+      ],
+      "at": 301,
+      "expect": {
+        "red": {"points": 2},
+        "blue": {"points": 2},
+        "winner": null,
+        "needsExtraTime": true
+      }
+    },
+    {
+      "name": "grappling has no one-hand warning",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0}
+      ],
+      "at": 5,
+      "expect": {
+        "refuse": [
+          {"action": "ONE_HAND_WARNING", "expect": "notInThisSport"}
+        ]
+      }
+    },
+    {
+      "name": "cancelling forgets the submission and the actions",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "r1", "action": "POINT", "at": 1, "side": "RED", "value": 4},
+        {"id": "sub", "action": "SUBMISSION", "at": 2, "side": "RED"},
+        {"id": "c", "action": "CANCEL", "at": 3}
+      ],
+      "at": 4,
+      "expect": {
+        "started": false,
+        "endReason": null,
+        "winner": null,
+        "red": {"points": 0}
+      }
+    }
+  ]
+}

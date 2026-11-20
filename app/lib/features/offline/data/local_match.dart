@@ -1,6 +1,6 @@
 import '../../mat/data/mat_board.dart';
-import '../../scoreboard/data/match_view.dart';
 import '../../scoreboard/data/match_state.dart';
+import '../../scoreboard/data/match_view.dart';
 import 'offline_op.dart';
 
 /// A match as the device shows it: the last view from the server with the queued actions

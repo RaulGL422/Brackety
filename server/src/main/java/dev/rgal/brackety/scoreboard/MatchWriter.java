@@ -7,7 +7,6 @@ import dev.rgal.brackety.grouping.CompetitorDirectory;
 import dev.rgal.brackety.grouping.Match;
 import dev.rgal.brackety.grouping.MatchRepository;
 import dev.rgal.brackety.participant.ParticipantRepository;
-import dev.rgal.brackety.scoreboard.MatchState.Rules;
 import dev.rgal.brackety.scoreboard.RejectedOp.Cause;
 import java.time.Duration;
 import java.time.Instant;
@@ -116,7 +115,7 @@ class MatchWriter {
     static MatchState replay(Event event, Match match, List<MatchEvent> history) {
         var teams = match.isTeamMatch();
         return MatchState.replay(
-                new Rules(
+                new MatchRules(
                         Duration.ofSeconds(event.modality().matchSeconds(teams)),
                         event.modality().pointsLimit(teams)),
                 history.stream().map(MatchEvent::toEntry).toList());

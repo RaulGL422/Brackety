@@ -631,6 +631,54 @@
         "elapsed": 5,
         "started": true
       }
+    },
+    {
+      "name": "tambo has no submission, extra time nor points worth more than one",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0}
+      ],
+      "at": 5,
+      "expect": {
+        "refuse": [
+          {"action": "SUBMISSION", "expect": "notInThisSport"},
+          {"action": "EXTRA_TIME", "expect": "notInThisSport"},
+          {"action": "POINT", "expect": "invalidValue", "value": 2},
+          {"action": "POINT", "expect": null, "value": 1}
+        ]
+      }
+    },
+    {
+      "name": "who reaches the limit wins",
+      "rules": {"pointsLimit": 2},
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "p1", "action": "POINT", "at": 1, "side": "RED"},
+        {"id": "p2", "action": "POINT", "at": 2, "side": "BLUE"},
+        {"id": "p3", "action": "POINT", "at": 3, "side": "RED"}
+      ],
+      "at": 4,
+      "expect": {
+        "endReason": "POINTS",
+        "winner": "RED",
+        "needsExtraTime": false
+      }
+    },
+    {
+      "name": "a tie at the end is a draw, with no extra time",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "p1", "action": "POINT", "at": 1, "side": "RED"},
+        {"id": "p2", "action": "POINT", "at": 2, "side": "BLUE"}
+      ],
+      "at": 61,
+      "expect": {
+        "endReason": "TIME",
+        "winner": null,
+        "needsExtraTime": false,
+        "refuse": [
+          {"action": "FINISH", "expect": null}
+        ]
+      }
     }
   ]
 }

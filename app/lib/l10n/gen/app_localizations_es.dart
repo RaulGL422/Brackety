@@ -853,6 +853,18 @@ class AppLocalizationsEs extends AppLocalizations {
   String get endDisqualification => 'Fin por descalificación';
 
   @override
+  String get endSuperiority => 'Fin por superioridad';
+
+  @override
+  String get endWarnings => 'Fin por amonestaciones';
+
+  @override
+  String get endSubmission => 'Fin por sumisión';
+
+  @override
+  String get endExtraTime => 'Fin en la prórroga';
+
+  @override
   String actionRefused(String detail) {
     return 'No se ha podido registrar. $detail';
   }
@@ -940,6 +952,20 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get refusalClockLimit => 'El reloj no puede ir más allá.';
+
+  @override
+  String get refusalNotInThisSport => 'Esta acción no existe en este deporte.';
+
+  @override
+  String get refusalInvalidValue => 'Ninguna acción de este deporte vale eso.';
+
+  @override
+  String get refusalNoExtraTime =>
+      'La prórroga es solo para un empate al final que no resuelve ningún desempate.';
+
+  @override
+  String get refusalExtraTimePending =>
+      'Empate tras todos los desempates: primero la prórroga.';
 
   @override
   String get settingsMatchRules => 'Combates';
@@ -2546,6 +2572,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get tlReopen => 'Combate reabierto';
+
+  @override
+  String get tlSubmission => 'Sumisión';
+
+  @override
+  String get tlExtraTime => 'Prórroga ganada';
 
   @override
   String get matOneAtATime =>

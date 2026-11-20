@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import dev.rgal.brackety.scoreboard.MatchState.Corner;
 import dev.rgal.brackety.scoreboard.MatchState.EndReason;
 import dev.rgal.brackety.scoreboard.MatchState.Entry;
-import dev.rgal.brackety.scoreboard.MatchState.Rules;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -28,8 +27,8 @@ import org.junit.jupiter.api.Test;
 class MatchStateTest {
 
     private static final Instant T0 = Instant.parse("2027-03-10T09:00:00Z");
-    private static final Rules RULES = new Rules(Duration.ofMinutes(2), 15);
-    private static final Rules TEAMS = new Rules(Duration.ofMinutes(3), 0);
+    private static final MatchRules RULES = new MatchRules(Duration.ofMinutes(2), 15);
+    private static final MatchRules TEAMS = new MatchRules(Duration.ofMinutes(3), 0);
 
     private final List<Entry> entries = new ArrayList<>();
 
@@ -224,7 +223,7 @@ class MatchStateTest {
     void nothingIsScoredBeforeTheFirstStart() {
         var match = replay();
         for (var type : List.of(POINT, WARNING, ONE_HAND_WARNING, DISQUALIFICATION)) {
-            assertThat(match.refuse(type, T0)).contains(MatchState.NOT_STARTED);
+            assertThat(match.refuse(type, T0)).contains(MatchRefusals.NOT_STARTED);
         }
         assertThat(match.refuse(START, T0)).isEmpty();
         assertThat(match.refuse(UNDO, T0)).contains("Nothing to undo.");
@@ -278,7 +277,7 @@ class MatchStateTest {
 
     @Test
     void aPointCanBeTakenBackOnceTheTimeOrThePointsEndedTheMatchButNotAfterADisqualification() {
-        assertThat(replay().refuse(POINT_REMOVED, RED, 0, T0)).contains(MatchState.NOT_STARTED);
+        assertThat(replay().refuse(POINT_REMOVED, RED, 0, T0)).contains(MatchRefusals.NOT_STARTED);
         add(START, null, 0);
         for (int i = 0; i < 15; i++) {
             add(POINT, BLUE, i + 1);

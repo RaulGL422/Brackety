@@ -11,30 +11,36 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * State of a tambo match rebuilt from its events in order (reglamento Yoseikan, cap. 3.1): clock,
- * points, warnings and how it ended. Undone events are skipped, so an undo never loses the trail.
+ * State of a match rebuilt from its events in order: clock, points, warnings and how it ended, by the rules of its
+ * sport ({@link MatchRules}). Undone events are skipped, so an undo never loses the trail.
  */
 final class MatchState {
 
     enum EndReason {
+        /** Reached the points limit (tambo). */
         POINTS,
+        /** Reached the points difference (grappling's technical superiority). */
+        SUPERIORITY,
         TIME,
-        DISQUALIFICATION
-    }
-
-    /** {@code pointsLimit}: 0 = no limit (team matches). */
-    record Rules(Duration length, int pointsLimit) {
-
-        boolean hasLimit() {
-            return pointsLimit > 0;
-        }
+        DISQUALIFICATION,
+        /** The last warning a sport allows (grappling: the 4th). */
+        WARNINGS,
+        SUBMISSION,
+        EXTRA_TIME
     }
 
     /** What a disqualification gives the rival when there is no points limit, at least. */
     static final int DISQUALIFICATION_POINTS = 15;
 
-    /** {@code target}: for an UNDO, the event it undoes. {@code deltaMs}: for a CLOCK_ADJUST, the time added. */
-    record Entry(UUID id, MatchEventType type, Side side, Instant at, UUID target, long deltaMs) {
+    /**
+     * {@code target}: for an UNDO, the event it undoes. {@code deltaMs}: for a CLOCK_ADJUST, the time added.
+     * {@code value}: for a POINT or POINT_REMOVED, how many points (1 to the sport's most).
+     */
+    record Entry(UUID id, MatchEventType type, Side side, Instant at, UUID target, long deltaMs, int value) {
+
+        Entry(UUID id, MatchEventType type, Side side, Instant at, UUID target, long deltaMs) {
+            this(id, type, side, at, target, deltaMs, 1);
+        }
 
         Entry(UUID id, MatchEventType type, Side side, Instant at, UUID target) {
             this(id, type, side, at, target, 0);
@@ -42,38 +48,33 @@ final class MatchState {
     }
 
     /**
-     * Points include those given for the rival's warnings (every second one, and every second one-hand warning). A
-     * disqualification is scored as 0 for the disqualified fighter and the points limit for the rival, or, with no
-     * limit, the rival's points but at least {@value #DISQUALIFICATION_POINTS}.
+     * Points include those given for the rival's warnings. When the sport says so, a disqualification is scored as 0
+     * for the disqualified fighter and the points limit for the rival, or, with no limit, the rival's points but at
+     * least {@value #DISQUALIFICATION_POINTS}.
      */
     record Corner(int points, int warnings, int oneHandWarnings) {}
 
-    private static final class Tally {
-        int points;
-        int warnings;
-        int oneHandWarnings;
-    }
-
-    static final String NOT_STARTED = "The match has not started: press Start first.";
-
-    private final Rules rules;
-    private final Map<Side, Tally> tallies = new EnumMap<>(Side.class);
+    private final MatchRules rules;
+    private final Map<Side, CornerTally> tallies = new EnumMap<>(Side.class);
     private final Set<UUID> autoPointWarnings = new HashSet<>();
     private Duration elapsed = Duration.ZERO;
     private Instant runningSince;
     private Side disqualified;
+    private boolean disqualifiedByWarnings;
+    private Side submittedBy;
+    private Side extraTimeWinner;
     private boolean started;
     private boolean finished;
     private Entry lastUndoable;
 
-    private MatchState(Rules rules) {
+    private MatchState(MatchRules rules) {
         this.rules = rules;
         for (var side : Side.values()) {
-            tallies.put(side, new Tally());
+            tallies.put(side, new CornerTally());
         }
     }
 
-    static MatchState replay(Rules rules, List<Entry> entries) {
+    static MatchState replay(MatchRules rules, List<Entry> entries) {
         var match = new MatchState(rules);
         var undone = new HashSet<UUID>();
         entries.stream().filter(e -> e.type() == MatchEventType.UNDO).forEach(e -> undone.add(e.target()));
@@ -95,42 +96,45 @@ final class MatchState {
                 elapsed = elapsedAt(e.at());
                 runningSince = null;
             }
-            case POINT -> {
-                tallies.get(e.side()).points++;
-                lastUndoable = e;
-            }
-            case POINT_REMOVED -> {
-                var tally = tallies.get(e.side());
-                tally.points = Math.max(0, tally.points - 1);
-                lastUndoable = e;
-            }
+            // Only on a stopped clock; one that ran out of time stays stopped after the adjustment.
             case CLOCK_ADJUST -> {
-                // Only on a stopped clock; one that ran out of time stays stopped after the adjustment.
                 elapsed = adjusted(elapsedAt(e.at()), e.deltaMs());
                 runningSince = null;
-                lastUndoable = e;
             }
-            case WARNING -> {
-                // Every second warning gives the rival a point (Raul, 2026-11-13); one-hand warnings count apart.
-                if (++tallies.get(e.side()).warnings % 2 == 0) {
-                    givePointToRival(e);
-                }
-                lastUndoable = e;
-            }
+            case POINT -> tallies.get(e.side()).score(e.value());
+            case POINT_REMOVED -> tallies.get(e.side()).takeBack(e.value());
+            case WARNING -> warn(e);
             case ONE_HAND_WARNING -> {
                 if (++tallies.get(e.side()).oneHandWarnings % 2 == 0) {
                     givePointToRival(e);
                 }
-                lastUndoable = e;
             }
             case DISQUALIFICATION -> {
                 disqualified = e.side();
-                lastUndoable = e;
+                disqualifiedByWarnings = false;
             }
+            case SUBMISSION -> submittedBy = e.side();
+            case EXTRA_TIME -> extraTimeWinner = e.side();
             case FINISH -> finished = true;
             case CANCEL -> cancel();
             case REOPEN -> finished = false;
             case UNDO -> throw new IllegalArgumentException("UNDO entries are never applied");
+        }
+        if (e.type().undoable()) {
+            lastUndoable = e;
+        }
+    }
+
+    // Tambo: every second warning gives the rival a point (Raul, 2026-11-13); grappling: every one, and the 4th
+    // disqualifies.
+    private void warn(Entry e) {
+        var warnings = ++tallies.get(e.side()).warnings;
+        if (warnings % rules.scoring().warningsPerRivalPoint() == 0) {
+            givePointToRival(e);
+        }
+        if (warnings == rules.scoring().warningsToDisqualify()) {
+            disqualified = e.side();
+            disqualifiedByWarnings = true;
         }
     }
 
@@ -141,15 +145,14 @@ final class MatchState {
 
     // As if it had never started: nothing before it can be undone either.
     private void cancel() {
-        tallies.values().forEach(t -> {
-            t.points = 0;
-            t.warnings = 0;
-            t.oneHandWarnings = 0;
-        });
+        tallies.values().forEach(CornerTally::clear);
         autoPointWarnings.clear();
         elapsed = Duration.ZERO;
         runningSince = null;
         disqualified = null;
+        disqualifiedByWarnings = false;
+        submittedBy = null;
+        extraTimeWinner = null;
         started = false;
         lastUndoable = null;
     }
@@ -164,7 +167,7 @@ final class MatchState {
     }
 
     // An adjustment must change the clock and never leave it at 0: the time runs out only by running.
-    private boolean cannotAdjust(Instant now, long deltaMs) {
+    boolean cannotAdjust(Instant now, long deltaMs) {
         var result = adjusted(elapsedAt(now), deltaMs);
         return result.equals(elapsedAt(now)) || result.equals(rules.length());
     }
@@ -185,12 +188,49 @@ final class MatchState {
 
     Optional<EndReason> endReason(Instant now) {
         if (disqualified != null) {
-            return Optional.of(EndReason.DISQUALIFICATION);
+            return Optional.of(disqualifiedByWarnings ? EndReason.WARNINGS : EndReason.DISQUALIFICATION);
+        }
+        if (submittedBy != null) {
+            return Optional.of(EndReason.SUBMISSION);
+        }
+        if (extraTimeWinner != null) {
+            return Optional.of(EndReason.EXTRA_TIME);
         }
         if (rules.hasLimit() && tallies.values().stream().anyMatch(t -> t.points >= rules.pointsLimit())) {
             return Optional.of(EndReason.POINTS);
         }
+        var gap = rules.scoring().superiorityGap();
+        if (gap > 0 && Math.abs(tallied(Side.RED) - tallied(Side.BLUE)) >= gap) {
+            return Optional.of(EndReason.SUPERIORITY);
+        }
         return remainingAt(now).isZero() ? Optional.of(EndReason.TIME) : Optional.empty();
+    }
+
+    /**
+     * Who won, once the match is over; empty while it goes on, on a draw (tambo) or while a tie waits for the extra
+     * time (grappling, art. 31).
+     */
+    Optional<Side> winner(Instant now) {
+        return endReason(now).flatMap(end -> switch (end) {
+            case DISQUALIFICATION, WARNINGS -> Optional.of(disqualified.opponent());
+            case SUBMISSION -> Optional.of(submittedBy);
+            case EXTRA_TIME -> Optional.of(extraTimeWinner);
+            case POINTS, SUPERIORITY, TIME -> onPoints();
+        });
+    }
+
+    // More points; on a tie, the sport's tiebreakers (CornerTally).
+    private Optional<Side> onPoints() {
+        var lead = CornerTally.compare(
+                tallies.get(Side.RED), tallies.get(Side.BLUE), rules.scoring().tiebreaks());
+        return lead == 0 ? Optional.empty() : Optional.of(lead > 0 ? Side.RED : Side.BLUE);
+    }
+
+    /** The time ended on a tie that no tiebreaker settles: only the extra time decides (grappling, art. 32). */
+    boolean needsExtraTime(Instant now) {
+        return rules.scoring().tiebreaks()
+                && endReason(now).filter(r -> r == EndReason.TIME).isPresent()
+                && winner(now).isEmpty();
     }
 
     Corner corner(Side side) {
@@ -200,13 +240,27 @@ final class MatchState {
 
     // The points the fighter had stay in the tally, so undoing the disqualification gives them back.
     private int points(Side side) {
-        if (disqualified != null) {
+        if (disqualified != null && rules.scoring().disqualificationScores()) {
             if (disqualified == side) {
                 return 0;
             }
-            return rules.hasLimit() ? rules.pointsLimit() : Math.max(tallies.get(side).points, DISQUALIFICATION_POINTS);
+            return rules.hasLimit() ? rules.pointsLimit() : Math.max(tallied(side), DISQUALIFICATION_POINTS);
         }
+        return tallied(side);
+    }
+
+    /** The points a fighter scored and got for the rival's warnings, whatever a disqualification shows. */
+    int tallied(Side side) {
         return tallies.get(side).points;
+    }
+
+    /** A disqualification, a submission or the extra time decided it: no points move it any more. */
+    boolean isDecided() {
+        return disqualified != null || submittedBy != null || extraTimeWinner != null;
+    }
+
+    MatchRules rules() {
+        return rules;
     }
 
     Side disqualified() {
@@ -230,44 +284,16 @@ final class MatchState {
         return autoPointWarnings.contains(warningId);
     }
 
-    /** Why {@code type} cannot happen now, or empty if it can. Checks only the match itself. */
+    /** Why {@code type} cannot happen now, or empty if it can ({@link MatchRefusals}). */
     Optional<String> refuse(MatchEventType type, Instant now) {
-        return refuse(type, null, 0, now);
+        return refuse(type, null, 0, 1, now);
     }
 
-    /** {@code side}: for a point removed; {@code deltaMs}: for a clock adjustment. */
     Optional<String> refuse(MatchEventType type, Side side, long deltaMs, Instant now) {
-        if (finished) {
-            return Optional.ofNullable(type == MatchEventType.REOPEN ? null : "The match is finished.");
-        }
-        var end = endReason(now);
-        var over = end.isPresent();
-        String reason = switch (type) {
-            case START -> over ? "The match is over." : isRunning(now) ? "The clock is already running." : null;
-            case STOP -> isRunning(now) ? null : "The clock is not running.";
-            // The last action's point may come when the clock already shows 0:00 (F1-3); sanctions may not.
-            case POINT ->
-                end.filter(r -> r != EndReason.TIME).isPresent() ? "The match is over." : started ? null : NOT_STARTED;
-            case WARNING, ONE_HAND_WARNING, DISQUALIFICATION ->
-                over ? "The match is over." : started ? null : NOT_STARTED;
-            // A correction: also once the time or the points ended the match, which it may reopen.
-            case POINT_REMOVED ->
-                !started
-                        ? NOT_STARTED
-                        : disqualified != null
-                                ? "The match is over."
-                                : side != null && tallies.get(side).points == 0 ? "No points to take back." : null;
-            case CLOCK_ADJUST ->
-                isRunning(now)
-                        ? "Stop the clock first."
-                        : end.filter(r -> r != EndReason.TIME).isPresent()
-                                ? "The match is over."
-                                : cannotAdjust(now, deltaMs) ? "The clock cannot go further." : null;
-            case UNDO -> lastUndoable == null ? "Nothing to undo." : null;
-            case FINISH -> over ? null : "The match is not over yet.";
-            case CANCEL -> started ? null : NOT_STARTED;
-            case REOPEN -> "The match is not finished.";
-        };
-        return Optional.ofNullable(reason);
+        return refuse(type, side, deltaMs, 1, now);
+    }
+
+    Optional<String> refuse(MatchEventType type, Side side, long deltaMs, int value, Instant now) {
+        return MatchRefusals.of(this, type, side, deltaMs, value, now);
     }
 }
