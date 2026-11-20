@@ -1,0 +1,153 @@
+﻿Grupo;Combate nº (en el grupo);Tapiz;Acción nº;Fecha;Hora;Reloj del combate (m:ss);Acción;Lado;Alumno o equipo;Motivo;Usuario;Deshacer;Deshecha después
+1;1;1;1;10/03/2027;10:00:00;0:00;Iniciar reloj;;;;arbitro1;;No
+1;1;1;2;10/03/2027;10:00:04;0:04;Punto;Rojo;Lucía Prueba 7-0;;arbitro1;;No
+1;1;1;3;10/03/2027;10:00:08;0:08;Punto;Rojo;Lucía Prueba 7-0;;arbitro1;;No
+1;1;1;4;10/03/2027;10:00:12;0:12;Punto;Rojo;Lucía Prueba 7-0;;arbitro1;;No
+1;1;1;5;10/03/2027;10:00:16;0:16;Punto;Azul;Hugo Prueba 7-1;;arbitro1;;No
+1;1;1;6;10/03/2027;10:01:20;1:00;Finalizar combate;;;;arbitro1;;No
+1;2;1;1;10/03/2027;10:06:24;0:00;Iniciar reloj;;;;arbitro1;;No
+1;2;1;2;10/03/2027;10:06:28;0:04;Punto;Azul;Mateo Prueba 7-3;;arbitro1;;No
+1;2;1;3;10/03/2027;10:06:32;0:08;Punto;Azul;Mateo Prueba 7-3;;arbitro1;;No
+1;2;1;4;10/03/2027;10:06:36;0:12;Punto;Azul;Mateo Prueba 7-3;;arbitro1;;No
+1;2;1;5;10/03/2027;10:06:40;0:16;Punto;Azul;Mateo Prueba 7-3;;arbitro1;;No
+1;2;1;6;10/03/2027;10:06:44;0:20;Punto;Azul;Mateo Prueba 7-3;;arbitro1;;No
+1;2;1;7;10/03/2027;10:06:48;0:24;Punto;Azul;Mateo Prueba 7-3;;arbitro1;;No
+1;2;1;8;10/03/2027;10:06:52;0:28;Punto;Azul;Mateo Prueba 7-3;;arbitro1;;No
+1;2;1;9;10/03/2027;10:06:56;0:32;Punto;Azul;Mateo Prueba 7-3;;arbitro1;;No
+1;2;1;10;10/03/2027;10:07:00;0:36;Punto;Azul;Mateo Prueba 7-3;;arbitro1;;No
+1;2;1;11;10/03/2027;10:07:04;0:40;Punto;Azul;Mateo Prueba 7-3;;arbitro1;;No
+1;2;1;12;10/03/2027;10:07:08;0:44;Punto;Azul;Mateo Prueba 7-3;;arbitro1;;No
+1;2;1;13;10/03/2027;10:07:12;0:48;Punto;Azul;Mateo Prueba 7-3;;arbitro1;;No
+1;2;1;14;10/03/2027;10:07:16;0:52;Punto;Azul;Mateo Prueba 7-3;;arbitro1;;No
+1;2;1;15;10/03/2027;10:07:20;0:56;Punto;Azul;Mateo Prueba 7-3;;arbitro1;;No
+1;2;1;16;10/03/2027;10:07:24;1:00;Punto;Azul;Mateo Prueba 7-3;Fuera de tiempo;arbitro1;;No
+1;2;1;17;10/03/2027;10:07:28;1:00;Finalizar combate;;;;arbitro1;;No
+1;3;1;1;10/03/2027;10:12:32;0:00;Iniciar reloj;;;;arbitro1;;No
+1;3;1;2;10/03/2027;10:12:36;0:04;Advertencia;Rojo;Lucía Prueba 7-0;Exceso de potencia;arbitro1;;No
+1;3;1;3;10/03/2027;10:12:40;0:08;Advertencia;Rojo;Lucía Prueba 7-0;Exceso de potencia;arbitro1;;No
+1;3;1;4;10/03/2027;10:12:44;0:12;Punto;Azul;Martina Prueba 7-2;;arbitro1;;No
+1;3;1;5;10/03/2027;10:13:48;1:00;Finalizar combate;;;;arbitro1;;No
+1;4;1;1;10/03/2027;10:18:52;0:00;Iniciar reloj;;;;arbitro1;;No
+1;4;1;2;10/03/2027;10:18:56;0:04;Punto;Rojo;Hugo Prueba 7-1;;arbitro1;;No
+1;4;1;3;10/03/2027;10:19:00;0:08;Punto;Rojo;Hugo Prueba 7-1;;arbitro1;;No
+1;4;1;4;10/03/2027;10:19:04;0:12;Descalificación;Azul;Mateo Prueba 7-3;Exceso de potencia;arbitro1;;No
+1;4;1;5;10/03/2027;10:19:04;0:12;Parar reloj;;;;Automático;;No
+1;4;1;6;10/03/2027;10:19:08;0:12;Finalizar combate;;;;arbitro1;;No
+1;5;1;1;10/03/2027;10:24:12;0:00;Iniciar reloj;;;;arbitro1;;No
+1;5;1;2;10/03/2027;10:24:16;0:04;Punto;Rojo;Lucía Prueba 7-0;;arbitro1;;No
+1;5;1;3;10/03/2027;10:24:20;0:08;Punto;Rojo;Lucía Prueba 7-0;;arbitro1;;No
+1;5;1;4;10/03/2027;10:24:24;0:12;Quitar punto;Rojo;Lucía Prueba 7-0;;arbitro1;;No
+1;5;1;5;10/03/2027;10:24:28;0:16;Punto;Azul;Mateo Prueba 7-3;;arbitro1;;Sí
+1;5;1;6;10/03/2027;10:24:32;0:20;Deshacer;;;;arbitro1;Deshace la acción 5;No
+1;5;1;7;10/03/2027;10:24:36;0:24;Punto;Azul;Mateo Prueba 7-3;;arbitro1;;No
+1;5;1;8;10/03/2027;10:25:40;1:00;Finalizar combate;;;;arbitro1;;No
+1;6;1;1;10/03/2027;10:30:44;0:00;Iniciar reloj;;;;arbitro1;;No
+1;6;1;2;10/03/2027;10:30:48;0:04;Punto;Rojo;Hugo Prueba 7-1;;arbitro1;;No
+1;6;1;3;10/03/2027;10:30:52;0:08;Cancelar combate;;;Empezado por error;arbitro1;;No
+1;6;1;4;10/03/2027;10:30:56;0:00;Iniciar reloj;;;;arbitro1;;No
+1;6;1;5;10/03/2027;10:31:00;0:04;Punto;Azul;Martina Prueba 7-2;;arbitro1;;No
+1;6;1;6;10/03/2027;10:31:04;0:08;Punto;Azul;Martina Prueba 7-2;;arbitro1;;No
+1;6;1;7;10/03/2027;10:32:08;1:00;Punto;Rojo;Hugo Prueba 7-1;Fuera de tiempo;arbitro1;;No
+1;6;1;8;10/03/2027;10:32:12;1:00;Finalizar combate;;;;arbitro1;;No
+2;1;2;1;10/03/2027;10:37:16;0:00;Iniciar reloj;;;;arbitro2;;No
+2;1;2;2;10/03/2027;10:37:20;0:04;Punto;Rojo;Sofía Prueba 7-4;;arbitro2;;No
+2;1;2;3;10/03/2027;10:37:24;0:08;Punto;Rojo;Sofía Prueba 7-4;;arbitro2;;No
+2;1;2;4;10/03/2027;10:37:28;0:12;Punto;Rojo;Sofía Prueba 7-4;;arbitro2;;No
+2;1;2;5;10/03/2027;10:37:32;0:16;Punto;Azul;Leo Prueba 7-5;;arbitro2;;No
+2;1;2;6;10/03/2027;10:38:36;1:00;Finalizar combate;;;;arbitro2;;No
+2;2;2;1;10/03/2027;10:43:40;0:00;Iniciar reloj;;;;arbitro2;;No
+2;2;2;2;10/03/2027;10:43:44;0:04;Punto;Azul;Lucía Prueba 7-0;;arbitro2;;No
+2;2;2;3;10/03/2027;10:43:48;0:08;Punto;Azul;Lucía Prueba 7-0;;arbitro2;;No
+2;2;2;4;10/03/2027;10:43:52;0:12;Punto;Azul;Lucía Prueba 7-0;;arbitro2;;No
+2;2;2;5;10/03/2027;10:43:56;0:16;Punto;Azul;Lucía Prueba 7-0;;arbitro2;;No
+2;2;2;6;10/03/2027;10:44:00;0:20;Punto;Azul;Lucía Prueba 7-0;;arbitro2;;No
+2;2;2;7;10/03/2027;10:44:04;0:24;Punto;Azul;Lucía Prueba 7-0;;arbitro2;;No
+2;2;2;8;10/03/2027;10:44:08;0:28;Punto;Azul;Lucía Prueba 7-0;;arbitro2;;No
+2;2;2;9;10/03/2027;10:44:12;0:32;Punto;Azul;Lucía Prueba 7-0;;arbitro2;;No
+2;2;2;10;10/03/2027;10:44:16;0:36;Punto;Azul;Lucía Prueba 7-0;;arbitro2;;No
+2;2;2;11;10/03/2027;10:44:20;0:40;Punto;Azul;Lucía Prueba 7-0;;arbitro2;;No
+2;2;2;12;10/03/2027;10:44:24;0:44;Punto;Azul;Lucía Prueba 7-0;;arbitro2;;No
+2;2;2;13;10/03/2027;10:44:28;0:48;Punto;Azul;Lucía Prueba 7-0;;arbitro2;;No
+2;2;2;14;10/03/2027;10:44:32;0:52;Punto;Azul;Lucía Prueba 7-0;;arbitro2;;No
+2;2;2;15;10/03/2027;10:44:36;0:56;Punto;Azul;Lucía Prueba 7-0;;arbitro2;;No
+2;2;2;16;10/03/2027;10:44:40;1:00;Punto;Azul;Lucía Prueba 7-0;Fuera de tiempo;arbitro2;;No
+2;2;2;17;10/03/2027;10:44:44;1:00;Finalizar combate;;;;arbitro2;;No
+2;3;2;1;10/03/2027;10:49:48;0:00;Iniciar reloj;;;;arbitro2;;No
+2;3;2;2;10/03/2027;10:49:52;0:04;Advertencia;Rojo;Sofía Prueba 7-4;Exceso de potencia;arbitro2;;No
+2;3;2;3;10/03/2027;10:49:56;0:08;Advertencia;Rojo;Sofía Prueba 7-4;Exceso de potencia;arbitro2;;No
+2;3;2;4;10/03/2027;10:50:00;0:12;Punto;Azul;Julia Prueba 7-6;;arbitro2;;No
+2;3;2;5;10/03/2027;10:51:04;1:00;Finalizar combate;;;;arbitro2;;No
+2;4;2;1;10/03/2027;10:56:08;0:00;Iniciar reloj;;;;arbitro2;;No
+2;4;2;2;10/03/2027;10:56:12;0:04;Punto;Rojo;Leo Prueba 7-5;;arbitro2;;No
+2;4;2;3;10/03/2027;10:56:16;0:08;Punto;Rojo;Leo Prueba 7-5;;arbitro2;;No
+2;4;2;4;10/03/2027;10:56:20;0:12;Descalificación;Azul;Lucía Prueba 7-0;Exceso de potencia;arbitro2;;No
+2;4;2;5;10/03/2027;10:56:20;0:12;Parar reloj;;;;Automático;;No
+2;4;2;6;10/03/2027;10:56:24;0:12;Finalizar combate;;;;arbitro2;;No
+2;5;2;1;10/03/2027;11:01:28;0:00;Iniciar reloj;;;;arbitro2;;No
+2;5;2;2;10/03/2027;11:01:32;0:04;Punto;Rojo;Sofía Prueba 7-4;;arbitro2;;No
+2;5;2;3;10/03/2027;11:01:36;0:08;Punto;Rojo;Sofía Prueba 7-4;;arbitro2;;No
+2;5;2;4;10/03/2027;11:01:40;0:12;Quitar punto;Rojo;Sofía Prueba 7-4;;arbitro2;;No
+2;5;2;5;10/03/2027;11:01:44;0:16;Punto;Azul;Lucía Prueba 7-0;;arbitro2;;Sí
+2;5;2;6;10/03/2027;11:01:48;0:20;Deshacer;;;;arbitro2;Deshace la acción 5;No
+2;5;2;7;10/03/2027;11:01:52;0:24;Punto;Azul;Lucía Prueba 7-0;;arbitro2;;No
+2;5;2;8;10/03/2027;11:02:56;1:00;Finalizar combate;;;;arbitro2;;No
+2;6;2;1;10/03/2027;11:08:00;0:00;Iniciar reloj;;;;arbitro2;;No
+2;6;2;2;10/03/2027;11:08:04;0:04;Punto;Rojo;Leo Prueba 7-5;;arbitro2;;No
+2;6;2;3;10/03/2027;11:08:08;0:08;Cancelar combate;;;Empezado por error;arbitro2;;No
+2;6;2;4;10/03/2027;11:08:12;0:00;Iniciar reloj;;;;arbitro2;;No
+2;6;2;5;10/03/2027;11:08:16;0:04;Punto;Azul;Julia Prueba 7-6;;arbitro2;;No
+2;6;2;6;10/03/2027;11:08:20;0:08;Punto;Azul;Julia Prueba 7-6;;arbitro2;;No
+2;6;2;7;10/03/2027;11:09:24;1:00;Punto;Rojo;Leo Prueba 7-5;Fuera de tiempo;arbitro2;;No
+2;6;2;8;10/03/2027;11:09:28;1:00;Finalizar combate;;;;arbitro2;;No
+3;1;1;1;10/03/2027;11:14:32;0:00;Iniciar reloj;;;;arbitro1;;No
+3;1;1;2;10/03/2027;11:14:36;0:04;Punto;Rojo;Equipo 1;;arbitro1;;No
+3;1;1;3;10/03/2027;11:14:40;0:08;Punto;Rojo;Equipo 1;;arbitro1;;No
+3;1;1;4;10/03/2027;11:14:44;0:12;Punto;Rojo;Equipo 1;;arbitro1;;No
+3;1;1;5;10/03/2027;11:14:48;0:16;Punto;Azul;Equipo 2;;arbitro1;;No
+3;1;1;6;10/03/2027;11:17:52;3:00;Finalizar combate;;;;arbitro1;;No
+3;2;2;1;10/03/2027;11:22:56;0:00;Iniciar reloj;;;;arbitro2;;No
+3;2;2;2;10/03/2027;11:23:00;0:04;Punto;Azul;Equipo 4;;arbitro2;;No
+3;2;2;3;10/03/2027;11:23:04;0:08;Punto;Azul;Equipo 4;;arbitro2;;No
+3;2;2;4;10/03/2027;11:23:08;0:12;Punto;Azul;Equipo 4;;arbitro2;;No
+3;2;2;5;10/03/2027;11:23:12;0:16;Punto;Azul;Equipo 4;;arbitro2;;No
+3;2;2;6;10/03/2027;11:23:16;0:20;Punto;Azul;Equipo 4;;arbitro2;;No
+3;2;2;7;10/03/2027;11:23:20;0:24;Punto;Azul;Equipo 4;;arbitro2;;No
+3;2;2;8;10/03/2027;11:23:24;0:28;Punto;Azul;Equipo 4;;arbitro2;;No
+3;2;2;9;10/03/2027;11:23:28;0:32;Punto;Azul;Equipo 4;;arbitro2;;No
+3;2;2;10;10/03/2027;11:23:32;0:36;Punto;Azul;Equipo 4;;arbitro2;;No
+3;2;2;11;10/03/2027;11:23:36;0:40;Punto;Azul;Equipo 4;;arbitro2;;No
+3;2;2;12;10/03/2027;11:23:40;0:44;Punto;Azul;Equipo 4;;arbitro2;;No
+3;2;2;13;10/03/2027;11:23:44;0:48;Punto;Azul;Equipo 4;;arbitro2;;No
+3;2;2;14;10/03/2027;11:23:48;0:52;Punto;Azul;Equipo 4;;arbitro2;;No
+3;2;2;15;10/03/2027;11:23:52;0:56;Punto;Azul;Equipo 4;;arbitro2;;No
+3;2;2;16;10/03/2027;11:23:56;1:00;Punto;Azul;Equipo 4;;arbitro2;;No
+3;2;2;17;10/03/2027;11:24:00;1:04;Punto;Azul;Equipo 4;;arbitro2;;No
+3;2;2;18;10/03/2027;11:24:04;1:08;Punto;Azul;Equipo 4;;arbitro2;;No
+3;2;2;19;10/03/2027;11:27:08;3:00;Finalizar combate;;;;arbitro2;;No
+3;3;1;1;10/03/2027;11:32:12;0:00;Iniciar reloj;;;;arbitro1;;No
+3;3;1;2;10/03/2027;11:32:16;0:04;Advertencia;Rojo;Equipo 1;Exceso de potencia;arbitro1;;No
+3;3;1;3;10/03/2027;11:32:20;0:08;Advertencia;Rojo;Equipo 1;Exceso de potencia;arbitro1;;No
+3;3;1;4;10/03/2027;11:32:24;0:12;Punto;Azul;Equipo 3;;arbitro1;;No
+3;3;1;5;10/03/2027;11:35:28;3:00;Finalizar combate;;;;arbitro1;;No
+3;4;2;1;10/03/2027;11:40:32;0:00;Iniciar reloj;;;;arbitro2;;No
+3;4;2;2;10/03/2027;11:40:36;0:04;Punto;Rojo;Equipo 2;;arbitro2;;No
+3;4;2;3;10/03/2027;11:40:40;0:08;Punto;Rojo;Equipo 2;;arbitro2;;No
+3;4;2;4;10/03/2027;11:40:44;0:12;Descalificación;Azul;Equipo 4;Exceso de potencia;arbitro2;;No
+3;4;2;5;10/03/2027;11:40:44;0:12;Parar reloj;;;;Automático;;No
+3;4;2;6;10/03/2027;11:40:48;0:12;Finalizar combate;;;;arbitro2;;No
+3;5;1;1;10/03/2027;11:45:52;0:00;Iniciar reloj;;;;arbitro1;;No
+3;5;1;2;10/03/2027;11:45:56;0:04;Punto;Rojo;Equipo 1;;arbitro1;;No
+3;5;1;3;10/03/2027;11:46:00;0:08;Punto;Rojo;Equipo 1;;arbitro1;;No
+3;5;1;4;10/03/2027;11:46:04;0:12;Quitar punto;Rojo;Equipo 1;;arbitro1;;No
+3;5;1;5;10/03/2027;11:46:08;0:16;Punto;Azul;Equipo 4;;arbitro1;;Sí
+3;5;1;6;10/03/2027;11:46:12;0:20;Deshacer;;;;arbitro1;Deshace la acción 5;No
+3;5;1;7;10/03/2027;11:46:16;0:24;Punto;Azul;Equipo 4;;arbitro1;;No
+3;5;1;8;10/03/2027;11:49:20;3:00;Finalizar combate;;;;arbitro1;;No
+3;6;2;1;10/03/2027;11:54:24;0:00;Iniciar reloj;;;;arbitro2;;No
+3;6;2;2;10/03/2027;11:54:28;0:04;Punto;Rojo;Equipo 2;;arbitro2;;No
+3;6;2;3;10/03/2027;11:54:32;0:08;Cancelar combate;;;Empezado por error;arbitro2;;No
+3;6;2;4;10/03/2027;11:54:36;0:00;Iniciar reloj;;;;arbitro2;;No
+3;6;2;5;10/03/2027;11:54:40;0:04;Punto;Azul;Equipo 3;;arbitro2;;No
+3;6;2;6;10/03/2027;11:54:44;0:08;Punto;Azul;Equipo 3;;arbitro2;;No
+3;6;2;7;10/03/2027;11:57:48;3:00;Punto;Rojo;Equipo 2;Fuera de tiempo;arbitro2;;No
+3;6;2;8;10/03/2027;11:57:52;3:00;Finalizar combate;;;;arbitro2;;No

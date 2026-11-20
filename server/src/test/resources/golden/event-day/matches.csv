@@ -1,0 +1,19 @@
+﻿Grupo;Categoría;Tapiz;Combate nº (en el grupo);Rojo;Club rojo;Azul;Club azul;Puntos rojo;Puntos azul;Ganador;Cómo acabó;Estado;Comodín del grupo (no puntúa);Fecha;Hora de inicio;Hora de fin;Tiempo de combate (m:ss)
+1;7-8;1;1;Lucía Prueba 7-0;;Hugo Prueba 7-1;;3;1;Lucía Prueba 7-0;Fin del tiempo;Terminado;;10/03/2027;10:00:00;10:01:20;1:00
+1;7-8;1;2;Martina Prueba 7-2;;Mateo Prueba 7-3;;0;15;Mateo Prueba 7-3;Llegó a 15 puntos;Terminado;;10/03/2027;10:06:24;10:07:28;1:00
+1;7-8;1;3;Lucía Prueba 7-0;;Martina Prueba 7-2;;0;2;Martina Prueba 7-2;Fin del tiempo;Terminado;;10/03/2027;10:12:32;10:13:48;1:00
+1;7-8;1;4;Hugo Prueba 7-1;;Mateo Prueba 7-3;;15;0;Hugo Prueba 7-1;Descalificación de Mateo Prueba 7-3;Terminado;;10/03/2027;10:18:52;10:19:08;0:12
+1;7-8;1;5;Lucía Prueba 7-0;;Mateo Prueba 7-3;;1;1;Empate;Fin del tiempo;Terminado;;10/03/2027;10:24:12;10:25:40;1:00
+1;7-8;1;6;Hugo Prueba 7-1;;Martina Prueba 7-2;;1;2;Martina Prueba 7-2;Fin del tiempo;Terminado;;10/03/2027;10:30:56;10:32:12;1:00
+2;7-8;2;1;Sofía Prueba 7-4;;Leo Prueba 7-5;;3;1;Sofía Prueba 7-4;Fin del tiempo;Terminado;Lucía Prueba 7-0;10/03/2027;10:37:16;10:38:36;1:00
+2;7-8;2;2;Julia Prueba 7-6;;Lucía Prueba 7-0;;0;15;Lucía Prueba 7-0;Llegó a 15 puntos;Terminado;Lucía Prueba 7-0;10/03/2027;10:43:40;10:44:44;1:00
+2;7-8;2;3;Sofía Prueba 7-4;;Julia Prueba 7-6;;0;2;Julia Prueba 7-6;Fin del tiempo;Terminado;Lucía Prueba 7-0;10/03/2027;10:49:48;10:51:04;1:00
+2;7-8;2;4;Leo Prueba 7-5;;Lucía Prueba 7-0;;15;0;Leo Prueba 7-5;Descalificación de Lucía Prueba 7-0;Terminado;Lucía Prueba 7-0;10/03/2027;10:56:08;10:56:24;0:12
+2;7-8;2;5;Sofía Prueba 7-4;;Lucía Prueba 7-0;;1;1;Empate;Fin del tiempo;Terminado;Lucía Prueba 7-0;10/03/2027;11:01:28;11:02:56;1:00
+2;7-8;2;6;Leo Prueba 7-5;;Julia Prueba 7-6;;1;2;Julia Prueba 7-6;Fin del tiempo;Terminado;Lucía Prueba 7-0;10/03/2027;11:08:12;11:09:28;1:00
+3;15-16;1;1;Equipo 1 (Paula Prueba 15-0, Pablo Prueba 15-1, Valeria Prueba 15-2);;Equipo 2 (Álvaro Prueba 15-3, Emma Prueba 15-4, Manuel Prueba 15-5);;3;1;Equipo 1;Fin del tiempo;Terminado;Equipo 4;10/03/2027;11:14:32;11:17:52;3:00
+3;15-16;2;2;Equipo 3 (Carla Prueba 15-6, Adrián Prueba 15-7, Noa Prueba 15-8);;Equipo 4 (Mario Prueba 15-9, Alba Prueba 15-10, Diego Prueba 15-11);;0;17;Equipo 4;Fin del tiempo;Terminado;Equipo 4;10/03/2027;11:22:56;11:27:08;3:00
+3;15-16;1;3;Equipo 1 (Paula Prueba 15-0, Pablo Prueba 15-1, Valeria Prueba 15-2);;Equipo 3 (Carla Prueba 15-6, Adrián Prueba 15-7, Noa Prueba 15-8);;0;2;Equipo 3;Fin del tiempo;Terminado;Equipo 4;10/03/2027;11:32:12;11:35:28;3:00
+3;15-16;2;4;Equipo 2 (Álvaro Prueba 15-3, Emma Prueba 15-4, Manuel Prueba 15-5);;Equipo 4 (Mario Prueba 15-9, Alba Prueba 15-10, Diego Prueba 15-11);;15;0;Equipo 2;Descalificación de Equipo 4;Terminado;Equipo 4;10/03/2027;11:40:32;11:40:48;0:12
+3;15-16;1;5;Equipo 1 (Paula Prueba 15-0, Pablo Prueba 15-1, Valeria Prueba 15-2);;Equipo 4 (Mario Prueba 15-9, Alba Prueba 15-10, Diego Prueba 15-11);;1;1;Empate;Fin del tiempo;Terminado;Equipo 4;10/03/2027;11:45:52;11:49:20;3:00
+3;15-16;2;6;Equipo 2 (Álvaro Prueba 15-3, Emma Prueba 15-4, Manuel Prueba 15-5);;Equipo 3 (Carla Prueba 15-6, Adrián Prueba 15-7, Noa Prueba 15-8);;1;2;Equipo 3;Fin del tiempo;Terminado;Equipo 4;10/03/2027;11:54:36;11:57:52;3:00

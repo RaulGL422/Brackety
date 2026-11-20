@@ -66,6 +66,7 @@ Todo está fusionado; falta comprobarlo en debug o en la Pi.
 - [ ] Producción: IP real de `CF-Connecting-IP` confiando solo en el túnel; Content-Security-Policy en nginx probada contra el despliegue real.
 - [ ] Emails de auth a la cola con reintentos de `notificaciones`; enlaces con token en `api.log` cuando no hay Resend.
 - [ ] Retirar `staffNames` (y `event_staff_name`, M6) ahora que el personal tiene cuenta propia.
+- [ ] Reparto no reproducible: con la misma entrada, los empates del reparto (tapiz libre para el bote, combate propuesto) se deciden por el orden de `HashMap<UUID, …>` (`MatFloor`, `MatPlanner`, `CategoryRoster`), que cambia con los ids. Desempatar por número de tapiz, grupo y orden del combate; cambia comportamiento, PR aparte. Hasta entonces una semilla de `EventDaySimulationTest` no repite el mismo día.
 - [ ] Refresh idempotente: caché en memoria, supone una sola instancia de la API.
 - [ ] Register y forgot: pequeña diferencia de tiempo según exista la cuenta (aceptado por ahora).
 - [ ] `opId` único por combate, no global; límite de tamaño del paquete `.brackety`; revisar CVE (Dependabot u OSV).

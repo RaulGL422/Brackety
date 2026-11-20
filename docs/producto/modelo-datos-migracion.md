@@ -7,7 +7,7 @@ Cómo pasar de lo actual al objetivo ligero de `modelo-datos.md` (un dato en un 
 - **Una PR por paso** (M1, M2…), sin mezclar cambios de comportamiento. Antes de cada una, tests de caracterización de lo que toca.
 - **Flyway solo hacia delante**, con backup antes de desplegar (`09-despliegue.md`).
 - **Prueba con datos reales anonimizados**: se restaura el backup de producción en local, un script cambia nombres y fechas por ficticios y el resultado se carga en debug (nunca datos reales en debug, `modulos/entornos.md`). Ahí se aplica la migración.
-- **Comprobación de oro**: la clasificación de la liga, los resultados por categoría y el CSV de cada fase deben salir **idénticos** antes y después. Se automatiza como test con una exportación guardada de la F1 anonimizada.
+- **Comprobación de oro**: la clasificación de la liga, los resultados por categoría y el CSV de cada fase deben salir **idénticos** antes y después. Automatizada en `EventExportsGoldenTest` con una jornada ficticia de guion fijo (`plan-limpieza.md`, L0); una copia anonimizada de la F1 real se puede añadir como segundo juego cuando haya backup.
 - **Paquete del pabellón y export .zip**: cada paso que cambie su forma sube `schemaVersion` y sigue importando las versiones anteriores (la F1 se guardó con la 1).
 - **API estable para la app**: los DTO no cambian mientras se pueda; si cambian, la app acepta los dos formatos durante una versión (hay móviles con caché offline).
 

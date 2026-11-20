@@ -1,0 +1,10 @@
+﻿Categoría;Edad mínima;Edad máxima;Formato;Alumnos por equipo;Por grupo (alumnos o equipos);Inscritos;Grupos;Podio: primeros;Podio: segundos;Podio: terceros
+4-6;4;6;Individual;;4;0;0;2;2;3
+7-8;7;8;Individual;;4;8;2;2;2;3
+9-10;9;10;Individual;;4;0;0;2;2;3
+11-12;11;12;Individual;;4;0;0;2;2;3
+13-14;13;14;Individual;;4;0;0;2;2;3
+15-16;15;16;Por equipos;3;4;12;1;2;2;3
+17-19;17;19;Por equipos;3;4;0;0;2;2;3
+20-25;20;25;Por equipos;3;4;0;0;2;2;3
+26+;26;120;Por equipos;3;4;0;0;2;2;3
