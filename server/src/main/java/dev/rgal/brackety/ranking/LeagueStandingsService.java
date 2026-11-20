@@ -1,5 +1,6 @@
 package dev.rgal.brackety.ranking;
 
+import dev.rgal.brackety.common.Names;
 import dev.rgal.brackety.event.Event;
 import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventCategory;
@@ -140,8 +141,8 @@ class LeagueStandingsService {
                             })
                             .sorted(Comparator.comparingInt(Row::total)
                                     .reversed()
-                                    .thenComparing(Row::firstName, String.CASE_INSENSITIVE_ORDER)
-                                    .thenComparing(Row::lastName, String.CASE_INSENSITIVE_ORDER))
+                                    .thenComparing(Row::firstName, Names.ORDER)
+                                    .thenComparing(Row::lastName, Names.ORDER))
                             .toList();
                     for (int i = 0; i < people.size(); i++) {
                         var r = people.get(i);
