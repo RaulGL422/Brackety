@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:brackety_core/brackety_core.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -10,9 +11,13 @@ import '../../../core/async_view.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../auth/data/api_error.dart';
 import '../../auth/ui/widgets/confirm_dialog.dart';
+import '../../events/data/my_event.dart';
 import '../../events/state/events_providers.dart';
 import '../../league/state/league_providers.dart';
 import '../../rulebook/rulebook_ui.dart';
+import '../../staff/data/staff_repository.dart';
+import '../../staff/ui/qr_access.dart';
+import '../../staff/ui/qr_access_section.dart';
 import '../../staff/ui/staff_section.dart';
 import '../data/club_models.dart';
 import '../data/club_repository.dart';
@@ -132,6 +137,39 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
     _minRest.dispose();
     _attendance.dispose();
     super.dispose();
+  }
+
+  // A QR access for a mat puts its referee there on the server: show it, unless a save is on its way.
+  @override
+  void didUpdateWidget(covariant _SettingsForm oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final referees = widget.initial.matReferees;
+    if (!_saving && !listEquals(referees, oldWidget.initial.matReferees)) {
+      _matReferees = [...referees];
+    }
+  }
+
+  Widget _matReferee(EventSettings settings, int i, String? refereeId) {
+    final l10n = AppLocalizations.of(context);
+    return DropdownButtonFormField<String?>(
+      // A new key when the value changes, so a refused change shows the saved referee again.
+      key: ValueKey('$i:$refereeId'),
+      initialValue: refereeId,
+      // A person's name next to the sign-in can be long: it is cut, never overflows a phone.
+      isExpanded: true,
+      decoration: InputDecoration(
+        labelText: '${l10n.matTitle(i + 1)} · ${l10n.settingsReferee}',
+      ),
+      items: [
+        DropdownMenuItem(child: Text(l10n.matNoReferee)),
+        for (final r in settings.referees)
+          DropdownMenuItem(
+            value: r.id,
+            child: Text(r.label, overflow: TextOverflow.ellipsis),
+          ),
+      ],
+      onChanged: (id) => _change(() => _matReferees[i] = id),
+    );
   }
 
   void _change(VoidCallback update) {
@@ -266,25 +304,16 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
           for (final (i, refereeId) in _matReferees.indexed)
             Padding(
               padding: const EdgeInsets.only(top: AppSpacing.s),
-              child: DropdownButtonFormField<String?>(
-                // A new key when the value changes, so a refused change shows the saved referee again.
-                key: ValueKey('$i:$refereeId'),
-                initialValue: refereeId,
-                // A person's name next to the sign-in can be long: it is cut, never overflows a phone.
-                isExpanded: true,
-                decoration: InputDecoration(
-                  labelText:
-                      '${l10n.matTitle(i + 1)} · ${l10n.settingsReferee}',
-                ),
-                items: [
-                  DropdownMenuItem(child: Text(l10n.matNoReferee)),
-                  for (final r in settings.referees)
-                    DropdownMenuItem(
-                      value: r.id,
-                      child: Text(r.label, overflow: TextOverflow.ellipsis),
-                    ),
+              child: Row(
+                children: [
+                  Expanded(child: _matReferee(settings, i, refereeId)),
+                  // A referee without an account of their own: a QR for this mat.
+                  QrAccessButton(
+                    eventId: widget.eventId,
+                    role: StaffRole.referee,
+                    mat: i + 1,
+                  ),
                 ],
-                onChanged: (id) => _change(() => _matReferees[i] = id),
               ),
             ),
           const SizedBox(height: AppSpacing.s),
@@ -325,6 +354,14 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
             ),
           const SizedBox(height: AppSpacing.s),
           StaffInvitations(eventId: widget.eventId),
+          const SizedBox(height: AppSpacing.xl),
+          QrAccessSection(
+            eventId: widget.eventId,
+            matReferees: _matReferees,
+            hasGrouper: settings.staff.any(
+              (m) => m.permissions.contains(EventPermission.groups),
+            ),
+          ),
           const SizedBox(height: AppSpacing.xl),
           Text(l10n.measuresTitle, style: text.titleMedium),
           MeasuresEditor(eventId: widget.eventId, settings: settings),

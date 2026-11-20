@@ -7,6 +7,7 @@ import java.time.Clock;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,12 +27,19 @@ public class EventPhase {
     private final EventRepository events;
     private final EventPhaseChangeRepository changes;
     private final EventAccess access;
+    private final ApplicationEventPublisher publisher;
     private final Clock clock;
 
-    EventPhase(EventRepository events, EventPhaseChangeRepository changes, EventAccess access, Clock clock) {
+    EventPhase(
+            EventRepository events,
+            EventPhaseChangeRepository changes,
+            EventAccess access,
+            ApplicationEventPublisher publisher,
+            Clock clock) {
         this.events = events;
         this.changes = changes;
         this.access = access;
+        this.publisher = publisher;
         this.clock = clock;
     }
 
@@ -110,6 +118,7 @@ public class EventPhase {
         event.finish(clock.instant());
         changes.save(new EventPhaseChange(event.getId(), action, accountId, null, unplayed, clock.instant()));
         log.info("Phase {} finished ({}), {} matches unplayed", event.getId(), action, unplayed);
+        publisher.publishEvent(new PhaseFinished(event.getId()));
     }
 
     private Event lock(UUID eventId) {

@@ -35,6 +35,8 @@ public class SessionService {
     // Tells an access token from the other tokens signed with the same key (see ShortLivedTokens).
     public static final String PURPOSE_CLAIM = "purpose";
     public static final String ACCESS_PURPOSE = "ACCESS";
+    // Only on the tokens of an account let in by QR: SecurityConfig keeps it out of account-wide endpoints.
+    public static final String TEMPORARY_CLAIM = "temporary";
 
     private static final Logger log = LoggerFactory.getLogger(SessionService.class);
 
@@ -165,6 +167,11 @@ public class SessionService {
                 .map(p -> p.getType().name())
                 .toList();
         var claims = JwtClaimsSet.builder()
+                .claims(c -> {
+                    if (account.isTemporary()) {
+                        c.put(TEMPORARY_CLAIM, true);
+                    }
+                })
                 .subject(account.getId().toString())
                 .issuedAt(now)
                 .expiresAt(now.plus(accessTtl))

@@ -103,6 +103,10 @@ public class AuthEmails {
     }
 
     private void send(String to, Account account, String kind, String path, Object... args) {
+        // Its sign-in is no address: nothing to send.
+        if (account.isTemporary()) {
+            return;
+        }
         var locale = Locale.forLanguageTag(account.getLocale());
         var subject = messages.getMessage("email." + kind + ".subject", args, locale);
         var body = messages.getMessage("email." + kind + ".body", args, locale);

@@ -50,6 +50,7 @@ class MeService {
                 account.getBirthDate(),
                 account.getLocale(),
                 accountProfiles,
-                identities.methods(account));
+                identities.methods(account),
+                account.isTemporary());
     }
 }

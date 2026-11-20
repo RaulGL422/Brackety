@@ -166,7 +166,8 @@ public class EventPackageService {
     public EventPackage export(UUID eventId, UUID accountId) {
         access.require(eventId, accountId, EventRole.CLUB);
         var event = eventService.get(eventId);
-        var eventStaff = staff.findByEventId(eventId);
+        // QR accounts stay on this server: on the laptop nobody could sign in with them.
+        var eventStaff = staff.findLastingByEventId(eventId);
         var usernames =
                 accounts
                         .findAllById(eventStaff.stream()

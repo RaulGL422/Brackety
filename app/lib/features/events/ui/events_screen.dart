@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/async_view.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../auth/state/account_controller.dart';
 import '../../league/ui/new_event_dialog.dart';
 import '../../offline/ui/confirm_sign_out.dart';
 import '../data/my_event.dart';
@@ -17,6 +18,8 @@ class EventsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    final temporary =
+        ref.watch(accountProvider.select((a) => a.value?.temporary)) ?? false;
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.eventsTitle),
@@ -25,11 +28,14 @@ class EventsScreen extends ConsumerWidget {
           SizedBox(width: AppSpacing.s),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        icon: const Icon(Icons.add),
-        label: Text(l10n.newEventButton),
-        onPressed: () => showNewEventDialog(context),
-      ),
+      // An account let in by QR only helps in its event.
+      floatingActionButton: temporary
+          ? null
+          : FloatingActionButton.extended(
+              icon: const Icon(Icons.add),
+              label: Text(l10n.newEventButton),
+              onPressed: () => showNewEventDialog(context),
+            ),
       body: AsyncView(
         value: ref.watch(myEventsProvider),
         onRetry: () => ref.invalidate(myEventsProvider),
@@ -163,6 +169,9 @@ class _AccountMenu extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final error = Theme.of(context).colorScheme.error;
+    // An account let in by QR has no settings of its own.
+    final temporary =
+        ref.watch(accountProvider.select((a) => a.value?.temporary)) ?? false;
     return PopupMenuButton<_AccountItem>(
       tooltip: l10n.accountMenu,
       onSelected: (item) => switch (item) {
@@ -171,14 +180,15 @@ class _AccountMenu extends ConsumerWidget {
         _AccountItem.signOut => confirmSignOut(context, ref),
       },
       itemBuilder: (_) => [
-        PopupMenuItem(
-          value: _AccountItem.settings,
-          child: ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.settings_outlined),
-            title: Text(l10n.settingsTitle),
+        if (!temporary)
+          PopupMenuItem(
+            value: _AccountItem.settings,
+            child: ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.settings_outlined),
+              title: Text(l10n.settingsTitle),
+            ),
           ),
-        ),
         PopupMenuItem(
           value: _AccountItem.connection,
           child: ListTile(

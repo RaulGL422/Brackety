@@ -15,7 +15,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.Duration;
-import java.util.List;
+import java.util.ArrayList;
 import java.util.UUID;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -30,6 +31,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -61,6 +63,16 @@ public class SecurityConfig {
 
     /** Granted when the access token says the email is verified; see {@link RequiresVerifiedEmail}. */
     public static final String EMAIL_VERIFIED = "EMAIL_VERIFIED";
+    // Every account but those let in by QR, which only act inside their event.
+    static final String PERMANENT = "PERMANENT_ACCOUNT";
+    // Account-wide: what a temporary account may never do (its own data, new events and leagues, invitations).
+    static final String[] PERMANENT_ONLY = {
+        "/api/v1/me/**",
+        "/api/v1/invitations/**",
+        "/api/v1/events/*/invitations/**",
+        "/api/v1/events/*/temporary-access/**"
+    };
+    static final String[] PERMANENT_ONLY_POST = {"/api/v1/events", "/api/v1/events/*/league/**"};
 
     static final String ADMIN_PATHS = "/api/v1/admin/**";
     static final String ADMIN_LOGIN_PATH = "/api/v1/admin/auth/login";
@@ -111,8 +123,16 @@ public class SecurityConfig {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(a ->
-                        a.requestMatchers(PUBLIC_PATHS).permitAll().anyRequest().authenticated())
+                .authorizeHttpRequests(a -> a.requestMatchers(PUBLIC_PATHS)
+                        .permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/me")
+                        .authenticated()
+                        .requestMatchers(PERMANENT_ONLY)
+                        .hasAuthority(PERMANENT)
+                        .requestMatchers(HttpMethod.POST, PERMANENT_ONLY_POST)
+                        .hasAuthority(PERMANENT)
+                        .anyRequest()
+                        .authenticated())
                 .exceptionHandling(
                         e -> e.authenticationEntryPoint(unauthorized()).accessDeniedHandler(forbidden()))
                 .oauth2ResourceServer(o -> o.jwt(j -> j.jwtAuthenticationConverter(jwtAuthenticationConverter()))
@@ -136,10 +156,16 @@ public class SecurityConfig {
 
     private static JwtAuthenticationConverter jwtAuthenticationConverter() {
         var converter = new JwtAuthenticationConverter();
-        converter.setJwtGrantedAuthoritiesConverter(
-                jwt -> Boolean.TRUE.equals(jwt.getClaimAsBoolean(SessionService.EMAIL_VERIFIED_CLAIM))
-                        ? List.of(new SimpleGrantedAuthority(EMAIL_VERIFIED))
-                        : List.of());
+        converter.setJwtGrantedAuthoritiesConverter(jwt -> {
+            var authorities = new ArrayList<GrantedAuthority>();
+            if (Boolean.TRUE.equals(jwt.getClaimAsBoolean(SessionService.EMAIL_VERIFIED_CLAIM))) {
+                authorities.add(new SimpleGrantedAuthority(EMAIL_VERIFIED));
+            }
+            if (!Boolean.TRUE.equals(jwt.getClaimAsBoolean(SessionService.TEMPORARY_CLAIM))) {
+                authorities.add(new SimpleGrantedAuthority(PERMANENT));
+            }
+            return authorities;
+        });
         return converter;
     }
 

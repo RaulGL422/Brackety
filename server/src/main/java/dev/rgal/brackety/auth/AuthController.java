@@ -47,6 +47,7 @@ class AuthController {
     private final PasswordResetService passwordReset;
     private final GoogleSignInService google;
     private final EmailChangeService emailChange;
+    private final TemporarySignIn temporary;
     private final boolean secureCookie;
 
     AuthController(
@@ -56,6 +57,7 @@ class AuthController {
             PasswordResetService passwordReset,
             GoogleSignInService google,
             EmailChangeService emailChange,
+            TemporarySignIn temporary,
             @Value("${brackety.auth.refresh-cookie-secure}") boolean secureCookie) {
         this.auth = auth;
         this.sessions = sessions;
@@ -63,6 +65,7 @@ class AuthController {
         this.passwordReset = passwordReset;
         this.google = google;
         this.emailChange = emailChange;
+        this.temporary = temporary;
         this.secureCookie = secureCookie;
     }
 
@@ -109,6 +112,14 @@ class AuthController {
                 throw AuthException.signInConflict();
             }
         }
+    }
+
+    /** With the code of a staff QR: single use, and it closes any other session of that account. */
+    @PostMapping("/temporary")
+    ResponseEntity<TokenResponse> temporary(
+            @Valid @RequestBody TokenRequest request,
+            @RequestHeader(name = CLIENT_HEADER, required = false) String client) {
+        return respond(temporary.signIn(request.token()), isWeb(client));
     }
 
     @PostMapping("/restore")
