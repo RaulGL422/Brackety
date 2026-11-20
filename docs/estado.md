@@ -9,7 +9,7 @@
 Estados: **pendiente** · **en curso** · **en pruebas** (hecho; falta la prueba a mano de Raul, lista en `pendientes.md`) · **cerrado**.
 
 ## Ahora
-- Calidad, fase L0 (`producto/plan-limpieza.md`): métricas en el CI (#137), ArchUnit (#138) y lints estrictos (#139) hechos; faltan los casos de reglas compartidos Java/Dart y la comprobación de oro.
+- Calidad, fase L0 (`producto/plan-limpieza.md`): métricas en el CI (#137), ArchUnit (#138), lints estrictos (#139) y casos de reglas compartidos Java/Dart hechos; falta la comprobación de oro.
 - Exportaciones a medida (`producto/exportaciones.md`): aprobadas en lo básico, por programar.
 - Esperando a Raul: detalles de la competición del 20-12, puntuación de la F2 y las preguntas de `pendientes.md`.
 

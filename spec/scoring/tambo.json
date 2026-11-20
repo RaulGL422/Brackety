@@ -1,0 +1,636 @@
+{
+  "_about": "Tambo scoring cases (reglamento Yoseikan, cap. 3.1) that TamboMatch passes in Java (server) and in Dart (app). Times in seconds from the first entry. Refusals use the names of MatchRefusal (Dart). Only the keys present in \"expect\" are checked. docs/producto/plan-limpieza.md, phase L0.",
+  "rules": {"length": 60, "pointsLimit": 15},
+  "cases": [
+    {
+      "name": "the clock only runs between start and stop",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "t", "action": "STOP", "at": 10},
+        {"id": "s2", "action": "START", "at": 20}
+      ],
+      "at": 25,
+      "expect": {
+        "elapsed": 15,
+        "running": true,
+        "started": true,
+        "refuse": [
+          {"action": "START", "expect": "running"},
+          {"action": "STOP", "expect": null}
+        ]
+      }
+    },
+    {
+      "name": "two starts in a row keep the first one",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "s2", "action": "START", "at": 5}
+      ],
+      "at": 10,
+      "expect": {
+        "elapsed": 10
+      }
+    },
+    {
+      "name": "nothing is scored before the first start",
+      "entries": [],
+      "at": 0,
+      "expect": {
+        "started": false,
+        "running": false,
+        "endReason": null,
+        "lastUndoable": null,
+        "refuse": [
+          {"action": "POINT", "expect": "notStarted"},
+          {"action": "WARNING", "expect": "notStarted"},
+          {"action": "ONE_HAND_WARNING", "expect": "notStarted"},
+          {"action": "DISQUALIFICATION", "expect": "notStarted"},
+          {"action": "POINT_REMOVED", "expect": "notStarted", "side": "RED"},
+          {"action": "CANCEL", "expect": "notStarted"},
+          {"action": "START", "expect": null},
+          {"action": "STOP", "expect": "notRunning"},
+          {"action": "UNDO", "expect": "nothingToUndo"},
+          {"action": "FINISH", "expect": "notOver"},
+          {"action": "REOPEN", "expect": "notFinished"}
+        ]
+      }
+    },
+    {
+      "name": "a started and stopped clock still scores",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "t", "action": "STOP", "at": 5}
+      ],
+      "at": 6,
+      "expect": {
+        "running": false,
+        "elapsed": 5,
+        "refuse": [
+          {"action": "POINT", "expect": null},
+          {"action": "WARNING", "expect": null},
+          {"action": "STOP", "expect": "notRunning"}
+        ]
+      }
+    },
+    {
+      "name": "when the time is over the clock stops and only the last point, a correction or finish are left",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0}
+      ],
+      "at": 61,
+      "expect": {
+        "elapsed": 60,
+        "running": false,
+        "endReason": "TIME",
+        "refuse": [
+          {"action": "POINT", "expect": null},
+          {"action": "WARNING", "expect": "over"},
+          {"action": "ONE_HAND_WARNING", "expect": "over"},
+          {"action": "DISQUALIFICATION", "expect": "over"},
+          {"action": "START", "expect": "over"},
+          {"action": "STOP", "expect": "notRunning"},
+          {"action": "FINISH", "expect": null},
+          {"action": "CLOCK_ADJUST", "expect": null, "delta": 10}
+        ]
+      }
+    },
+    {
+      "name": "a point after the time counts and is the last action to undo",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "p1", "action": "POINT", "at": 61, "side": "RED"}
+      ],
+      "at": 62,
+      "expect": {
+        "red": {"points": 1},
+        "endReason": "TIME",
+        "lastUndoable": "p1"
+      }
+    },
+    {
+      "name": "undoing the point given after the time takes it back",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "p1", "action": "POINT", "at": 61, "side": "RED"},
+        {"id": "u1", "action": "UNDO", "at": 62, "target": "p1"}
+      ],
+      "at": 63,
+      "expect": {
+        "red": {"points": 0},
+        "lastUndoable": null
+      }
+    },
+    {
+      "name": "a point after the time may reach the limit",
+      "rules": {"pointsLimit": 3},
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "p1", "action": "POINT", "at": 1, "side": "RED"},
+        {"id": "p2", "action": "POINT", "at": 2, "side": "RED"},
+        {"id": "p3", "action": "POINT", "at": 61, "side": "RED"}
+      ],
+      "at": 62,
+      "expect": {
+        "red": {"points": 3},
+        "endReason": "POINTS",
+        "refuse": [
+          {"action": "POINT", "expect": "over"}
+        ]
+      }
+    },
+    {
+      "name": "reaching the points limit ends the match",
+      "rules": {"pointsLimit": 3},
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "p1", "action": "POINT", "at": 1, "side": "RED"},
+        {"id": "p2", "action": "POINT", "at": 2, "side": "RED"},
+        {"id": "p3", "action": "POINT", "at": 3, "side": "RED"}
+      ],
+      "at": 4,
+      "expect": {
+        "red": {"points": 3},
+        "blue": {"points": 0},
+        "endReason": "POINTS",
+        "refuse": [
+          {"action": "POINT", "expect": "over"},
+          {"action": "WARNING", "expect": "over"},
+          {"action": "START", "expect": "over"},
+          {"action": "FINISH", "expect": null}
+        ]
+      }
+    },
+    {
+      "name": "undoing the point that reached the limit reopens the match",
+      "rules": {"pointsLimit": 3},
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "p1", "action": "POINT", "at": 1, "side": "RED"},
+        {"id": "p2", "action": "POINT", "at": 2, "side": "RED"},
+        {"id": "p3", "action": "POINT", "at": 3, "side": "RED"},
+        {"id": "u1", "action": "UNDO", "at": 5, "target": "p3"}
+      ],
+      "at": 6,
+      "expect": {
+        "red": {"points": 2},
+        "endReason": null,
+        "lastUndoable": "p2",
+        "refuse": [
+          {"action": "POINT", "expect": null},
+          {"action": "FINISH", "expect": "notOver"}
+        ]
+      }
+    },
+    {
+      "name": "every second warning gives the rival a point, apart from one-hand warnings",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "w1", "action": "WARNING", "at": 1, "side": "RED"},
+        {"id": "o1", "action": "ONE_HAND_WARNING", "at": 2, "side": "RED"},
+        {"id": "w2", "action": "WARNING", "at": 3, "side": "RED"},
+        {"id": "o2", "action": "ONE_HAND_WARNING", "at": 4, "side": "RED"}
+      ],
+      "at": 5,
+      "expect": {
+        "red": {"points": 0, "warnings": 2, "oneHandWarnings": 2},
+        "blue": {"points": 2},
+        "autoPoint": {"w1": false, "w2": true, "o1": false, "o2": true},
+        "lastUndoable": "o2"
+      }
+    },
+    {
+      "name": "undoing the second warning takes the rival's point back",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "w1", "action": "WARNING", "at": 1, "side": "RED"},
+        {"id": "w2", "action": "WARNING", "at": 2, "side": "RED"},
+        {"id": "u1", "action": "UNDO", "at": 3, "target": "w2"}
+      ],
+      "at": 4,
+      "expect": {
+        "red": {"warnings": 1},
+        "blue": {"points": 0},
+        "autoPoint": {"w1": false},
+        "lastUndoable": "w1"
+      }
+    },
+    {
+      "name": "with no points limit only the time ends a match",
+      "rules": {"length": 180, "pointsLimit": 0},
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "p1", "action": "POINT", "at": 1, "side": "RED"},
+        {"id": "p2", "action": "POINT", "at": 2, "side": "RED"},
+        {"id": "p3", "action": "POINT", "at": 3, "side": "RED"},
+        {"id": "p4", "action": "POINT", "at": 4, "side": "RED"},
+        {"id": "p5", "action": "POINT", "at": 5, "side": "RED"},
+        {"id": "p6", "action": "POINT", "at": 6, "side": "RED"},
+        {"id": "p7", "action": "POINT", "at": 7, "side": "RED"},
+        {"id": "p8", "action": "POINT", "at": 8, "side": "RED"},
+        {"id": "p9", "action": "POINT", "at": 9, "side": "RED"},
+        {"id": "p10", "action": "POINT", "at": 10, "side": "RED"},
+        {"id": "p11", "action": "POINT", "at": 11, "side": "RED"},
+        {"id": "p12", "action": "POINT", "at": 12, "side": "RED"},
+        {"id": "p13", "action": "POINT", "at": 13, "side": "RED"},
+        {"id": "p14", "action": "POINT", "at": 14, "side": "RED"},
+        {"id": "p15", "action": "POINT", "at": 15, "side": "RED"},
+        {"id": "p16", "action": "POINT", "at": 16, "side": "RED"}
+      ],
+      "at": 20,
+      "expect": {
+        "red": {"points": 16},
+        "endReason": null,
+        "refuse": [
+          {"action": "POINT", "expect": null}
+        ]
+      }
+    },
+    {
+      "name": "with no points limit the time still ends it",
+      "rules": {"length": 180, "pointsLimit": 0},
+      "entries": [
+        {"id": "s", "action": "START", "at": 0}
+      ],
+      "at": 181,
+      "expect": {
+        "endReason": "TIME",
+        "elapsed": 180
+      }
+    },
+    {
+      "name": "with no points limit a disqualification gives the rival fifteen at least",
+      "rules": {"length": 180, "pointsLimit": 0},
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "p1", "action": "POINT", "at": 1, "side": "RED"},
+        {"id": "p2", "action": "POINT", "at": 2, "side": "RED"},
+        {"id": "p3", "action": "POINT", "at": 3, "side": "RED"},
+        {"id": "d1", "action": "DISQUALIFICATION", "at": 5, "side": "BLUE"}
+      ],
+      "at": 6,
+      "expect": {
+        "red": {"points": 15},
+        "blue": {"points": 0},
+        "endReason": "DISQUALIFICATION",
+        "disqualified": "BLUE"
+      }
+    },
+    {
+      "name": "with no points limit a disqualified rival leaves more than fifteen as they were",
+      "rules": {"length": 180, "pointsLimit": 0},
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "p1", "action": "POINT", "at": 1, "side": "RED"},
+        {"id": "p2", "action": "POINT", "at": 2, "side": "RED"},
+        {"id": "p3", "action": "POINT", "at": 3, "side": "RED"},
+        {"id": "p4", "action": "POINT", "at": 4, "side": "RED"},
+        {"id": "p5", "action": "POINT", "at": 5, "side": "RED"},
+        {"id": "p6", "action": "POINT", "at": 6, "side": "RED"},
+        {"id": "p7", "action": "POINT", "at": 7, "side": "RED"},
+        {"id": "p8", "action": "POINT", "at": 8, "side": "RED"},
+        {"id": "p9", "action": "POINT", "at": 9, "side": "RED"},
+        {"id": "p10", "action": "POINT", "at": 10, "side": "RED"},
+        {"id": "p11", "action": "POINT", "at": 11, "side": "RED"},
+        {"id": "p12", "action": "POINT", "at": 12, "side": "RED"},
+        {"id": "p13", "action": "POINT", "at": 13, "side": "RED"},
+        {"id": "p14", "action": "POINT", "at": 14, "side": "RED"},
+        {"id": "p15", "action": "POINT", "at": 15, "side": "RED"},
+        {"id": "p16", "action": "POINT", "at": 16, "side": "RED"},
+        {"id": "p17", "action": "POINT", "at": 17, "side": "RED"},
+        {"id": "d1", "action": "DISQUALIFICATION", "at": 20, "side": "BLUE"}
+      ],
+      "at": 21,
+      "expect": {
+        "red": {"points": 17},
+        "blue": {"points": 0}
+      }
+    },
+    {
+      "name": "a disqualification scores the limit for the rival and ends the match",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "p1", "action": "POINT", "at": 1, "side": "RED"},
+        {"id": "p2", "action": "POINT", "at": 2, "side": "RED"},
+        {"id": "b1", "action": "POINT", "at": 3, "side": "BLUE"},
+        {"id": "d1", "action": "DISQUALIFICATION", "at": 4, "side": "RED"}
+      ],
+      "at": 5,
+      "expect": {
+        "red": {"points": 0},
+        "blue": {"points": 15},
+        "endReason": "DISQUALIFICATION",
+        "disqualified": "RED",
+        "lastUndoable": "d1",
+        "refuse": [
+          {"action": "POINT", "expect": "over"},
+          {"action": "WARNING", "expect": "over"},
+          {"action": "POINT_REMOVED", "expect": "over", "side": "BLUE"},
+          {"action": "CLOCK_ADJUST", "expect": "clockRunning", "delta": 10},
+          {"action": "FINISH", "expect": null}
+        ]
+      }
+    },
+    {
+      "name": "undoing a disqualification gives the points back",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "p1", "action": "POINT", "at": 1, "side": "RED"},
+        {"id": "p2", "action": "POINT", "at": 2, "side": "RED"},
+        {"id": "b1", "action": "POINT", "at": 3, "side": "BLUE"},
+        {"id": "d1", "action": "DISQUALIFICATION", "at": 4, "side": "RED"},
+        {"id": "u1", "action": "UNDO", "at": 5, "target": "d1"}
+      ],
+      "at": 6,
+      "expect": {
+        "red": {"points": 2},
+        "blue": {"points": 1},
+        "disqualified": null,
+        "endReason": null,
+        "lastUndoable": "b1"
+      }
+    },
+    {
+      "name": "undo walks back one action at a time",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "p1", "action": "POINT", "at": 1, "side": "RED"},
+        {"id": "w1", "action": "WARNING", "at": 2, "side": "BLUE"},
+        {"id": "u1", "action": "UNDO", "at": 3, "target": "w1"},
+        {"id": "u2", "action": "UNDO", "at": 4, "target": "p1"}
+      ],
+      "at": 5,
+      "expect": {
+        "red": {"points": 0},
+        "blue": {"warnings": 0},
+        "lastUndoable": null,
+        "refuse": [
+          {"action": "UNDO", "expect": "nothingToUndo"}
+        ]
+      }
+    },
+    {
+      "name": "a finished match refuses everything but reopening",
+      "rules": {"pointsLimit": 1},
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "p1", "action": "POINT", "at": 1, "side": "RED"},
+        {"id": "f", "action": "FINISH", "at": 2}
+      ],
+      "at": 3,
+      "expect": {
+        "finished": true,
+        "refuse": [
+          {"action": "POINT", "expect": "finished"},
+          {"action": "UNDO", "expect": "finished"},
+          {"action": "START", "expect": "finished"},
+          {"action": "CANCEL", "expect": "finished"},
+          {"action": "FINISH", "expect": "finished"},
+          {"action": "REOPEN", "expect": null}
+        ]
+      }
+    },
+    {
+      "name": "a reopened match keeps what it had",
+      "rules": {"pointsLimit": 1},
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "p1", "action": "POINT", "at": 1, "side": "RED"},
+        {"id": "f", "action": "FINISH", "at": 2},
+        {"id": "ro", "action": "REOPEN", "at": 3}
+      ],
+      "at": 4,
+      "expect": {
+        "finished": false,
+        "red": {"points": 1},
+        "endReason": "POINTS",
+        "refuse": [
+          {"action": "REOPEN", "expect": "notFinished"},
+          {"action": "FINISH", "expect": null},
+          {"action": "POINT_REMOVED", "expect": null, "side": "RED"}
+        ]
+      }
+    },
+    {
+      "name": "a point removed never goes below zero",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "p1", "action": "POINT", "at": 1, "side": "RED"},
+        {"id": "r1", "action": "POINT_REMOVED", "at": 2, "side": "RED"},
+        {"id": "r2", "action": "POINT_REMOVED", "at": 3, "side": "RED"}
+      ],
+      "at": 4,
+      "expect": {
+        "red": {"points": 0},
+        "lastUndoable": "r2",
+        "refuse": [
+          {"action": "POINT_REMOVED", "expect": "noPoints", "side": "RED"},
+          {"action": "POINT_REMOVED", "expect": "noPoints", "side": "BLUE"}
+        ]
+      }
+    },
+    {
+      "name": "undoing a point removed gives it back",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "p1", "action": "POINT", "at": 1, "side": "RED"},
+        {"id": "r1", "action": "POINT_REMOVED", "at": 2, "side": "RED"},
+        {"id": "u1", "action": "UNDO", "at": 3, "target": "r1"}
+      ],
+      "at": 4,
+      "expect": {
+        "red": {"points": 1}
+      }
+    },
+    {
+      "name": "a point can be taken back once the time ended the match",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "p1", "action": "POINT", "at": 10, "side": "RED"}
+      ],
+      "at": 61,
+      "expect": {
+        "endReason": "TIME",
+        "refuse": [
+          {"action": "POINT_REMOVED", "expect": null, "side": "RED"}
+        ]
+      }
+    },
+    {
+      "name": "a point can be taken back once the points ended the match",
+      "rules": {"pointsLimit": 1},
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "p1", "action": "POINT", "at": 1, "side": "RED"}
+      ],
+      "at": 2,
+      "expect": {
+        "endReason": "POINTS",
+        "refuse": [
+          {"action": "POINT_REMOVED", "expect": null, "side": "RED"}
+        ]
+      }
+    },
+    {
+      "name": "no point is taken back after a disqualification",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "p1", "action": "POINT", "at": 1, "side": "RED"},
+        {"id": "d1", "action": "DISQUALIFICATION", "at": 2, "side": "BLUE"}
+      ],
+      "at": 3,
+      "expect": {
+        "refuse": [
+          {"action": "POINT_REMOVED", "expect": "over", "side": "RED"}
+        ]
+      }
+    },
+    {
+      "name": "adding time to the stopped clock takes it off the elapsed time",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "t", "action": "STOP", "at": 30},
+        {"id": "a1", "action": "CLOCK_ADJUST", "at": 31, "delta": 10}
+      ],
+      "at": 32,
+      "expect": {
+        "elapsed": 20,
+        "running": false,
+        "lastUndoable": "a1"
+      }
+    },
+    {
+      "name": "taking time off the stopped clock adds it to the elapsed time",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "t", "action": "STOP", "at": 30},
+        {"id": "a1", "action": "CLOCK_ADJUST", "at": 31, "delta": -5}
+      ],
+      "at": 32,
+      "expect": {
+        "elapsed": 35
+      }
+    },
+    {
+      "name": "undoing a clock adjustment takes it back",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "t", "action": "STOP", "at": 30},
+        {"id": "a1", "action": "CLOCK_ADJUST", "at": 31, "delta": 10},
+        {"id": "u1", "action": "UNDO", "at": 32, "target": "a1"}
+      ],
+      "at": 33,
+      "expect": {
+        "elapsed": 30,
+        "lastUndoable": null
+      }
+    },
+    {
+      "name": "the clock never goes below zero elapsed nor reaches the end by an adjustment",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "t", "action": "STOP", "at": 10}
+      ],
+      "at": 11,
+      "expect": {
+        "refuse": [
+          {"action": "CLOCK_ADJUST", "expect": "clockLimit", "delta": -50},
+          {"action": "CLOCK_ADJUST", "expect": "clockLimit", "delta": -60},
+          {"action": "CLOCK_ADJUST", "expect": null, "delta": -40},
+          {"action": "CLOCK_ADJUST", "expect": null, "delta": 20}
+        ]
+      }
+    },
+    {
+      "name": "adding more time than elapsed leaves the clock at the full length",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "t", "action": "STOP", "at": 10},
+        {"id": "a1", "action": "CLOCK_ADJUST", "at": 11, "delta": 20}
+      ],
+      "at": 12,
+      "expect": {
+        "elapsed": 0,
+        "refuse": [
+          {"action": "CLOCK_ADJUST", "expect": "clockLimit", "delta": 5}
+        ]
+      }
+    },
+    {
+      "name": "the clock is adjusted only when stopped",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0}
+      ],
+      "at": 5,
+      "expect": {
+        "running": true,
+        "refuse": [
+          {"action": "CLOCK_ADJUST", "expect": "clockRunning", "delta": 10}
+        ]
+      }
+    },
+    {
+      "name": "a clock that ran out stays stopped after an adjustment",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "a1", "action": "CLOCK_ADJUST", "at": 70, "delta": 10}
+      ],
+      "at": 80,
+      "expect": {
+        "elapsed": 50,
+        "running": false,
+        "endReason": null
+      }
+    },
+    {
+      "name": "no adjustment after the points ended the match",
+      "rules": {"pointsLimit": 1},
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "p1", "action": "POINT", "at": 1, "side": "RED"},
+        {"id": "t", "action": "STOP", "at": 2}
+      ],
+      "at": 3,
+      "expect": {
+        "refuse": [
+          {"action": "CLOCK_ADJUST", "expect": "over", "delta": 10}
+        ]
+      }
+    },
+    {
+      "name": "cancelling puts the match back as if it had never started",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "p1", "action": "POINT", "at": 1, "side": "RED"},
+        {"id": "w1", "action": "WARNING", "at": 2, "side": "BLUE"},
+        {"id": "c", "action": "CANCEL", "at": 3}
+      ],
+      "at": 4,
+      "expect": {
+        "started": false,
+        "running": false,
+        "elapsed": 0,
+        "red": {"points": 0},
+        "blue": {"warnings": 0},
+        "lastUndoable": null,
+        "refuse": [
+          {"action": "POINT", "expect": "notStarted"},
+          {"action": "UNDO", "expect": "nothingToUndo"},
+          {"action": "START", "expect": null}
+        ]
+      }
+    },
+    {
+      "name": "after cancelling the clock starts again from zero",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "c", "action": "CANCEL", "at": 3},
+        {"id": "s2", "action": "START", "at": 5}
+      ],
+      "at": 10,
+      "expect": {
+        "elapsed": 5,
+        "started": true
+      }
+    }
+  ]
+}
