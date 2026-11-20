@@ -26,7 +26,7 @@ Arreglo de lo que encontró `auditoria-codigo.md`, por fases. Sigue el método d
 2. Lints más estrictos en app, admin y core: `strict-casts`, `strict-raw-types`, `strict-inference`; reglas `unawaited_futures`, `prefer_final_locals`, `avoid_dynamic_calls`, `use_super_parameters`, `prefer_const_constructors`. Se arreglan los avisos en la misma PR (cambios mecánicos).
 3. ArchUnit en el servidor: sin ciclos entre paquetes, los controllers solo llaman a services, ningún paquete de producto depende de `demo`.
 4. Comprobación de oro: `EventExportsGoldenTest` juega una jornada con guion fijo y datos ficticios (grupos individuales con comodín, equipos con bote; límite, tiempo, advertencias, descalificación, corrección, deshacer, cancelar y punto fuera de tiempo) y compara byte a byte todas las descargas del club con `server/src/test/resources/golden/` (`GoldenFiles`). Un cambio buscado se acepta con `-Dgolden.update=true` y se revisa el diff en la PR. La jornada al azar de `EventDaySimulationTest` no sirve: no se repite igual (punto 5 técnico de `../pendientes.md`).
-5. Casos JSON compartidos de las reglas del marcador: los mismos ficheros los pasan `TamboMatch` (Java) y `tambo_match.dart`. Fija el comportamiento antes de L7.
+5. Casos JSON compartidos de las reglas del marcador: `spec/scoring/tambo.json` (36 casos) lo pasan `TamboMatch` en Java (`TamboSharedCasesTest`) y en Dart (`tambo_shared_cases_test.dart`). Un caso nuevo de reglas se añade ahí, no en un solo lado. Fija el comportamiento antes de L7.
 
 ### L1 · Arreglos rápidos
 1. A `brackety_core`: `AsyncView`, diálogos de confirmar y de motivo, ejecutar acción con aviso. App y admin los importan.

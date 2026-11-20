@@ -36,10 +36,11 @@ jobs:
           # A change to this workflow tests everything it runs.
           all='^\.github/workflows/ci\.yml$'
           server=false
-          touched "^server/|$all" && server=true
+          # spec/ holds cases both the server and the app pass.
+          touched "^(server|spec)/|$all" && server=true
           flutter=()
           touched "^packages/|$all" && flutter+=('"packages/brackety_core"')
-          touched "^(app|packages)/|$all" && flutter+=('"app"')
+          touched "^(app|packages|spec)/|$all" && flutter+=('"app"')
           touched "^(admin|packages)/|$all" && flutter+=('"admin"')
           echo "server=$server" >> "$GITHUB_OUTPUT"
           echo "flutter=[$(IFS=,; echo "${flutter[*]}")]" >> "$GITHUB_OUTPUT"
