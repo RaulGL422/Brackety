@@ -128,7 +128,9 @@ class EventResultsTransfer {
                                     usernames.get(uuid(rs, "actor_account_id")),
                                     rs.getBoolean("automatic"),
                                     instant(rs, "at"),
-                                    rs.getLong("clock_ms")));
+                                    rs.getLong("clock_ms"),
+                                    rs.getObject("delta_ms", Long.class),
+                                    rs.getInt("points")));
                 });
         var matches = jdbc
                 .sql("select * from fight_match where event_id = ?")
@@ -268,9 +270,9 @@ class EventResultsTransfer {
             for (var a : m.actions()) {
                 var actionId = UUID.randomUUID();
                 actionIds.put(a.position(), actionId);
-                jdbc.sql(
-                                "insert into match_event (id, match_id, position, type, side, reason, target_event_id,"
-                                        + " actor_account_id, automatic, at, clock_ms) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+                jdbc.sql("insert into match_event (id, match_id, position, type, side, reason, target_event_id,"
+                                + " actor_account_id, automatic, at, clock_ms, delta_ms, points)"
+                                + " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
                         .params(
                                 actionId,
                                 id,
@@ -284,7 +286,9 @@ class EventResultsTransfer {
                                 accounts.get(a.actor()),
                                 a.automatic(),
                                 timestamp(a.at()),
-                                a.clockMs())
+                                a.clockMs(),
+                                a.deltaMs(),
+                                a.points() == null ? 1 : a.points())
                         .update();
             }
         }

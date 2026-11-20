@@ -106,6 +106,7 @@ class MatchController extends AsyncNotifier<MatchView> {
     Side? side,
     String? reason,
     Duration? delta,
+    int points = 1,
   }) async {
     final local = _local();
     if (local == null) return const ActionRefusal.server('');
@@ -113,7 +114,13 @@ class MatchController extends AsyncNotifier<MatchView> {
     final firstStart =
         action == MatchAction.start && local.view.status == MatchStatus.pending;
     final refusal =
-        local.refuse(action, side, now, delta: delta ?? Duration.zero) ??
+        local.refuse(
+          action,
+          side,
+          now,
+          delta: delta ?? Duration.zero,
+          points: points,
+        ) ??
         // A first start or a reopening takes the mat: not while another match is on it.
         ((firstStart || action == MatchAction.reopen) &&
                 _matBusy(local.view, now)
@@ -130,6 +137,7 @@ class MatchController extends AsyncNotifier<MatchView> {
       side: side,
       reason: reason,
       delta: delta,
+      points: points,
     );
     return queued ? null : const ActionRefusal.server('');
   }

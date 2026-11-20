@@ -184,7 +184,7 @@ class _RejectedDialog extends ConsumerWidget {
                 ListTile(
                   dense: true,
                   contentPadding: EdgeInsets.zero,
-                  title: Text(actionLabel(l10n, op.action)),
+                  title: Text(actionLabel(l10n, op.action, points: op.points)),
                   subtitle: Text(
                     [?sideLabel(l10n, op.side), ?op.reason].join(' · '),
                   ),

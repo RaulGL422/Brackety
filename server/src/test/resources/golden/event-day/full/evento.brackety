@@ -526,7 +526,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:00:00Z",
-        "clockMs" : 0
+        "clockMs" : 0,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 1,
         "type" : "POINT",
@@ -536,7 +538,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:00:04Z",
-        "clockMs" : 4000
+        "clockMs" : 4000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 2,
         "type" : "POINT",
@@ -546,7 +550,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:00:08Z",
-        "clockMs" : 8000
+        "clockMs" : 8000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 3,
         "type" : "POINT",
@@ -556,7 +562,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:00:12Z",
-        "clockMs" : 12000
+        "clockMs" : 12000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 4,
         "type" : "POINT",
@@ -566,7 +574,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:00:16Z",
-        "clockMs" : 16000
+        "clockMs" : 16000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 5,
         "type" : "FINISH",
@@ -576,7 +586,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:01:20Z",
-        "clockMs" : 60000
+        "clockMs" : 60000,
+        "deltaMs" : null,
+        "points" : 1
       } ]
     }, {
       "groupNumber" : 1,
@@ -608,7 +620,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:06:24Z",
-        "clockMs" : 0
+        "clockMs" : 0,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 1,
         "type" : "POINT",
@@ -618,7 +632,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:06:28Z",
-        "clockMs" : 4000
+        "clockMs" : 4000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 2,
         "type" : "POINT",
@@ -628,7 +644,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:06:32Z",
-        "clockMs" : 8000
+        "clockMs" : 8000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 3,
         "type" : "POINT",
@@ -638,7 +656,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:06:36Z",
-        "clockMs" : 12000
+        "clockMs" : 12000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 4,
         "type" : "POINT",
@@ -648,7 +668,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:06:40Z",
-        "clockMs" : 16000
+        "clockMs" : 16000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 5,
         "type" : "POINT",
@@ -658,7 +680,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:06:44Z",
-        "clockMs" : 20000
+        "clockMs" : 20000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 6,
         "type" : "POINT",
@@ -668,7 +692,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:06:48Z",
-        "clockMs" : 24000
+        "clockMs" : 24000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 7,
         "type" : "POINT",
@@ -678,7 +704,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:06:52Z",
-        "clockMs" : 28000
+        "clockMs" : 28000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 8,
         "type" : "POINT",
@@ -688,7 +716,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:06:56Z",
-        "clockMs" : 32000
+        "clockMs" : 32000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 9,
         "type" : "POINT",
@@ -698,7 +728,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:07:00Z",
-        "clockMs" : 36000
+        "clockMs" : 36000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 10,
         "type" : "POINT",
@@ -708,7 +740,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:07:04Z",
-        "clockMs" : 40000
+        "clockMs" : 40000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 11,
         "type" : "POINT",
@@ -718,7 +752,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:07:08Z",
-        "clockMs" : 44000
+        "clockMs" : 44000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 12,
         "type" : "POINT",
@@ -728,7 +764,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:07:12Z",
-        "clockMs" : 48000
+        "clockMs" : 48000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 13,
         "type" : "POINT",
@@ -738,7 +776,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:07:16Z",
-        "clockMs" : 52000
+        "clockMs" : 52000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 14,
         "type" : "POINT",
@@ -748,7 +788,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:07:20Z",
-        "clockMs" : 56000
+        "clockMs" : 56000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 15,
         "type" : "POINT",
@@ -758,7 +800,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:07:24Z",
-        "clockMs" : 60000
+        "clockMs" : 60000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 16,
         "type" : "FINISH",
@@ -768,7 +812,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:07:28Z",
-        "clockMs" : 60000
+        "clockMs" : 60000,
+        "deltaMs" : null,
+        "points" : 1
       } ]
     }, {
       "groupNumber" : 1,
@@ -800,7 +846,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:12:32Z",
-        "clockMs" : 0
+        "clockMs" : 0,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 1,
         "type" : "WARNING",
@@ -810,7 +858,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:12:36Z",
-        "clockMs" : 4000
+        "clockMs" : 4000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 2,
         "type" : "WARNING",
@@ -820,7 +870,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:12:40Z",
-        "clockMs" : 8000
+        "clockMs" : 8000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 3,
         "type" : "POINT",
@@ -830,7 +882,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:12:44Z",
-        "clockMs" : 12000
+        "clockMs" : 12000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 4,
         "type" : "FINISH",
@@ -840,7 +894,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:13:48Z",
-        "clockMs" : 60000
+        "clockMs" : 60000,
+        "deltaMs" : null,
+        "points" : 1
       } ]
     }, {
       "groupNumber" : 1,
@@ -872,7 +928,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:18:52Z",
-        "clockMs" : 0
+        "clockMs" : 0,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 1,
         "type" : "POINT",
@@ -882,7 +940,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:18:56Z",
-        "clockMs" : 4000
+        "clockMs" : 4000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 2,
         "type" : "POINT",
@@ -892,7 +952,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:19:00Z",
-        "clockMs" : 8000
+        "clockMs" : 8000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 3,
         "type" : "DISQUALIFICATION",
@@ -902,7 +964,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:19:04Z",
-        "clockMs" : 12000
+        "clockMs" : 12000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 4,
         "type" : "STOP",
@@ -912,7 +976,9 @@
         "actor" : "arbitro1",
         "automatic" : true,
         "at" : "2027-03-10T09:19:04Z",
-        "clockMs" : 12000
+        "clockMs" : 12000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 5,
         "type" : "FINISH",
@@ -922,7 +988,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:19:08Z",
-        "clockMs" : 12000
+        "clockMs" : 12000,
+        "deltaMs" : null,
+        "points" : 1
       } ]
     }, {
       "groupNumber" : 1,
@@ -954,7 +1022,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:24:12Z",
-        "clockMs" : 0
+        "clockMs" : 0,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 1,
         "type" : "POINT",
@@ -964,7 +1034,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:24:16Z",
-        "clockMs" : 4000
+        "clockMs" : 4000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 2,
         "type" : "POINT",
@@ -974,7 +1046,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:24:20Z",
-        "clockMs" : 8000
+        "clockMs" : 8000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 3,
         "type" : "POINT_REMOVED",
@@ -984,7 +1058,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:24:24Z",
-        "clockMs" : 12000
+        "clockMs" : 12000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 4,
         "type" : "POINT",
@@ -994,7 +1070,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:24:28Z",
-        "clockMs" : 16000
+        "clockMs" : 16000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 5,
         "type" : "UNDO",
@@ -1004,7 +1082,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:24:32Z",
-        "clockMs" : 20000
+        "clockMs" : 20000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 6,
         "type" : "POINT",
@@ -1014,7 +1094,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:24:36Z",
-        "clockMs" : 24000
+        "clockMs" : 24000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 7,
         "type" : "FINISH",
@@ -1024,7 +1106,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:25:40Z",
-        "clockMs" : 60000
+        "clockMs" : 60000,
+        "deltaMs" : null,
+        "points" : 1
       } ]
     }, {
       "groupNumber" : 1,
@@ -1056,7 +1140,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:30:44Z",
-        "clockMs" : 0
+        "clockMs" : 0,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 1,
         "type" : "POINT",
@@ -1066,7 +1152,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:30:48Z",
-        "clockMs" : 4000
+        "clockMs" : 4000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 2,
         "type" : "CANCEL",
@@ -1076,7 +1164,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:30:52Z",
-        "clockMs" : 8000
+        "clockMs" : 8000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 3,
         "type" : "START",
@@ -1086,7 +1176,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:30:56Z",
-        "clockMs" : 0
+        "clockMs" : 0,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 4,
         "type" : "POINT",
@@ -1096,7 +1188,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:31:00Z",
-        "clockMs" : 4000
+        "clockMs" : 4000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 5,
         "type" : "POINT",
@@ -1106,7 +1200,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:31:04Z",
-        "clockMs" : 8000
+        "clockMs" : 8000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 6,
         "type" : "POINT",
@@ -1116,7 +1212,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:32:08Z",
-        "clockMs" : 60000
+        "clockMs" : 60000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 7,
         "type" : "FINISH",
@@ -1126,7 +1224,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T09:32:12Z",
-        "clockMs" : 60000
+        "clockMs" : 60000,
+        "deltaMs" : null,
+        "points" : 1
       } ]
     }, {
       "groupNumber" : 2,
@@ -1158,7 +1258,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:37:16Z",
-        "clockMs" : 0
+        "clockMs" : 0,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 1,
         "type" : "POINT",
@@ -1168,7 +1270,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:37:20Z",
-        "clockMs" : 4000
+        "clockMs" : 4000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 2,
         "type" : "POINT",
@@ -1178,7 +1282,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:37:24Z",
-        "clockMs" : 8000
+        "clockMs" : 8000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 3,
         "type" : "POINT",
@@ -1188,7 +1294,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:37:28Z",
-        "clockMs" : 12000
+        "clockMs" : 12000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 4,
         "type" : "POINT",
@@ -1198,7 +1306,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:37:32Z",
-        "clockMs" : 16000
+        "clockMs" : 16000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 5,
         "type" : "FINISH",
@@ -1208,7 +1318,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:38:36Z",
-        "clockMs" : 60000
+        "clockMs" : 60000,
+        "deltaMs" : null,
+        "points" : 1
       } ]
     }, {
       "groupNumber" : 2,
@@ -1240,7 +1352,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:43:40Z",
-        "clockMs" : 0
+        "clockMs" : 0,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 1,
         "type" : "POINT",
@@ -1250,7 +1364,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:43:44Z",
-        "clockMs" : 4000
+        "clockMs" : 4000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 2,
         "type" : "POINT",
@@ -1260,7 +1376,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:43:48Z",
-        "clockMs" : 8000
+        "clockMs" : 8000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 3,
         "type" : "POINT",
@@ -1270,7 +1388,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:43:52Z",
-        "clockMs" : 12000
+        "clockMs" : 12000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 4,
         "type" : "POINT",
@@ -1280,7 +1400,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:43:56Z",
-        "clockMs" : 16000
+        "clockMs" : 16000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 5,
         "type" : "POINT",
@@ -1290,7 +1412,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:44:00Z",
-        "clockMs" : 20000
+        "clockMs" : 20000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 6,
         "type" : "POINT",
@@ -1300,7 +1424,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:44:04Z",
-        "clockMs" : 24000
+        "clockMs" : 24000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 7,
         "type" : "POINT",
@@ -1310,7 +1436,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:44:08Z",
-        "clockMs" : 28000
+        "clockMs" : 28000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 8,
         "type" : "POINT",
@@ -1320,7 +1448,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:44:12Z",
-        "clockMs" : 32000
+        "clockMs" : 32000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 9,
         "type" : "POINT",
@@ -1330,7 +1460,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:44:16Z",
-        "clockMs" : 36000
+        "clockMs" : 36000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 10,
         "type" : "POINT",
@@ -1340,7 +1472,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:44:20Z",
-        "clockMs" : 40000
+        "clockMs" : 40000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 11,
         "type" : "POINT",
@@ -1350,7 +1484,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:44:24Z",
-        "clockMs" : 44000
+        "clockMs" : 44000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 12,
         "type" : "POINT",
@@ -1360,7 +1496,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:44:28Z",
-        "clockMs" : 48000
+        "clockMs" : 48000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 13,
         "type" : "POINT",
@@ -1370,7 +1508,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:44:32Z",
-        "clockMs" : 52000
+        "clockMs" : 52000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 14,
         "type" : "POINT",
@@ -1380,7 +1520,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:44:36Z",
-        "clockMs" : 56000
+        "clockMs" : 56000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 15,
         "type" : "POINT",
@@ -1390,7 +1532,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:44:40Z",
-        "clockMs" : 60000
+        "clockMs" : 60000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 16,
         "type" : "FINISH",
@@ -1400,7 +1544,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:44:44Z",
-        "clockMs" : 60000
+        "clockMs" : 60000,
+        "deltaMs" : null,
+        "points" : 1
       } ]
     }, {
       "groupNumber" : 2,
@@ -1432,7 +1578,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:49:48Z",
-        "clockMs" : 0
+        "clockMs" : 0,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 1,
         "type" : "WARNING",
@@ -1442,7 +1590,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:49:52Z",
-        "clockMs" : 4000
+        "clockMs" : 4000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 2,
         "type" : "WARNING",
@@ -1452,7 +1602,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:49:56Z",
-        "clockMs" : 8000
+        "clockMs" : 8000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 3,
         "type" : "POINT",
@@ -1462,7 +1614,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:50:00Z",
-        "clockMs" : 12000
+        "clockMs" : 12000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 4,
         "type" : "FINISH",
@@ -1472,7 +1626,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:51:04Z",
-        "clockMs" : 60000
+        "clockMs" : 60000,
+        "deltaMs" : null,
+        "points" : 1
       } ]
     }, {
       "groupNumber" : 2,
@@ -1504,7 +1660,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:56:08Z",
-        "clockMs" : 0
+        "clockMs" : 0,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 1,
         "type" : "POINT",
@@ -1514,7 +1672,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:56:12Z",
-        "clockMs" : 4000
+        "clockMs" : 4000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 2,
         "type" : "POINT",
@@ -1524,7 +1684,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:56:16Z",
-        "clockMs" : 8000
+        "clockMs" : 8000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 3,
         "type" : "DISQUALIFICATION",
@@ -1534,7 +1696,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:56:20Z",
-        "clockMs" : 12000
+        "clockMs" : 12000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 4,
         "type" : "STOP",
@@ -1544,7 +1708,9 @@
         "actor" : "arbitro2",
         "automatic" : true,
         "at" : "2027-03-10T09:56:20Z",
-        "clockMs" : 12000
+        "clockMs" : 12000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 5,
         "type" : "FINISH",
@@ -1554,7 +1720,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T09:56:24Z",
-        "clockMs" : 12000
+        "clockMs" : 12000,
+        "deltaMs" : null,
+        "points" : 1
       } ]
     }, {
       "groupNumber" : 2,
@@ -1586,7 +1754,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:01:28Z",
-        "clockMs" : 0
+        "clockMs" : 0,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 1,
         "type" : "POINT",
@@ -1596,7 +1766,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:01:32Z",
-        "clockMs" : 4000
+        "clockMs" : 4000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 2,
         "type" : "POINT",
@@ -1606,7 +1778,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:01:36Z",
-        "clockMs" : 8000
+        "clockMs" : 8000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 3,
         "type" : "POINT_REMOVED",
@@ -1616,7 +1790,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:01:40Z",
-        "clockMs" : 12000
+        "clockMs" : 12000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 4,
         "type" : "POINT",
@@ -1626,7 +1802,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:01:44Z",
-        "clockMs" : 16000
+        "clockMs" : 16000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 5,
         "type" : "UNDO",
@@ -1636,7 +1814,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:01:48Z",
-        "clockMs" : 20000
+        "clockMs" : 20000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 6,
         "type" : "POINT",
@@ -1646,7 +1826,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:01:52Z",
-        "clockMs" : 24000
+        "clockMs" : 24000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 7,
         "type" : "FINISH",
@@ -1656,7 +1838,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:02:56Z",
-        "clockMs" : 60000
+        "clockMs" : 60000,
+        "deltaMs" : null,
+        "points" : 1
       } ]
     }, {
       "groupNumber" : 2,
@@ -1688,7 +1872,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:08:00Z",
-        "clockMs" : 0
+        "clockMs" : 0,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 1,
         "type" : "POINT",
@@ -1698,7 +1884,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:08:04Z",
-        "clockMs" : 4000
+        "clockMs" : 4000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 2,
         "type" : "CANCEL",
@@ -1708,7 +1896,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:08:08Z",
-        "clockMs" : 8000
+        "clockMs" : 8000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 3,
         "type" : "START",
@@ -1718,7 +1908,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:08:12Z",
-        "clockMs" : 0
+        "clockMs" : 0,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 4,
         "type" : "POINT",
@@ -1728,7 +1920,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:08:16Z",
-        "clockMs" : 4000
+        "clockMs" : 4000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 5,
         "type" : "POINT",
@@ -1738,7 +1932,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:08:20Z",
-        "clockMs" : 8000
+        "clockMs" : 8000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 6,
         "type" : "POINT",
@@ -1748,7 +1944,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:09:24Z",
-        "clockMs" : 60000
+        "clockMs" : 60000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 7,
         "type" : "FINISH",
@@ -1758,7 +1956,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:09:28Z",
-        "clockMs" : 60000
+        "clockMs" : 60000,
+        "deltaMs" : null,
+        "points" : 1
       } ]
     }, {
       "groupNumber" : 3,
@@ -1790,7 +1990,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T10:14:32Z",
-        "clockMs" : 0
+        "clockMs" : 0,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 1,
         "type" : "POINT",
@@ -1800,7 +2002,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T10:14:36Z",
-        "clockMs" : 4000
+        "clockMs" : 4000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 2,
         "type" : "POINT",
@@ -1810,7 +2014,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T10:14:40Z",
-        "clockMs" : 8000
+        "clockMs" : 8000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 3,
         "type" : "POINT",
@@ -1820,7 +2026,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T10:14:44Z",
-        "clockMs" : 12000
+        "clockMs" : 12000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 4,
         "type" : "POINT",
@@ -1830,7 +2038,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T10:14:48Z",
-        "clockMs" : 16000
+        "clockMs" : 16000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 5,
         "type" : "FINISH",
@@ -1840,7 +2050,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T10:17:52Z",
-        "clockMs" : 180000
+        "clockMs" : 180000,
+        "deltaMs" : null,
+        "points" : 1
       } ]
     }, {
       "groupNumber" : 3,
@@ -1872,7 +2084,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:22:56Z",
-        "clockMs" : 0
+        "clockMs" : 0,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 1,
         "type" : "POINT",
@@ -1882,7 +2096,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:23:00Z",
-        "clockMs" : 4000
+        "clockMs" : 4000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 2,
         "type" : "POINT",
@@ -1892,7 +2108,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:23:04Z",
-        "clockMs" : 8000
+        "clockMs" : 8000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 3,
         "type" : "POINT",
@@ -1902,7 +2120,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:23:08Z",
-        "clockMs" : 12000
+        "clockMs" : 12000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 4,
         "type" : "POINT",
@@ -1912,7 +2132,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:23:12Z",
-        "clockMs" : 16000
+        "clockMs" : 16000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 5,
         "type" : "POINT",
@@ -1922,7 +2144,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:23:16Z",
-        "clockMs" : 20000
+        "clockMs" : 20000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 6,
         "type" : "POINT",
@@ -1932,7 +2156,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:23:20Z",
-        "clockMs" : 24000
+        "clockMs" : 24000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 7,
         "type" : "POINT",
@@ -1942,7 +2168,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:23:24Z",
-        "clockMs" : 28000
+        "clockMs" : 28000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 8,
         "type" : "POINT",
@@ -1952,7 +2180,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:23:28Z",
-        "clockMs" : 32000
+        "clockMs" : 32000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 9,
         "type" : "POINT",
@@ -1962,7 +2192,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:23:32Z",
-        "clockMs" : 36000
+        "clockMs" : 36000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 10,
         "type" : "POINT",
@@ -1972,7 +2204,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:23:36Z",
-        "clockMs" : 40000
+        "clockMs" : 40000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 11,
         "type" : "POINT",
@@ -1982,7 +2216,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:23:40Z",
-        "clockMs" : 44000
+        "clockMs" : 44000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 12,
         "type" : "POINT",
@@ -1992,7 +2228,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:23:44Z",
-        "clockMs" : 48000
+        "clockMs" : 48000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 13,
         "type" : "POINT",
@@ -2002,7 +2240,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:23:48Z",
-        "clockMs" : 52000
+        "clockMs" : 52000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 14,
         "type" : "POINT",
@@ -2012,7 +2252,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:23:52Z",
-        "clockMs" : 56000
+        "clockMs" : 56000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 15,
         "type" : "POINT",
@@ -2022,7 +2264,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:23:56Z",
-        "clockMs" : 60000
+        "clockMs" : 60000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 16,
         "type" : "POINT",
@@ -2032,7 +2276,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:24:00Z",
-        "clockMs" : 64000
+        "clockMs" : 64000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 17,
         "type" : "POINT",
@@ -2042,7 +2288,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:24:04Z",
-        "clockMs" : 68000
+        "clockMs" : 68000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 18,
         "type" : "FINISH",
@@ -2052,7 +2300,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:27:08Z",
-        "clockMs" : 180000
+        "clockMs" : 180000,
+        "deltaMs" : null,
+        "points" : 1
       } ]
     }, {
       "groupNumber" : 3,
@@ -2084,7 +2334,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T10:32:12Z",
-        "clockMs" : 0
+        "clockMs" : 0,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 1,
         "type" : "WARNING",
@@ -2094,7 +2346,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T10:32:16Z",
-        "clockMs" : 4000
+        "clockMs" : 4000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 2,
         "type" : "WARNING",
@@ -2104,7 +2358,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T10:32:20Z",
-        "clockMs" : 8000
+        "clockMs" : 8000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 3,
         "type" : "POINT",
@@ -2114,7 +2370,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T10:32:24Z",
-        "clockMs" : 12000
+        "clockMs" : 12000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 4,
         "type" : "FINISH",
@@ -2124,7 +2382,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T10:35:28Z",
-        "clockMs" : 180000
+        "clockMs" : 180000,
+        "deltaMs" : null,
+        "points" : 1
       } ]
     }, {
       "groupNumber" : 3,
@@ -2156,7 +2416,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:40:32Z",
-        "clockMs" : 0
+        "clockMs" : 0,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 1,
         "type" : "POINT",
@@ -2166,7 +2428,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:40:36Z",
-        "clockMs" : 4000
+        "clockMs" : 4000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 2,
         "type" : "POINT",
@@ -2176,7 +2440,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:40:40Z",
-        "clockMs" : 8000
+        "clockMs" : 8000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 3,
         "type" : "DISQUALIFICATION",
@@ -2186,7 +2452,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:40:44Z",
-        "clockMs" : 12000
+        "clockMs" : 12000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 4,
         "type" : "STOP",
@@ -2196,7 +2464,9 @@
         "actor" : "arbitro2",
         "automatic" : true,
         "at" : "2027-03-10T10:40:44Z",
-        "clockMs" : 12000
+        "clockMs" : 12000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 5,
         "type" : "FINISH",
@@ -2206,7 +2476,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:40:48Z",
-        "clockMs" : 12000
+        "clockMs" : 12000,
+        "deltaMs" : null,
+        "points" : 1
       } ]
     }, {
       "groupNumber" : 3,
@@ -2238,7 +2510,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T10:45:52Z",
-        "clockMs" : 0
+        "clockMs" : 0,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 1,
         "type" : "POINT",
@@ -2248,7 +2522,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T10:45:56Z",
-        "clockMs" : 4000
+        "clockMs" : 4000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 2,
         "type" : "POINT",
@@ -2258,7 +2534,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T10:46:00Z",
-        "clockMs" : 8000
+        "clockMs" : 8000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 3,
         "type" : "POINT_REMOVED",
@@ -2268,7 +2546,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T10:46:04Z",
-        "clockMs" : 12000
+        "clockMs" : 12000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 4,
         "type" : "POINT",
@@ -2278,7 +2558,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T10:46:08Z",
-        "clockMs" : 16000
+        "clockMs" : 16000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 5,
         "type" : "UNDO",
@@ -2288,7 +2570,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T10:46:12Z",
-        "clockMs" : 20000
+        "clockMs" : 20000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 6,
         "type" : "POINT",
@@ -2298,7 +2582,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T10:46:16Z",
-        "clockMs" : 24000
+        "clockMs" : 24000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 7,
         "type" : "FINISH",
@@ -2308,7 +2594,9 @@
         "actor" : "arbitro1",
         "automatic" : false,
         "at" : "2027-03-10T10:49:20Z",
-        "clockMs" : 180000
+        "clockMs" : 180000,
+        "deltaMs" : null,
+        "points" : 1
       } ]
     }, {
       "groupNumber" : 3,
@@ -2340,7 +2628,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:54:24Z",
-        "clockMs" : 0
+        "clockMs" : 0,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 1,
         "type" : "POINT",
@@ -2350,7 +2640,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:54:28Z",
-        "clockMs" : 4000
+        "clockMs" : 4000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 2,
         "type" : "CANCEL",
@@ -2360,7 +2652,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:54:32Z",
-        "clockMs" : 8000
+        "clockMs" : 8000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 3,
         "type" : "START",
@@ -2370,7 +2664,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:54:36Z",
-        "clockMs" : 0
+        "clockMs" : 0,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 4,
         "type" : "POINT",
@@ -2380,7 +2676,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:54:40Z",
-        "clockMs" : 4000
+        "clockMs" : 4000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 5,
         "type" : "POINT",
@@ -2390,7 +2688,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:54:44Z",
-        "clockMs" : 8000
+        "clockMs" : 8000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 6,
         "type" : "POINT",
@@ -2400,7 +2700,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:57:48Z",
-        "clockMs" : 180000
+        "clockMs" : 180000,
+        "deltaMs" : null,
+        "points" : 1
       }, {
         "position" : 7,
         "type" : "FINISH",
@@ -2410,7 +2712,9 @@
         "actor" : "arbitro2",
         "automatic" : false,
         "at" : "2027-03-10T10:57:52Z",
-        "clockMs" : 180000
+        "clockMs" : 180000,
+        "deltaMs" : null,
+        "points" : 1
       } ]
     } ],
     "empty" : false

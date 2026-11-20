@@ -29,10 +29,10 @@ void main() {
     ]);
 
     expect(csv.split('\r\n'), [
-      '﻿brackety-offline-ops;2',
-      'opId;matchId;type;side;reason;at;knownEvents;actor;deltaMs',
-      'op1;m1;WARNING;BLUE;"Agarre; sin soltar";2027-03-10T09:00:00.000Z;2;a1;',
-      'op2;m1;CLOCK_ADJUST;;;2027-03-10T09:00:00.000Z;3;a1;-10000',
+      '﻿brackety-offline-ops;3',
+      'opId;matchId;type;side;reason;at;knownEvents;actor;deltaMs;points',
+      'op1;m1;WARNING;BLUE;"Agarre; sin soltar";2027-03-10T09:00:00.000Z;2;a1;;1',
+      'op2;m1;CLOCK_ADJUST;;;2027-03-10T09:00:00.000Z;3;a1;-10000;1',
       '',
     ]);
   });

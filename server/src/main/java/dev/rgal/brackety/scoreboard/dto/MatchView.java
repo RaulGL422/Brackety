@@ -59,6 +59,7 @@ public record MatchView(
     /**
      * {@code gaveRivalPoint}: a second one-hand warning that gave the rival a point. {@code opId}: the device
      * action it came from, or null. {@code deltaMs}: for a CLOCK_ADJUST, the time added (negative: taken).
+     * {@code points}: what a POINT or POINT_REMOVED was worth (grappling: 1 to 4), else 1.
      */
     public record TimelineEntry(
             UUID id,
@@ -73,7 +74,8 @@ public record MatchView(
             boolean gaveRivalPoint,
             UUID opId,
             Long deltaMs,
-            boolean overtime) {}
+            boolean overtime,
+            int points) {}
 
     /**
      * {@code reason}: why the first action clashed (KNOWN_EVENTS, RULES, AGE, MAT_BUSY, FIGHTER_BUSY).
@@ -91,5 +93,6 @@ public record MatchView(
             Instant at,
             Instant receivedAt,
             String cause,
-            Long deltaMs) {}
+            Long deltaMs,
+            int points) {}
 }

@@ -1490,6 +1490,18 @@ abstract class AppLocalizations {
   /// **'Parada'**
   String get tlStop;
 
+  /// No description provided for @tlPoints.
+  ///
+  /// In es, this message translates to:
+  /// **'{points} puntos'**
+  String tlPoints(int points);
+
+  /// No description provided for @tlPointsRemoved.
+  ///
+  /// In es, this message translates to:
+  /// **'{points} puntos quitados'**
+  String tlPointsRemoved(int points);
+
   /// No description provided for @tlPoint.
   ///
   /// In es, this message translates to:

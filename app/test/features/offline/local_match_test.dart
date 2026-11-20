@@ -46,6 +46,43 @@ void main() {
     expect(view.red.disqualified, isTrue);
   });
 
+  // Without network a +4 counts four and says so in the timeline; a value no button has is
+  // left out, as the server would refuse it.
+  test('a queued point keeps its value', () {
+    const grappling = Scoring(
+      actions: [
+        ScoringAction(value: 2, label: 'Derribo'),
+        ScoringAction(value: 4, label: 'Montada o espalda'),
+      ],
+      warningsPerRivalPoint: 1,
+      warningsToDisqualify: 4,
+      superiorityGap: 15,
+      pointsAfterTime: false,
+      disqualificationScores: false,
+      oneHandWarnings: false,
+      submissions: true,
+      tiebreaks: true,
+    );
+    OfflineOp point(String id, int second, int points) => OfflineOp(
+      opId: id,
+      matchId: 'm1',
+      action: MatchAction.point,
+      side: Side.red,
+      points: points,
+      at: at(second),
+      knownEvents: 0,
+    );
+
+    final view = LocalMatch.project(serverMatch('m1', scoring: grappling), [
+      op(MatchAction.start, 0),
+      point('four', 1, 4),
+      point('three', 2, 3),
+    ], at(10)).view;
+
+    expect(view.red.points, 4);
+    expect(view.timeline.map((e) => e.points), [1, 4]);
+  });
+
   group('a match with queued actions', () {
     test('replays them on the server view with the device clock', () {
       final local = LocalMatch.project(serverMatch('m1'), [

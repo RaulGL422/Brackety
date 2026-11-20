@@ -68,6 +68,17 @@ final class SheetText {
         return (deltaMs > 0 ? "añade " : "quita ") + Math.abs(deltaMs) / 1000 + " s";
     }
 
+    /** With its points when a point (added or removed) is worth more than one, in words (grappling: "4 puntos"). */
+    static String action(String type, int points) {
+        if (points > 1 && type.equals("POINT")) {
+            return points + " puntos";
+        }
+        if (points > 1 && type.equals("POINT_REMOVED")) {
+            return "Quitar " + points + " puntos";
+        }
+        return action(type);
+    }
+
     /** Unknown types (added later to the scoreboard) keep their code. */
     static String action(String type) {
         return switch (type) {
@@ -83,6 +94,8 @@ final class SheetText {
             case "FINISH" -> "Finalizar combate";
             case "CANCEL" -> "Cancelar combate";
             case "REOPEN" -> "Reabrir combate";
+            case "SUBMISSION" -> "Sumisión";
+            case "EXTRA_TIME" -> "Ganador de la prórroga";
             default -> type;
         };
     }

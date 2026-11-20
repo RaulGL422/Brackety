@@ -14,6 +14,7 @@ class OfflineOp {
     this.side,
     this.reason,
     this.delta,
+    this.points = 1,
     this.rejected = false,
     this.account,
   });
@@ -28,6 +29,7 @@ class OfflineOp {
       final int ms => Duration(milliseconds: ms),
       _ => null,
     },
+    points: json['points'] as int? ?? 1,
     at: DateTime.parse(json['at'] as String),
     knownEvents: json['knownEvents'] as int,
     rejected: json['rejected'] as bool? ?? false,
@@ -42,6 +44,9 @@ class OfflineOp {
 
   /// For a clock adjustment: the time added (negative: taken away).
   final Duration? delta;
+
+  /// What a point (added or removed) is worth (grappling: 1 to 4); 1 for the rest.
+  final int points;
   final DateTime at;
   final int knownEvents;
   final bool rejected;
@@ -60,6 +65,7 @@ class OfflineOp {
         side: side,
         reason: reason,
         delta: delta,
+        points: points,
         at: at,
         knownEvents: knownEvents,
         rejected: rejected,
@@ -72,6 +78,7 @@ class OfflineOp {
     'side': sideToJson(side),
     'reason': reason,
     'deltaMs': delta?.inMilliseconds,
+    'points': points,
     'opId': opId,
     'at': at.toUtc().toIso8601String(),
     'knownEvents': knownEvents,

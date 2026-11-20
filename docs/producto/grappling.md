@@ -30,4 +30,4 @@ Pedido de Raul (2026-11-20): un evento de grappling con grupos como la F1 indivi
 - Juez y jefe de tapiz con dispositivo propio: un árbitro por tapiz apunta lo que decide el equipo.
 
 ## Estado
-G1 en PR (#151). G2a hecha (2026-11-20): reglas en la modalidad, grappling disponible, duración por categoría, paquete v4. Siguiente: G2b.
+G1 (#151) y G2a (#153) fusionadas. G2b hecha (2026-11-20): el valor de cada punto, Sumisión y Prórroga por la API, la cola sin red (CSV de rescate v3), el historial, los CSV y el traspaso del portátil a la Pi, que además ya conserva los ajustes de reloj. Siguiente: G2c.

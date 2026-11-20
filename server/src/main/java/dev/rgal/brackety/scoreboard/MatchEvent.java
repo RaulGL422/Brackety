@@ -39,6 +39,9 @@ public class MatchEvent {
     /** For a CLOCK_ADJUST, the time added to the clock (negative: taken away); else null. */
     private Long deltaMs;
 
+    /** What a POINT or POINT_REMOVED is worth; 1 for the rest. */
+    private int points = 1;
+
     protected MatchEvent() {}
 
     MatchEvent(
@@ -53,7 +56,8 @@ public class MatchEvent {
             Instant at,
             Duration clock,
             UUID opId,
-            Long deltaMs) {
+            Long deltaMs,
+            int points) {
         this.matchId = matchId;
         this.position = position;
         this.type = type;
@@ -66,6 +70,7 @@ public class MatchEvent {
         this.clockMs = clock.toMillis();
         this.opId = opId;
         this.deltaMs = deltaMs;
+        this.points = points;
     }
 
     public UUID getId() {
@@ -121,7 +126,11 @@ public class MatchEvent {
         return deltaMs;
     }
 
+    public int getPoints() {
+        return points;
+    }
+
     MatchState.Entry toEntry() {
-        return new MatchState.Entry(id, type, side, at, targetEventId, deltaMs == null ? 0 : deltaMs);
+        return new MatchState.Entry(id, type, side, at, targetEventId, deltaMs == null ? 0 : deltaMs, points);
     }
 }
