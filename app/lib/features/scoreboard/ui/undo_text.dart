@@ -2,18 +2,23 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../data/match_view.dart';
 import 'corner_panel.dart';
 
-/// What an undo of [entry] takes back, for its button and the message after it: "+1 Rojo".
+/// What an undo of [entry] takes back, for its button and the message after it: "+2 Rojo".
 String undoTarget(AppLocalizations l10n, TimelineEntry entry) {
   final corner = entry.side == null ? '' : cornerName(l10n, entry.side!);
   return switch (entry.action) {
     MatchAction.warning => l10n.whatWarning(corner),
     MatchAction.oneHandWarning => l10n.whatOneHand(corner),
     MatchAction.disqualification => l10n.whatDisqualification(corner),
-    MatchAction.pointRemoved => l10n.whatPointRemoved(corner),
+    MatchAction.pointRemoved => l10n.whatPointRemoved(entry.points, corner),
     MatchAction.clockAdjust => l10n.whatClockAdjust(
       signedSeconds(entry.delta ?? Duration.zero),
     ),
-    _ => l10n.whatPoint(corner),
+    MatchAction.submission => l10n.whatFinish(
+      entry.reason ?? l10n.tlSubmission,
+      corner,
+    ),
+    MatchAction.extraTime => l10n.whatFinish(l10n.tlExtraTime, corner),
+    _ => l10n.whatPoint(entry.points, corner),
   };
 }
 

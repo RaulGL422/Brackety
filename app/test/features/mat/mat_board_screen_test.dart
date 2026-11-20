@@ -107,7 +107,7 @@ void main() {
           ),
         );
         expect(
-          find.text('Group 3, ages 7-8', skipOffstage: false),
+          find.text('Group 3 · 7-8', skipOffstage: false),
           findsNWidgets(2),
         );
         expect(find.text('Recommended match'), findsOneWidget);

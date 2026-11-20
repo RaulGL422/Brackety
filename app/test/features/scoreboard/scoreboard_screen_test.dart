@@ -727,6 +727,8 @@ void main() {
       expect(repository.sent.last, (MatchAction.point, Side.red, null));
       expect(repository.sentPoints.last, 4);
       expect(find.text('4'), findsWidgets);
+      // Undo says the value it takes back.
+      expect(find.textContaining('+4 Red'), findsWidgets);
       expect(tester.takeException(), isNull);
 
       await tester.pumpWidget(const SizedBox());

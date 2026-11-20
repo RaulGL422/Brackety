@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
  * downloads work as for any phase. Its creator is its club; it starts from its sport's rules.
  */
 @Service
-class NewEventService {
+public class NewEventService {
 
     private final LeagueRepository leagues;
     private final EventRepository events;
@@ -42,7 +42,7 @@ class NewEventService {
     }
 
     @Transactional
-    PhaseResponse create(UUID accountId, NewEventRequest request) {
+    public PhaseResponse create(UUID accountId, NewEventRequest request) {
         if (!request.discipline().isAvailable()) {
             throw EventException.invalid("That discipline has no scoreboard yet.");
         }

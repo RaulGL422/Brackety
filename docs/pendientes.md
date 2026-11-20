@@ -12,6 +12,8 @@ Lo que espera a alguien, ordenado por quién tiene que actuar. Lo hecho se borra
 - [ ] Grupo con sobrante: promedio por combate, puntos brutos o caso a caso; será opción del evento.
 - [ ] Equipos en torneos: plantilla, suplentes y entrenadores. Categorías reales por equipos y si hay ranking de equipos (`modulos/prototipo-f1-equipos.md`).
 - [ ] Plantillas de deporte (`producto/plantillas-deporte.md`): ¿dueño la cuenta o el club? ¿galería pública o primero por enlace? ¿moderación previa o denuncias? ¿autor visible?
+- [ ] Grappling: una persona va a una sola categoría por evento. ¿Gi y sin gi como dos eventos, o varias categorías por persona?
+- [ ] Un evento suelto sale en Mis eventos como liga («Abrir la liga», podio de liga): ¿botón directo a su panel?
 - [ ] Gestión del club (`producto/gestion-club.md`): ¿se amplía el alcance? Si se cobra o factura: forma jurídica, asesor y contratos.
 
 ### Técnicas y diseño
@@ -27,6 +29,7 @@ Lo que espera a alguien, ordenado por quién tiene que actuar. Lo hecho se borra
 Todo está fusionado; falta comprobarlo en debug o en la Pi.
 - [ ] `auth` completo: registro, login y bloqueo, verificación, recuperación, Google, perfiles, cambio de email, borrado y restaurar, exportación; admin con superadmin (`modulos/auth.md`).
 - [ ] `legal-paginas`: páginas, casilla del registro, pie y ajustes.
+- [ ] Grappling (G1-G5): escenario `grappling`; marcador, prórroga, puntos de clasificación y «Nuevo evento» (`producto/grappling.md`).
 - [ ] Liga y fases: liga primero, podios de un toque, reinscripción, puntos por asistir (#81, #86, #89).
 - [ ] Tiempo real: el marcador, el tablero, Tapices y Puntuaciones se actualizan solos.
 - [ ] Offline: marcador sin red en APK y web, revisión del club (Aplicar o Descartar) con un combate en revisión, rescate por CSV.
@@ -67,6 +70,8 @@ Todo está fusionado; falta comprobarlo en debug o en la Pi.
 - [ ] Emails de auth a la cola con reintentos de `notificaciones`; enlaces con token en `api.log` cuando no hay Resend.
 - [ ] Retirar `staffNames` (y `event_staff_name`, M6) ahora que el personal tiene cuenta propia.
 - [ ] Reparto no reproducible: con la misma entrada, los empates del reparto (tapiz libre para el bote, combate propuesto) se deciden por el orden de `HashMap<UUID, …>` (`MatFloor`, `MatPlanner`, `CategoryRoster`), que cambia con los ids. Desempatar por número de tapiz, grupo y orden del combate; cambia comportamiento, PR aparte. Hasta entonces una semilla de `EventDaySimulationTest` no repite el mismo día.
+- [ ] Tapiz: al acabar un descanso la lista no se refresca sola; hay que salir y volver a entrar.
+- [ ] Marcador en móvil (360 px): el texto de «Deshacer» corta el tiempo («+1 Rojo · 0…»).
 - [ ] Refresh idempotente: caché en memoria, supone una sola instancia de la API.
 - [ ] Register y forgot: pequeña diferencia de tiempo según exista la cuenta (aceptado por ahora).
 - [ ] `opId` único por combate, no global; límite de tamaño del paquete `.brackety`; revisar CVE (Dependabot u OSV).

@@ -592,11 +592,6 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String categoryAges(String name) {
-    return '$name años';
-  }
-
-  @override
   String get sortByName => 'Nombre';
 
   @override
@@ -717,7 +712,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String matGroupHeader(int number, String category) {
-    return 'Grupo $number, de $category años';
+    return 'Grupo $number · $category';
   }
 
   @override
@@ -979,8 +974,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String whatPointRemoved(String corner) {
-    return '−1 $corner';
+  String whatPointRemoved(int points, String corner) {
+    return '−$points $corner';
   }
 
   @override
@@ -2284,8 +2279,13 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String whatPoint(String corner) {
-    return '+1 $corner';
+  String whatPoint(int points, String corner) {
+    return '+$points $corner';
+  }
+
+  @override
+  String whatFinish(String what, String corner) {
+    return '$what $corner';
   }
 
   @override

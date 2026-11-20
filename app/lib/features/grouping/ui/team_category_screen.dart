@@ -58,7 +58,7 @@ class TeamCategoryScreen extends ConsumerWidget {
             fallback: '/events/$eventId/categories',
           ),
           leadingWidth: UpButton.leadingWidth(context),
-          title: Text(l10n.categoryAges(categoryName)),
+          title: Text(categoryName),
           actions: [
             AppBarAction(
               icon: Icons.person_outline,
