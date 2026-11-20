@@ -10,7 +10,7 @@ Estados: **pendiente** · **en curso** · **en pruebas** (hecho; falta la prueba
 
 ## Ahora
 - Calidad (`producto/plan-limpieza.md`): L0 completa (2026-11-20): métricas en el CI (#137), ArchUnit (#138), lints estrictos (#139), casos de reglas compartidos (#142) y comprobación de oro (#143, #149). Destapó el orden de nombres con acento en Linux (#144). Siguiente: L1.
-- Grappling FELODA (`producto/grappling.md`), antes que L1: G1 motor (#151) y G2a reglas como datos (#153) fusionadas; G2b acciones con valor, sumisión y prórroga por la API y sin red en PR. Siguiente: G2c.
+- Grappling FELODA (`producto/grappling.md`), antes que L1: G1 motor (#151), G2a reglas como datos (#153) y G2b acciones con valor (#154) fusionadas; G2c clasificación FELODA en PR. Siguiente: G3 marcador.
 - Exportaciones a medida (`producto/exportaciones.md`): aprobadas en lo básico, por programar.
 - Esperando a Raul: detalles de la competición del 20-12, puntuación de la F2 y las preguntas de `pendientes.md`.
 
@@ -53,4 +53,4 @@ Estados: **pendiente** · **en curso** · **en pruebas** (hecho; falta la prueba
 | Fuera `maxGroupsPerMat` | `producto/calidad.md` | cerrado (#134) |
 | Plugins `playwright` y `frontend-design` | `08-ejecucion-local.md` | cerrado (#54) |
 | Plantillas de deporte y arbitraje | `producto/plantillas-deporte.md` | idea, preguntas en `pendientes.md` |
-| Grappling FELODA (G1-G5) | `producto/grappling.md` | G1 (#151), G2a (#153) y G2b hechas |
+| Grappling FELODA (G1-G5) | `producto/grappling.md` | G1-G2b fusionadas (#151, #153, #154); G2c hecha |

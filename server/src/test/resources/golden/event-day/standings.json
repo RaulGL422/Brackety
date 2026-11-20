@@ -12,7 +12,9 @@
   "matches" : 3,
   "teamNumber" : 2,
   "personId" : "id-4",
-  "organizationName" : null
+  "organizationName" : null,
+  "wins" : null,
+  "classificationPoints" : null
 }, {
   "position" : 1,
   "participantId" : "id-31",
@@ -27,7 +29,9 @@
   "matches" : 3,
   "teamNumber" : 2,
   "personId" : "id-8",
-  "organizationName" : null
+  "organizationName" : null,
+  "wins" : null,
+  "classificationPoints" : null
 }, {
   "position" : 1,
   "participantId" : "id-22",
@@ -42,7 +46,9 @@
   "matches" : 3,
   "teamNumber" : null,
   "personId" : "id-9",
-  "organizationName" : null
+  "organizationName" : null,
+  "wins" : null,
+  "classificationPoints" : null
 }, {
   "position" : 1,
   "participantId" : "id-23",
@@ -57,7 +63,9 @@
   "matches" : 3,
   "teamNumber" : null,
   "personId" : "id-11",
-  "organizationName" : null
+  "organizationName" : null,
+  "wins" : null,
+  "classificationPoints" : null
 }, {
   "position" : 1,
   "participantId" : "id-32",
@@ -72,7 +80,9 @@
   "matches" : 3,
   "teamNumber" : 2,
   "personId" : "id-13",
-  "organizationName" : null
+  "organizationName" : null,
+  "wins" : null,
+  "classificationPoints" : null
 }, {
   "position" : 3,
   "participantId" : "id-24",
@@ -87,7 +97,9 @@
   "matches" : 3,
   "teamNumber" : null,
   "personId" : "id-16",
-  "organizationName" : null
+  "organizationName" : null,
+  "wins" : null,
+  "classificationPoints" : null
 }, {
   "position" : 4,
   "participantId" : "id-33",
@@ -102,7 +114,9 @@
   "matches" : 3,
   "teamNumber" : 3,
   "personId" : "id-2",
-  "organizationName" : null
+  "organizationName" : null,
+  "wins" : null,
+  "classificationPoints" : null
 }, {
   "position" : 4,
   "participantId" : "id-34",
@@ -117,7 +131,9 @@
   "matches" : 3,
   "teamNumber" : 3,
   "personId" : "id-5",
-  "organizationName" : null
+  "organizationName" : null,
+  "wins" : null,
+  "classificationPoints" : null
 }, {
   "position" : 4,
   "participantId" : "id-25",
@@ -132,7 +148,9 @@
   "matches" : 3,
   "teamNumber" : null,
   "personId" : "id-10",
-  "organizationName" : null
+  "organizationName" : null,
+  "wins" : null,
+  "classificationPoints" : null
 }, {
   "position" : 4,
   "participantId" : "id-26",
@@ -147,7 +165,9 @@
   "matches" : 3,
   "teamNumber" : null,
   "personId" : "id-12",
-  "organizationName" : null
+  "organizationName" : null,
+  "wins" : null,
+  "classificationPoints" : null
 }, {
   "position" : 4,
   "participantId" : "id-27",
@@ -162,7 +182,9 @@
   "matches" : 3,
   "teamNumber" : null,
   "personId" : "id-15",
-  "organizationName" : null
+  "organizationName" : null,
+  "wins" : null,
+  "classificationPoints" : null
 }, {
   "position" : 4,
   "participantId" : "id-35",
@@ -177,7 +199,9 @@
   "matches" : 3,
   "teamNumber" : 3,
   "personId" : "id-17",
-  "organizationName" : null
+  "organizationName" : null,
+  "wins" : null,
+  "classificationPoints" : null
 }, {
   "position" : 4,
   "participantId" : "id-36",
@@ -192,7 +216,9 @@
   "matches" : 3,
   "teamNumber" : 1,
   "personId" : "id-18",
-  "organizationName" : null
+  "organizationName" : null,
+  "wins" : null,
+  "classificationPoints" : null
 }, {
   "position" : 4,
   "participantId" : "id-37",
@@ -207,7 +233,9 @@
   "matches" : 3,
   "teamNumber" : 1,
   "personId" : "id-19",
-  "organizationName" : null
+  "organizationName" : null,
+  "wins" : null,
+  "classificationPoints" : null
 }, {
   "position" : 4,
   "participantId" : "id-28",
@@ -222,7 +250,9 @@
   "matches" : 3,
   "teamNumber" : null,
   "personId" : "id-20",
-  "organizationName" : null
+  "organizationName" : null,
+  "wins" : null,
+  "classificationPoints" : null
 }, {
   "position" : 4,
   "participantId" : "id-38",
@@ -237,7 +267,9 @@
   "matches" : 3,
   "teamNumber" : 1,
   "personId" : "id-21",
-  "organizationName" : null
+  "organizationName" : null,
+  "wins" : null,
+  "classificationPoints" : null
 }, {
   "position" : 10,
   "participantId" : "id-39",
@@ -252,7 +284,9 @@
   "matches" : 0,
   "teamNumber" : null,
   "personId" : "id-3",
-  "organizationName" : null
+  "organizationName" : null,
+  "wins" : null,
+  "classificationPoints" : null
 }, {
   "position" : 8,
   "participantId" : "id-29",
@@ -267,7 +301,9 @@
   "matches" : 0,
   "teamNumber" : null,
   "personId" : "id-6",
-  "organizationName" : null
+  "organizationName" : null,
+  "wins" : null,
+  "classificationPoints" : null
 }, {
   "position" : 10,
   "participantId" : "id-40",
@@ -282,7 +318,9 @@
   "matches" : 0,
   "teamNumber" : null,
   "personId" : "id-7",
-  "organizationName" : null
+  "organizationName" : null,
+  "wins" : null,
+  "classificationPoints" : null
 }, {
   "position" : 10,
   "participantId" : "id-41",
@@ -297,5 +335,7 @@
   "matches" : 0,
   "teamNumber" : null,
   "personId" : "id-14",
-  "organizationName" : null
+  "organizationName" : null,
+  "wins" : null,
+  "classificationPoints" : null
 } ]

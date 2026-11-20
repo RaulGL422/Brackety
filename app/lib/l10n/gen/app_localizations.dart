@@ -1850,6 +1850,18 @@ abstract class AppLocalizations {
   /// **'Todavía no hay puntuaciones.'**
   String get standingsEmpty;
 
+  /// No description provided for @standingsClassification.
+  ///
+  /// In es, this message translates to:
+  /// **'{points} pts clas.'**
+  String standingsClassification(int points);
+
+  /// No description provided for @standingsWinsDetail.
+  ///
+  /// In es, this message translates to:
+  /// **'Victorias {wins} · Puntos técnicos {points} ({matches})'**
+  String standingsWinsDetail(int wins, int points, int matches);
+
   /// No description provided for @standingsTotal.
   ///
   /// In es, this message translates to:

@@ -505,6 +505,10 @@
   "noCategory": "Sin categoría",
   "sortByPoints": "Puntos",
   "standingsEmpty": "Todavía no hay puntuaciones.",
+  "standingsClassification": "{points} pts clas.",
+  "@standingsClassification": {"placeholders": {"points": {"type": "int"}}},
+  "standingsWinsDetail": "Victorias {wins} · Puntos técnicos {points} ({matches})",
+  "@standingsWinsDetail": {"placeholders": {"wins": {"type": "int"}, "points": {"type": "int"}, "matches": {"type": "int"}}},
   "standingsTotal": "{total} pts",
   "@standingsTotal": {
     "placeholders": {

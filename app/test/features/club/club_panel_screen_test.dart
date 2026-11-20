@@ -418,6 +418,42 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    // Grappling ranks by wins and FELODA classification points, and says so.
+    testWidgets('grappling standings show wins and classification on $device', (
+      tester,
+    ) async {
+      StandingRow grappler(int position, String name, int wins, int points) =>
+          StandingRow(
+            position: position,
+            participantId: name,
+            firstName: name,
+            lastName: 'Test',
+            age: 9,
+            categoryId: 'c2',
+            categoryName: '8-11',
+            attendancePoints: 0,
+            matchPoints: 21,
+            total: 21,
+            matches: 3,
+            wins: wins,
+            classificationPoints: points,
+          );
+      await pumpPanel(
+        tester,
+        size,
+        scores: [grappler(1, 'Ana', 2, 10), grappler(2, 'Dani', 2, 5)],
+      );
+
+      // The first row (the second may be below the fold on a phone).
+      expect(find.text('10 class. pts'), findsOneWidget);
+      expect(
+        find.textContaining('Wins 2 · Technical points 21 (3)'),
+        findsWidgets,
+      );
+      expect(find.textContaining('Attendance'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('without the global standings one category shows on $device', (
       tester,
     ) async {

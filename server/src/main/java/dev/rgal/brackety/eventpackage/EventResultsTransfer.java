@@ -150,7 +150,9 @@ class EventResultsTransfer {
                         instant(rs, "running_since"),
                         rs.getString("disqualified_side"),
                         rs.getString("review_reason"),
-                        actions.getOrDefault(uuid(rs, "id"), List.of())))
+                        actions.getOrDefault(uuid(rs, "id"), List.of()),
+                        rs.getString("winner_side"),
+                        rs.getString("end_reason")))
                 .list()
                 .stream()
                 .sorted((a, b) -> a.groupNumber() != b.groupNumber()
@@ -244,8 +246,9 @@ class EventResultsTransfer {
             var id = UUID.randomUUID();
             jdbc.sql("insert into fight_match (id, event_id, group_id, mat_id, order_index, red_participant_id,"
                             + " blue_participant_id, red_team_id, blue_team_id, status, red_score, blue_score,"
-                            + " started_at, finished_at, elapsed_ms, running_since, disqualified_side, review_reason)"
-                            + " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+                            + " started_at, finished_at, elapsed_ms, running_since, disqualified_side, review_reason,"
+                            + " winner_side, end_reason)"
+                            + " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
                     .params(
                             id,
                             eventId,
@@ -264,7 +267,9 @@ class EventResultsTransfer {
                             m.elapsedMs(),
                             timestamp(m.runningSince()),
                             m.disqualifiedSide(),
-                            m.reviewReason())
+                            m.reviewReason(),
+                            m.winnerSide(),
+                            m.endReason())
                     .update();
             var actionIds = new HashMap<Integer, UUID>();
             for (var a : m.actions()) {

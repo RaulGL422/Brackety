@@ -1079,6 +1079,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get standingsEmpty => 'No scores yet.';
 
   @override
+  String standingsClassification(int points) {
+    return '$points class. pts';
+  }
+
+  @override
+  String standingsWinsDetail(int wins, int points, int matches) {
+    return 'Wins $wins · Technical points $points ($matches)';
+  }
+
+  @override
   String standingsTotal(int total) {
     return '$total pts';
   }

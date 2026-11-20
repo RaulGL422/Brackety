@@ -22,6 +22,7 @@ import java.util.List;
  * @param oneHandWarnings the one-hand warning exists (tambo, ages 4 to 8)
  * @param submissions a submission ends the match
  * @param tiebreaks a tie on points is broken by the best action, how many of it, fewer warnings, then extra time
+ * @param classification the points each way of winning gives (FELODA, art. 39); empty: ranked by the points scored
  */
 public record ScoringRules(
         @NotEmpty @Size(max = 10) List<@Valid Action> actions,
@@ -32,16 +33,27 @@ public record ScoringRules(
         boolean disqualificationScores,
         boolean oneHandWarnings,
         boolean submissions,
-        boolean tiebreaks) {
+        boolean tiebreaks,
+        @Size(max = 10) List<@Valid Classification> classification) {
 
     /** A scoring button: what the referee saw and the points it gives. */
     public record Action(
             @Min(1) @Max(20) int value,
             @NotBlank @Size(max = 60) String label) {}
 
+    /**
+     * What a win that ended as {@code end} (a match end reason: SUBMISSION, SUPERIORITY…) gives the winner, the loser,
+     * and the loser if they scored.
+     */
+    public record Classification(
+            @NotBlank @Size(max = 20) String end,
+            @Min(0) @Max(10) int winner,
+            @Min(0) @Max(10) int loser,
+            @Min(0) @Max(10) int loserWhoScored) {}
+
     /** Liga Yoseikan, cap. 3.1, and Raul's rules of the F1 (2026-11-13). */
     public static final ScoringRules TAMBO =
-            new ScoringRules(List.of(new Action(1, "Punto")), 2, 0, 0, true, true, true, false, false);
+            new ScoringRules(List.of(new Action(1, "Punto")), 2, 0, 0, true, true, true, false, false, List.of());
 
     /** FELODA national rules, November 2025 (docs/reglamentos/grappling-feloda-2025.md, art. 38). */
     public static final ScoringRules GRAPPLING = new ScoringRules(
@@ -57,10 +69,26 @@ public record ScoringRules(
             false,
             false,
             true,
-            true);
+            true,
+            // Art. 39: submission or disqualification 5-0, superiority 4-0 or 4-1, decision 3-0 or 3-1, four
+            // warnings 3-0, extra time 2-0.
+            List.of(
+                    new Classification("SUBMISSION", 5, 0, 0),
+                    new Classification("DISQUALIFICATION", 5, 0, 0),
+                    new Classification("SUPERIORITY", 4, 0, 1),
+                    new Classification("TIME", 3, 0, 1),
+                    new Classification("WARNINGS", 3, 0, 0),
+                    new Classification("EXTRA_TIME", 2, 0, 0)));
 
     public ScoringRules {
         actions = List.copyOf(actions);
+        // Rules stored before classification existed are tambo's: ranked by points.
+        classification = classification == null ? List.of() : List.copyOf(classification);
+    }
+
+    /** Ranked by classification points and wins (grappling) rather than by the points scored (tambo). */
+    public boolean ranksByClassification() {
+        return !classification.isEmpty();
     }
 
     /** The most one action is worth. */
