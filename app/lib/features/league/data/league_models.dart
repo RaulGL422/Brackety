@@ -9,6 +9,12 @@ Discipline _discipline(String value) => switch (value) {
   _ => Discipline.tambo,
 };
 
+/// The sports with a scoreboard today, from the server's list of `{discipline, available}`.
+Set<Discipline> disciplinesWithScoreboard(List<dynamic> json) => {
+  for (final d in json.cast<Map<String, dynamic>>())
+    if (d['available'] == true) _discipline(d['discipline'] as String),
+};
+
 String disciplineJson(Discipline d) => switch (d) {
   Discipline.tambo => 'TAMBO',
   Discipline.grappling => 'GRAPPLING',
@@ -111,11 +117,9 @@ class League {
         LeaguePhase.fromJson(p as Map<String, dynamic>),
     ],
     categoryNames: [for (final n in json['categoryNames'] as List) n as String],
-    availableDisciplines: {
-      for (final d in json['disciplines'] as List)
-        if ((d as Map<String, dynamic>)['available'] == true)
-          _discipline(d['discipline'] as String),
-    },
+    availableDisciplines: disciplinesWithScoreboard(
+      json['disciplines'] as List,
+    ),
   );
 
   final String name;

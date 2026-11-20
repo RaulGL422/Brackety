@@ -950,6 +950,54 @@ abstract class AppLocalizations {
   /// **'Mis eventos'**
   String get eventsTitle;
 
+  /// No description provided for @newEventButton.
+  ///
+  /// In es, this message translates to:
+  /// **'Nuevo evento'**
+  String get newEventButton;
+
+  /// No description provided for @newEventTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Nuevo evento'**
+  String get newEventTitle;
+
+  /// No description provided for @newEventHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Un evento suelto, con sus tapices. Las categorías, los inscritos y los árbitros se añaden después desde su panel.'**
+  String get newEventHint;
+
+  /// No description provided for @newEventName.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre del evento'**
+  String get newEventName;
+
+  /// No description provided for @newEventMats.
+  ///
+  /// In es, this message translates to:
+  /// **'Tapices'**
+  String get newEventMats;
+
+  /// No description provided for @newEventMatsInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'Entre 1 y {max}'**
+  String newEventMatsInvalid(int max);
+
+  /// No description provided for @newEventCreate.
+  ///
+  /// In es, this message translates to:
+  /// **'Crear evento'**
+  String get newEventCreate;
+
+  /// No description provided for @newEventDone.
+  ///
+  /// In es, this message translates to:
+  /// **'Evento creado'**
+  String get newEventDone;
+
   /// No description provided for @eventsEmpty.
   ///
   /// In es, this message translates to:

@@ -528,6 +528,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get eventsTitle => 'My events';
 
   @override
+  String get newEventButton => 'New event';
+
+  @override
+  String get newEventTitle => 'New event';
+
+  @override
+  String get newEventHint =>
+      'A standalone event, with its mats. Categories, entries and referees are added later from its panel.';
+
+  @override
+  String get newEventName => 'Event name';
+
+  @override
+  String get newEventMats => 'Mats';
+
+  @override
+  String newEventMatsInvalid(int max) {
+    return 'From 1 to $max';
+  }
+
+  @override
+  String get newEventCreate => 'Create event';
+
+  @override
+  String get newEventDone => 'Event created';
+
+  @override
   String get eventsEmpty => 'You have no events assigned.';
 
   @override
