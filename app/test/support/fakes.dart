@@ -85,6 +85,7 @@ class FakeAuthApi implements AuthApi {
 
   DioException? loginError;
   DioException? restoreError;
+  DioException? qrError;
   DioException? refreshError;
   DioException? registerError;
   DioException? verifyError;
@@ -101,6 +102,7 @@ class FakeAuthApi implements AuthApi {
 
   final logins = <String>[];
   final restores = <String>[];
+  final qrCodes = <String>[];
   final refreshes = <String?>[];
   final logouts = <String?>[];
   final registrations = <Registration>[];
@@ -134,6 +136,14 @@ class FakeAuthApi implements AuthApi {
     }
     logins.add(email);
     subject = email;
+    return _session();
+  }
+
+  @override
+  Future<SessionTokens> temporary(String code) async {
+    _failWith(qrError);
+    qrCodes.add(code);
+    signedIn = true;
     return _session();
   }
 

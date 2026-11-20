@@ -203,6 +203,17 @@ public class EventService {
         return settings(event);
     }
 
+    /** Puts someone who may referee their mat on mat {@code number}, as the settings do (staff QR access). */
+    @Transactional
+    public void assignReferee(UUID eventId, int number, UUID refereeAccountId) {
+        var mat = mats.findByEventIdOrderByNumber(eventId).stream()
+                .filter(m -> m.getNumber() == number)
+                .findFirst()
+                .orElseThrow(EventException::notFound);
+        mat.assignReferee(refereeAccountId);
+        matSync.changed(eventId);
+    }
+
     private EventSettingsResponse settings(Event event) {
         var names = staffNames.names(event.getId());
         var rolesByAccount = staff.findByEventId(event.getId()).stream()

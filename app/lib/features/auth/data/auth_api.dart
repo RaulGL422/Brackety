@@ -40,6 +40,10 @@ class AuthApi {
   Future<SessionTokens> login(String email, String password) =>
       _session('/login', {'email': email, 'password': password});
 
+  /// With the code of a staff QR: single use, and any other session of that account ends.
+  Future<SessionTokens> temporary(String code) =>
+      _session('/temporary', {'token': code});
+
   Future<SessionTokens> restore(String restoreToken) =>
       _session('/restore', {'restoreToken': restoreToken});
 

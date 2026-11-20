@@ -45,6 +45,7 @@ public class Account {
     private Instant deletedAt;
     private Instant sessionsRevokedAt;
     private Instant suspendedAt;
+    private boolean temporary;
 
     protected Account() {}
 
@@ -56,6 +57,21 @@ public class Account {
         this.status = Status.ACTIVE;
         this.createdAt = now;
         this.updatedAt = now;
+    }
+
+    /**
+     * A referee or helper let in by QR for one event (staff.TemporaryAccessService): no email, no password, signed in
+     * only with the code the club shows. Counts as verified: it never receives emails.
+     */
+    public static Account temporary(String signIn, Instant now) {
+        var account = new Account(signIn, null, null, "es", now);
+        account.emailVerified = true;
+        account.temporary = true;
+        return account;
+    }
+
+    public boolean isTemporary() {
+        return temporary;
     }
 
     public UUID getId() {

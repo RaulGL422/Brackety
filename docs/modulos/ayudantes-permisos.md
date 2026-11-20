@@ -49,5 +49,15 @@ Cada permiso permitido/denegado, delegación de un nivel, cambios en directo, au
 - Portátil del pabellón (rama `feat/package-staff-permissions`): el paquete lleva lo elegido (`staffPermissions`, opcional); allí cada persona tiene lo mismo que en el servidor del club y un ayudante con «Arbitrar su tapiz» puede ir en un tapiz. Paquetes anteriores: los del rol.
 - Tests: `StaffPermissionsTest`, `EventPackageServiceTest`; app: Personal, barra de fase, panel del ayudante, tapices y grupos en solo lectura.
 
+## Adelanto: acceso por QR (Raul, 2026-11-20)
+- Para quien ayuda sin cuenta (o la usará una sola vez): el club escribe su nombre y le enseña un QR. Al escanearlo entra en una **cuenta temporal** de ese evento, sin registrarse.
+- Dónde: Configuración → Tapices (icono QR junto a cada tapiz: árbitro de ese tapiz) y «Acceso por QR» (ayudante para grupos). Avisa de tapices sin árbitro y de que nadie más que el club hace grupos.
+- Permisos: los del rol (árbitro = su tapiz; ayudante = grupos, equipos y medidas), cambiables en «Personal» como los demás. Solo dentro del evento: no crea eventos ni ligas, no acepta invitaciones ni toca ajustes de cuenta (403).
+- Una sesión a la vez: el código sirve **una vez** y entrar cierra cualquier otra sesión de esa cuenta. «Nuevo QR» da otro código al momento y saca al dispositivo anterior. «Quitar acceso» la cierra.
+- Confirmación: el diálogo del QR espera y avisa «X ha entrado»; la lista dice a qué hora entró.
+- Dura lo que la fase: al finalizarla se cierran todas (suspendidas, sin sesión); con la fase finalizada no se crean ni renuevan. Una fase nueva no las copia (ni a sus tapices) y el paquete del portátil no las lleva.
+- Datos: `temporary_access` (evento, cuenta, nombre, rol, hash del código, entrada, fin) y `account.temporary`. Inicio de sesión: `POST /api/v1/auth/temporary {token}`. Club: `GET/POST /events/{id}/temporary-access`, `POST …/{id}/renew`, `POST …/{id}/end`. Enlace: `/qr?code=…`.
+- Tests: `TemporaryAccessTest`; app: `qr_access_test`, `qr_sign_in_screen_test`.
+
 ## Estado
 Adelantos F1-5 y F1-7 C en pruebas. Pendiente: roles libres, ubicaciones, delegación y auditoría.

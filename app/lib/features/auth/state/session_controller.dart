@@ -164,6 +164,10 @@ class SessionController extends Notifier<SessionState> {
     }
   }
 
+  /// Signs in with the code of a QR the club showed (a temporary account for one event).
+  Future<void> signInWithQr(String code) async =>
+      _signIn(await _api.temporary(code));
+
   /// Cancels a pending account deletion with the token from the 403 of the login.
   Future<void> restoreAccount(String restoreToken) async =>
       _signIn(await _api.restore(restoreToken));
