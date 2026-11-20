@@ -15,7 +15,7 @@ void main() {
   DateTime at(Object? seconds) => t0.add(duration(seconds));
   Side? side(Object? value) => sideFromJson(value);
 
-  for (final sport in ['tambo', 'grappling']) {
+  for (final sport in ['tambo', 'grappling', 'custom']) {
     final doc = jsonDecode(
       File('../spec/scoring/$sport.json').readAsStringSync(),
     ) as Map<String, dynamic>;

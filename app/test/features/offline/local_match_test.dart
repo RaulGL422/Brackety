@@ -27,14 +27,18 @@ void main() {
   test("the queue follows the match's sport: four warnings disqualify in grappling", () {
     const grappling = Scoring(
       actions: [ScoringAction(value: 1, label: 'Salida o ataque')],
-      warningsPerRivalPoint: 1,
+      warningPoints: [1],
       warningsToDisqualify: 4,
       superiorityGap: 15,
       pointsAfterTime: false,
       disqualificationScores: false,
       oneHandWarnings: false,
-      submissions: true,
-      tiebreaks: true,
+      finishes: ['Sumisión'],
+      tiebreaks: [
+        Tiebreak.bestAction,
+        Tiebreak.fewerWarnings,
+        Tiebreak.extraTime,
+      ],
     );
     final view = LocalMatch.project(serverMatch('m1', scoring: grappling), [
       op(MatchAction.start, 0),
@@ -54,14 +58,18 @@ void main() {
         ScoringAction(value: 2, label: 'Derribo'),
         ScoringAction(value: 4, label: 'Montada o espalda'),
       ],
-      warningsPerRivalPoint: 1,
+      warningPoints: [1],
       warningsToDisqualify: 4,
       superiorityGap: 15,
       pointsAfterTime: false,
       disqualificationScores: false,
       oneHandWarnings: false,
-      submissions: true,
-      tiebreaks: true,
+      finishes: ['Sumisión'],
+      tiebreaks: [
+        Tiebreak.bestAction,
+        Tiebreak.fewerWarnings,
+        Tiebreak.extraTime,
+      ],
     );
     OfflineOp point(String id, int second, int points) => OfflineOp(
       opId: id,

@@ -48,7 +48,7 @@ public class Match {
     /** RED or BLUE once decided; null while it goes on, on a draw or while a tie waits for the extra time. */
     private String winnerSide;
 
-    /** How it ended (MatchState.EndReason's name); null while it goes on. */
+    /** How it ended (the scoreboard's EndReason, by name); null while it goes on. */
     private String endReason;
     /** Why an offline action clashed; while set, the match takes no actions until the club reviews it. */
     private String reviewReason;

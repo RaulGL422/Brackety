@@ -1,6 +1,5 @@
 package dev.rgal.brackety.scoreboard;
 
-import dev.rgal.brackety.scoreboard.MatchState.EndReason;
 import java.time.Instant;
 import java.util.Optional;
 
@@ -24,8 +23,8 @@ final class MatchRefusals {
         var scoring = match.rules().scoring();
         var notInThisSport = switch (type) {
             case ONE_HAND_WARNING -> !scoring.oneHandWarnings();
-            case SUBMISSION -> !scoring.submissions();
-            case EXTRA_TIME -> !scoring.tiebreaks();
+            case SUBMISSION -> scoring.finishes().isEmpty();
+            case EXTRA_TIME -> !scoring.hasExtraTime();
             default -> false;
         };
         if (notInThisSport) {

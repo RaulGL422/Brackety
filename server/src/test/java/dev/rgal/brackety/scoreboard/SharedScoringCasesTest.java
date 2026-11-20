@@ -23,7 +23,7 @@ import tools.jackson.databind.json.JsonMapper;
 /** The scoring cases shared with the app (spec/scoring/*.json): both MatchState must agree on every one. */
 class SharedScoringCasesTest {
 
-    private static final List<String> SPORTS = List.of("tambo", "grappling");
+    private static final List<String> SPORTS = List.of("tambo", "grappling", "custom");
     private static final Instant T0 = Instant.parse("2027-03-10T09:00:00Z");
     private static final JsonMapper JSON = JsonMapper.builder().build();
     private static final Map<String, ScoringRules> BUILT_IN =

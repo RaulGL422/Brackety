@@ -85,6 +85,7 @@ Todo está fusionado; falta comprobarlo en debug o en la Pi.
 - [ ] Confirmar el orden de fases: F1 suelo, F2 armas, F3 expresión técnica, F4 derribos.
 
 ## 7. Por investigar
+- Sambo: confirmar con su reglamento oficial qué cabe ya en `ScoringRules` (escalera de amonestaciones, victoria total, último en puntuar) y qué falta (inmovilizaciones con cronómetro). Las hojas imprimen «Sumisión» para cualquier acción de victoria.
 - [ ] Otras plantillas de deporte (judo, karate, taekwondo, fútbol) al llegar a `puntuacion`.
 - [ ] Doble eliminación y repesca al llegar a `torneo`.
 - [ ] Previsión del día por tapiz (disputado, en curso, por disputar): duración media por categoría y hora estimada de fin de cada grupo.

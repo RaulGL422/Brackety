@@ -13,14 +13,18 @@ void main() {
       ScoringAction(value: 3, label: 'Montada lateral o derribo de amplitud'),
       ScoringAction(value: 4, label: 'Montada o espalda'),
     ],
-    warningsPerRivalPoint: 1,
+    warningPoints: [1],
     warningsToDisqualify: 4,
     superiorityGap: 15,
     pointsAfterTime: false,
     disqualificationScores: false,
     oneHandWarnings: false,
-    submissions: true,
-    tiebreaks: true,
+    finishes: ['Sumisión'],
+    tiebreaks: [
+      Tiebreak.bestAction,
+      Tiebreak.fewerWarnings,
+      Tiebreak.extraTime,
+    ],
   );
 
   test('a stored view keeps its rules and buttons', () {
@@ -42,7 +46,7 @@ void main() {
     final view = MatchView.fromJson(json);
 
     expect(view.scoring.actions.single.value, 1);
-    expect(view.scoring.warningsPerRivalPoint, 2);
-    expect(view.scoring.submissions, isFalse);
+    expect(view.scoring.warningPoints, [0, 1]);
+    expect(view.scoring.finishes, isEmpty);
   });
 }
