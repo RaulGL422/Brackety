@@ -33,6 +33,7 @@ class LocalMatch {
     MatchState replay() => MatchState.replay(
       length: server.length,
       pointsLimit: server.pointsLimit,
+      scoring: server.scoring,
       entries: entries,
     );
     for (final op in pending) {
@@ -130,6 +131,7 @@ class LocalMatch {
             pointsLimit: server.pointsLimit,
             readyAt: server.readyAt,
             warningReasons: server.warningReasons,
+            scoring: server.scoring,
             remaining: state.remainingAt(now),
             running: state.isRunning(now),
             endReason: state.endReason(now),

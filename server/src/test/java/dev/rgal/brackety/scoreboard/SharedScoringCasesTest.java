@@ -2,6 +2,7 @@ package dev.rgal.brackety.scoreboard;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import dev.rgal.brackety.event.ScoringRules;
 import dev.rgal.brackety.scoreboard.MatchState.Entry;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -24,8 +25,9 @@ class SharedScoringCasesTest {
 
     private static final List<String> SPORTS = List.of("tambo", "grappling");
     private static final Instant T0 = Instant.parse("2027-03-10T09:00:00Z");
-    private static final Map<String, MatchRules.Scoring> SCORINGS =
-            Map.of("TAMBO", MatchRules.Scoring.TAMBO, "GRAPPLING", MatchRules.Scoring.GRAPPLING);
+    private static final JsonMapper JSON = JsonMapper.builder().build();
+    private static final Map<String, ScoringRules> BUILT_IN =
+            Map.of("tambo", ScoringRules.TAMBO, "grappling", ScoringRules.GRAPPLING);
 
     // The app names each refusal; the server words it. Both must mean the same.
     private static final Map<String, String> REFUSALS = Map.ofEntries(
@@ -50,7 +52,7 @@ class SharedScoringCasesTest {
         var cases = new ArrayList<DynamicTest>();
         for (var sport : SPORTS) {
             var file = Path.of("..", "spec", "scoring", sport + ".json");
-            var root = JsonMapper.builder().build().readTree(Files.readString(file, StandardCharsets.UTF_8));
+            var root = JSON.readTree(Files.readString(file, StandardCharsets.UTF_8));
             var defaults = root.get("rules");
             for (var testCase : root.get("cases")) {
                 cases.add(DynamicTest.dynamicTest(
@@ -58,6 +60,19 @@ class SharedScoringCasesTest {
             }
         }
         return cases.stream();
+    }
+
+    // The built-in sports are exactly what the shared cases test.
+    @TestFactory
+    Stream<DynamicTest> builtInSportsAreTheSharedOnes() {
+        return BUILT_IN.entrySet().stream()
+                .map(sport -> DynamicTest.dynamicTest(sport.getKey(), () -> {
+                    var file = Path.of("..", "spec", "scoring", sport.getKey() + ".json");
+                    var scoring = JSON.readTree(Files.readString(file, StandardCharsets.UTF_8))
+                            .get("rules")
+                            .get("scoring");
+                    assertThat(JSON.treeToValue(scoring, ScoringRules.class)).isEqualTo(sport.getValue());
+                }));
     }
 
     private static void check(JsonNode defaults, JsonNode testCase) {
@@ -69,9 +84,8 @@ class SharedScoringCasesTest {
         for (var entry : testCase.get("entries")) {
             entries.add(entry(entry));
         }
-        var scoring = (rules.has("scoring") ? rules : defaults).path("scoring").asString("TAMBO");
-        var match = MatchState.replay(
-                new MatchRules(Duration.ofSeconds(length), limit, SCORINGS.get(scoring)), List.copyOf(entries));
+        var scoring = JSON.treeToValue((rules.has("scoring") ? rules : defaults).get("scoring"), ScoringRules.class);
+        var match = MatchState.replay(new MatchRules(Duration.ofSeconds(length), limit, scoring), List.copyOf(entries));
         var now = at(testCase.get("at"));
         var expect = testCase.get("expect");
 

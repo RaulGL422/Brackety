@@ -296,7 +296,7 @@ class MatchState {
     };
     if (notInThisSport) return MatchRefusal.notInThisSport;
     if ((action == MatchAction.point || action == MatchAction.pointRemoved) &&
-        (value < 1 || value > scoring.maxPointValue)) {
+        !scoring.hasValue(value)) {
       return MatchRefusal.invalidValue;
     }
     final end = endReason(now);

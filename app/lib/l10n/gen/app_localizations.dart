@@ -2863,6 +2863,24 @@ abstract class AppLocalizations {
   /// **'Hasta'**
   String get categoryMaxAge;
 
+  /// No description provided for @categoryOwnLength.
+  ///
+  /// In es, this message translates to:
+  /// **'{length} por combate'**
+  String categoryOwnLength(String length);
+
+  /// No description provided for @categoryMatchLength.
+  ///
+  /// In es, this message translates to:
+  /// **'Duración propia (min:s)'**
+  String get categoryMatchLength;
+
+  /// No description provided for @categoryMatchLengthHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Vacía: la del evento. En grappling, 4:00 para U13, U15 y veteranos.'**
+  String get categoryMatchLengthHint;
+
   /// No description provided for @categoryByTeams.
   ///
   /// In es, this message translates to:
@@ -3833,6 +3851,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Tambo'**
   String get disciplineTambo;
+
+  /// No description provided for @disciplineGrappling.
+  ///
+  /// In es, this message translates to:
+  /// **'Grappling'**
+  String get disciplineGrappling;
 
   /// No description provided for @disciplineGround.
   ///

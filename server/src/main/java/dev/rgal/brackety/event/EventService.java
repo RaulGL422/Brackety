@@ -243,7 +243,8 @@ public class EventService {
                 event.modality().team().pointsLimit(),
                 event.modality().getMinRestSeconds(),
                 MeasureRules.of(event),
-                WarningReasons.of(event));
+                WarningReasons.of(event),
+                event.modality().scoring());
     }
 
     private List<UUID> refereeIds(UUID eventId) {

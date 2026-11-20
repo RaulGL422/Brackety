@@ -1,4 +1,5 @@
 import '../../mat/data/mat_board.dart';
+import 'scoring.dart';
 
 enum Side { red, blue }
 
@@ -398,6 +399,7 @@ class MatchView {
     this.review,
     this.readyAt,
     this.warningReasons = const [],
+    this.scoring = Scoring.tambo,
   });
 
   factory MatchView.fromJson(Map<String, dynamic> json) => MatchView(
@@ -433,6 +435,7 @@ class MatchView {
     warningReasons: [
       for (final r in json['warningReasons'] as List? ?? const []) r as String,
     ],
+    scoring: Scoring.fromJson(json['scoring'] as Map<String, dynamic>?),
   );
 
   Map<String, dynamic> toJson() => {
@@ -458,6 +461,7 @@ class MatchView {
     'review': review?.toJson(),
     'readyAt': readyAt?.toUtc().toIso8601String(),
     'warningReasons': warningReasons,
+    'scoring': scoring.toJson(),
   };
 
   final String id;
@@ -493,6 +497,9 @@ class MatchView {
   /// The event's warning reasons, picked with one tap (F1-4); "Otro" is typed.
   final List<String> warningReasons;
 
+  /// How the match's sport scores (the referee's buttons and rules), from the server.
+  final Scoring scoring;
+
   /// What the device counts in `knownEvents`: the automatic stops are left out.
   int get knownEvents => timeline.where((e) => !e.automatic).length;
 
@@ -517,6 +524,7 @@ class MatchView {
     review: review,
     readyAt: readyAt,
     warningReasons: warningReasons,
+    scoring: scoring,
   );
 
   bool get finished => status == MatchStatus.finished;

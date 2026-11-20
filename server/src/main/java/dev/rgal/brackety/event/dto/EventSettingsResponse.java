@@ -5,6 +5,7 @@ import dev.rgal.brackety.event.EventCategory.Format;
 import dev.rgal.brackety.event.EventOrganization;
 import dev.rgal.brackety.event.EventPermission;
 import dev.rgal.brackety.event.EventRole;
+import dev.rgal.brackety.event.ScoringRules;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
@@ -27,7 +28,8 @@ public record EventSettingsResponse(
         int teamPointsLimit,
         int minRestSeconds,
         MeasureRules measures,
-        WarningReasons warningReasons) {
+        WarningReasons warningReasons,
+        ScoringRules scoring) {
 
     /** For a helper: everything but who the staff are and their sign-ins. */
     public EventSettingsResponse withoutStaff() {
@@ -48,7 +50,8 @@ public record EventSettingsResponse(
                 teamPointsLimit,
                 minRestSeconds,
                 measures,
-                warningReasons);
+                warningReasons,
+                scoring);
     }
 
     public record OrganizationResponse(UUID id, String name, String shortName) {
@@ -69,7 +72,14 @@ public record EventSettingsResponse(
 
     /** {@code teamSize} is null in an individual category. */
     public record CategoryResponse(
-            UUID id, String name, int minAge, int maxAge, Format format, Integer teamSize, int groupSize) {
+            UUID id,
+            String name,
+            int minAge,
+            int maxAge,
+            Format format,
+            Integer teamSize,
+            int groupSize,
+            Integer matchSeconds) {
 
         public static CategoryResponse of(EventCategory c) {
             return new CategoryResponse(
@@ -79,7 +89,8 @@ public record EventSettingsResponse(
                     c.getMaxAge(),
                     c.getFormat(),
                     c.getTeamSize(),
-                    c.getGroupSize());
+                    c.getGroupSize(),
+                    c.getMatchSeconds());
         }
     }
 }

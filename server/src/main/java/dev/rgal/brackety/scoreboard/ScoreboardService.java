@@ -291,7 +291,8 @@ class ScoreboardService {
 
     MatchView view(Match match, Mat mat, Event event, Instant now) {
         var history = matchEvents.findByMatchIdOrderByPosition(match.getId());
-        var state = MatchWriter.replay(event, match, history);
+        var state = writer.replay(event, match, history);
+        var rules = state.rules();
         var group = groups.findById(match.getGroupId()).orElseThrow();
         var competitors = directory.of(match.getEventId());
         var ghosts = members.findByGroupIdInOrderByPosition(List.of(group.getId())).stream()
@@ -311,24 +312,21 @@ class ScoreboardService {
                 mat == null ? null : mat.getNumber(),
                 group.getNumber(),
                 match.getStatus(),
-                event.modality().matchSeconds(match.isTeamMatch()),
-                event.modality().pointsLimit(match.isTeamMatch()),
+                (int) rules.length().toSeconds(),
+                rules.pointsLimit(),
                 state.remainingAt(now).toMillis(),
                 state.isRunning(now),
                 state.endReason(now).map(Enum::name).orElse(null),
                 corner(event, state, Side.RED, competitors.get(match.getRedId()), ghosts),
                 corner(event, state, Side.BLUE, competitors.get(match.getBlueId()), ghosts),
-                timeline(
-                        history,
-                        state,
-                        actors,
-                        Duration.ofSeconds(event.modality().matchSeconds(match.isTeamMatch()))),
+                timeline(history, state, actors, rules.length()),
                 now,
                 match.isInReview() ? review(match, pending, actors) : null,
                 match.getStatus() == Match.Status.PENDING
                         ? writer.restedAt(match, event).filter(now::isBefore).orElse(null)
                         : null,
-                event.warningReasons());
+                event.warningReasons(),
+                rules.scoring());
     }
 
     private Map<UUID, String> actors(Stream<UUID> ids) {

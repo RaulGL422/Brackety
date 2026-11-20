@@ -9,6 +9,7 @@ import '../../grouping/state/grouping_providers.dart';
 import '../data/club_models.dart';
 import '../data/club_repository.dart';
 import '../state/club_providers.dart';
+import 'settings_tab.dart';
 
 /// The event's categories (docs/modulos/prototipo-f1-equipos.md): age band and whether they
 /// compete individually or as teams. Every change is saved at once, as the rest of the settings.
@@ -87,7 +88,8 @@ class _CategoriesEditorState extends ConsumerState<CategoriesEditor> {
             title: Text(l10n.categoryRange(c.name, c.minAge, c.maxAge)),
             subtitle: Text(
               '${c.isTeam ? l10n.categoryTeams : l10n.categoryIndividual}'
-              ' · ${l10n.categoryGroupSize(c.groupSize)}',
+              ' · ${l10n.categoryGroupSize(c.groupSize)}'
+              '${c.matchLength == null ? '' : ' · ${l10n.categoryOwnLength(formatMatchLength(c.matchLength!))}'}',
             ),
             onTap: _saving ? null : () => _edit(i),
             trailing: IconButton(
@@ -127,12 +129,19 @@ class _CategoryDialogState extends State<_CategoryDialog> {
     text: widget.initial?.maxAge.toString(),
   );
   late var _teamSize = widget.initial?.teamSize;
+  late final _length = TextEditingController(
+    text: switch (widget.initial?.matchLength) {
+      final Duration length => formatMatchLength(length),
+      null => '',
+    },
+  );
 
   @override
   void dispose() {
     _name.dispose();
     _min.dispose();
     _max.dispose();
+    _length.dispose();
     super.dispose();
   }
 
@@ -145,6 +154,9 @@ class _CategoryDialogState extends State<_CategoryDialog> {
         minAge: int.parse(_min.text),
         maxAge: int.parse(_max.text),
         teamSize: _teamSize,
+        matchLength: _length.text.trim().isEmpty
+            ? null
+            : parseMatchLength(_length.text),
       ),
     );
   }
@@ -224,6 +236,22 @@ class _CategoryDialogState extends State<_CategoryDialog> {
                       ),
                     ),
                   ],
+                ),
+                const SizedBox(height: AppSpacing.m),
+                TextFormField(
+                  controller: _length,
+                  decoration: InputDecoration(
+                    labelText: l10n.categoryMatchLength,
+                    helperText: l10n.categoryMatchLengthHint,
+                    helperMaxLines: 3,
+                  ),
+                  keyboardType: TextInputType.datetime,
+                  validator: (v) =>
+                      v == null ||
+                          v.trim().isEmpty ||
+                          parseMatchLength(v) != null
+                      ? null
+                      : l10n.settingsMatchLengthInvalid,
                 ),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,

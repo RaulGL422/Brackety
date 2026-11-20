@@ -107,6 +107,7 @@ class FakeClubRepository extends Fake implements ClubRepository {
           minAge: c.minAge,
           maxAge: c.maxAge,
           teamSize: c.teamSize,
+          matchLength: c.matchLength,
         ),
     ];
   }
@@ -1108,6 +1109,35 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  // Grappling: U15 fight 4 minutes in an event of 5.
+  testWidgets('a category takes its own match length', (tester) async {
+    final repository = FakeClubRepository(settings);
+    await pumpPanel(tester, const Size(800, 1280), repository: repository);
+    await openCategories(tester);
+    await tester.tap(find.text('Add category'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.widgetWithText(TextFormField, 'Name'), 'U15');
+    await tester.enterText(find.widgetWithText(TextFormField, 'From'), '14');
+    await tester.enterText(find.widgetWithText(TextFormField, 'To'), '15');
+    final length = find.widgetWithText(
+      TextFormField,
+      'Own match length (min:s)',
+    );
+    await tester.enterText(length, '9:99');
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+    expect(repository.savedCategories, isEmpty);
+
+    await tester.enterText(length, '4:00');
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+
+    final saved = repository.savedCategories.single;
+    expect(saved.last.matchLength, const Duration(minutes: 4));
+    expect(saved.last.toJson()['matchSeconds'], 240);
+    expect(find.textContaining('4:00 per match'), findsOneWidget);
+  });
 
   testWidgets('a category with ages the wrong way round is not saved', (
     tester,

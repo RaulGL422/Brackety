@@ -5,6 +5,7 @@ import 'package:brackety/features/offline/data/offline_store.dart';
 import 'package:brackety/features/offline/state/offline_sync.dart';
 import 'package:brackety/features/scoreboard/data/match_view.dart';
 import 'package:brackety/features/scoreboard/data/scoreboard_repository.dart';
+import 'package:brackety/features/scoreboard/data/scoring.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/misc.dart';
 
@@ -83,10 +84,17 @@ MatchView stamped(MatchView view, DateTime at, {MatchReview? review}) =>
       timeline: view.timeline,
       serverTime: at,
       review: review ?? view.review,
+      readyAt: view.readyAt,
+      warningReasons: view.warningReasons,
+      scoring: view.scoring,
     );
 
-/// A pending match [id] on mat `mat1`, as the server sends it.
-MatchView serverMatch(String id, {DateTime? at}) {
+/// A pending match [id] on mat `mat1`, as the server sends it; tambo unless [scoring] says.
+MatchView serverMatch(
+  String id, {
+  DateTime? at,
+  Scoring scoring = Scoring.tambo,
+}) {
   final base = matchView();
   return stamped(
     MatchView(
@@ -103,6 +111,7 @@ MatchView serverMatch(String id, {DateTime? at}) {
       red: base.red,
       blue: base.blue,
       timeline: const [],
+      scoring: scoring,
     ),
     at ?? t0,
   );

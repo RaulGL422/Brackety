@@ -25,6 +25,7 @@ import dev.rgal.brackety.event.MatRepository;
 import dev.rgal.brackety.event.Modality;
 import dev.rgal.brackety.event.OrganizationRepository;
 import dev.rgal.brackety.event.RulebookService;
+import dev.rgal.brackety.event.ScoringRules;
 import dev.rgal.brackety.event.StaffNames;
 import dev.rgal.brackety.eventpackage.EventPackage.Category;
 import dev.rgal.brackety.eventpackage.EventPackage.CategoryPodiumEntry;
@@ -190,8 +191,13 @@ public class EventPackageService {
                         .sorted(Comparator.comparing(StaffMember::role).thenComparing(StaffMember::username))
                         .toList(),
                 eventCategories.stream()
-                        .map(c ->
-                                new Category(c.getName(), c.getMinAge(), c.getMaxAge(), c.getFormat(), c.getTeamSize()))
+                        .map(c -> new Category(
+                                c.getName(),
+                                c.getMinAge(),
+                                c.getMaxAge(),
+                                c.getFormat(),
+                                c.getTeamSize(),
+                                c.getMatchSeconds()))
                         .toList(),
                 eventOrganizations.stream()
                         .map(o -> new OrganizationEntry(o.getName(), o.getShortName()))
@@ -310,8 +316,7 @@ public class EventPackageService {
         }
         var categoryIds = new HashMap<String, UUID>();
         for (var c : p.categories()) {
-            var category = categories.save(
-                    new EventCategory(event.getId(), c.name().strip(), c.minAge(), c.maxAge(), c.teamSize()));
+            var category = categories.save(c.toCategory(event.getId()));
             categoryIds.put(category.getName(), category.getId());
         }
         var organizationIds = new HashMap<String, UUID>();
@@ -451,8 +456,7 @@ public class EventPackageService {
         var newCategories = 0;
         for (var c : p.categories()) {
             if (!categoryIds.containsKey(c.name().strip())) {
-                var category = categories.save(
-                        new EventCategory(eventId, c.name().strip(), c.minAge(), c.maxAge(), c.teamSize()));
+                var category = categories.save(c.toCategory(eventId));
                 categoryIds.put(category.getName(), category.getId());
                 newCategories++;
             }
@@ -655,10 +659,14 @@ public class EventPackageService {
                 event.modality().getMinRestSeconds(),
                 event.getOwnWeightRequirement(),
                 event.getOwnHeightRequirement(),
-                event.getOwnWarningReasons());
+                event.getOwnWarningReasons(),
+                event.modality().scoring());
     }
 
-    /** Packages from before the team rules (schema 1 of the first F1 builds) take the tambo defaults. */
+    /**
+     * Packages from before the team rules (schema 1 of the first F1 builds) take the tambo defaults; those from before
+     * the scoring rules (schema 3 and before), tambo's.
+     */
     private static Modality modality(EventPackage.Settings settings) {
         var defaults = Modality.tambo();
         return Modality.of(
@@ -669,7 +677,8 @@ public class EventPackageService {
                 Objects.requireNonNullElse(
                         settings.teamPointsLimit(), defaults.team().pointsLimit()),
                 Objects.requireNonNullElse(settings.minRestSeconds(), defaults.getMinRestSeconds()),
-                settings.changeoverSeconds());
+                settings.changeoverSeconds(),
+                Objects.requireNonNullElse(settings.scoring(), ScoringRules.TAMBO));
     }
 
     private LeagueEntry league(Event event) {

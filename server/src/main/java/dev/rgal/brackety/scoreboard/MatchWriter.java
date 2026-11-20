@@ -34,18 +34,21 @@ class MatchWriter {
     private final ParticipantRepository participants;
     private final CompetitorDirectory directory;
     private final EventService events;
+    private final MatchRulesService rules;
 
     MatchWriter(
             MatchRepository matches,
             MatchEventRepository matchEvents,
             ParticipantRepository participants,
             CompetitorDirectory directory,
-            EventService events) {
+            EventService events,
+            MatchRulesService rules) {
         this.matches = matches;
         this.matchEvents = matchEvents;
         this.participants = participants;
         this.directory = directory;
         this.events = events;
+        this.rules = rules;
     }
 
     /**
@@ -112,12 +115,9 @@ class MatchWriter {
         return age >= ONE_HAND_MIN_AGE && age <= ONE_HAND_MAX_AGE;
     }
 
-    static MatchState replay(Event event, Match match, List<MatchEvent> history) {
-        var teams = match.isTeamMatch();
+    MatchState replay(Event event, Match match, List<MatchEvent> history) {
         return MatchState.replay(
-                new MatchRules(
-                        Duration.ofSeconds(event.modality().matchSeconds(teams)),
-                        event.modality().pointsLimit(teams)),
+                rules.of(event, match),
                 history.stream().map(MatchEvent::toEntry).toList());
     }
 
@@ -129,9 +129,9 @@ class MatchWriter {
             Instant now,
             boolean checkOtherMats,
             boolean checkRest) {
-        var rules = state.refuse(action.type(), action.side(), action.deltaMs() == null ? 0 : action.deltaMs(), now);
-        if (rules.isPresent()) {
-            return Optional.of(new Refusal(Cause.RULES, rules.get()));
+        var refused = state.refuse(action.type(), action.side(), action.deltaMs() == null ? 0 : action.deltaMs(), now);
+        if (refused.isPresent()) {
+            return Optional.of(new Refusal(Cause.RULES, refused.get()));
         }
         // Reopening takes the mat and the fighters again, as a first start does.
         if ((action.type() == MatchEventType.START && !state.isStarted()) || action.type() == MatchEventType.REOPEN) {

@@ -14,14 +14,15 @@ import java.util.UUID;
  * {@code matReferees} has one entry per mat, in mat order (mat 1 first): its size is the number of
  * mats and each entry is the referee's account id, or null for a mat without referee yet.
  * {@code matchSeconds} (30 s to 20 min), {@code pointsLimit}, {@code attendancePoints}, {@code teamMatchSeconds},
- * {@code teamPointsLimit} (0 = no limit) and {@code minRestSeconds}: null keeps the current value.
+ * {@code teamPointsLimit} (0 = no limit, both; grappling has none) and {@code minRestSeconds}: null keeps the current
+ * value.
  */
 public record EventSettingsRequest(
         @NotBlank @Size(max = 120) String name,
         @NotNull LocalDate date,
         @NotEmpty @Size(max = 20) List<UUID> matReferees,
         @Min(30) @Max(1200) Integer matchSeconds,
-        @Min(1) @Max(99) Integer pointsLimit,
+        @Min(0) @Max(99) Integer pointsLimit,
         @Min(0) @Max(100) Integer attendancePoints,
         @Min(30) @Max(1200) Integer teamMatchSeconds,
         @Min(0) @Max(99) Integer teamPointsLimit,

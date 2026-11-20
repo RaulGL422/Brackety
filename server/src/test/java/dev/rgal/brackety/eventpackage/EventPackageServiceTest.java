@@ -8,6 +8,7 @@ import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventApiTest;
 import dev.rgal.brackety.event.EventPermission;
 import dev.rgal.brackety.event.RulebookService;
+import dev.rgal.brackety.event.ScoringRules;
 import dev.rgal.brackety.participant.Participant;
 import dev.rgal.brackety.participant.ParticipantRepository;
 import java.nio.charset.StandardCharsets;
@@ -248,6 +249,43 @@ class EventPackageServiceTest extends EventApiTest {
         emptyDatabase();
 
         assertThat(packages.load(file).eventId()).isNotNull();
+    }
+
+    // The laptop scores grappling as grappling: the rules and each category's length travel (schema 4).
+    @Test
+    void aGrapplingEventTravelsWithItsRulesAndLengths() {
+        jdbc.sql("update modality set scoring = ?::jsonb where event_id = ?")
+                .params(json.writeValueAsString(ScoringRules.GRAPPLING), eventId)
+                .update();
+        jdbc.sql("update event_category set match_seconds = 240 where event_id = ? and name = '7-8'")
+                .param(eventId)
+                .update();
+        var exported = packages.export(eventId, accountId("club1"));
+        emptyDatabase();
+
+        var loaded =
+                packages.export(packages.load(json.writeValueAsBytes(exported)).eventId(), accountId("club1"));
+
+        assertThat(loaded.event().scoring()).isEqualTo(ScoringRules.GRAPPLING);
+        assertThat(loaded.categories())
+                .filteredOn(c -> c.name().equals("7-8"))
+                .singleElement()
+                .extracting(EventPackage.Category::matchSeconds)
+                .isEqualTo(240);
+    }
+
+    @Test
+    void aVersion3FileWithoutRulesLoadsAsTambo() {
+        var file = edit(root -> {
+            root.put("schemaVersion", 3);
+            root.withObject("event").remove("scoring");
+            root.get("categories").forEach(c -> ((ObjectNode) c).remove("matchSeconds"));
+        });
+        emptyDatabase();
+
+        var loaded = packages.export(packages.load(file).eventId(), accountId("club1"));
+
+        assertThat(loaded.event().scoring()).isEqualTo(ScoringRules.TAMBO);
     }
 
     @Test

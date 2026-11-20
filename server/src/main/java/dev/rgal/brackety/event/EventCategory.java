@@ -34,6 +34,9 @@ public class EventCategory {
     private Integer teamSize;
     private int groupSize;
 
+    /** Its own match length; null follows its modality. */
+    private Integer matchSeconds;
+
     protected EventCategory() {}
 
     public EventCategory(UUID eventId, String name, int minAge, int maxAge) {
@@ -53,6 +56,21 @@ public class EventCategory {
         this.format = teamSize == null ? Format.INDIVIDUAL : Format.TEAM;
         this.teamSize = teamSize;
         this.groupSize = GROUP_SIZE;
+    }
+
+    /** The same category in another phase of the league. */
+    public EventCategory copyFor(UUID otherEventId) {
+        var copy = new EventCategory(otherEventId, name, minAge, maxAge, teamSize);
+        copy.matchSeconds = matchSeconds;
+        return copy;
+    }
+
+    public void setMatchSeconds(Integer matchSeconds) {
+        this.matchSeconds = matchSeconds;
+    }
+
+    public Integer getMatchSeconds() {
+        return matchSeconds;
     }
 
     public UUID getId() {

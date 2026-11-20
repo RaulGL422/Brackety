@@ -32,7 +32,7 @@ final class MatchRefusals {
             return Optional.of("Not in this sport.");
         }
         if ((type == MatchEventType.POINT || type == MatchEventType.POINT_REMOVED)
-                && (value < 1 || value > scoring.maxPointValue())) {
+                && scoring.actions().stream().noneMatch(action -> action.value() == value)) {
             return Optional.of("This sport has no such value.");
         }
         return Optional.ofNullable(byState(match, type, side, deltaMs, value, now));

@@ -1669,6 +1669,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get categoryMaxAge => 'To';
 
   @override
+  String categoryOwnLength(String length) {
+    return '$length per match';
+  }
+
+  @override
+  String get categoryMatchLength => 'Own match length (min:s)';
+
+  @override
+  String get categoryMatchLengthHint =>
+      'Empty: the event\'s. In grappling, 4:00 for U13, U15 and veterans.';
+
+  @override
   String get categoryByTeams => 'By teams';
 
   @override
@@ -2312,6 +2324,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get disciplineTambo => 'Tambo';
+
+  @override
+  String get disciplineGrappling => 'Grappling';
 
   @override
   String get disciplineGround => 'Ground';

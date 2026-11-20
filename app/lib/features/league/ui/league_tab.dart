@@ -151,6 +151,7 @@ class _Phases extends ConsumerWidget {
 
 String disciplineName(AppLocalizations l10n, Discipline d) => switch (d) {
   Discipline.tambo => l10n.disciplineTambo,
+  Discipline.grappling => l10n.disciplineGrappling,
   Discipline.ground => l10n.disciplineGround,
   Discipline.throws => l10n.disciplineThrows,
   Discipline.technicalExpression => l10n.disciplineTechnicalExpression,
