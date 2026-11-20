@@ -130,13 +130,16 @@ public class LeagueService {
                 request.date(),
                 request.attendancePoints(),
                 clock.instant()));
-        for (var member : staff.findByEventId(eventId)) {
+        var lasting = staff.findLastingByEventId(eventId);
+        for (var member : lasting) {
             staff.save(new EventStaff(phase.getId(), member.getAccountId(), member.getRole()));
         }
         staff.flush();
         access.copyPermissions(eventId, phase.getId());
+        var kept = lasting.stream().map(EventStaff::getAccountId).collect(Collectors.toSet());
         for (var mat : mats.findByEventIdOrderByNumber(eventId)) {
-            mats.save(new Mat(phase.getId(), mat.getNumber(), mat.getRefereeAccountId()));
+            var referee = kept.contains(mat.getRefereeAccountId()) ? mat.getRefereeAccountId() : null;
+            mats.save(new Mat(phase.getId(), mat.getNumber(), referee));
         }
         for (var c : categories.findByEventIdOrderByMinAge(eventId)) {
             categories.save(c.copyFor(phase.getId()));

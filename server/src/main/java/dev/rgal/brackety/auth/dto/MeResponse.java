@@ -9,4 +9,6 @@ public record MeResponse(
         LocalDate birthDate,
         String locale,
         List<ProfileResponse> profiles,
-        List<SignInMethodResponse> signInMethods) {}
+        List<SignInMethodResponse> signInMethods,
+        // Let in by QR for one event: the app hides what such an account cannot do.
+        boolean temporary) {}

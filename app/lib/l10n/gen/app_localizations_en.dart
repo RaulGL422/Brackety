@@ -3080,4 +3080,110 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get permissionsReadOnly =>
       'You can only look: the club has not let you change anything here.';
+
+  @override
+  String get qrAccessCreateHelper => 'Helper by QR';
+
+  @override
+  String qrAccessCreateReferee(int mat) {
+    return 'Mat $mat referee by QR';
+  }
+
+  @override
+  String get qrAccessHint =>
+      'For someone helping without a Brackety account: type their name and let them scan the QR with their phone. They get in without signing up, only to this event and while the phase lasts.';
+
+  @override
+  String get qrAccessName => 'Full name';
+
+  @override
+  String get qrAccessCreate => 'Create QR';
+
+  @override
+  String get qrAccessPhaseFinished => 'The phase is over: no more QR access.';
+
+  @override
+  String get qrAccessTooMany => 'This event already has too many QR accesses.';
+
+  @override
+  String qrAccessCodeLabel(String name) {
+    return 'Access QR for $name';
+  }
+
+  @override
+  String get qrAccessScan =>
+      'Let them scan it with their phone camera. It works once.';
+
+  @override
+  String get qrAccessWaiting => 'Waiting for them to sign in…';
+
+  @override
+  String qrAccessSignedIn(String name) {
+    return '$name is in.';
+  }
+
+  @override
+  String get qrAccessTitle => 'QR access';
+
+  @override
+  String get qrAccessSectionHint =>
+      'Helpers and referees without an account. Each QR works once and for one phone: if they change phones, create a new one. They stop working when the phase ends.';
+
+  @override
+  String qrAccessMatsWithoutReferee(String mats) {
+    return 'Mats without a referee: $mats. Use the QR next to each mat.';
+  }
+
+  @override
+  String get qrAccessNoGrouper => 'Nobody but the club can create groups.';
+
+  @override
+  String qrAccessRefereeOf(int mat) {
+    return 'Mat $mat referee';
+  }
+
+  @override
+  String get qrAccessReferee => 'Referee';
+
+  @override
+  String get qrAccessHelper => 'Helper';
+
+  @override
+  String get qrAccessEnded => 'no access';
+
+  @override
+  String qrAccessSignedInAt(String time) {
+    return 'signed in at $time';
+  }
+
+  @override
+  String get qrAccessNotYet => 'not signed in yet';
+
+  @override
+  String get qrAccessRenew => 'New QR (signs them out)';
+
+  @override
+  String get qrAccessEnd => 'Remove access';
+
+  @override
+  String qrAccessEndConfirm(String name) {
+    return '$name will no longer be able to sign in and will be signed out.';
+  }
+
+  @override
+  String get qrAccessSignInTitle => 'Sign in with QR';
+
+  @override
+  String get qrAccessInvalid =>
+      'This QR no longer works: ask the club for a new one.';
+
+  @override
+  String get qrAccessGoToLogin => 'Go to sign in';
+
+  @override
+  String get qrAccessReplaceSession =>
+      'You are signing in with the club\'s QR. The session open on this device will end.';
+
+  @override
+  String get qrAccessEnter => 'Sign in';
 }

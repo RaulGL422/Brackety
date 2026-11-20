@@ -5003,6 +5003,180 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Solo puedes mirar: el club no te ha dado permiso para cambiar nada aquí.'**
   String get permissionsReadOnly;
+
+  /// No description provided for @qrAccessCreateHelper.
+  ///
+  /// In es, this message translates to:
+  /// **'Ayudante por QR'**
+  String get qrAccessCreateHelper;
+
+  /// No description provided for @qrAccessCreateReferee.
+  ///
+  /// In es, this message translates to:
+  /// **'Árbitro del tapiz {mat} por QR'**
+  String qrAccessCreateReferee(int mat);
+
+  /// No description provided for @qrAccessHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Para quien ayuda sin cuenta en Brackety: escribe su nombre y que escanee el QR con su móvil. Entra sin registrarse, solo en este evento y mientras dure la fase.'**
+  String get qrAccessHint;
+
+  /// No description provided for @qrAccessName.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre y apellidos'**
+  String get qrAccessName;
+
+  /// No description provided for @qrAccessCreate.
+  ///
+  /// In es, this message translates to:
+  /// **'Crear QR'**
+  String get qrAccessCreate;
+
+  /// No description provided for @qrAccessPhaseFinished.
+  ///
+  /// In es, this message translates to:
+  /// **'La fase ha terminado: ya no hay accesos por QR.'**
+  String get qrAccessPhaseFinished;
+
+  /// No description provided for @qrAccessTooMany.
+  ///
+  /// In es, this message translates to:
+  /// **'Este evento ya tiene demasiados accesos por QR.'**
+  String get qrAccessTooMany;
+
+  /// No description provided for @qrAccessCodeLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'QR de acceso de {name}'**
+  String qrAccessCodeLabel(String name);
+
+  /// No description provided for @qrAccessScan.
+  ///
+  /// In es, this message translates to:
+  /// **'Que lo escanee con la cámara de su móvil. Sirve una sola vez.'**
+  String get qrAccessScan;
+
+  /// No description provided for @qrAccessWaiting.
+  ///
+  /// In es, this message translates to:
+  /// **'Esperando a que entre…'**
+  String get qrAccessWaiting;
+
+  /// No description provided for @qrAccessSignedIn.
+  ///
+  /// In es, this message translates to:
+  /// **'{name} ha entrado.'**
+  String qrAccessSignedIn(String name);
+
+  /// No description provided for @qrAccessTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Acceso por QR'**
+  String get qrAccessTitle;
+
+  /// No description provided for @qrAccessSectionHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Ayudantes y árbitros sin cuenta. Cada QR sirve una vez y para un solo móvil: si cambia de móvil, crea uno nuevo. Al terminar la fase dejan de funcionar.'**
+  String get qrAccessSectionHint;
+
+  /// No description provided for @qrAccessMatsWithoutReferee.
+  ///
+  /// In es, this message translates to:
+  /// **'Tapices sin árbitro: {mats}. Usa el QR junto a cada tapiz.'**
+  String qrAccessMatsWithoutReferee(String mats);
+
+  /// No description provided for @qrAccessNoGrouper.
+  ///
+  /// In es, this message translates to:
+  /// **'Nadie más que el club puede crear grupos.'**
+  String get qrAccessNoGrouper;
+
+  /// No description provided for @qrAccessRefereeOf.
+  ///
+  /// In es, this message translates to:
+  /// **'Árbitro del tapiz {mat}'**
+  String qrAccessRefereeOf(int mat);
+
+  /// No description provided for @qrAccessReferee.
+  ///
+  /// In es, this message translates to:
+  /// **'Árbitro'**
+  String get qrAccessReferee;
+
+  /// No description provided for @qrAccessHelper.
+  ///
+  /// In es, this message translates to:
+  /// **'Ayudante'**
+  String get qrAccessHelper;
+
+  /// No description provided for @qrAccessEnded.
+  ///
+  /// In es, this message translates to:
+  /// **'sin acceso'**
+  String get qrAccessEnded;
+
+  /// No description provided for @qrAccessSignedInAt.
+  ///
+  /// In es, this message translates to:
+  /// **'entró a las {time}'**
+  String qrAccessSignedInAt(String time);
+
+  /// No description provided for @qrAccessNotYet.
+  ///
+  /// In es, this message translates to:
+  /// **'aún no ha entrado'**
+  String get qrAccessNotYet;
+
+  /// No description provided for @qrAccessRenew.
+  ///
+  /// In es, this message translates to:
+  /// **'Nuevo QR (cierra su sesión)'**
+  String get qrAccessRenew;
+
+  /// No description provided for @qrAccessEnd.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar acceso'**
+  String get qrAccessEnd;
+
+  /// No description provided for @qrAccessEndConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'{name} dejará de poder entrar y se cerrará su sesión.'**
+  String qrAccessEndConfirm(String name);
+
+  /// No description provided for @qrAccessSignInTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Entrar con QR'**
+  String get qrAccessSignInTitle;
+
+  /// No description provided for @qrAccessInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'Este QR ya no sirve: pide al club uno nuevo.'**
+  String get qrAccessInvalid;
+
+  /// No description provided for @qrAccessGoToLogin.
+  ///
+  /// In es, this message translates to:
+  /// **'Ir a iniciar sesión'**
+  String get qrAccessGoToLogin;
+
+  /// No description provided for @qrAccessReplaceSession.
+  ///
+  /// In es, this message translates to:
+  /// **'Vas a entrar con el QR del club. Se cerrará la sesión que tienes abierta en este dispositivo.'**
+  String get qrAccessReplaceSession;
+
+  /// No description provided for @qrAccessEnter.
+  ///
+  /// In es, this message translates to:
+  /// **'Entrar'**
+  String get qrAccessEnter;
 }
 
 class _AppLocalizationsDelegate

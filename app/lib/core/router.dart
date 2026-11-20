@@ -24,6 +24,7 @@ import '../features/mat/ui/mat_board_screen.dart';
 import '../features/scoreboard/ui/match_watch_screen.dart';
 import '../features/scoreboard/ui/scoreboard_screen.dart';
 import '../features/staff/ui/invitation_screen.dart';
+import '../features/staff/ui/qr_sign_in_screen.dart';
 import '../l10n/gen/app_localizations.dart';
 
 // Email links land here whatever the session (the server builds them, docs/modulos/auth.md).
@@ -33,6 +34,8 @@ const _anySession = {
   '/reset-password',
   '/forgot-password',
   '/confirm-email-change',
+  // A club's staff QR: signs in by itself, or asks first when another account is signed in.
+  '/qr',
 };
 // Legal pages too: the sign-up links to them and the web shows them to anyone.
 const _anySessionPrefix = '/legal/';
@@ -142,6 +145,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/invitation',
         builder: (_, state) =>
             InvitationScreen(token: state.uri.queryParameters['token']),
+      ),
+      GoRoute(
+        path: '/qr',
+        builder: (_, state) =>
+            QrSignInScreen(code: state.uri.queryParameters['code']),
       ),
       GoRoute(
         path: '/connection',

@@ -8,6 +8,7 @@ class Account {
     required this.locale,
     required this.profiles,
     required this.signInMethods,
+    this.temporary = false,
   });
 
   factory Account.fromJson(Map<String, dynamic> json) => Account(
@@ -22,6 +23,7 @@ class Account {
       for (final method in json['signInMethods'] as List<dynamic>)
         SignInMethod.fromJson(method as Map<String, dynamic>),
     ],
+    temporary: json['temporary'] as bool? ?? false,
   );
 
   final String email;
@@ -29,6 +31,9 @@ class Account {
   final String locale;
   final List<AccountProfile> profiles;
   final List<SignInMethod> signInMethods;
+
+  /// Let in by a club's QR for one event: no events of its own, no account settings.
+  final bool temporary;
 
   bool get hasPassword =>
       signInMethods.any((m) => m.method == SignInMethod.password);

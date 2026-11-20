@@ -29,6 +29,7 @@ Lo que espera a alguien, ordenado por quién tiene que actuar. Lo hecho se borra
 Todo está fusionado; falta comprobarlo en debug o en la Pi.
 - [ ] `auth` completo: registro, login y bloqueo, verificación, recuperación, Google, perfiles, cambio de email, borrado y restaurar, exportación; admin con superadmin (`modulos/auth.md`).
 - [ ] `legal-paginas`: páginas, casilla del registro, pie y ajustes.
+- [ ] Acceso por QR con un móvil real: escanear, arbitrar, «Nuevo QR» saca al anterior, finalizar la fase lo cierra (`modulos/ayudantes-permisos.md`).
 - [ ] Grappling (G1-G5): escenario `grappling`; marcador, prórroga, puntos de clasificación y «Nuevo evento» (`producto/grappling.md`).
 - [ ] Liga y fases: liga primero, podios de un toque, reinscripción, puntos por asistir (#81, #86, #89).
 - [ ] Tiempo real: el marcador, el tablero, Tapices y Puntuaciones se actualizan solos.
