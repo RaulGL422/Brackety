@@ -79,4 +79,4 @@ Ver `diseno-revision.md`. Regla al tocar una pantalla: `build` ≤ 60 líneas, a
 | Claves foráneas consultadas sin índice | 8 | 0 |
 
 ## Estado
-Aprobado por Raul (2026-11-18); L0 en curso, en paralelo a la competición del 20-12.
+Aprobado por Raul (2026-11-18). L0 completa (2026-11-20); siguiente, L1.
