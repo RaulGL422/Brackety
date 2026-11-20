@@ -797,6 +797,43 @@ class AppLocalizationsEs extends AppLocalizations {
   String get addPoint => '+1';
 
   @override
+  String addPointsFor(int points, String corner, String labels) {
+    return '+$points $corner: $labels';
+  }
+
+  @override
+  String removePointsValue(int points) {
+    String _temp0 = intl.Intl.pluralLogic(
+      points,
+      locale: localeName,
+      other: 'Quitar $points puntos',
+      one: 'Quitar 1 punto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get extraTimeWon => 'Gana la prórroga';
+
+  @override
+  String extraTimeWonBy(String corner) {
+    return '$corner gana la prórroga';
+  }
+
+  @override
+  String winConfirmTitle(String what) {
+    return '¿$what?';
+  }
+
+  @override
+  String winConfirmBody(String corner) {
+    return 'Gana $corner y el combate termina. Se puede deshacer.';
+  }
+
+  @override
+  String get winConfirm => 'Dar la victoria';
+
+  @override
   String addPointFor(String corner) {
     return '+1 $corner';
   }

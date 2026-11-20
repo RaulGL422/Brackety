@@ -331,7 +331,9 @@ class ScoreboardService {
                         ? writer.restedAt(match, event).filter(now::isBefore).orElse(null)
                         : null,
                 event.warningReasons(),
-                rules.scoring());
+                rules.scoring(),
+                state.winner(now).orElse(null),
+                state.needsExtraTime(now));
     }
 
     private Map<UUID, String> actors(Stream<UUID> ids) {

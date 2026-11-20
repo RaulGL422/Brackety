@@ -15,7 +15,9 @@ import java.util.UUID;
  * {@code review}: null unless an offline action clashed and the club has to review it. {@code matId} and
  * {@code matNumber}: null for a team match in the pool, until a mat starts it. {@code readyAt}: a pending match whose
  * fighters have not had the least rest yet, until when; the device refuses to start it before. {@code scoring}: how
- * the match's sport scores (the referee's buttons and rules), so the device needs no copy of them.
+ * the match's sport scores (the referee's buttons and rules), so the device needs no copy of them. {@code winner}:
+ * RED or BLUE once the match is decided, by the sport's rules and tiebreaks; null while it goes on or on a draw.
+ * {@code needsExtraTime}: the time ended on a tie no tiebreak settles, and the referee must say who won the extra time.
  */
 public record MatchView(
         UUID id,
@@ -36,7 +38,9 @@ public record MatchView(
         Review review,
         Instant readyAt,
         List<String> warningReasons,
-        ScoringRules scoring) {
+        ScoringRules scoring,
+        Side winner,
+        boolean needsExtraTime) {
 
     /**
      * A participant ({@code participantId}) or a team ({@code teamId}, {@code teamNumber}); {@code members}

@@ -411,6 +411,9 @@ class MatchView {
     this.readyAt,
     this.warningReasons = const [],
     this.scoring = Scoring.tambo,
+    this.ruledWinner,
+    this.winnerRuled = false,
+    this.needsExtraTime = false,
   });
 
   factory MatchView.fromJson(Map<String, dynamic> json) => MatchView(
@@ -447,6 +450,9 @@ class MatchView {
       for (final r in json['warningReasons'] as List? ?? const []) r as String,
     ],
     scoring: Scoring.fromJson(json['scoring'] as Map<String, dynamic>?),
+    ruledWinner: sideFromJson(json['winner']),
+    winnerRuled: json.containsKey('winner'),
+    needsExtraTime: json['needsExtraTime'] as bool? ?? false,
   );
 
   Map<String, dynamic> toJson() => {
@@ -465,6 +471,8 @@ class MatchView {
     'remainingMs': remaining.inMilliseconds,
     'running': running,
     'endReason': endReasonToJson(endReason),
+    if (winnerRuled) 'winner': sideToJson(ruledWinner),
+    'needsExtraTime': needsExtraTime,
     'red': red.toJson(),
     'blue': blue.toJson(),
     'timeline': [for (final e in timeline) e.toJson()],
@@ -511,6 +519,15 @@ class MatchView {
   /// How the match's sport scores (the referee's buttons and rules), from the server.
   final Scoring scoring;
 
+  /// Who won by the sport's rules and tiebreaks, as the server or the device's replay says;
+  /// null while it goes on or on a draw. Only when [winnerRuled]: views from an older server
+  /// had no winner, and [winner] works it out from the points.
+  final Side? ruledWinner;
+  final bool winnerRuled;
+
+  /// The time ended on a tie no tiebreak settles: the referee says who won the extra time.
+  final bool needsExtraTime;
+
   /// What the device counts in `knownEvents`: the automatic stops are left out.
   int get knownEvents => timeline.where((e) => !e.automatic).length;
 
@@ -536,6 +553,9 @@ class MatchView {
     readyAt: readyAt,
     warningReasons: warningReasons,
     scoring: scoring,
+    ruledWinner: ruledWinner,
+    winnerRuled: winnerRuled,
+    needsExtraTime: needsExtraTime,
   );
 
   bool get finished => status == MatchStatus.finished;
@@ -553,25 +573,13 @@ class MatchView {
   /// disqualification or clock adjustment in force.
   TimelineEntry? get lastUndoable => finished
       ? null
-      : _sinceCancel
-            .where(
-              (e) =>
-                  !e.undone &&
-                  const {
-                    MatchAction.point,
-                    MatchAction.pointRemoved,
-                    MatchAction.warning,
-                    MatchAction.oneHandWarning,
-                    MatchAction.disqualification,
-                    MatchAction.clockAdjust,
-                  }.contains(e.action),
-            )
-            .lastOrNull;
+      : _sinceCancel.where((e) => !e.undone && e.action.undoable).lastOrNull;
 
   bool get canUndo => lastUndoable != null;
 
-  /// The rival of a disqualified fighter, else the one with more points; null on a draw.
+  /// Who won; null while it goes on or on a draw.
   Side? get winner {
+    if (winnerRuled) return ruledWinner;
     if (red.disqualified) return Side.blue;
     if (blue.disqualified) return Side.red;
     if (red.points == blue.points) return null;

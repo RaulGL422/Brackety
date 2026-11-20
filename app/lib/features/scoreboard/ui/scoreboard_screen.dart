@@ -7,6 +7,7 @@ import '../../../core/async_view.dart';
 import '../../../core/keep_screen_on.dart';
 import '../../../core/up_button.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../auth/ui/widgets/confirm_dialog.dart';
 import '../../mat/state/mat_providers.dart';
 import '../../mat/ui/fighter_text.dart';
 import '../../mat/ui/mat_label.dart';
@@ -16,6 +17,7 @@ import '../data/match_view.dart';
 import '../state/bell.dart';
 import '../state/match_controller.dart';
 import 'clock_bar.dart';
+import 'corner_buttons.dart';
 import 'corner_panel.dart';
 import 'final_score.dart';
 import 'match_corrections.dart';
@@ -109,8 +111,16 @@ class ScoreboardScreen extends ConsumerWidget {
                             )
                           : _Live(
                               view: view,
-                              onAction: (action, {side}) =>
-                                  _act(context, ref, view, action, side: side),
+                              onAction: (action, {side, points = 1, finish}) =>
+                                  _act(
+                                    context,
+                                    ref,
+                                    view,
+                                    action,
+                                    side: side,
+                                    points: points,
+                                    finish: finish,
+                                  ),
                               onAdjust: (delta) => _send(
                                 context,
                                 ref,
@@ -155,10 +165,25 @@ class ScoreboardScreen extends ConsumerWidget {
     MatchView view,
     MatchAction action, {
     Side? side,
+    int points = 1,
+    String? finish,
   }) async {
     final l10n = AppLocalizations.of(context);
     String? reason;
+    // A win at once ends the match: said out loud first. The finish's name is its reason.
     if (side != null &&
+        (action == MatchAction.submission || action == MatchAction.extraTime)) {
+      final cornerTitle = view.corner(side).title(l10n);
+      final what = finish ?? l10n.tlExtraTime;
+      final confirmed = await confirmAction(
+        context,
+        title: l10n.winConfirmTitle(what),
+        body: l10n.winConfirmBody(cornerTitle),
+        confirmLabel: l10n.winConfirm,
+      );
+      if (!confirmed || !context.mounted) return;
+      reason = finish;
+    } else if (side != null &&
         action != MatchAction.point &&
         action != MatchAction.pointRemoved) {
       final label = switch (action) {
@@ -185,6 +210,7 @@ class ScoreboardScreen extends ConsumerWidget {
       action,
       side: side,
       reason: reason,
+      points: points,
       undoing: action == MatchAction.undo ? view.lastUndoable : null,
     );
     // The match is over: the mat board must show the next recommendation.
@@ -201,13 +227,14 @@ class ScoreboardScreen extends ConsumerWidget {
     Side? side,
     String? reason,
     Duration? delta,
+    int points = 1,
     TimelineEntry? undoing,
   }) async {
     final l10n = AppLocalizations.of(context);
     final toasts = Toasts.of(context);
     final refused = await ref
         .read(matchControllerProvider(matchId).notifier)
-        .send(action, side: side, reason: reason, delta: delta);
+        .send(action, side: side, reason: reason, delta: delta, points: points);
     if (refused != null) {
       toasts.show(_refusalText(l10n, refused), kind: ToastKind.error);
     } else if (undoing != null) {
@@ -268,7 +295,13 @@ class _Live extends StatelessWidget {
   });
 
   final MatchView view;
-  final void Function(MatchAction action, {Side? side}) onAction;
+  final void Function(
+    MatchAction action, {
+    Side? side,
+    int points,
+    String? finish,
+  })
+  onAction;
   final void Function(Duration delta) onAdjust;
 
   /// Share of the height the clock takes in portrait.
@@ -285,17 +318,26 @@ class _Live extends StatelessWidget {
       child: CornerPanel(
         side: side,
         corner: view.corner(side),
-        canPoint: scoring || overtime,
-        canSanction: scoring,
-        // A correction: also once the time or the points ended it, not after a disqualification.
-        canRemove:
-            !locked &&
-            view.started &&
-            view.endReason != EndReason.disqualification &&
-            view.corner(side).points > 0,
-        onPoint: () => onAction(MatchAction.point, side: side),
-        onRemovePoint: () => onAction(MatchAction.pointRemoved, side: side),
-        onSanction: (action) => onAction(action, side: side),
+        buttons: CornerButtons(
+          side: side,
+          corner: view.corner(side),
+          scoring: view.scoring,
+          extraTimeDue: view.needsExtraTime && !locked,
+          canPoint: scoring || overtime,
+          canSanction: scoring,
+          // A correction: also once the time or the points ended it, not after a disqualification.
+          canRemove:
+              !locked &&
+              view.started &&
+              view.endReason != EndReason.disqualification &&
+              view.corner(side).points > 0,
+          onPoint: (value) =>
+              onAction(MatchAction.point, side: side, points: value),
+          onRemovePoint: (value) =>
+              onAction(MatchAction.pointRemoved, side: side, points: value),
+          onChoice: (choice) =>
+              onAction(choice.action, side: side, finish: choice.finish),
+        ),
       ),
     );
     return Column(

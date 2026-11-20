@@ -367,6 +367,18 @@
   "undo": "Deshacer",
   "timeline": "Línea de tiempo",
   "addPoint": "+1",
+  "addPointsFor": "+{points} {corner}: {labels}",
+  "@addPointsFor": {"placeholders": {"points": {"type": "int"}, "corner": {"type": "String"}, "labels": {"type": "String"}}},
+  "removePointsValue": "{points, plural, =1{Quitar 1 punto} other{Quitar {points} puntos}}",
+  "@removePointsValue": {"placeholders": {"points": {"type": "int"}}},
+  "extraTimeWon": "Gana la prórroga",
+  "extraTimeWonBy": "{corner} gana la prórroga",
+  "@extraTimeWonBy": {"placeholders": {"corner": {"type": "String"}}},
+  "winConfirmTitle": "¿{what}?",
+  "@winConfirmTitle": {"placeholders": {"what": {"type": "String"}}},
+  "winConfirmBody": "Gana {corner} y el combate termina. Se puede deshacer.",
+  "@winConfirmBody": {"placeholders": {"corner": {"type": "String"}}},
+  "winConfirm": "Dar la victoria",
   "addPointFor": "+1 {corner}",
   "@addPointFor": {
     "placeholders": {

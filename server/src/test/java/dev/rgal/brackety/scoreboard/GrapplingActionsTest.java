@@ -50,6 +50,9 @@ class GrapplingActionsTest extends ScoreboardApiTest {
                 .andExpect(jsonPath("$.red.points").value(4))
                 .andExpect(jsonPath("$.blue.points").value(2))
                 .andExpect(jsonPath("$.endReason").value("SUBMISSION"))
+                // The winner by the rules, though Blue has fewer points.
+                .andExpect(jsonPath("$.winner").value("BLUE"))
+                .andExpect(jsonPath("$.needsExtraTime").value(false))
                 .andExpect(jsonPath("$.timeline[1].points").value(4))
                 .andExpect(jsonPath("$.timeline[2].points").value(2));
         act("FINISH", null, null).andExpect(status().isOk());
