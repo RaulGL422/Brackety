@@ -20,7 +20,7 @@
         <embedded-postgres-binaries.version>18.6.0</embedded-postgres-binaries.version>
         <spotless.version>3.11.0</spotless.version>
         <palantir-java-format.version>2.103.0</palantir-java-format.version>
-        <bouncycastle.version>1.86</bouncycastle.version>
+        <bouncycastle.version>1.87</bouncycastle.version>
         <archunit.version>1.5.1</archunit.version>
     </properties>
 
