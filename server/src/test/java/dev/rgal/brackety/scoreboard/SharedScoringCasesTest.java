@@ -2,8 +2,8 @@ package dev.rgal.brackety.scoreboard;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import dev.rgal.brackety.scoreboard.TamboMatch.Entry;
-import dev.rgal.brackety.scoreboard.TamboMatch.Rules;
+import dev.rgal.brackety.scoreboard.MatchState.Entry;
+import dev.rgal.brackety.scoreboard.MatchState.Rules;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,8 +20,8 @@ import org.junit.jupiter.api.TestFactory;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
-/** The scoring cases shared with the app (spec/scoring/tambo.json): both TamboMatch must agree on every one. */
-class TamboSharedCasesTest {
+/** The scoring cases shared with the app (spec/scoring/tambo.json): both MatchState must agree on every one. */
+class SharedScoringCasesTest {
 
     private static final Path CASES = Path.of("..", "spec", "scoring", "tambo.json");
     private static final Instant T0 = Instant.parse("2027-03-10T09:00:00Z");
@@ -30,7 +30,7 @@ class TamboSharedCasesTest {
     private static final Map<String, String> REFUSALS = Map.ofEntries(
             Map.entry("The match is finished.", "finished"),
             Map.entry("The match is over.", "over"),
-            Map.entry(TamboMatch.NOT_STARTED, "notStarted"),
+            Map.entry(MatchState.NOT_STARTED, "notStarted"),
             Map.entry("The clock is already running.", "running"),
             Map.entry("The clock is not running.", "notRunning"),
             Map.entry("Nothing to undo.", "nothingToUndo"),
@@ -60,7 +60,7 @@ class TamboSharedCasesTest {
         for (var entry : testCase.get("entries")) {
             entries.add(entry(entry));
         }
-        var match = TamboMatch.replay(new Rules(Duration.ofSeconds(length), limit), List.copyOf(entries));
+        var match = MatchState.replay(new Rules(Duration.ofSeconds(length), limit), List.copyOf(entries));
         var now = at(testCase.get("at"));
         var expect = testCase.get("expect");
 

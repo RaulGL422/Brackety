@@ -14,7 +14,7 @@ import java.util.UUID;
  * State of a tambo match rebuilt from its events in order (reglamento Yoseikan, cap. 3.1): clock,
  * points, warnings and how it ended. Undone events are skipped, so an undo never loses the trail.
  */
-final class TamboMatch {
+final class MatchState {
 
     enum EndReason {
         POINTS,
@@ -66,15 +66,15 @@ final class TamboMatch {
     private boolean finished;
     private Entry lastUndoable;
 
-    private TamboMatch(Rules rules) {
+    private MatchState(Rules rules) {
         this.rules = rules;
         for (var side : Side.values()) {
             tallies.put(side, new Tally());
         }
     }
 
-    static TamboMatch replay(Rules rules, List<Entry> entries) {
-        var match = new TamboMatch(rules);
+    static MatchState replay(Rules rules, List<Entry> entries) {
+        var match = new MatchState(rules);
         var undone = new HashSet<UUID>();
         entries.stream().filter(e -> e.type() == MatchEventType.UNDO).forEach(e -> undone.add(e.target()));
         entries.stream()

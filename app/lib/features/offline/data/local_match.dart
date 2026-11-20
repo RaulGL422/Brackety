@@ -1,6 +1,6 @@
 import '../../mat/data/mat_board.dart';
 import '../../scoreboard/data/match_view.dart';
-import '../../scoreboard/data/tambo_match.dart';
+import '../../scoreboard/data/match_state.dart';
 import 'offline_op.dart';
 
 /// A match as the device shows it: the last view from the server with the queued actions
@@ -17,10 +17,10 @@ class LocalMatch {
     bool heldForReview = false,
   }) {
     // The server's timeline already says what is undone, so its undos are not needed again.
-    final entries = <TamboEntry>[
+    final entries = <MatchEntry>[
       for (final (i, e) in server.timeline.indexed)
         if (e.action != MatchAction.undo && !e.undone)
-          TamboEntry(
+          MatchEntry(
             id: e.id ?? 'server-$i',
             action: e.action,
             side: e.side,
@@ -30,7 +30,7 @@ class LocalMatch {
     ];
     final timeline = [...server.timeline];
     var lastAt = server.timeline.lastOrNull?.at;
-    TamboMatch replay() => TamboMatch.replay(
+    MatchState replay() => MatchState.replay(
       length: server.length,
       pointsLimit: server.pointsLimit,
       entries: entries,
@@ -49,7 +49,7 @@ class LocalMatch {
         continue;
       }
       entries.add(
-        TamboEntry(
+        MatchEntry(
           id: op.opId,
           action: op.action,
           side: op.side,
@@ -84,7 +84,7 @@ class LocalMatch {
       final end = after.endReason(at);
       if (end != null && end != EndReason.time && after.isRunning(at)) {
         entries.add(
-          TamboEntry(id: 'stop-${op.opId}', action: MatchAction.stop, at: at),
+          MatchEntry(id: 'stop-${op.opId}', action: MatchAction.stop, at: at),
         );
         timeline.add(
           TimelineEntry(
@@ -162,7 +162,7 @@ class LocalMatch {
   }
 
   final MatchView view;
-  final TamboMatch _state;
+  final MatchState _state;
   final DateTime? _lastAt;
 
   /// Why the referee cannot do [action] now, checked here before it goes into the queue.

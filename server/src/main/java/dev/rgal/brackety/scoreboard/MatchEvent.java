@@ -121,7 +121,7 @@ public class MatchEvent {
         return deltaMs;
     }
 
-    TamboMatch.Entry toEntry() {
-        return new TamboMatch.Entry(id, type, side, at, targetEventId, deltaMs == null ? 0 : deltaMs);
+    MatchState.Entry toEntry() {
+        return new MatchState.Entry(id, type, side, at, targetEventId, deltaMs == null ? 0 : deltaMs);
     }
 }

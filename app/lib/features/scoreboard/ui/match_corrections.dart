@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
 import '../data/match_view.dart';
-import '../data/tambo_match.dart';
+import '../data/match_state.dart';
 import '../state/match_controller.dart';
 import 'reason_dialog.dart';
 

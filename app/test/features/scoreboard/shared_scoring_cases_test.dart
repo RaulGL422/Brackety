@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:brackety/features/scoreboard/data/match_view.dart';
-import 'package:brackety/features/scoreboard/data/tambo_match.dart';
+import 'package:brackety/features/scoreboard/data/match_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// The scoring cases shared with the server (spec/scoring/tambo.json): both TamboMatch must
+/// The scoring cases shared with the server (spec/scoring/tambo.json): both MatchState must
 /// agree on every one.
 void main() {
   final doc = jsonDecode(
@@ -25,13 +25,13 @@ void main() {
         ...defaults,
         ...?testCase['rules'] as Map<String, dynamic>?,
       };
-      final match = TamboMatch.replay(
+      final match = MatchState.replay(
         length: duration(rules['length']),
         pointsLimit: rules['pointsLimit'] as int,
         entries: [
           for (final e
               in (testCase['entries'] as List).cast<Map<String, dynamic>>())
-            TamboEntry(
+            MatchEntry(
               id: e['id'] as String,
               action: MatchAction.fromWire(e['action'] as String),
               at: at(e['at']),

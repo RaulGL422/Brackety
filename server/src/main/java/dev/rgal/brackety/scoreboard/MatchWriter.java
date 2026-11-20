@@ -7,8 +7,8 @@ import dev.rgal.brackety.grouping.CompetitorDirectory;
 import dev.rgal.brackety.grouping.Match;
 import dev.rgal.brackety.grouping.MatchRepository;
 import dev.rgal.brackety.participant.ParticipantRepository;
+import dev.rgal.brackety.scoreboard.MatchState.Rules;
 import dev.rgal.brackety.scoreboard.RejectedOp.Cause;
-import dev.rgal.brackety.scoreboard.TamboMatch.Rules;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -113,9 +113,9 @@ class MatchWriter {
         return age >= ONE_HAND_MIN_AGE && age <= ONE_HAND_MAX_AGE;
     }
 
-    static TamboMatch replay(Event event, Match match, List<MatchEvent> history) {
+    static MatchState replay(Event event, Match match, List<MatchEvent> history) {
         var teams = match.isTeamMatch();
-        return TamboMatch.replay(
+        return MatchState.replay(
                 new Rules(
                         Duration.ofSeconds(event.modality().matchSeconds(teams)),
                         event.modality().pointsLimit(teams)),
@@ -125,7 +125,7 @@ class MatchWriter {
     private Optional<Refusal> refusal(
             Match match,
             Event event,
-            TamboMatch state,
+            MatchState state,
             Action action,
             Instant now,
             boolean checkOtherMats,
@@ -205,7 +205,7 @@ class MatchWriter {
     private void stopIfOverAndSnapshot(Match match, Event event, List<MatchEvent> history, Action action, Instant now) {
         var state = replay(event, match, history);
         var endsNow =
-                state.endReason(now).filter(r -> r != TamboMatch.EndReason.TIME).isPresent();
+                state.endReason(now).filter(r -> r != MatchState.EndReason.TIME).isPresent();
         if (endsNow && state.isRunning(now)) {
             history.add(matchEvents.save(new MatchEvent(
                     match.getId(),

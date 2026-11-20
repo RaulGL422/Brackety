@@ -1,6 +1,6 @@
 import 'match_view.dart';
 
-/// Why an action cannot happen now: the server's `TamboMatch.refuse`, then what the offline
+/// Why an action cannot happen now: the server's `MatchState.refuse`, then what the offline
 /// queue checks on top (`notForAge`, `inReview`, `matBusy`), which the server would turn into
 /// a review.
 enum MatchRefusal {
@@ -24,8 +24,8 @@ enum MatchRefusal {
 }
 
 /// [target]: for an UNDO, the entry it undoes. [delta]: for a CLOCK_ADJUST, the time added.
-class TamboEntry {
-  const TamboEntry({
+class MatchEntry {
+  const MatchEntry({
     required this.id,
     required this.action,
     required this.at,
@@ -49,16 +49,16 @@ class _Tally {
 }
 
 /// State of a tambo match rebuilt from its entries in order: the same rules as the server's
-/// `TamboMatch` (reglamento Yoseikan, cap. 3.1), so the device can play on without network.
-class TamboMatch {
-  TamboMatch._(this.length, this.pointsLimit);
+/// `MatchState` (reglamento Yoseikan, cap. 3.1), so the device can play on without network.
+class MatchState {
+  MatchState._(this.length, this.pointsLimit);
 
-  factory TamboMatch.replay({
+  factory MatchState.replay({
     required Duration length,
     required int pointsLimit,
-    required List<TamboEntry> entries,
+    required List<MatchEntry> entries,
   }) {
-    final match = TamboMatch._(length, pointsLimit);
+    final match = MatchState._(length, pointsLimit);
     final undone = {
       for (final e in entries)
         if (e.action == MatchAction.undo) e.target,
@@ -80,9 +80,9 @@ class TamboMatch {
   Side? _disqualified;
   var _started = false;
   var _finished = false;
-  TamboEntry? _lastUndoable;
+  MatchEntry? _lastUndoable;
 
-  void _apply(TamboEntry e) {
+  void _apply(MatchEntry e) {
     switch (e.action) {
       case MatchAction.start:
         _started = true;
@@ -166,7 +166,7 @@ class TamboMatch {
   bool isRunning(DateTime now) =>
       _runningSince != null && remainingAt(now) > Duration.zero;
 
-  void _givePointToRival(TamboEntry warning) {
+  void _givePointToRival(MatchEntry warning) {
     _tallies[_rival(warning.side!)]!.points++;
     _autoPointWarnings.add(warning.id);
   }
@@ -202,7 +202,7 @@ class TamboMatch {
   Side? get disqualified => _disqualified;
   bool get started => _started;
   bool get finished => _finished;
-  TamboEntry? get lastUndoable => _lastUndoable;
+  MatchEntry? get lastUndoable => _lastUndoable;
 
   /// True for a warning (of either kind) that gave the rival a point.
   bool gaveAutoPoint(String warningId) =>

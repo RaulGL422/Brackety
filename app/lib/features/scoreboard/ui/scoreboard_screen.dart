@@ -12,7 +12,7 @@ import '../../mat/ui/fighter_text.dart';
 import '../../mat/ui/mat_label.dart';
 import '../../offline/ui/sync_status_icon.dart';
 import '../data/match_view.dart';
-import '../data/tambo_match.dart';
+import '../data/match_state.dart';
 import '../state/bell.dart';
 import '../state/match_controller.dart';
 import 'clock_bar.dart';
