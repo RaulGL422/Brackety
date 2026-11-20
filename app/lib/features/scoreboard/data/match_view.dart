@@ -2,7 +2,20 @@ import '../../mat/data/mat_board.dart';
 
 enum Side { red, blue }
 
-enum EndReason { points, time, disqualification }
+enum EndReason {
+  /// Reached the points limit (tambo).
+  points,
+
+  /// Reached the points difference (grappling's technical superiority).
+  superiority,
+  time,
+  disqualification,
+
+  /// The last warning a sport allows (grappling: the 4th).
+  warnings,
+  submission,
+  extraTime,
+}
 
 Side? sideFromJson(Object? value) => switch (value) {
   'RED' => Side.red,
@@ -11,6 +24,28 @@ Side? sideFromJson(Object? value) => switch (value) {
 };
 
 String? sideToJson(Side? side) => side?.name.toUpperCase();
+
+EndReason? endReasonFromJson(Object? value) => switch (value) {
+  'POINTS' => EndReason.points,
+  'SUPERIORITY' => EndReason.superiority,
+  'TIME' => EndReason.time,
+  'DISQUALIFICATION' => EndReason.disqualification,
+  'WARNINGS' => EndReason.warnings,
+  'SUBMISSION' => EndReason.submission,
+  'EXTRA_TIME' => EndReason.extraTime,
+  _ => null,
+};
+
+String? endReasonToJson(EndReason? reason) => switch (reason) {
+  EndReason.points => 'POINTS',
+  EndReason.superiority => 'SUPERIORITY',
+  EndReason.time => 'TIME',
+  EndReason.disqualification => 'DISQUALIFICATION',
+  EndReason.warnings => 'WARNINGS',
+  EndReason.submission => 'SUBMISSION',
+  EndReason.extraTime => 'EXTRA_TIME',
+  null => null,
+};
 
 enum MatchAction {
   start,
@@ -28,12 +63,33 @@ enum MatchAction {
   cancel,
 
   /// A finished match opens again to correct it (with a reason).
-  reopen;
+  reopen,
+
+  /// The side that made the other give up; ends the match (grappling).
+  submission,
+
+  /// The side that won the extra time of a match tied after every tiebreaker (grappling).
+  extraTime;
+
+  /// What an UNDO can take back: the referee's scoring actions, not the clock's start and
+  /// stop nor the outcome.
+  bool get undoable => switch (this) {
+    point ||
+    pointRemoved ||
+    clockAdjust ||
+    warning ||
+    oneHandWarning ||
+    disqualification ||
+    submission ||
+    extraTime => true,
+    start || stop || finish || cancel || reopen || undo => false,
+  };
 
   String get wire => switch (this) {
     oneHandWarning => 'ONE_HAND_WARNING',
     pointRemoved => 'POINT_REMOVED',
     clockAdjust => 'CLOCK_ADJUST',
+    extraTime => 'EXTRA_TIME',
     _ => name.toUpperCase(),
   };
 
@@ -355,12 +411,7 @@ class MatchView {
     pointsLimit: json['pointsLimit'] as int,
     remaining: Duration(milliseconds: json['remainingMs'] as int),
     running: json['running'] as bool,
-    endReason: switch (json['endReason']) {
-      'POINTS' => EndReason.points,
-      'TIME' => EndReason.time,
-      'DISQUALIFICATION' => EndReason.disqualification,
-      _ => null,
-    },
+    endReason: endReasonFromJson(json['endReason']),
     red: Corner.fromJson(json['red'] as Map<String, dynamic>),
     blue: Corner.fromJson(json['blue'] as Map<String, dynamic>),
     timeline: [
@@ -399,12 +450,7 @@ class MatchView {
     'pointsLimit': pointsLimit,
     'remainingMs': remaining.inMilliseconds,
     'running': running,
-    'endReason': switch (endReason) {
-      EndReason.points => 'POINTS',
-      EndReason.time => 'TIME',
-      EndReason.disqualification => 'DISQUALIFICATION',
-      null => null,
-    },
+    'endReason': endReasonToJson(endReason),
     'red': red.toJson(),
     'blue': blue.toJson(),
     'timeline': [for (final e in timeline) e.toJson()],

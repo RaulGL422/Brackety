@@ -5,6 +5,7 @@ Cada reglamento oficial se guarda como plantilla de deporte en un MD propio y co
 | Reglamento | Archivo | Estado |
 |---|---|---|
 | Liga Yoseikan Budo Andalucía 2027 | `yoseikan-2027.md` | Transcrito; faltan datos (ver pendientes) |
+| Grappling y Grappling-Gi FELODA (nov. 2025) | `grappling-feloda-2025.md` | Resumido; puntuación en `spec/scoring/grappling.json` |
 
 ## Reglas generales
 - La regla se fija por **modalidad + fase + categoría**; el organizador no la altera una vez publicado el evento.

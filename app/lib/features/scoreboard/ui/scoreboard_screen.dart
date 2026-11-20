@@ -11,8 +11,8 @@ import '../../mat/state/mat_providers.dart';
 import '../../mat/ui/fighter_text.dart';
 import '../../mat/ui/mat_label.dart';
 import '../../offline/ui/sync_status_icon.dart';
+import '../data/match_state.dart';
 import '../data/match_view.dart';
-import '../data/tambo_match.dart';
 import '../state/bell.dart';
 import '../state/match_controller.dart';
 import 'clock_bar.dart';
@@ -236,6 +236,10 @@ class ScoreboardScreen extends ConsumerWidget {
         MatchRefusal.noPoints => l10n.refusalNoPoints,
         MatchRefusal.clockRunning => l10n.refusalClockRunning,
         MatchRefusal.clockLimit => l10n.refusalClockLimit,
+        MatchRefusal.notInThisSport => l10n.refusalNotInThisSport,
+        MatchRefusal.invalidValue => l10n.refusalInvalidValue,
+        MatchRefusal.noExtraTime => l10n.refusalNoExtraTime,
+        MatchRefusal.extraTimePending => l10n.refusalExtraTimePending,
       };
 
   void _showTimeline(BuildContext context, MatchView view) {

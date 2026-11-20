@@ -133,13 +133,7 @@ class _WatchClockState extends ConsumerState<_WatchClock> {
     return Column(
       children: [
         Text(
-          over
-              ? switch (view.endReason) {
-                  EndReason.points => l10n.endPoints,
-                  EndReason.disqualification => l10n.endDisqualification,
-                  _ => l10n.endTime,
-                }
-              : clockLabel(left),
+          over ? endLabel(l10n, view.endReason) : clockLabel(left),
           style: text.displayMedium,
         ),
         if (!over)

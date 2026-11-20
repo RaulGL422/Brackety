@@ -843,6 +843,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get endDisqualification => 'Ended by disqualification';
 
   @override
+  String get endSuperiority => 'Ended by superiority';
+
+  @override
+  String get endWarnings => 'Ended by warnings';
+
+  @override
+  String get endSubmission => 'Ended by submission';
+
+  @override
+  String get endExtraTime => 'Ended in extra time';
+
+  @override
   String actionRefused(String detail) {
     return 'Could not record it. $detail';
   }
@@ -930,6 +942,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get refusalClockLimit => 'The clock cannot go further.';
+
+  @override
+  String get refusalNotInThisSport =>
+      'This action does not exist in this sport.';
+
+  @override
+  String get refusalInvalidValue => 'No action of this sport is worth that.';
+
+  @override
+  String get refusalNoExtraTime =>
+      'Extra time is only for a tie at the end that no tiebreaker settles.';
+
+  @override
+  String get refusalExtraTimePending =>
+      'Tied after every tiebreaker: extra time first.';
 
   @override
   String get settingsMatchRules => 'Matches';
@@ -2526,6 +2553,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tlReopen => 'Match reopened';
+
+  @override
+  String get tlSubmission => 'Submission';
+
+  @override
+  String get tlExtraTime => 'Extra time won';
 
   @override
   String get matOneAtATime =>

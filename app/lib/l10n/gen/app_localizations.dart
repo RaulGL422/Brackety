@@ -1448,6 +1448,30 @@ abstract class AppLocalizations {
   /// **'Fin por descalificación'**
   String get endDisqualification;
 
+  /// No description provided for @endSuperiority.
+  ///
+  /// In es, this message translates to:
+  /// **'Fin por superioridad'**
+  String get endSuperiority;
+
+  /// No description provided for @endWarnings.
+  ///
+  /// In es, this message translates to:
+  /// **'Fin por amonestaciones'**
+  String get endWarnings;
+
+  /// No description provided for @endSubmission.
+  ///
+  /// In es, this message translates to:
+  /// **'Fin por sumisión'**
+  String get endSubmission;
+
+  /// No description provided for @endExtraTime.
+  ///
+  /// In es, this message translates to:
+  /// **'Fin en la prórroga'**
+  String get endExtraTime;
+
   /// No description provided for @actionRefused.
   ///
   /// In es, this message translates to:
@@ -1597,6 +1621,30 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'El reloj no puede ir más allá.'**
   String get refusalClockLimit;
+
+  /// No description provided for @refusalNotInThisSport.
+  ///
+  /// In es, this message translates to:
+  /// **'Esta acción no existe en este deporte.'**
+  String get refusalNotInThisSport;
+
+  /// No description provided for @refusalInvalidValue.
+  ///
+  /// In es, this message translates to:
+  /// **'Ninguna acción de este deporte vale eso.'**
+  String get refusalInvalidValue;
+
+  /// No description provided for @refusalNoExtraTime.
+  ///
+  /// In es, this message translates to:
+  /// **'La prórroga es solo para un empate al final que no resuelve ningún desempate.'**
+  String get refusalNoExtraTime;
+
+  /// No description provided for @refusalExtraTimePending.
+  ///
+  /// In es, this message translates to:
+  /// **'Empate tras todos los desempates: primero la prórroga.'**
+  String get refusalExtraTimePending;
 
   /// No description provided for @settingsMatchRules.
   ///
@@ -4151,6 +4199,18 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Combate reabierto'**
   String get tlReopen;
+
+  /// No description provided for @tlSubmission.
+  ///
+  /// In es, this message translates to:
+  /// **'Sumisión'**
+  String get tlSubmission;
+
+  /// No description provided for @tlExtraTime.
+  ///
+  /// In es, this message translates to:
+  /// **'Prórroga ganada'**
+  String get tlExtraTime;
 
   /// No description provided for @matOneAtATime.
   ///

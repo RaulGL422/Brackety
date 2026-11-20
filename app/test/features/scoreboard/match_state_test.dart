@@ -1,11 +1,11 @@
+import 'package:brackety/features/scoreboard/data/match_state.dart';
 import 'package:brackety/features/scoreboard/data/match_view.dart';
-import 'package:brackety/features/scoreboard/data/tambo_match.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-// The same cases as the server's TamboMatchTest: both must agree on every rule.
+// The same cases as the server's MatchStateTest: both must agree on every rule.
 void main() {
   final t0 = DateTime.utc(2027, 3, 10, 9);
-  late List<TamboEntry> entries;
+  late List<MatchEntry> entries;
   var ids = 0;
 
   setUp(() => entries = []);
@@ -15,7 +15,7 @@ void main() {
   String add(MatchAction action, Side? side, int second, [String? target]) {
     final id = 'e${ids++}';
     entries.add(
-      TamboEntry(
+      MatchEntry(
         id: id,
         action: action,
         side: side,
@@ -26,7 +26,7 @@ void main() {
     return id;
   }
 
-  TamboMatch replay() => TamboMatch.replay(
+  MatchState replay() => MatchState.replay(
     length: const Duration(minutes: 2),
     pointsLimit: 15,
     entries: entries,
@@ -232,7 +232,7 @@ void main() {
   );
 
   test('with no points limit only the time ends it; a disqualification gives 15 at least', () {
-    TamboMatch teams() => TamboMatch.replay(
+    MatchState teams() => MatchState.replay(
       length: const Duration(minutes: 3),
       pointsLimit: 0,
       entries: entries,

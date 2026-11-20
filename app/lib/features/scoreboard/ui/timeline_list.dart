@@ -88,10 +88,23 @@ String actionLabel(AppLocalizations l10n, MatchAction action) =>
       MatchAction.finish => l10n.tlFinish,
       MatchAction.cancel => l10n.tlCancel,
       MatchAction.reopen => l10n.tlReopen,
+      MatchAction.submission => l10n.tlSubmission,
+      MatchAction.extraTime => l10n.tlExtraTime,
     };
 
 String? sideLabel(AppLocalizations l10n, Side? side) => switch (side) {
   Side.red => l10n.cornerRed,
   Side.blue => l10n.cornerBlue,
   null => null,
+};
+
+/// How the match ended, where the clock was.
+String endLabel(AppLocalizations l10n, EndReason? reason) => switch (reason) {
+  EndReason.points => l10n.endPoints,
+  EndReason.superiority => l10n.endSuperiority,
+  EndReason.disqualification => l10n.endDisqualification,
+  EndReason.warnings => l10n.endWarnings,
+  EndReason.submission => l10n.endSubmission,
+  EndReason.extraTime => l10n.endExtraTime,
+  EndReason.time || null => l10n.endTime,
 };

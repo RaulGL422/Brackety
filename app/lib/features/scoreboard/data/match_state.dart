@@ -1,6 +1,10 @@
+import 'corner_tally.dart';
 import 'match_view.dart';
+import 'scoring.dart';
 
-/// Why an action cannot happen now: the server's `TamboMatch.refuse`, then what the offline
+export 'scoring.dart';
+
+/// Why an action cannot happen now: the server's `MatchState.refuse`, then what the offline
 /// queue checks on top (`notForAge`, `inReview`, `matBusy`), which the server would turn into
 /// a review.
 enum MatchRefusal {
@@ -15,6 +19,18 @@ enum MatchRefusal {
   noPoints,
   clockRunning,
   clockLimit,
+
+  /// The action does not exist in this sport (a submission in tambo).
+  notInThisSport,
+
+  /// No action of the sport is worth that many points.
+  invalidValue,
+
+  /// The extra time is only for a tie that no tiebreaker settles.
+  noExtraTime,
+
+  /// Tied after every tiebreaker: the extra time comes before finishing.
+  extraTimePending,
   notForAge,
   inReview,
   matBusy,
@@ -24,14 +40,16 @@ enum MatchRefusal {
 }
 
 /// [target]: for an UNDO, the entry it undoes. [delta]: for a CLOCK_ADJUST, the time added.
-class TamboEntry {
-  const TamboEntry({
+/// [value]: for a POINT or POINT_REMOVED, how many points.
+class MatchEntry {
+  const MatchEntry({
     required this.id,
     required this.action,
     required this.at,
     this.side,
     this.target,
     this.delta = Duration.zero,
+    this.value = 1,
   });
 
   final String id;
@@ -40,25 +58,22 @@ class TamboEntry {
   final DateTime at;
   final String? target;
   final Duration delta;
+  final int value;
 }
 
-class _Tally {
-  var points = 0;
-  var warnings = 0;
-  var oneHandWarnings = 0;
-}
+/// State of a match rebuilt from its entries in order: the same rules as the server's
+/// `MatchState` (docs/reglamentos: tambo of the Yoseikan league, grappling of the FELODA),
+/// so the device can play on without network.
+class MatchState {
+  MatchState._(this.length, this.pointsLimit, this.scoring);
 
-/// State of a tambo match rebuilt from its entries in order: the same rules as the server's
-/// `TamboMatch` (reglamento Yoseikan, cap. 3.1), so the device can play on without network.
-class TamboMatch {
-  TamboMatch._(this.length, this.pointsLimit);
-
-  factory TamboMatch.replay({
+  factory MatchState.replay({
     required Duration length,
     required int pointsLimit,
-    required List<TamboEntry> entries,
+    Scoring scoring = Scoring.tambo,
+    required List<MatchEntry> entries,
   }) {
-    final match = TamboMatch._(length, pointsLimit);
+    final match = MatchState._(length, pointsLimit, scoring);
     final undone = {
       for (final e in entries)
         if (e.action == MatchAction.undo) e.target,
@@ -73,16 +88,20 @@ class TamboMatch {
 
   final Duration length;
   final int pointsLimit;
-  final _tallies = {Side.red: _Tally(), Side.blue: _Tally()};
+  final Scoring scoring;
+  final _tallies = {Side.red: CornerTally(), Side.blue: CornerTally()};
   final _autoPointWarnings = <String>{};
   var _elapsed = Duration.zero;
   DateTime? _runningSince;
   Side? _disqualified;
+  var _disqualifiedByWarnings = false;
+  Side? _submittedBy;
+  Side? _extraTimeWinner;
   var _started = false;
   var _finished = false;
-  TamboEntry? _lastUndoable;
+  MatchEntry? _lastUndoable;
 
-  void _apply(TamboEntry e) {
+  void _apply(MatchEntry e) {
     switch (e.action) {
       case MatchAction.start:
         _started = true;
@@ -91,27 +110,30 @@ class TamboMatch {
         _elapsed = elapsedAt(e.at);
         _runningSince = null;
       case MatchAction.point:
-        _tallies[e.side]!.points++;
-        _lastUndoable = e;
+        _tallies[e.side]!.score(e.value);
       case MatchAction.pointRemoved:
-        final tally = _tallies[e.side]!;
-        tally.points = tally.points > 0 ? tally.points - 1 : 0;
-        _lastUndoable = e;
+        _tallies[e.side]!.takeBack(e.value);
       case MatchAction.clockAdjust:
         // Only on a stopped clock; one that ran out of time stays stopped after the adjustment.
         _elapsed = _adjusted(elapsedAt(e.at), e.delta);
         _runningSince = null;
-        _lastUndoable = e;
       case MatchAction.warning:
-        // Every second warning gives the rival a point; one-hand warnings count apart.
-        if (++_tallies[e.side]!.warnings % 2 == 0) _givePointToRival(e);
-        _lastUndoable = e;
+        // Tambo: every second warning gives the rival a point; grappling: every one.
+        final warnings = ++_tallies[e.side]!.warnings;
+        if (warnings % scoring.warningsPerRivalPoint == 0) _givePointToRival(e);
+        if (warnings == scoring.warningsToDisqualify) {
+          _disqualified = e.side;
+          _disqualifiedByWarnings = true;
+        }
       case MatchAction.oneHandWarning:
         if (++_tallies[e.side]!.oneHandWarnings % 2 == 0) _givePointToRival(e);
-        _lastUndoable = e;
       case MatchAction.disqualification:
         _disqualified = e.side;
-        _lastUndoable = e;
+        _disqualifiedByWarnings = false;
+      case MatchAction.submission:
+        _submittedBy = e.side;
+      case MatchAction.extraTime:
+        _extraTimeWinner = e.side;
       case MatchAction.finish:
         _finished = true;
       case MatchAction.cancel:
@@ -121,20 +143,21 @@ class TamboMatch {
       case MatchAction.undo:
         throw ArgumentError('UNDO entries are never applied');
     }
+    if (e.action.undoable) _lastUndoable = e;
   }
 
   // As if it had never started: nothing before it can be undone either.
   void _cancel() {
     for (final t in _tallies.values) {
-      t
-        ..points = 0
-        ..warnings = 0
-        ..oneHandWarnings = 0;
+      t.clear();
     }
     _autoPointWarnings.clear();
     _elapsed = Duration.zero;
     _runningSince = null;
     _disqualified = null;
+    _disqualifiedByWarnings = false;
+    _submittedBy = null;
+    _extraTimeWinner = null;
     _started = false;
     _lastUndoable = null;
   }
@@ -166,31 +189,76 @@ class TamboMatch {
   bool isRunning(DateTime now) =>
       _runningSince != null && remainingAt(now) > Duration.zero;
 
-  void _givePointToRival(TamboEntry warning) {
+  void _givePointToRival(MatchEntry warning) {
     _tallies[_rival(warning.side!)]!.points++;
     _autoPointWarnings.add(warning.id);
   }
 
-  /// [pointsLimit] 0: no limit (team matches).
+  /// [pointsLimit] 0: no limit (team matches, grappling).
   bool get hasLimit => pointsLimit > 0;
 
   EndReason? endReason(DateTime now) {
-    if (_disqualified != null) return EndReason.disqualification;
+    if (_disqualified != null) {
+      return _disqualifiedByWarnings
+          ? EndReason.warnings
+          : EndReason.disqualification;
+    }
+    if (_submittedBy != null) return EndReason.submission;
+    if (_extraTimeWinner != null) return EndReason.extraTime;
     if (hasLimit && _tallies.values.any((t) => t.points >= pointsLimit)) {
       return EndReason.points;
+    }
+    final gap = scoring.superiorityGap;
+    if (gap > 0 &&
+        (_tallies[Side.red]!.points - _tallies[Side.blue]!.points).abs() >=
+            gap) {
+      return EndReason.superiority;
     }
     return remainingAt(now) == Duration.zero ? EndReason.time : null;
   }
 
+  /// Who won, once the match is over; null while it goes on, on a draw (tambo) or while a
+  /// tie waits for the extra time (grappling, art. 31).
+  Side? winner(DateTime now) => switch (endReason(now)) {
+    null => null,
+    EndReason.disqualification || EndReason.warnings => _rival(_disqualified!),
+    EndReason.submission => _submittedBy,
+    EndReason.extraTime => _extraTimeWinner,
+    EndReason.points || EndReason.superiority || EndReason.time => _onPoints(),
+  };
+
+  // More points; on a tie, the sport's tiebreakers (CornerTally).
+  Side? _onPoints() {
+    final lead = CornerTally.compare(
+      _tallies[Side.red]!,
+      _tallies[Side.blue]!,
+      tiebreaks: scoring.tiebreaks,
+    );
+    return lead == 0
+        ? null
+        : lead > 0
+        ? Side.red
+        : Side.blue;
+  }
+
+  /// The time ended on a tie that no tiebreaker settles: only the extra time decides
+  /// (grappling, art. 32).
+  bool needsExtraTime(DateTime now) =>
+      scoring.tiebreaks &&
+      endReason(now) == EndReason.time &&
+      winner(now) == null;
+
   /// What a disqualification gives the rival when there is no points limit, at least.
   static const disqualificationPoints = 15;
 
-  /// A disqualification scores 0 for the disqualified fighter and the points limit for the
-  /// rival, or with no limit the rival's points but at least [disqualificationPoints]; the
-  /// tally stays, so undoing it gives the points back.
+  /// With [Scoring.disqualificationScores], a disqualification scores 0 for the disqualified
+  /// fighter and the points limit for the rival, or with no limit the rival's points but at
+  /// least [disqualificationPoints]; the tally stays, so undoing it gives the points back.
   int points(Side side) {
     final disqualified = _disqualified;
-    if (disqualified == null) return _tallies[side]!.points;
+    if (disqualified == null || !scoring.disqualificationScores) {
+      return _tallies[side]!.points;
+    }
     if (disqualified == side) return 0;
     if (hasLimit) return pointsLimit;
     final own = _tallies[side]!.points;
@@ -202,25 +270,39 @@ class TamboMatch {
   Side? get disqualified => _disqualified;
   bool get started => _started;
   bool get finished => _finished;
-  TamboEntry? get lastUndoable => _lastUndoable;
+  MatchEntry? get lastUndoable => _lastUndoable;
 
   /// True for a warning (of either kind) that gave the rival a point.
   bool gaveAutoPoint(String warningId) =>
       _autoPointWarnings.contains(warningId);
 
   /// Why [action] cannot happen at [now], or null if it can. Checks only the match itself.
-  /// [side]: for a point removed; [delta]: for a clock adjustment.
+  /// [side]: for a point removed; [delta]: for a clock adjustment; [value]: for points.
   MatchRefusal? refuse(
     MatchAction action,
     DateTime now, {
     Side? side,
     Duration delta = Duration.zero,
+    int value = 1,
   }) {
     if (_finished) {
       return action == MatchAction.reopen ? null : MatchRefusal.finished;
     }
+    final notInThisSport = switch (action) {
+      MatchAction.oneHandWarning => !scoring.oneHandWarnings,
+      MatchAction.submission => !scoring.submissions,
+      MatchAction.extraTime => !scoring.tiebreaks,
+      _ => false,
+    };
+    if (notInThisSport) return MatchRefusal.notInThisSport;
+    if ((action == MatchAction.point || action == MatchAction.pointRemoved) &&
+        (value < 1 || value > scoring.maxPointValue)) {
+      return MatchRefusal.invalidValue;
+    }
     final end = endReason(now);
     final over = end != null;
+    // The time ended the match, but the last action's point may still come (tambo, F1-3).
+    final overButTime = end != null && end != EndReason.time;
     return switch (action) {
       MatchAction.start =>
         over
@@ -229,16 +311,16 @@ class TamboMatch {
             ? MatchRefusal.running
             : null,
       MatchAction.stop => isRunning(now) ? null : MatchRefusal.notRunning,
-      // The last action's point may come when the clock already shows 0:00 (F1-3); sanctions may not.
       MatchAction.point =>
-        end != null && end != EndReason.time
+        (scoring.pointsAfterTime ? overButTime : over)
             ? MatchRefusal.over
             : !_started
             ? MatchRefusal.notStarted
             : null,
       MatchAction.warning ||
       MatchAction.oneHandWarning ||
-      MatchAction.disqualification =>
+      MatchAction.disqualification ||
+      MatchAction.submission =>
         over
             ? MatchRefusal.over
             : !_started
@@ -248,22 +330,31 @@ class TamboMatch {
       MatchAction.pointRemoved =>
         !_started
             ? MatchRefusal.notStarted
-            : _disqualified != null
+            : _disqualified != null ||
+                  _submittedBy != null ||
+                  _extraTimeWinner != null
             ? MatchRefusal.over
-            : side != null && _tallies[side]!.points == 0
+            : side != null && _tallies[side]!.points < value
             ? MatchRefusal.noPoints
             : null,
       MatchAction.clockAdjust =>
         isRunning(now)
             ? MatchRefusal.clockRunning
-            : end != null && end != EndReason.time
+            : overButTime
             ? MatchRefusal.over
             : _cannotAdjust(now, delta)
             ? MatchRefusal.clockLimit
             : null,
+      MatchAction.extraTime =>
+        needsExtraTime(now) ? null : MatchRefusal.noExtraTime,
       MatchAction.undo =>
         _lastUndoable == null ? MatchRefusal.nothingToUndo : null,
-      MatchAction.finish => over ? null : MatchRefusal.notOver,
+      MatchAction.finish =>
+        !over
+            ? MatchRefusal.notOver
+            : needsExtraTime(now)
+            ? MatchRefusal.extraTimePending
+            : null,
       MatchAction.cancel => _started ? null : MatchRefusal.notStarted,
       MatchAction.reopen => MatchRefusal.notFinished,
     };

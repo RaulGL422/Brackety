@@ -337,7 +337,7 @@ class ScoreboardService {
     }
 
     private static List<TimelineEntry> timeline(
-            List<MatchEvent> history, TamboMatch state, Map<UUID, String> actors, Duration length) {
+            List<MatchEvent> history, MatchState state, Map<UUID, String> actors, Duration length) {
         var undone = history.stream()
                 .map(MatchEvent::getTargetEventId)
                 .filter(Objects::nonNull)
@@ -377,7 +377,7 @@ class ScoreboardService {
                         .toList());
     }
 
-    private Corner corner(Event event, TamboMatch state, Side side, Competitor fighter, Set<UUID> ghosts) {
+    private Corner corner(Event event, MatchState state, Side side, Competitor fighter, Set<UUID> ghosts) {
         var tally = state.corner(side);
         return new Corner(
                 fighter.isTeam() ? null : fighter.id(),

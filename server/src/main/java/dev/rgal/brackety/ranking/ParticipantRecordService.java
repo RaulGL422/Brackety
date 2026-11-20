@@ -141,7 +141,7 @@ class ParticipantRecordService {
                 .toList();
     }
 
-    // Those of their side that stand: a cancel starts the match over, as the scoreboard does (TamboMatch).
+    // Those of their side that stand: a cancel starts the match over, as the scoreboard does (MatchState).
     private static List<Incident> incidents(List<TimelineEntry> timeline, Side side) {
         var lastCancel = -1;
         for (int i = 0; i < timeline.size(); i++) {
