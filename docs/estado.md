@@ -9,7 +9,7 @@
 Estados: **pendiente** · **en curso** · **en pruebas** (hecho; falta la prueba a mano de Raul, lista en `pendientes.md`) · **cerrado**.
 
 ## Ahora
-- Calidad, fase L0 (`producto/plan-limpieza.md`): métricas en el CI (#137), ArchUnit (#138), lints estrictos (#139) y casos de reglas compartidos Java/Dart hechos; falta la comprobación de oro.
+- Calidad (`producto/plan-limpieza.md`): L0 completa (2026-11-20): métricas en el CI (#137), ArchUnit (#138), lints estrictos (#139), casos de reglas compartidos (#142) y comprobación de oro (#143, #149). Destapó el orden de nombres con acento en Linux (#144). Siguiente: L1.
 - Exportaciones a medida (`producto/exportaciones.md`): aprobadas en lo básico, por programar.
 - Esperando a Raul: detalles de la competición del 20-12, puntuación de la F2 y las preguntas de `pendientes.md`.
 
