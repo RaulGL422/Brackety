@@ -1358,6 +1358,48 @@ abstract class AppLocalizations {
   /// **'+1'**
   String get addPoint;
 
+  /// No description provided for @addPointsFor.
+  ///
+  /// In es, this message translates to:
+  /// **'+{points} {corner}: {labels}'**
+  String addPointsFor(int points, String corner, String labels);
+
+  /// No description provided for @removePointsValue.
+  ///
+  /// In es, this message translates to:
+  /// **'{points, plural, =1{Quitar 1 punto} other{Quitar {points} puntos}}'**
+  String removePointsValue(int points);
+
+  /// No description provided for @extraTimeWon.
+  ///
+  /// In es, this message translates to:
+  /// **'Gana la prórroga'**
+  String get extraTimeWon;
+
+  /// No description provided for @extraTimeWonBy.
+  ///
+  /// In es, this message translates to:
+  /// **'{corner} gana la prórroga'**
+  String extraTimeWonBy(String corner);
+
+  /// No description provided for @winConfirmTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿{what}?'**
+  String winConfirmTitle(String what);
+
+  /// No description provided for @winConfirmBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Gana {corner} y el combate termina. Se puede deshacer.'**
+  String winConfirmBody(String corner);
+
+  /// No description provided for @winConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'Dar la victoria'**
+  String get winConfirm;
+
   /// No description provided for @addPointFor.
   ///
   /// In es, this message translates to:

@@ -4,7 +4,9 @@ import 'package:brackety/features/offline/data/local_match.dart';
 import 'package:brackety/features/offline/data/offline_op.dart';
 import 'package:brackety/features/scoreboard/data/match_view.dart';
 import 'package:brackety/features/scoreboard/data/scoreboard_repository.dart';
+import 'package:brackety/features/scoreboard/data/scoring.dart';
 import 'package:brackety/features/scoreboard/state/bell.dart';
+import 'package:brackety/features/scoreboard/ui/corner_buttons.dart';
 import 'package:brackety/features/scoreboard/ui/scoreboard_screen.dart';
 import 'package:brackety/l10n/gen/app_localizations.dart';
 import 'package:brackety_core/brackety_core.dart';
@@ -152,7 +154,7 @@ void main() {
 
         Future<void> warn(int corner) async {
           await tester.tap(
-            find.byType(PopupMenuButton<MatchAction>).at(corner),
+            find.byType(PopupMenuButton<CornerChoice>).at(corner),
           );
           await settle(tester);
           await tester.tap(find.text('Warning'));
@@ -206,7 +208,7 @@ void main() {
       ),
     );
 
-    await tester.tap(find.byType(PopupMenuButton<MatchAction>).first);
+    await tester.tap(find.byType(PopupMenuButton<CornerChoice>).first);
     await settle(tester);
     await tester.tap(find.text('Disqualification'));
     await settle(tester);
@@ -238,7 +240,7 @@ void main() {
       matchView(status: MatchStatus.inProgress),
     );
 
-    await tester.tap(find.byType(PopupMenuButton<MatchAction>).first);
+    await tester.tap(find.byType(PopupMenuButton<CornerChoice>).first);
     await settle(tester);
     expect(find.text('Warning for hitting with one hand'), findsOneWidget);
     await tester.tap(find.text('Warning'));
@@ -303,8 +305,8 @@ void main() {
           ),
         );
 
-        final menu = tester.widget<PopupMenuButton<MatchAction>>(
-          find.byType(PopupMenuButton<MatchAction>).first,
+        final menu = tester.widget<PopupMenuButton<CornerChoice>>(
+          find.byType(PopupMenuButton<CornerChoice>).first,
         );
         expect(menu.enabled, isFalse);
         await tester.tap(find.widgetWithText(FilledButton, '+1').last);
@@ -445,9 +447,9 @@ void main() {
       FilledButton point() => tester.widget<FilledButton>(
         find.widgetWithText(FilledButton, '+1').first,
       );
-      PopupMenuButton<MatchAction> menu() =>
-          tester.widget<PopupMenuButton<MatchAction>>(
-            find.byType(PopupMenuButton<MatchAction>).first,
+      PopupMenuButton<CornerChoice> menu() =>
+          tester.widget<PopupMenuButton<CornerChoice>>(
+            find.byType(PopupMenuButton<CornerChoice>).first,
           );
 
       await open(tester, matchView());
@@ -587,7 +589,7 @@ void main() {
     setSize(tester, sizes['tablet']!);
     await open(tester, matchView(status: MatchStatus.inProgress));
 
-    await tester.tap(find.byType(PopupMenuButton<MatchAction>).first);
+    await tester.tap(find.byType(PopupMenuButton<CornerChoice>).first);
     await settle(tester);
     final label = find.text('Disqualification');
     final item = tester.widget<ListTile>(
@@ -652,5 +654,157 @@ void main() {
 
     await tester.pumpWidget(const SizedBox());
     expect(calls, [true, false]);
+  });
+
+  // Grappling's rules (FELODA): the buttons, the finish and the extra time come from them.
+  const grappling = Scoring(
+    actions: [
+      ScoringAction(value: 1, label: 'Salida o ataque'),
+      ScoringAction(value: 2, label: 'Derribo'),
+      ScoringAction(value: 3, label: 'Montada lateral'),
+      ScoringAction(value: 4, label: 'Montada o espalda'),
+    ],
+    warningPoints: [1],
+    warningsToDisqualify: 4,
+    superiorityGap: 15,
+    pointsAfterTime: false,
+    disqualificationScores: false,
+    oneHandWarnings: false,
+    finishes: ['Sumisión'],
+    tiebreaks: [
+      Tiebreak.bestAction,
+      Tiebreak.fewerWarnings,
+      Tiebreak.extraTime,
+    ],
+  );
+
+  // 2-2 with one 2 each and no warnings, the 2 minutes long over: only the extra time decides.
+  MatchView tiedAtTheEnd() {
+    final start = DateTime(2027, 3, 10, 9, 57);
+    OfflineOp op(int i, MatchAction action, {Side? side, int points = 1}) =>
+        OfflineOp(
+          opId: 'op$i',
+          matchId: 'm1',
+          action: action,
+          side: side,
+          points: points,
+          at: start.add(Duration(seconds: i * 10)),
+          knownEvents: i,
+        );
+    return LocalMatch.project(
+      matchView(
+        status: MatchStatus.inProgress,
+        scoring: grappling,
+        started: false,
+      ),
+      [
+        op(0, MatchAction.start),
+        op(1, MatchAction.point, side: Side.red, points: 2),
+        op(2, MatchAction.point, side: Side.blue, points: 2),
+      ],
+      DateTime(2027, 3, 10, 10, 0, 30),
+    ).view;
+  }
+
+  for (final MapEntry(key: device, value: size) in sizes.entries) {
+    testWidgets('the sport gives each value its button on $device', (
+      tester,
+    ) async {
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final (repository, _) = await open(
+        tester,
+        matchView(status: MatchStatus.inProgress, scoring: grappling),
+      );
+
+      for (final value in ['+1', '+2', '+3', '+4']) {
+        expect(find.text(value), findsNWidgets(2));
+      }
+      await tester.tap(find.text('+4').first);
+      await settle(tester);
+
+      expect(repository.sent.last, (MatchAction.point, Side.red, null));
+      expect(repository.sentPoints.last, 4);
+      expect(find.text('4'), findsWidgets);
+      expect(tester.takeException(), isNull);
+
+      await tester.pumpWidget(const SizedBox());
+    });
+
+    testWidgets(
+      'a tie no tiebreak settles asks who won the extra time on $device',
+      (tester) async {
+        tester.view.physicalSize = size;
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        final (repository, _) = await open(tester, tiedAtTheEnd());
+
+        expect(find.text('Won the extra time'), findsNWidgets(2));
+        expect(find.text('+4'), findsNothing);
+        await tester.tap(find.text('Won the extra time').last);
+        await settle(tester);
+        await tester.tap(find.text('Give the win'));
+        await settle(tester);
+
+        expect(repository.sent.last, (MatchAction.extraTime, Side.blue, null));
+        expect(tester.takeException(), isNull);
+
+        await tester.pumpWidget(const SizedBox());
+      },
+    );
+  }
+
+  testWidgets(
+    'a submission is picked from the menu, confirmed, and ends the match',
+    (tester) async {
+      final (repository, _) = await open(
+        tester,
+        matchView(status: MatchStatus.inProgress, scoring: grappling),
+      );
+
+      await tester.tap(find.byTooltip('Warnings: Red'));
+      await settle(tester);
+      await tester.tap(find.text('Sumisión'));
+      await settle(tester);
+      expect(find.text('Sumisión?'), findsOneWidget);
+      await tester.tap(find.text('Give the win'));
+      await settle(tester);
+
+      expect(repository.sent.single, (
+        MatchAction.submission,
+        Side.red,
+        'Sumisión',
+      ));
+    },
+  );
+
+  testWidgets('a value is taken back from its own menu', (tester) async {
+    final (repository, _) = await open(
+      tester,
+      matchView(status: MatchStatus.inProgress, scoring: grappling),
+    );
+    await tester.tap(find.text('+3').first);
+    await settle(tester);
+
+    await tester.tap(find.byTooltip('Warnings: Red'));
+    await settle(tester);
+    // Only what Red has can be taken back.
+    expect(
+      tester
+          .widget<PopupMenuItem<CornerChoice>>(
+            find.ancestor(
+              of: find.text('Take back 4 points'),
+              matching: find.byType(PopupMenuItem<CornerChoice>),
+            ),
+          )
+          .enabled,
+      isFalse,
+    );
+    await tester.tap(find.text('Take back 3 points'));
+    await settle(tester);
+
+    expect(repository.sent.last.$1, MatchAction.pointRemoved);
+    expect(repository.sentPoints.last, 3);
   });
 }

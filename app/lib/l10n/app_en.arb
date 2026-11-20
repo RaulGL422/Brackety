@@ -319,6 +319,18 @@
   "undo": "Undo",
   "timeline": "Timeline",
   "addPoint": "+1",
+  "addPointsFor": "+{points} {corner}: {labels}",
+  "@addPointsFor": {"placeholders": {"points": {"type": "int"}, "corner": {"type": "String"}, "labels": {"type": "String"}}},
+  "removePointsValue": "{points, plural, =1{Take back 1 point} other{Take back {points} points}}",
+  "@removePointsValue": {"placeholders": {"points": {"type": "int"}}},
+  "extraTimeWon": "Won the extra time",
+  "extraTimeWonBy": "{corner} won the extra time",
+  "@extraTimeWonBy": {"placeholders": {"corner": {"type": "String"}}},
+  "winConfirmTitle": "{what}?",
+  "@winConfirmTitle": {"placeholders": {"what": {"type": "String"}}},
+  "winConfirmBody": "{corner} wins and the match ends. It can be undone.",
+  "@winConfirmBody": {"placeholders": {"corner": {"type": "String"}}},
+  "winConfirm": "Give the win",
   "addPointFor": "+1 {corner}",
   "@addPointFor": {
     "placeholders": {

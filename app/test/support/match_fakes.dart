@@ -5,6 +5,7 @@ import 'package:brackety/features/offline/data/local_match.dart';
 import 'package:brackety/features/offline/data/offline_op.dart';
 import 'package:brackety/features/scoreboard/data/match_view.dart';
 import 'package:brackety/features/scoreboard/data/scoreboard_repository.dart';
+import 'package:brackety/features/scoreboard/data/scoring.dart';
 import 'package:brackety/features/scoreboard/state/bell.dart';
 import 'package:dio/dio.dart';
 
@@ -61,8 +62,12 @@ MatchView matchView({
   bool? started,
   DateTime? readyAt,
   List<String> warningReasons = const [],
+  Scoring scoring = Scoring.tambo,
+  bool needsExtraTime = false,
 }) => MatchView(
   warningReasons: warningReasons,
+  scoring: scoring,
+  needsExtraTime: needsExtraTime,
   id: 'm1',
   eventId: 'e1',
   matId: 'mat1',
@@ -114,6 +119,9 @@ class FakeScoreboardRepository implements ScoreboardRepository {
   String? refusal;
 
   final sent = <(MatchAction, Side?, String?)>[];
+
+  /// The points of each action sent (1 unless a point said more).
+  final sentPoints = <int>[];
   final knownSent = <int>[];
 
   /// Each answer waits for this, when set: the test decides when the server answers.
@@ -125,6 +133,7 @@ class FakeScoreboardRepository implements ScoreboardRepository {
   @override
   Future<MatchView> sendOp(OfflineOp op) async {
     sent.add((op.action, op.side, op.reason));
+    sentPoints.add(op.points);
     knownSent.add(op.knownEvents);
     await hold?.future;
     final refused = refusal;

@@ -139,6 +139,9 @@ class LocalMatch {
             remaining: state.remainingAt(now),
             running: state.isRunning(now),
             endReason: state.endReason(now),
+            ruledWinner: state.winner(now),
+            winnerRuled: true,
+            needsExtraTime: state.needsExtraTime(now),
             red: corner(Side.red),
             blue: corner(Side.blue),
             timeline: [

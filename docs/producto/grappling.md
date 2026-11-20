@@ -31,4 +31,4 @@ Pedido de Raul (2026-11-20): un evento de grappling con grupos como la F1 indivi
 - Juez y jefe de tapiz con dispositivo propio: un árbitro por tapiz apunta lo que decide el equipo.
 
 ## Estado
-G1 (#151), G2a (#153), G2b (#154) y G2c (#155) fusionadas. G2d hecha (2026-11-20). Siguiente: G3 (marcador). Inmovilizaciones con cronómetro (sambo) fuera: función nueva del marcador.
+G1-G2d fusionadas (#151, #153-#156). G3 hecha (2026-11-20): un botón por valor de las reglas en una fila (tambo sigue con +1 y −1), quitar puntos y acciones de victoria en el menú de la esquina, «Gana la prórroga» cuando el empate no se rompe; la vista del combate trae el ganador según las reglas. Probada en tests de 3 tamaños; en navegador, con el escenario de la G5. Siguiente: G4. Inmovilizaciones con cronómetro (sambo) fuera: función nueva del marcador.
