@@ -30,4 +30,4 @@ Pedido de Raul (2026-11-20): un evento de grappling con grupos como la F1 indivi
 - Juez y jefe de tapiz con dispositivo propio: un árbitro por tapiz apunta lo que decide el equipo.
 
 ## Estado
-G1 (#151) y G2a (#153) fusionadas. G2b hecha (2026-11-20): el valor de cada punto, Sumisión y Prórroga por la API, la cola sin red (CSV de rescate v3), el historial, los CSV y el traspaso del portátil a la Pi, que además ya conserva los ajustes de reloj. Siguiente: G2c.
+G1 (#151), G2a (#153) y G2b (#154) fusionadas. G2c hecha (2026-11-20): cada combate guarda ganador y cómo acabó; la tabla de puntos de clasificación es parte de las reglas (`ScoringRules.classification`) y Puntuaciones y su CSV ordenan por victorias, puntos de clasificación, combate directo, sumisiones, superioridades y puntos técnicos. Siguiente: G3 (marcador).

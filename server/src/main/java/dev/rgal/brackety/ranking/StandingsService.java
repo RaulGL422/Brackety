@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -87,12 +88,19 @@ class StandingsService {
         var ghosts = ghostsByGroup(eventMembers);
         var points = new HashMap<UUID, Integer>();
         var fought = new HashMap<UUID, Integer>();
+        var scoring = event.modality().scoring();
+        var classified = scoring.ranksByClassification() ? new ClassificationStandings(scoring) : null;
         for (var m : matches.findByEventId(eventId)) {
             if (m.getStatus() != Match.Status.FINISHED) {
                 continue;
             }
-            count(m, competitors.get(m.getRedId()), Side.RED, m.getRedScore(), ghosts, points, fought);
-            count(m, competitors.get(m.getBlueId()), Side.BLUE, m.getBlueScore(), ghosts, points, fought);
+            var red = competitors.get(m.getRedId());
+            var blue = competitors.get(m.getBlueId());
+            count(m, red, Side.RED, m.getRedScore(), ghosts, points, fought);
+            count(m, blue, Side.BLUE, m.getBlueScore(), ghosts, points, fought);
+            if (classified != null) {
+                classified.add(m, scorers(m, red, ghosts), scorers(m, blue, ghosts));
+            }
         }
         var rows = participants.findByEventIdOrderByFirstNameAscLastNameAsc(eventId).stream()
                 .map(p -> {
@@ -114,8 +122,27 @@ class StandingsService {
                             fought.getOrDefault(p.getId(), 0),
                             teamNumbers.get(p.getId()),
                             p.getPersonId(),
-                            organizationNames.get(p.getOrganizationId()));
+                            organizationNames.get(p.getOrganizationId()),
+                            classified == null ? null : classified.tally(p.getId()).wins,
+                            classified == null ? null : classified.tally(p.getId()).points);
                 })
+                .toList();
+        return classified == null ? byTotal(rows) : byClassification(rows, classified);
+    }
+
+    /** Positions within each category, in the order the categories first appear. */
+    private static List<StandingRow> byClassification(List<StandingRow> rows, ClassificationStandings classified) {
+        var byCategory = rows.stream()
+                .collect(Collectors.groupingBy(
+                        row -> Optional.ofNullable(row.categoryId()), LinkedHashMap::new, Collectors.toList()));
+        return byCategory.values().stream()
+                .flatMap(category -> classified.rank(category, StandingRow::participantId).stream())
+                .map(placed -> placed.item().withPosition(placed.position()))
+                .toList();
+    }
+
+    private static List<StandingRow> byTotal(List<StandingRow> unsorted) {
+        var rows = unsorted.stream()
                 .sorted(Comparator.comparingInt(StandingRow::total).reversed())
                 .toList();
         var ranked = new ArrayList<StandingRow>();
@@ -136,34 +163,47 @@ class StandingsService {
 
     @Transactional(readOnly = true)
     String standingsCsv(UUID eventId, UUID accountId) {
-        var rows = standings(eventId, accountId).stream()
-                .map(r -> Arrays.asList(
-                        r.position(),
-                        r.firstName(),
-                        r.lastName(),
-                        r.age(),
-                        r.organizationName(),
-                        r.categoryName(),
-                        r.teamNumber() == null ? null : "Equipo " + r.teamNumber(),
-                        r.attendancePoints(),
-                        r.matchPoints(),
-                        r.total(),
-                        r.matches()))
+        var standings = standings(eventId, accountId);
+        // Grappling ranks by wins and classification points: they come before the rest.
+        var classified = standings.stream().anyMatch(r -> r.wins() != null);
+        var rows = standings.stream()
+                .map(r -> {
+                    var cells = new ArrayList<Object>();
+                    cells.add(r.position());
+                    if (classified) {
+                        cells.add(r.wins());
+                        cells.add(r.classificationPoints());
+                    }
+                    cells.addAll(Arrays.asList(
+                            r.firstName(),
+                            r.lastName(),
+                            r.age(),
+                            r.organizationName(),
+                            r.categoryName(),
+                            r.teamNumber() == null ? null : "Equipo " + r.teamNumber(),
+                            r.attendancePoints(),
+                            r.matchPoints(),
+                            r.total(),
+                            r.matches()));
+                    return cells;
+                })
                 .toList();
-        return Csv.of(
-                List.of(
-                        "Posición",
-                        "Nombre",
-                        "Apellidos",
-                        "Edad el día del evento",
-                        "Club",
-                        "Categoría",
-                        "Equipo",
-                        "Puntos de asistencia",
-                        "Puntos en combates",
-                        "Total",
-                        "Combates disputados"),
-                rows);
+        var header = new ArrayList<>(List.of("Posición"));
+        if (classified) {
+            header.addAll(List.of("Victorias", "Puntos de clasificación"));
+        }
+        header.addAll(List.of(
+                "Nombre",
+                "Apellidos",
+                "Edad el día del evento",
+                "Club",
+                "Categoría",
+                "Equipo",
+                "Puntos de asistencia",
+                "Puntos en combates",
+                "Total",
+                "Combates disputados"));
+        return Csv.of(header, rows);
     }
 
     /** Every member of a team gets the team's points. */
@@ -184,6 +224,13 @@ class StandingsService {
                 points.merge(participant, score, Integer::sum);
             }
         }
+    }
+
+    // A wildcard's points and wins count in their own group, not in the one they filled.
+    private static Set<UUID> scorers(Match m, Competitor fighter, Map<UUID, Set<UUID>> ghosts) {
+        return ghosts.getOrDefault(m.getGroupId(), Set.of()).contains(fighter.id())
+                ? Set.of()
+                : Set.copyOf(fighter.scorerIds());
     }
 
     static Map<UUID, Set<UUID>> ghostsByGroup(List<GroupMember> eventMembers) {

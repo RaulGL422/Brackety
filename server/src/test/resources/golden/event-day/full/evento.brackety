@@ -27,7 +27,8 @@
       "disqualificationScores" : true,
       "oneHandWarnings" : true,
       "submissions" : false,
-      "tiebreaks" : false
+      "tiebreaks" : false,
+      "classification" : [ ]
     }
   },
   "league" : {
@@ -589,7 +590,9 @@
         "clockMs" : 60000,
         "deltaMs" : null,
         "points" : 1
-      } ]
+      } ],
+      "winnerSide" : "RED",
+      "endReason" : "TIME"
     }, {
       "groupNumber" : 1,
       "orderIndex" : 1,
@@ -815,7 +818,9 @@
         "clockMs" : 60000,
         "deltaMs" : null,
         "points" : 1
-      } ]
+      } ],
+      "winnerSide" : "BLUE",
+      "endReason" : "POINTS"
     }, {
       "groupNumber" : 1,
       "orderIndex" : 2,
@@ -897,7 +902,9 @@
         "clockMs" : 60000,
         "deltaMs" : null,
         "points" : 1
-      } ]
+      } ],
+      "winnerSide" : "BLUE",
+      "endReason" : "TIME"
     }, {
       "groupNumber" : 1,
       "orderIndex" : 3,
@@ -991,7 +998,9 @@
         "clockMs" : 12000,
         "deltaMs" : null,
         "points" : 1
-      } ]
+      } ],
+      "winnerSide" : "RED",
+      "endReason" : "DISQUALIFICATION"
     }, {
       "groupNumber" : 1,
       "orderIndex" : 4,
@@ -1109,7 +1118,9 @@
         "clockMs" : 60000,
         "deltaMs" : null,
         "points" : 1
-      } ]
+      } ],
+      "winnerSide" : null,
+      "endReason" : "TIME"
     }, {
       "groupNumber" : 1,
       "orderIndex" : 5,
@@ -1227,7 +1238,9 @@
         "clockMs" : 60000,
         "deltaMs" : null,
         "points" : 1
-      } ]
+      } ],
+      "winnerSide" : "BLUE",
+      "endReason" : "TIME"
     }, {
       "groupNumber" : 2,
       "orderIndex" : 0,
@@ -1321,7 +1334,9 @@
         "clockMs" : 60000,
         "deltaMs" : null,
         "points" : 1
-      } ]
+      } ],
+      "winnerSide" : "RED",
+      "endReason" : "TIME"
     }, {
       "groupNumber" : 2,
       "orderIndex" : 1,
@@ -1547,7 +1562,9 @@
         "clockMs" : 60000,
         "deltaMs" : null,
         "points" : 1
-      } ]
+      } ],
+      "winnerSide" : "BLUE",
+      "endReason" : "POINTS"
     }, {
       "groupNumber" : 2,
       "orderIndex" : 2,
@@ -1629,7 +1646,9 @@
         "clockMs" : 60000,
         "deltaMs" : null,
         "points" : 1
-      } ]
+      } ],
+      "winnerSide" : "BLUE",
+      "endReason" : "TIME"
     }, {
       "groupNumber" : 2,
       "orderIndex" : 3,
@@ -1723,7 +1742,9 @@
         "clockMs" : 12000,
         "deltaMs" : null,
         "points" : 1
-      } ]
+      } ],
+      "winnerSide" : "RED",
+      "endReason" : "DISQUALIFICATION"
     }, {
       "groupNumber" : 2,
       "orderIndex" : 4,
@@ -1841,7 +1862,9 @@
         "clockMs" : 60000,
         "deltaMs" : null,
         "points" : 1
-      } ]
+      } ],
+      "winnerSide" : null,
+      "endReason" : "TIME"
     }, {
       "groupNumber" : 2,
       "orderIndex" : 5,
@@ -1959,7 +1982,9 @@
         "clockMs" : 60000,
         "deltaMs" : null,
         "points" : 1
-      } ]
+      } ],
+      "winnerSide" : "BLUE",
+      "endReason" : "TIME"
     }, {
       "groupNumber" : 3,
       "orderIndex" : 0,
@@ -2053,7 +2078,9 @@
         "clockMs" : 180000,
         "deltaMs" : null,
         "points" : 1
-      } ]
+      } ],
+      "winnerSide" : "RED",
+      "endReason" : "TIME"
     }, {
       "groupNumber" : 3,
       "orderIndex" : 1,
@@ -2303,7 +2330,9 @@
         "clockMs" : 180000,
         "deltaMs" : null,
         "points" : 1
-      } ]
+      } ],
+      "winnerSide" : "BLUE",
+      "endReason" : "TIME"
     }, {
       "groupNumber" : 3,
       "orderIndex" : 2,
@@ -2385,7 +2414,9 @@
         "clockMs" : 180000,
         "deltaMs" : null,
         "points" : 1
-      } ]
+      } ],
+      "winnerSide" : "BLUE",
+      "endReason" : "TIME"
     }, {
       "groupNumber" : 3,
       "orderIndex" : 3,
@@ -2479,7 +2510,9 @@
         "clockMs" : 12000,
         "deltaMs" : null,
         "points" : 1
-      } ]
+      } ],
+      "winnerSide" : "RED",
+      "endReason" : "DISQUALIFICATION"
     }, {
       "groupNumber" : 3,
       "orderIndex" : 4,
@@ -2597,7 +2630,9 @@
         "clockMs" : 180000,
         "deltaMs" : null,
         "points" : 1
-      } ]
+      } ],
+      "winnerSide" : null,
+      "endReason" : "TIME"
     }, {
       "groupNumber" : 3,
       "orderIndex" : 5,
@@ -2715,7 +2750,9 @@
         "clockMs" : 180000,
         "deltaMs" : null,
         "points" : 1
-      } ]
+      } ],
+      "winnerSide" : "BLUE",
+      "endReason" : "TIME"
     } ],
     "empty" : false
   },

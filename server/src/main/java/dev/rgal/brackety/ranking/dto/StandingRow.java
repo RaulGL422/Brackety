@@ -6,7 +6,8 @@ import java.util.UUID;
  * {@code attendancePoints}: given once the participant is in a group (not as a ghost).
  * {@code matchPoints}: what they (or their team) scored in finished matches, except as a ghost or when
  * disqualified. {@code teamNumber}: their real team, or null. {@code personId}: the same person in every phase.
- * Equal totals share {@code position}.
+ * Equal totals share {@code position}. {@code wins} and {@code classificationPoints}: only when the event's sport ranks
+ * by them (grappling), else null.
  */
 public record StandingRow(
         int position,
@@ -22,7 +23,9 @@ public record StandingRow(
         int matches,
         Integer teamNumber,
         UUID personId,
-        String organizationName) {
+        String organizationName,
+        Integer wins,
+        Integer classificationPoints) {
 
     public StandingRow withPosition(int position) {
         return new StandingRow(
@@ -39,6 +42,8 @@ public record StandingRow(
                 matches,
                 teamNumber,
                 personId,
-                organizationName);
+                organizationName,
+                wins,
+                classificationPoints);
     }
 }

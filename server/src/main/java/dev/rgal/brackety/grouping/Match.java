@@ -44,6 +44,12 @@ public class Match {
     private long elapsedMs;
     private Instant runningSince;
     private String disqualifiedSide;
+
+    /** RED or BLUE once decided; null while it goes on, on a draw or while a tie waits for the extra time. */
+    private String winnerSide;
+
+    /** How it ended (MatchState.EndReason's name); null while it goes on. */
+    private String endReason;
     /** Why an offline action clashed; while set, the match takes no actions until the club reviews it. */
     private String reviewReason;
     /** Set when the club or the superadmin lets it start without the least rest. */
@@ -170,6 +176,14 @@ public class Match {
     }
 
     /** "RED", "BLUE" or null. */
+    public String getWinnerSide() {
+        return winnerSide;
+    }
+
+    public String getEndReason() {
+        return endReason;
+    }
+
     public String getDisqualifiedSide() {
         return disqualifiedSide;
     }
@@ -181,9 +195,13 @@ public class Match {
             Duration elapsed,
             Instant runningSince,
             String disqualifiedSide,
+            String winnerSide,
+            String endReason,
             boolean started,
             boolean finished,
             Instant now) {
+        this.winnerSide = winnerSide;
+        this.endReason = endReason;
         this.redScore = redScore;
         this.blueScore = blueScore;
         this.elapsedMs = elapsed.toMillis();
@@ -209,6 +227,8 @@ public class Match {
         elapsedMs = 0;
         runningSince = null;
         disqualifiedSide = null;
+        winnerSide = null;
+        endReason = null;
         reviewReason = null;
     }
 

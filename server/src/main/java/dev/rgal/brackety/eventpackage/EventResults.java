@@ -61,7 +61,9 @@ public record EventResults(
             Instant runningSince,
             String disqualifiedSide,
             String reviewReason,
-            @NotNull List<@NotNull @Valid ActionEntry> actions) {}
+            @NotNull List<@NotNull @Valid ActionEntry> actions,
+            String winnerSide,
+            String endReason) {}
 
     /**
      * {@code undoesPosition}: for an undo, the position of the action it undoes in the same match. {@code deltaMs}: for

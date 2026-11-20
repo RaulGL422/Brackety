@@ -234,6 +234,8 @@ class MatchWriter {
                 state.elapsedAt(now),
                 state.isRunning(now) ? now : null,
                 state.disqualified() == null ? null : state.disqualified().name(),
+                state.winner(now).map(Enum::name).orElse(null),
+                state.endReason(now).map(Enum::name).orElse(null),
                 state.isStarted(),
                 state.isFinished(),
                 now);

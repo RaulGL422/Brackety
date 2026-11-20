@@ -306,6 +306,8 @@ class StandingRow {
     this.categoryId,
     this.categoryName,
     this.teamNumber,
+    this.wins,
+    this.classificationPoints,
   });
 
   factory StandingRow.fromJson(Map<String, dynamic> json) => StandingRow(
@@ -321,6 +323,8 @@ class StandingRow {
     total: json['total'] as int,
     matches: json['matches'] as int,
     teamNumber: json['teamNumber'] as int?,
+    wins: json['wins'] as int?,
+    classificationPoints: json['classificationPoints'] as int?,
   );
 
   /// Equal totals share the position.
@@ -338,6 +342,11 @@ class StandingRow {
   final int matchPoints;
   final int total;
   final int matches;
+
+  /// When the sport ranks by them (grappling, FELODA): the wins and the classification
+  /// points; null otherwise (tambo ranks by [total]).
+  final int? wins;
+  final int? classificationPoints;
 }
 
 class MatOverview {
