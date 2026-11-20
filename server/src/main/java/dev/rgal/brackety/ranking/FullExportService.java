@@ -8,6 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.core.util.DefaultIndenter;
+import tools.jackson.core.util.DefaultPrettyPrinter;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
@@ -53,6 +55,10 @@ class FullExportService {
             """;
 
     private static final String CATEGORY_FOLDER = "clasificacion-por-categoria/";
+
+    // The same file from the hall's Windows laptop and from the Pi: lines end in \n, not in the system's separator.
+    private static final DefaultPrettyPrinter PACKAGE_FORMAT =
+            new DefaultPrettyPrinter().withObjectIndenter(new DefaultIndenter("  ", "\n"));
 
     private final EventSheets sheets;
     private final StandingsService standings;
@@ -103,7 +109,7 @@ class FullExportService {
         files.put("clasificacion-por-categoria.pdf", leagueStandings.pdf(eventId, accountId));
         files.put(
                 EventPackageService.ZIP_ENTRY,
-                json.writerWithDefaultPrettyPrinter().writeValueAsBytes(eventPackage));
+                json.writer().with(PACKAGE_FORMAT).writeValueAsBytes(eventPackage));
         return new Export(names.of(eventId, "exportacion-completa.zip"), Zip.of(files));
     }
 }
