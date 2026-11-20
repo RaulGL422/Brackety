@@ -96,7 +96,10 @@ public class Event {
         return new Event(ownerAccountId, leagueId, 1, Discipline.TAMBO, name, eventDate, 10, Modality.tambo(), now);
     }
 
-    /** The next phase of the same league, with this one's match rules, measures asked and warning reasons. */
+    /**
+     * The next phase of the same league. In the same sport it keeps this one's match rules, measures asked and warning
+     * reasons; in another sport it starts from that sport's (a tambo phase does not hand its rules to grappling).
+     */
     public Event nextPhase(
             int phaseNumber,
             Discipline discipline,
@@ -112,10 +115,12 @@ public class Event {
                 name,
                 eventDate,
                 attendancePoints,
-                modality().copy(),
+                discipline == this.discipline ? modality().copy() : discipline.defaultModality(),
                 now);
-        next.setMeasureRequirements(weightRequirement, heightRequirement);
-        next.warningReasons = warningReasons == null ? null : List.copyOf(warningReasons);
+        if (discipline == this.discipline) {
+            next.setMeasureRequirements(weightRequirement, heightRequirement);
+            next.warningReasons = warningReasons == null ? null : List.copyOf(warningReasons);
+        }
         return next;
     }
 

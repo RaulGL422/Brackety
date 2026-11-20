@@ -1,6 +1,7 @@
 package dev.rgal.brackety.league;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -46,7 +47,10 @@ class LeagueControllerTest extends EventApiTest {
                 .andExpect(jsonPath("$.phases[0].number").value(1))
                 .andExpect(jsonPath("$.disciplines[0].discipline").value("TAMBO"))
                 .andExpect(jsonPath("$.disciplines[0].available").value(true))
-                .andExpect(jsonPath("$.disciplines[1].available").value(false))
+                .andExpect(jsonPath("$.disciplines[?(@.discipline == 'GRAPPLING')].available")
+                        .value(contains(true)))
+                .andExpect(jsonPath("$.disciplines[?(@.discipline == 'GROUND')].available")
+                        .value(contains(false)))
                 .andExpect(jsonPath("$.globalStandings").value(false));
     }
 

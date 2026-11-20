@@ -139,8 +139,7 @@ public class LeagueService {
             mats.save(new Mat(phase.getId(), mat.getNumber(), mat.getRefereeAccountId()));
         }
         for (var c : categories.findByEventIdOrderByMinAge(eventId)) {
-            categories.save(
-                    new EventCategory(phase.getId(), c.getName(), c.getMinAge(), c.getMaxAge(), c.getTeamSize()));
+            categories.save(c.copyFor(phase.getId()));
         }
         for (var o : organizations.findByEventIdOrderByName(eventId)) {
             organizations.save(new EventOrganization(phase.getId(), o.getOrganization()));

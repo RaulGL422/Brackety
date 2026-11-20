@@ -845,6 +845,10 @@
   "categoryNameLabel": "Nombre",
   "categoryMinAge": "Desde",
   "categoryMaxAge": "Hasta",
+  "categoryOwnLength": "{length} por combate",
+  "@categoryOwnLength": {"placeholders": {"length": {"type": "String"}}},
+  "categoryMatchLength": "Duración propia (min:s)",
+  "categoryMatchLengthHint": "Vacía: la del evento. En grappling, 4:00 para U13, U15 y veteranos.",
   "categoryByTeams": "Por equipos",
   "categoryGroupSize": "Grupos de {size}",
   "@categoryGroupSize": {
@@ -1290,6 +1294,7 @@
   },
   "leagueCurrentPhase": "Esta fase",
   "disciplineTambo": "Tambo",
+  "disciplineGrappling": "Grappling",
   "disciplineGround": "Suelo",
   "disciplineThrows": "Derribos",
   "disciplineTechnicalExpression": "Expresión técnica",

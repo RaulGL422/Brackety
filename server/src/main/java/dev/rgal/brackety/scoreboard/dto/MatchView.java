@@ -1,5 +1,6 @@
 package dev.rgal.brackety.scoreboard.dto;
 
+import dev.rgal.brackety.event.ScoringRules;
 import dev.rgal.brackety.grouping.Match;
 import dev.rgal.brackety.scoreboard.MatchEventType;
 import dev.rgal.brackety.scoreboard.Side;
@@ -13,7 +14,8 @@ import java.util.UUID;
  * {@code serverTime}: the instant the view is computed at, so the device can correct its clock.
  * {@code review}: null unless an offline action clashed and the club has to review it. {@code matId} and
  * {@code matNumber}: null for a team match in the pool, until a mat starts it. {@code readyAt}: a pending match whose
- * fighters have not had the least rest yet, until when; the device refuses to start it before.
+ * fighters have not had the least rest yet, until when; the device refuses to start it before. {@code scoring}: how
+ * the match's sport scores (the referee's buttons and rules), so the device needs no copy of them.
  */
 public record MatchView(
         UUID id,
@@ -33,7 +35,8 @@ public record MatchView(
         Instant serverTime,
         Review review,
         Instant readyAt,
-        List<String> warningReasons) {
+        List<String> warningReasons,
+        ScoringRules scoring) {
 
     /**
      * A participant ({@code participantId}) or a team ({@code teamId}, {@code teamNumber}); {@code members}

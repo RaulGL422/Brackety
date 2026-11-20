@@ -1,6 +1,6 @@
 {
-  "_about": "Tambo scoring cases (reglamento Yoseikan, cap. 3.1) that MatchState passes in Java (server) and in Dart (app). Times in seconds from the first entry. Refusals use the names of MatchRefusal (Dart). Only the keys present in \"expect\" are checked. docs/producto/plan-limpieza.md, phase L0.",
-  "rules": {"length": 60, "pointsLimit": 15},
+  "_about": "Tambo scoring cases (reglamento Yoseikan, cap. 3.1) that MatchState passes in Java (server) and in Dart (app). Times in seconds from the first entry. Refusals use the names of MatchRefusal (Dart). \"rules.scoring\" is the sport's ScoringRules as the server stores it. Only the keys present in \"expect\" are checked. docs/producto/plan-limpieza.md, phase L0.",
+  "rules": {"length": 60, "pointsLimit": 15, "scoring": {"actions": [{"value": 1, "label": "Punto"}], "warningsPerRivalPoint": 2, "warningsToDisqualify": 0, "superiorityGap": 0, "pointsAfterTime": true, "disqualificationScores": true, "oneHandWarnings": true, "submissions": false, "tiebreaks": false}},
   "cases": [
     {
       "name": "the clock only runs between start and stop",

@@ -23,6 +23,29 @@ void main() {
 
   DateTime at(int second) => t0.add(Duration(seconds: second));
 
+  // Without network the device scores by the rules the server sent with the match.
+  test("the queue follows the match's sport: four warnings disqualify in grappling", () {
+    const grappling = Scoring(
+      actions: [ScoringAction(value: 1, label: 'Salida o ataque')],
+      warningsPerRivalPoint: 1,
+      warningsToDisqualify: 4,
+      superiorityGap: 15,
+      pointsAfterTime: false,
+      disqualificationScores: false,
+      oneHandWarnings: false,
+      submissions: true,
+      tiebreaks: true,
+    );
+    final view = LocalMatch.project(serverMatch('m1', scoring: grappling), [
+      op(MatchAction.start, 0),
+      for (var i = 1; i <= 4; i++) op(MatchAction.warning, i, side: Side.red),
+    ], at(10)).view;
+
+    expect(view.endReason, EndReason.warnings);
+    expect(view.blue.points, 4);
+    expect(view.red.disqualified, isTrue);
+  });
+
   group('a match with queued actions', () {
     test('replays them on the server view with the device clock', () {
       final local = LocalMatch.project(serverMatch('m1'), [

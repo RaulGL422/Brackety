@@ -16,7 +16,9 @@ Pedido de Raul (2026-11-20): un evento de grappling con grupos como la F1 indivi
 | Paso | Qué |
 |---|---|
 | G1 | Motor de reglas en Java y Dart: puntos de +1 a +4, amonestación con punto al rival, la 4.ª descalifica, superioridad por diferencia, sumisión, desempate (acciones de más valor, menos amonestaciones) y prórroga. Casos en `spec/scoring/grappling.json` |
-| G2 | Deporte "Grappling" disponible: reglas, motivos de amonestación del reglamento, duración por categoría (4 o 5 min), puntos de clasificación y criterio nórdico en Puntuaciones, cómo acabó en los CSV |
+| G2a | Reglas como datos (Raul, 2026-11-20): cada modalidad guarda su `ScoringRules` (botones con su valor, amonestaciones, superioridad, sumisión, desempate); el servidor las manda con el combate y la app ya no tiene copia. Grappling disponible con sus motivos de amonestación; duración por categoría (4 o 5 min); paquete v4 |
+| G2b | Acciones nuevas por la API y la cola sin red: puntos de +2 a +4, Sumisión y Prórroga; el valor en la línea de tiempo y los CSV |
+| G2c | Puntos de clasificación FELODA y criterio nórdico en Puntuaciones; ganador y cómo acabó guardados en el combate |
 | G3 | Marcador: botones +1 a +4 por esquina, amonestación con motivo, Sumisión, Prórroga; tests en 3 tamaños |
 | G4 | Crear un evento suelto (nombre, fecha, deporte, tapices); hoy solo se crean fases de una liga |
 | G5 | Escenario "Grappling" en debug: categorías U13 a veteranos, gi y sin gi, alumnos ficticios |
@@ -28,4 +30,4 @@ Pedido de Raul (2026-11-20): un evento de grappling con grupos como la F1 indivi
 - Juez y jefe de tapiz con dispositivo propio: un árbitro por tapiz apunta lo que decide el equipo.
 
 ## Estado
-G1 en curso (2026-11-20).
+G1 en PR (#151). G2a hecha (2026-11-20): reglas en la modalidad, grappling disponible, duración por categoría, paquete v4. Siguiente: G2b.

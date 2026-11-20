@@ -35,7 +35,8 @@ class StaffMember {
   String get label => personName == null ? username : '$personName ($username)';
 }
 
-/// An age band of the event; [teamSize] is null when it competes individually.
+/// An age band of the event; [teamSize] is null when it competes individually. [matchLength]:
+/// null when its matches last as the event says (grappling: U13, U15 and veterans fight 4 min).
 class EventCategory {
   const EventCategory({
     this.id,
@@ -44,6 +45,7 @@ class EventCategory {
     required this.maxAge,
     this.teamSize,
     this.groupSize = 4,
+    this.matchLength,
   });
 
   factory EventCategory.fromJson(Map<String, dynamic> json) => EventCategory(
@@ -53,6 +55,10 @@ class EventCategory {
     maxAge: json['maxAge'] as int,
     teamSize: json['format'] == 'TEAM' ? json['teamSize'] as int? : null,
     groupSize: json['groupSize'] as int? ?? 4,
+    matchLength: switch (json['matchSeconds']) {
+      final int seconds => Duration(seconds: seconds),
+      _ => null,
+    },
   );
 
   /// Null for a category not saved yet.
@@ -64,6 +70,7 @@ class EventCategory {
 
   /// Participants or teams per group; only 4 for now.
   final int groupSize;
+  final Duration? matchLength;
 
   bool get isTeam => teamSize != null;
 
@@ -75,6 +82,7 @@ class EventCategory {
     'format': isTeam ? 'TEAM' : 'INDIVIDUAL',
     'teamSize': teamSize,
     'groupSize': groupSize,
+    'matchSeconds': matchLength?.inSeconds,
   };
 }
 

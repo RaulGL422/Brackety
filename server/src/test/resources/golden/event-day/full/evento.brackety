@@ -1,5 +1,5 @@
 {
-  "schemaVersion" : 3,
+  "schemaVersion" : 4,
   "exportedAt" : "2027-03-10T11:02:56Z",
   "event" : {
     "name" : "Liga Yoseikan 2027 · Fase 1 · Tambo",
@@ -14,7 +14,21 @@
     "minRestSeconds" : 30,
     "weightRequirement" : null,
     "heightRequirement" : null,
-    "warningReasons" : null
+    "warningReasons" : null,
+    "scoring" : {
+      "actions" : [ {
+        "value" : 1,
+        "label" : "Punto"
+      } ],
+      "warningsPerRivalPoint" : 2,
+      "warningsToDisqualify" : 0,
+      "superiorityGap" : 0,
+      "pointsAfterTime" : true,
+      "disqualificationScores" : true,
+      "oneHandWarnings" : true,
+      "submissions" : false,
+      "tiebreaks" : false
+    }
   },
   "league" : {
     "name" : "Liga Yoseikan 2027",
@@ -63,55 +77,64 @@
     "minAge" : 4,
     "maxAge" : 6,
     "format" : "INDIVIDUAL",
-    "teamSize" : null
+    "teamSize" : null,
+    "matchSeconds" : null
   }, {
     "name" : "7-8",
     "minAge" : 7,
     "maxAge" : 8,
     "format" : "INDIVIDUAL",
-    "teamSize" : null
+    "teamSize" : null,
+    "matchSeconds" : null
   }, {
     "name" : "9-10",
     "minAge" : 9,
     "maxAge" : 10,
     "format" : "INDIVIDUAL",
-    "teamSize" : null
+    "teamSize" : null,
+    "matchSeconds" : null
   }, {
     "name" : "11-12",
     "minAge" : 11,
     "maxAge" : 12,
     "format" : "INDIVIDUAL",
-    "teamSize" : null
+    "teamSize" : null,
+    "matchSeconds" : null
   }, {
     "name" : "13-14",
     "minAge" : 13,
     "maxAge" : 14,
     "format" : "INDIVIDUAL",
-    "teamSize" : null
+    "teamSize" : null,
+    "matchSeconds" : null
   }, {
     "name" : "15-16",
     "minAge" : 15,
     "maxAge" : 16,
     "format" : "TEAM",
-    "teamSize" : 3
+    "teamSize" : 3,
+    "matchSeconds" : null
   }, {
     "name" : "17-19",
     "minAge" : 17,
     "maxAge" : 19,
     "format" : "TEAM",
-    "teamSize" : 3
+    "teamSize" : 3,
+    "matchSeconds" : null
   }, {
     "name" : "20-25",
     "minAge" : 20,
     "maxAge" : 25,
     "format" : "TEAM",
-    "teamSize" : 3
+    "teamSize" : 3,
+    "matchSeconds" : null
   }, {
     "name" : "26+",
     "minAge" : 26,
     "maxAge" : 120,
     "format" : "TEAM",
-    "teamSize" : 3
+    "teamSize" : 3,
+    "matchSeconds" : null
   } ],
   "organizations" : [ {
     "name" : "Club Demo Yoseikan",

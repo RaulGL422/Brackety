@@ -1,7 +1,8 @@
 /// What a phase competes in; only those in [League.availableDisciplines] have a scoreboard.
-enum Discipline { tambo, ground, throws, technicalExpression }
+enum Discipline { tambo, grappling, ground, throws, technicalExpression }
 
 Discipline _discipline(String value) => switch (value) {
+  'GRAPPLING' => Discipline.grappling,
   'GROUND' => Discipline.ground,
   'THROWS' => Discipline.throws,
   'TECHNICAL_EXPRESSION' => Discipline.technicalExpression,
@@ -10,6 +11,7 @@ Discipline _discipline(String value) => switch (value) {
 
 String disciplineJson(Discipline d) => switch (d) {
   Discipline.tambo => 'TAMBO',
+  Discipline.grappling => 'GRAPPLING',
   Discipline.ground => 'GROUND',
   Discipline.throws => 'THROWS',
   Discipline.technicalExpression => 'TECHNICAL_EXPRESSION',

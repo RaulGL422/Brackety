@@ -19,6 +19,26 @@ public enum Discipline {
                     "Ataque de pique",
                     "Exceso de potencia",
                     "Conducta antideportiva")),
+    // FELODA national rules, Nov. 2025 (docs/reglamentos/grappling-feloda-2025.md, art. 41 and 44): each one is a
+    // warning and a point for the rival; with gi and without, the age limits named in the reason.
+    GRAPPLING(
+            true,
+            MeasureRequirement.OPTIONAL,
+            MeasureRequirement.OFF,
+            List.of(
+                    "Pasividad",
+                    "Salir o huir del tapiz",
+                    "Sentarse a guardia sin contacto",
+                    "Agarrar la ropa (sin gi)",
+                    "Heel hook",
+                    "Neck crank o presión en la columna",
+                    "Slam",
+                    "Pequeñas articulaciones o menos de 4 dedos",
+                    "Dedos en ojos, cara o tráquea",
+                    "Llave con proyección",
+                    "Estrangular con el cinturón (gi)",
+                    "Técnica prohibida en U13 y U15",
+                    "Ignorar al árbitro o conducta antideportiva")),
     GROUND(false, MeasureRequirement.OPTIONAL, MeasureRequirement.OPTIONAL, List.of()),
     THROWS(false, MeasureRequirement.OPTIONAL, MeasureRequirement.OPTIONAL, List.of()),
     TECHNICAL_EXPRESSION(false, MeasureRequirement.OPTIONAL, MeasureRequirement.OPTIONAL, List.of());
@@ -49,5 +69,10 @@ public enum Discipline {
 
     public List<String> warningReasons() {
         return warningReasons;
+    }
+
+    /** The rules a new event of this sport starts with; the club changes what it needs. */
+    public Modality defaultModality() {
+        return this == GRAPPLING ? Modality.grappling() : Modality.tambo();
     }
 }

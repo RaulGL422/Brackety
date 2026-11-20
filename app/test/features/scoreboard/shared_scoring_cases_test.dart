@@ -8,7 +8,6 @@ import 'package:flutter_test/flutter_test.dart';
 /// The scoring cases shared with the server (spec/scoring/*.json): both MatchState must agree
 /// on every one.
 void main() {
-  const scorings = {'TAMBO': Scoring.tambo, 'GRAPPLING': Scoring.grappling};
   final t0 = DateTime.utc(2027, 3, 10, 9);
 
   Duration duration(Object? seconds) =>
@@ -31,7 +30,7 @@ void main() {
         final match = MatchState.replay(
           length: duration(rules['length']),
           pointsLimit: rules['pointsLimit'] as int,
-          scoring: scorings[rules['scoring'] ?? 'TAMBO']!,
+          scoring: Scoring.fromJson(rules['scoring'] as Map<String, dynamic>?),
           entries: [
             for (final e
                 in (testCase['entries'] as List).cast<Map<String, dynamic>>())
