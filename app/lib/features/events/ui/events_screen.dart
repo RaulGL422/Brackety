@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/async_view.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../league/ui/new_event_dialog.dart';
 import '../../offline/ui/confirm_sign_out.dart';
 import '../data/my_event.dart';
 import '../state/events_providers.dart';
@@ -23,6 +24,11 @@ class EventsScreen extends ConsumerWidget {
           _AccountMenu(),
           SizedBox(width: AppSpacing.s),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        icon: const Icon(Icons.add),
+        label: Text(l10n.newEventButton),
+        onPressed: () => showNewEventDialog(context),
       ),
       body: AsyncView(
         value: ref.watch(myEventsProvider),
