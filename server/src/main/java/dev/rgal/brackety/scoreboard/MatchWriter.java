@@ -209,8 +209,7 @@ class MatchWriter {
     // Points or a disqualification end the match: the clock stops here and stays stopped after an undo.
     private void stopIfOverAndSnapshot(Match match, Event event, List<MatchEvent> history, Action action, Instant now) {
         var state = replay(event, match, history);
-        var endsNow =
-                state.endReason(now).filter(r -> r != MatchState.EndReason.TIME).isPresent();
+        var endsNow = state.endReason(now).filter(r -> r != EndReason.TIME).isPresent();
         if (endsNow && state.isRunning(now)) {
             history.add(matchEvents.save(new MatchEvent(
                     match.getId(),

@@ -41,7 +41,7 @@ Que cualquier modalidad y su forma de arbitrar se creen **desde la propia app**,
 Lo público necesita: denunciar, ocultar desde el superadmin, nombre del autor (o anónimo) y aceptar unas condiciones al publicar. Sin datos personales dentro de una plantilla.
 
 ## Qué implica en el código
-- Es la fase L7 de `plan-limpieza.md`: el **motor de reglas por datos**. Hoy cada deporte está escrito en código (`Discipline`, `TamboMatch` en Java y Dart); una plantilla creada en la app necesita un motor que la interprete.
+- Es la fase L7 de `plan-limpieza.md`: el **motor de reglas por datos**. Hecho el motor (G2a-G2d de `grappling.md`): `ScoringRules` guarda botones, escalera de amonestaciones, superioridad, acciones de victoria, desempates y puntos de clasificación; `MatchState` (Java y Dart) solo lee esos datos. Falta: la lista de deportes sigue en código (`Discipline`) y no hay editor.
 - Datos (propuesta): `sport_template` (dueño, visibilidad, origen si es un duplicado) y `sport_template_version` (inmutable, JSON con `schemaVersion`). La `modality` del evento apunta a una versión y guarda solo lo que el evento cambia.
 - El JSON se valida en el servidor con un esquema; la app usa el mismo esquema para el editor. Sin lenguaje propio ni fórmulas libres (decisión de `puntuacion.md`): solo piezas fijas que se combinan.
 - Offline: el paquete del pabellón y la caché de la app llevan la versión entera.

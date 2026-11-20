@@ -228,7 +228,8 @@ class ScoreboardService {
         return new MatchWriter.Action(
                 type,
                 side,
-                NEED_REASON.contains(type) ? reason : null,
+                // A finish says which one (a submission, a total victory…) when the sport has several.
+                NEED_REASON.contains(type) || (type == MatchEventType.SUBMISSION && !reason.isEmpty()) ? reason : null,
                 adjust ? request.deltaMs() : null,
                 request.opId(),
                 accountId,

@@ -16,19 +16,6 @@ import java.util.UUID;
  */
 final class MatchState {
 
-    enum EndReason {
-        /** Reached the points limit (tambo). */
-        POINTS,
-        /** Reached the points difference (grappling's technical superiority). */
-        SUPERIORITY,
-        TIME,
-        DISQUALIFICATION,
-        /** The last warning a sport allows (grappling: the 4th). */
-        WARNINGS,
-        SUBMISSION,
-        EXTRA_TIME
-    }
-
     /** What a disqualification gives the rival when there is no points limit, at least. */
     static final int DISQUALIFICATION_POINTS = 15;
 
@@ -66,6 +53,8 @@ final class MatchState {
     private boolean started;
     private boolean finished;
     private Entry lastUndoable;
+    // How many points have been scored, to know who scored last.
+    private int scored;
 
     private MatchState(MatchRules rules) {
         this.rules = rules;
@@ -101,12 +90,12 @@ final class MatchState {
                 elapsed = adjusted(elapsedAt(e.at()), e.deltaMs());
                 runningSince = null;
             }
-            case POINT -> tallies.get(e.side()).score(e.value());
+            case POINT -> tallies.get(e.side()).score(e.value(), ++scored);
             case POINT_REMOVED -> tallies.get(e.side()).takeBack(e.value());
             case WARNING -> warn(e);
             case ONE_HAND_WARNING -> {
                 if (++tallies.get(e.side()).oneHandWarnings % 2 == 0) {
-                    givePointToRival(e);
+                    givePointsToRival(e, 1);
                 }
             }
             case DISQUALIFICATION -> {
@@ -129,8 +118,9 @@ final class MatchState {
     // disqualifies.
     private void warn(Entry e) {
         var warnings = ++tallies.get(e.side()).warnings;
-        if (warnings % rules.scoring().warningsPerRivalPoint() == 0) {
-            givePointToRival(e);
+        var points = rules.scoring().warningPoints(warnings);
+        if (points > 0) {
+            givePointsToRival(e, points);
         }
         if (warnings == rules.scoring().warningsToDisqualify()) {
             disqualified = e.side();
@@ -138,8 +128,8 @@ final class MatchState {
         }
     }
 
-    private void givePointToRival(Entry warning) {
-        tallies.get(warning.side().opponent()).points++;
+    private void givePointsToRival(Entry warning, int points) {
+        tallies.get(warning.side().opponent()).points += points;
         autoPointWarnings.add(warning.id());
     }
 
@@ -154,6 +144,7 @@ final class MatchState {
         submittedBy = null;
         extraTimeWinner = null;
         started = false;
+        scored = 0;
         lastUndoable = null;
     }
 
@@ -228,7 +219,7 @@ final class MatchState {
 
     /** The time ended on a tie that no tiebreaker settles: only the extra time decides (grappling, art. 32). */
     boolean needsExtraTime(Instant now) {
-        return rules.scoring().tiebreaks()
+        return rules.scoring().hasExtraTime()
                 && endReason(now).filter(r -> r == EndReason.TIME).isPresent()
                 && winner(now).isEmpty();
     }

@@ -15,7 +15,6 @@ import static dev.rgal.brackety.scoreboard.Side.RED;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.rgal.brackety.scoreboard.MatchState.Corner;
-import dev.rgal.brackety.scoreboard.MatchState.EndReason;
 import dev.rgal.brackety.scoreboard.MatchState.Entry;
 import java.time.Duration;
 import java.time.Instant;

@@ -101,6 +101,9 @@ class MatchState {
   var _finished = false;
   MatchEntry? _lastUndoable;
 
+  // How many points have been scored, to know who scored last.
+  var _scored = 0;
+
   void _apply(MatchEntry e) {
     switch (e.action) {
       case MatchAction.start:
@@ -110,7 +113,7 @@ class MatchState {
         _elapsed = elapsedAt(e.at);
         _runningSince = null;
       case MatchAction.point:
-        _tallies[e.side]!.score(e.value);
+        _tallies[e.side]!.score(e.value, ++_scored);
       case MatchAction.pointRemoved:
         _tallies[e.side]!.takeBack(e.value);
       case MatchAction.clockAdjust:
@@ -120,13 +123,16 @@ class MatchState {
       case MatchAction.warning:
         // Tambo: every second warning gives the rival a point; grappling: every one.
         final warnings = ++_tallies[e.side]!.warnings;
-        if (warnings % scoring.warningsPerRivalPoint == 0) _givePointToRival(e);
+        final points = scoring.warningPointsFor(warnings);
+        if (points > 0) _givePointsToRival(e, points);
         if (warnings == scoring.warningsToDisqualify) {
           _disqualified = e.side;
           _disqualifiedByWarnings = true;
         }
       case MatchAction.oneHandWarning:
-        if (++_tallies[e.side]!.oneHandWarnings % 2 == 0) _givePointToRival(e);
+        if (++_tallies[e.side]!.oneHandWarnings % 2 == 0) {
+          _givePointsToRival(e, 1);
+        }
       case MatchAction.disqualification:
         _disqualified = e.side;
         _disqualifiedByWarnings = false;
@@ -159,6 +165,7 @@ class MatchState {
     _submittedBy = null;
     _extraTimeWinner = null;
     _started = false;
+    _scored = 0;
     _lastUndoable = null;
   }
 
@@ -189,8 +196,8 @@ class MatchState {
   bool isRunning(DateTime now) =>
       _runningSince != null && remainingAt(now) > Duration.zero;
 
-  void _givePointToRival(MatchEntry warning) {
-    _tallies[_rival(warning.side!)]!.points++;
+  void _givePointsToRival(MatchEntry warning, int points) {
+    _tallies[_rival(warning.side!)]!.points += points;
     _autoPointWarnings.add(warning.id);
   }
 
@@ -244,7 +251,7 @@ class MatchState {
   /// The time ended on a tie that no tiebreaker settles: only the extra time decides
   /// (grappling, art. 32).
   bool needsExtraTime(DateTime now) =>
-      scoring.tiebreaks &&
+      scoring.hasExtraTime &&
       endReason(now) == EndReason.time &&
       winner(now) == null;
 
@@ -290,8 +297,8 @@ class MatchState {
     }
     final notInThisSport = switch (action) {
       MatchAction.oneHandWarning => !scoring.oneHandWarnings,
-      MatchAction.submission => !scoring.submissions,
-      MatchAction.extraTime => !scoring.tiebreaks,
+      MatchAction.submission => scoring.finishes.isEmpty,
+      MatchAction.extraTime => !scoring.hasExtraTime,
       _ => false,
     };
     if (notInThisSport) return MatchRefusal.notInThisSport;

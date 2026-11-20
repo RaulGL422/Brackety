@@ -20,14 +20,14 @@
         "value" : 1,
         "label" : "Punto"
       } ],
-      "warningsPerRivalPoint" : 2,
+      "warningPoints" : [ 0, 1 ],
       "warningsToDisqualify" : 0,
       "superiorityGap" : 0,
       "pointsAfterTime" : true,
       "disqualificationScores" : true,
       "oneHandWarnings" : true,
-      "submissions" : false,
-      "tiebreaks" : false,
+      "finishes" : [ ],
+      "tiebreaks" : [ ],
       "classification" : [ ]
     }
   },

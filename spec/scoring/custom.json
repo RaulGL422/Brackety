@@ -1,0 +1,115 @@
+{
+  "_about": "Rules no built-in sport has, as a sport template could set them (docs/producto/grappling.md, G2d): a ladder of warnings, the last to score breaking a tie, two actions that win at once. Same format as tambo.json.",
+  "rules": {"length": 300, "pointsLimit": 0, "scoring": {"actions": [{"value": 1, "label": "Uno"}, {"value": 2, "label": "Dos"}, {"value": 4, "label": "Cuatro"}], "warningPoints": [0, 1, 2], "warningsToDisqualify": 4, "superiorityGap": 0, "pointsAfterTime": false, "disqualificationScores": false, "oneHandWarnings": false, "finishes": ["Victoria total", "Sumisión"], "tiebreaks": ["BEST_ACTION", "FEWER_WARNINGS", "LAST_TO_SCORE"], "classification": []}},
+  "cases": [
+    {
+      "name": "each warning gives the rival what the ladder says, and the fourth disqualifies",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "w1", "action": "WARNING", "at": 1, "side": "RED"},
+        {"id": "w2", "action": "WARNING", "at": 2, "side": "RED"},
+        {"id": "w3", "action": "WARNING", "at": 3, "side": "RED"}
+      ],
+      "at": 10,
+      "expect": {
+        "red": {"points": 0, "warnings": 3},
+        "blue": {"points": 3},
+        "endReason": null,
+        "refuse": [
+          {"action": "WARNING", "expect": null}
+        ]
+      }
+    },
+    {
+      "name": "the fourth warning disqualifies",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "w1", "action": "WARNING", "at": 1, "side": "BLUE"},
+        {"id": "w2", "action": "WARNING", "at": 2, "side": "BLUE"},
+        {"id": "w3", "action": "WARNING", "at": 3, "side": "BLUE"},
+        {"id": "w4", "action": "WARNING", "at": 4, "side": "BLUE"}
+      ],
+      "at": 10,
+      "expect": {
+        "endReason": "WARNINGS",
+        "disqualified": "BLUE",
+        "winner": "RED"
+      }
+    },
+    {
+      "name": "tie with the same best action and no warnings: the last to score wins",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "r1", "action": "POINT", "at": 1, "side": "RED", "value": 2},
+        {"id": "b1", "action": "POINT", "at": 2, "side": "BLUE", "value": 2}
+      ],
+      "at": 301,
+      "expect": {
+        "endReason": "TIME",
+        "winner": "BLUE",
+        "needsExtraTime": false,
+        "refuse": [
+          {"action": "FINISH", "expect": null},
+          {"action": "EXTRA_TIME", "expect": "notInThisSport"}
+        ]
+      }
+    },
+    {
+      "name": "a corrected action no longer counts as the last one",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "r1", "action": "POINT", "at": 1, "side": "RED", "value": 2},
+        {"id": "b1", "action": "POINT", "at": 2, "side": "BLUE", "value": 2},
+        {"id": "r2", "action": "POINT", "at": 3, "side": "RED", "value": 2},
+        {"id": "r3", "action": "POINT_REMOVED", "at": 4, "side": "RED", "value": 2}
+      ],
+      "at": 301,
+      "expect": {
+        "red": {"points": 2},
+        "blue": {"points": 2},
+        "winner": "BLUE"
+      }
+    },
+    {
+      "name": "the best action still comes before the last to score",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "r1", "action": "POINT", "at": 1, "side": "RED", "value": 4},
+        {"id": "b1", "action": "POINT", "at": 2, "side": "BLUE", "value": 2},
+        {"id": "b2", "action": "POINT", "at": 3, "side": "BLUE", "value": 2}
+      ],
+      "at": 301,
+      "expect": {
+        "winner": "RED"
+      }
+    },
+    {
+      "name": "0-0 at the end is a draw: no tiebreak settles it and there is no extra time",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0}
+      ],
+      "at": 301,
+      "expect": {
+        "endReason": "TIME",
+        "winner": null,
+        "needsExtraTime": false,
+        "refuse": [
+          {"action": "FINISH", "expect": null}
+        ]
+      }
+    },
+    {
+      "name": "a finish ends the match",
+      "entries": [
+        {"id": "s", "action": "START", "at": 0},
+        {"id": "b1", "action": "POINT", "at": 1, "side": "BLUE", "value": 4},
+        {"id": "f", "action": "SUBMISSION", "at": 2, "side": "RED"}
+      ],
+      "at": 10,
+      "expect": {
+        "endReason": "SUBMISSION",
+        "winner": "RED"
+      }
+    }
+  ]
+}

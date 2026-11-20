@@ -28,8 +28,8 @@ class SportRulesTest extends EventApiTest {
         call(get("/api/v1/events/" + eventId + "/settings"), "club1")
                 .andExpect(jsonPath("$.discipline").value("TAMBO"))
                 .andExpect(jsonPath("$.scoring.actions", hasSize(1)))
-                .andExpect(jsonPath("$.scoring.warningsPerRivalPoint").value(2))
-                .andExpect(jsonPath("$.scoring.submissions").value(false));
+                .andExpect(jsonPath("$.scoring.warningPoints[1]").value(1))
+                .andExpect(jsonPath("$.scoring.finishes", hasSize(0)));
     }
 
     // A tambo phase hands nothing of tambo's to a grappling one: rules, length and warning reasons are grappling's.
@@ -52,7 +52,7 @@ class SportRulesTest extends EventApiTest {
                 .andExpect(jsonPath("$.scoring.actions[3].value").value(4))
                 .andExpect(jsonPath("$.scoring.warningsToDisqualify").value(4))
                 .andExpect(jsonPath("$.scoring.superiorityGap").value(15))
-                .andExpect(jsonPath("$.scoring.submissions").value(true))
+                .andExpect(jsonPath("$.scoring.finishes[0]").value("Sumisión"))
                 .andExpect(jsonPath("$.warningReasons.sport[0]").value("Pasividad"));
     }
 
