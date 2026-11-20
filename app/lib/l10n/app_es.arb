@@ -222,14 +222,6 @@
       }
     }
   },
-  "categoryAges": "{name} años",
-  "@categoryAges": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
   "sortByName": "Nombre",
   "sortByHeight": "Estatura",
   "participantDetails": "{age} años · {height}",
@@ -317,7 +309,7 @@
     }
   },
   "matEmpty": "Todavía no hay grupos en este tapiz.",
-  "matGroupHeader": "Grupo {number}, de {category} años",
+  "matGroupHeader": "Grupo {number} · {category}",
   "@matGroupHeader": {
     "placeholders": {
       "number": {
@@ -469,8 +461,8 @@
   "removePoint": "−1",
   "removePointFor": "Quitar un punto a {corner}",
   "@removePointFor": {"placeholders": {"corner": {"type": "String"}}},
-  "whatPointRemoved": "−1 {corner}",
-  "@whatPointRemoved": {"placeholders": {"corner": {"type": "String"}}},
+  "whatPointRemoved": "−{points} {corner}",
+  "@whatPointRemoved": {"placeholders": {"points": {"type": "int"}, "corner": {"type": "String"}}},
   "whatClockAdjust": "{delta} s al reloj",
   "@whatClockAdjust": {"placeholders": {"delta": {"type": "String"}}},
   "clockAdjustBy": "{delta} s",
@@ -1198,14 +1190,10 @@
       }
     }
   },
-  "whatPoint": "+1 {corner}",
-  "@whatPoint": {
-    "placeholders": {
-      "corner": {
-        "type": "String"
-      }
-    }
-  },
+  "whatPoint": "+{points} {corner}",
+  "@whatPoint": {"placeholders": {"points": {"type": "int"}, "corner": {"type": "String"}}},
+  "whatFinish": "{what} {corner}",
+  "@whatFinish": {"placeholders": {"what": {"type": "String"}, "corner": {"type": "String"}}},
   "whatWarning": "advertencia {corner}",
   "@whatWarning": {
     "placeholders": {

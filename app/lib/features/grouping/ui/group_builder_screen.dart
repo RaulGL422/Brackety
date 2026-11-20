@@ -208,7 +208,7 @@ class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
         title: Text(
           widget.categoryName == null
               ? l10n.categoriesTitle
-              : l10n.categoryAges(widget.categoryName!),
+              : widget.categoryName!,
         ),
         actions: [
           if (widget.teamSize != null)

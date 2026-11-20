@@ -201,14 +201,6 @@
       }
     }
   },
-  "categoryAges": "Ages {name}",
-  "@categoryAges": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
   "sortByName": "Name",
   "sortByHeight": "Height",
   "participantDetails": "{age} years · {height}",
@@ -289,7 +281,7 @@
   "queuedTeamLabel": "the team of {names}",
   "@queuedTeamLabel": {"placeholders": {"names": {"type": "String"}}},
   "matEmpty": "No groups on this mat yet.",
-  "matGroupHeader": "Group {number}, ages {category}",
+  "matGroupHeader": "Group {number} · {category}",
   "matRecommended": "Recommended match",
   "matInProgress": "In progress",
   "matPending": "Other available matches",
@@ -390,8 +382,8 @@
   "removePoint": "−1",
   "removePointFor": "Take a point from {corner}",
   "@removePointFor": {"placeholders": {"corner": {"type": "String"}}},
-  "whatPointRemoved": "−1 {corner}",
-  "@whatPointRemoved": {"placeholders": {"corner": {"type": "String"}}},
+  "whatPointRemoved": "−{points} {corner}",
+  "@whatPointRemoved": {"placeholders": {"points": {"type": "int"}, "corner": {"type": "String"}}},
   "whatClockAdjust": "{delta} s on the clock",
   "@whatClockAdjust": {"placeholders": {"delta": {"type": "String"}}},
   "clockAdjustBy": "{delta} s",
@@ -765,7 +757,10 @@
   "logoutPending": "{count, plural, =1{You have 1 action not sent yet; if you sign out it will be lost.} other{You have {count} actions not sent yet; if you sign out they will be lost.}}",
   "refusalNotStarted": "Start the clock before scoring.",
   "undoneWhat": "Undone: {what}",
-  "whatPoint": "+1 {corner}",
+  "whatPoint": "+{points} {corner}",
+  "@whatPoint": {"placeholders": {"points": {"type": "int"}, "corner": {"type": "String"}}},
+  "whatFinish": "{what} {corner}",
+  "@whatFinish": {"placeholders": {"what": {"type": "String"}, "corner": {"type": "String"}}},
   "whatWarning": "{corner} warning",
   "whatOneHand": "{corner} one-hand warning",
   "whatDisqualification": "{corner} disqualification",

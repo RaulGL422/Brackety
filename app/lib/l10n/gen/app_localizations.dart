@@ -1058,12 +1058,6 @@ abstract class AppLocalizations {
   /// **'{participants} inscritos · {grouped} en grupos'**
   String categoryCounts(int participants, int grouped);
 
-  /// No description provided for @categoryAges.
-  ///
-  /// In es, this message translates to:
-  /// **'{name} años'**
-  String categoryAges(String name);
-
   /// No description provided for @sortByName.
   ///
   /// In es, this message translates to:
@@ -1229,7 +1223,7 @@ abstract class AppLocalizations {
   /// No description provided for @matGroupHeader.
   ///
   /// In es, this message translates to:
-  /// **'Grupo {number}, de {category} años'**
+  /// **'Grupo {number} · {category}'**
   String matGroupHeader(int number, String category);
 
   /// No description provided for @matRecommended.
@@ -1649,8 +1643,8 @@ abstract class AppLocalizations {
   /// No description provided for @whatPointRemoved.
   ///
   /// In es, this message translates to:
-  /// **'−1 {corner}'**
-  String whatPointRemoved(String corner);
+  /// **'−{points} {corner}'**
+  String whatPointRemoved(int points, String corner);
 
   /// No description provided for @whatClockAdjust.
   ///
@@ -3759,8 +3753,14 @@ abstract class AppLocalizations {
   /// No description provided for @whatPoint.
   ///
   /// In es, this message translates to:
-  /// **'+1 {corner}'**
-  String whatPoint(String corner);
+  /// **'+{points} {corner}'**
+  String whatPoint(int points, String corner);
+
+  /// No description provided for @whatFinish.
+  ///
+  /// In es, this message translates to:
+  /// **'{what} {corner}'**
+  String whatFinish(String what, String corner);
 
   /// No description provided for @whatWarning.
   ///

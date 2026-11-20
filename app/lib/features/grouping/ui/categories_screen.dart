@@ -47,7 +47,7 @@ class CategoriesScreen extends ConsumerWidget {
                           final done =
                               c.participants > 0 && c.grouped == c.participants;
                           return ListTile(
-                            title: Text(l10n.categoryAges(c.name)),
+                            title: Text(c.name),
                             subtitle: Text(
                               c.isTeam
                                   ? l10n.categoryTeamCounts(

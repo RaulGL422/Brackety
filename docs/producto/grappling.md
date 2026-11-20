@@ -31,4 +31,4 @@ Pedido de Raul (2026-11-20): un evento de grappling con grupos como la F1 indivi
 - Juez y jefe de tapiz con dispositivo propio: un árbitro por tapiz apunta lo que decide el equipo.
 
 ## Estado
-G1-G3 fusionadas (#151, #153-#157). G4 hecha (2026-11-20): botón «Nuevo evento» en Mis eventos (nombre, fecha, deporte con marcador y 1-20 tapices); el evento es una liga de una fase, su creador es su club y empieza con las reglas de su deporte. Siguiente: G5 (escenario en debug y prueba en navegador de G3 y G4). Inmovilizaciones con cronómetro (sambo) fuera: función nueva del marcador.
+G1-G4 fusionadas (#151, #153-#158). G5 hecha (2026-11-20): escenario `grappling` (`08-ejecucion-local.md`), creado como evento suelto. Probado en navegador (escritorio y móvil): puntos, advertencia con motivo, sumisión, superioridad, prórroga, puntos de clasificación y «Nuevo evento». Arreglado en la prueba: «años» tras el nombre de la categoría y «Deshacer» siempre con «+1». Dudas que salieron, en `pendientes.md`. Inmovilizaciones con cronómetro (sambo) fuera: función nueva del marcador.
