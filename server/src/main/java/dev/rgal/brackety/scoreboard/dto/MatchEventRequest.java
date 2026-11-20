@@ -11,7 +11,8 @@ import java.time.Instant;
 import java.util.UUID;
 
 /**
- * {@code side} for points (added or removed), warnings and disqualifications; {@code deltaMs} for a
+ * {@code side} for points (added or removed), warnings, disqualifications, and the winner of a SUBMISSION or the
+ * EXTRA_TIME; {@code points} for a POINT or POINT_REMOVED, 1 if absent (grappling: 1 to 4); {@code deltaMs} for a
  * CLOCK_ADJUST (time added to the stopped clock, negative to take it away); {@code reason} required for warnings and
  * disqualifications. {@code knownEvents} (required, so two tabs pressing at once do not both count): how
  * many non-automatic actions the sender knew before this one. From the Android queue (docs/modulos/offline.md): {@code opId} is the action's id and
@@ -25,4 +26,5 @@ public record MatchEventRequest(
         Instant at,
         @PositiveOrZero Integer knownEvents,
         // At most 10 minutes either way in one adjustment.
-        @Min(-600_000) @Max(600_000) Long deltaMs) {}
+        @Min(-600_000) @Max(600_000) Long deltaMs,
+        @Min(1) @Max(20) Integer points) {}

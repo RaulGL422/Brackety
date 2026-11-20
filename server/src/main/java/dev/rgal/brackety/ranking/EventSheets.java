@@ -428,7 +428,7 @@ class EventSheets {
                             SheetText.date(e.getAt(), zone),
                             SheetText.time(e.getAt(), zone),
                             SheetText.duration(e.getClockMs()),
-                            SheetText.action(e.getType().name()),
+                            SheetText.action(e.getType().name(), e.getPoints()),
                             SheetText.side(side),
                             fighter,
                             e.getDeltaMs() != null

@@ -191,6 +191,7 @@ class TimelineEntry {
     this.opId,
     this.delta,
     this.overtime = false,
+    this.points = 1,
   });
 
   factory TimelineEntry.fromJson(Map<String, dynamic> json) => TimelineEntry(
@@ -207,6 +208,7 @@ class TimelineEntry {
     opId: json['opId'] as String?,
     delta: _duration(json['deltaMs']),
     overtime: json['overtime'] as bool? ?? false,
+    points: json['points'] as int? ?? 1,
   );
 
   /// The server's event id; for an action still in the device's queue, its `opId`.
@@ -232,6 +234,9 @@ class TimelineEntry {
   /// A point given once the clock showed 0:00 (F1-3).
   final bool overtime;
 
+  /// What a point (added or removed) was worth (grappling: 1 to 4).
+  final int points;
+
   TimelineEntry withFlags({
     required bool undone,
     required bool gaveRivalPoint,
@@ -249,6 +254,7 @@ class TimelineEntry {
     opId: opId,
     delta: delta,
     overtime: overtime,
+    points: points,
   );
 
   Map<String, dynamic> toJson() => {
@@ -265,6 +271,7 @@ class TimelineEntry {
     'opId': opId,
     'deltaMs': delta?.inMilliseconds,
     'overtime': overtime,
+    'points': points,
   };
 }
 
@@ -294,6 +301,7 @@ class ReviewOp {
     this.reason,
     this.actor,
     this.delta,
+    this.points = 1,
   });
 
   factory ReviewOp.fromJson(Map<String, dynamic> json) => ReviewOp(
@@ -306,6 +314,7 @@ class ReviewOp {
     receivedAt: DateTime.parse(json['receivedAt'] as String),
     cause: json['cause'] as String,
     delta: _duration(json['deltaMs']),
+    points: json['points'] as int? ?? 1,
   );
 
   final String opId;
@@ -317,6 +326,7 @@ class ReviewOp {
   final DateTime receivedAt;
   final String cause;
   final Duration? delta;
+  final int points;
 
   Map<String, dynamic> toJson() => {
     'opId': opId,
@@ -328,6 +338,7 @@ class ReviewOp {
     'receivedAt': receivedAt.toUtc().toIso8601String(),
     'cause': cause,
     'deltaMs': delta?.inMilliseconds,
+    'points': points,
   };
 }
 

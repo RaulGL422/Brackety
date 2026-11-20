@@ -71,7 +71,14 @@ class OfflineImportService {
                 continue;
             }
             var request = new MatchEventRequest(
-                    row.type(), row.side(), row.reason(), row.opId(), row.at(), row.knownEvents(), row.deltaMs());
+                    row.type(),
+                    row.side(),
+                    row.reason(),
+                    row.opId(),
+                    row.at(),
+                    row.knownEvents(),
+                    row.deltaMs(),
+                    row.points());
             try {
                 var recorded =
                         scoreboard.recordImported(row.matchId(), actor(eventId, row.actor(), accountId), request);

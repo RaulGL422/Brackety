@@ -866,6 +866,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tlStop => 'Stop';
 
   @override
+  String tlPoints(int points) {
+    return '$points points';
+  }
+
+  @override
+  String tlPointsRemoved(int points) {
+    return '$points points taken back';
+  }
+
+  @override
   String get tlPoint => 'Point';
 
   @override

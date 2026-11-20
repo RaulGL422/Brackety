@@ -282,6 +282,7 @@ class OfflineSync extends Notifier<OfflineState> {
     Side? side,
     String? reason,
     Duration? delta,
+    int points = 1,
   }) async {
     if (!_loaded) await ready;
     final view = ref.mounted ? state.views[matchId] : null;
@@ -293,6 +294,7 @@ class OfflineSync extends Notifier<OfflineState> {
       side: side,
       reason: reason,
       delta: delta,
+      points: points,
       at: now(),
       account: _account,
       knownEvents:

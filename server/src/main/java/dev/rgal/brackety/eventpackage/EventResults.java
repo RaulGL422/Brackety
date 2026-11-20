@@ -1,6 +1,8 @@
 package dev.rgal.brackety.eventpackage;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
@@ -61,7 +63,11 @@ public record EventResults(
             String reviewReason,
             @NotNull List<@NotNull @Valid ActionEntry> actions) {}
 
-    /** {@code undoesPosition}: for an undo, the position of the action it undoes in the same match. */
+    /**
+     * {@code undoesPosition}: for an undo, the position of the action it undoes in the same match. {@code deltaMs}: for
+     * a clock adjustment, the time added; {@code points}: what a point (added or removed) was worth. Both absent in
+     * files from before them: no adjustment, 1 point.
+     */
     public record ActionEntry(
             int position,
             @NotNull String type,
@@ -71,7 +77,9 @@ public record EventResults(
             String actor,
             boolean automatic,
             @NotNull Instant at,
-            long clockMs) {}
+            long clockMs,
+            Long deltaMs,
+            @Min(1) @Max(20) Integer points) {}
 
     public int actionCount() {
         return matches.stream().mapToInt(m -> m.actions().size()).sum();

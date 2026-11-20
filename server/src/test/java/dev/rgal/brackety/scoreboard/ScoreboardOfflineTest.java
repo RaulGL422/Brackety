@@ -310,7 +310,7 @@ class ScoreboardOfflineTest extends ScoreboardApiTest {
 
     private static MatchEventRequest request(MatchEventType type, Side side, UUID opId, Instant at, Integer known) {
         var reason = type == MatchEventType.DISQUALIFICATION || type == MatchEventType.WARNING ? "Motivo" : null;
-        return new MatchEventRequest(type, side, reason, opId, at, known, null);
+        return new MatchEventRequest(type, side, reason, opId, at, known, null, null);
     }
 
     private MatchView view() {

@@ -876,6 +876,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get tlStop => 'Parada';
 
   @override
+  String tlPoints(int points) {
+    return '$points puntos';
+  }
+
+  @override
+  String tlPointsRemoved(int points) {
+    return '$points puntos quitados';
+  }
+
+  @override
   String get tlPoint => 'Punto';
 
   @override

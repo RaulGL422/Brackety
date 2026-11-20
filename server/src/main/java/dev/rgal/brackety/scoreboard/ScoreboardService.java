@@ -58,7 +58,9 @@ class ScoreboardService {
             MatchEventType.POINT_REMOVED,
             MatchEventType.WARNING,
             MatchEventType.ONE_HAND_WARNING,
-            MatchEventType.DISQUALIFICATION);
+            MatchEventType.DISQUALIFICATION,
+            MatchEventType.SUBMISSION,
+            MatchEventType.EXTRA_TIME);
     private static final Set<MatchEventType> NEED_REASON = EnumSet.of(
             MatchEventType.WARNING,
             MatchEventType.ONE_HAND_WARNING,
@@ -222,13 +224,15 @@ class ScoreboardService {
         if (request.knownEvents() == null) {
             throw EventException.invalid("Every action needs knownEvents.");
         }
+        var scores = type == MatchEventType.POINT || type == MatchEventType.POINT_REMOVED;
         return new MatchWriter.Action(
                 type,
                 side,
                 NEED_REASON.contains(type) ? reason : null,
                 adjust ? request.deltaMs() : null,
                 request.opId(),
-                accountId);
+                accountId,
+                scores && request.points() != null ? request.points() : 1);
     }
 
     // Online the referee sees the clash at once: refused, not sent to the club's review.
@@ -354,7 +358,8 @@ class ScoreboardService {
                         state.gaveAutoPoint(e.getId()),
                         e.getOpId(),
                         e.getDeltaMs(),
-                        e.isOvertimePoint(length)))
+                        e.isOvertimePoint(length),
+                        e.getPoints()))
                 .toList();
     }
 
@@ -371,7 +376,8 @@ class ScoreboardService {
                                 op.getAt(),
                                 op.getCreatedAt(),
                                 op.getCause().name(),
-                                op.getDeltaMs()))
+                                op.getDeltaMs(),
+                                op.getPoints()))
                         .toList());
     }
 

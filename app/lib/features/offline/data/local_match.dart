@@ -26,6 +26,7 @@ class LocalMatch {
             side: e.side,
             at: e.at,
             delta: e.delta ?? Duration.zero,
+            value: e.points,
           ),
     ];
     final timeline = [...server.timeline];
@@ -45,6 +46,7 @@ class LocalMatch {
             at,
             side: op.side,
             delta: op.delta ?? Duration.zero,
+            value: op.points,
           ) !=
           null) {
         continue;
@@ -56,6 +58,7 @@ class LocalMatch {
           side: op.side,
           at: at,
           delta: op.delta ?? Duration.zero,
+          value: op.points,
           target: op.action == MatchAction.undo
               ? before.lastUndoable!.id
               : null,
@@ -69,6 +72,7 @@ class LocalMatch {
           side: op.side,
           reason: op.reason,
           delta: op.delta,
+          points: op.points,
           at: at,
           clock: before.elapsedAt(at),
           automatic: false,
@@ -173,6 +177,7 @@ class LocalMatch {
     Side? side,
     DateTime now, {
     Duration delta = Duration.zero,
+    int points = 1,
   }) {
     if (view.review != null) return MatchRefusal.inReview;
     if (action == MatchAction.oneHandWarning &&
@@ -186,6 +191,7 @@ class LocalMatch {
       lastAt != null && now.isBefore(lastAt) ? lastAt : now,
       side: side,
       delta: delta,
+      value: points,
     );
   }
 }
