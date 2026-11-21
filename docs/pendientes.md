@@ -13,7 +13,9 @@ Lo que espera a alguien, ordenado por quién tiene que actuar. Lo hecho se borra
 - [ ] Equipos en torneos: plantilla, suplentes y entrenadores. Categorías reales por equipos y si hay ranking de equipos (`modulos/prototipo-f1-equipos.md`).
 - [ ] Plantillas de deporte (`producto/plantillas-deporte.md`): ¿dueño la cuenta o el club? ¿galería pública o primero por enlace? ¿moderación previa o denuncias? ¿autor visible?
 - [ ] Grappling: una persona va a una sola categoría por evento. ¿Gi y sin gi como dos eventos, o varias categorías por persona?
-- [ ] Un evento suelto sale en Mis eventos como liga («Abrir la liga», podio de liga): ¿botón directo a su panel?
+- [ ] Botón de acceso en Mis eventos (Raul, 2026-11-21): hoy pone siempre «Abrir la liga». El texto depende de lo que se abre: liga, competición (evento suelto) o, para árbitros y ayudantes, la fase o competición. Un evento suelto lleva además podio de liga: ¿botón directo a su panel?
+- [ ] Torneo ≠ liga (Raul, 2026-11-21, **muy importante**): un torneo (evento suelto, p. ej. grappling) hoy se ve con fases, podio de liga, puntos por asistir y demás conceptos de liga. No tiene nada que ver con una liga: cada tipo debe mostrar solo lo suyo, en Mis eventos, panel, ajustes y clasificaciones. Revisar todas las pantallas con esa diferencia.
+- [ ] Configuración del evento (Raul, 2026-11-21): da pereza configurar. Jugar con tamaños, subsecciones (desplegables) y mostrar según importancia; lo secundario, oculto tras interruptores. Rediseño en `producto/eventos-ux.md`.
 - [ ] Gestión del club (`producto/gestion-club.md`): ¿se amplía el alcance? Si se cobra o factura: forma jurídica, asesor y contratos.
 
 ### Técnicas y diseño
@@ -29,7 +31,6 @@ Lo que espera a alguien, ordenado por quién tiene que actuar. Lo hecho se borra
 Todo está fusionado; falta comprobarlo en debug o en la Pi.
 - [ ] `auth` completo: registro, login y bloqueo, verificación, recuperación, Google, perfiles, cambio de email, borrado y restaurar, exportación; admin con superadmin (`modulos/auth.md`).
 - [ ] `legal-paginas`: páginas, casilla del registro, pie y ajustes.
-- [ ] Acceso por QR con un móvil real: escanear, arbitrar, «Nuevo QR» saca al anterior, finalizar la fase lo cierra (`modulos/ayudantes-permisos.md`).
 - [ ] Grappling (G1-G5): escenario `grappling`; marcador, prórroga, puntos de clasificación y «Nuevo evento» (`producto/grappling.md`).
 - [ ] Liga y fases: liga primero, podios de un toque, reinscripción, puntos por asistir (#81, #86, #89).
 - [ ] Tiempo real: el marcador, el tablero, Tapices y Puntuaciones se actualizan solos.
@@ -67,6 +68,7 @@ Todo está fusionado; falta comprobarlo en debug o en la Pi.
 - [ ] Sin probar aún: punto de acceso desde `start-event.ps1`, aviso UAC del firewall, arranque en un portátil limpio; reglas "java" del firewall del portátil de Raul (mantener o borrar).
 
 ## 5. Técnico, más adelante
+- [ ] Fallo (Raul, 2026-11-21): quitar un árbitro sin tapiz da «tiene un tapiz asignado» (`REFEREE_ON_MAT`, `StaffService.remove`). La comprobación mira `mats.refereeAccountId`: sospecha de un tapiz inhabilitado o quitado que guarda aún el árbitro sin mostrarlo en Ajustes.
 - [ ] Producción: IP real de `CF-Connecting-IP` confiando solo en el túnel; Content-Security-Policy en nginx probada contra el despliegue real.
 - [ ] Emails de auth a la cola con reintentos de `notificaciones`; enlaces con token en `api.log` cuando no hay Resend.
 - [ ] Retirar `staffNames` (y `event_staff_name`, M6) ahora que el personal tiene cuenta propia.

@@ -15,6 +15,7 @@ import 'package:brackety/features/league/data/league_models.dart';
 import 'package:brackety/features/league/state/league_providers.dart';
 import 'package:brackety/features/mat/data/mat_board.dart';
 import 'package:brackety/features/staff/data/staff_repository.dart';
+import 'package:brackety/features/staff/data/temporary_access.dart';
 import 'package:brackety/l10n/gen/app_localizations.dart';
 import 'package:brackety_core/brackety_core.dart';
 import 'package:dio/dio.dart';
@@ -44,6 +45,7 @@ class FakeClubRepository extends Fake implements ClubRepository {
   String? refuseCode;
   final savedMatReferees = <List<String?>>[];
   final savedRules = <(Duration, int)>[];
+  final savedGaps = <int>[];
   final savedAttendance = <int>[];
   final savedCategories = <List<EventCategory>>[];
   final savedParticipantCategories = <String?>[];
@@ -137,9 +139,11 @@ class FakeClubRepository extends Fake implements ClubRepository {
     required Duration teamMatchLength,
     required int teamPointsLimit,
     required Duration minRest,
+    required int superiorityGap,
   }) async {
     _refuse();
     savedMatReferees.add(matReferees);
+    savedGaps.add(superiorityGap);
     savedRules.add((matchLength, pointsLimit));
     savedAttendance.add(attendancePoints);
     return current = EventSettings(
@@ -155,8 +159,25 @@ class FakeClubRepository extends Fake implements ClubRepository {
       teamMatchLength: teamMatchLength,
       teamPointsLimit: teamPointsLimit,
       minRest: minRest,
+      superiorityGap: superiorityGap,
     );
   }
+}
+
+/// The settings list builds what is below the screen only once scrolled to.
+Future<Finder> scrolledTo(WidgetTester tester, String text) async {
+  final finder = find.text(text);
+  await tester.scrollUntilVisible(
+    finder,
+    200,
+    scrollable: find
+        .descendant(
+          of: find.byType(ListView),
+          matching: find.byType(Scrollable),
+        )
+        .first,
+  );
+  return finder;
 }
 
 void main() {
@@ -275,6 +296,7 @@ void main() {
             staff ?? FakeStaffRepository(),
           ),
           myEventsProvider.overrideWith((ref) async => [me ?? event]),
+          temporaryAccessesProvider.overrideWith((ref, _) async => []),
           leagueProvider.overrideWith(
             (ref, _) async => League(
               name: 'Liga',
@@ -890,7 +912,7 @@ void main() {
 
     expect(find.widgetWithText(FilledButton, 'Save'), findsNothing);
     expect(find.text('Groups per mat at once'), findsNothing);
-    await tester.tap(find.text('Add mat'));
+    await tester.tap(await scrolledTo(tester, 'Add mat'));
     await tester.pumpAndSettle();
 
     expect(repository.savedMatReferees, [
@@ -946,14 +968,14 @@ void main() {
     await tester.tap(find.text('Settings'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Remove the last mat'));
+    await tester.tap(await scrolledTo(tester, 'Remove the last mat'));
     await tester.pumpAndSettle();
     expect(find.textContaining('Mat 2 is removed'), findsOneWidget);
     await tester.tap(find.text('Cancel'));
     await tester.pumpAndSettle();
     expect(repository.savedMatReferees, isEmpty);
 
-    await tester.tap(find.text('Remove the last mat'));
+    await tester.tap(await scrolledTo(tester, 'Remove the last mat'));
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(FilledButton, 'Remove the last mat'));
     await tester.pumpAndSettle();
@@ -972,7 +994,7 @@ void main() {
     await tester.tap(find.text('Settings'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Remove the last mat'));
+    await tester.tap(await scrolledTo(tester, 'Remove the last mat'));
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(FilledButton, 'Remove the last mat'));
     await tester.pumpAndSettle();
@@ -981,7 +1003,7 @@ void main() {
       find.textContaining('use "Disable mat" in the mats tab'),
       findsOneWidget,
     );
-    expect(find.text('Mat 2 · Referee'), findsOneWidget);
+    expect(find.text('Mat 2 · Referee', skipOffstage: false), findsOneWidget);
   });
 
   testWidgets('a refused change explains why and shows the saved value', (
@@ -992,7 +1014,7 @@ void main() {
     await tester.tap(find.text('Settings'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Add mat'));
+    await tester.tap(await scrolledTo(tester, 'Add mat'));
     await tester.pumpAndSettle();
 
     expect(
@@ -1033,6 +1055,51 @@ void main() {
       const Duration(minutes: 2, seconds: 30),
       10,
     ));
+  });
+
+  // Grappling: no points limit, the match ends at 15 points of difference.
+  testWidgets('the club sets no points limit and a superiority gap', (
+    tester,
+  ) async {
+    final repository = FakeClubRepository(settings);
+    await pumpPanel(tester, const Size(800, 1280), repository: repository);
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+
+    final limit = find.widgetWithText(
+      TextFormField,
+      'Individual: points that end the match',
+    );
+    final gap = find.widgetWithText(
+      TextFormField,
+      'Points difference that ends the match',
+    );
+    await tester.enterText(limit, '');
+    await tester.enterText(gap, '101');
+    await tester.pump(const Duration(seconds: 1));
+    expect(find.textContaining('Between 0 and 100'), findsOneWidget);
+    expect(repository.savedGaps, isEmpty);
+
+    await tester.enterText(gap, '15');
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    expect(repository.savedRules.last.$2, 0);
+    expect(repository.savedGaps.last, 15);
+  });
+
+  // Raul, 2026-11-21: on the phone's web the QR access could not be found.
+  testWidgets('the QR accesses show in the settings on a phone', (
+    tester,
+  ) async {
+    await pumpPanel(tester, const Size(360, 800));
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+
+    await scrolledTo(tester, 'Mat 1 · Referee');
+    expect(find.byTooltip('Mat 1 referee by QR'), findsOneWidget);
+    await scrolledTo(tester, 'Helper by QR');
+    expect(find.text('Helper by QR'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('the club changes the attendance points of the phase', (

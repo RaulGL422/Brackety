@@ -1076,14 +1076,26 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settingsPointsLimitHint =>
-      'Al llegar uno, acaba. La descalificación da estos puntos al rival. No cambia una vez empezado un combate.';
+      'Al llegar uno, acaba. Vacío = sin límite: acaba por tiempo. La descalificación da estos puntos al rival. No cambia una vez empezado un combate.';
 
   @override
   String get settingsMatchRulesConflict =>
       'No se puede cambiar ahora: hay un combate en curso o ya empezado.';
 
   @override
-  String get settingsPointsLimitInvalid => 'Entre 1 y 99.';
+  String get settingsPointsLimitInvalid => 'Entre 0 y 99 (vacío = sin límite).';
+
+  @override
+  String get settingsSuperiorityGap =>
+      'Diferencia de puntos que acaba el combate';
+
+  @override
+  String get settingsSuperiorityGapHint =>
+      'Gana quien saque esta ventaja (grappling: 15). Vacío = no acaba por diferencia. No cambia una vez empezado un combate.';
+
+  @override
+  String get settingsSuperiorityGapInvalid =>
+      'Entre 0 y 100 (vacío = no acaba por diferencia).';
 
   @override
   String get matWaitingTitle => 'En espera';
