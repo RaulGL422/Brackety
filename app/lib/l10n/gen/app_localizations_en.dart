@@ -1066,14 +1066,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsPointsLimitHint =>
-      'The match ends when one fighter reaches them. A disqualification gives them to the rival. It does not change once a match has started.';
+      'The match ends when one fighter reaches them. Empty = no limit: the time ends it. A disqualification gives them to the rival. It does not change once a match has started.';
 
   @override
   String get settingsMatchRulesConflict =>
       'It cannot change now: a match is in progress or has started.';
 
   @override
-  String get settingsPointsLimitInvalid => 'Between 1 and 99.';
+  String get settingsPointsLimitInvalid =>
+      'Between 0 and 99 (empty = no limit).';
+
+  @override
+  String get settingsSuperiorityGap => 'Points difference that ends the match';
+
+  @override
+  String get settingsSuperiorityGapHint =>
+      'Whoever gets this lead wins (grappling: 15). Empty = it never ends on difference. It does not change once a match has started.';
+
+  @override
+  String get settingsSuperiorityGapInvalid =>
+      'Between 0 and 100 (empty = it never ends on difference).';
 
   @override
   String get matWaitingTitle => 'Waiting';

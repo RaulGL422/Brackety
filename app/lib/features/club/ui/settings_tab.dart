@@ -47,16 +47,11 @@ Duration? parseMatchLength(String text) {
       : length;
 }
 
-int? parsePointsLimit(String text) {
-  final value = int.tryParse(text.trim());
-  return value == null || value < 1 || value > 99 ? null : value;
-}
-
-/// Empty or 0: no limit (returns 0); else 1 to 99, or null if invalid.
-int? parseTeamPointsLimit(String text) {
+/// Empty or 0: no limit (returns 0); else up to [max], or null if invalid.
+int? parsePointsLimit(String text, {int max = 99}) {
   if (text.trim().isEmpty) return 0;
   final value = int.tryParse(text.trim());
-  return value == null || value < 0 || value > 99 ? null : value;
+  return value == null || value < 0 || value > max ? null : value;
 }
 
 /// Seconds, 0 to 600.
@@ -72,7 +67,7 @@ int? parseAttendancePoints(String text) {
   return value == null || value < 0 || value > 100 ? null : value;
 }
 
-/// Event name and date, match length, points limit and attendance points, mats with their referee, and the
+/// Event name and date, match length, points limit, superiority gap and attendance points, mats with their referee, and the
 /// categories.
 /// Every change saves on its own; a refused one goes back to what the server has.
 class SettingsTab extends ConsumerWidget {
@@ -109,12 +104,17 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
   late final _length = TextEditingController(
     text: formatMatchLength(_saved.matchLength),
   );
-  late final _limit = TextEditingController(text: '${_saved.pointsLimit}');
+  late final _limit = TextEditingController(
+    text: _limitText(_saved.pointsLimit),
+  );
   late final _teamLength = TextEditingController(
     text: formatMatchLength(_saved.teamMatchLength),
   );
   late final _teamLimit = TextEditingController(
-    text: _teamLimitText(_saved.teamPointsLimit),
+    text: _limitText(_saved.teamPointsLimit),
+  );
+  late final _gap = TextEditingController(
+    text: _limitText(_saved.superiorityGap),
   );
   late final _minRest = TextEditingController(
     text: '${_saved.minRest.inSeconds}',
@@ -134,6 +134,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
     _limit.dispose();
     _teamLength.dispose();
     _teamLimit.dispose();
+    _gap.dispose();
     _minRest.dispose();
     _attendance.dispose();
     super.dispose();
@@ -263,8 +264,23 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
               helperMaxLines: 3,
             ),
             keyboardType: TextInputType.number,
-            validator: (v) => parseTeamPointsLimit(v ?? '') == null
+            validator: (v) => parsePointsLimit(v ?? '') == null
                 ? l10n.settingsPointsLimitInvalid
+                : null,
+            onChanged: (_) => _typed(),
+            onFieldSubmitted: (_) => _save(),
+          ),
+          const SizedBox(height: AppSpacing.m),
+          TextFormField(
+            controller: _gap,
+            decoration: InputDecoration(
+              labelText: l10n.settingsSuperiorityGap,
+              helperText: l10n.settingsSuperiorityGapHint,
+              helperMaxLines: 3,
+            ),
+            keyboardType: TextInputType.number,
+            validator: (v) => parsePointsLimit(v ?? '', max: 100) == null
+                ? l10n.settingsSuperiorityGapInvalid
                 : null,
             onChanged: (_) => _typed(),
             onFieldSubmitted: (_) => _save(),
@@ -421,7 +437,8 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
     final limit = parsePointsLimit(_limit.text);
     final attendance = parseAttendancePoints(_attendance.text);
     final teamLength = parseMatchLength(_teamLength.text);
-    final teamLimit = parseTeamPointsLimit(_teamLimit.text);
+    final teamLimit = parsePointsLimit(_teamLimit.text);
+    final gap = parsePointsLimit(_gap.text, max: 100);
     final minRest = parseMinRest(_minRest.text);
     if (_name.text.trim().isEmpty ||
         length == null ||
@@ -429,6 +446,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
         attendance == null ||
         teamLength == null ||
         teamLimit == null ||
+        gap == null ||
         minRest == null) {
       return;
     }
@@ -436,7 +454,8 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
         length != _saved.matchLength ||
         limit != _saved.pointsLimit ||
         teamLength != _saved.teamMatchLength ||
-        teamLimit != _saved.teamPointsLimit;
+        teamLimit != _saved.teamPointsLimit ||
+        gap != _saved.superiorityGap;
     if (_saving) {
       _changedWhileSaving = true;
       return;
@@ -460,6 +479,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
               teamMatchLength: teamLength,
               teamPointsLimit: teamLimit,
               minRest: minRest,
+              superiorityGap: gap,
             );
       } while (_changedWhileSaving && mounted);
       ref
@@ -492,16 +512,17 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
     _date = _saved.date;
     _matReferees = [..._saved.matReferees];
     _length.text = formatMatchLength(_saved.matchLength);
-    _limit.text = '${_saved.pointsLimit}';
+    _limit.text = _limitText(_saved.pointsLimit);
     _teamLength.text = formatMatchLength(_saved.teamMatchLength);
-    _teamLimit.text = _teamLimitText(_saved.teamPointsLimit);
+    _teamLimit.text = _limitText(_saved.teamPointsLimit);
+    _gap.text = _limitText(_saved.superiorityGap);
     _minRest.text = '${_saved.minRest.inSeconds}';
     _attendance.text = '${_saved.attendancePoints}';
   });
 }
 
 // No limit is an empty field.
-String _teamLimitText(int limit) => limit == 0 ? '' : '$limit';
+String _limitText(int limit) => limit == 0 ? '' : '$limit';
 
 /// The person behind one staff account; saved once the club stops typing, like the event's name.
 class _StaffNameField extends ConsumerStatefulWidget {

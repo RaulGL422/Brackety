@@ -56,6 +56,21 @@ class SportRulesTest extends EventApiTest {
                 .andExpect(jsonPath("$.warningReasons.sport[0]").value("Pasividad"));
     }
 
+    // FELODA ends a match at 15 points of difference; the club can change it or turn it off (0), the rest stays.
+    @Test
+    void theClubSetsTheSuperiorityGap() throws Exception {
+        call(put("/api/v1/events/" + eventId + "/settings").content("""
+                        {"name":"Fase 1","date":"2027-03-10","matReferees":["%s"],"pointsLimit":0,
+                         "superiorityGap":12}""".formatted(accountId("arbitro1"))), "club1")
+                .andExpect(status().isOk());
+
+        call(get("/api/v1/events/" + eventId + "/settings"), "club1")
+                .andExpect(jsonPath("$.pointsLimit").value(0))
+                .andExpect(jsonPath("$.scoring.superiorityGap").value(12))
+                .andExpect(jsonPath("$.scoring.actions", hasSize(1)))
+                .andExpect(jsonPath("$.scoring.warningPoints[1]").value(1));
+    }
+
     // Grappling: U15 fight 4 minutes in an event of 5.
     @Test
     void aCategoryWithItsOwnLengthGivesItToItsMatches() throws Exception {

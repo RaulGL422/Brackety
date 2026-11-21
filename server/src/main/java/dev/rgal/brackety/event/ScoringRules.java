@@ -116,6 +116,20 @@ public record ScoringRules(
         return tiebreaks.contains(Tiebreak.EXTRA_TIME);
     }
 
+    public ScoringRules withSuperiorityGap(int gap) {
+        return new ScoringRules(
+                actions,
+                warningPoints,
+                warningsToDisqualify,
+                gap,
+                pointsAfterTime,
+                disqualificationScores,
+                oneHandWarnings,
+                finishes,
+                tiebreaks,
+                classification);
+    }
+
     /** The most one action is worth. */
     public int maxPointValue() {
         return actions.stream().mapToInt(Action::value).max().orElse(1);
