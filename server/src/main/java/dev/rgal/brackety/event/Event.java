@@ -286,10 +286,11 @@ public class Event {
             int attendancePoints,
             Modality.FormatRules individual,
             Modality.FormatRules team,
-            int minRestSeconds) {
+            int minRestSeconds,
+            int superiorityGap) {
         this.name = name;
         this.eventDate = eventDate;
         this.attendancePoints = attendancePoints;
-        modality().update(individual, team, minRestSeconds);
+        modality().update(individual, team, minRestSeconds, superiorityGap);
     }
 }

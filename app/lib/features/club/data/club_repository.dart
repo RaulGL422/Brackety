@@ -69,6 +69,7 @@ class ClubRepository {
     required Duration teamMatchLength,
     required int teamPointsLimit,
     required Duration minRest,
+    required int superiorityGap,
   }) async {
     final response = await _dio.put<Map<String, dynamic>>(
       '/api/v1/events/$eventId/settings',
@@ -82,6 +83,7 @@ class ClubRepository {
         'teamMatchSeconds': teamMatchLength.inSeconds,
         'teamPointsLimit': teamPointsLimit,
         'minRestSeconds': minRest.inSeconds,
+        'superiorityGap': superiorityGap,
       },
     );
     return EventSettings.fromJson(response.data!);

@@ -152,9 +152,10 @@ public class Modality {
         return rules.get(Format.TEAM);
     }
 
-    void update(FormatRules individual, FormatRules team, int minRestSeconds) {
+    void update(FormatRules individual, FormatRules team, int minRestSeconds, int superiorityGap) {
         rules.put(Format.INDIVIDUAL, individual);
         rules.put(Format.TEAM, team);
         this.minRestSeconds = minRestSeconds;
+        scoring = scoring.withSuperiorityGap(superiorityGap);
     }
 }

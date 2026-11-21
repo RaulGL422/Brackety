@@ -101,6 +101,7 @@ class EventSettings {
     this.teamMatchLength = const Duration(minutes: 3),
     this.teamPointsLimit = 0,
     this.minRest = const Duration(seconds: 30),
+    this.superiorityGap = 0,
     this.weightChoice,
     this.heightChoice,
     this.sportWeight = MeasureRequirement.optional,
@@ -143,6 +144,10 @@ class EventSettings {
       ),
       teamPointsLimit: json['teamPointsLimit'] as int? ?? 0,
       minRest: Duration(seconds: json['minRestSeconds'] as int? ?? 30),
+      superiorityGap:
+          (json['scoring'] as Map<String, dynamic>?)?['superiorityGap']
+              as int? ??
+          0,
       weightChoice: MeasureRequirement.fromJson(measures?['weight']),
       heightChoice: MeasureRequirement.fromJson(measures?['height']),
       sportWeight:
@@ -175,7 +180,7 @@ class EventSettings {
   final List<EventCategory> categories;
   final Duration matchLength;
 
-  /// Points that end a match; a disqualification gives them to the rival.
+  /// Points that end a match (0 = no limit); a disqualification gives them to the rival.
   final int pointsLimit;
 
   /// Points everyone in a group of this phase adds to the standings.
@@ -187,6 +192,9 @@ class EventSettings {
 
   /// The least rest of a fighter between two matches, on any mat.
   final Duration minRest;
+
+  /// The points difference that ends a match (grappling: 15); 0 = none.
+  final int superiorityGap;
 
   /// The clubs taking part, in the order the club entered them.
   final List<Organization> organizations;

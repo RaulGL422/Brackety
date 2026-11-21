@@ -154,6 +154,8 @@ public class EventService {
                 Objects.requireNonNullElse(
                         request.teamPointsLimit(), modality.team().pointsLimit()));
         var minRestSeconds = Objects.requireNonNullElse(request.minRestSeconds(), modality.getMinRestSeconds());
+        var superiorityGap = Objects.requireNonNullElse(
+                request.superiorityGap(), modality.scoring().superiorityGap());
         if ((individual.matchSeconds() != modality.individual().matchSeconds()
                         || team.matchSeconds() != modality.team().matchSeconds())
                 && events.hasMatchIn(eventId, "IN_PROGRESS")) {
@@ -161,7 +163,8 @@ public class EventService {
         }
         // A disqualification scores the limit for the rival: started matches keep the one they had.
         if ((individual.pointsLimit() != modality.individual().pointsLimit()
-                        || team.pointsLimit() != modality.team().pointsLimit())
+                        || team.pointsLimit() != modality.team().pointsLimit()
+                        || superiorityGap != modality.scoring().superiorityGap())
                 && events.hasStartedMatches(eventId)) {
             throw EventException.conflict("The points limit cannot change once a match has started.");
         }
@@ -190,7 +193,14 @@ public class EventService {
         }
         var attendancePoints =
                 request.attendancePoints() != null ? request.attendancePoints() : event.getAttendancePoints();
-        event.update(request.name().strip(), request.date(), attendancePoints, individual, team, minRestSeconds);
+        event.update(
+                request.name().strip(),
+                request.date(),
+                attendancePoints,
+                individual,
+                team,
+                minRestSeconds,
+                superiorityGap);
         for (int i = 0; i < request.matReferees().size(); i++) {
             var referee = request.matReferees().get(i);
             if (i < current.size()) {

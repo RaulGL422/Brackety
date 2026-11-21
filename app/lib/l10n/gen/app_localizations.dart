@@ -1811,7 +1811,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsPointsLimitHint.
   ///
   /// In es, this message translates to:
-  /// **'Al llegar uno, acaba. La descalificación da estos puntos al rival. No cambia una vez empezado un combate.'**
+  /// **'Al llegar uno, acaba. Vacío = sin límite: acaba por tiempo. La descalificación da estos puntos al rival. No cambia una vez empezado un combate.'**
   String get settingsPointsLimitHint;
 
   /// No description provided for @settingsMatchRulesConflict.
@@ -1823,8 +1823,26 @@ abstract class AppLocalizations {
   /// No description provided for @settingsPointsLimitInvalid.
   ///
   /// In es, this message translates to:
-  /// **'Entre 1 y 99.'**
+  /// **'Entre 0 y 99 (vacío = sin límite).'**
   String get settingsPointsLimitInvalid;
+
+  /// No description provided for @settingsSuperiorityGap.
+  ///
+  /// In es, this message translates to:
+  /// **'Diferencia de puntos que acaba el combate'**
+  String get settingsSuperiorityGap;
+
+  /// No description provided for @settingsSuperiorityGapHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Gana quien saque esta ventaja (grappling: 15). Vacío = no acaba por diferencia. No cambia una vez empezado un combate.'**
+  String get settingsSuperiorityGapHint;
+
+  /// No description provided for @settingsSuperiorityGapInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'Entre 0 y 100 (vacío = no acaba por diferencia).'**
+  String get settingsSuperiorityGapInvalid;
 
   /// No description provided for @matWaitingTitle.
   ///
