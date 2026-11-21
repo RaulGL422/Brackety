@@ -15,6 +15,7 @@ import 'package:brackety/features/league/data/league_models.dart';
 import 'package:brackety/features/league/state/league_providers.dart';
 import 'package:brackety/features/mat/data/mat_board.dart';
 import 'package:brackety/features/staff/data/staff_repository.dart';
+import 'package:brackety/features/staff/data/temporary_access.dart';
 import 'package:brackety/l10n/gen/app_localizations.dart';
 import 'package:brackety_core/brackety_core.dart';
 import 'package:dio/dio.dart';
@@ -295,6 +296,7 @@ void main() {
             staff ?? FakeStaffRepository(),
           ),
           myEventsProvider.overrideWith((ref) async => [me ?? event]),
+          temporaryAccessesProvider.overrideWith((ref, _) async => []),
           leagueProvider.overrideWith(
             (ref, _) async => League(
               name: 'Liga',
@@ -1083,6 +1085,21 @@ void main() {
     await tester.pumpAndSettle();
     expect(repository.savedRules.last.$2, 0);
     expect(repository.savedGaps.last, 15);
+  });
+
+  // Raul, 2026-11-21: on the phone's web the QR access could not be found.
+  testWidgets('the QR accesses show in the settings on a phone', (
+    tester,
+  ) async {
+    await pumpPanel(tester, const Size(360, 800));
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+
+    await scrolledTo(tester, 'Mat 1 · Referee');
+    expect(find.byTooltip('Mat 1 referee by QR'), findsOneWidget);
+    await scrolledTo(tester, 'Helper by QR');
+    expect(find.text('Helper by QR'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('the club changes the attendance points of the phase', (
