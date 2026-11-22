@@ -33,6 +33,16 @@ final fakeMatsOverride = matsOverviewProvider.overrideWith(
       remaining: Duration.zero,
       estimatedEnd: DateTime(2027, 3, 10, 9),
     ),
+    MatOverview(
+      id: 'm3',
+      number: 3,
+      groups: 0,
+      pendingMatches: 0,
+      matchInProgress: false,
+      remaining: Duration.zero,
+      estimatedEnd: DateTime(2027, 3, 10, 9),
+      disabledAt: DateTime(2027, 3, 10, 8),
+    ),
   ],
 );
 

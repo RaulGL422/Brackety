@@ -152,11 +152,11 @@ abstract class AppLocalizations {
   /// **'Ese combate ya ha empezado: no se puede cambiar.'**
   String get controlMatchNotPending;
 
-  /// No description provided for @controlMatWithoutReferee.
+  /// No description provided for @controlMatIsDisabled.
   ///
   /// In es, this message translates to:
-  /// **'Ese tapiz no tiene árbitro.'**
-  String get controlMatWithoutReferee;
+  /// **'Ese tapiz está inhabilitado: reactívalo o elige otro.'**
+  String get controlMatIsDisabled;
 
   /// No description provided for @controlOrderChanged.
   ///
@@ -233,8 +233,14 @@ abstract class AppLocalizations {
   /// No description provided for @controlNoOtherMat.
   ///
   /// In es, this message translates to:
-  /// **'No hay otro tapiz con árbitro.'**
+  /// **'No hay otro tapiz en uso.'**
   String get controlNoOtherMat;
+
+  /// No description provided for @controlNoReferee.
+  ///
+  /// In es, this message translates to:
+  /// **'sin árbitro'**
+  String get controlNoReferee;
 
   /// No description provided for @controlMatOption.
   ///

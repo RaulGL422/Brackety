@@ -41,7 +41,8 @@ class AppLocalizationsEs extends AppLocalizations {
       'Ese combate ya ha empezado: no se puede cambiar.';
 
   @override
-  String get controlMatWithoutReferee => 'Ese tapiz no tiene árbitro.';
+  String get controlMatIsDisabled =>
+      'Ese tapiz está inhabilitado: reactívalo o elige otro.';
 
   @override
   String get controlOrderChanged =>
@@ -89,7 +90,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get controlPickMat => '¿A qué tapiz?';
 
   @override
-  String get controlNoOtherMat => 'No hay otro tapiz con árbitro.';
+  String get controlNoOtherMat => 'No hay otro tapiz en uso.';
+
+  @override
+  String get controlNoReferee => 'sin árbitro';
 
   @override
   String controlMatOption(int number, String referee, int pending) {

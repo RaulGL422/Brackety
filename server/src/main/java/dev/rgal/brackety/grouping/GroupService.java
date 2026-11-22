@@ -210,8 +210,9 @@ class GroupService {
         var mat = mats.findById(matId)
                 .filter(m -> m.getEventId().equals(event.getId()))
                 .orElseThrow(() -> EventException.invalid("That mat is not in this event."));
-        if (mat.getRefereeAccountId() == null) {
-            throw EventException.conflict("That mat has no referee yet.");
+        // Without a referee yet it still takes groups (Raul, 2026-11-22): only a disabled mat does not.
+        if (mat.isDisabled()) {
+            throw EventException.conflict("MAT_DISABLED", "That mat is disabled.");
         }
         return mat;
     }

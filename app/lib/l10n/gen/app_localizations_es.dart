@@ -60,7 +60,8 @@ class AppLocalizationsEs extends AppLocalizations {
       'Ese combate ya ha empezado: no se puede cambiar.';
 
   @override
-  String get controlMatWithoutReferee => 'Ese tapiz no tiene árbitro.';
+  String get controlMatIsDisabled =>
+      'Ese tapiz está inhabilitado: reactívalo o elige otro.';
 
   @override
   String get controlOrderChanged =>
@@ -148,7 +149,7 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get controlNoOtherMat => 'No hay otro tapiz con árbitro.';
+  String get controlNoOtherMat => 'No hay otro tapiz en uso.';
 
   @override
   String controlMatOption(int number, String referee, int pending) {
@@ -660,7 +661,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get groupsConflict =>
-      'Algún alumno ya está en un grupo o el tapiz se ha quedado sin árbitro. La lista se ha actualizado.';
+      'Algún alumno ya está en otro grupo. La lista se ha actualizado.';
+
+  @override
+  String get groupsMatDisabled =>
+      'Ese tapiz está inhabilitado: elige otro o «Automático».';
 
   @override
   String get groupsError => 'No se ha podido crear el grupo.';

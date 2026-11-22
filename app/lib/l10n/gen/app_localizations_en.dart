@@ -60,7 +60,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'That match has started: it cannot change.';
 
   @override
-  String get controlMatWithoutReferee => 'That mat has no referee.';
+  String get controlMatIsDisabled =>
+      'That mat is disabled: enable it or pick another.';
 
   @override
   String get controlOrderChanged =>
@@ -148,7 +149,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get controlNoOtherMat => 'No other mat has a referee.';
+  String get controlNoOtherMat => 'No other mat is in use.';
 
   @override
   String controlMatOption(int number, String referee, int pending) {
@@ -657,7 +658,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get groupsConflict =>
-      'A participant is already in a group or the mat has lost its referee. The list has been refreshed.';
+      'A participant is already in another group. The list has been refreshed.';
+
+  @override
+  String get groupsMatDisabled =>
+      'That mat is disabled: pick another or \"Automatic\".';
 
   @override
   String get groupsError => 'The group could not be created.';

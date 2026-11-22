@@ -121,9 +121,9 @@ void main() {
     matches: board.matches,
     recommendedMatchId: 'm1',
     mats: const [
-      MatChoice(id: 'mat1', number: 1, hasReferee: true),
-      MatChoice(id: 'mat2', number: 2, hasReferee: true),
-      MatChoice(id: 'mat3', number: 3, hasReferee: false),
+      MatChoice(id: 'mat1', number: 1, disabled: false),
+      MatChoice(id: 'mat2', number: 2, disabled: false),
+      MatChoice(id: 'mat3', number: 3, disabled: true),
     ],
   );
 
@@ -216,9 +216,9 @@ void main() {
         matches: board.matches,
         recommendedMatchId: 'm1',
         mats: const [
-          MatChoice(id: 'mat1', number: 1, hasReferee: true),
-          MatChoice(id: 'mat2', number: 2, hasReferee: true),
-          MatChoice(id: 'mat3', number: 3, hasReferee: false),
+          MatChoice(id: 'mat1', number: 1, disabled: false),
+          MatChoice(id: 'mat2', number: 2, disabled: false),
+          MatChoice(id: 'mat3', number: 3, disabled: true),
         ],
       );
       await tester.pumpWidget(

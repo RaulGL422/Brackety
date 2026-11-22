@@ -182,11 +182,11 @@ abstract class AppLocalizations {
   /// **'Ese combate ya ha empezado: no se puede cambiar.'**
   String get controlMatchNotPending;
 
-  /// No description provided for @controlMatWithoutReferee.
+  /// No description provided for @controlMatIsDisabled.
   ///
   /// In es, this message translates to:
-  /// **'Ese tapiz no tiene árbitro.'**
-  String get controlMatWithoutReferee;
+  /// **'Ese tapiz está inhabilitado: reactívalo o elige otro.'**
+  String get controlMatIsDisabled;
 
   /// No description provided for @controlOrderChanged.
   ///
@@ -299,7 +299,7 @@ abstract class AppLocalizations {
   /// No description provided for @controlNoOtherMat.
   ///
   /// In es, this message translates to:
-  /// **'No hay otro tapiz con árbitro.'**
+  /// **'No hay otro tapiz en uso.'**
   String get controlNoOtherMat;
 
   /// No description provided for @controlMatOption.
@@ -1145,8 +1145,14 @@ abstract class AppLocalizations {
   /// No description provided for @groupsConflict.
   ///
   /// In es, this message translates to:
-  /// **'Algún alumno ya está en un grupo o el tapiz se ha quedado sin árbitro. La lista se ha actualizado.'**
+  /// **'Algún alumno ya está en otro grupo. La lista se ha actualizado.'**
   String get groupsConflict;
+
+  /// No description provided for @groupsMatDisabled.
+  ///
+  /// In es, this message translates to:
+  /// **'Ese tapiz está inhabilitado: elige otro o «Automático».'**
+  String get groupsMatDisabled;
 
   /// No description provided for @groupsError.
   ///
