@@ -1,0 +1,48 @@
+# Decisiones del 2026-11-11 al 2026-11-16 (F1)
+
+Formato: fecha · decisión · motivo. Las siguientes, en `decisiones.md`.
+
+- 2026-11-11 · Liga con fases en el servidor (cada evento es una fase); sus pantallas, después de la F1. Antes del domingo solo: superadmin en el portátil, exportar todo en .zip, importar resultados en la Pi y clubes · decidido por Raul: priorizar lo que se usa el domingo.
+- 2026-11-11 · Superadmin del portátil: solo responde a 127.0.0.1/::1 (`ADMIN_LOCAL_ONLY`) y la contraseña se genera en el primer arranque · allí no hay Cloudflare Access.
+- 2026-11-11 · Descalificación = límite de puntos para el rival y 0 para el descalificado; duración (F1: 3:00) y límite editables en Configuración, sin cambiar con un combate en curso (el límite, tras empezar uno) · pedido por Raul para la F1.
+- 2026-11-11 · El ayudante puede deshacer un grupo mientras ningún combate suyo haya empezado; después solo el superadmin · corregir errores al crear sin borrar puntos.
+- 2026-11-11 · Tiempo real con un WebSocket simple que solo avisa "esto cambió" (el cliente vuelve a pedir por REST), no STOMP; sondeo de respaldo cada 20 s · permisos y vistas en un solo sitio; un aviso perdido solo retrasa.
+- 2026-11-12 · (Sustituida el 2026-11-16) El nombre de la persona detrás de cada cuenta del staff es por evento y lo pone el club · las cuentas del pabellón son genéricas (arbitro1…) y cambian de persona entre fases.
+- 2026-11-12 · Un equipo real puede llevar alumnos fantasma (ya en otro equipo o grupo): combaten pero no puntúan por él; dos equipos de un grupo que comparten alumno solo dan aviso · pedido por Raul para completar equipos con pocos alumnos.
+- 2026-11-11 · En la F1 árbitros y ayudantes usan la web también en el pabellón, con la misma cola offline que la APK guardada en el navegador; el paquete ya no lleva APK por defecto · pedido por Raul: solo web, que es lo probado.
+- 2026-11-12 · Sin límite de fantasmas: un grupo individual admite hasta 3 (al menos 1 real) y un equipo puede ser entero de fantasmas · pedido por Raul en la prueba in situ, para categorías con pocos alumnos.
+- 2026-11-13 · "Fantasma" pasa a llamarse **Comodín** en textos y CSV (en código sigue `ghost`) · pedido por Raul tras la prueba in situ.
+- 2026-11-13 · Reglas por formato: individual 1:00 y 15 puntos; equipos 3:00 y sin límite (la descalificación da al rival 15 o sus puntos si lleva más); cada 2 advertencias, +1 al rival (aparte de las de una mano) · pedido por Raul para la F1.
+- 2026-11-13 · Equipos siempre de 2 o 3; un grupo de equipos lleva 1-4 reales y hasta 3 equipos comodín, nunca el mismo alumno en dos equipos del grupo (antes solo avisaba) · pedido por Raul.
+- 2026-11-13 · Los grupos de equipos no tienen tapiz: sus combates van a un bote común que se reparte entre los tapices sin individuales pendientes (dinámico; el que lleva más parado elige primero) y el combate toma el tapiz del árbitro que lo empieza · elegido por Raul: "dinámico".
+- 2026-11-13 · Descanso mínimo por alumno entre combates en cualquier tapiz (30 s, configurable en la fase); hasta entonces el combate sale "Descansando" · pedido por Raul.
+- 2026-11-13 · Ayudantes sin red: listas guardadas en el dispositivo y equipos/grupos en cola que se envían al volver (si choca, se descarta y se avisa); sin red las pantallas leen lo guardado al instante y un sondeo ligero cada 3 s detecta la vuelta · pedido por Raul.
+- 2026-11-13 · La F1 usa 3 tapices con 3 árbitros: se configura en el evento (quitar tapices 4 y 5); la demo sigue con 5 · aviso de la organización.
+- 2026-11-13 · Reglamento en PDF por fase: lo sube el club en Configuración (hasta 10 MB), viaja en el paquete al portátil y el árbitro lo abre desde su tapiz con el visor del navegador (en el móvil, la app de PDF) · pedido por Raul.
+- 2026-11-13 · Clasificación de la liga: un apartado por categoría (los puestos cuentan dentro de cada una), sin puesto con 0 puntos y con el desglose asistencia + combates por fase · pedido por Raul.
+- 2026-11-13 · El descanso mínimo se hace cumplir en el marcador y en el servidor (con red); sin red se acepta tal cual · Raul.
+- 2026-11-13 · Un tapiz con combates por jugar no puede quedarse sin árbitro · Raul.
+- 2026-11-13 · Panel de control en el club y el superadmin: mover grupos y combates pendientes, reordenar, cambiar alumnos de equipo (solo grupos sin empezar) y dejar empezar sin descanso · Raul ("tener yo el control de todo").
+- 2026-11-13 · Reparto de equipos: siguen en el bote común, que ya equilibra (el tapiz libre coge el siguiente); no se pre-asignan por tapiz · Raul.
+- 2026-11-13 · Cada tapiz enseña su orden previsto (recalculado con cada cambio, sin guardar un orden fijo); club, superadmin y árbitros pueden mover un combate pendiente a otro tapiz, también los de equipos · Raul.
+- 2026-11-14 · Ficha del alumno abierta desde la liga: advertencias de todas las fases (coinciden con la cifra de la tabla); desde la fase, solo las de la fase · Raul.
+- 2026-11-14 · Al cambiar los tapices, propuestas del bote estables y aviso "Sincronizando combates" con los tapices que faltan, sin bloquear el inicio de combates · Raul.
+- 2026-11-14 · Inhabilitar tapiz = quitarle el árbitro tras repartir sus grupos individuales (destino elegido por grupo o Automático) y devolver al bote sus combates de equipos; sin estado nuevo en BD · Raul.
+- 2026-11-13 · F1 real: 3 tapices; 5-8 individual y siempre a dos manos (aviso de una mano ampliado a 4-8 años); 9-12, 13-16 y 17+ por equipos (2 o 3); cuentas del portátil con usuario = contraseña; botón del superadmin para reiniciar el evento desde el paquete · Raul.
+- 2026-11-16 · Fin del staff genérico: en producción cada árbitro y ayudante entra con su cuenta y el club lo invita; se retira el nombre por evento (`staffNames`); las cuentas genéricas quedan solo en debug · Raul tras la F1; el club pide sus datos a buen recaudo.
+- 2026-11-16 · Dos entornos: producción (datos reales, solo releases) y debug con URL propia y escenarios cargables desde su superadmin · Raul: probar sin tocar los datos del club.
+- 2026-11-16 · Tests: en desarrollo y PRs solo los módulos tocados; batería completa (con E2E, despliegue y restauración) antes de cada release a `main` · Raul.
+- 2026-11-16 · Toda PR que cambie pantallas pasa la skill `frontend-design` y capturas en 3 tamaños · Raul: pantallas más ordenadas.
+- 2026-11-16 · El entorno debug va en la misma Pi que producción, parado los días de evento · Raul.
+- 2026-11-16 · Todos los datos de la F1 pasan a producción en una cuenta privada de la entidad que lleva Raul; se cede al club cuando la app esté estable · Raul.
+- 2026-11-16 · Calendario: competición aparte de la liga el 2026-12-20 (grupos de 4 individuales, 3 modalidades seguidas) y F2 el 2027-01-24; peso y edades mezcladas pero distinguidas, para la F2 · Raul.
+- 2026-11-16 · Al crear un grupo con comodines, «Añadir como: Normal | Comodín» fija el papel del siguiente toque en cualquier orden; quien ya tiene grupo (o el equipo de otro grupo) sigue entrando como comodín y, en individual, el 4.º tras 3 reales también · F1-2: el papel se deducía del orden y un comodín elegido primero se guardaba como normal.
+- 2026-11-16 · Debug en `brackety-debug.rgal.dev`, `brackety-debug-api.rgal.dev` y `brackety-debug-admin.rgal.dev` · Raul.
+- 2026-11-16 · Peso y estatura: se miden el día, se guardan en la inscripción y en la ficha global; obligatorio u opcional según la plantilla del deporte y el evento (obligatorio bloquea agruparlo; opcional avisa al crear el grupo) · Raul.
+- 2026-11-16 · Inhabilitar tapiz guarda estado (cuándo y qué árbitro tenía) y se reactiva con un botón que le devuelve su árbitro; el reparto sigue basándose en «sin árbitro, no recibe nada» · F1-1: sin estado nadie veía el tapiz inhabilitado ni encontraba la acción; sustituye a «sin estado nuevo en BD» del 2026-11-14.
+- 2026-11-16 · Un dato vive en un solo sitio de la BD y una regla o cálculo tiene un solo dueño en el código; lo calculable no se guarda salvo caché medida, listada y con test de coherencia · Raul, al revisar el modelo de datos.
+- 2026-11-16 · Modelo de datos ligero aprobado (`producto/modelo-datos.md`): M1 antes del 20-12, M2 antes del 24-01, el resto después · Raul.
+- 2026-11-16 · El alumno pertenece a un club; se guarda solo su último peso; el sexo es obligatorio; las categorías de la liga no cambian entre fases; el PDF del reglamento pasa a un fichero · respuestas de Raul para M2 y M5.
+- 2026-11-16 · M1: las reglas viven en `modality` (descanso y cambio entre combates) y `modality_rules` (duración y límite por formato, individual o equipos), no en columnas por formato · un dato en un solo sitio; las columnas viejas de `event` se borran en una release posterior.
+- 2026-11-16 · Un CSV por categoría con la clasificación de la liga (.zip y dentro de la exportación completa), solo el total de cada fase · petición urgente de la entidad; el desglose sigue en `clasificacion-liga.csv`.
+- 2026-11-16 · Competición del 20-12: dentro del grupo de 4 (1.º, 2.º y dos 3.º) por victorias, luego puntos, luego menos advertencias y, en último caso, decide el árbitro; suma de las 3 modalidades · Raul.
