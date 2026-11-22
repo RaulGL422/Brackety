@@ -49,6 +49,15 @@ competición del 2026-12-20 (`competicion-2026-12-20.md`); objetivo de prueba in
   primero lo que se usa en el momento y esconder lo secundario; menos texto y menos cifras a la vista.
 - Rediseño pantalla a pantalla: después, con Raul, cuando GR-1 a GR-6 estén bien.
 
+## GR-8 · Batería del servidor endurecida
+- Reglas en `04-testing.md`, «Batería del servidor». Faltan: día completo por formato con incidentes, concurrencia,
+  sesiones de una fase entera (cubre GR-2), matriz de permisos de todos los endpoints, ataques y migración desde la
+  última release. Antes de la release del 20-12, al menos sesiones, día completo de torneo y matriz de permisos.
+
+## GR-9 · Accesibilidad y organización en lo que ya existe
+- Reglas duras en `07-diseno.md`. Se aplican a cada pantalla al tocarla (GR-1, GR-4) y en el repaso de Raul (GR-7).
+- Una ayuda de test en `brackety_core` que pase las guías de Flutter a 3 tamaños y texto al 200 %.
+
 ## Orden propuesto
 1. GR-3 (pequeño, solo servidor y mensaje) y GR-2 (sin sesión estable no se puede arbitrar).
 2. GR-1 marcador.

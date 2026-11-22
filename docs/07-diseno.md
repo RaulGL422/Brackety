@@ -51,6 +51,25 @@ Familias, deportistas (niños y adultos), entrenadores, árbitros y mesa. Muchos
 - Textos siempre por i18n (ES/EN).
 - Misma identidad en app, web y superadmin.
 
+## Reglas duras (Raul, 2026-11-22)
+Se comprueban en cada pantalla que se toque; una pantalla que no las cumple no se fusiona.
+### Accesibilidad
+- Contraste AA: texto 4,5:1, texto grande e iconos 3:1, en claro y oscuro.
+- Táctil ≥ 48 (marcador 72) con al menos 8 de separación; acciones opuestas (+ y −, rojo y azul) bien separadas.
+- Todo icono con texto o `tooltip`/`Semantics`; nada se entiende solo por color o solo por icono.
+- Texto al 200 % sin cortes; orden de foco y teclado lógicos en web; lector de pantalla con etiquetas útiles.
+- Arrastrar siempre tiene alternativa de un toque (WCAG 2.5.7).
+### Organización
+- Una acción principal por pantalla, visible. Lo secundario, tras «Más» o un desplegable; lo raro, en otra pantalla.
+- Cada menú agrupa una sola clase de cosa: la bandera del marcador solo avisos y advertencias (GR-1).
+- Pocas cifras a la vista: las que sirven para decidir ahora; el resto, en el detalle.
+- Si una pantalla mezcla tareas, se divide o se crea una nueva.
+### Seguridad del diseño
+- Lo irreversible (descalificar, finalizar, borrar, quitar acceso) nunca junto a lo frecuente; confirmación con el nombre de lo afectado o deshacer.
+- Un mensaje de error dice una sola causa y qué hacer (GR-3 mezclaba dos).
+- Datos personales: solo los necesarios para la tarea, nunca de menores de más; emails enmascarados salvo al club; nada en URLs.
+- Una cuenta temporal ve solo su evento y su tarea, sin menús de cuenta.
+
 ## Responsive (obligatorio en app, web y admin)
 Cada pantalla se diseña y prueba en móvil, tablet y escritorio. Clases de ventana (Material 3), en `core/layout`:
 | Clase | Ancho | Navegación | Contenido |
