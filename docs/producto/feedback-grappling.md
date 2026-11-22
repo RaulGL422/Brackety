@@ -24,8 +24,11 @@ competición del 2026-12-20 (`competicion-2026-12-20.md`); objetivo de prueba in
   5. «Arbitraba y de repente salía el login» (Raul): en la Fase 2 cuatro sesiones por QR murieron sin que el servidor
      las rechazara ni recibiera su token de renovación (una a los 74 s). La app pidió renovar **sin el token**:
      el servidor dijo 401 y la app mandó al login. Sospecha principal: en la web (iPhone), la cookie `SameSite=Strict`
-     no viaja tras abrir el QR desde la cámara (navegación desde otra app). Reproducir en un iPhone antes de arreglar.
-  - Arreglo: cookie `SameSite=Lax` si se confirma; usuario y contraseña temporales; ante un 401 de renovación
+     no viaja tras abrir el QR desde fuera. Raul: iPhone con Safari; él lo abría desde una web lectora de QR (con una
+     captura) y otro árbitro con la cámara: en los dos casos, navegación desde otro sitio. Reproducir en debug con
+     `ACCESS_TTL=1m` y el iPhone de Raul antes de arreglar.
+  - Arreglo: cookie `SameSite=Lax` si se confirma; tras entrar por QR, recarga completa dentro de Brackety (la página
+    deja de venir de fuera); usuario y contraseña temporales; ante un 401 de renovación
     sin token, la app avisa y ofrece volver a entrar con ellos en vez de un login vacío.
 - Arreglo pedido por Raul: la cuenta temporal tiene además **usuario y contraseña reales temporales** (el club los
   ve junto al QR). Si se cae la sesión, se vuelve a entrar con ellos sin un QR nuevo.
