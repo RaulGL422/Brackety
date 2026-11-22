@@ -6,8 +6,8 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../../club/data/club_models.dart';
 import '../../club/state/club_providers.dart';
 
-/// Where the next group goes: "Automatic" (the mat free first, chosen by the server) or a mat
-/// with a referee. Mats without one are listed but cannot be picked.
+/// Where the next group goes: "Automatic" (the mat free first, chosen by the server) or any mat
+/// in use, with or without a referee yet. Disabled mats are listed but cannot be picked.
 class MatPicker extends ConsumerWidget {
   const MatPicker({
     super.key,
@@ -48,11 +48,11 @@ class MatPicker extends ConsumerWidget {
         for (final m in mats)
           DropdownMenuItem(
             value: m.id,
-            enabled: m.referee != null,
+            enabled: m.disabledAt == null,
             child: _Option(
               title: l10n.matTitle(m.number),
               subtitle: _detail(l10n, m),
-              enabled: m.referee != null,
+              enabled: m.disabledAt == null,
             ),
           ),
       ],
@@ -60,9 +60,10 @@ class MatPicker extends ConsumerWidget {
     );
   }
 
-  String _detail(AppLocalizations l10n, MatOverview mat) => mat.referee == null
-      ? l10n.matNoReferee
-      : '${mat.referee} · ${l10n.matSummary(mat.groups, mat.pendingMatches)}';
+  String _detail(AppLocalizations l10n, MatOverview mat) =>
+      mat.disabledAt != null
+      ? l10n.matDisabled
+      : '${mat.referee ?? l10n.matNoReferee} · ${l10n.matSummary(mat.groups, mat.pendingMatches)}';
 }
 
 /// One line under the button saying where the group will go.

@@ -571,66 +571,74 @@ void main() {
   });
 
   for (final MapEntry(key: device, value: size) in sizes.entries) {
-    testWidgets('the helper can pick a mat with a referee on $device', (
-      tester,
-    ) async {
-      tester.view.physicalSize = size;
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.reset);
-      final repository = FakeGroupingRepository(participants);
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            ...sessionOverrides(FakeAuthApi(signedIn: true)),
-            groupingRepositoryProvider.overrideWithValue(repository),
-            fakeMatsOverride,
-            clubEventsOverride,
-          ],
-          child: const BracketyApp(),
-        ),
-      );
-      await tester.pumpAndSettle();
-      pushRoute(tester, '/events/e1/categories/c1');
-      await tester.pumpAndSettle();
+    testWidgets(
+      'the helper can pick any mat in use, not a disabled one, on $device',
+      (tester) async {
+        tester.view.physicalSize = size;
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        final repository = FakeGroupingRepository(participants);
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              ...sessionOverrides(FakeAuthApi(signedIn: true)),
+              groupingRepositoryProvider.overrideWithValue(repository),
+              fakeMatsOverride,
+              clubEventsOverride,
+            ],
+            child: const BracketyApp(),
+          ),
+        );
+        await tester.pumpAndSettle();
+        pushRoute(tester, '/events/e1/categories/c1');
+        await tester.pumpAndSettle();
 
-      expect(find.text('Automatic'), findsWidgets);
-      expect(
-        find.text(
-          'It is assigned automatically to the mat that will be free first.',
-        ),
-        findsOneWidget,
-      );
+        expect(find.text('Automatic'), findsWidgets);
+        expect(
+          find.text(
+            'It is assigned automatically to the mat that will be free first.',
+          ),
+          findsOneWidget,
+        );
 
-      await tester.tap(find.byType(DropdownButtonFormField<String?>));
-      await tester.pumpAndSettle();
-      expect(find.text('No referee'), findsOneWidget);
-      // Mat 2 has no referee: tapping it leaves the menu open and nothing picked.
-      await tester.tap(find.text('Mat 2').last, warnIfMissed: false);
-      await tester.pumpAndSettle();
-      expect(find.text('No referee'), findsOneWidget);
-      await tester.tap(find.text('Mat 1').last);
-      await tester.pumpAndSettle();
-      expect(find.text('It goes to Mat 1, picked by hand.'), findsOneWidget);
+        await tester.tap(find.byType(DropdownButtonFormField<String?>));
+        await tester.pumpAndSettle();
+        expect(find.textContaining('No referee'), findsOneWidget);
+        expect(find.text('Out of use'), findsOneWidget);
+        // Mat 3 is disabled: tapping it leaves the menu open and nothing picked.
+        await tester.tap(find.text('Mat 3').last, warnIfMissed: false);
+        await tester.pumpAndSettle();
+        expect(find.text('Out of use'), findsOneWidget);
+        // Mat 2 has no referee yet but takes groups (Raul, 2026-11-22).
+        await tester.tap(find.text('Mat 2').last);
+        await tester.pumpAndSettle();
+        expect(find.text('It goes to Mat 2, picked by hand.'), findsOneWidget);
+        await tester.tap(find.byType(DropdownButtonFormField<String?>));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Mat 1').last);
+        await tester.pumpAndSettle();
+        expect(find.text('It goes to Mat 1, picked by hand.'), findsOneWidget);
 
-      for (final name in ['Ana', 'Bea', 'Carla', 'Diego']) {
-        await tester.tap(find.text('$name Prueba'));
-        await tester.pump();
-      }
-      await tester.tap(find.text('Create group'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('OK'));
-      await tester.pumpAndSettle();
+        for (final name in ['Ana', 'Bea', 'Carla', 'Diego']) {
+          await tester.tap(find.text('$name Prueba'));
+          await tester.pump();
+        }
+        await tester.tap(find.text('Create group'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('OK'));
+        await tester.pumpAndSettle();
 
-      expect(repository.createdOnMat.single, 'm1');
-      // Back to automatic for the next group.
-      expect(
-        find.text(
-          'It is assigned automatically to the mat that will be free first.',
-        ),
-        findsOneWidget,
-      );
-      expect(tester.takeException(), isNull);
-    });
+        expect(repository.createdOnMat.single, 'm1');
+        // Back to automatic for the next group.
+        expect(
+          find.text(
+            'It is assigned automatically to the mat that will be free first.',
+          ),
+          findsOneWidget,
+        );
+        expect(tester.takeException(), isNull);
+      },
+    );
   }
 
   Future<FakeGroupingRepository> openBuilder(

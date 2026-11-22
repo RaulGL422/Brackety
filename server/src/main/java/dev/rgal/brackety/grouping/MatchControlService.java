@@ -98,7 +98,7 @@ public class MatchControlService {
         if (groupMatches.stream().anyMatch(m -> m.getStatus() == Match.Status.IN_PROGRESS)) {
             throw EventException.conflict("MATCH_IN_PROGRESS", "A match of this group is in progress.");
         }
-        var mat = refereedMat(eventId, matId);
+        var mat = usableMat(eventId, matId);
         group.moveTo(mat.getId());
         groupMatches.stream().filter(m -> m.getStatus() == Match.Status.PENDING).forEach(m -> m.moveTo(mat.getId()));
         log.info("Group {} moved to mat {} by {}", groupId, mat.getNumber(), who(by));
@@ -113,7 +113,7 @@ public class MatchControlService {
         phase.requireInProgress(eventId);
         var match = pending(eventId, matchId);
         events.lock(eventId);
-        var mat = refereedMat(eventId, matId);
+        var mat = usableMat(eventId, matId);
         match.moveTo(mat.getId());
         log.info("Match {} moved to mat {} by {}", matchId, mat.getNumber(), who(by));
     }
@@ -251,12 +251,12 @@ public class MatchControlService {
         if (toPlay.stream().anyMatch(Match::isInReview)) {
             throw EventException.conflict("MATCH_IN_REVIEW", "A match on this mat waits for the club's review.");
         }
-        if (mat.getRefereeAccountId() == null) {
-            throw EventException.conflict("MAT_WITHOUT_REFEREE", "This mat has no referee: it is already out of use.");
+        if (mat.isDisabled()) {
+            throw EventException.conflict("MAT_DISABLED", "This mat is already disabled.");
         }
         if (mats.findByEventIdOrderByNumber(eventId).stream()
-                .noneMatch(m -> !m.getId().equals(matId) && m.getRefereeAccountId() != null)) {
-            throw EventException.conflict("NO_OTHER_MAT", "No other mat has a referee to take its matches.");
+                .noneMatch(m -> !m.getId().equals(matId) && !m.isDisabled())) {
+            throw EventException.conflict("NO_OTHER_MAT", "No other mat in use to take its matches.");
         }
         mat.disable(clock.instant());
         matSync.changed(eventId);
@@ -273,7 +273,7 @@ public class MatchControlService {
                 continue;
             }
             var target = chosen.containsKey(group.getId())
-                    ? refereedMat(eventId, chosen.get(group.getId()))
+                    ? usableMat(eventId, chosen.get(group.getId()))
                     : schedule.soonestFree(event, clock.instant()).orElseThrow();
             group.moveTo(target.getId());
             pending.forEach(m -> m.moveTo(target.getId()));
@@ -368,12 +368,12 @@ public class MatchControlService {
         return match;
     }
 
-    private Mat refereedMat(UUID eventId, UUID matId) {
+    private Mat usableMat(UUID eventId, UUID matId) {
         var mat = mats.findById(matId)
                 .filter(m -> m.getEventId().equals(eventId))
                 .orElseThrow(() -> EventException.invalid("That mat is not in this event."));
-        if (mat.getRefereeAccountId() == null) {
-            throw EventException.conflict("MAT_WITHOUT_REFEREE", "That mat has no referee.");
+        if (mat.isDisabled()) {
+            throw EventException.conflict("MAT_DISABLED", "That mat is disabled.");
         }
         return mat;
     }

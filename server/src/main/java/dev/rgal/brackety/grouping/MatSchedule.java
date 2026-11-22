@@ -52,10 +52,10 @@ class MatSchedule {
                 .toList();
     }
 
-    /** Where new groups go: the mat with a referee that will be free first; on a tie, the lowest number. */
+    /** Where new groups go: the mat in use that will be free first; on a tie, the lowest number. */
     Optional<Mat> soonestFree(Event event, Instant now) {
         return states(event, now).stream()
-                .filter(s -> s.mat().getRefereeAccountId() != null)
+                .filter(s -> !s.mat().isDisabled())
                 .min(Comparator.comparing(MatState::remaining)
                         .thenComparingInt(s -> s.mat().getNumber()))
                 .map(MatState::mat);

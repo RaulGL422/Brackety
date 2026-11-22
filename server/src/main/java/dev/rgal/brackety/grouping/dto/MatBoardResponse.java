@@ -23,7 +23,7 @@ public record MatBoardResponse(
         List<Integer> syncingMats) {
 
     /** The event's mats, for moving a match to another one: only those with a referee take it. */
-    public record MatChoice(UUID id, int number, boolean hasReferee) {}
+    public record MatChoice(UUID id, int number, boolean disabled) {}
 
     /**
      * A participant ({@code participantId}) or a team ({@code teamId}, {@code teamNumber}); {@code members}

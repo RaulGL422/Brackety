@@ -14,7 +14,7 @@ String? controlError(AppLocalizations l10n, AdminApiError error) =>
     switch (error.code) {
       'MATCH_IN_PROGRESS' => l10n.controlMatchInProgress,
       'MATCH_NOT_PENDING' => l10n.controlMatchNotPending,
-      'MAT_WITHOUT_REFEREE' => l10n.controlMatWithoutReferee,
+      'MAT_DISABLED' => l10n.controlMatIsDisabled,
       'ORDER_CHANGED' => l10n.controlOrderChanged,
       'TEAM_SIZE' => l10n.controlTeamSize,
       'GROUP_STARTED' => l10n.controlGroupStarted,
@@ -35,7 +35,7 @@ Future<void> _control(BuildContext context, Future<void> Function() change) {
   );
 }
 
-/// A mat with a referee other than [current]; null if cancelled.
+/// A mat in use (with or without a referee yet) other than [current]; null if cancelled.
 Future<AdminMat?> _pickMat(
   BuildContext context,
   AdminEventDetail event, {
@@ -43,7 +43,7 @@ Future<AdminMat?> _pickMat(
 }) {
   final l10n = AppLocalizations.of(context);
   final mats = event.mats
-      .where((m) => m.referee != null && m.number != current)
+      .where((m) => !m.disabled && m.number != current)
       .toList();
   return showDialog<AdminMat>(
     context: context,
@@ -59,7 +59,11 @@ Future<AdminMat?> _pickMat(
           SimpleDialogOption(
             onPressed: () => Navigator.pop(context, m),
             child: Text(
-              l10n.controlMatOption(m.number, m.referee!, m.plan.length),
+              l10n.controlMatOption(
+                m.number,
+                m.referee ?? l10n.controlNoReferee,
+                m.plan.length,
+              ),
             ),
           ),
       ],
@@ -290,7 +294,7 @@ class _DisableMatDialogState extends State<_DisableMatDialog> {
           g,
     ];
     final mats = widget.event.mats
-        .where((m) => m.referee != null && m.id != widget.mat.id)
+        .where((m) => !m.disabled && m.id != widget.mat.id)
         .toList();
     return AlertDialog(
       scrollable: true,
@@ -320,7 +324,9 @@ class _DisableMatDialogState extends State<_DisableMatDialog> {
                         DropdownMenuItem(
                           value: m.id,
                           child: Text(
-                            l10n.eventMatReferee(m.number, m.referee!),
+                            m.referee == null
+                                ? l10n.eventMatNoReferee(m.number)
+                                : l10n.eventMatReferee(m.number, m.referee!),
                           ),
                         ),
                     ],

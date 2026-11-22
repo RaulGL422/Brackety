@@ -76,9 +76,10 @@ class EventDaySimulationTest extends EventApiTest {
 
     @ParameterizedTest
     @ValueSource(longs = {66, 77})
-    void aMatWithoutRefereeHoldsNothingBack(long seed) throws Exception {
-        // Mat 3 is set up but nobody referees it: no individual group goes there, the pool must not wait for it.
-        jdbc.sql("update mat set referee_account_id = null where number = 3").update();
+    void aDisabledMatHoldsNothingBack(long seed) throws Exception {
+        // Mat 3 is disabled: no individual group goes there, the pool must not wait for it.
+        jdbc.sql("update mat set referee_account_id = null, disabled_at = now() where number = 3")
+                .update();
         new Day(new Random(seed), Set.of(1, 2), false).run();
     }
 

@@ -61,8 +61,13 @@ class MatchControlTest extends AdminApiTestBase {
                 .param(target)
                 .update();
         club(put(control() + "/matches/" + match(young, 0, 1) + "/mat").content(mat(target)))
+                .andExpect(status().isNoContent());
+        jdbc.sql("update mat set disabled_at = now() where id = ?")
+                .param(target)
+                .update();
+        club(put(control() + "/matches/" + match(young, 0, 2) + "/mat").content(mat(target)))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.code").value("MAT_WITHOUT_REFEREE"));
+                .andExpect(jsonPath("$.code").value("MAT_DISABLED"));
     }
 
     @Test
@@ -222,7 +227,7 @@ class MatchControlTest extends AdminApiTestBase {
         var toItself = "{\"groupMats\":{\"%s\":\"%s\"}}".formatted(youngGroup, youngMat);
         club(post(control() + "/mats/" + youngMat + "/disable").content(toItself))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.code").value("MAT_WITHOUT_REFEREE"));
+                .andExpect(jsonPath("$.code").value("MAT_DISABLED"));
         assertThat(rows("select count(*) from mat where id = ? and referee_account_id is not null", youngMat))
                 .isOne();
 
@@ -277,7 +282,7 @@ class MatchControlTest extends AdminApiTestBase {
         clock.advance(Duration.ofMinutes(2));
         referee(first, "FINISH", null, 1);
 
-        jdbc.sql("update mat set referee_account_id = null where event_id = ? and id <> ?")
+        jdbc.sql("update mat set referee_account_id = null, disabled_at = now() where event_id = ? and id <> ?")
                 .params(eventId, youngMat)
                 .update();
         club(post(control() + "/mats/" + youngMat + "/disable"))
@@ -303,7 +308,7 @@ class MatchControlTest extends AdminApiTestBase {
                         .value(org.hamcrest.Matchers.contains(org.hamcrest.Matchers.startsWith("arbitro"))));
         club(post(control() + "/mats/" + youngMat + "/disable"))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.code").value("MAT_WITHOUT_REFEREE"));
+                .andExpect(jsonPath("$.code").value("MAT_DISABLED"));
 
         club(post(control() + "/mats/" + youngMat + "/enable")).andExpect(status().isNoContent());
 

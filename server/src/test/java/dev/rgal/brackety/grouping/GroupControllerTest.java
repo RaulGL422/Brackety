@@ -77,18 +77,26 @@ class GroupControllerTest extends EventApiTest {
     }
 
     @Test
-    void aHelperCanPickTheMatIfItHasAReferee() throws Exception {
+    void aHelperCanPickAnyMatInUseEvenWithoutAReferee() throws Exception {
         call(post(event() + "/groups").content(jsonOnMat(matId(3), group(0, 1, 2, 3))), "ayudante1")
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.matNumber").value(3));
         call(get("/api/v1/mats/" + matId(3) + "/board"), "arbitro3").andExpect(jsonPath("$.matches", hasSize(6)));
 
-        jdbc.sql("update mat set referee_account_id = null where number = 4").update();
-        call(post(event() + "/groups").content(jsonOnMat(matId(4), group(4, 5, 6, 7))), "ayudante1")
-                .andExpect(status().isConflict());
+        jdbc.sql("update mat set referee_account_id = null, disabled_at = now() where number = 5")
+                .update();
+        call(post(event() + "/groups").content(jsonOnMat(matId(5), group(4, 5, 6, 7))), "ayudante1")
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("MAT_DISABLED"));
         call(post(event() + "/groups").content(jsonOnMat(UUID.randomUUID(), group(4, 5, 6, 7))), "ayudante1")
                 .andExpect(status().isBadRequest());
-        assertThat(count("fight_group")).isOne();
+
+        // Its referee has not arrived yet: the mat still takes groups (Raul, 2026-11-22).
+        jdbc.sql("update mat set referee_account_id = null where number = 4").update();
+        call(post(event() + "/groups").content(jsonOnMat(matId(4), group(4, 5, 6, 7))), "ayudante1")
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.matNumber").value(4));
+        assertThat(count("fight_group")).isEqualTo(2);
     }
 
     @Test
