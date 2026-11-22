@@ -41,7 +41,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'That match has started: it cannot change.';
 
   @override
-  String get controlMatWithoutReferee => 'That mat has no referee.';
+  String get controlMatIsDisabled =>
+      'That mat is disabled: enable it or pick another.';
 
   @override
   String get controlOrderChanged =>
@@ -89,7 +90,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get controlPickMat => 'To which mat?';
 
   @override
-  String get controlNoOtherMat => 'No other mat has a referee.';
+  String get controlNoOtherMat => 'No other mat is in use.';
+
+  @override
+  String get controlNoReferee => 'no referee';
 
   @override
   String controlMatOption(int number, String referee, int pending) {

@@ -101,7 +101,7 @@ class MatBoardScreen extends ConsumerWidget {
             if (readOnly && controls)
               if (board.value case final b?
                   when b.eventId != null &&
-                      b.mats.any((m) => m.id == matId && m.hasReferee))
+                      b.mats.any((m) => m.id == matId && !m.disabled))
                 DisableMatButton(
                   eventId: b.eventId!,
                   matId: matId,

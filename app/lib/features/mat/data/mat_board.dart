@@ -224,23 +224,24 @@ class BoardMatch {
   );
 }
 
-/// A mat of the event, to send a match to: only one with a referee takes it.
+/// A mat of the event, to send a match or group to: any one not disabled takes it.
 class MatChoice {
   const MatChoice({
     required this.id,
     required this.number,
-    required this.hasReferee,
+    required this.disabled,
   });
 
   factory MatChoice.fromJson(Map<String, dynamic> json) => MatChoice(
     id: json['id'] as String,
     number: json['number'] as int,
-    hasReferee: json['hasReferee'] as bool,
+    // A board cached before 2026-11-22 lacks it.
+    disabled: json['disabled'] as bool? ?? false,
   );
 
   final String id;
   final int number;
-  final bool hasReferee;
+  final bool disabled;
 }
 
 class MatBoard {

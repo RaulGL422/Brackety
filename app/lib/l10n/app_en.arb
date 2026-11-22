@@ -13,7 +13,7 @@
   "controlError": "The change could not be made. Reload and try again.",
   "controlMatchInProgress": "A match of this group is in progress: wait until it ends.",
   "controlMatchNotPending": "That match has started: it cannot change.",
-  "controlMatWithoutReferee": "That mat has no referee.",
+  "controlMatIsDisabled": "That mat is disabled: enable it or pick another.",
   "controlOrderChanged": "The matches changed meanwhile: reload and order them again.",
   "controlTeamSize": "Teams must stay of 2 or 3.",
   "controlGroupStarted": "The group of those teams has started: its teams no longer change.",
@@ -34,7 +34,7 @@
   "matDisabled": "Out of use",
   "matDisabledSince": "Out of use since {time}",
   "matDisabledReferee": "Referee: {name}",
-  "controlNoOtherMat": "No other mat has a referee.",
+  "controlNoOtherMat": "No other mat is in use.",
   "controlMatOption": "Mat {number} · {referee} · {pending, plural, =0{nothing pending} =1{1 pending} other{{pending} pending}}",
   "controlMoveMatch": "Move this match to another mat",
   "controlWaiveRest": "Let it start without waiting for the rest",
@@ -263,7 +263,8 @@
       }
     }
   },
-  "groupsConflict": "A participant is already in a group or the mat has lost its referee. The list has been refreshed.",
+  "groupsConflict": "A participant is already in another group. The list has been refreshed.",
+  "groupsMatDisabled": "That mat is disabled: pick another or \"Automatic\".",
   "groupsError": "The group could not be created.",
   "ok": "OK",
   "ghostBadge": "Wildcard",

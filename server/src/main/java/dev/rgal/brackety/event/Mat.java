@@ -70,8 +70,8 @@ public class Mat {
     }
 
     /**
-     * Out of use: without a referee it gets no groups and takes no team matches until it is enabled again or gets a
-     * referee in the settings.
+     * Out of use: it gets no groups and takes no team matches until it is enabled again or gets a referee in the
+     * settings. A mat that just has no referee yet is still in use (Raul, 2026-11-22).
      */
     public void disable(Instant at) {
         this.disabledRefereeAccountId = refereeAccountId;

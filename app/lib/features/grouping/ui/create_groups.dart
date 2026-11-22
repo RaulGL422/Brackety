@@ -105,6 +105,7 @@ Future<bool> createGroup(
               'MEASURES_MISSING' => l10n.measuresMissingError,
               'PHASE_NOT_STARTED' => l10n.phaseNotStartedError,
               'PHASE_FINISHED' => l10n.phaseFinishedError,
+              'MAT_DISABLED' => l10n.groupsMatDisabled,
               _ => l10n.groupsConflict,
             }
           : l10n.groupsError,

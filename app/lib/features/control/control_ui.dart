@@ -32,7 +32,7 @@ String controlErrorText(AppLocalizations l10n, DioException e) =>
     switch (ApiError.from(e).code) {
       'MATCH_IN_PROGRESS' => l10n.controlMatchInProgress,
       'MATCH_NOT_PENDING' => l10n.controlMatchNotPending,
-      'MAT_WITHOUT_REFEREE' => l10n.controlMatWithoutReferee,
+      'MAT_DISABLED' => l10n.controlMatIsDisabled,
       'ORDER_CHANGED' => l10n.controlOrderChanged,
       'TEAM_SIZE' => l10n.controlTeamSize,
       'GROUP_STARTED' => l10n.controlGroupStarted,
@@ -102,7 +102,7 @@ class RefereeMoveMenu extends ConsumerWidget {
       ],
       onSelected: (_) async {
         final mats = board.mats
-            .where((m) => m.hasReferee && m.number != board.matNumber)
+            .where((m) => !m.disabled && m.number != board.matNumber)
             .toList();
         final mat = await showDialog<MatChoice>(
           context: context,
@@ -332,7 +332,7 @@ class _DisableMatDialogState extends State<_DisableMatDialog> {
           g,
     ];
     final mats = board.mats
-        .where((m) => m.hasReferee && m.id != widget.matId)
+        .where((m) => !m.disabled && m.id != widget.matId)
         .toList();
     return AlertDialog(
       scrollable: true,

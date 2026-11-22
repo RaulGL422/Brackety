@@ -360,15 +360,33 @@ void main() {
     expect(api.calls, ['waiveRest g1-m2']);
   });
 
-  testWidgets('a group only moves to a mat with a referee', (tester) async {
+  testWidgets('a group moves to a mat without a referee yet', (tester) async {
     useSize(tester, screenSizes['desktop']!);
     final api = await open(tester);
     await openDetail(tester);
 
     await tester.tap(find.text('Move the group to another mat').first);
     await tester.pumpAndSettle();
-    // Mat 2 has no referee and mat 1 is its own.
-    expect(find.text('No other mat has a referee.'), findsOneWidget);
+    // Mat 2 has no referee yet but takes groups (Raul, 2026-11-22); mat 1 is its own.
+    await tester.tap(find.textContaining('Mat 2 · no referee'));
+    await tester.pumpAndSettle();
+    expect(api.calls.single, startsWith('moveGroup '));
+    expect(api.calls.single, endsWith(' m2'));
+  });
+
+  testWidgets('a group never moves to a mat out of use', (tester) async {
+    useSize(tester, screenSizes['desktop']!);
+    final api = FakeEventsApi(secondDisabled: true);
+    await pumpAdmin(
+      tester,
+      location: '/events',
+      overrides: [eventsApiProvider.overrideWithValue(api)],
+    );
+    await openDetail(tester);
+
+    await tester.tap(find.text('Move the group to another mat').first);
+    await tester.pumpAndSettle();
+    expect(find.text('No other mat is in use.'), findsOneWidget);
     expect(api.calls, isEmpty);
   });
 

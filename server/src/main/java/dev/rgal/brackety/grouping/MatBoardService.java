@@ -205,7 +205,7 @@ class MatBoardService {
                 teamPool,
                 mat.getEventId(),
                 floor.mats().stream()
-                        .map(x -> new MatChoice(x.getId(), x.getNumber(), x.getRefereeAccountId() != null))
+                        .map(x -> new MatChoice(x.getId(), x.getNumber(), x.isDisabled()))
                         .toList(),
                 matSync.waitingFor(event.getId(), floor.mats()));
     }
