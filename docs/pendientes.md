@@ -6,7 +6,7 @@ Lo que espera a alguien, ordenado por quién tiene que actuar. Lo hecho se borra
 ### Producto
 - [ ] Competición del 2026-12-20: modalidades y su puntuación, categorías, tapices y servidor (`producto/competicion-2026-12-20.md`).
 - [ ] Tras el grappling (`producto/feedback-grappling.md`): si el árbitro mueve grupos con su permiso o con «Panel de control» (GR-4) y qué configuración pedida faltó (GR-6).
-- [ ] GR-2: qué veían los árbitros de la Fase 2 del grappling que entraron por QR hacia las 11:03 y a los 16-20 min necesitaron otro (`producto/feedback-grappling.md`).
+- [ ] GR-2: ¿con qué móvil y navegador arbitrabas en el grappling (iPhone y Safari, app guardada en inicio, APK)? ¿Abrías el QR con la cámara?
 - [ ] Puntuación de la F2 (armas) y escalas de la F3 (`reglamentos/yoseikan-2027.md`, sección de abajo).
 - [ ] Correos: elegir de la lista propuesta (`modulos/notificaciones.md`, «Propuesta a Raul») y si vale enviar resultados por correo; llevan datos de menores (`06-legal-rgpd.md`).
 - [ ] F1-4: revisar la lista de motivos de advertencia del tambo (reglamento, cap. 3.1). Se cambia en `Discipline` o por evento.
