@@ -1,0 +1,52 @@
+# Decisiones de octubre de 2026 (2 de 2)
+
+Formato: fecha · decisión · motivo. Las siguientes, en `decisiones-2026-11-01.md`.
+
+- 2026-10-30 · Recordatorio del día 5 con un enlace de verificación nuevo; tarea diaria que también corre 1 min tras arrancar · el enlace del registro caduca a las 24 h; permite probar en local con el reloj desplazado.
+- 2026-10-30 · Recuperar la contraseña con el enlace borra el bloqueo y el contador por email de la cuenta (no el de IP); el aviso "ya tienes cuenta" también tiene el límite de 1 cada 60 s; los límites de 60 s bloquean la fila de la cuenta · el enlace prueba que es el dueño y un atacante no puede dejarle fuera; sin inundar buzones ni con peticiones simultáneas.
+- 2026-10-30 · Enlace de recuperación de contraseña válido 1 h (verificación, 24 h) · ventana corta para un enlace que cambia la contraseña.
+- 2026-10-30 · `compose-smoke` obligatorio en la protección de `development` · la PR #11 se fusionó con él en rojo (faltaba JWT_SECRET en CI); activado por Raul.
+- 2026-10-30 · CORS rechaza comodines de host (`*`, `https://*…`) al arrancar · con credenciales permitiría a cualquier web actuar como el usuario.
+- 2026-10-30 · `auth` dividido en subpaquetes por tema (account, session, lockout, email) y utilidades en `common/crypto`; regla de ~15 archivos por feature · 28 archivos sueltos en una carpeta y creciendo; pedido por Raul.
+- 2026-10-30 · ID token de Google verificado con Nimbus (ya incluido) contra el JWKS de Google; `GOOGLE_CLIENT_ID` admite varios ids separados por comas (web y Android); sin él, 503 solo en Google · sin dependencia nueva; la API funciona sin cuentas de Google Cloud.
+- 2026-10-30 · `/auth/google` responde `REGISTRATION_REQUIRED` con el email y la app repite con el mismo token y `registration` (objeto anidado con las validaciones del registro) · sin estado en servidor entre las dos llamadas.
+- 2026-10-30 · Quitar la contraseña cierra todas las sesiones, incluida la actual · lo más simple, igual que recuperar contraseña; el access token no lleva la sesión.
+- 2026-10-30 · Una identidad de Google por cuenta; vincular la misma otra vez no hace nada; desvincular sin Google vinculado o quitar una contraseña que no hay: 204 sin efecto · `DELETE /me/identities/google` no lleva id.
+- 2026-10-30 · En local, Google simulado: clave generada al arrancar y `POST /api/v1/auth/dev/google-token` que emite idTokens; solo en `src/test` (nunca en el jar) · probar Google sin client IDs ni red.
+- 2026-10-30 · Vincular Google con el mismo email que la cuenta (normalizado) la marca como verificada; con otro email, no · Google ha probado que el buzón es suyo, como el enlace de recuperar contraseña.
+- 2026-10-30 · Una cuenta sin verificar no puede vincular un Google con otro email (403 `EMAIL_NOT_VERIFIED`) · cierra el pre-secuestro: el dueño real verificaría después la cuenta con el Google del atacante dentro.
+- 2026-10-30 · Reauth con JWT HS256 (misma clave que el acceso, claim `purpose` `REAUTH` frente a `ACCESS`; el decoder de la API solo acepta `ACCESS`), 5 min, ligado a la cuenta por `sub`, en la cabecera `X-Reauth`; reutilizable dentro de esos 5 min · sin tabla ni purga; un token de acceso no vale como reauth ni al revés; decidido por Raul.
+- 2026-10-30 · Reauth fallida: 403 `REAUTH_FAILED` (no 401) · la sesión es válida y un 401 haría que la app refrescara y repitiera.
+- 2026-10-30 · Cuenta pendiente de borrado: `restoreToken` JWT de 5 min (claim `purpose` `RESTORE`), solo para una cuenta aún borrada · la contraseña o Google ya han probado que es el dueño; sin estado en servidor.
+- 2026-10-30 · Cambio de email: el token se guarda aunque el email esté ocupado (no se envía) y la confirmación cierra todas las sesiones, también la actual · mismo trabajo en ambos casos (sin enumeración); lo más simple, como recuperar contraseña.
+- 2026-10-30 · Exportación sin el `sub` de Google · es un identificador interno de Google, no un dato que dio el usuario; pendiente de revisión legal.
+- 2026-10-30 · Purga de cuentas borradas: tarea diaria con `brackety.auth.deleted-purge-initial-delay` (1 min tras arrancar); marca `// eventos/ranking:` como punto de anonimizado · sin infraestructura hasta que existan resultados.
+- 2026-10-30 · Prototipo de uso real en la Fase 1 (≈ 2026-11-14) con versiones mínimas de los módulos reales (`modulos/prototipo-f1.md`) · fecha fija del primer cliente; pedido por Raul.
+- 2026-10-30 · Cuentas demo usuario = contraseña (`arbitro1`/`arbitro1`), solo con `DEMO_ACCOUNTS_ENABLED=true` · riesgo aceptado por Raul para tenerlas ya; bloqueo y limitador siguen activos.
+- 2026-10-30 · Fase 1 del prototipo = Tambo (2:00, máx. 15); cada competidor suma lo que marca, gane o no; descalificado 0 · elegido por Raul.
+- 2026-10-30 · Prototipo sin WebSocket ni offline: el front sondea cada pocos segundos y el reloj del combate se calcula con eventos con hora del servidor · menos piezas para llegar a tiempo; `tiempo-real` y `offline` lo sustituirán.
+- 2026-10-30 · Prototipo solo en la web (PWA en móvil/tablet) · una sola build que probar; Android nativo después.
+- 2026-10-30 · Combate recomendado: sumas de descanso a menos de un hueco (combate + cambio) cuentan como iguales y entonces se intercalan grupos · con tiempos reales nunca hay empate exacto y el intercalado pedido por Raul no ocurriría.
+- 2026-10-30 · Orden dentro del grupo = orden de selección del ayudante, sin semilla aleatoria en el prototipo · el ayudante ya decide el grupo a mano; la semilla de `liga-fases` llegará con ese módulo.
+- 2026-10-30 · `event` y `participant` consultan `fight_group` con SQL nativo para sus protecciones · evita una dependencia circular entre paquetes (grouping ya depende de ellos).
+- 2026-10-30 · Marcador guardado como eventos con hora (`match_event`) y estado recalculado al repetirlos; instantánea en `fight_match` para tableros y ranking · todo queda registrado sin código extra y el reloj sobrevive a recargar el móvil.
+- 2026-10-30 · Al llegar a 15 o descalificar, el servidor registra una parada automática; "Finalizar" solo con el combate acabado · deshacer el último punto no deja el reloj corriendo solo; evita cerrar un combate por error.
+- 2026-10-30 · CSV con `;`, BOM UTF-8 y celdas de fórmula neutralizadas con `'` · abre bien en Excel en español y evita inyección de fórmulas con nombres maliciosos.
+- 2026-10-30 · Sesión provisional en el front del prototipo: acceso solo en memoria, refresh por la cookie web, un reintento tras 401 y un solo refresh a la vez · cumple la decisión de sesión web sin esperar a las pantallas de `auth`; se sustituirá con ellas.
+- 2026-10-30 · Prototipo desplegado en la Pi de Raul con el Postgres del compose; grupos solo de 4 o 3 + fantasma · elegido por Raul.
+- 2026-10-30 · Corte por fecha `sessions_revoked_at`: al cambiar credenciales o borrar la cuenta, los tokens de acceso y reauth emitidos antes se rechazan (una lectura de la cuenta por petición) y se borran los enlaces de email pendientes · un atacante expulsado no debe seguir 15 min con acceso a datos de menores; decidido por Raul.
+- 2026-10-30 · `GET /me` ya no responde a una cuenta borrada (sale `deletesOn` de su respuesta); la app usa el `deletesOn` de `DELETE /me` · consecuencia del corte por fecha; sustituye a la decisión anterior.
+- 2026-10-30 · Un dueño de eventos no puede borrar su cuenta (409 `OWNS_EVENTS`) hasta ceder o borrar el evento · no perder datos de otros ni dejar eventos huérfanos; decidido por Raul.
+- 2026-10-30 · Cuenta borrada pasados 30 días: no se restaura aunque la purga no haya corrido · el plazo prometido es de 30 días, no "hasta la purga".
+- 2026-10-31 · Campana del marcador generada por script (`app/tool/make_bell.py`) y reproducida con `audioplayers` 6.8.1 · sin licencias de terceros; el paquete funciona en web y Android.
+- 2026-10-30 · Migración del marcador renombrada a `V20261030_2000` · chocaba en `development` con `V20261030_1900` de auth (cada PR pasaba sola). Antes de fechar una migración, mirar las de `origin/development` y las ramas abiertas.
+- 2026-10-30 · Cloudflare Access verificado también en la API: todo `/api/v1/admin/**` exige `Cf-Access-Jwt-Assertion` válido, y el nginx de admin reenvía `/api/` a la API para que la app admin pase por Access · el hostname `api` no está tras Access; sin esto, la API de superadmin quedaría expuesta solo con la contraseña. Decidido por Raul.
+- 2026-10-30 · Sesión de superadmin: JWT de 1 h (`purpose` `ADMIN`), sin refresh ni revocación; tokens de usuario y de superadmin no se aceptan en la otra API · uso esporádico; un reinicio basta para cambiar la contraseña. Decidido por Raul.
+- 2026-10-30 · Contraseña del superadmin como hash Argon2id en `SUPERADMIN_PASSWORD_HASH`; se genera con la run config `server · superadmin password hash` (clase en `server/src/test`) · sin dependencias nuevas, misma configuración que el login y la contraseña no queda en el historial del shell.
+- 2026-10-30 · Auditoría de superadmin (`admin_audit`) sin IP ni emails y sin FK a `account` · minimización de datos y que la purga de cuentas borradas no falle por una FK.
+- 2026-10-30 · Al validar un organizador se le avisa por email en su idioma (solo la primera vez) · sabe cuándo puede publicar eventos.
+- 2026-10-31 · El login de superadmin tiene su propio contador de fallos (no el del email) y comparte el de IP · con el del email, cualquiera podía bloquear al superadmin desde el login público, y él no puede revocar su propio bloqueo.
+- 2026-10-31 · Registro con email de cuenta pasada la gracia y aún sin purgar: 202 sin crear ni avisar hasta la purga diaria · como mucho un día de espera; no duplicar la purga en el registro; decidido por Raul.
+- 2026-10-31 · En local, Cloudflare Access se simula (clave generada al arrancar y filtro que añade la cabecera, en `server/src/test`) en lugar de desactivarse · el código de producción no tiene forma de saltarse la comprobación y en local se ejecuta la misma.
+- 2026-10-31 · Registro en la app con versión legal provisional `2026-11-draft` y una casilla sin enlaces hasta `legal-paginas` · no hay textos legales todavía; decidido por Raul.
+- 2026-10-31 · Login con Google en la app pospuesto hasta tener sus client IDs · sin ellos no se puede probar; decidido por Raul.

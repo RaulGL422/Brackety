@@ -8,7 +8,7 @@ Mapa de qué vive dónde. Un hecho está en un solo documento; los demás lo enl
 | Saber qué está hecho y qué toca | `estado.md` |
 | Saber qué espera a alguien (preguntas, pruebas a mano, tareas) | `pendientes.md` |
 | Trabajar en un módulo | `estado.md` → `modulos/<modulo>.md` → los `roles/` que nombre |
-| Entender por qué algo es así | `decisiones.md` (noviembre) y `decisiones-2026-10.md` |
+| Entender por qué algo es así | `decisiones.md` (las últimas); las anteriores, en `decisiones-2026-*.md` (índice al principio de `decisiones.md`) |
 | El plan de las próximas semanas | `producto/roadmap.md` |
 | Una palabra del proyecto (tapiz, comodín, fase…) | `glosario.md` |
 
@@ -26,4 +26,4 @@ Mapa de qué vive dónde. Un hecho está en un solo documento; los demás lo enl
 - Español, frases cortas, listas. Sin relleno ni historia: la historia está en git y en las PR.
 - `estado.md`: una línea por cosa, con su estado y su doc; el detalle, en el doc.
 - `pendientes.md`: solo lo que espera a alguien; lo hecho se borra.
-- Límites: 150 líneas y 12.000 caracteres por documento. Si crece, se divide o lo cerrado pasa a `historico/`.
+- Límite duro: 150 líneas y 12.000 caracteres por documento (el CI falla). Si crece, se divide por temas o lo cerrado pasa a `historico/`.

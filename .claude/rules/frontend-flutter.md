@@ -27,11 +27,12 @@ Toda pantalla funciona en móvil, tablet y escritorio con las clases de ventana 
 ## Backend
 La URL de la API llega solo por `API_BASE_URL` (`--dart-define-from-file=env/<destino>.json`); nunca URLs fijas en código. Ver `docs/08-ejecucion-local.md`.
 
-## Accesibilidad y diseño
-Seguir `docs/07-diseno.md`. Contraste suficiente, textos escalables, uso con una mano en el tapiz.
-
-## Revisión de diseño
-Toda PR que cambie una pantalla pasa la skill `frontend-design` (plugin del proyecto) y capturas con Playwright en 360×800, 800×1280 y 1440×900 antes de pedir revisión (`docs/producto/calidad.md`).
+## Accesibilidad, organización y seguridad del diseño (reglas duras)
+- Detalle y lista completa: `docs/07-diseno.md`, «Reglas duras». Una pantalla que no las cumple no se fusiona.
+- **Skill `frontend-design` obligatoria al empezar** a diseñar o cambiar una pantalla (antes de escribir el widget), no solo al final. Después, capturas con Playwright en 360×800, 800×1280 y 1440×900 antes de pedir revisión (`docs/producto/calidad.md`).
+- Cada pantalla tocada pasa en su widget test las guías de Flutter (`androidTapTargetGuideline`, `labeledTapTargetGuideline`, `textContrastGuideline`) y se prueba con texto al 200 % sin desbordes, en los 3 tamaños.
+- Se pueden crear pantallas nuevas o dividir una si así se ordena mejor la información: mejor dos pantallas claras que una saturada.
+- Arrastrar siempre con alternativa de un toque (botón «Mover a…»): WCAG 2.5.7.
 
 ## Tests
 Widget tests por pantalla crítica y unit tests de lógica; golden tests solo si el diseño está cerrado.
