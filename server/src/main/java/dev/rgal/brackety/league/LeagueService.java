@@ -1,7 +1,6 @@
 package dev.rgal.brackety.league;
 
 import dev.rgal.brackety.common.Names;
-import dev.rgal.brackety.event.Discipline;
 import dev.rgal.brackety.event.Event;
 import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventCategory;
@@ -17,6 +16,7 @@ import dev.rgal.brackety.event.EventStaffRepository;
 import dev.rgal.brackety.event.Mat;
 import dev.rgal.brackety.event.MatRepository;
 import dev.rgal.brackety.event.PhaseCreated;
+import dev.rgal.brackety.event.sport.SportCatalog;
 import dev.rgal.brackety.league.dto.LeagueDtos.Candidate;
 import dev.rgal.brackety.league.dto.LeagueDtos.CategoryPodiumDto;
 import dev.rgal.brackety.league.dto.LeagueDtos.DisciplineResponse;
@@ -30,7 +30,6 @@ import dev.rgal.brackety.participant.Participant;
 import dev.rgal.brackety.participant.ParticipantRepository;
 import dev.rgal.brackety.participant.ParticipantService;
 import java.time.Clock;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -61,6 +60,7 @@ public class LeagueService {
     private final EventOrganizationRepository organizations;
     private final ParticipantRepository participants;
     private final EventAccess access;
+    private final SportCatalog sports;
     private final ApplicationEventPublisher publisher;
     private final Clock clock;
 
@@ -75,6 +75,7 @@ public class LeagueService {
             EventOrganizationRepository organizations,
             ParticipantRepository participants,
             EventAccess access,
+            SportCatalog sports,
             ApplicationEventPublisher publisher,
             Clock clock) {
         this.leagues = leagues;
@@ -87,6 +88,7 @@ public class LeagueService {
         this.organizations = organizations;
         this.participants = participants;
         this.access = access;
+        this.sports = sports;
         this.publisher = publisher;
         this.clock = clock;
     }
@@ -122,19 +124,12 @@ public class LeagueService {
     @Transactional
     public PhaseResponse createPhase(UUID eventId, UUID accountId, NewPhaseRequest request) {
         access.require(eventId, accountId, EventRole.CLUB);
-        if (!request.discipline().isAvailable()) {
-            throw EventException.invalid("That discipline has no scoreboard yet.");
-        }
+        var sport = sports.playable(request.discipline());
         var source = eventService.get(eventId);
         var phases = events.findByLeagueIdOrderByPhaseNumber(source.getLeagueId());
         var number = phases.getLast().getPhaseNumber() + 1;
         var phase = events.save(source.nextPhase(
-                number,
-                request.discipline(),
-                request.name().strip(),
-                request.date(),
-                request.attendancePoints(),
-                clock.instant()));
+                number, sport, request.name().strip(), request.date(), request.attendancePoints(), clock.instant()));
         var lasting = staff.findLastingByEventId(eventId);
         for (var member : lasting) {
             staff.save(new EventStaff(phase.getId(), member.getAccountId(), member.getRole()));
@@ -154,7 +149,12 @@ public class LeagueService {
         }
         publisher.publishEvent(new PhaseCreated(eventId, phase.getId()));
         return new PhaseResponse(
-                phase.getId(), number, phase.getName(), phase.getEventDate(), phase.getDiscipline(), 0);
+                phase.getId(),
+                number,
+                phase.getName(),
+                phase.getEventDate(),
+                phase.getSport().code(),
+                0);
     }
 
     /** People of the other phases not entered in this one, with their latest entry, by name. */
@@ -287,12 +287,10 @@ public class LeagueService {
                                 e.getPhaseNumber(),
                                 e.getName(),
                                 e.getEventDate(),
-                                e.getDiscipline(),
+                                e.getSport().code(),
                                 counts.getOrDefault(e.getId(), 0L).intValue()))
                         .toList(),
                 categoryNames,
-                Arrays.stream(Discipline.values())
-                        .map(d -> new DisciplineResponse(d, d.isAvailable()))
-                        .toList());
+                sports.latest().stream().map(DisciplineResponse::of).toList());
     }
 }

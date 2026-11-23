@@ -1,27 +1,39 @@
-/// What a phase competes in; only those in [League.availableDisciplines] have a scoreboard.
-enum Discipline { tambo, grappling, ground, throws, technicalExpression }
+/// A sport to pick (docs/producto/plantillas-deporte.md): its [code] in the API, its names by
+/// language, and whether it has a scoreboard yet ([available]); the others are listed for later.
+class Sport {
+  const Sport({
+    required this.code,
+    required this.names,
+    required this.available,
+  });
 
-Discipline _discipline(String value) => switch (value) {
-  'GRAPPLING' => Discipline.grappling,
-  'GROUND' => Discipline.ground,
-  'THROWS' => Discipline.throws,
-  'TECHNICAL_EXPRESSION' => Discipline.technicalExpression,
-  _ => Discipline.tambo,
-};
+  factory Sport.fromJson(Map<String, dynamic> json) => Sport(
+    code: json['discipline'] as String,
+    names: (json['names'] as Map<String, dynamic>).cast<String, String>(),
+    available: json['available'] as bool,
+  );
 
-/// The sports with a scoreboard today, from the server's list of `{discipline, available}`.
-Set<Discipline> disciplinesWithScoreboard(List<dynamic> json) => {
-  for (final d in json.cast<Map<String, dynamic>>())
-    if (d['available'] == true) _discipline(d['discipline'] as String),
-};
+  final String code;
+  final Map<String, String> names;
+  final bool available;
 
-String disciplineJson(Discipline d) => switch (d) {
-  Discipline.tambo => 'TAMBO',
-  Discipline.grappling => 'GRAPPLING',
-  Discipline.ground => 'GROUND',
-  Discipline.throws => 'THROWS',
-  Discipline.technicalExpression => 'TECHNICAL_EXPRESSION',
-};
+  /// In the app's language; otherwise in Spanish, the language the sports are written in first.
+  String name(String languageCode) =>
+      names[languageCode] ?? names['es'] ?? names.values.firstOrNull ?? code;
+}
+
+List<Sport> sportsFromJson(List<dynamic> json) => [
+  for (final s in json.cast<Map<String, dynamic>>()) Sport.fromJson(s),
+];
+
+/// [code]'s name among [sports] in [localeTag]'s language (`es`, `es-ES`); the code itself for
+/// one no longer listed.
+String sportName(List<Sport> sports, String code, String localeTag) =>
+    sports
+        .where((s) => s.code == code)
+        .firstOrNull
+        ?.name(localeTag.split('-').first) ??
+    code;
 
 /// How many golds, silvers and bronzes a category gives on the final league standings.
 class Podium {
@@ -72,7 +84,7 @@ class LeaguePhase {
     required this.number,
     required this.name,
     required this.date,
-    required this.discipline,
+    required this.sport,
     required this.participants,
   });
 
@@ -81,7 +93,7 @@ class LeaguePhase {
     number: json['number'] as int,
     name: json['name'] as String,
     date: DateTime.parse(json['date'] as String),
-    discipline: _discipline(json['discipline'] as String),
+    sport: json['discipline'] as String,
     participants: json['participants'] as int,
   );
 
@@ -89,7 +101,9 @@ class LeaguePhase {
   final int number;
   final String name;
   final DateTime date;
-  final Discipline discipline;
+
+  /// Its sport's code ([Sport.code]).
+  final String sport;
   final int participants;
 }
 
@@ -100,7 +114,7 @@ class League {
     required this.categoryPodiums,
     required this.phases,
     required this.categoryNames,
-    required this.availableDisciplines,
+    required this.sports,
     this.globalStandings = false,
   });
 
@@ -117,9 +131,7 @@ class League {
         LeaguePhase.fromJson(p as Map<String, dynamic>),
     ],
     categoryNames: [for (final n in json['categoryNames'] as List) n as String],
-    availableDisciplines: disciplinesWithScoreboard(
-      json['disciplines'] as List,
-    ),
+    sports: sportsFromJson(json['disciplines'] as List),
   );
 
   final String name;
@@ -129,7 +141,9 @@ class League {
 
   /// Every category of every phase, youngest first.
   final List<String> categoryNames;
-  final Set<Discipline> availableDisciplines;
+
+  /// Every sport, with or without a scoreboard yet.
+  final List<Sport> sports;
 
   /// Also every category together (F2-4); off, the standings are only per category.
   final bool globalStandings;

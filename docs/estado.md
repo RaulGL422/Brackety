@@ -27,7 +27,7 @@ Estados: **pendiente** · **en curso** · **en pruebas** (hecho; falta la prueba
 | `eventos` | pendiente | Adelantado: comenzar, finalizar y reabrir la fase (#129); rediseño en `producto/eventos-ux.md` |
 | `inscripciones` | pendiente | Adelantado por el prototipo y la importación |
 | `ayudantes-permisos` | pendiente | Adelantado: invitaciones (#122) y permisos por persona (#130, #131, #133) |
-| `puntuacion` | pendiente | Solo tambo, en código; plantillas en `producto/plantillas-deporte.md` |
+| `puntuacion` | pendiente | Tambo y grappling como plantillas de datos (paso 1); plan en `producto/plantillas-deporte.md` |
 | `liga` | pendiente | |
 | `liga-fases` | en pruebas | Fases, reinscripción, puntos por asistir, podios |
 | `torneo` | pendiente | Lo pide la competición del 20-12 |
@@ -54,5 +54,5 @@ Estados: **pendiente** · **en curso** · **en pruebas** (hecho; falta la prueba
 | Servidor: banner y estado al arrancar | `09-despliegue.md` | en pruebas (#128) |
 | Fuera `maxGroupsPerMat` | `producto/calidad.md` | cerrado (#134) |
 | Plugins `playwright` y `frontend-design` | `08-ejecucion-local.md` | cerrado (#54) |
-| Plantillas de deporte y arbitraje | `producto/plantillas-deporte.md` | principio del producto, sin diseñar; tambo y grappling fijos en código (deuda); preguntas en `pendientes.md` |
+| Plantillas de deporte y arbitraje | `producto/plantillas-deporte.md` | paso 1 hecho (deportes como plantillas en BD); sin editor; preguntas en `pendientes.md` |
 | Grappling FELODA (G1-G5) | `producto/grappling.md` | G1-G4 fusionadas (#151, #153-#158); G5 hecha |

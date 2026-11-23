@@ -1,13 +1,13 @@
 package dev.rgal.brackety.league;
 
 import dev.rgal.brackety.event.Event;
-import dev.rgal.brackety.event.EventException;
 import dev.rgal.brackety.event.EventRepository;
 import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventStaff;
 import dev.rgal.brackety.event.EventStaffRepository;
 import dev.rgal.brackety.event.Mat;
 import dev.rgal.brackety.event.MatRepository;
+import dev.rgal.brackety.event.sport.SportCatalog;
 import dev.rgal.brackety.league.dto.LeagueDtos.NewEventRequest;
 import dev.rgal.brackety.league.dto.LeagueDtos.PhaseResponse;
 import java.time.Clock;
@@ -26,6 +26,7 @@ public class NewEventService {
     private final EventRepository events;
     private final EventStaffRepository staff;
     private final MatRepository mats;
+    private final SportCatalog sports;
     private final Clock clock;
 
     NewEventService(
@@ -33,19 +34,19 @@ public class NewEventService {
             EventRepository events,
             EventStaffRepository staff,
             MatRepository mats,
+            SportCatalog sports,
             Clock clock) {
         this.leagues = leagues;
         this.events = events;
         this.staff = staff;
         this.mats = mats;
+        this.sports = sports;
         this.clock = clock;
     }
 
     @Transactional
     public PhaseResponse create(UUID accountId, NewEventRequest request) {
-        if (!request.discipline().isAvailable()) {
-            throw EventException.invalid("That discipline has no scoreboard yet.");
-        }
+        var sport = sports.playable(request.discipline());
         var name = request.name().strip();
         var now = clock.instant();
         var league = leagues.save(new League(accountId, name, now));
@@ -54,16 +55,16 @@ public class NewEventService {
                 accountId,
                 league.getId(),
                 1,
-                request.discipline(),
+                sport,
                 name,
                 request.date(),
                 0,
-                request.discipline().defaultModality(),
+                sport.rules().modality(),
                 now));
         staff.save(new EventStaff(event.getId(), accountId, EventRole.CLUB));
         for (int number = 1; number <= request.mats(); number++) {
             mats.save(new Mat(event.getId(), number, null));
         }
-        return new PhaseResponse(event.getId(), 1, name, event.getEventDate(), event.getDiscipline(), 0);
+        return new PhaseResponse(event.getId(), 1, name, event.getEventDate(), sport.code(), 0);
     }
 }

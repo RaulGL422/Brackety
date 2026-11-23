@@ -259,7 +259,7 @@ public class EventService {
                 EventOrganizationService.list(organizations, event.getId()),
                 event.getAttendancePoints(),
                 event.getPhaseNumber(),
-                event.getDiscipline().name(),
+                event.getSport().code(),
                 event.modality().team().matchSeconds(),
                 event.modality().team().pointsLimit(),
                 event.modality().getMinRestSeconds(),

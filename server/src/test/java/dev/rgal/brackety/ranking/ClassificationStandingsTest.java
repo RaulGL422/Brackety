@@ -2,7 +2,7 @@ package dev.rgal.brackety.ranking;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import dev.rgal.brackety.event.ScoringRules;
+import dev.rgal.brackety.event.TestSports;
 import dev.rgal.brackety.scoreboard.Side;
 import java.util.List;
 import java.util.Set;
@@ -16,7 +16,7 @@ class ClassificationStandingsTest {
     private final UUID bea = UUID.randomUUID();
     private final UUID carla = UUID.randomUUID();
 
-    private final ClassificationStandings standings = new ClassificationStandings(ScoringRules.GRAPPLING);
+    private final ClassificationStandings standings = new ClassificationStandings(TestSports.GRAPPLING);
 
     @Test
     void eachWayOfWinningGivesItsPoints() {

@@ -1,6 +1,6 @@
 package dev.rgal.brackety.league.dto;
 
-import dev.rgal.brackety.event.Discipline;
+import dev.rgal.brackety.event.sport.SportVersion;
 import dev.rgal.brackety.league.Podium;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /** The league an event is a phase of (docs/modulos/liga-fases.md). */
@@ -34,17 +35,26 @@ public final class LeagueDtos {
             @NotNull @Valid Podium podium) {}
 
     public record PhaseResponse(
-            UUID eventId, int number, String name, LocalDate date, Discipline discipline, int participants) {}
+            UUID eventId, int number, String name, LocalDate date, String discipline, int participants) {}
 
     /** A standalone event: a league of one phase, with {@code mats} mats and no referee yet. */
     public record NewEventRequest(
             @NotBlank @Size(max = 120) String name,
             @NotNull LocalDate date,
-            @NotNull Discipline discipline,
+            @NotBlank @Size(max = 40) String discipline,
             @Min(1) @Max(20) int mats) {}
 
-    /** {@code available}: has a scoreboard today; the others are declared for later. */
-    public record DisciplineResponse(Discipline discipline, boolean available) {}
+    /**
+     * A sport to pick, by its code, with its name in each language. {@code available}: has a scoreboard today; the
+     * others are declared for later.
+     */
+    public record DisciplineResponse(String discipline, Map<String, String> names, boolean available) {
+
+        public static DisciplineResponse of(SportVersion sport) {
+            return new DisciplineResponse(
+                    sport.code(), sport.rules().names(), sport.rules().scoreboard());
+        }
+    }
 
     public record LeagueRequest(
             @NotBlank @Size(max = 120) String name,
@@ -56,7 +66,7 @@ public final class LeagueDtos {
     public record NewPhaseRequest(
             @NotBlank @Size(max = 120) String name,
             @NotNull LocalDate date,
-            @NotNull Discipline discipline,
+            @NotBlank @Size(max = 40) String discipline,
             @Min(0) @Max(100) int attendancePoints) {}
 
     /** Someone from another phase of the league not entered in this one; their latest entry. */

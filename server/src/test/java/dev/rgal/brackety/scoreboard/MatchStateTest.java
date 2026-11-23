@@ -14,6 +14,7 @@ import static dev.rgal.brackety.scoreboard.Side.BLUE;
 import static dev.rgal.brackety.scoreboard.Side.RED;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import dev.rgal.brackety.event.TestSports;
 import dev.rgal.brackety.scoreboard.MatchState.Corner;
 import dev.rgal.brackety.scoreboard.MatchState.Entry;
 import java.time.Duration;
@@ -26,8 +27,8 @@ import org.junit.jupiter.api.Test;
 class MatchStateTest {
 
     private static final Instant T0 = Instant.parse("2027-03-10T09:00:00Z");
-    private static final MatchRules RULES = new MatchRules(Duration.ofMinutes(2), 15);
-    private static final MatchRules TEAMS = new MatchRules(Duration.ofMinutes(3), 0);
+    private static final MatchRules RULES = new MatchRules(Duration.ofMinutes(2), 15, TestSports.TAMBO);
+    private static final MatchRules TEAMS = new MatchRules(Duration.ofMinutes(3), 0, TestSports.TAMBO);
 
     private final List<Entry> entries = new ArrayList<>();
 

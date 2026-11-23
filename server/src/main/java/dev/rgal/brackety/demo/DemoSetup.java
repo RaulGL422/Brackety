@@ -14,6 +14,7 @@ import dev.rgal.brackety.event.EventStaffRepository;
 import dev.rgal.brackety.event.Mat;
 import dev.rgal.brackety.event.MatRepository;
 import dev.rgal.brackety.event.OrganizationRepository;
+import dev.rgal.brackety.event.sport.SportCatalog;
 import dev.rgal.brackety.league.League;
 import dev.rgal.brackety.league.LeagueRepository;
 import java.time.Clock;
@@ -70,6 +71,7 @@ public class DemoSetup {
     private final EventOrganizationRepository organizations;
     private final OrganizationRepository clubs;
     private final LeagueRepository leagues;
+    private final SportCatalog sports;
     private final TransactionOperations transactions;
     private final Clock clock;
     private final boolean enabled;
@@ -86,6 +88,7 @@ public class DemoSetup {
             EventOrganizationRepository organizations,
             OrganizationRepository clubs,
             LeagueRepository leagues,
+            SportCatalog sports,
             TransactionOperations transactions,
             Clock clock,
             @Value("${brackety.demo.enabled}") boolean enabled,
@@ -100,6 +103,7 @@ public class DemoSetup {
         this.organizations = organizations;
         this.clubs = clubs;
         this.leagues = leagues;
+        this.sports = sports;
         this.transactions = transactions;
         this.clock = clock;
         this.enabled = enabled;
@@ -127,8 +131,18 @@ public class DemoSetup {
             var club = verifiedAccounts.club(CLUB, DEMO_CLUB_NAME, DEMO_CLUB_CIF);
             var date = eventDate.isBlank() ? LocalDate.now(clock) : LocalDate.parse(eventDate);
             var league = leagues.save(new League(club, "Liga Yoseikan 2027", now));
-            var event =
-                    events.save(Event.tambo(club, league.getId(), "Liga Yoseikan 2027 · Fase 1 · Tambo", date, now));
+            // Liga Yoseikan, Fase 1: 10 points for attending.
+            var tambo = sports.latest("TAMBO");
+            var event = events.save(new Event(
+                    club,
+                    league.getId(),
+                    1,
+                    tambo,
+                    "Liga Yoseikan 2027 · Fase 1 · Tambo",
+                    date,
+                    10,
+                    tambo.rules().modality(),
+                    now));
             staff.save(new EventStaff(event.getId(), club, EventRole.CLUB));
             for (var grouper : GROUPERS) {
                 staff.save(new EventStaff(event.getId(), verifiedAccounts.helper(grouper), EventRole.GROUPER));

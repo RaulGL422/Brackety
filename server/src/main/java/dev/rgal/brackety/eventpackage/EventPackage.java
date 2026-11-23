@@ -1,6 +1,5 @@
 package dev.rgal.brackety.eventpackage;
 
-import dev.rgal.brackety.event.Discipline;
 import dev.rgal.brackety.event.EventCategory;
 import dev.rgal.brackety.event.EventPermission;
 import dev.rgal.brackety.event.EventRole;
@@ -105,7 +104,7 @@ public record EventPackage(
     public record LeagueEntry(
             @NotBlank @Size(max = 120) String name,
             @Min(1) int phaseNumber,
-            @NotNull Discipline discipline,
+            @NotBlank @Size(max = 40) String discipline,
             @NotNull @Valid Podium podium,
             @NotNull List<@NotNull @Valid CategoryPodiumEntry> categoryPodiums,
             Boolean globalStandings) {}

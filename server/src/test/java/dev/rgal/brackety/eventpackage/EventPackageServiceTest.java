@@ -8,7 +8,7 @@ import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventApiTest;
 import dev.rgal.brackety.event.EventPermission;
 import dev.rgal.brackety.event.RulebookService;
-import dev.rgal.brackety.event.ScoringRules;
+import dev.rgal.brackety.event.TestSports;
 import dev.rgal.brackety.participant.Participant;
 import dev.rgal.brackety.participant.ParticipantRepository;
 import java.nio.charset.StandardCharsets;
@@ -264,7 +264,7 @@ class EventPackageServiceTest extends EventApiTest {
     @Test
     void aGrapplingEventTravelsWithItsRulesAndLengths() {
         jdbc.sql("update modality set scoring = ?::jsonb where event_id = ?")
-                .params(json.writeValueAsString(ScoringRules.GRAPPLING), eventId)
+                .params(json.writeValueAsString(TestSports.GRAPPLING), eventId)
                 .update();
         jdbc.sql("update event_category set match_seconds = 240 where event_id = ? and name = '7-8'")
                 .param(eventId)
@@ -275,7 +275,7 @@ class EventPackageServiceTest extends EventApiTest {
         var loaded =
                 packages.export(packages.load(json.writeValueAsBytes(exported)).eventId(), accountId("club1"));
 
-        assertThat(loaded.event().scoring()).isEqualTo(ScoringRules.GRAPPLING);
+        assertThat(loaded.event().scoring()).isEqualTo(TestSports.GRAPPLING);
         assertThat(loaded.categories())
                 .filteredOn(c -> c.name().equals("7-8"))
                 .singleElement()
@@ -294,7 +294,7 @@ class EventPackageServiceTest extends EventApiTest {
 
         var loaded = packages.export(packages.load(file).eventId(), accountId("club1"));
 
-        assertThat(loaded.event().scoring()).isEqualTo(ScoringRules.TAMBO);
+        assertThat(loaded.event().scoring()).isEqualTo(TestSports.TAMBO);
     }
 
     @Test

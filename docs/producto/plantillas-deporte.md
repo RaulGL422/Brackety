@@ -1,6 +1,6 @@
 # Plantillas de deporte y de arbitraje
 
-Principio de Brackety desde el inicio: deportes ilimitados, ninguno fijado en código. Lo que hoy está fijo (tambo y grappling en `ScoringRules`/`Modality`) es deuda a migrar aquí. Se diseña con `modulos/puntuacion.md`; las dudas están en `pendientes.md`. Las pantallas (editor, asistente GR-12), con Raul.
+Principio de Brackety desde el inicio: deportes ilimitados, ninguno fijado en código. Paso 1 hecho: los deportes son plantillas en la base de datos. Se diseña con `modulos/puntuacion.md`; las dudas están en `pendientes.md`. Las pantallas (editor, asistente GR-12), con Raul.
 
 ## Objetivo
 Que cualquier modalidad y su forma de arbitrar se creen **desde la propia app**, sin programar, y queden como plantillas reutilizables, duplicables y editables. Más adelante, un modo público donde la gente comparte sus configuraciones y sus deportes inventados con sus normas.
@@ -41,14 +41,14 @@ Que cualquier modalidad y su forma de arbitrar se creen **desde la propia app**,
 Lo público necesita: denunciar, ocultar desde el superadmin, nombre del autor (o anónimo) y aceptar unas condiciones al publicar. Sin datos personales dentro de una plantilla.
 
 ## Qué implica en el código
-- Es la fase L7 de `plan-limpieza.md`: el **motor de reglas por datos**. Hecho el motor (G2a-G2d de `grappling.md`): `ScoringRules` guarda botones, escalera de amonestaciones, superioridad, acciones de victoria, desempates y puntos de clasificación; `MatchState` (Java y Dart) solo lee esos datos. Falta: la lista de deportes sigue en código (`Discipline`) y no hay editor.
+- Es la fase L7 de `plan-limpieza.md`: el **motor de reglas por datos**. Hecho el motor (G2a-G2d de `grappling.md`): `ScoringRules` guarda botones, escalera de amonestaciones, superioridad, acciones de victoria, desempates y puntos de clasificación; `MatchState` (Java y Dart) solo lee esos datos. Paso 1 hecho: `sport_template` y `sport_template_version` (reglas en JSON, versión inmutable); el evento guarda `sport_version_id`. Fuera del código: `Discipline`, `Modality.tambo()/grappling()`, `ScoringRules.TAMBO/GRAPPLING` (quedan como datos de prueba, `TestSports`). Falta: editor, y `Scoring.tambo` de la app (respaldo de caché antigua).
 - Datos (propuesta): `sport_template` (dueño, visibilidad, origen si es un duplicado) y `sport_template_version` (inmutable, JSON con `schemaVersion`). La `modality` del evento apunta a una versión y guarda solo lo que el evento cambia.
 - El JSON se valida en el servidor con un esquema; la app usa el mismo esquema para el editor. Sin lenguaje propio ni fórmulas libres (decisión de `puntuacion.md`): solo piezas fijas que se combinan.
 - Offline: el paquete del pabellón y la caché de la app llevan la versión entera.
 - Todo lo que hoy es "si es tambo…" pasa a "lo que diga la plantilla".
 
 ## Orden propuesto
-1. Motor por datos con tambo como primera plantilla (sin editor): mismos resultados que hoy, comprobación de oro.
+1. Motor por datos con tambo como primera plantilla (sin editor): mismos resultados que hoy, comprobación de oro. Hecho.
 2. Plantillas de la F2 (armas) y F3 (expresión técnica) como datos.
 3. Editor en la app: duplicar y editar privadas; probar en marcador de prueba.
 4. Arbitraje configurable (papeles, jueces, decisión).
@@ -56,4 +56,4 @@ Lo público necesita: denunciar, ocultar desde el superadmin, nombre del autor (
 6. Galería pública con moderación.
 
 ## Estado
-Idea apuntada (2026-11-18). Preguntas abiertas en `pendientes.md` (Producto).
+Paso 1 hecho (2026-11-24): las 5 de la Liga Yoseikan son plantillas oficiales (`TAMBO`, `GRAPPLING`… mismos códigos en API y paquetes). Siguiente: paso 2. Preguntas abiertas en `pendientes.md` (Producto).

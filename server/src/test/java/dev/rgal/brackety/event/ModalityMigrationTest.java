@@ -74,12 +74,12 @@ class ModalityMigrationTest {
                             .query(String.class)
                             .single(),
                     ScoringRules.class);
-            assertThat(stored.apply(tambo)).isEqualTo(ScoringRules.TAMBO);
+            assertThat(stored.apply(tambo)).isEqualTo(TestSports.TAMBO);
             // Everything but the classification table, which came later (G2c).
             assertThat(stored.apply(grappling))
                     .usingRecursiveComparison()
                     .ignoringFields("classification")
-                    .isEqualTo(ScoringRules.GRAPPLING);
+                    .isEqualTo(TestSports.GRAPPLING);
         }
     }
 

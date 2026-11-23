@@ -46,7 +46,7 @@ class LeagueRepository {
     String eventId, {
     required String name,
     required DateTime date,
-    required Discipline discipline,
+    required String sport,
     required int attendancePoints,
   }) async {
     final response = await _dio.post<Map<String, dynamic>>(
@@ -54,7 +54,7 @@ class LeagueRepository {
       data: {
         'name': name,
         'date': DateFormat('yyyy-MM-dd').format(date),
-        'discipline': disciplineJson(discipline),
+        'discipline': sport,
         'attendancePoints': attendancePoints,
       },
     );
@@ -65,7 +65,7 @@ class LeagueRepository {
   Future<LeaguePhase> createEvent({
     required String name,
     required DateTime date,
-    required Discipline discipline,
+    required String sport,
     required int mats,
   }) async {
     final response = await _dio.post<Map<String, dynamic>>(
@@ -73,19 +73,19 @@ class LeagueRepository {
       data: {
         'name': name,
         'date': DateFormat('yyyy-MM-dd').format(date),
-        'discipline': disciplineJson(discipline),
+        'discipline': sport,
         'mats': mats,
       },
     );
     return LeaguePhase.fromJson(response.data!);
   }
 
-  /// The sports with a scoreboard today.
-  Future<Set<Discipline>> disciplines() async {
+  /// Every sport, with or without a scoreboard yet.
+  Future<List<Sport>> sports() async {
     final response = await _dio.get<List<dynamic>>(
       '/api/v1/events/disciplines',
     );
-    return disciplinesWithScoreboard(response.data!);
+    return sportsFromJson(response.data!);
   }
 
   Future<List<LeagueCandidate>> candidates(String eventId) async {

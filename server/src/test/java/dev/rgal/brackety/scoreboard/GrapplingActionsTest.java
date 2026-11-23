@@ -6,7 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import dev.rgal.brackety.event.ScoringRules;
+import dev.rgal.brackety.event.TestSports;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +31,7 @@ class GrapplingActionsTest extends ScoreboardApiTest {
     @BeforeEach
     void grappling() {
         jdbc.sql("update modality set scoring = ?::jsonb where event_id = ?")
-                .params(json.writeValueAsString(ScoringRules.GRAPPLING), eventId)
+                .params(json.writeValueAsString(TestSports.GRAPPLING), eventId)
                 .update();
         jdbc.sql("update modality_rules set points_limit = 0 where modality_id in"
                         + " (select id from modality where event_id = ?)")

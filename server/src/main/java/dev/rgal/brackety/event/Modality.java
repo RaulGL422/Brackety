@@ -68,23 +68,6 @@ public class Modality {
         rules.put(Format.TEAM, team);
     }
 
-    /**
-     * Liga Yoseikan tambo, Fase 1 (Raul, 2026-11-13): individual 1 min and 15 points end it; teams 3 min with no
-     * points limit; 30 s of rest at least between two matches of a fighter; 30 s to change over. The club can change
-     * all of it in the settings.
-     */
-    public static Modality tambo() {
-        return new Modality(1, new FormatRules(60, 15), new FormatRules(180, 0), 30, 30, ScoringRules.TAMBO);
-    }
-
-    /**
-     * FELODA grappling (docs/reglamentos/grappling-feloda-2025.md): 5 min with no points limit (a 15-point difference
-     * ends it); categories of 4 min set their own length. Rest and changeover as in tambo until the club says.
-     */
-    public static Modality grappling() {
-        return new Modality(1, new FormatRules(300, 0), new FormatRules(300, 0), 30, 30, ScoringRules.GRAPPLING);
-    }
-
     public static Modality of(
             int matchSeconds,
             int pointsLimit,
