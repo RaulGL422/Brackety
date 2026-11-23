@@ -1490,11 +1490,17 @@ abstract class AppLocalizations {
   /// **'+{points} {corner}: {labels}'**
   String addPointsFor(int points, String corner, String labels);
 
-  /// No description provided for @removePointsValue.
+  /// No description provided for @removePointsFor.
   ///
   /// In es, this message translates to:
-  /// **'{points, plural, =1{Quitar 1 punto} other{Quitar {points} puntos}}'**
-  String removePointsValue(int points);
+  /// **'{points, plural, =1{Quitar 1 punto a {corner}} other{Quitar {points} puntos a {corner}}}'**
+  String removePointsFor(int points, String corner);
+
+  /// No description provided for @finishFor.
+  ///
+  /// In es, this message translates to:
+  /// **'{finish}: {corner}'**
+  String finishFor(String finish, String corner);
 
   /// No description provided for @extraTimeWon.
   ///
@@ -1711,18 +1717,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'punto al rival'**
   String get tlRivalPoint;
-
-  /// No description provided for @removePoint.
-  ///
-  /// In es, this message translates to:
-  /// **'−1'**
-  String get removePoint;
-
-  /// No description provided for @removePointFor.
-  ///
-  /// In es, this message translates to:
-  /// **'Quitar un punto a {corner}'**
-  String removePointFor(String corner);
 
   /// No description provided for @whatPointRemoved.
   ///

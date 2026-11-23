@@ -10,6 +10,8 @@ competición del 2026-12-20 (`competicion-2026-12-20.md`); objetivo de prueba in
 - Cada «+N» con su «−N» al lado, a la vista. Sumisión (y cualquier acción de victoria) como botón propio.
 - Las demás pantallas: Raul las revisará una a una cuando esté todo lo de aquí (GR-7).
 - Probar en móvil 360 px (el «Deshacer» ya cortaba el tiempo, `pendientes.md` §5).
+- Hecho (Raul, 2026-11-23): parejas [+N|−N] de dos en dos; la sumisión, botón propio con confirmación; en móvil
+  (esquina baja) 🏆 cuadrado bajo la bandera; botones a alto fijo, el texto grande encoge.
 
 ## GR-2 · Sesión estable con el QR
 - Pasó: casi 15 QR para 3 árbitros. Las sesiones se cerraban solas cada cierto tiempo y, al volver a entrar, el QR

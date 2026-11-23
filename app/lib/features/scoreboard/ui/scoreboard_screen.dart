@@ -307,6 +307,9 @@ class _Live extends StatelessWidget {
   /// Share of the height the clock takes in portrait.
   static const _clockShare = 0.16;
 
+  /// Below this a corner cannot take a third row of buttons and still show the score (GR-1).
+  static const _shortCorner = 320.0;
+
   @override
   Widget build(BuildContext context) {
     final locked = view.review != null;
@@ -314,7 +317,7 @@ class _Live extends StatelessWidget {
     final scoring = view.endReason == null && !locked && view.started;
     // The last action's point, once the clock shows 0:00 (F1-3).
     final overtime = view.endReason == EndReason.time && !locked;
-    Widget corner(Side side) => Expanded(
+    Widget corner(Side side, {required bool short}) => Expanded(
       child: CornerPanel(
         side: side,
         corner: view.corner(side),
@@ -323,6 +326,7 @@ class _Live extends StatelessWidget {
           corner: view.corner(side),
           scoring: view.scoring,
           extraTimeDue: view.needsExtraTime && !locked,
+          short: short,
           canPoint: scoring || overtime,
           canSanction: scoring,
           // A correction: also once the time or the points ended it, not after a disqualification.
@@ -346,11 +350,16 @@ class _Live extends StatelessWidget {
         Expanded(
           child: LayoutBuilder(
             builder: (context, size) {
-              if (size.maxWidth > size.maxHeight) {
+              final landscape = size.maxWidth > size.maxHeight;
+              // About each corner's height: stacked in portrait, under the clock.
+              final short =
+                  (landscape ? size.maxHeight : size.maxHeight / 3) <
+                  _shortCorner;
+              if (landscape) {
                 return Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    corner(Side.red),
+                    corner(Side.red, short: short),
                     Expanded(
                       child: ClockBar(
                         view: view,
@@ -358,7 +367,7 @@ class _Live extends StatelessWidget {
                         onAdjust: onAdjust,
                       ),
                     ),
-                    corner(Side.blue),
+                    corner(Side.blue, short: short),
                   ],
                 );
               }
@@ -370,8 +379,8 @@ class _Live extends StatelessWidget {
                     onAdjust: onAdjust,
                     clockHeight: size.maxHeight * _clockShare,
                   ),
-                  corner(Side.red),
-                  corner(Side.blue),
+                  corner(Side.red, short: short),
+                  corner(Side.blue, short: short),
                 ],
               );
             },

@@ -49,3 +49,4 @@ Anteriores:
 - 2026-11-23 · GR-5 en detalle: grupos de 2 a 8 (comodines incluidos, al menos uno que no lo sea); un rango nuevo vale para los grupos que se hagan después; la ida y vuelta no cambia con grupos hechos; empate entre dos con ida y vuelta: victorias entre ellos y luego puntos marcados entre ellos · Claude (sin regla de Raul para estos casos).
 - 2026-11-23 · Crear grupos con rango: el ayudante elige el tamaño antes (chips, empieza en el mayor) y las reglas del comodín siguen con ese tamaño; más de 4 huecos van en dos filas · Raul.
 - 2026-11-23 · GR-4: tablero «Grupos por tapiz» (columnas; móvil, en lista con «Mover»), solo grupos por acabar; permiso nuevo `MOVE_GROUPS` que abre ese tablero y mover grupos, sin el resto del panel · Raul.
+- 2026-11-23 · GR-1: marcador con parejas [+N|−N] a la vista, sumisión como botón propio (confirma), bandera solo avisos y descalificación; en esquina baja (móvil) 🏆 cuadrado junto a las parejas · Raul.
