@@ -12,7 +12,7 @@ Estados: **pendiente** · **en curso** · **en pruebas** (hecho; falta la prueba
 - Calidad (`producto/plan-limpieza.md`): L0 completa (2026-11-20): métricas en el CI (#137), ArchUnit (#138), lints estrictos (#139), casos de reglas compartidos (#142) y comprobación de oro (#143, #149). Destapó el orden de nombres con acento en Linux (#144). Siguiente: L1.
 - Grappling FELODA (`producto/grappling.md`): G1-G5 fusionadas (#151, #153-#159); release v0.8.0 (#160).
 - Acceso por QR para ayudantes y árbitros sin cuenta (`modulos/ayudantes-permisos.md`): fusionado (#162), release v0.8.1.
-- Tras el grappling del 2026-11-21: superioridad en Ajustes (#165). Arreglos GR-1 a GR-12 para el 20-12 (`producto/feedback-grappling.md`): GR-3 (#169) y GR-11 (#170) hechos; resto pendiente. L1 espera.
+- Tras el grappling del 2026-11-21: superioridad en Ajustes (#165). Arreglos GR-1 a GR-12 para el 20-12 (`producto/feedback-grappling.md`): GR-3 (#169), GR-11 (#170) y GR-10 (#171) hechos; resto pendiente. L1 espera.
 - Exportaciones a medida (`producto/exportaciones.md`): aprobadas en lo básico, por programar.
 - Esperando a Raul: detalles de la competición del 20-12, puntuación de la F2 y las preguntas de `pendientes.md`.
 
@@ -54,5 +54,5 @@ Estados: **pendiente** · **en curso** · **en pruebas** (hecho; falta la prueba
 | Servidor: banner y estado al arrancar | `09-despliegue.md` | en pruebas (#128) |
 | Fuera `maxGroupsPerMat` | `producto/calidad.md` | cerrado (#134) |
 | Plugins `playwright` y `frontend-design` | `08-ejecucion-local.md` | cerrado (#54) |
-| Plantillas de deporte y arbitraje | `producto/plantillas-deporte.md` | idea, preguntas en `pendientes.md` |
+| Plantillas de deporte y arbitraje | `producto/plantillas-deporte.md` | decidida (2026-11-23), sin diseñar; preguntas en `pendientes.md` |
 | Grappling FELODA (G1-G5) | `producto/grappling.md` | G1-G4 fusionadas (#151, #153-#158); G5 hecha |

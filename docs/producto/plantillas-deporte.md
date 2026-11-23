@@ -1,6 +1,6 @@
 # Plantillas de deporte y de arbitraje
 
-Idea de Raul (2026-11-18), apuntada para diseñarla con `modulos/puntuacion.md`. Todavía no es una decisión: las dudas están en `pendientes.md`.
+Idea de Raul (2026-11-18), dirección decidida el 2026-11-23 (`decisiones.md`). Se diseña con `modulos/puntuacion.md`; las dudas están en `pendientes.md`. Las pantallas (editor, asistente GR-12), con Raul.
 
 ## Objetivo
 Que cualquier modalidad y su forma de arbitrar se creen **desde la propia app**, sin programar, y queden como plantillas reutilizables, duplicables y editables. Más adelante, un modo público donde la gente comparte sus configuraciones y sus deportes inventados con sus normas.
