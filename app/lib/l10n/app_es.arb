@@ -898,6 +898,18 @@
   "categoryMatchLength": "Duración propia (min:s)",
   "categoryMatchLengthHint": "Vacía: la del evento. En grappling, 4:00 para U13, U15 y veteranos.",
   "categoryByTeams": "Por equipos",
+  "categoryGroupSizes": "Grupos de {min} a {max}",
+  "@categoryGroupSizes": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "categoryReturnLeg": "Ida y vuelta",
   "categoryGroupSize": "Grupos de {size}",
   "@categoryGroupSize": {
     "placeholders": {

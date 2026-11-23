@@ -233,7 +233,10 @@ class EventSheets {
                             c.getMaxAge(),
                             c.getFormat() == EventCategory.Format.TEAM ? "Por equipos" : "Individual",
                             c.getTeamSize(),
-                            c.getGroupSize(),
+                            c.getMinGroupSize() == c.getMaxGroupSize()
+                                    ? String.valueOf(c.getMaxGroupSize())
+                                    : c.getMinGroupSize() + " a " + c.getMaxGroupSize(),
+                            c.isReturnLeg() ? "Sí" : "No",
                             entered.getOrDefault(c.getId(), 0),
                             groupCount.getOrDefault(c.getId(), 0L),
                             podium.firsts(),
@@ -249,6 +252,7 @@ class EventSheets {
                         "Formato",
                         "Alumnos por equipo",
                         "Por grupo (alumnos o equipos)",
+                        "Ida y vuelta",
                         "Inscritos",
                         "Grupos",
                         "Podio: primeros",

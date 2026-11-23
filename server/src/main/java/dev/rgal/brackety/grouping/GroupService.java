@@ -116,7 +116,10 @@ class GroupService {
                             c.getFormat(),
                             c.getTeamSize(),
                             (int) ids.stream().filter(teamNumbers::containsKey).count(),
-                            realTeams.getOrDefault(c.getId(), 0L).intValue());
+                            realTeams.getOrDefault(c.getId(), 0L).intValue(),
+                            c.getMinGroupSize(),
+                            c.getMaxGroupSize(),
+                            c.isReturnLeg());
                 })
                 .filter(c -> c.participants() > 0)
                 .toList();
@@ -225,9 +228,7 @@ class GroupService {
             var ids = group.participantIds() == null ? List.<UUID>of() : group.participantIds();
             var all = new ArrayList<>(ids);
             all.addAll(group.ghosts());
-            if (ids.isEmpty() || all.size() != RoundRobin.GROUP_SIZE) {
-                throw EventException.invalid("A group is 4 participants; up to 3 of them can be ghosts.");
-            }
+            checkSize(category, ids.size(), group.ghosts().size());
             if (new HashSet<>(all).size() != all.size()) {
                 throw EventException.invalid("A participant appears twice in a group.");
             }
@@ -259,7 +260,10 @@ class GroupService {
                         TeamMember::getTeamId, Collectors.mapping(TeamMember::getParticipantId, Collectors.toSet())));
         for (var group : teamRequests) {
             var wildcards = group.wildcardTeams();
-            checkShape(group.teamIds(), wildcards.size(), "A group is 4 teams; up to 3 of them can be wildcard teams.");
+            checkSize(category, group.teamIds().size(), wildcards.size());
+            if (new HashSet<>(group.teamIds()).size() != group.teamIds().size()) {
+                throw EventException.invalid("A competitor appears twice in a group.");
+            }
             allTeams.addAll(group.teamIds());
             for (var wildcard : wildcards) {
                 TeamService.requireTeamShape(wildcard);
@@ -292,12 +296,12 @@ class GroupService {
         }
     }
 
-    private static void checkShape(List<UUID> ids, int ghosts, String message) {
-        if (ids.isEmpty() || ghosts > RoundRobin.GROUP_SIZE - 1 || ids.size() + ghosts != RoundRobin.GROUP_SIZE) {
-            throw EventException.invalid(message);
-        }
-        if (new HashSet<>(ids).size() != ids.size()) {
-            throw EventException.invalid("A competitor appears twice in a group.");
+    // Within the category's range, wildcards included; at least one member is not a wildcard (Raul, 2026-11-21).
+    private static void checkSize(EventCategory category, int real, int wildcards) {
+        var size = real + wildcards;
+        if (real == 0 || size < category.getMinGroupSize() || size > category.getMaxGroupSize()) {
+            throw EventException.invalid("A group of this category is of " + category.getMinGroupSize() + " to "
+                    + category.getMaxGroupSize() + ", wildcards included, with one non-wildcard at least.");
         }
     }
 
@@ -315,7 +319,7 @@ class GroupService {
             members.save(new GroupMember(group.getId(), ghost, ofTeams, order.size(), true));
             order.add(ghost);
         }
-        var pairs = RoundRobin.pairs();
+        var pairs = RoundRobin.pairs(order.size(), category.isReturnLeg());
         for (int i = 0; i < pairs.size(); i++) {
             var pair = pairs.get(i);
             matches.save(new Match(

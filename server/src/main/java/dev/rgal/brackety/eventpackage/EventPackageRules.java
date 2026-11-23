@@ -104,6 +104,9 @@ final class EventPackageRules {
             if ((c.format() == EventCategory.Format.TEAM) != (c.teamSize() != null)) {
                 throw invalid("categories[" + i + "]: teamSize is set for TEAM and only for TEAM");
             }
+            if (c.minGroupSize() != null && c.maxGroupSize() != null && c.minGroupSize() > c.maxGroupSize()) {
+                throw invalid("categories[" + i + "]: minGroupSize is above maxGroupSize");
+            }
         }
     }
 

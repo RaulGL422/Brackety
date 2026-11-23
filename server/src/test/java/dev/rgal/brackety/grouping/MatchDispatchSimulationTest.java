@@ -299,7 +299,7 @@ class MatchDispatchSimulationTest {
             groupCreated.put(id, created);
             groupNumbers.put(id, groupNumbers.size() + 1);
             groupUnits.put(id, List.copyOf(units));
-            var pairs = RoundRobin.pairs();
+            var pairs = RoundRobin.pairs(4, false);
             for (int i = 0; i < pairs.size(); i++) {
                 var c = new Candidate(
                         UUID.randomUUID(),

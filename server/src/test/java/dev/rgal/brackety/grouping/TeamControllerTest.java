@@ -388,7 +388,9 @@ class TeamControllerTest extends EventApiTest {
         createTeam(0, 1, 2).andExpect(status().isCreated());
         var current = call(get(event() + "/settings"), "club1")
                 .andExpect(jsonPath("$.categories[5].format").value("TEAM"))
-                .andExpect(jsonPath("$.categories[5].groupSize").value(4))
+                .andExpect(jsonPath("$.categories[5].minGroupSize").value(4))
+                .andExpect(jsonPath("$.categories[5].maxGroupSize").value(4))
+                .andExpect(jsonPath("$.categories[5].returnLeg").value(false))
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
@@ -396,14 +398,20 @@ class TeamControllerTest extends EventApiTest {
 
         // The team category in use keeps its team size, but can change its name.
         updateCategories(categories(ids, "15-16", 2, 4)).andExpect(status().isConflict());
-        updateCategories(categories(ids, "Cadete", 3, 4))
+        updateCategories(categories(ids, "Cadete", 3, 5))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[5].name").value("Cadete"));
-        updateCategories(categories(ids, "Cadete", 3, 5)).andExpect(status().isBadRequest());
+                .andExpect(jsonPath("$[5].name").value("Cadete"))
+                .andExpect(jsonPath("$[5].minGroupSize").value(2))
+                .andExpect(jsonPath("$[5].maxGroupSize").value(5));
+        updateCategories(categories(ids, "Cadete", 3, 9)).andExpect(status().isBadRequest());
+        // Its groups would be scored over one and two legs at once.
+        updateCategories(categories(ids, "Cadete", 3, 5).replace("\"returnLeg\":false", "\"returnLeg\":true"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("RETURN_LEG_IN_USE"));
         updateCategories(categories(ids.subList(0, 5), "Cadete", 3, 4)).andExpect(status().isConflict());
         updateCategories("""
-                [{"name":"A","minAge":4,"maxAge":10,"format":"INDIVIDUAL","groupSize":4},
-                 {"name":"B","minAge":10,"maxAge":20,"format":"INDIVIDUAL","groupSize":4}]""").andExpect(status().isBadRequest());
+                [{"name":"A","minAge":4,"maxAge":10,"format":"INDIVIDUAL"},
+                 {"name":"B","minAge":10,"maxAge":20,"format":"INDIVIDUAL"}]""").andExpect(status().isBadRequest());
         call(put(event() + "/categories").content("{\"categories\":" + categories(ids, "X", 3, 4) + "}"), "ayudante1")
                 .andExpect(status().isForbidden());
     }
@@ -451,7 +459,7 @@ class TeamControllerTest extends EventApiTest {
     }
 
     /** The demo's categories with the 6th renamed and resized; ids decide which ones are kept. */
-    private String categories(List<String> ids, String sixthName, int teamSize, int groupSize) {
+    private String categories(List<String> ids, String sixthName, int teamSize, int maxGroupSize) {
         String[][] bands = {
             {"4-6", "4", "6"},
             {"7-8", "7", "8"},
@@ -467,14 +475,14 @@ class TeamControllerTest extends EventApiTest {
         for (int i = 0; i < ids.size(); i++) {
             var team = i >= 5;
             result.add("""
-                    {"id":"%s","name":"%s","minAge":%s,"maxAge":%s,"format":"%s","teamSize":%s,"groupSize":%d}""".formatted(
+                    {"id":"%s","name":"%s","minAge":%s,"maxAge":%s,"format":"%s","teamSize":%s,                    "minGroupSize":2,"maxGroupSize":%d,"returnLeg":false}""".formatted(
                             ids.get(i),
                             bands[i][0],
                             bands[i][1],
                             bands[i][2],
                             team ? "TEAM" : "INDIVIDUAL",
                             team ? (i == 5 ? teamSize : 3) : "null",
-                            groupSize));
+                            maxGroupSize));
         }
         return "[" + String.join(",", result) + "]";
     }

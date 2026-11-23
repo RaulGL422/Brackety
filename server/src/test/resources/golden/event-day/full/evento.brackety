@@ -79,63 +79,90 @@
     "maxAge" : 6,
     "format" : "INDIVIDUAL",
     "teamSize" : null,
-    "matchSeconds" : null
+    "matchSeconds" : null,
+    "minGroupSize" : 4,
+    "maxGroupSize" : 4,
+    "returnLeg" : false
   }, {
     "name" : "7-8",
     "minAge" : 7,
     "maxAge" : 8,
     "format" : "INDIVIDUAL",
     "teamSize" : null,
-    "matchSeconds" : null
+    "matchSeconds" : null,
+    "minGroupSize" : 4,
+    "maxGroupSize" : 4,
+    "returnLeg" : false
   }, {
     "name" : "9-10",
     "minAge" : 9,
     "maxAge" : 10,
     "format" : "INDIVIDUAL",
     "teamSize" : null,
-    "matchSeconds" : null
+    "matchSeconds" : null,
+    "minGroupSize" : 4,
+    "maxGroupSize" : 4,
+    "returnLeg" : false
   }, {
     "name" : "11-12",
     "minAge" : 11,
     "maxAge" : 12,
     "format" : "INDIVIDUAL",
     "teamSize" : null,
-    "matchSeconds" : null
+    "matchSeconds" : null,
+    "minGroupSize" : 4,
+    "maxGroupSize" : 4,
+    "returnLeg" : false
   }, {
     "name" : "13-14",
     "minAge" : 13,
     "maxAge" : 14,
     "format" : "INDIVIDUAL",
     "teamSize" : null,
-    "matchSeconds" : null
+    "matchSeconds" : null,
+    "minGroupSize" : 4,
+    "maxGroupSize" : 4,
+    "returnLeg" : false
   }, {
     "name" : "15-16",
     "minAge" : 15,
     "maxAge" : 16,
     "format" : "TEAM",
     "teamSize" : 3,
-    "matchSeconds" : null
+    "matchSeconds" : null,
+    "minGroupSize" : 4,
+    "maxGroupSize" : 4,
+    "returnLeg" : false
   }, {
     "name" : "17-19",
     "minAge" : 17,
     "maxAge" : 19,
     "format" : "TEAM",
     "teamSize" : 3,
-    "matchSeconds" : null
+    "matchSeconds" : null,
+    "minGroupSize" : 4,
+    "maxGroupSize" : 4,
+    "returnLeg" : false
   }, {
     "name" : "20-25",
     "minAge" : 20,
     "maxAge" : 25,
     "format" : "TEAM",
     "teamSize" : 3,
-    "matchSeconds" : null
+    "matchSeconds" : null,
+    "minGroupSize" : 4,
+    "maxGroupSize" : 4,
+    "returnLeg" : false
   }, {
     "name" : "26+",
     "minAge" : 26,
     "maxAge" : 120,
     "format" : "TEAM",
     "teamSize" : 3,
-    "matchSeconds" : null
+    "matchSeconds" : null,
+    "minGroupSize" : 4,
+    "maxGroupSize" : 4,
+    "returnLeg" : false
   } ],
   "organizations" : [ {
     "name" : "Club Demo Yoseikan",

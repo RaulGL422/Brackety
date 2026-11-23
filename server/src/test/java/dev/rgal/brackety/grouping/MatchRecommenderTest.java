@@ -118,7 +118,7 @@ class MatchRecommenderTest {
         Group addGroup(int number) {
             var group = new Group(UUID.randomUUID(), List.of(id(), id(), id(), id()));
             groupCreated.put(group.id, now);
-            var pairs = RoundRobin.pairs();
+            var pairs = RoundRobin.pairs(4, false);
             for (int i = 0; i < pairs.size(); i++) {
                 var pair = pairs.get(i);
                 var candidate = new Candidate(

@@ -3073,6 +3073,18 @@ abstract class AppLocalizations {
   /// **'Por equipos'**
   String get categoryByTeams;
 
+  /// No description provided for @categoryGroupSizes.
+  ///
+  /// In es, this message translates to:
+  /// **'Grupos de {min} a {max}'**
+  String categoryGroupSizes(int min, int max);
+
+  /// No description provided for @categoryReturnLeg.
+  ///
+  /// In es, this message translates to:
+  /// **'Ida y vuelta'**
+  String get categoryReturnLeg;
+
   /// No description provided for @categoryGroupSize.
   ///
   /// In es, this message translates to:

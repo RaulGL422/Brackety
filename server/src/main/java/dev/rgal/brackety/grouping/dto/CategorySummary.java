@@ -5,7 +5,8 @@ import java.util.UUID;
 
 /**
  * {@code grouped}: participants competing in a group, directly or through their team (not counting
- * ghosts). {@code inTeams}: participants in a real team. {@code teams}: real teams.
+ * ghosts). {@code inTeams}: participants in a real team. {@code teams}: real teams. A new group has
+ * {@code minGroupSize} to {@code maxGroupSize} members, wildcards included.
  */
 public record CategorySummary(
         UUID id,
@@ -17,4 +18,7 @@ public record CategorySummary(
         Format format,
         Integer teamSize,
         int inTeams,
-        int teams) {}
+        int teams,
+        int minGroupSize,
+        int maxGroupSize,
+        boolean returnLeg) {}

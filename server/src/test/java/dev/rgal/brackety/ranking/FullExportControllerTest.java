@@ -99,7 +99,7 @@ class FullExportControllerTest extends EventApiTest {
                 .startsWith(Csv.BOM
                         + "Nombre;Apellidos;Fecha de nacimiento;Edad el día del evento;Sexo;Estatura (cm);Peso (kg)")
                 .contains("Ana;Prueba;15/01/2018;9;Sin declarar;130;;Club Demo Yoseikan;9-10;Por edad;Sí;;1;1;");
-        assertThat(files.get("categorias.csv")).contains("9-10;9;10;Individual;;4;4;1;2;2;3");
+        assertThat(files.get("categorias.csv")).contains("9-10;9;10;Individual;;4;No;4;1;2;2;3");
         assertThat(files.get("tapices.csv")).contains("1;arbitro1;1;6;1");
         assertThat(files.get("grupos.csv")).contains(";ayudante1;1;Ana Prueba;;Club Demo Yoseikan;No");
         assertThat(files.get("combates.csv"))

@@ -76,6 +76,16 @@ class _CategoriesEditorState extends ConsumerState<CategoriesEditor> {
     );
   }
 
+  // A new category has no sizes yet: the server makes it of 4, one leg.
+  static String _groups(AppLocalizations l10n, EventCategory c) {
+    final min = c.minGroupSize ?? 4;
+    final max = c.maxGroupSize ?? 4;
+    final sizes = min == max
+        ? l10n.categoryGroupSize(max)
+        : l10n.categoryGroupSizes(min, max);
+    return c.returnLeg ?? false ? '$sizes · ${l10n.categoryReturnLeg}' : sizes;
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -88,7 +98,7 @@ class _CategoriesEditorState extends ConsumerState<CategoriesEditor> {
             title: Text(l10n.categoryRange(c.name, c.minAge, c.maxAge)),
             subtitle: Text(
               '${c.isTeam ? l10n.categoryTeams : l10n.categoryIndividual}'
-              ' · ${l10n.categoryGroupSize(c.groupSize)}'
+              ' · ${_groups(l10n, c)}'
               '${c.matchLength == null ? '' : ' · ${l10n.categoryOwnLength(formatMatchLength(c.matchLength!))}'}',
             ),
             onTap: _saving ? null : () => _edit(i),
@@ -154,6 +164,9 @@ class _CategoryDialogState extends State<_CategoryDialog> {
         minAge: int.parse(_min.text),
         maxAge: int.parse(_max.text),
         teamSize: _teamSize,
+        minGroupSize: widget.initial?.minGroupSize,
+        maxGroupSize: widget.initial?.maxGroupSize,
+        returnLeg: widget.initial?.returnLeg,
         matchLength: _length.text.trim().isEmpty
             ? null
             : parseMatchLength(_length.text),

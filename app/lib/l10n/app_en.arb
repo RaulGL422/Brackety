@@ -642,6 +642,8 @@
   "categoryMatchLength": "Own match length (min:s)",
   "categoryMatchLengthHint": "Empty: the event's. In grappling, 4:00 for U13, U15 and veterans.",
   "categoryByTeams": "By teams",
+  "categoryGroupSizes": "Groups of {min} to {max}",
+  "categoryReturnLeg": "Home and away",
   "categoryGroupSize": "Groups of {size}",
   "categoryAgesInvalid": "The minimum age cannot be above the maximum.",
   "categoriesInUse": "A category with groups or teams can only change its name.",

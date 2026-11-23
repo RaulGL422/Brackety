@@ -6,7 +6,6 @@ import dev.rgal.brackety.scoreboard.Side;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,8 +14,8 @@ import java.util.function.Function;
 
 /**
  * The FELODA ranking of a group or category (docs/reglamentos/grappling-feloda-2025.md, art. 8 and 39): most wins,
- * then classification points, the match between the two tied, wins by submission, wins by superiority and technical
- * points. What each way of winning gives comes from the event's rules ({@link ScoringRules#classification()}).
+ * then classification points, the match between the two tied (with a return leg, both matches: wins, then points
+ * scored), wins by submission, wins by superiority and technical points. What each way of winning gives comes from the event's rules ({@link ScoringRules#classification()}).
  */
 final class ClassificationStandings {
 
@@ -27,7 +26,8 @@ final class ClassificationStandings {
         int submissions;
         int superiorities;
         int technical;
-        final Set<UUID> beaten = new HashSet<>();
+        final Map<UUID, Integer> winsAgainst = new HashMap<>();
+        final Map<UUID, Integer> scoredAgainst = new HashMap<>();
 
         // Everything but the match between the two: equal here means tied unless they fought.
         private List<Integer> key() {
@@ -79,9 +79,10 @@ final class ClassificationStandings {
         for (var person : people) {
             var tally = tally(person);
             tally.technical += score;
+            rivals.forEach(rival -> tally.scoredAgainst.merge(rival, score, Integer::sum));
             if (won) {
                 tally.wins++;
-                tally.beaten.addAll(rivals);
+                rivals.forEach(rival -> tally.winsAgainst.merge(rival, 1, Integer::sum));
                 tally.submissions += "SUBMISSION".equals(end) ? 1 : 0;
                 tally.superiorities += "SUPERIORITY".equals(end) ? 1 : 0;
             }
@@ -115,9 +116,9 @@ final class ClassificationStandings {
             if (block.size() == 2) {
                 var first = tally(person.apply(block.get(0)));
                 var second = tally(person.apply(block.get(1)));
-                var firstWon = first.beaten.contains(person.apply(block.get(1)));
-                var secondWon = second.beaten.contains(person.apply(block.get(0)));
-                if (firstWon != secondWon) {
+                var between = headToHead(first, second, person.apply(block.get(0)), person.apply(block.get(1)));
+                if (between != 0) {
+                    var firstWon = between > 0;
                     placed.add(new Placed<>(firstWon ? block.get(0) : block.get(1), position));
                     placed.add(new Placed<>(firstWon ? block.get(1) : block.get(0), position + 1));
                     continue;
@@ -126,6 +127,16 @@ final class ClassificationStandings {
             block.forEach(item -> placed.add(new Placed<>(item, position)));
         }
         return placed;
+    }
+
+    // Above 0 when the first did better against the second: wins between them, then points scored between them.
+    private static int headToHead(Tally first, Tally second, UUID firstId, UUID secondId) {
+        var wins = Integer.compare(
+                first.winsAgainst.getOrDefault(secondId, 0), second.winsAgainst.getOrDefault(firstId, 0));
+        return wins != 0
+                ? wins
+                : Integer.compare(
+                        first.scoredAgainst.getOrDefault(secondId, 0), second.scoredAgainst.getOrDefault(firstId, 0));
     }
 
     record Placed<T>(T item, int position) {}

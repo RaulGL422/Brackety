@@ -1824,6 +1824,14 @@ class AppLocalizationsEs extends AppLocalizations {
   String get categoryByTeams => 'Por equipos';
 
   @override
+  String categoryGroupSizes(int min, int max) {
+    return 'Grupos de $min a $max';
+  }
+
+  @override
+  String get categoryReturnLeg => 'Ida y vuelta';
+
+  @override
   String categoryGroupSize(int size) {
     return 'Grupos de $size';
   }

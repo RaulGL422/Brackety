@@ -76,7 +76,7 @@ class SportRulesTest extends EventApiTest {
     void aCategoryWithItsOwnLengthGivesItToItsMatches() throws Exception {
         call(put("/api/v1/events/" + eventId + "/categories").content("""
                         {"categories":[{"name":"U15 M -46 kg","minAge":14,"maxAge":15,"format":"INDIVIDUAL",
-                          "groupSize":4,"matchSeconds":240}]}"""), "club1")
+                          "matchSeconds":240}]}"""), "club1")
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].matchSeconds").value(240));
         call(get("/api/v1/events/" + eventId + "/settings"), "club1")

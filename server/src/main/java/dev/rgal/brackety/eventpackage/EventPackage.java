@@ -124,18 +124,28 @@ public record EventPackage(
             @NotBlank @Size(max = 254) String username,
             @NotNull EventRole role) {}
 
-    /** {@code teamSize}: null for an individual category. {@code matchSeconds}: null follows the modality. */
+    /**
+     * {@code teamSize}: null for an individual category. {@code matchSeconds}: null follows the modality. Group sizes
+     * and return leg: absent in files from before GR-5 (groups of 4, one leg).
+     */
     public record Category(
             @NotBlank @Size(max = 40) String name,
             @Min(0) @Max(120) int minAge,
             @Min(0) @Max(120) int maxAge,
             @NotNull EventCategory.Format format,
             @Min(2) @Max(5) Integer teamSize,
-            @Min(30) @Max(1200) Integer matchSeconds) {
+            @Min(30) @Max(1200) Integer matchSeconds,
+            @Min(2) @Max(8) Integer minGroupSize,
+            @Min(2) @Max(8) Integer maxGroupSize,
+            Boolean returnLeg) {
 
         EventCategory toCategory(UUID eventId) {
             var category = new EventCategory(eventId, name.strip(), minAge, maxAge, teamSize);
             category.setMatchSeconds(matchSeconds);
+            category.setGroups(
+                    minGroupSize == null ? EventCategory.GROUP_SIZE : minGroupSize,
+                    maxGroupSize == null ? EventCategory.GROUP_SIZE : maxGroupSize,
+                    Boolean.TRUE.equals(returnLeg));
             return category;
         }
     }
