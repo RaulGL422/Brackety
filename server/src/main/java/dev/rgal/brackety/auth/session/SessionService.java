@@ -28,9 +28,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class SessionService {
 
     public static final Duration REFRESH_TTL = Duration.ofDays(30);
-    // Two tabs, two app calls at once or a repeat after a lost answer are not a theft: within this time the
-    // repeat gets the same pair the first refresh issued (or a 401 if it can no longer be given).
+    // Two tabs or two app calls at once are not a theft: within this time a repeat whose new pair was already rotated
+    // gets a 401 but the session stays.
     static final Duration REUSE_GRACE = Duration.ofSeconds(10);
+    // A repeat after a lost answer (no network in the hall for a while, docs/04-testing.md, «Sesiones») is not a
+    // theft either: while the pair it issued was never used, for a whole competition day, it gets that same refresh
+    // token again with a new access token. Once the session moved on, a reuse is a theft and revokes it.
+    static final Duration LOST_ANSWER_GRACE = Duration.ofHours(12);
     public static final String EMAIL_VERIFIED_CLAIM = "email_verified";
     // Tells an access token from the other tokens signed with the same key (see ShortLivedTokens).
     public static final String PURPOSE_CLAIM = "purpose";
@@ -48,7 +52,7 @@ public class SessionService {
     private final JwtEncoder jwtEncoder;
     private final Clock clock;
     private final Duration accessTtl;
-    private final RecentRefreshes recent = new RecentRefreshes(REUSE_GRACE);
+    private final RecentRefreshes recent = new RecentRefreshes(LOST_ANSWER_GRACE);
 
     SessionService(
             RefreshTokenRepository refreshTokens,
@@ -89,8 +93,14 @@ public class SessionService {
         if (token.isRevoked()) {
             throw AuthException.invalidSession();
         }
-        if (token.isUsed() && token.wasUsedSince(now.minus(REUSE_GRACE))) {
-            return repeat(Sha256.hex(rawToken), token, now).orElseThrow(AuthException::invalidSession);
+        if (token.isUsed() && token.wasUsedSince(now.minus(LOST_ANSWER_GRACE))) {
+            var repeat = repeat(Sha256.hex(rawToken), token, now);
+            if (repeat.isPresent()) {
+                return repeat.get();
+            }
+            if (token.wasUsedSince(now.minus(REUSE_GRACE))) {
+                throw AuthException.invalidSession();
+            }
         }
         if (token.isUsed()) {
             refreshTokens.revokeFamily(token.getFamilyId(), now);
@@ -115,14 +125,13 @@ public class SessionService {
                         .findByTokenHash(Sha256.hex(issued.session().refreshToken()))
                         .filter(child -> !child.isUsed() && !child.isRevoked() && !child.isExpired(now))
                         .isPresent())
-                .filter(issued -> accounts.findById(rotated.getAccountId())
+                .flatMap(issued -> accounts.findById(rotated.getAccountId())
                         .filter(Account::isActive)
-                        .isPresent())
-                .map(issued -> {
-                    var s = issued.session();
-                    var left = accessTtl.minus(Duration.between(issued.at(), now));
-                    return new Session(s.accessToken(), left.toSeconds(), s.refreshToken(), s.emailVerified());
-                });
+                        .map(account -> new Session(
+                                accessToken(account, now),
+                                accessTtl.toSeconds(),
+                                issued.session().refreshToken(),
+                                account.isEmailVerified())));
     }
 
     @Transactional

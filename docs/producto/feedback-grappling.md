@@ -79,8 +79,10 @@ competición del 2026-12-20 (`competicion-2026-12-20.md`); objetivo de prueba in
 
 ## GR-8 · Batería del servidor endurecida
 - Reglas en `04-testing.md`, «Batería del servidor». Faltan: día completo por formato con incidentes, concurrencia,
-  sesiones de una fase entera (cubre GR-2), matriz de permisos de todos los endpoints, ataques y migración desde la
-  última release. Antes de la release del 20-12, al menos sesiones, día completo de torneo y matriz de permisos.
+  matriz de permisos de todos los endpoints, ataques y migración desde la última release. Antes de la release del
+  20-12, al menos día completo de torneo y matriz de permisos.
+- Sesiones hecho (`PhaseSessionsTest`): normal y por QR, 10 h con respuestas perdidas y 3 h sin red. Encontró un
+  fallo: un reintento pasados 10 s cerraba la sesión como robo; ahora vale 12 h mientras el par nuevo no se use.
 
 ## GR-9 · Accesibilidad y organización en lo que ya existe
 - Reglas duras en `07-diseno.md`. Se aplican a cada pantalla al tocarla (GR-1, GR-4) y en el repaso de Raul (GR-7).

@@ -236,7 +236,7 @@ class AuthControllerTest extends AuthIntegrationTest {
     }
 
     @Test
-    void aRepeatedRefreshGetsTheSamePairUntilTheGraceEndsAndThenIsUnauthorized() throws Exception {
+    void aRepeatedRefreshGetsTheSameTokenUntilTheSessionMovesOnAndThenIsUnauthorized() throws Exception {
         registerAna();
         var refresh = refreshTokenOf(login(null, "ana@example.test"));
         var body = "{\"refreshToken\":\"%s\"}".formatted(refresh);
@@ -249,6 +249,18 @@ class AuthControllerTest extends AuthIntegrationTest {
                         .content(body))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.refreshToken").value(issued));
+        // The answer was lost for a while: the same token still comes back.
+        clock.advance(Duration.ofMinutes(30));
+        mvc.perform(post("/api/v1/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.refreshToken").value(issued));
+        // Once the session moved on with it, the old token is a theft.
+        mvc.perform(post("/api/v1/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"refreshToken\":\"%s\"}".formatted(issued)))
+                .andExpect(status().isOk());
         clock.advance(Duration.ofSeconds(11));
         mvc.perform(post("/api/v1/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
