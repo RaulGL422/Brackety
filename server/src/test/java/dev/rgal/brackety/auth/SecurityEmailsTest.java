@@ -115,17 +115,19 @@ class SecurityEmailsTest extends AuthIntegrationTest {
     }
 
     @Test
-    void refreshReuseAfterTheGraceWarnsTheOwner() {
+    void refreshReuseOnceTheSessionMovedOnWarnsTheOwner() {
         auth.register(registration(ANA));
         var first = auth.login(ANA, PASSWORD, IP);
-        sessions.refresh(first.refreshToken());
+        var second = sessions.refresh(first.refreshToken());
         emails.reset();
 
-        clock.advance(Duration.ofSeconds(10));
+        // A lost answer repeated is no theft.
+        clock.advance(Duration.ofMinutes(10));
         sessions.refresh(first.refreshToken());
         assertThat(emails.sent()).isEmpty();
 
-        clock.advance(Duration.ofSeconds(1));
+        sessions.refresh(second.refreshToken());
+        clock.advance(Duration.ofSeconds(11));
         assertThatThrownBy(() -> sessions.refresh(first.refreshToken()));
         assertThat(emails.sentTo(ANA))
                 .extracting(Email::subject)

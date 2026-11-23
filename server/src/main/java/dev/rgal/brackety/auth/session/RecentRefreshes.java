@@ -8,8 +8,8 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * The pair each refresh issued, by the hash of the token it rotated, kept in memory only for the reuse grace: a
- * client that lost the answer (flaky wifi) and repeats the refresh gets the same pair. The database only has hashes,
+ * The pair each refresh issued, by the hash of the token it rotated, kept in memory only for the lost-answer grace:
+ * a client that lost the answer (flaky wifi) and repeats the refresh gets the same refresh token. The database only has hashes,
  * so the new refresh token cannot be read back from it; a restart forgets this and the repeat gets a 401 again.
  */
 class RecentRefreshes {

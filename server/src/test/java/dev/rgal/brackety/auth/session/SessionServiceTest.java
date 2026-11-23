@@ -130,26 +130,27 @@ class SessionServiceTest extends AuthIntegrationTest {
     }
 
     @Test
-    void reusingAUsedTokenRevokesTheWholeFamily() {
+    void reusingATokenOnceTheSessionMovedOnRevokesTheWholeFamily() {
         var second = sessions.refresh(first.refreshToken());
+        var third = sessions.refresh(second.refreshToken());
         clock.advance(SessionService.REUSE_GRACE.plusSeconds(1));
 
         assertUnauthorized(() -> sessions.refresh(first.refreshToken()));
 
-        assertUnauthorized(() -> sessions.refresh(second.refreshToken()));
+        assertUnauthorized(() -> sessions.refresh(third.refreshToken()));
         assertThat(count("refresh_token where revoked_at is null")).isZero();
     }
 
     @Test
-    void aRepeatWithinTheGraceGetsTheSamePairWithoutRevokingTheSession() {
+    void aRepeatWithinTheGraceGetsTheSameRefreshTokenWithoutRevokingTheSession() {
         var second = sessions.refresh(first.refreshToken());
         clock.advance(SessionService.REUSE_GRACE);
 
         var repeat = sessions.refresh(first.refreshToken());
 
-        assertThat(repeat.accessToken()).isEqualTo(second.accessToken());
         assertThat(repeat.refreshToken()).isEqualTo(second.refreshToken());
-        assertThat(repeat.expiresIn()).isEqualTo(second.expiresIn() - SessionService.REUSE_GRACE.toSeconds());
+        assertThat(repeat.accessToken()).isNotBlank();
+        assertThat(repeat.expiresIn()).isEqualTo(second.expiresIn());
         assertThat(sessions.refresh(first.refreshToken()).refreshToken()).isEqualTo(second.refreshToken());
         assertThat(count("refresh_token")).isEqualTo(2);
         assertThat(count("refresh_token where revoked_at is not null")).isZero();
@@ -178,10 +179,23 @@ class SessionServiceTest extends AuthIntegrationTest {
     }
 
     @Test
-    void aRepeatAfterTheGraceRevokesTheFamilyAsAnyReuse() {
+    void aRepeatAfterALostAnswerKeepsTheSessionAllDayWhileItsPairWasNeverUsed() {
+        var second = sessions.refresh(first.refreshToken());
+        // No network in the hall for two hours: the answer never arrived and the app tries again with the old token.
+        clock.advance(Duration.ofHours(2));
+
+        var repeat = sessions.refresh(first.refreshToken());
+
+        assertThat(repeat.refreshToken()).isEqualTo(second.refreshToken());
+        assertThat(count("refresh_token where revoked_at is not null")).isZero();
+        assertThat(emails.sentTo("ana@example.test")).hasSize(1);
+        assertThat(sessions.refresh(repeat.refreshToken()).accessToken()).isNotBlank();
+    }
+
+    @Test
+    void aRepeatAfterTheLostAnswerGraceRevokesTheFamilyAsAnyReuse() {
         sessions.refresh(first.refreshToken());
-        sessions.refresh(first.refreshToken());
-        clock.advance(SessionService.REUSE_GRACE.plusSeconds(1));
+        clock.advance(SessionService.LOST_ANSWER_GRACE.plusSeconds(1));
 
         assertUnauthorized(() -> sessions.refresh(first.refreshToken()));
 
@@ -191,7 +205,7 @@ class SessionServiceTest extends AuthIntegrationTest {
     @Test
     void reuseDoesNotTouchOtherSessions() {
         var other = auth.login("ana@example.test", PASSWORD, "203.0.113.10");
-        sessions.refresh(first.refreshToken());
+        sessions.refresh(sessions.refresh(first.refreshToken()).refreshToken());
         clock.advance(SessionService.REUSE_GRACE.plusSeconds(1));
 
         assertUnauthorized(() -> sessions.refresh(first.refreshToken()));
