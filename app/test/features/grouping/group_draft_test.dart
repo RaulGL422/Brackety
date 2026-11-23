@@ -264,4 +264,42 @@ void main() {
     expect(draft.canToggleGhost, isFalse);
     expect(draft.setGhostMode(true).canToggleGhost, isTrue);
   });
+
+  group('a size other than 4 (GR-5)', () {
+    test('a group of 3 is complete with 3', () {
+      final draft = pick(const DraftGroup(size: 3), ['a', 'b', 'c', 'd']);
+      expect(draft.members, ['a', 'b', 'c']);
+      expect(draft.isComplete, isTrue);
+    });
+
+    test(
+      'in a group of 5 with wildcards, the 5th after 4 real is the wildcard',
+      () {
+        final draft = pick(const DraftGroup(size: 5).setGhostMode(true), [
+          'a',
+          'b',
+          'c',
+          'd',
+          'e',
+        ]);
+        expect(draft.members, ['a', 'b', 'c', 'd']);
+        expect(draft.ghosts, ['e']);
+        expect(draft.isComplete, isTrue);
+      },
+    );
+
+    test('it never shrinks below who is picked', () {
+      final draft = pick(const DraftGroup(size: 5), ['a', 'b', 'c', 'd']);
+      expect(draft.canResize(3), isFalse);
+      expect(draft.withSize(3), same(draft));
+      expect(draft.withSize(4).isComplete, isTrue);
+    });
+
+    test('a fresh draft fits the category at its largest', () {
+      expect(const DraftGroup().fitTo(3, 5).size, 5);
+      expect(const DraftGroup(size: 3).fitTo(3, 5).size, 3);
+      final four = pick(const DraftGroup(size: 5), ['a', 'b', 'c', 'd']);
+      expect(four.fitTo(2, 3), same(four));
+    });
+  });
 }

@@ -344,11 +344,17 @@ class _TeamGroups extends ConsumerStatefulWidget {
 }
 
 class _TeamGroupsState extends ConsumerState<_TeamGroups> {
-  late var _group = _fresh();
+  var _draft = const DraftGroup(ofTeams: true);
+  var _sizes = (4, 4);
   String? _matId;
+
+  // Always within the category's sizes: a fresh draft takes the largest.
+  DraftGroup get _group => _draft.fitTo(_sizes.$1, _sizes.$2);
+  set _group(DraftGroup group) => _draft = group;
   var _busy = false;
 
-  DraftGroup _fresh() => const DraftGroup(ofTeams: true);
+  // Keeps the size: a helper usually makes several groups alike.
+  DraftGroup _fresh() => DraftGroup(ofTeams: true, size: _group.size);
 
   void _change(DraftGroup Function(DraftGroup) change) =>
       setState(() => _group = change(_group));
@@ -597,6 +603,7 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
       }
     });
     final teams = ref.watch(categoryTeamsProvider(key));
+    _sizes = watchGroupSizes(ref, key.eventId, key.categoryId);
     final groups = can.contains(EventPermission.groups);
     final list = AsyncView(
       value: teams,
@@ -645,6 +652,8 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
             onChanged: _change,
             onMatChanged: (id) => setState(() => _matId = id),
             onCreate: _create,
+            minSize: _sizes.$1,
+            maxSize: _sizes.$2,
             labelOf: (id) {
               final team = teams.value?.where((t) => t.id == id).firstOrNull;
               return team == null ? '' : l10n.teamName(team.number);
@@ -699,7 +708,13 @@ class _TeamTile extends StatelessWidget {
     return ListTile(
       enabled: state != PickState.unavailable,
       onTap: onTap,
-      leading: onTap == null ? null : PickMark(state: state, onTap: onTap!),
+      leading: onTap == null
+          ? null
+          : PickMark(
+              state: state,
+              onTap: onTap!,
+              label: l10n.teamName(team.number),
+            ),
       title: Text(l10n.teamName(team.number)),
       subtitle: Text(
         [

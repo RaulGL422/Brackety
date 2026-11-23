@@ -2403,6 +2403,14 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get draftSize => 'Size';
+
+  @override
+  String draftSizeOf(int size) {
+    return 'Group of $size';
+  }
+
+  @override
   String get draftTitle => 'New group';
 
   @override

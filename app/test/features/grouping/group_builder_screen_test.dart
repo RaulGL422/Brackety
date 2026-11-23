@@ -247,7 +247,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // On a phone the list starts below the group's slots: Zoe is further down.
-      final list = find.byType(Scrollable).last;
+      final list = find.byType(Scrollable).first;
       Future<void> toTop() async {
         await tester.drag(list, const Offset(0, 2000));
         await tester.pumpAndSettle();
@@ -493,7 +493,7 @@ void main() {
         matching: find.text(label),
       );
       // On a phone the group's panel leaves room for a few rows: from the top, scroll to each one.
-      final list = find.byType(Scrollable).last;
+      final list = find.byType(Scrollable).first;
       Future<void> tapName(String name) async {
         await tester.drag(list, const Offset(0, 2000));
         await tester.pumpAndSettle();
@@ -524,6 +524,98 @@ void main() {
       expect(group.ghosts, ['p4']);
     });
   }
+
+  // GR-5: a category of 3 to 5 lets the helper pick the size first; it starts at the largest.
+  Future<FakeGroupingRepository> pumpRange(
+    WidgetTester tester,
+    Size size,
+  ) async {
+    tester.view.physicalSize = size;
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final repository = FakeGroupingRepository(
+      participants,
+      summaries: const [
+        CategorySummary(
+          id: 'c1',
+          name: '7-8',
+          participants: 6,
+          grouped: 1,
+          minGroupSize: 3,
+          maxGroupSize: 5,
+        ),
+      ],
+    );
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...sessionOverrides(FakeAuthApi(signedIn: true)),
+          groupingRepositoryProvider.overrideWithValue(repository),
+          fakeMatsOverride,
+          clubEventsOverride,
+        ],
+        child: const BracketyApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    pushRoute(tester, '/events/e1/categories/c1');
+    await tester.pumpAndSettle();
+    return repository;
+  }
+
+  for (final MapEntry(key: device, value: size) in sizes.entries) {
+    testWidgets('a category with a size range picks the size on $device', (
+      tester,
+    ) async {
+      final repository = await pumpRange(tester, size);
+
+      expect(find.text('Slot 5'), findsOneWidget);
+      expect(
+        find.textContaining('5 to go', findRichText: true),
+        findsOneWidget,
+      );
+      await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+      await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+
+      final list = find.byType(Scrollable).first;
+      for (final name in ['Ana', 'Bea', 'Carla', 'Diego']) {
+        await tester.scrollUntilVisible(
+          find.text('$name Prueba'),
+          100,
+          scrollable: list,
+        );
+        await tester.tap(find.text('$name Prueba'));
+        await tester.pump();
+      }
+      // Four picked: a group of 3 would drop one, so it stays off until one comes out.
+      final three = find.widgetWithText(ChoiceChip, '3');
+      expect(tester.widget<ChoiceChip>(three).onSelected, isNull);
+      await tester.tap(find.text('Diego P.'));
+      await tester.pump();
+      await tester.tap(three);
+      await tester.pump();
+
+      expect(find.text('Slot 4'), findsNothing);
+      expect(
+        find.textContaining('Complete', findRichText: true),
+        findsOneWidget,
+      );
+      await tester.tap(find.text('Create group'));
+      await tester.pumpAndSettle();
+      expect(repository.created.single.members, ['p0', 'p1', 'p2']);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets('a group of 5 fits a phone with text at 200 %', (tester) async {
+    await pumpRange(tester, sizes['phone']!);
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Slot 5'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('the slots fill as the helper picks and a tap empties one', (
     tester,

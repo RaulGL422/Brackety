@@ -10,7 +10,21 @@ import '../../mat/ui/mat_label.dart';
 import '../../phase/ui/phase_bar.dart';
 import '../data/grouping_repository.dart';
 import '../state/group_draft.dart';
+import '../state/grouping_providers.dart';
 import '../state/helper_queue.dart';
+
+/// The group sizes of a category (GR-5), from the categories list; 4 to 4 until it loads. Watching it
+/// rebuilds the screen when the club changes them.
+(int, int) watchGroupSizes(WidgetRef ref, String eventId, String categoryId) {
+  final category = ref
+      .watch(categoriesProvider(eventId))
+      .value
+      ?.where((c) => c.id == categoryId)
+      .firstOrNull;
+  return category == null
+      ? (4, 4)
+      : (category.minGroupSize, category.maxGroupSize);
+}
 
 /// Sends the group to [matId], or to the mat the server picks if null, and shows which one. Calls
 /// [refresh] after creating it or on a conflict (someone else took a participant or team, or the

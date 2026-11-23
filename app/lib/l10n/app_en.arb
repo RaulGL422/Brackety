@@ -791,6 +791,8 @@
   "matLocked": "Cannot open yet",
   "needsGuardian": "Guardian missing",
   "settingsRemoveMatConfirm": "Mat {number} is removed; its referee is no longer assigned.",
+  "draftSize": "Size",
+  "draftSizeOf": "Group of {size}",
   "draftTitle": "New group",
   "draftReady": "Complete",
   "draftMissing": "{count} to go",

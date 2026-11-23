@@ -47,9 +47,16 @@ final fakeMatsOverride = matsOverviewProvider.overrideWith(
 );
 
 class FakeGroupingRepository implements GroupingRepository {
-  FakeGroupingRepository(this.list, {this.teamList = const []});
+  FakeGroupingRepository(
+    this.list, {
+    this.teamList = const [],
+    this.summaries = const [],
+  });
 
   final List<CategoryParticipant> list;
+
+  /// The event's categories, with their group sizes.
+  final List<CategorySummary> summaries;
   final List<Team> teamList;
   final created = <DraftGroup>[];
   final createdOnMat = <String?>[];
@@ -68,7 +75,7 @@ class FakeGroupingRepository implements GroupingRepository {
   ) async => list;
 
   @override
-  Future<List<CategorySummary>> categories(String eventId) async => [];
+  Future<List<CategorySummary>> categories(String eventId) async => summaries;
 
   final measured = <(String, int?, double?)>[];
 

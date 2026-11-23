@@ -1300,6 +1300,15 @@
       }
     }
   },
+  "draftSize": "Tamaño",
+  "draftSizeOf": "Grupo de {size}",
+  "@draftSizeOf": {
+    "placeholders": {
+      "size": {
+        "type": "int"
+      }
+    }
+  },
   "draftTitle": "Grupo nuevo",
   "draftReady": "Completo",
   "draftMissing": "{count, plural, =1{Falta 1} other{Faltan {count}}}",
