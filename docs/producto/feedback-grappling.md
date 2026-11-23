@@ -50,14 +50,15 @@ competición del 2026-12-20 (`competicion-2026-12-20.md`); objetivo de prueba in
 - Ver de un vistazo qué grupos hay en cada tapiz con **el nombre de cada integrante**.
 - Mover un grupo entero a otro tapiz de forma mucho más fácil desde el panel del club y también desde el árbitro.
 - Forma: **arrastrar** el grupo de un tapiz a otro (Raul, 2026-11-22). Sigue el criterio de GR-7.
-- Por concretar: si el árbitro mueve con su permiso actual o con «Panel de control».
+- El árbitro mueve con un permiso extra que le da el club (Raul, 2026-11-23).
 
 ## GR-5 · Grupos de distintos tamaños
 - Decidido el 2026-11-21 (`decisiones.md`, grupos nórdicos de tamaño libre) y sin hacer: rango por categoría, ida y
   vuelta opcional, hasta tamaño − 1 comodines.
 
 ## GR-6 · Configuración pedida que no se aplicó
-- Raul: «alguna configuración que te pedí». Por concretar cuál.
+- Raul (2026-11-23): grupos no solo de 4 (es GR-5) y fin a 15 puntos de diferencia. Este existe en Ajustes y
+  en el marcador desde la #165: por concretar qué falló (`pendientes.md`).
 
 ## GR-7 · Ambiente de la app: menos datos, más arrastrar
 - Raul (2026-11-22): hoy da sensación de «muchísimos datos, opciones descontroladas y poco sentido».
@@ -74,10 +75,22 @@ competición del 2026-12-20 (`competicion-2026-12-20.md`); objetivo de prueba in
 - Reglas duras en `07-diseno.md`. Se aplican a cada pantalla al tocarla (GR-1, GR-4) y en el repaso de Raul (GR-7).
 - Una ayuda de test en `brackety_core` que pase las guías de Flutter a 3 tamaños y texto al 200 %.
 
-## Orden propuesto
-1. GR-3 (pequeño, solo servidor y mensaje) y GR-2 (sin sesión estable no se puede arbitrar).
-2. GR-1 marcador.
-3. GR-5 grupos de tamaño libre y GR-4 grupos visibles.
+## GR-10 · PDF del reglamento
+- En la web no sube (Raul, 2026-11-23). En Android elegir archivo no existe (`file_upload_stub.dart`) y el error
+  se pierde sin aviso.
+
+## GR-11 · Ajustes con botón Guardar
+- Un tapiz añadido no seguía al salir y entrar, sin mensaje: el guardado automático se saltaba todo si un
+  campo no era válido. Ahora botón Guardar, campo nombrado y aviso al salir. Hecho.
+- Puntuaciones desborda en móvil con texto al 200 % (GR-9).
+
+## GR-12 · Asistente al crear un evento
+- Al crear un evento, además del deporte, configurarlo paso a paso. Pantalla nueva: los pasos, con Raul.
+
+## Orden (Raul, 2026-11-23)
+1. Primero lo interno que falla: GR-11, GR-10, GR-2, GR-6, GR-5, GR-4.
+2. Pantallas con Raul, una a una, aprobadas al 100 %: GR-1 (árbitro) la primera, GR-12, GR-7. Claude avisa
+   cuando toca una.
 4. Competición del 20-12: 3 modalidades seguidas con los mismos grupos (esperando sus reglas).
 
 ## Estado

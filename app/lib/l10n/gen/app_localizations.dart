@@ -2276,6 +2276,36 @@ abstract class AppLocalizations {
   /// **'Árbitro'**
   String get settingsReferee;
 
+  /// No description provided for @settingsUnsaved.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambios sin guardar'**
+  String get settingsUnsaved;
+
+  /// No description provided for @settingsDiscard.
+  ///
+  /// In es, this message translates to:
+  /// **'Descartar'**
+  String get settingsDiscard;
+
+  /// No description provided for @settingsFixFields.
+  ///
+  /// In es, this message translates to:
+  /// **'No se ha guardado. Revisa: {fields}.'**
+  String settingsFixFields(String fields);
+
+  /// No description provided for @settingsLeaveUnsaved.
+  ///
+  /// In es, this message translates to:
+  /// **'Hay cambios en Ajustes sin guardar. Si sales, se pierden.'**
+  String get settingsLeaveUnsaved;
+
+  /// No description provided for @settingsLeaveWithoutSaving.
+  ///
+  /// In es, this message translates to:
+  /// **'Salir sin guardar'**
+  String get settingsLeaveWithoutSaving;
+
   /// No description provided for @categoryRange.
   ///
   /// In es, this message translates to:
