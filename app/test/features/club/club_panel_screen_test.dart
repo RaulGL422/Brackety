@@ -238,7 +238,15 @@ void main() {
     attendancePoints: 10,
     sportWarningReasons: const ['Ataque de pique', 'Exceso de potencia'],
     categories: const [
-      EventCategory(id: 'c1', name: '4-7', minAge: 4, maxAge: 7),
+      EventCategory(
+        id: 'c1',
+        name: '4-7',
+        minAge: 4,
+        maxAge: 7,
+        minGroupSize: 3,
+        maxGroupSize: 5,
+        returnLeg: true,
+      ),
       EventCategory(id: 'c2', name: '8-11', minAge: 8, maxAge: 11),
       EventCategory(
         id: 'c3',
@@ -1291,7 +1299,11 @@ void main() {
       await openCategories(tester);
 
       expect(find.text('Teams of 2 or 3 · Groups of 4'), findsOneWidget);
-      expect(find.text('Individual · Groups of 4'), findsNWidgets(2));
+      expect(find.text('Individual · Groups of 4'), findsOneWidget);
+      expect(
+        find.text('Individual · Groups of 3 to 5 · Home and away'),
+        findsOneWidget,
+      );
       await tester.tap(find.text('Add category'));
       await tester.pumpAndSettle();
       await tester.enterText(
@@ -1341,6 +1353,31 @@ void main() {
     expect(saved.last.matchLength, const Duration(minutes: 4));
     expect(saved.last.toJson()['matchSeconds'], 240);
     expect(find.textContaining('4:00 per match'), findsOneWidget);
+  });
+
+  // GR-5: the sizes the server keeps survive an edit made without them on screen.
+  testWidgets('editing a category keeps its group sizes and return leg', (
+    tester,
+  ) async {
+    final repository = FakeClubRepository(settings);
+    await pumpPanel(tester, const Size(800, 1280), repository: repository);
+    await openCategories(tester);
+    expect(
+      find.textContaining('Groups of 3 to 5 · Home and away'),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.textContaining('4-7'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.widgetWithText(TextFormField, 'Name'), 'Mini');
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+
+    final json = repository.savedCategories.single.first.toJson();
+    expect(json['name'], 'Mini');
+    expect(json['minGroupSize'], 3);
+    expect(json['maxGroupSize'], 5);
+    expect(json['returnLeg'], true);
   });
 
   testWidgets('a category with ages the wrong way round is not saved', (
