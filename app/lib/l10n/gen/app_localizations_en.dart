@@ -45,6 +45,56 @@ class AppLocalizationsEn extends AppLocalizations {
   String get controlMenu => 'Change';
 
   @override
+  String get permissionMoveGroups => 'Move groups between mats';
+
+  @override
+  String get matGroupsTitle => 'Groups by mat';
+
+  @override
+  String matGroupsFinished(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count finished',
+      one: '1 finished',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get matGroupsEmpty => 'No groups left to finish';
+
+  @override
+  String matGroupsMoveGroup(int number) {
+    return 'Move group $number';
+  }
+
+  @override
+  String get matGroupsInProgress => 'Fighting: it cannot move';
+
+  @override
+  String matGroupsProgress(int played, int matches) {
+    return '$played of $matches';
+  }
+
+  @override
+  String get matGroupsDisabled => 'Disabled';
+
+  @override
+  String matGroupsDropHere(int number) {
+    return 'Drop here to move it to mat $number';
+  }
+
+  @override
+  String matGroupsGroup(int number, String category) {
+    return 'Group $number · $category';
+  }
+
+  @override
+  String get matGroupsDragHint =>
+      'Press and hold a group and drag it to another mat, or use “Move to…”.';
+
+  @override
   String get controlDone => 'Done';
 
   @override

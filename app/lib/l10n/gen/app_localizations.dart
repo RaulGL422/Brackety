@@ -158,6 +158,72 @@ abstract class AppLocalizations {
   /// **'Cambiar'**
   String get controlMenu;
 
+  /// No description provided for @permissionMoveGroups.
+  ///
+  /// In es, this message translates to:
+  /// **'Mover grupos entre tapices'**
+  String get permissionMoveGroups;
+
+  /// No description provided for @matGroupsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Grupos por tapiz'**
+  String get matGroupsTitle;
+
+  /// No description provided for @matGroupsFinished.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 terminado} other{{count} terminados}}'**
+  String matGroupsFinished(int count);
+
+  /// No description provided for @matGroupsEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin grupos por acabar'**
+  String get matGroupsEmpty;
+
+  /// No description provided for @matGroupsMoveGroup.
+  ///
+  /// In es, this message translates to:
+  /// **'Mover el grupo {number}'**
+  String matGroupsMoveGroup(int number);
+
+  /// No description provided for @matGroupsInProgress.
+  ///
+  /// In es, this message translates to:
+  /// **'En combate: no se puede mover'**
+  String get matGroupsInProgress;
+
+  /// No description provided for @matGroupsProgress.
+  ///
+  /// In es, this message translates to:
+  /// **'{played} de {matches}'**
+  String matGroupsProgress(int played, int matches);
+
+  /// No description provided for @matGroupsDisabled.
+  ///
+  /// In es, this message translates to:
+  /// **'Inhabilitado'**
+  String get matGroupsDisabled;
+
+  /// No description provided for @matGroupsDropHere.
+  ///
+  /// In es, this message translates to:
+  /// **'Suelta aquí para moverlo al tapiz {number}'**
+  String matGroupsDropHere(int number);
+
+  /// No description provided for @matGroupsGroup.
+  ///
+  /// In es, this message translates to:
+  /// **'Grupo {number} · {category}'**
+  String matGroupsGroup(int number, String category);
+
+  /// No description provided for @matGroupsDragHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Mantén pulsado un grupo y arrástralo a otro tapiz, o usa «Mover a…».'**
+  String get matGroupsDragHint;
+
   /// No description provided for @controlDone.
   ///
   /// In es, this message translates to:

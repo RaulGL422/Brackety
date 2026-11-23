@@ -11,6 +11,58 @@
   "matPlannedAt": "Previsto hacia las {time}",
   "@matPlannedAt": {"placeholders": {"time": {"type": "String"}}},
   "controlMenu": "Cambiar",
+  "permissionMoveGroups": "Mover grupos entre tapices",
+  "matGroupsTitle": "Grupos por tapiz",
+  "matGroupsFinished": "{count, plural, =1{1 terminado} other{{count} terminados}}",
+  "@matGroupsFinished": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "matGroupsEmpty": "Sin grupos por acabar",
+  "matGroupsMoveGroup": "Mover el grupo {number}",
+  "@matGroupsMoveGroup": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "matGroupsInProgress": "En combate: no se puede mover",
+  "matGroupsProgress": "{played} de {matches}",
+  "@matGroupsProgress": {
+    "placeholders": {
+      "played": {
+        "type": "int"
+      },
+      "matches": {
+        "type": "int"
+      }
+    }
+  },
+  "matGroupsDisabled": "Inhabilitado",
+  "matGroupsDropHere": "Suelta aquí para moverlo al tapiz {number}",
+  "@matGroupsDropHere": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "matGroupsGroup": "Grupo {number} · {category}",
+  "@matGroupsGroup": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "matGroupsDragHint": "Mantén pulsado un grupo y arrástralo a otro tapiz, o usa «Mover a…».",
   "controlDone": "Hecho",
   "controlError": "No se pudo hacer el cambio. Recarga y vuelve a intentarlo.",
   "controlMatchInProgress": "Hay un combate de este grupo en curso: espera a que acabe.",

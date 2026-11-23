@@ -45,6 +45,56 @@ class AppLocalizationsEs extends AppLocalizations {
   String get controlMenu => 'Cambiar';
 
   @override
+  String get permissionMoveGroups => 'Mover grupos entre tapices';
+
+  @override
+  String get matGroupsTitle => 'Grupos por tapiz';
+
+  @override
+  String matGroupsFinished(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count terminados',
+      one: '1 terminado',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get matGroupsEmpty => 'Sin grupos por acabar';
+
+  @override
+  String matGroupsMoveGroup(int number) {
+    return 'Mover el grupo $number';
+  }
+
+  @override
+  String get matGroupsInProgress => 'En combate: no se puede mover';
+
+  @override
+  String matGroupsProgress(int played, int matches) {
+    return '$played de $matches';
+  }
+
+  @override
+  String get matGroupsDisabled => 'Inhabilitado';
+
+  @override
+  String matGroupsDropHere(int number) {
+    return 'Suelta aquí para moverlo al tapiz $number';
+  }
+
+  @override
+  String matGroupsGroup(int number, String category) {
+    return 'Grupo $number · $category';
+  }
+
+  @override
+  String get matGroupsDragHint =>
+      'Mantén pulsado un grupo y arrástralo a otro tapiz, o usa «Mover a…».';
+
+  @override
   String get controlDone => 'Hecho';
 
   @override

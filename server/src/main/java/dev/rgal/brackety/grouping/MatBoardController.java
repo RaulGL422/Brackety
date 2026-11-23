@@ -4,6 +4,7 @@ import dev.rgal.brackety.auth.RequiresVerifiedEmail;
 import dev.rgal.brackety.common.CurrentAccount;
 import dev.rgal.brackety.grouping.dto.ControlRequests;
 import dev.rgal.brackety.grouping.dto.MatBoardResponse;
+import dev.rgal.brackety.grouping.dto.MatGroups;
 import dev.rgal.brackety.grouping.dto.MatOverview;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -26,10 +27,18 @@ class MatBoardController {
 
     private final MatBoardService boards;
     private final MatchControlService control;
+    private final MatGroupsService matGroups;
 
-    MatBoardController(MatBoardService boards, MatchControlService control) {
+    MatBoardController(MatBoardService boards, MatchControlService control, MatGroupsService matGroups) {
         this.boards = boards;
         this.control = control;
+        this.matGroups = matGroups;
+    }
+
+    /** Every mat with its groups still to finish and who is in them (GR-4). */
+    @GetMapping("/events/{eventId}/mat-groups")
+    List<MatGroups> matGroups(@PathVariable UUID eventId, @AuthenticationPrincipal Jwt jwt) {
+        return matGroups.list(eventId, CurrentAccount.id(jwt));
     }
 
     /** The referee sends one of their mat's pending matches to another mat (MatchControlService). */

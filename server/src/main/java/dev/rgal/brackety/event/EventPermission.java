@@ -15,7 +15,12 @@ public enum EventPermission {
     CONTROL,
     REVIEWS,
     DEVICE_IMPORT,
-    PARTICIPANTS;
+    PARTICIPANTS,
+    /**
+     * Sees the groups of every mat and moves a whole group to another, without the rest of the control panel (GR-4:
+     * a referee the club trusts with it).
+     */
+    MOVE_GROUPS;
 
     /** Sees every mat and match: the control panel, the reviews or plain viewing. */
     public static boolean watchesMats(Set<EventPermission> granted) {

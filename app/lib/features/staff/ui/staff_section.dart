@@ -161,6 +161,7 @@ String permissionName(AppLocalizations l10n, EventPermission p) => switch (p) {
   EventPermission.reviews => l10n.permissionReviews,
   EventPermission.deviceImport => l10n.permissionDeviceImport,
   EventPermission.participants => l10n.permissionParticipants,
+  EventPermission.moveGroups => l10n.permissionMoveGroups,
 };
 
 /// What a helper or referee may do in the event (F1-7 C): the club ticks it here.

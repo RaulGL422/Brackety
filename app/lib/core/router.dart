@@ -13,6 +13,7 @@ import '../features/auth/ui/reset_password_screen.dart';
 import '../features/auth/ui/settings_screen.dart';
 import '../features/auth/ui/verify_email_screen.dart';
 import '../features/club/ui/club_panel_screen.dart';
+import '../features/control/mat_groups_screen.dart';
 import '../features/events/ui/events_screen.dart';
 import '../features/grouping/ui/categories_screen.dart';
 import '../features/grouping/ui/group_builder_screen.dart';
@@ -203,6 +204,11 @@ final routerProvider = Provider<GoRouter>((ref) {
           key: ValueKey(state.pathParameters['eventId']),
           eventId: state.pathParameters['eventId']!,
         ),
+      ),
+      GoRoute(
+        path: '/events/:eventId/mat-groups',
+        builder: (_, state) =>
+            MatGroupsScreen(eventId: state.pathParameters['eventId']!),
       ),
       GoRoute(
         path: '/club/mats/:matId',

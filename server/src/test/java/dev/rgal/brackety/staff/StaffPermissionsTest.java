@@ -23,7 +23,7 @@ class StaffPermissionsTest extends EventApiTest {
         call(get("/api/v1/events"), "arbitro1")
                 .andExpect(jsonPath("$[0].permissions[0]").value("OWN_MAT"));
         call(get("/api/v1/events"), "club1")
-                .andExpect(jsonPath("$[0].permissions.length()").value(10));
+                .andExpect(jsonPath("$[0].permissions.length()").value(11));
 
         call(get(mats()), "ayudante1").andExpect(status().isOk());
         call(get(participants()), "ayudante1").andExpect(status().isForbidden());
