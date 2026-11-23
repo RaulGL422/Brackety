@@ -3212,7 +3212,22 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get qrAccessSectionHint =>
-      'Ayudantes y árbitros sin cuenta. Cada QR sirve una vez y para un solo móvil: si cambia de móvil, crea uno nuevo. Al terminar la fase dejan de funcionar.';
+      'Ayudantes y árbitros sin cuenta. Cada QR sirve una vez; si se le cierra la sesión, vuelve a entrar con su usuario y contraseña. Al terminar la fase dejan de funcionar; la fase que crees antes de terminarla se los queda.';
+
+  @override
+  String get qrAccessSignInLabel => 'Usuario';
+
+  @override
+  String get qrAccessPasswordLabel => 'Contraseña';
+
+  @override
+  String get qrAccessCredentialsHint =>
+      'Si se le cierra la sesión, que entre con estos datos en «Iniciar sesión». Apúntalos: la contraseña solo se ve ahora.';
+
+  @override
+  String qrAccessReplacesReferee(int mat, String name) {
+    return 'El tapiz $mat lo tiene $name. Con un QR nuevo, $name deja el tapiz.';
+  }
 
   @override
   String qrAccessMatsWithoutReferee(String mats) {

@@ -14,17 +14,20 @@ class _FakeAccesses extends Fake implements TemporaryAccessRepository {
   final created = <(String, StaffRole, int?)>[];
   var signedIn = false;
 
-  TemporaryAccess _access(String name, {String? link}) => TemporaryAccess(
-    id: 'a1',
-    accountId: 'acc1',
-    name: name,
-    role: StaffRole.referee,
-    mat: 2,
-    waiting: !signedIn,
-    ended: false,
-    signedInAt: signedIn ? DateTime.utc(2027, 5, 8, 9, 30) : null,
-    link: link,
-  );
+  TemporaryAccess _access(String name, {String? link, String? password}) =>
+      TemporaryAccess(
+        id: 'a1',
+        accountId: 'acc1',
+        name: name,
+        role: StaffRole.referee,
+        mat: 2,
+        waiting: !signedIn,
+        ended: false,
+        signedInAt: signedIn ? DateTime.utc(2027, 5, 8, 9, 30) : null,
+        link: link,
+        signIn: 'qr-k3f9a2',
+        password: password,
+      );
 
   @override
   Future<TemporaryAccess> create(
@@ -34,7 +37,11 @@ class _FakeAccesses extends Fake implements TemporaryAccessRepository {
     int? mat,
   }) async {
     created.add((name, role, mat));
-    return _access(name, link: 'https://brackety.example/qr?code=abc');
+    return _access(
+      name,
+      link: 'https://brackety.example/qr?code=abc',
+      password: 'mn4pq7rs',
+    );
   }
 
   @override
@@ -81,7 +88,7 @@ void main() {
 
   for (final MapEntry(key: device, value: size) in sizes.entries) {
     testWidgets(
-      'the club types a name, shows the QR and hears when they are in on $device',
+      'the club shows the QR with sign-in and password and hears when they are in on $device',
       (tester) async {
         final accesses = await open(
           tester,
@@ -100,19 +107,56 @@ void main() {
         expect(accesses.created.single, ('Juan Pérez', StaffRole.referee, 2));
         expect(find.byType(QrImageView), findsOneWidget);
         expect(find.text('Waiting for them to sign in…'), findsOneWidget);
+        expect(find.text('qr-k3f9a2'), findsOneWidget);
+        expect(find.text('mn4pq7rs'), findsOneWidget);
         expect(tester.takeException(), isNull);
 
-        // Scanned: the next check confirms it and the QR goes away.
+        // Scanned: the next check confirms it; the password stays to write it down.
         accesses.signedIn = true;
         await tester.pump(const Duration(seconds: 3));
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 500));
-        expect(find.byType(QrImageView), findsNothing);
         expect(find.text('Juan Pérez is in.'), findsOneWidget);
-        await tester.pump(const Duration(seconds: 5));
+        expect(find.text('mn4pq7rs'), findsOneWidget);
+        await tester.tap(find.text('Close'));
+        await tester.pumpAndSettle();
+        expect(find.byType(QrImageView), findsNothing);
       },
     );
   }
+
+  testWidgets('a QR for a mat with a referee says who leaves it', (
+    tester,
+  ) async {
+    final accesses = await open(
+      tester,
+      sizes['phone']!,
+      const QrAccessButton(
+        eventId: 'e1',
+        role: StaffRole.referee,
+        mat: 2,
+        replaces: 'Ana (arbitro1)',
+      ),
+    );
+    await tester.tap(find.byIcon(Icons.qr_code_2));
+    await tester.pumpAndSettle();
+    expect(
+      find.text(
+        'Mat 2 has Ana (arbitro1). With a new QR, Ana (arbitro1) leaves the mat.',
+      ),
+      findsOneWidget,
+    );
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(find.byType(TextFormField), findsNothing);
+    expect(accesses.created, isEmpty);
+
+    await tester.tap(find.byIcon(Icons.qr_code_2));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Create QR'));
+    await tester.pumpAndSettle();
+    expect(find.byType(TextFormField), findsOneWidget);
+  });
 
   testWidgets('a name is needed before the QR', (tester) async {
     final accesses = await open(

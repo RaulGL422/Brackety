@@ -9,8 +9,9 @@ import java.time.Instant;
 import java.util.UUID;
 
 /**
- * A referee or helper let in by QR (docs/modulos/ayudantes-permisos.md): a temporary account for one event, signed
- * in with a single-use code. It ends with the phase or when the club ends it.
+ * A referee or helper let in by QR (docs/modulos/ayudantes-permisos.md): a temporary account for one phase, signed
+ * in with a single-use code or its sign-in and password. It ends with the phase or when the club ends it; a phase
+ * created while it is open gets a copy.
  */
 @Entity
 class TemporaryAccess {
@@ -44,6 +45,13 @@ class TemporaryAccess {
         this.createdBy = createdBy;
         this.createdAt = now;
         renew(tokenHash, now);
+    }
+
+    /** The same person in a phase created from this one: already in, no code of its own. */
+    TemporaryAccess copyFor(UUID eventId, Instant now) {
+        var copy = new TemporaryAccess(eventId, accountId, name, role, null, createdBy, now);
+        copy.signedInAt = signedInAt;
+        return copy;
     }
 
     /** A new code: the previous one, used or not, stops working. */

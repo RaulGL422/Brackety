@@ -1613,7 +1613,21 @@
   "qrAccessSignedIn": "{name} ha entrado.",
   "@qrAccessSignedIn": {"placeholders": {"name": {"type": "String"}}},
   "qrAccessTitle": "Acceso por QR",
-  "qrAccessSectionHint": "Ayudantes y árbitros sin cuenta. Cada QR sirve una vez y para un solo móvil: si cambia de móvil, crea uno nuevo. Al terminar la fase dejan de funcionar.",
+  "qrAccessSectionHint": "Ayudantes y árbitros sin cuenta. Cada QR sirve una vez; si se le cierra la sesión, vuelve a entrar con su usuario y contraseña. Al terminar la fase dejan de funcionar; la fase que crees antes de terminarla se los queda.",
+  "qrAccessSignInLabel": "Usuario",
+  "qrAccessPasswordLabel": "Contraseña",
+  "qrAccessCredentialsHint": "Si se le cierra la sesión, que entre con estos datos en «Iniciar sesión». Apúntalos: la contraseña solo se ve ahora.",
+  "qrAccessReplacesReferee": "El tapiz {mat} lo tiene {name}. Con un QR nuevo, {name} deja el tapiz.",
+  "@qrAccessReplacesReferee": {
+    "placeholders": {
+      "mat": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "qrAccessMatsWithoutReferee": "Tapices sin árbitro: {mats}. Usa el QR junto a cada tapiz.",
   "@qrAccessMatsWithoutReferee": {"placeholders": {"mats": {"type": "String"}}},
   "qrAccessNoGrouper": "Nadie más que el club puede crear grupos.",

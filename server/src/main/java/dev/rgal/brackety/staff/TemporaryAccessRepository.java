@@ -13,5 +13,7 @@ interface TemporaryAccessRepository extends JpaRepository<TemporaryAccess, UUID>
 
     List<TemporaryAccess> findByEventIdAndEndedAtIsNull(UUID eventId);
 
+    List<TemporaryAccess> findByAccountIdAndEndedAtIsNull(UUID accountId);
+
     long countByEventId(UUID eventId);
 }

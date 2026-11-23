@@ -193,6 +193,12 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
     );
   }
 
+  /// Who has mat [i] on the server now (the QR changes the saved mats, not the edited ones).
+  String? _refereeName(EventSettings settings, int i) {
+    final id = _saved.matReferees.elementAtOrNull(i);
+    return settings.referees.where((r) => r.id == id).firstOrNull?.label;
+  }
+
   void _change(VoidCallback update) {
     setState(update);
     widget.unsaved.value = _dirty;
@@ -360,6 +366,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
                   eventId: widget.eventId,
                   role: StaffRole.referee,
                   mat: i + 1,
+                  replaces: _refereeName(settings, i),
                 ),
               ],
             ),
