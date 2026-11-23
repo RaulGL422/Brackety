@@ -318,7 +318,7 @@ void main() {
               categoryPodiums: const [],
               phases: const [],
               categoryNames: const [],
-              availableDisciplines: const {},
+              sports: const [],
               globalStandings: globalStandings,
             ),
           ),

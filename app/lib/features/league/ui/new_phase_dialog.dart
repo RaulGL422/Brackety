@@ -38,10 +38,13 @@ class _NewPhaseDialogState extends ConsumerState<_NewPhaseDialog> {
   late final _name = TextEditingController();
   final _attendance = TextEditingController(text: '10');
   late DateTime _date = _fourWeeksAfter(widget.league.phases.last.date);
-  late var _discipline = Discipline.values.firstWhere(
-    widget.league.availableDisciplines.contains,
-    orElse: () => Discipline.tambo,
-  );
+  // The last phase's sport, as a league usually goes on in it; otherwise the first playable.
+  late var _sport = _playable(widget.league.phases.last.sport);
+
+  String _playable(String last) {
+    final playable = widget.league.sports.where((s) => s.available);
+    return playable.any((s) => s.code == last) ? last : playable.first.code;
+  }
 
   // By calendar day, not by hours: adding 28 × 24 h lands a day early across a DST change.
   static DateTime _fourWeeksAfter(DateTime d) =>
@@ -97,9 +100,9 @@ class _NewPhaseDialogState extends ConsumerState<_NewPhaseDialog> {
                 ),
                 const SizedBox(height: AppSpacing.m),
                 SportField(
-                  value: _discipline,
-                  available: widget.league.availableDisciplines,
-                  onChanged: (d) => setState(() => _discipline = d),
+                  value: _sport,
+                  sports: widget.league.sports,
+                  onChanged: (s) => setState(() => _sport = s),
                 ),
                 const SizedBox(height: AppSpacing.m),
                 TextFormField(
@@ -143,7 +146,7 @@ class _NewPhaseDialogState extends ConsumerState<_NewPhaseDialog> {
             widget.eventId,
             name: _name.text.trim(),
             date: _date,
-            discipline: _discipline,
+            sport: _sport,
             attendancePoints: parseAttendancePoints(_attendance.text)!,
           );
       ref

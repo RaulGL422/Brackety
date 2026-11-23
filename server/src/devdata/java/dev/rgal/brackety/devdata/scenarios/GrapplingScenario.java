@@ -4,7 +4,6 @@ import dev.rgal.brackety.auth.account.VerifiedAccounts;
 import dev.rgal.brackety.devdata.DevScenario;
 import dev.rgal.brackety.devdata.Scenario;
 import dev.rgal.brackety.devdata.ScenarioContext;
-import dev.rgal.brackety.event.Discipline;
 import dev.rgal.brackety.event.EventCategory;
 import dev.rgal.brackety.event.EventCategoryRepository;
 import dev.rgal.brackety.event.EventOrganization;
@@ -101,7 +100,7 @@ class GrapplingScenario implements Scenario {
         var club = accounts.club("club1", CLUBS.getFirst(), "G12345674");
         // No mats here: they come below, each with its referee.
         var eventId = newEvents
-                .create(club, new NewEventRequest("Open de Grappling", ctx.today(), Discipline.GRAPPLING, 0))
+                .create(club, new NewEventRequest("Open de Grappling", ctx.today(), "GRAPPLING", 0))
                 .eventId();
         staff.save(new EventStaff(eventId, accounts.helper("ayudante1"), EventRole.GROUPER));
         for (int number = 1; number <= MATS; number++) {

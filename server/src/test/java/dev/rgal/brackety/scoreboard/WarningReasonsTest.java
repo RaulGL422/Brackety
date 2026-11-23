@@ -9,8 +9,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import dev.rgal.brackety.event.Discipline;
 import dev.rgal.brackety.event.EventRepository;
+import dev.rgal.brackety.event.TestSports;
 import java.time.Instant;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
@@ -46,8 +46,7 @@ class WarningReasonsTest extends ScoreboardApiTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.own").doesNotExist());
         call(get(path(match)), "arbitro2")
-                .andExpect(jsonPath("$.warningReasons[0]")
-                        .value(Discipline.TAMBO.warningReasons().getFirst()));
+                .andExpect(jsonPath("$.warningReasons[0]").value(TestSports.TAMBO_WARNINGS.getFirst()));
     }
 
     @Test
@@ -61,9 +60,8 @@ class WarningReasonsTest extends ScoreboardApiTest {
     void theNextPhaseAndTheHallPackageKeepTheEventsOwnList() throws Exception {
         call(put(reasons()).content("{\"reasons\":[\"Agarre\"]}"), "club1").andExpect(status().isOk());
 
-        var next = events.findById(eventId)
-                .orElseThrow()
-                .nextPhase(2, Discipline.TAMBO, "Fase 2", LocalDate.of(2027, 4, 10), 10, Instant.now());
+        var event = events.findById(eventId).orElseThrow();
+        var next = event.nextPhase(2, event.getSport(), "Fase 2", LocalDate.of(2027, 4, 10), 10, Instant.now());
         assertThat(next.getOwnWarningReasons()).containsExactly("Agarre");
 
         call(get("/api/v1/events/" + eventId + "/export/package"), "club1")

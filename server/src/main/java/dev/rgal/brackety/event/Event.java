@@ -1,5 +1,6 @@
 package dev.rgal.brackety.event;
 
+import dev.rgal.brackety.event.sport.SportVersion;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import java.time.Instant;
@@ -34,8 +36,9 @@ public class Event {
     private UUID leagueId;
     private int phaseNumber;
 
-    @Enumerated(EnumType.STRING)
-    private Discipline discipline;
+    /** The sport's version it plays (docs/producto/plantillas-deporte.md). */
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    private SportVersion sportVersion;
 
     private String name;
     private LocalDate eventDate;
@@ -74,7 +77,7 @@ public class Event {
             UUID ownerAccountId,
             UUID leagueId,
             int phaseNumber,
-            Discipline discipline,
+            SportVersion sport,
             String name,
             LocalDate eventDate,
             int attendancePoints,
@@ -83,7 +86,7 @@ public class Event {
         this.ownerAccountId = ownerAccountId;
         this.leagueId = leagueId;
         this.phaseNumber = phaseNumber;
-        this.discipline = discipline;
+        this.sportVersion = sport;
         this.name = name;
         this.eventDate = eventDate;
         this.attendancePoints = attendancePoints;
@@ -91,33 +94,24 @@ public class Event {
         this.createdAt = now;
     }
 
-    /** Liga Yoseikan tambo, Fase 1: 10 points for attending; its match rules in {@link Modality#tambo()}. */
-    public static Event tambo(UUID ownerAccountId, UUID leagueId, String name, LocalDate eventDate, Instant now) {
-        return new Event(ownerAccountId, leagueId, 1, Discipline.TAMBO, name, eventDate, 10, Modality.tambo(), now);
-    }
-
     /**
      * The next phase of the same league. In the same sport it keeps this one's match rules, measures asked and warning
      * reasons; in another sport it starts from that sport's (a tambo phase does not hand its rules to grappling).
      */
     public Event nextPhase(
-            int phaseNumber,
-            Discipline discipline,
-            String name,
-            LocalDate eventDate,
-            int attendancePoints,
-            Instant now) {
+            int phaseNumber, SportVersion sport, String name, LocalDate eventDate, int attendancePoints, Instant now) {
+        var same = sport.sameSport(sportVersion);
         var next = new Event(
                 ownerAccountId,
                 leagueId,
                 phaseNumber,
-                discipline,
+                same ? sportVersion : sport,
                 name,
                 eventDate,
                 attendancePoints,
-                discipline == this.discipline ? modality().copy() : discipline.defaultModality(),
+                same ? modality().copy() : sport.rules().modality(),
                 now);
-        if (discipline == this.discipline) {
+        if (same) {
             next.setMeasureRequirements(weightRequirement, heightRequirement);
             next.warningReasons = warningReasons == null ? null : List.copyOf(warningReasons);
         }
@@ -176,11 +170,15 @@ public class Event {
 
     /** Whether weight is asked: the event's own choice, or its sport's. */
     public MeasureRequirement weightRequirement() {
-        return weightRequirement != null ? weightRequirement : discipline.weight();
+        return weightRequirement != null
+                ? weightRequirement
+                : sportVersion.rules().weight();
     }
 
     public MeasureRequirement heightRequirement() {
-        return heightRequirement != null ? heightRequirement : discipline.height();
+        return heightRequirement != null
+                ? heightRequirement
+                : sportVersion.rules().height();
     }
 
     /** Null: as the sport says. */
@@ -194,7 +192,9 @@ public class Event {
 
     /** What the referee picks from: the event's own list, or its sport's. */
     public List<String> warningReasons() {
-        return warningReasons != null ? List.copyOf(warningReasons) : discipline.warningReasons();
+        return warningReasons != null
+                ? List.copyOf(warningReasons)
+                : sportVersion.rules().warningReasons();
     }
 
     /** Null: as the sport says. */
@@ -238,8 +238,8 @@ public class Event {
         return phaseNumber;
     }
 
-    public Discipline getDiscipline() {
-        return discipline;
+    public SportVersion getSport() {
+        return sportVersion;
     }
 
     public String getName() {

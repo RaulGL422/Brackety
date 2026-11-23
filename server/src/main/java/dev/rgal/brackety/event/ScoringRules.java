@@ -11,8 +11,7 @@ import java.util.List;
 
 /**
  * How a sport scores a match, as data: each modality keeps its own copy, so an event never changes when a sport's
- * defaults do. The sport templates (docs/producto/plantillas-deporte.md) will be stored sets of these; for now the
- * built-in ones are {@link #TAMBO} and {@link #GRAPPLING}.
+ * defaults do. A sport's version (docs/producto/plantillas-deporte.md) holds the ones a new event starts with.
  *
  * @param actions the scoring buttons of the referee, each with its points
  * @param warningPoints what the rival gets for each warning of a fighter, in order, starting over when the list
@@ -63,35 +62,6 @@ public record ScoringRules(
             @Min(0) @Max(10) int winner,
             @Min(0) @Max(10) int loser,
             @Min(0) @Max(10) int loserWhoScored) {}
-
-    /** Liga Yoseikan, cap. 3.1, and Raul's rules of the F1 (2026-11-13). */
-    public static final ScoringRules TAMBO = new ScoringRules(
-            List.of(new Action(1, "Punto")), List.of(0, 1), 0, 0, true, true, true, List.of(), List.of(), List.of());
-
-    /** FELODA national rules, November 2025 (docs/reglamentos/grappling-feloda-2025.md, art. 38). */
-    public static final ScoringRules GRAPPLING = new ScoringRules(
-            List.of(
-                    new Action(1, "Salida o ataque"),
-                    new Action(2, "Derribo, inversión o derribo rápido"),
-                    new Action(3, "Montada lateral o derribo de amplitud"),
-                    new Action(4, "Montada o espalda")),
-            List.of(1),
-            4,
-            15,
-            false,
-            false,
-            false,
-            List.of("Sumisión"),
-            List.of(Tiebreak.BEST_ACTION, Tiebreak.FEWER_WARNINGS, Tiebreak.EXTRA_TIME),
-            // Art. 39: submission or disqualification 5-0, superiority 4-0 or 4-1, decision 3-0 or 3-1, four
-            // warnings 3-0, extra time 2-0.
-            List.of(
-                    new Classification("SUBMISSION", 5, 0, 0),
-                    new Classification("DISQUALIFICATION", 5, 0, 0),
-                    new Classification("SUPERIORITY", 4, 0, 1),
-                    new Classification("TIME", 3, 0, 1),
-                    new Classification("WARNINGS", 3, 0, 0),
-                    new Classification("EXTRA_TIME", 2, 0, 0)));
 
     public ScoringRules {
         actions = List.copyOf(actions);

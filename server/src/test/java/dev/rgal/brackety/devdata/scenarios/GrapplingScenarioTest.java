@@ -46,7 +46,10 @@ class GrapplingScenarioTest extends AuthIntegrationTest {
         new GrapplingScenario(accounts, newEvents, staff, mats, categories, clubs, eventClubs, participants)
                 .seed(new ScenarioContext(clock));
 
-        assertThat(jdbc.sql("select discipline from event").query(String.class).single())
+        assertThat(jdbc.sql("select t.code from event e join sport_template_version v on v.id = e.sport_version_id"
+                                + " join sport_template t on t.id = v.template_id")
+                        .query(String.class)
+                        .single())
                 .isEqualTo("GRAPPLING");
         assertThat(jdbc.sql("select count(*) from event_category where match_seconds is not null")
                         .query(Integer.class)

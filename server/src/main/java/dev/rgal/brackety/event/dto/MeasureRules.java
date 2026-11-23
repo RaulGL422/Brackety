@@ -14,7 +14,7 @@ public record MeasureRules(
         return new MeasureRules(
                 event.getOwnWeightRequirement(),
                 event.getOwnHeightRequirement(),
-                event.getDiscipline().weight(),
-                event.getDiscipline().height());
+                event.getSport().rules().weight(),
+                event.getSport().rules().height());
     }
 }

@@ -8,6 +8,6 @@ public record WarningReasons(List<String> own, List<String> sport) {
 
     public static WarningReasons of(Event event) {
         return new WarningReasons(
-                event.getOwnWarningReasons(), event.getDiscipline().warningReasons());
+                event.getOwnWarningReasons(), event.getSport().rules().warningReasons());
     }
 }

@@ -132,7 +132,7 @@ class _Phases extends ConsumerWidget {
             subtitle: Text(
               [
                 DateFormat.yMMMMd(locale).format(phase.date),
-                disciplineName(l10n, phase.discipline),
+                sportName(league.sports, phase.sport, locale),
                 l10n.leaguePhaseEntries(phase.participants),
               ].join(' · '),
             ),
@@ -148,14 +148,6 @@ class _Phases extends ConsumerWidget {
     );
   }
 }
-
-String disciplineName(AppLocalizations l10n, Discipline d) => switch (d) {
-  Discipline.tambo => l10n.disciplineTambo,
-  Discipline.grappling => l10n.disciplineGrappling,
-  Discipline.ground => l10n.disciplineGround,
-  Discipline.throws => l10n.disciplineThrows,
-  Discipline.technicalExpression => l10n.disciplineTechnicalExpression,
-};
 
 /// Points per person added up over the phases, ranked by category, with the podium's medals.
 class _Standings extends ConsumerStatefulWidget {

@@ -3,6 +3,7 @@ package dev.rgal.brackety.scoreboard;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.rgal.brackety.event.ScoringRules;
+import dev.rgal.brackety.event.TestSports;
 import dev.rgal.brackety.scoreboard.MatchState.Entry;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -27,7 +28,7 @@ class SharedScoringCasesTest {
     private static final Instant T0 = Instant.parse("2027-03-10T09:00:00Z");
     private static final JsonMapper JSON = JsonMapper.builder().build();
     private static final Map<String, ScoringRules> BUILT_IN =
-            Map.of("tambo", ScoringRules.TAMBO, "grappling", ScoringRules.GRAPPLING);
+            Map.of("tambo", TestSports.TAMBO, "grappling", TestSports.GRAPPLING);
 
     // The app names each refusal; the server words it. Both must mean the same.
     private static final Map<String, String> REFUSALS = Map.ofEntries(

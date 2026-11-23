@@ -1440,11 +1440,6 @@
     }
   },
   "leagueCurrentPhase": "Esta fase",
-  "disciplineTambo": "Tambo",
-  "disciplineGrappling": "Grappling",
-  "disciplineGround": "Suelo",
-  "disciplineThrows": "Derribos",
-  "disciplineTechnicalExpression": "Expresión técnica",
   "disciplineSoon": "{name} (próximamente)",
   "@disciplineSoon": {
     "placeholders": {

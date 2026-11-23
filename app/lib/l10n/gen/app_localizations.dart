@@ -4164,36 +4164,6 @@ abstract class AppLocalizations {
   /// **'Esta fase'**
   String get leagueCurrentPhase;
 
-  /// No description provided for @disciplineTambo.
-  ///
-  /// In es, this message translates to:
-  /// **'Tambo'**
-  String get disciplineTambo;
-
-  /// No description provided for @disciplineGrappling.
-  ///
-  /// In es, this message translates to:
-  /// **'Grappling'**
-  String get disciplineGrappling;
-
-  /// No description provided for @disciplineGround.
-  ///
-  /// In es, this message translates to:
-  /// **'Suelo'**
-  String get disciplineGround;
-
-  /// No description provided for @disciplineThrows.
-  ///
-  /// In es, this message translates to:
-  /// **'Derribos'**
-  String get disciplineThrows;
-
-  /// No description provided for @disciplineTechnicalExpression.
-  ///
-  /// In es, this message translates to:
-  /// **'Expresión técnica'**
-  String get disciplineTechnicalExpression;
-
   /// No description provided for @disciplineSoon.
   ///
   /// In es, this message translates to:

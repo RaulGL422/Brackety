@@ -2572,21 +2572,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get leagueCurrentPhase => 'Esta fase';
 
   @override
-  String get disciplineTambo => 'Tambo';
-
-  @override
-  String get disciplineGrappling => 'Grappling';
-
-  @override
-  String get disciplineGround => 'Suelo';
-
-  @override
-  String get disciplineThrows => 'Derribos';
-
-  @override
-  String get disciplineTechnicalExpression => 'Expresión técnica';
-
-  @override
   String disciplineSoon(String name) {
     return '$name (próximamente)';
   }

@@ -85,7 +85,7 @@ void main() {
         number: 1,
         name: 'Liga Yoseikan · Fase 1',
         date: DateTime(2026, 11, 14),
-        discipline: Discipline.tambo,
+        sport: 'TAMBO',
         participants: 40,
       ),
       LeaguePhase(
@@ -93,12 +93,18 @@ void main() {
         number: 2,
         name: 'Liga Yoseikan · Fase 2',
         date: DateTime(2026, 12, 12),
-        discipline: Discipline.tambo,
+        sport: 'TAMBO',
         participants: 1,
       ),
     ],
     categoryNames: const ['4-7', '8-11'],
-    availableDisciplines: const {Discipline.tambo},
+    sports: const [
+      Sport(
+        code: 'TAMBO',
+        names: {'es': 'Tambo', 'en': 'Tambo'},
+        available: true,
+      ),
+    ],
     globalStandings: true,
   );
 
@@ -267,7 +273,7 @@ void main() {
         categoryPodiums: league.categoryPodiums,
         phases: league.phases,
         categoryNames: league.categoryNames,
-        availableDisciplines: league.availableDisciplines,
+        sports: league.sports,
       );
       await tester.pumpWidget(
         app(

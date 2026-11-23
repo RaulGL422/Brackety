@@ -9,10 +9,6 @@ import java.time.Duration;
  */
 record MatchRules(Duration length, int pointsLimit, ScoringRules scoring) {
 
-    MatchRules(Duration length, int pointsLimit) {
-        this(length, pointsLimit, ScoringRules.TAMBO);
-    }
-
     boolean hasLimit() {
         return pointsLimit > 0;
     }

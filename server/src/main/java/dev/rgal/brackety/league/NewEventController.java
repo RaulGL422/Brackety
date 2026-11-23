@@ -2,12 +2,11 @@ package dev.rgal.brackety.league;
 
 import dev.rgal.brackety.auth.RequiresVerifiedEmail;
 import dev.rgal.brackety.common.CurrentAccount;
-import dev.rgal.brackety.event.Discipline;
+import dev.rgal.brackety.event.sport.SportCatalog;
 import dev.rgal.brackety.league.dto.LeagueDtos.DisciplineResponse;
 import dev.rgal.brackety.league.dto.LeagueDtos.NewEventRequest;
 import dev.rgal.brackety.league.dto.LeagueDtos.PhaseResponse;
 import jakarta.validation.Valid;
-import java.util.Arrays;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,9 +25,11 @@ import org.springframework.web.bind.annotation.RestController;
 class NewEventController {
 
     private final NewEventService newEvents;
+    private final SportCatalog sports;
 
-    NewEventController(NewEventService newEvents) {
+    NewEventController(NewEventService newEvents, SportCatalog sports) {
         this.newEvents = newEvents;
+        this.sports = sports;
     }
 
     @PostMapping
@@ -40,8 +41,6 @@ class NewEventController {
     /** The sports to pick from, and which have a scoreboard today. */
     @GetMapping("/disciplines")
     List<DisciplineResponse> disciplines() {
-        return Arrays.stream(Discipline.values())
-                .map(d -> new DisciplineResponse(d, d.isAvailable()))
-                .toList();
+        return sports.latest().stream().map(DisciplineResponse::of).toList();
     }
 }

@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
 import '../data/league_models.dart';
-import 'league_tab.dart';
 
 /// The event's day, picked from a calendar: up to a year back and two ahead.
 class DateField extends StatelessWidget {
@@ -42,33 +41,35 @@ class SportField extends StatelessWidget {
   const SportField({
     super.key,
     required this.value,
-    required this.available,
+    required this.sports,
     required this.onChanged,
     this.validator,
   });
 
-  final Discipline? value;
-  final Set<Discipline> available;
-  final ValueChanged<Discipline> onChanged;
-  final FormFieldValidator<Discipline>? validator;
+  /// A [Sport.code].
+  final String? value;
+  final List<Sport> sports;
+  final ValueChanged<String> onChanged;
+  final FormFieldValidator<String>? validator;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return DropdownButtonFormField<Discipline>(
+    final language = Localizations.localeOf(context).languageCode;
+    return DropdownButtonFormField<String>(
       initialValue: value,
       // Sized by the form, not by the longest sport: it overflowed a phone.
       isExpanded: true,
       decoration: InputDecoration(labelText: l10n.leagueDiscipline),
       items: [
-        for (final d in Discipline.values)
+        for (final s in sports)
           DropdownMenuItem(
-            value: d,
-            enabled: available.contains(d),
+            value: s.code,
+            enabled: s.available,
             child: Text(
-              available.contains(d)
-                  ? disciplineName(l10n, d)
-                  : l10n.disciplineSoon(disciplineName(l10n, d)),
+              s.available
+                  ? s.name(language)
+                  : l10n.disciplineSoon(s.name(language)),
             ),
           ),
       ],

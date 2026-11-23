@@ -11,22 +11,35 @@ import 'package:go_router/go_router.dart';
 
 /// Creates a standalone event and says what it was asked.
 class _FakeLeagueRepository extends Fake implements LeagueRepository {
-  final created = <(String, Discipline, int)>[];
+  final created = <(String, String, int)>[];
 
   @override
-  Future<Set<Discipline>> disciplines() async => {
-    Discipline.tambo,
-    Discipline.grappling,
-  };
+  Future<List<Sport>> sports() async => const [
+    Sport(
+      code: 'TAMBO',
+      names: {'es': 'Tambo', 'en': 'Tambo'},
+      available: true,
+    ),
+    Sport(
+      code: 'GRAPPLING',
+      names: {'es': 'Grappling', 'en': 'Grappling'},
+      available: true,
+    ),
+    Sport(
+      code: 'GROUND',
+      names: {'es': 'Suelo', 'en': 'Ground'},
+      available: false,
+    ),
+  ];
 
   @override
   Future<LeaguePhase> createEvent({
     required String name,
     required DateTime date,
-    required Discipline discipline,
+    required String sport,
     required int mats,
   }) async {
-    created.add((name, discipline, mats));
+    created.add((name, sport, mats));
     return LeaguePhase.fromJson({
       'eventId': 'new',
       'number': 1,
@@ -94,8 +107,10 @@ void main() {
           find.widgetWithText(TextFormField, 'Event name'),
           'Open de grappling',
         );
-        await tester.tap(find.byType(DropdownButtonFormField<Discipline>));
+        await tester.tap(find.byType(DropdownButtonFormField<String>));
         await tester.pumpAndSettle();
+        // The names come from each sport's template; one without a scoreboard is listed for later.
+        expect(find.text('Ground (coming soon)'), findsWidgets);
         await tester.tap(find.text('Grappling').last);
         await tester.pumpAndSettle();
         await tester.enterText(find.widgetWithText(TextFormField, 'Mats'), '3');
@@ -104,7 +119,7 @@ void main() {
 
         expect(repository.created.single, (
           'Open de grappling',
-          Discipline.grappling,
+          'GRAPPLING',
           3,
         ));
         expect(find.text('Panel new'), findsOneWidget);

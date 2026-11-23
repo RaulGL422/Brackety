@@ -21,6 +21,7 @@ import dev.rgal.brackety.auth.session.SessionService;
 import dev.rgal.brackety.auth.session.SessionService.Session;
 import dev.rgal.brackety.event.Event;
 import dev.rgal.brackety.event.EventRepository;
+import dev.rgal.brackety.event.sport.SportCatalog;
 import dev.rgal.brackety.league.League;
 import dev.rgal.brackety.league.LeagueRepository;
 import java.time.Duration;
@@ -41,6 +42,9 @@ class AccountDeletionTest extends AuthIntegrationTest {
 
     @Autowired
     MockMvc mvc;
+
+    @Autowired
+    SportCatalog sports;
 
     @Autowired
     AuthService auth;
@@ -333,6 +337,16 @@ class AccountDeletionTest extends AuthIntegrationTest {
 
     private void saveEvent(UUID owner) {
         var league = leagues.save(new League(owner, "Liga", clock.instant()));
-        events.save(Event.tambo(owner, league.getId(), "Liga", LocalDate.of(2027, 4, 1), clock.instant()));
+        var tambo = sports.latest("TAMBO");
+        events.save(new Event(
+                owner,
+                league.getId(),
+                1,
+                tambo,
+                "Liga",
+                LocalDate.of(2027, 4, 1),
+                10,
+                tambo.rules().modality(),
+                clock.instant()));
     }
 }

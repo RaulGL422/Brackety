@@ -11,9 +11,9 @@ import '../data/league_models.dart';
 import '../data/league_repository.dart';
 import 'event_fields.dart';
 
-/// The sports with a scoreboard today.
-final _disciplinesProvider = FutureProvider.autoDispose<Set<Discipline>>(
-  (ref) => ref.watch(leagueRepositoryProvider).disciplines(),
+/// Every sport, with or without a scoreboard yet.
+final _sportsProvider = FutureProvider.autoDispose<List<Sport>>(
+  (ref) => ref.watch(leagueRepositoryProvider).sports(),
 );
 
 /// Creates a standalone event (name, day, sport and mats) and opens its panel: the caller is
@@ -33,7 +33,7 @@ class _NewEventDialogState extends ConsumerState<_NewEventDialog> {
   final _name = TextEditingController();
   final _mats = TextEditingController(text: '1');
   var _date = DateUtils.dateOnly(DateTime.now());
-  Discipline? _discipline;
+  String? _sport;
   var _saving = false;
 
   static const maxMats = 20;
@@ -56,8 +56,8 @@ class _NewEventDialogState extends ConsumerState<_NewEventDialog> {
       content: SizedBox(
         width: 400,
         child: AsyncView(
-          value: ref.watch(_disciplinesProvider),
-          onRetry: () => ref.invalidate(_disciplinesProvider),
+          value: ref.watch(_sportsProvider),
+          onRetry: () => ref.invalidate(_sportsProvider),
           data: _fields,
         ),
       ),
@@ -74,7 +74,7 @@ class _NewEventDialogState extends ConsumerState<_NewEventDialog> {
     );
   }
 
-  Widget _fields(Set<Discipline> available) {
+  Widget _fields(List<Sport> sports) {
     final l10n = AppLocalizations.of(context);
     return Form(
       key: _form,
@@ -94,10 +94,10 @@ class _NewEventDialogState extends ConsumerState<_NewEventDialog> {
           ),
           DateField(date: _date, onChanged: (d) => setState(() => _date = d)),
           SportField(
-            value: _discipline,
-            available: available,
-            validator: (d) => d == null ? l10n.fieldRequired : null,
-            onChanged: (d) => setState(() => _discipline = d),
+            value: _sport,
+            sports: sports,
+            validator: (s) => s == null ? l10n.fieldRequired : null,
+            onChanged: (s) => setState(() => _sport = s),
           ),
           TextFormField(
             controller: _mats,
@@ -130,7 +130,7 @@ class _NewEventDialogState extends ConsumerState<_NewEventDialog> {
           .createEvent(
             name: _name.text.trim(),
             date: _date,
-            discipline: _discipline!,
+            sport: _sport!,
             mats: _parseMats(_mats.text)!,
           );
       ref.invalidate(myEventsProvider);

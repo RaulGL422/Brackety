@@ -7,7 +7,6 @@ import dev.rgal.brackety.auth.account.Profile;
 import dev.rgal.brackety.auth.account.ProfileRepository;
 import dev.rgal.brackety.auth.account.VerifiedAccounts;
 import dev.rgal.brackety.common.crypto.Sha256;
-import dev.rgal.brackety.event.Discipline;
 import dev.rgal.brackety.event.Event;
 import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventCategory;
@@ -25,8 +24,9 @@ import dev.rgal.brackety.event.MatRepository;
 import dev.rgal.brackety.event.Modality;
 import dev.rgal.brackety.event.OrganizationRepository;
 import dev.rgal.brackety.event.RulebookService;
-import dev.rgal.brackety.event.ScoringRules;
 import dev.rgal.brackety.event.StaffNames;
+import dev.rgal.brackety.event.sport.SportCatalog;
+import dev.rgal.brackety.event.sport.SportVersion;
 import dev.rgal.brackety.eventpackage.EventPackage.Category;
 import dev.rgal.brackety.eventpackage.EventPackage.CategoryPodiumEntry;
 import dev.rgal.brackety.eventpackage.EventPackage.LeagueEntry;
@@ -102,6 +102,7 @@ public class EventPackageService {
     private final EventResultsTransfer results;
     private final JsonMapper json;
     private final Validator validator;
+    private final SportCatalog sports;
     private final Clock clock;
     private final StaffNames staffNames;
     private final RulebookService rulebooks;
@@ -125,6 +126,7 @@ public class EventPackageService {
             EventResultsTransfer results,
             JsonMapper json,
             Validator validator,
+            SportCatalog sports,
             Clock clock,
             StaffNames staffNames,
             RulebookService rulebooks) {
@@ -146,6 +148,7 @@ public class EventPackageService {
         this.results = results;
         this.json = json;
         this.validator = validator;
+        this.sports = sports;
         this.clock = clock;
         this.staffNames = staffNames;
         this.rulebooks = rulebooks;
@@ -272,6 +275,8 @@ public class EventPackageService {
         var settings = p.event();
         var ownerId = accountIds.get(EventPackageRules.username(p.owner().username()));
         var leagueEntry = p.league();
+        // Packages from before the leagues are all tambo.
+        var sport = sports.playable(leagueEntry != null ? leagueEntry.discipline() : "TAMBO");
         var league = new League(
                 ownerId,
                 leagueEntry != null
@@ -292,11 +297,11 @@ public class EventPackageService {
                 ownerId,
                 league.getId(),
                 leagueEntry != null ? leagueEntry.phaseNumber() : 1,
-                leagueEntry != null ? leagueEntry.discipline() : Discipline.TAMBO,
+                sport,
                 settings.name().strip(),
                 settings.date(),
                 settings.attendancePoints(),
-                modality(settings),
+                modality(settings, sport),
                 clock.instant());
         event.setOriginEventId(settings.originId());
         event.setMeasureRequirements(settings.weightRequirement(), settings.heightRequirement());
@@ -668,11 +673,11 @@ public class EventPackageService {
     }
 
     /**
-     * Packages from before the team rules (schema 1 of the first F1 builds) take the tambo defaults; those from before
-     * the scoring rules (schema 3 and before), tambo's.
+     * Packages from before the team rules (schema 1 of the first F1 builds) or the scoring rules (schema 3 and before)
+     * take what they lack from their sport.
      */
-    private static Modality modality(EventPackage.Settings settings) {
-        var defaults = Modality.tambo();
+    private static Modality modality(EventPackage.Settings settings, SportVersion sport) {
+        var defaults = sport.rules().modality();
         return Modality.of(
                 settings.matchSeconds(),
                 settings.pointsLimit(),
@@ -682,7 +687,7 @@ public class EventPackageService {
                         settings.teamPointsLimit(), defaults.team().pointsLimit()),
                 Objects.requireNonNullElse(settings.minRestSeconds(), defaults.getMinRestSeconds()),
                 settings.changeoverSeconds(),
-                Objects.requireNonNullElse(settings.scoring(), ScoringRules.TAMBO));
+                Objects.requireNonNullElse(settings.scoring(), defaults.scoring()));
     }
 
     private LeagueEntry league(Event event) {
@@ -690,7 +695,7 @@ public class EventPackageService {
         return new LeagueEntry(
                 league.getName(),
                 event.getPhaseNumber(),
-                event.getDiscipline(),
+                event.getSport().code(),
                 league.getPodium(),
                 podiums.findByLeagueIdOrderByCategoryName(league.getId()).stream()
                         .map(c -> new CategoryPodiumEntry(c.getCategoryName(), c.getPodium()))
