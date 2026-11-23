@@ -15,6 +15,9 @@ class _FakeRulebooks extends RulebookRepository {
   String? name;
   List<int>? bytes;
 
+  /// Thrown by [upload] instead of keeping the file.
+  Object? uploadError;
+
   @override
   Future<String?> fileName(String eventId) async => name;
 
@@ -23,6 +26,7 @@ class _FakeRulebooks extends RulebookRepository {
 
   @override
   Future<void> upload(String eventId, String name, List<int> bytes) async {
+    if (uploadError case final e?) throw e;
     this.name = name;
     this.bytes = bytes;
   }
@@ -37,15 +41,12 @@ class _FakeRulebooks extends RulebookRepository {
 void main() {
   late _FakeRulebooks rulebooks;
   late List<List<int>> opened;
+  late PickFiles pick;
 
   Widget app(Widget child) => ProviderScope(
     overrides: [
       rulebookRepositoryProvider.overrideWithValue(rulebooks),
-      pickFilesProvider.overrideWithValue(
-        ({required accept, required multiple}) async => [
-          const PickedFile(name: 'Reglamento F1.pdf', bytes: [37, 80, 68, 70]),
-        ],
-      ),
+      pickFilesProvider.overrideWithValue(pick),
       openPdfProvider.overrideWithValue((name, bytes) async {
         opened.add(await bytes);
       }),
@@ -65,6 +66,56 @@ void main() {
   setUp(() {
     rulebooks = _FakeRulebooks();
     opened = [];
+    pick = ({required accept, required multiple}) async => [
+      const PickedFile(name: 'Reglamento F1.pdf', bytes: [37, 80, 68, 70]),
+    ];
+  });
+
+  // Raul, 2026-11-23: choosing the PDF did nothing, without a word.
+  testWidgets('a picker that cannot open says so', (tester) async {
+    pick = ({required accept, required multiple}) =>
+        throw UnsupportedError('no picker');
+    await tester.pumpWidget(app(const RulebookSection(eventId: 'e1')));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Upload PDF'));
+    await tester.pumpAndSettle();
+    expect(
+      find.text('Uploading files only works on the web for now.'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('an upload that fails says why, whatever the error', (
+    tester,
+  ) async {
+    rulebooks.uploadError = StateError('reading the file');
+    await tester.pumpWidget(app(const RulebookSection(eventId: 'e1')));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Upload PDF'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Check the connection'), findsOneWidget);
+    expect(find.text('No rulebook'), findsOneWidget);
+  });
+
+  testWidgets('a file the server refuses asks for a PDF up to 10 MB', (
+    tester,
+  ) async {
+    final request = RequestOptions();
+    rulebooks.uploadError = DioException(
+      requestOptions: request,
+      response: Response(requestOptions: request, statusCode: 400),
+    );
+    await tester.pumpWidget(app(const RulebookSection(eventId: 'e1')));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Upload PDF'));
+    await tester.pumpAndSettle();
+    expect(
+      find.text('Could not upload: it must be a PDF of up to 10 MB.'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('the club uploads the rulebook and can open or remove it', (

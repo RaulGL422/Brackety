@@ -62,6 +62,8 @@
   "rulebookRemove": "Remove",
   "rulebookUploaded": "Rulebook uploaded",
   "rulebookUploadError": "Could not upload: it must be a PDF of up to 10 MB.",
+  "rulebookUploadFailed": "Could not upload the rulebook. Check the connection and try again.",
+  "fileUploadWebOnly": "Uploading files only works on the web for now.",
   "rulebookRemoveError": "Could not remove the rulebook.",
   "rulebookOpenError": "Could not open the rulebook. Check the connection.",
   "@@locale": "en",
