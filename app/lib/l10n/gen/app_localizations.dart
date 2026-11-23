@@ -5157,8 +5157,32 @@ abstract class AppLocalizations {
   /// No description provided for @qrAccessSectionHint.
   ///
   /// In es, this message translates to:
-  /// **'Ayudantes y árbitros sin cuenta. Cada QR sirve una vez y para un solo móvil: si cambia de móvil, crea uno nuevo. Al terminar la fase dejan de funcionar.'**
+  /// **'Ayudantes y árbitros sin cuenta. Cada QR sirve una vez; si se le cierra la sesión, vuelve a entrar con su usuario y contraseña. Al terminar la fase dejan de funcionar; la fase que crees antes de terminarla se los queda.'**
   String get qrAccessSectionHint;
+
+  /// No description provided for @qrAccessSignInLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Usuario'**
+  String get qrAccessSignInLabel;
+
+  /// No description provided for @qrAccessPasswordLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Contraseña'**
+  String get qrAccessPasswordLabel;
+
+  /// No description provided for @qrAccessCredentialsHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Si se le cierra la sesión, que entre con estos datos en «Iniciar sesión». Apúntalos: la contraseña solo se ve ahora.'**
+  String get qrAccessCredentialsHint;
+
+  /// No description provided for @qrAccessReplacesReferee.
+  ///
+  /// In es, this message translates to:
+  /// **'El tapiz {mat} lo tiene {name}. Con un QR nuevo, {name} deja el tapiz.'**
+  String qrAccessReplacesReferee(int mat, String name);
 
   /// No description provided for @qrAccessMatsWithoutReferee.
   ///

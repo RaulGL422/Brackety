@@ -53,10 +53,11 @@ Cada permiso permitido/denegado, delegación de un nivel, cambios en directo, au
 - Para quien ayuda sin cuenta (o la usará una sola vez): el club escribe su nombre y le enseña un QR. Al escanearlo entra en una **cuenta temporal** de ese evento, sin registrarse.
 - Dónde: Configuración → Tapices (icono QR junto a cada tapiz: árbitro de ese tapiz) y «Acceso por QR» (ayudante para grupos). Avisa de tapices sin árbitro y de que nadie más que el club hace grupos.
 - Permisos: los del rol (árbitro = su tapiz; ayudante = grupos, equipos y medidas), cambiables en «Personal» como los demás. Solo dentro del evento: no crea eventos ni ligas, no acepta invitaciones ni toca ajustes de cuenta (403).
-- Una sesión a la vez: el código sirve **una vez** y entrar cierra cualquier otra sesión de esa cuenta. «Nuevo QR» da otro código al momento y saca al dispositivo anterior. «Quitar acceso» la cierra.
-- Confirmación: el diálogo del QR espera y avisa «X ha entrado»; la lista dice a qué hora entró.
+- Una sesión a la vez: el código sirve **una vez** y entrar cierra cualquier otra sesión de esa cuenta. Si se cae la sesión, se vuelve a entrar con **usuario y contraseña temporales** (`qr-…` y 8 caracteres sin letras parecidas), que el club ve junto al QR (la contraseña solo al crearlo o renovarlo). «Nuevo QR» da otro código y otra contraseña y saca al dispositivo anterior. «Quitar acceso» la cierra en todas las fases.
+- Fases (Raul, 2026-11-23): vive mientras dure la fase. Una fase creada antes de terminarla se queda el acceso con su tapiz; al terminar una fase, la cuenta sigue si tiene acceso en otra abierta. Un QR para un tapiz con árbitro avisa de quién lo deja.
+- Confirmación: el diálogo del QR espera y avisa «X ha entrado» sin cerrarse (para apuntar la contraseña); la lista dice a qué hora entró y su usuario.
 - Dura lo que la fase: al finalizarla se cierran todas (suspendidas, sin sesión); con la fase finalizada no se crean ni renuevan. Una fase nueva no las copia (ni a sus tapices) y el paquete del portátil no las lleva.
-- Datos: `temporary_access` (evento, cuenta, nombre, rol, hash del código, entrada, fin) y `account.temporary`. Inicio de sesión: `POST /api/v1/auth/temporary {token}`. Club: `GET/POST /events/{id}/temporary-access`, `POST …/{id}/renew`, `POST …/{id}/end`. Enlace: `/qr?code=…`.
+- Datos: `temporary_access` (evento, cuenta, nombre, rol, hash del código, entrada, fin; una fila por fase y cuenta) y `account.temporary` (con contraseña). Entrar a mano: login normal con el usuario `qr-…`. Inicio de sesión: `POST /api/v1/auth/temporary {token}`. Club: `GET/POST /events/{id}/temporary-access`, `POST …/{id}/renew`, `POST …/{id}/end`. Enlace: `/qr?code=…`.
 - Tests: `TemporaryAccessTest`; app: `qr_access_test`, `qr_sign_in_screen_test`.
 
 ## Estado
