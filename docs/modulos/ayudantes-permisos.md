@@ -35,7 +35,7 @@ Cada permiso permitido/denegado, delegación de un nivel, cambios en directo, au
 - Tests: `StaffInvitationTest`; app: Configuración y pantalla de la invitación en 3 tamaños.
 
 ## Adelanto F1-7 C: permisos por persona (2026-11-18, #130 y rama `feat/staff-panel-access`)
-- Lista aprobada por Raul: ver grupos, tapices y combates sin cambiar nada (`VIEW`, añadido en la C2), crear y deshacer grupos (`GROUPS`), formar equipos (`TEAMS`), pesos y estaturas (`MEASURES`), arbitrar su tapiz (`OWN_MAT`), comenzar y finalizar la fase (`PHASE`), panel de control (`CONTROL`: mover, reordenar, saltar descanso, inhabilitar tapices), resolver revisiones (`REVIEWS`), importar CSV de un dispositivo (`DEVICE_IMPORT`), alumnos (`PARTICIPANTS`).
+- Lista aprobada por Raul: ver grupos, tapices y combates sin cambiar nada (`VIEW`, añadido en la C2), crear y deshacer grupos (`GROUPS`), formar equipos (`TEAMS`), pesos y estaturas (`MEASURES`), arbitrar su tapiz (`OWN_MAT`), comenzar y finalizar la fase (`PHASE`), panel de control (`CONTROL`: mover, reordenar, saltar descanso, inhabilitar tapices), resolver revisiones (`REVIEWS`), importar CSV de un dispositivo (`DEVICE_IMPORT`), alumnos (`PARTICIPANTS`), mover grupos entre tapices sin el resto del panel (`MOVE_GROUPS`, GR-4: para un árbitro de confianza).
 - El club lo puede todo. Reabrir una fase y gestionar el personal y sus permisos: solo el club.
 - Por defecto: ayudante = grupos, equipos y medidas; árbitro = su tapiz (lo de antes). Con los dos roles, la suma.
 - El club los marca por persona en Configuración → Personal (icono junto a cada una). Al quitar a alguien del todo, vuelve a los de su rol. Una fase nueva copia los de la anterior.

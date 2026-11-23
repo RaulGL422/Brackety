@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../auth/state/session_controller.dart';
+import 'mat_groups.dart';
 
 /// The club's control panel (server: MatchControlService): every change is checked there again.
 class ControlRepository {
@@ -10,6 +11,17 @@ class ControlRepository {
   final Dio _dio;
 
   String _base(String eventId) => '/api/v1/events/$eventId/control';
+
+  /// Every mat with its groups still to finish (GR-4).
+  Future<List<MatGroups>> matGroups(String eventId) async {
+    final response = await _dio.get<List<dynamic>>(
+      '/api/v1/events/$eventId/mat-groups',
+    );
+    return [
+      for (final m in response.data!)
+        MatGroups.fromJson(m as Map<String, dynamic>),
+    ];
+  }
 
   Future<void> moveGroup(String eventId, String groupId, String matId) =>
       _dio.put<void>(

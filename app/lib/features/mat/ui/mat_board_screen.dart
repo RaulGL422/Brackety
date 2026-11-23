@@ -98,6 +98,21 @@ class MatBoardScreen extends ConsumerWidget {
             if (board.value?.eventId case final eventId?)
               RulebookButton(eventId: eventId, color: colors.onBand),
             if (queued) const SyncStatusIcon(),
+            // GR-4: a referee the club lets move groups sees every mat's.
+            if (board.value?.eventId case final eventId?
+                when ref
+                    .watch(myPermissionsProvider(eventId))
+                    .any(
+                      (p) =>
+                          p == EventPermission.moveGroups ||
+                          p == EventPermission.control,
+                    ))
+              IconButton(
+                tooltip: l10n.matGroupsTitle,
+                color: colors.onBand,
+                icon: const Icon(Icons.view_column_outlined),
+                onPressed: () => context.push('/events/$eventId/mat-groups'),
+              ),
             if (readOnly && controls)
               if (board.value case final b?
                   when b.eventId != null &&

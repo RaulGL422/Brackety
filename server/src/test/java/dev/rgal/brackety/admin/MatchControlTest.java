@@ -366,6 +366,57 @@ class MatchControlTest extends AdminApiTestBase {
         call(post(control() + "/mats/" + youngMat + "/disable"), "arbitro1").andExpect(status().isForbidden());
     }
 
+    // GR-4: a referee the club trusts with it sees every mat's groups and moves them; nothing else of the panel.
+    @Test
+    void aRefereeAllowedToMoveGroupsSeesEveryMatsGroupsAndMovesThem() throws Exception {
+        var first = match(young, 0, 1);
+        var group = groupOf(first);
+        var from = matOf(first);
+        var target = freeMat();
+        var move = put(control() + "/groups/" + group + "/mat").content(mat(target));
+        call(get(matGroups()), "arbitro1").andExpect(status().isForbidden());
+        call(move, "arbitro1").andExpect(status().isForbidden());
+
+        call(
+                        put("/api/v1/events/" + eventId + "/staff/" + accountId("arbitro1") + "/permissions")
+                                .content("{\"permissions\":[\"OWN_MAT\",\"MOVE_GROUPS\"]}"),
+                        "club1")
+                .andExpect(status().isOk());
+
+        call(get(matGroups()), "arbitro1")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(onMat(from) + ".groups[0].id").value(group.toString()))
+                .andExpect(jsonPath(onMat(from) + ".groups[0].categoryName").value("4-6"))
+                .andExpect(jsonPath(onMat(from) + ".groups[0].members[0].name").value("Peque0 Prueba"))
+                .andExpect(jsonPath(onMat(from) + ".groups[0].members[3].ghost").value(false))
+                .andExpect(jsonPath(onMat(from) + ".groups[0].played").value(0))
+                .andExpect(jsonPath(onMat(from) + ".groups[0].matches").value(6))
+                .andExpect(jsonPath(onMat(target) + ".groups[*].id").isEmpty());
+        call(move, "arbitro1").andExpect(status().isNoContent());
+
+        call(get(matGroups()), "club1")
+                .andExpect(jsonPath(onMat(target) + ".groups[0].id").value(group.toString()))
+                .andExpect(jsonPath(onMat(from) + ".groups[*].id").isEmpty());
+        assertThat(rows("select count(*) from fight_match where group_id = ? and mat_id = ?", group, target))
+                .isEqualTo(6);
+        call(post(control() + "/matches/" + match(older, 0, 1) + "/waive-rest"), "arbitro1")
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void aMatShowsOnlyItsGroupsToFinishAndCountsTheFinishedOnes() throws Exception {
+        var from = matOf(match(young, 0, 1));
+        // Finished without being played: only the count matters here.
+        jdbc.sql("update fight_match set status = 'FINISHED' where group_id = ?")
+                .param(groupOf(match(young, 0, 1)))
+                .update();
+
+        call(get(matGroups()), "club1")
+                .andExpect(jsonPath(onMat(from) + ".groups[*].id").isEmpty())
+                .andExpect(jsonPath(onMat(from) + ".finishedGroups").value(1));
+        call(get(matGroups()), outsider(), PASSWORD).andExpect(status().isNotFound());
+    }
+
     @Test
     void onlyTheClub() throws Exception {
         var match = match(young, 2, 3);
@@ -390,6 +441,14 @@ class MatchControlTest extends AdminApiTestBase {
 
     private ResultActions club(MockHttpServletRequestBuilder request) throws Exception {
         return call(request, "club1");
+    }
+
+    private String matGroups() {
+        return "/api/v1/events/" + eventId + "/mat-groups";
+    }
+
+    private static String onMat(UUID mat) {
+        return "$[?(@.matId == '%s')]".formatted(mat);
     }
 
     private String control() {

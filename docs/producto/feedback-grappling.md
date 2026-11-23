@@ -52,6 +52,9 @@ competición del 2026-12-20 (`competicion-2026-12-20.md`); objetivo de prueba in
 - Mover un grupo entero a otro tapiz de forma mucho más fácil desde el panel del club y también desde el árbitro.
 - Forma: **arrastrar** el grupo de un tapiz a otro (Raul, 2026-11-22). Sigue el criterio de GR-7.
 - El árbitro mueve con un permiso extra que le da el club (Raul, 2026-11-23).
+- Hecho: «Grupos por tapiz» (desde Tapices del club y, con `MOVE_GROUPS` o `CONTROL`, desde la pantalla del
+  árbitro): columnas por tapiz en tablet y escritorio, uno debajo de otro en móvil; solo grupos por acabar
+  (los terminados, contados); mantener pulsado y arrastrar, o «Mover» en cada grupo. Uno en combate no se mueve.
 
 ## GR-5 · Grupos de distintos tamaños
 - Decidido el 2026-11-21 (`decisiones.md`, grupos nórdicos de tamaño libre): rango por categoría, ida y vuelta

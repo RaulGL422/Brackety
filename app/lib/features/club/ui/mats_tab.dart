@@ -31,6 +31,20 @@ class MatsTab extends ConsumerWidget {
           : ListView(
               padding: const EdgeInsets.all(AppSpacing.l),
               children: [
+                // GR-4: who is in each group, and moving them by dragging.
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size(0, AppSizes.touchTarget),
+                    ),
+                    icon: const Icon(Icons.view_column_outlined),
+                    label: Text(l10n.matGroupsTitle),
+                    onPressed: () =>
+                        context.push('/events/$eventId/mat-groups'),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.m),
                 for (final mat in mats) _MatCard(eventId: eventId, mat: mat),
               ],
             ),

@@ -85,6 +85,11 @@ public class MatchControlService {
         access.require(eventId, accountId, EventPermission.CONTROL);
     }
 
+    /** Moving whole groups: the control panel, or only that (GR-4). */
+    public void requireGroupMover(UUID eventId, UUID accountId) {
+        access.require(eventId, accountId, EventPermission.CONTROL, EventPermission.MOVE_GROUPS);
+    }
+
     /** An individual group and its pending matches go to another mat; the played ones stay where they were. */
     @Transactional
     public void moveGroup(UUID eventId, UUID groupId, UUID matId, UUID by) {

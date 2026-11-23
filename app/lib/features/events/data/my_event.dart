@@ -13,7 +13,8 @@ enum EventPermission {
   control('CONTROL'),
   reviews('REVIEWS'),
   deviceImport('DEVICE_IMPORT'),
-  participants('PARTICIPANTS');
+  participants('PARTICIPANTS'),
+  moveGroups('MOVE_GROUPS');
 
   const EventPermission(this.wire);
 

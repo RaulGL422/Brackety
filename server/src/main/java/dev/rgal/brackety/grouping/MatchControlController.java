@@ -39,7 +39,8 @@ class MatchControlController {
             @PathVariable UUID groupId,
             @Valid @RequestBody MoveRequest request,
             @AuthenticationPrincipal Jwt jwt) {
-        var by = controller(eventId, jwt);
+        var by = CurrentAccount.id(jwt);
+        control.requireGroupMover(eventId, by);
         control.moveGroup(eventId, groupId, request.matId(), by);
     }
 
