@@ -263,6 +263,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Could not upload: it must be a PDF of up to 10 MB.';
 
   @override
+  String get rulebookUploadFailed =>
+      'Could not upload the rulebook. Check the connection and try again.';
+
+  @override
+  String get fileUploadWebOnly =>
+      'Uploading files only works on the web for now.';
+
+  @override
   String get rulebookRemoveError => 'Could not remove the rulebook.';
 
   @override

@@ -464,6 +464,18 @@ abstract class AppLocalizations {
   /// **'No se pudo subir: tiene que ser un PDF de hasta 10 MB.'**
   String get rulebookUploadError;
 
+  /// No description provided for @rulebookUploadFailed.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo subir el reglamento. Comprueba la conexión e inténtalo otra vez.'**
+  String get rulebookUploadFailed;
+
+  /// No description provided for @fileUploadWebOnly.
+  ///
+  /// In es, this message translates to:
+  /// **'Subir archivos solo se puede desde la web por ahora.'**
+  String get fileUploadWebOnly;
+
   /// No description provided for @rulebookRemoveError.
   ///
   /// In es, this message translates to:

@@ -5,8 +5,6 @@ Lo que espera a alguien, ordenado por quién tiene que actuar. Lo hecho se borra
 ## 1. Preguntas para Raul
 ### Producto
 - [ ] Competición del 2026-12-20: modalidades y su puntuación, categorías, tapices y servidor (`producto/competicion-2026-12-20.md`).
-- [ ] GR-6 (`producto/feedback-grappling.md`): qué falló con los 15 puntos de diferencia (¿el combate no acabó, no estaba en Ajustes o no venía por defecto?).
-- [ ] GR-10: el PDF del reglamento en la web no sube. Decir qué pasa al elegirlo (¿mensaje?) y cuánto pesa.
 - [ ] GR-2: probar en debug con el iPhone (Safari) el QR abierto desde la cámara y desde una web lectora; antes y después del arreglo. Debug ya preparado (2026-11-22): `ACCESS_TTL=1m`, cuenta `club1`/`club1`, evento «Open de Grappling». Al acabar, quitar `ACCESS_TTL` de `deploy/.env.debug` en la Pi (copia en `.env.debug.bak-gr2`) y `./deploy.sh debug`.
 - [ ] Puntuación de la F2 (armas) y escalas de la F3 (`reglamentos/yoseikan-2027.md`, sección de abajo).
 - [ ] Correos: elegir de la lista propuesta (`modulos/notificaciones.md`, «Propuesta a Raul») y si vale enviar resultados por correo; llevan datos de menores (`06-legal-rgpd.md`).
@@ -32,6 +30,8 @@ Lo que espera a alguien, ordenado por quién tiene que actuar. Lo hecho se borra
 
 ## 2. Pruebas a mano (Raul)
 Todo está fusionado; falta comprobarlo en debug o en la Pi.
+- [ ] GR-10: subir el PDF del reglamento desde el iPhone (Safari) y abrirlo (#171).
+- [ ] GR-11: Ajustes con Guardar; añadir un tapiz, salir y volver (#170).
 - [ ] `auth` completo: registro, login y bloqueo, verificación, recuperación, Google, perfiles, cambio de email, borrado y restaurar, exportación; admin con superadmin (`modulos/auth.md`).
 - [ ] `legal-paginas`: páginas, casilla del registro, pie y ajustes.
 - [ ] Grappling (G1-G5): escenario `grappling`; marcador, prórroga, puntos de clasificación y «Nuevo evento» (`producto/grappling.md`).

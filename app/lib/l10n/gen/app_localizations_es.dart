@@ -263,6 +263,14 @@ class AppLocalizationsEs extends AppLocalizations {
       'No se pudo subir: tiene que ser un PDF de hasta 10 MB.';
 
   @override
+  String get rulebookUploadFailed =>
+      'No se pudo subir el reglamento. Comprueba la conexión e inténtalo otra vez.';
+
+  @override
+  String get fileUploadWebOnly =>
+      'Subir archivos solo se puede desde la web por ahora.';
+
+  @override
   String get rulebookRemoveError => 'No se pudo quitar el reglamento.';
 
   @override

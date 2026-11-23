@@ -113,18 +113,28 @@ class _RulebookSectionState extends ConsumerState<RulebookSection> {
   Future<void> _upload() async {
     final l10n = AppLocalizations.of(context);
     final toasts = Toasts.of(context);
-    final picked = await ref.read(pickFilesProvider)(
-      accept: 'application/pdf,.pdf',
-      multiple: false,
-    );
+    final List<PickedFile> picked;
+    try {
+      picked = await ref.read(pickFilesProvider)(
+        accept: 'application/pdf,.pdf',
+        multiple: false,
+      );
+    } on UnsupportedError {
+      toasts.show(l10n.fileUploadWebOnly, kind: ToastKind.error);
+      return;
+    }
     if (picked.isEmpty) return;
     await _run(
       () => ref
           .read(rulebookRepositoryProvider)
           .upload(widget.eventId, picked.single.name, picked.single.bytes),
       done: () => toasts.show(l10n.rulebookUploaded, kind: ToastKind.success),
-      failed: () =>
-          toasts.show(l10n.rulebookUploadError, kind: ToastKind.error),
+      failed: (e) => toasts.show(
+        e is DioException && e.response?.statusCode == 400
+            ? l10n.rulebookUploadError
+            : l10n.rulebookUploadFailed,
+        kind: ToastKind.error,
+      ),
     );
   }
 
@@ -134,7 +144,7 @@ class _RulebookSectionState extends ConsumerState<RulebookSection> {
     await _run(
       () => ref.read(rulebookRepositoryProvider).delete(widget.eventId),
       done: () {},
-      failed: () =>
+      failed: (_) =>
           toasts.show(l10n.rulebookRemoveError, kind: ToastKind.error),
     );
   }
@@ -142,14 +152,14 @@ class _RulebookSectionState extends ConsumerState<RulebookSection> {
   Future<void> _run(
     Future<void> Function() action, {
     required VoidCallback done,
-    required VoidCallback failed,
+    required void Function(Object error) failed,
   }) async {
     setState(() => _busy = true);
     try {
       await action();
       done();
-    } on DioException {
-      failed();
+    } catch (e) {
+      failed(e);
     } finally {
       ref.invalidate(rulebookNameProvider(widget.eventId));
       ref.invalidate(rulebookPdfProvider(widget.eventId));

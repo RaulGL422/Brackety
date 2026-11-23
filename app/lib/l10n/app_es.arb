@@ -73,6 +73,8 @@
   "rulebookRemove": "Quitar",
   "rulebookUploaded": "Reglamento subido",
   "rulebookUploadError": "No se pudo subir: tiene que ser un PDF de hasta 10 MB.",
+  "rulebookUploadFailed": "No se pudo subir el reglamento. Comprueba la conexión e inténtalo otra vez.",
+  "fileUploadWebOnly": "Subir archivos solo se puede desde la web por ahora.",
   "rulebookRemoveError": "No se pudo quitar el reglamento.",
   "rulebookOpenError": "No se pudo abrir el reglamento. Comprueba la conexión.",
   "@@locale": "es",

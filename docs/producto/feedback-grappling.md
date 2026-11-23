@@ -57,8 +57,9 @@ competición del 2026-12-20 (`competicion-2026-12-20.md`); objetivo de prueba in
   vuelta opcional, hasta tamaño − 1 comodines.
 
 ## GR-6 · Configuración pedida que no se aplicó
-- Raul (2026-11-23): grupos no solo de 4 (es GR-5) y fin a 15 puntos de diferencia. Este existe en Ajustes y
-  en el marcador desde la #165: por concretar qué falló (`pendientes.md`).
+- Raul (2026-11-23): grupos no solo de 4 (es GR-5) y fin a 15 puntos de diferencia.
+- Los 15 puntos no son un fallo: falta poder configurar el deporte. Pasa a plantillas de deporte
+  (`plantillas-deporte.md`): nada fijo en código, todo elegible al crear o escoger el deporte.
 
 ## GR-7 · Ambiente de la app: menos datos, más arrastrar
 - Raul (2026-11-22): hoy da sensación de «muchísimos datos, opciones descontroladas y poco sentido».
@@ -76,8 +77,8 @@ competición del 2026-12-20 (`competicion-2026-12-20.md`); objetivo de prueba in
 - Una ayuda de test en `brackety_core` que pase las guías de Flutter a 3 tamaños y texto al 200 %.
 
 ## GR-10 · PDF del reglamento
-- En la web no sube (Raul, 2026-11-23). En Android elegir archivo no existe (`file_upload_stub.dart`) y el error
-  se pierde sin aviso.
+- En el iPhone (Safari) elegirlo no hacía nada (Raul, 2026-11-23): el selector no estaba en la página. Ahora
+  sí, y todo fallo avisa; en Android avisa de que es solo web. Hecho (#171); falta la prueba de Raul.
 
 ## GR-11 · Ajustes con botón Guardar
 - Un tapiz añadido no seguía al salir y entrar, sin mensaje: el guardado automático se saltaba todo si un
