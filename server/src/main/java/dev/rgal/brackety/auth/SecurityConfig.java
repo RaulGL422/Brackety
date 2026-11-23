@@ -119,7 +119,7 @@ public class SecurityConfig {
     @Bean
     @Order(2)
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // CSRF is off because the API is stateless; the only cookie (refresh) is SameSite=Strict.
+        // CSRF is off because the API is stateless; the only cookie (refresh) is SameSite=Lax and only POST reads it.
         return http.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

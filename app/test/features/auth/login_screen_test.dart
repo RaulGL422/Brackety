@@ -30,6 +30,29 @@ void main() {
     });
   }
 
+  // GR-2: a referee let in by QR whose session dropped got an empty sign-in screen.
+  testWidgets('a lost QR session brings its sign-in back', (tester) async {
+    final store = FakeRefreshTokenStore(inCookie: true)..qrSignIn = 'qr-k3f9a2';
+    await pumpAuthApp(tester, FakeAuthApi(), store: store);
+
+    expect(find.textContaining('Sign in with qr-k3f9a2'), findsOneWidget);
+    expect(find.widgetWithText(TextField, 'qr-k3f9a2'), findsOneWidget);
+    expect(find.text('Email or sign-in'), findsOneWidget);
+  });
+
+  testWidgets('without a QR account used here nothing is offered', (
+    tester,
+  ) async {
+    await pumpAuthApp(
+      tester,
+      FakeAuthApi(),
+      store: FakeRefreshTokenStore(inCookie: true),
+    );
+
+    expect(find.textContaining('the club gave you'), findsNothing);
+    expect(find.widgetWithText(TextField, 'qr-k3f9a2'), findsNothing);
+  });
+
   testWidgets('empty fields are not sent', (tester) async {
     final api = FakeAuthApi();
     await pumpAuthApp(tester, api);

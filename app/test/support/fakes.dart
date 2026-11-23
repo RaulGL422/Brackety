@@ -242,6 +242,14 @@ class FakeRefreshTokenStore implements RefreshTokenStore {
 
   @override
   Future<bool> hasSession() async => inCookie ? marked : token != null;
+
+  String? qrSignIn;
+
+  @override
+  Future<String?> readQrSignIn() async => qrSignIn;
+
+  @override
+  Future<void> writeQrSignIn(String? signIn) async => qrSignIn = signIn;
 }
 
 /// `/api/v1/me` without a server, starting from [account]. The password is [password]; each
@@ -373,12 +381,14 @@ Account testAccount({
   List<SignInMethod> signInMethods = const [
     SignInMethod(method: SignInMethod.password),
   ],
+  bool temporary = false,
 }) => Account(
   email: email,
   emailVerified: emailVerified,
   locale: locale,
   profiles: profiles,
   signInMethods: signInMethods,
+  temporary: temporary,
 );
 
 /// The club of event [id]: it may do everything there (F1-7 C).

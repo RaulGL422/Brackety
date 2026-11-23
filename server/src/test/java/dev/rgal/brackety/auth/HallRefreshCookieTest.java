@@ -36,7 +36,7 @@ class HallRefreshCookieTest extends AuthIntegrationTest {
                 .andReturn()
                 .getResponse();
         assertThat(login.getHeader(HttpHeaders.SET_COOKIE))
-                .contains("HttpOnly", "SameSite=Strict", "Path=/api/v1/auth")
+                .contains("HttpOnly", "SameSite=Lax", "Path=/api/v1/auth")
                 .doesNotContain("Secure");
 
         var refreshed = mvc.perform(post("/api/v1/auth/refresh")

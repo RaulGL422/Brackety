@@ -1,5 +1,6 @@
 import 'package:brackety/app.dart';
 import 'package:brackety/core/router.dart';
+import 'package:brackety/features/auth/data/refresh_token_store.dart';
 import 'package:brackety/features/auth/state/auth_providers.dart';
 import 'package:brackety/features/events/state/events_providers.dart';
 import 'package:brackety/features/legal/data/legal_repository.dart';
@@ -33,12 +34,13 @@ Future<GoRouter> pumpAuthApp(
   bool devEnvironment = false,
   FakeAccountApi? account,
   FakeLegalRepository? legal,
+  RefreshTokenStore store = const CookieRefreshTokenStore(),
   List<Override> overrides = const [],
 }) async {
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        ...sessionOverrides(api, account: account),
+        ...sessionOverrides(api, account: account, store: store),
         ...overrides,
         todayProvider.overrideWithValue(DateTime(2026, 10, 31)),
         devEnvironmentProvider.overrideWithValue(devEnvironment),

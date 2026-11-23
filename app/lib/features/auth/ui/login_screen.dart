@@ -35,6 +35,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   String? _error;
 
   @override
+  void initState() {
+    super.initState();
+    _offerQrSignIn();
+  }
+
+  // A referee whose session dropped: their sign-in is already typed (GR-2).
+  Future<void> _offerQrSignIn() async {
+    if (!ref.read(sessionProvider).expired) return;
+    final signIn = await ref.read(qrSignInProvider.future);
+    if (signIn != null && mounted && _email.text.isEmpty) {
+      setState(() => _email.text = signIn);
+    }
+  }
+
+  @override
   void dispose() {
     _email.dispose();
     _password.dispose();
@@ -115,6 +130,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final l10n = AppLocalizations.of(context);
     final error = _error;
     final notice = ref.watch(sessionProvider.select((s) => s.notice));
+    final expired = ref.watch(sessionProvider.select((s) => s.expired));
+    final qrSignIn = expired ? ref.watch(qrSignInProvider).value : null;
     return AuthFormPage(
       title: l10n.loginTitle,
       children: [
@@ -124,6 +141,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ],
         if (notice != null) ...[
           FormMessage.success(_noticeText(l10n, notice)),
+          const SizedBox(height: AppSpacing.l),
+        ],
+        if (qrSignIn != null) ...[
+          FormMessage.error(l10n.loginQrSessionLost(qrSignIn)),
           const SizedBox(height: AppSpacing.l),
         ],
         const ServerTile(),
@@ -142,7 +163,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     AutofillHints.username,
                   ],
                   textInputAction: TextInputAction.next,
-                  decoration: InputDecoration(labelText: l10n.emailLabel),
+                  // A QR account signs in with its `qr-…` sign-in, not an email.
+                  decoration: InputDecoration(labelText: l10n.loginUserLabel),
                   validator: (value) =>
                       (value ?? '').trim().isEmpty ? l10n.fieldRequired : null,
                 ),
