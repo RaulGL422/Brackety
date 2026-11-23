@@ -103,7 +103,7 @@ class _AccessTile extends ConsumerWidget {
       contentPadding: EdgeInsets.zero,
       leading: const Icon(Icons.badge_outlined),
       title: Text(access.name, overflow: TextOverflow.ellipsis),
-      subtitle: Text('$role · $status'),
+      subtitle: Text([role, status, ?access.signIn].join(' · ')),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

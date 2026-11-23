@@ -8,6 +8,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
 import '../../auth/data/api_error.dart';
+import '../../auth/ui/widgets/confirm_dialog.dart';
 import '../../club/state/club_providers.dart';
 import '../data/staff_repository.dart';
 import '../data/temporary_access.dart';
@@ -19,6 +20,7 @@ class QrAccessButton extends ConsumerWidget {
     required this.eventId,
     required this.role,
     this.mat,
+    this.replaces,
   });
 
   final String eventId;
@@ -26,6 +28,9 @@ class QrAccessButton extends ConsumerWidget {
 
   /// For a referee: the mat they take.
   final int? mat;
+
+  /// Who has [mat] now, if anyone: they leave it with the new QR.
+  final String? replaces;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -35,7 +40,18 @@ class QrAccessButton extends ConsumerWidget {
       tooltip: mat == null
           ? l10n.qrAccessCreateHelper
           : l10n.qrAccessCreateReferee(mat!),
-      onPressed: () => createQrAccess(context, ref, eventId, role, mat),
+      onPressed: () async {
+        if (replaces case final name? when mat != null) {
+          final l10n = AppLocalizations.of(context);
+          final go = await confirmAction(
+            context,
+            body: l10n.qrAccessReplacesReferee(mat!, name),
+            confirmLabel: l10n.qrAccessCreate,
+          );
+          if (!go || !context.mounted) return;
+        }
+        await createQrAccess(context, ref, eventId, role, mat);
+      },
     );
   }
 }
@@ -96,7 +112,8 @@ String qrAccessError(AppLocalizations l10n, DioException e) =>
       _ => l10n.saveError,
     };
 
-/// The QR until it is scanned: then the club hears who came in, and it closes.
+/// The QR and the sign-in and password to come back in. Once scanned the club hears who came in; it
+/// stays open so the password can still be written down.
 Future<void> showQr(
   BuildContext context,
   String eventId,
@@ -194,6 +211,7 @@ class _QrDialog extends ConsumerStatefulWidget {
 class _QrDialogState extends ConsumerState<_QrDialog> {
   static const _check = Duration(seconds: 3);
   Timer? _timer;
+  var _signedIn = false;
 
   @override
   void initState() {
@@ -207,7 +225,7 @@ class _QrDialogState extends ConsumerState<_QrDialog> {
     super.dispose();
   }
 
-  // The club's confirmation: as soon as the code is used, say who came in and close.
+  // The club's confirmation: as soon as the code is used, say who came in.
   Future<void> _checkSignedIn() async {
     final List<TemporaryAccess> all;
     try {
@@ -223,11 +241,7 @@ class _QrDialogState extends ConsumerState<_QrDialog> {
     }
     _timer?.cancel();
     ref.invalidate(temporaryAccessesProvider(widget.eventId));
-    Toasts.of(context).show(
-      AppLocalizations.of(context).qrAccessSignedIn(widget.access.name),
-      kind: ToastKind.success,
-    );
-    Navigator.pop(context);
+    setState(() => _signedIn = true);
   }
 
   @override
@@ -243,31 +257,39 @@ class _QrDialogState extends ConsumerState<_QrDialog> {
           mainAxisSize: MainAxisSize.min,
           spacing: AppSpacing.m,
           children: [
-            // White behind the code whatever the theme: phone cameras read dark on light.
-            Container(
-              color: Colors.white,
-              padding: const EdgeInsets.all(AppSpacing.m),
-              // A fixed size: the dialog measures its content and the QR cannot be measured.
-              child: SizedBox.square(
-                dimension: 240,
-                child: QrImageView(
-                  data: link,
-                  semanticsLabel: l10n.qrAccessCodeLabel(widget.access.name),
-                ),
-              ),
+            _QrCode(
+              link: link,
+              label: l10n.qrAccessCodeLabel(widget.access.name),
             ),
             Text(l10n.qrAccessScan, textAlign: TextAlign.center),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               spacing: AppSpacing.s,
               children: [
-                const SizedBox.square(
-                  dimension: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+                if (_signedIn)
+                  Icon(
+                    Icons.check_circle,
+                    color: Theme.of(context).colorScheme.primary,
+                  )
+                else
+                  const SizedBox.square(
+                    dimension: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                Flexible(
+                  child: Text(
+                    _signedIn
+                        ? l10n.qrAccessSignedIn(widget.access.name)
+                        : l10n.qrAccessWaiting,
+                  ),
                 ),
-                Flexible(child: Text(l10n.qrAccessWaiting)),
               ],
             ),
+            if (widget.access case TemporaryAccess(
+              :final signIn?,
+              :final password?,
+            ))
+              _Credentials(signIn: signIn, password: password),
           ],
         ),
       ),
@@ -276,6 +298,51 @@ class _QrDialogState extends ConsumerState<_QrDialog> {
           onPressed: () => Navigator.pop(context),
           child: Text(l10n.close),
         ),
+      ],
+    );
+  }
+}
+
+/// White behind the code whatever the theme: phone cameras read dark on light.
+class _QrCode extends StatelessWidget {
+  const _QrCode({required this.link, required this.label});
+
+  final String link;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    color: Colors.white,
+    padding: const EdgeInsets.all(AppSpacing.m),
+    // A fixed size: the dialog measures its content and the QR cannot be measured.
+    child: SizedBox.square(
+      dimension: 240,
+      child: QrImageView(data: link, semanticsLabel: label),
+    ),
+  );
+}
+
+/// What to type in "Sign in" if the session closes: big, selectable, no look-alike characters.
+class _Credentials extends StatelessWidget {
+  const _Credentials({required this.signIn, required this.password});
+
+  final String signIn;
+  final String password;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final text = Theme.of(context).textTheme;
+    final value = text.titleLarge?.copyWith(fontFamily: 'monospace');
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: AppSpacing.xs,
+      children: [
+        Text(l10n.qrAccessSignInLabel, style: text.labelMedium),
+        SelectableText(signIn, style: value),
+        Text(l10n.qrAccessPasswordLabel, style: text.labelMedium),
+        SelectableText(password, style: value),
+        Text(l10n.qrAccessCredentialsHint, style: text.bodySmall),
       ],
     );
   }

@@ -4,8 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../auth/state/session_controller.dart';
 import 'staff_repository.dart';
 
-/// Someone let in by QR for this event (a temporary account). [waiting]: its code is unused;
-/// [signedInAt]: when it was used; [link]: only right after creating or renewing it, for the QR.
+/// Someone let in by QR for this event (a temporary account). [signIn]: its account's sign-in;
+/// [waiting]: its code is unused; [signedInAt]: when it was used; [link] and [password]: only right
+/// after creating or renewing it, for the QR and to sign in again by hand.
 class TemporaryAccess {
   const TemporaryAccess({
     required this.id,
@@ -17,6 +18,8 @@ class TemporaryAccess {
     this.mat,
     this.signedInAt,
     this.link,
+    this.signIn,
+    this.password,
   });
 
   factory TemporaryAccess.fromJson(Map<String, dynamic> json) =>
@@ -33,6 +36,8 @@ class TemporaryAccess {
         },
         ended: json['ended'] as bool,
         link: json['link'] as String?,
+        signIn: json['signIn'] as String?,
+        password: json['password'] as String?,
       );
 
   final String id;
@@ -44,6 +49,8 @@ class TemporaryAccess {
   final DateTime? signedInAt;
   final bool ended;
   final String? link;
+  final String? signIn;
+  final String? password;
 }
 
 /// QR accesses of an event, for its club (docs/modulos/ayudantes-permisos.md).

@@ -16,6 +16,7 @@ import dev.rgal.brackety.event.EventStaff;
 import dev.rgal.brackety.event.EventStaffRepository;
 import dev.rgal.brackety.event.Mat;
 import dev.rgal.brackety.event.MatRepository;
+import dev.rgal.brackety.event.PhaseCreated;
 import dev.rgal.brackety.league.dto.LeagueDtos.Candidate;
 import dev.rgal.brackety.league.dto.LeagueDtos.CategoryPodiumDto;
 import dev.rgal.brackety.league.dto.LeagueDtos.DisciplineResponse;
@@ -39,6 +40,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,6 +61,7 @@ public class LeagueService {
     private final EventOrganizationRepository organizations;
     private final ParticipantRepository participants;
     private final EventAccess access;
+    private final ApplicationEventPublisher publisher;
     private final Clock clock;
 
     LeagueService(
@@ -72,6 +75,7 @@ public class LeagueService {
             EventOrganizationRepository organizations,
             ParticipantRepository participants,
             EventAccess access,
+            ApplicationEventPublisher publisher,
             Clock clock) {
         this.leagues = leagues;
         this.podiums = podiums;
@@ -83,6 +87,7 @@ public class LeagueService {
         this.organizations = organizations;
         this.participants = participants;
         this.access = access;
+        this.publisher = publisher;
         this.clock = clock;
     }
 
@@ -147,6 +152,7 @@ public class LeagueService {
         for (var o : organizations.findByEventIdOrderByName(eventId)) {
             organizations.save(new EventOrganization(phase.getId(), o.getOrganization()));
         }
+        publisher.publishEvent(new PhaseCreated(eventId, phase.getId()));
         return new PhaseResponse(
                 phase.getId(), number, phase.getName(), phase.getEventDate(), phase.getDiscipline(), 0);
     }

@@ -34,7 +34,8 @@ competición del 2026-12-20 (`competicion-2026-12-20.md`); objetivo de prueba in
   ve junto al QR). Si se cae la sesión, se vuelve a entrar con ellos sin un QR nuevo.
 - El acceso pasa a la fase siguiente con su tapiz; un QR nuevo para un tapiz ocupado avisa de a quién sustituye;
   escanear en un móvil con sesión pregunta antes de cambiar de cuenta.
-- La sesión aguanta toda la fase sin intervención. Se cierra al acabar el evento (no la fase) o con «Quitar acceso».
+- La sesión aguanta toda la fase sin intervención. Se cierra al acabar la fase (si la siguiente se creó antes, sigue en ella) o con «Quitar acceso» (Raul, 2026-11-23).
+- Hecho (PR A): usuario y contraseña, paso a la fase siguiente, aviso de tapiz ocupado, test de jornada. Preguntar antes de cambiar de cuenta ya existía. Falta (PR B): volver a entrar tras un 401 sin token y la cookie tras la prueba del iPhone.
 - Test con reloj simulado: la sesión temporal aguanta una jornada entera y el paso a la fase siguiente (GR-8).
 
 ## GR-3 · Tapiz sin árbitro admite grupos
