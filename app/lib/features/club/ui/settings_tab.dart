@@ -69,11 +69,15 @@ int? parseAttendancePoints(String text) {
 
 /// Event name and date, match length, points limit, superiority gap and attendance points, mats with their referee, and the
 /// categories.
-/// Every change saves on its own; a refused one goes back to what the server has.
+/// The event's fields save with a button (an autosave that silently skipped an invalid field lost a new mat, Raul
+/// 2026-11-23); the sections below them save on their own.
 class SettingsTab extends ConsumerWidget {
-  const SettingsTab({super.key, required this.eventId});
+  const SettingsTab({super.key, required this.eventId, required this.unsaved});
 
   final String eventId;
+
+  /// True while the event's fields have changes not saved, for the panel to ask before leaving.
+  final ValueNotifier<bool> unsaved;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -81,16 +85,22 @@ class SettingsTab extends ConsumerWidget {
     return AsyncView(
       value: ref.watch(provider),
       onRetry: () => ref.invalidate(provider),
-      data: (settings) => _SettingsForm(eventId: eventId, initial: settings),
+      data: (settings) =>
+          _SettingsForm(eventId: eventId, initial: settings, unsaved: unsaved),
     );
   }
 }
 
 class _SettingsForm extends ConsumerStatefulWidget {
-  const _SettingsForm({required this.eventId, required this.initial});
+  const _SettingsForm({
+    required this.eventId,
+    required this.initial,
+    required this.unsaved,
+  });
 
   final String eventId;
   final EventSettings initial;
+  final ValueNotifier<bool> unsaved;
 
   @override
   ConsumerState<_SettingsForm> createState() => _SettingsFormState();
@@ -122,13 +132,11 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
   late final _attendance = TextEditingController(
     text: '${_saved.attendancePoints}',
   );
-  Timer? _nameTyping;
+  final _form = GlobalKey<FormState>();
   var _saving = false;
-  var _changedWhileSaving = false;
 
   @override
   void dispose() {
-    _nameTyping?.cancel();
     _name.dispose();
     _length.dispose();
     _limit.dispose();
@@ -140,15 +148,27 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
     super.dispose();
   }
 
-  // A QR access for a mat puts its referee there on the server: show it, unless a save is on its way.
+  // A QR access for a mat puts its referee there on the server: show it, unless the club has changes to save.
   @override
   void didUpdateWidget(covariant _SettingsForm oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final referees = widget.initial.matReferees;
-    if (!_saving && !listEquals(referees, oldWidget.initial.matReferees)) {
-      _matReferees = [...referees];
+    if (!_saving && !_dirty && widget.initial != oldWidget.initial) {
+      _saved = widget.initial;
+      _fillFromSaved();
     }
   }
+
+  bool get _dirty =>
+      _name.text.trim() != _saved.name ||
+      _date != _saved.date ||
+      !listEquals(_matReferees, _saved.matReferees) ||
+      _length.text.trim() != formatMatchLength(_saved.matchLength) ||
+      _limit.text.trim() != _limitText(_saved.pointsLimit) ||
+      _teamLength.text.trim() != formatMatchLength(_saved.teamMatchLength) ||
+      _teamLimit.text.trim() != _limitText(_saved.teamPointsLimit) ||
+      _gap.text.trim() != _limitText(_saved.superiorityGap) ||
+      _minRest.text.trim() != '${_saved.minRest.inSeconds}' ||
+      _attendance.text.trim() != '${_saved.attendancePoints}';
 
   Widget _matReferee(EventSettings settings, int i, String? refereeId) {
     final l10n = AppLocalizations.of(context);
@@ -175,231 +195,242 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
 
   void _change(VoidCallback update) {
     setState(update);
-    _save();
+    widget.unsaved.value = _dirty;
   }
 
   @override
   Widget build(BuildContext context) {
+    final settings = widget.initial;
+    return Form(
+      key: _form,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      child: Column(
+        children: [
+          Expanded(child: _fields(context, settings)),
+          if (_dirty || _saving)
+            _SaveBar(saving: _saving, onDiscard: _discard, onSave: _save),
+        ],
+      ),
+    );
+  }
+
+  Widget _fields(BuildContext context, EventSettings settings) {
     final l10n = AppLocalizations.of(context);
     final locale = Localizations.localeOf(context).toLanguageTag();
     final text = Theme.of(context).textTheme;
-    final settings = widget.initial;
-    return Form(
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      child: ListView(
-        padding: const EdgeInsets.all(AppSpacing.l),
-        children: [
-          TextFormField(
-            controller: _name,
-            decoration: InputDecoration(labelText: l10n.settingsName),
-            maxLength: 120,
-            validator: (v) =>
-                v == null || v.trim().isEmpty ? l10n.fieldRequired : null,
-            onChanged: (_) => _typed(),
-            onFieldSubmitted: (_) => _save(),
-          ),
-          InkWell(
-            onTap: _pickDate,
-            child: InputDecorator(
-              decoration: InputDecoration(
-                labelText: l10n.settingsDate,
-                suffixIcon: const Icon(Icons.calendar_today_outlined),
-              ),
-              child: Text(DateFormat.yMMMMd(locale).format(_date)),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xl),
-          Text(l10n.settingsMatchRules, style: text.titleMedium),
-          const SizedBox(height: AppSpacing.s),
-          TextFormField(
-            controller: _length,
+    return ListView(
+      padding: const EdgeInsets.all(AppSpacing.l),
+      children: [
+        TextFormField(
+          controller: _name,
+          decoration: InputDecoration(labelText: l10n.settingsName),
+          maxLength: 120,
+          validator: (v) =>
+              v == null || v.trim().isEmpty ? l10n.fieldRequired : null,
+          onChanged: (_) => _change(() {}),
+          onFieldSubmitted: (_) => _save(),
+        ),
+        InkWell(
+          onTap: _pickDate,
+          child: InputDecorator(
             decoration: InputDecoration(
-              labelText: l10n.settingsMatchLength,
-              helperText: l10n.settingsMatchLengthHint,
-              helperMaxLines: 3,
+              labelText: l10n.settingsDate,
+              suffixIcon: const Icon(Icons.calendar_today_outlined),
             ),
-            keyboardType: TextInputType.datetime,
-            validator: (v) => parseMatchLength(v ?? '') == null
-                ? l10n.settingsMatchLengthInvalid
-                : null,
-            onChanged: (_) => _typed(),
-            onFieldSubmitted: (_) => _save(),
+            child: Text(DateFormat.yMMMMd(locale).format(_date)),
           ),
-          const SizedBox(height: AppSpacing.m),
-          TextFormField(
-            controller: _limit,
-            decoration: InputDecoration(
-              labelText: l10n.settingsPointsLimit,
-              helperText: l10n.settingsPointsLimitHint,
-              helperMaxLines: 3,
-            ),
-            keyboardType: TextInputType.number,
-            validator: (v) => parsePointsLimit(v ?? '') == null
-                ? l10n.settingsPointsLimitInvalid
-                : null,
-            onChanged: (_) => _typed(),
-            onFieldSubmitted: (_) => _save(),
+        ),
+        const SizedBox(height: AppSpacing.xl),
+        Text(l10n.settingsMatchRules, style: text.titleMedium),
+        const SizedBox(height: AppSpacing.s),
+        TextFormField(
+          controller: _length,
+          decoration: InputDecoration(
+            labelText: l10n.settingsMatchLength,
+            helperText: l10n.settingsMatchLengthHint,
+            helperMaxLines: 3,
           ),
-          const SizedBox(height: AppSpacing.m),
-          TextFormField(
-            controller: _teamLength,
-            decoration: InputDecoration(
-              labelText: l10n.settingsTeamMatchLength,
-              helperText: l10n.settingsMatchLengthHint,
-              helperMaxLines: 3,
-            ),
-            keyboardType: TextInputType.datetime,
-            validator: (v) => parseMatchLength(v ?? '') == null
-                ? l10n.settingsMatchLengthInvalid
-                : null,
-            onChanged: (_) => _typed(),
-            onFieldSubmitted: (_) => _save(),
+          keyboardType: TextInputType.datetime,
+          validator: (v) => parseMatchLength(v ?? '') == null
+              ? l10n.settingsMatchLengthInvalid
+              : null,
+          onChanged: (_) => _change(() {}),
+          onFieldSubmitted: (_) => _save(),
+        ),
+        const SizedBox(height: AppSpacing.m),
+        TextFormField(
+          controller: _limit,
+          decoration: InputDecoration(
+            labelText: l10n.settingsPointsLimit,
+            helperText: l10n.settingsPointsLimitHint,
+            helperMaxLines: 3,
           ),
-          const SizedBox(height: AppSpacing.m),
-          TextFormField(
-            controller: _teamLimit,
-            decoration: InputDecoration(
-              labelText: l10n.settingsTeamPointsLimit,
-              helperText: l10n.settingsTeamPointsLimitHint,
-              helperMaxLines: 3,
-            ),
-            keyboardType: TextInputType.number,
-            validator: (v) => parsePointsLimit(v ?? '') == null
-                ? l10n.settingsPointsLimitInvalid
-                : null,
-            onChanged: (_) => _typed(),
-            onFieldSubmitted: (_) => _save(),
+          keyboardType: TextInputType.number,
+          validator: (v) => parsePointsLimit(v ?? '') == null
+              ? l10n.settingsPointsLimitInvalid
+              : null,
+          onChanged: (_) => _change(() {}),
+          onFieldSubmitted: (_) => _save(),
+        ),
+        const SizedBox(height: AppSpacing.m),
+        TextFormField(
+          controller: _teamLength,
+          decoration: InputDecoration(
+            labelText: l10n.settingsTeamMatchLength,
+            helperText: l10n.settingsMatchLengthHint,
+            helperMaxLines: 3,
           ),
-          const SizedBox(height: AppSpacing.m),
-          TextFormField(
-            controller: _gap,
-            decoration: InputDecoration(
-              labelText: l10n.settingsSuperiorityGap,
-              helperText: l10n.settingsSuperiorityGapHint,
-              helperMaxLines: 3,
-            ),
-            keyboardType: TextInputType.number,
-            validator: (v) => parsePointsLimit(v ?? '', max: 100) == null
-                ? l10n.settingsSuperiorityGapInvalid
-                : null,
-            onChanged: (_) => _typed(),
-            onFieldSubmitted: (_) => _save(),
+          keyboardType: TextInputType.datetime,
+          validator: (v) => parseMatchLength(v ?? '') == null
+              ? l10n.settingsMatchLengthInvalid
+              : null,
+          onChanged: (_) => _change(() {}),
+          onFieldSubmitted: (_) => _save(),
+        ),
+        const SizedBox(height: AppSpacing.m),
+        TextFormField(
+          controller: _teamLimit,
+          decoration: InputDecoration(
+            labelText: l10n.settingsTeamPointsLimit,
+            helperText: l10n.settingsTeamPointsLimitHint,
+            helperMaxLines: 3,
           ),
-          const SizedBox(height: AppSpacing.m),
-          TextFormField(
-            controller: _minRest,
-            decoration: InputDecoration(
-              labelText: l10n.settingsMinRest,
-              helperText: l10n.settingsMinRestHint,
-              helperMaxLines: 3,
-            ),
-            keyboardType: TextInputType.number,
-            validator: (v) => parseMinRest(v ?? '') == null
-                ? l10n.settingsMinRestInvalid
-                : null,
-            onChanged: (_) => _typed(),
-            onFieldSubmitted: (_) => _save(),
+          keyboardType: TextInputType.number,
+          validator: (v) => parsePointsLimit(v ?? '') == null
+              ? l10n.settingsPointsLimitInvalid
+              : null,
+          onChanged: (_) => _change(() {}),
+          onFieldSubmitted: (_) => _save(),
+        ),
+        const SizedBox(height: AppSpacing.m),
+        TextFormField(
+          controller: _gap,
+          decoration: InputDecoration(
+            labelText: l10n.settingsSuperiorityGap,
+            helperText: l10n.settingsSuperiorityGapHint,
+            helperMaxLines: 3,
           ),
-          const SizedBox(height: AppSpacing.m),
-          TextFormField(
-            controller: _attendance,
-            decoration: InputDecoration(
-              labelText: l10n.leagueAttendancePoints,
-              helperText: l10n.settingsAttendanceHint,
-              helperMaxLines: 3,
-            ),
-            keyboardType: TextInputType.number,
-            validator: (v) => parseAttendancePoints(v ?? '') == null
-                ? l10n.leagueAttendanceInvalid
-                : null,
-            onChanged: (_) => _typed(),
-            onFieldSubmitted: (_) => _save(),
+          keyboardType: TextInputType.number,
+          validator: (v) => parsePointsLimit(v ?? '', max: 100) == null
+              ? l10n.settingsSuperiorityGapInvalid
+              : null,
+          onChanged: (_) => _change(() {}),
+          onFieldSubmitted: (_) => _save(),
+        ),
+        const SizedBox(height: AppSpacing.m),
+        TextFormField(
+          controller: _minRest,
+          decoration: InputDecoration(
+            labelText: l10n.settingsMinRest,
+            helperText: l10n.settingsMinRestHint,
+            helperMaxLines: 3,
           ),
-          const SizedBox(height: AppSpacing.xl),
-          Text(l10n.clubMats, style: text.titleMedium),
-          for (final (i, refereeId) in _matReferees.indexed)
-            Padding(
-              padding: const EdgeInsets.only(top: AppSpacing.s),
-              child: Row(
-                children: [
-                  Expanded(child: _matReferee(settings, i, refereeId)),
-                  // A referee without an account of their own: a QR for this mat.
-                  QrAccessButton(
-                    eventId: widget.eventId,
-                    role: StaffRole.referee,
-                    mat: i + 1,
-                  ),
-                ],
-              ),
-            ),
-          const SizedBox(height: AppSpacing.s),
-          Wrap(
-            spacing: AppSpacing.s,
-            children: [
-              TextButton.icon(
-                icon: const Icon(Icons.add),
-                label: Text(l10n.settingsAddMat),
-                onPressed: _matReferees.length >= maxMats
-                    ? null
-                    : () => _change(() => _matReferees.add(null)),
-              ),
-              TextButton.icon(
-                icon: const Icon(Icons.remove),
-                label: Text(l10n.settingsRemoveMat),
-                onPressed: _matReferees.length <= 1 ? null : _removeLastMat,
-              ),
-            ],
+          keyboardType: TextInputType.number,
+          validator: (v) => parseMinRest(v ?? '') == null
+              ? l10n.settingsMinRestInvalid
+              : null,
+          onChanged: (_) => _change(() {}),
+          onFieldSubmitted: (_) => _save(),
+        ),
+        const SizedBox(height: AppSpacing.m),
+        TextFormField(
+          controller: _attendance,
+          decoration: InputDecoration(
+            labelText: l10n.leagueAttendancePoints,
+            helperText: l10n.settingsAttendanceHint,
+            helperMaxLines: 3,
           ),
-          const SizedBox(height: AppSpacing.xl),
-          Text(l10n.staffTitle, style: text.titleMedium),
-          Text(l10n.staffHint, style: text.bodySmall),
-          for (final member in settings.staff)
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
+          keyboardType: TextInputType.number,
+          validator: (v) => parseAttendancePoints(v ?? '') == null
+              ? l10n.leagueAttendanceInvalid
+              : null,
+          onChanged: (_) => _change(() {}),
+          onFieldSubmitted: (_) => _save(),
+        ),
+        const SizedBox(height: AppSpacing.xl),
+        Text(l10n.clubMats, style: text.titleMedium),
+        for (final (i, refereeId) in _matReferees.indexed)
+          Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.s),
+            child: Row(
               children: [
-                Expanded(
-                  child: _StaffNameField(
-                    key: ValueKey(member.id),
-                    eventId: widget.eventId,
-                    member: member,
-                  ),
+                Expanded(child: _matReferee(settings, i, refereeId)),
+                // A referee without an account of their own: a QR for this mat.
+                QrAccessButton(
+                  eventId: widget.eventId,
+                  role: StaffRole.referee,
+                  mat: i + 1,
                 ),
-                StaffPermissionsButton(eventId: widget.eventId, member: member),
-                StaffRemoveButton(eventId: widget.eventId, member: member),
               ],
             ),
-          const SizedBox(height: AppSpacing.s),
-          StaffInvitations(eventId: widget.eventId),
-          const SizedBox(height: AppSpacing.xl),
-          QrAccessSection(
-            eventId: widget.eventId,
-            matReferees: _matReferees,
-            hasGrouper: settings.staff.any(
-              (m) => m.permissions.contains(EventPermission.groups),
+          ),
+        const SizedBox(height: AppSpacing.s),
+        Wrap(
+          spacing: AppSpacing.s,
+          children: [
+            TextButton.icon(
+              icon: const Icon(Icons.add),
+              label: Text(l10n.settingsAddMat),
+              onPressed: _matReferees.length >= maxMats
+                  ? null
+                  : () => _change(() => _matReferees.add(null)),
             ),
+            TextButton.icon(
+              icon: const Icon(Icons.remove),
+              label: Text(l10n.settingsRemoveMat),
+              onPressed: _matReferees.length <= 1 ? null : _removeLastMat,
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.xl),
+        Text(l10n.staffTitle, style: text.titleMedium),
+        Text(l10n.staffHint, style: text.bodySmall),
+        for (final member in settings.staff)
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: _StaffNameField(
+                  key: ValueKey(member.id),
+                  eventId: widget.eventId,
+                  member: member,
+                ),
+              ),
+              StaffPermissionsButton(eventId: widget.eventId, member: member),
+              StaffRemoveButton(eventId: widget.eventId, member: member),
+            ],
           ),
-          const SizedBox(height: AppSpacing.xl),
-          Text(l10n.measuresTitle, style: text.titleMedium),
-          MeasuresEditor(eventId: widget.eventId, settings: settings),
-          const SizedBox(height: AppSpacing.xl),
-          Text(l10n.warningReasonsTitle, style: text.titleMedium),
-          WarningReasonsEditor(eventId: widget.eventId, settings: settings),
-          const SizedBox(height: AppSpacing.xl),
-          Text(l10n.categoriesTitle, style: text.titleMedium),
-          CategoriesEditor(
-            eventId: widget.eventId,
-            categories: settings.categories,
+        const SizedBox(height: AppSpacing.s),
+        StaffInvitations(eventId: widget.eventId),
+        const SizedBox(height: AppSpacing.xl),
+        QrAccessSection(
+          eventId: widget.eventId,
+          matReferees: _matReferees,
+          hasGrouper: settings.staff.any(
+            (m) => m.permissions.contains(EventPermission.groups),
           ),
-          const SizedBox(height: AppSpacing.xl),
-          Text(l10n.organizationsTitle, style: text.titleMedium),
-          OrganizationsEditor(
-            eventId: widget.eventId,
-            organizations: settings.organizations,
-          ),
-          const SizedBox(height: AppSpacing.xl),
-          RulebookSection(eventId: widget.eventId),
-        ],
-      ),
+        ),
+        const SizedBox(height: AppSpacing.xl),
+        Text(l10n.measuresTitle, style: text.titleMedium),
+        MeasuresEditor(eventId: widget.eventId, settings: settings),
+        const SizedBox(height: AppSpacing.xl),
+        Text(l10n.warningReasonsTitle, style: text.titleMedium),
+        WarningReasonsEditor(eventId: widget.eventId, settings: settings),
+        const SizedBox(height: AppSpacing.xl),
+        Text(l10n.categoriesTitle, style: text.titleMedium),
+        CategoriesEditor(
+          eventId: widget.eventId,
+          categories: settings.categories,
+        ),
+        const SizedBox(height: AppSpacing.xl),
+        Text(l10n.organizationsTitle, style: text.titleMedium),
+        OrganizationsEditor(
+          eventId: widget.eventId,
+          organizations: settings.organizations,
+        ),
+        const SizedBox(height: AppSpacing.xl),
+        RulebookSection(eventId: widget.eventId),
+      ],
     );
   }
 
@@ -424,64 +455,66 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
     if (picked != null && picked != _date) _change(() => _date = picked);
   }
 
-  // Saves once the club stops typing, not on every key.
-  void _typed() {
-    _nameTyping?.cancel();
-    _nameTyping = Timer(const Duration(milliseconds: 800), _save);
-  }
+  /// The labels of the fields that cannot be saved as they are.
+  List<String> _invalidFields(AppLocalizations l10n) => [
+    if (_name.text.trim().isEmpty) l10n.settingsName,
+    if (parseMatchLength(_length.text) == null) l10n.settingsMatchLength,
+    if (parsePointsLimit(_limit.text) == null) l10n.settingsPointsLimit,
+    if (parseMatchLength(_teamLength.text) == null)
+      l10n.settingsTeamMatchLength,
+    if (parsePointsLimit(_teamLimit.text) == null) l10n.settingsTeamPointsLimit,
+    if (parsePointsLimit(_gap.text, max: 100) == null)
+      l10n.settingsSuperiorityGap,
+    if (parseMinRest(_minRest.text) == null) l10n.settingsMinRest,
+    if (parseAttendancePoints(_attendance.text) == null)
+      l10n.leagueAttendancePoints,
+  ];
 
-  /// One save at a time; changes made meanwhile go in the next one.
+  /// A refused save keeps what the club wrote, to fix it or discard it.
   Future<void> _save() async {
-    _nameTyping?.cancel();
-    final length = parseMatchLength(_length.text);
-    final limit = parsePointsLimit(_limit.text);
-    final attendance = parseAttendancePoints(_attendance.text);
-    final teamLength = parseMatchLength(_teamLength.text);
-    final teamLimit = parsePointsLimit(_teamLimit.text);
-    final gap = parsePointsLimit(_gap.text, max: 100);
-    final minRest = parseMinRest(_minRest.text);
-    if (_name.text.trim().isEmpty ||
-        length == null ||
-        limit == null ||
-        attendance == null ||
-        teamLength == null ||
-        teamLimit == null ||
-        gap == null ||
-        minRest == null) {
+    if (_saving || !_dirty) return;
+    final l10n = AppLocalizations.of(context);
+    final toasts = Toasts.of(context);
+    final invalid = _invalidFields(l10n);
+    if (invalid.isNotEmpty) {
+      _form.currentState?.validate();
+      toasts.show(
+        l10n.settingsFixFields(invalid.join(', ')),
+        kind: ToastKind.error,
+      );
       return;
     }
+    final length = parseMatchLength(_length.text)!;
+    final limit = parsePointsLimit(_limit.text)!;
+    final teamLength = parseMatchLength(_teamLength.text)!;
+    final teamLimit = parsePointsLimit(_teamLimit.text)!;
+    final gap = parsePointsLimit(_gap.text, max: 100)!;
     final rulesChanged =
         length != _saved.matchLength ||
         limit != _saved.pointsLimit ||
         teamLength != _saved.teamMatchLength ||
         teamLimit != _saved.teamPointsLimit ||
         gap != _saved.superiorityGap;
-    if (_saving) {
-      _changedWhileSaving = true;
-      return;
-    }
-    _saving = true;
-    final l10n = AppLocalizations.of(context);
-    final toasts = Toasts.of(context);
+    setState(() => _saving = true);
     try {
-      do {
-        _changedWhileSaving = false;
-        _saved = await ref
-            .read(clubRepositoryProvider)
-            .saveSettings(
-              widget.eventId,
-              name: _name.text.trim(),
-              date: _date,
-              matReferees: [..._matReferees],
-              matchLength: length,
-              pointsLimit: limit,
-              attendancePoints: attendance,
-              teamMatchLength: teamLength,
-              teamPointsLimit: teamLimit,
-              minRest: minRest,
-              superiorityGap: gap,
-            );
-      } while (_changedWhileSaving && mounted);
+      final saved = await ref
+          .read(clubRepositoryProvider)
+          .saveSettings(
+            widget.eventId,
+            name: _name.text.trim(),
+            date: _date,
+            matReferees: [..._matReferees],
+            matchLength: length,
+            pointsLimit: limit,
+            attendancePoints: parseAttendancePoints(_attendance.text)!,
+            teamMatchLength: teamLength,
+            teamPointsLimit: teamLimit,
+            minRest: parseMinRest(_minRest.text)!,
+            superiorityGap: gap,
+          );
+      if (!mounted) return;
+      _saved = saved;
+      _fillFromSaved();
       ref
         ..invalidate(eventSettingsProvider(widget.eventId))
         ..invalidate(leagueStandingsProvider(widget.eventId))
@@ -501,13 +534,14 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
           l10n.settingsMatchRulesConflict,
         _ => saveErrorMessage(l10n, e),
       }, kind: ToastKind.error);
-      if (mounted) _showSaved();
     } finally {
-      _saving = false;
+      if (mounted) _change(() => _saving = false);
     }
   }
 
-  void _showSaved() => setState(() {
+  void _discard() => _change(_fillFromSaved);
+
+  void _fillFromSaved() {
     _name.text = _saved.name;
     _date = _saved.date;
     _matReferees = [..._saved.matReferees];
@@ -518,7 +552,60 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
     _gap.text = _limitText(_saved.superiorityGap);
     _minRest.text = '${_saved.minRest.inSeconds}';
     _attendance.text = '${_saved.attendancePoints}';
+  }
+}
+
+/// Below the event's fields while they have changes: discard them or save them.
+class _SaveBar extends StatelessWidget {
+  const _SaveBar({
+    required this.saving,
+    required this.onDiscard,
+    required this.onSave,
   });
+
+  final bool saving;
+  final VoidCallback onDiscard;
+  final VoidCallback onSave;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Material(
+      elevation: 3,
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.l,
+            vertical: AppSpacing.s,
+          ),
+          child: Wrap(
+            alignment: WrapAlignment.end,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: AppSpacing.s,
+            runSpacing: AppSpacing.s,
+            children: [
+              Text(l10n.settingsUnsaved),
+              TextButton(
+                onPressed: saving ? null : onDiscard,
+                child: Text(l10n.settingsDiscard),
+              ),
+              FilledButton.icon(
+                onPressed: saving ? null : onSave,
+                icon: saving
+                    ? const SizedBox.square(
+                        dimension: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.save_outlined),
+                label: Text(l10n.save),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 // No limit is an empty field.

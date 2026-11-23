@@ -636,6 +636,18 @@
   "settingsAddMat": "Añadir tapiz",
   "settingsRemoveMat": "Quitar el último tapiz",
   "settingsReferee": "Árbitro",
+  "settingsUnsaved": "Cambios sin guardar",
+  "settingsDiscard": "Descartar",
+  "settingsFixFields": "No se ha guardado. Revisa: {fields}.",
+  "@settingsFixFields": {
+    "placeholders": {
+      "fields": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsLeaveUnsaved": "Hay cambios en Ajustes sin guardar. Si sales, se pierden.",
+  "settingsLeaveWithoutSaving": "Salir sin guardar",
   "categoryRange": "{name} · de {min} a {max} años",
   "@categoryRange": {
     "placeholders": {

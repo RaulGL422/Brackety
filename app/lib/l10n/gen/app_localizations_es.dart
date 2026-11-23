@@ -1368,6 +1368,24 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsReferee => 'Árbitro';
 
   @override
+  String get settingsUnsaved => 'Cambios sin guardar';
+
+  @override
+  String get settingsDiscard => 'Descartar';
+
+  @override
+  String settingsFixFields(String fields) {
+    return 'No se ha guardado. Revisa: $fields.';
+  }
+
+  @override
+  String get settingsLeaveUnsaved =>
+      'Hay cambios en Ajustes sin guardar. Si sales, se pierden.';
+
+  @override
+  String get settingsLeaveWithoutSaving => 'Salir sin guardar';
+
+  @override
   String categoryRange(String name, int min, int max) {
     return '$name · de $min a $max años';
   }

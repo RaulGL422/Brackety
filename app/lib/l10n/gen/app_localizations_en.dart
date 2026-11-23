@@ -1359,6 +1359,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsReferee => 'Referee';
 
   @override
+  String get settingsUnsaved => 'Unsaved changes';
+
+  @override
+  String get settingsDiscard => 'Discard';
+
+  @override
+  String settingsFixFields(String fields) {
+    return 'Not saved. Check: $fields.';
+  }
+
+  @override
+  String get settingsLeaveUnsaved =>
+      'There are unsaved changes in Settings. If you leave, they are lost.';
+
+  @override
+  String get settingsLeaveWithoutSaving => 'Leave without saving';
+
+  @override
   String categoryRange(String name, int min, int max) {
     return '$name · $min to $max years';
   }

@@ -5,7 +5,8 @@ Lo que espera a alguien, ordenado por quién tiene que actuar. Lo hecho se borra
 ## 1. Preguntas para Raul
 ### Producto
 - [ ] Competición del 2026-12-20: modalidades y su puntuación, categorías, tapices y servidor (`producto/competicion-2026-12-20.md`).
-- [ ] Tras el grappling (`producto/feedback-grappling.md`): si el árbitro mueve grupos con su permiso o con «Panel de control» (GR-4) y qué configuración pedida faltó (GR-6).
+- [ ] GR-6 (`producto/feedback-grappling.md`): qué falló con los 15 puntos de diferencia (¿el combate no acabó, no estaba en Ajustes o no venía por defecto?).
+- [ ] GR-10: el PDF del reglamento en la web no sube. Decir qué pasa al elegirlo (¿mensaje?) y cuánto pesa.
 - [ ] GR-2: probar en debug con el iPhone (Safari) el QR abierto desde la cámara y desde una web lectora; antes y después del arreglo. Debug ya preparado (2026-11-22): `ACCESS_TTL=1m`, cuenta `club1`/`club1`, evento «Open de Grappling». Al acabar, quitar `ACCESS_TTL` de `deploy/.env.debug` en la Pi (copia en `.env.debug.bak-gr2`) y `./deploy.sh debug`.
 - [ ] Puntuación de la F2 (armas) y escalas de la F3 (`reglamentos/yoseikan-2027.md`, sección de abajo).
 - [ ] Correos: elegir de la lista propuesta (`modulos/notificaciones.md`, «Propuesta a Raul») y si vale enviar resultados por correo; llevan datos de menores (`06-legal-rgpd.md`).
