@@ -8,9 +8,12 @@ import '../../events/state/events_providers.dart';
 
 /// Moves the club panel between the phases of its league; hidden while the league has only one.
 class PhaseSwitcher extends ConsumerWidget {
-  const PhaseSwitcher({super.key, required this.eventId});
+  const PhaseSwitcher({super.key, required this.eventId, this.mayLeave});
 
   final String eventId;
+
+  /// Asked before moving to another phase (unsaved changes on this one).
+  final Future<bool> Function()? mayLeave;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -21,7 +24,11 @@ class PhaseSwitcher extends ConsumerWidget {
     return PopupMenuButton<String>(
       tooltip: l10n.leagueSwitchPhase,
       initialValue: eventId,
-      onSelected: (id) => context.go('/events/$id/club'),
+      onSelected: (id) async {
+        if (await mayLeave?.call() ?? true) {
+          if (context.mounted) context.go('/events/$id/club');
+        }
+      },
       itemBuilder: (_) => [
         for (final p in phases) PopupMenuItem(value: p.id, child: Text(p.name)),
       ],

@@ -180,6 +180,12 @@ Future<Finder> scrolledTo(WidgetTester tester, String text) async {
   return finder;
 }
 
+/// The settings' Save, in the bar below the event's fields while they have changes.
+Future<void> tapSave(WidgetTester tester) async {
+  await tester.tap(find.byIcon(Icons.save_outlined));
+  await tester.pumpAndSettle();
+}
+
 void main() {
   const sizes = {
     'phone': Size(360, 800),
@@ -902,7 +908,51 @@ void main() {
     expect(repository.savedParticipantOrganizations, ['o1']);
   });
 
-  testWidgets('a settings change saves on its own, without a button', (
+  for (final MapEntry(key: device, value: size) in sizes.entries) {
+    testWidgets('a new mat is saved with the Save button on $device', (
+      tester,
+    ) async {
+      final repository = FakeClubRepository(settings);
+      await pumpPanel(tester, size, repository: repository);
+      await tester.tap(find.text('Settings').last);
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.save_outlined), findsNothing);
+      expect(find.text('Groups per mat at once'), findsNothing);
+      await tester.tap(await scrolledTo(tester, 'Add mat'));
+      await tester.pumpAndSettle();
+      expect(repository.savedMatReferees, isEmpty);
+      expect(find.text('Unsaved changes'), findsOneWidget);
+      await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+      await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+
+      await tapSave(tester);
+      expect(repository.savedMatReferees, [
+        ['r1', null, null],
+      ]);
+      expect(find.text('Unsaved changes'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets('the save bar fits a phone with text at 200 %', (tester) async {
+    await pumpPanel(tester, const Size(360, 800));
+    await tester.tap(find.text('Settings').last);
+    await tester.pumpAndSettle();
+    // Only now: the scores tab, where the panel opens, does not fit 200 % yet (pendientes.md).
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpAndSettle();
+    await tester.tap(await scrolledTo(tester, 'Add mat'));
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.save_outlined), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  // Raul, 2026-11-23: a new mat was gone after leaving, without a word. The autosave skipped any
+  // change while one field was invalid.
+  testWidgets('a field that cannot be saved is named, and nothing is lost', (
     tester,
   ) async {
     final repository = FakeClubRepository(settings);
@@ -910,15 +960,53 @@ void main() {
     await tester.tap(find.text('Settings'));
     await tester.pumpAndSettle();
 
-    expect(find.widgetWithText(FilledButton, 'Save'), findsNothing);
-    expect(find.text('Groups per mat at once'), findsNothing);
+    await tester.enterText(
+      find.widgetWithText(
+        TextFormField,
+        'Points difference that ends the match',
+      ),
+      '150',
+    );
+    await tester.tap(await scrolledTo(tester, 'Add mat'));
+    await tester.pumpAndSettle();
+    await tapSave(tester);
+
+    expect(repository.savedMatReferees, isEmpty);
+    expect(
+      find.text('Not saved. Check: Points difference that ends the match.'),
+      findsOneWidget,
+    );
+    expect(find.text('Mat 3 · Referee'), findsOneWidget);
+  });
+
+  testWidgets('leaving with unsaved settings asks first', (tester) async {
+    final repository = FakeClubRepository(settings);
+    await pumpPanel(tester, const Size(1440, 900), repository: repository);
+    await tester.tap(find.text('Settings').last);
+    await tester.pumpAndSettle();
     await tester.tap(await scrolledTo(tester, 'Add mat'));
     await tester.pumpAndSettle();
 
-    expect(repository.savedMatReferees, [
-      ['r1', null, null],
-    ]);
-    expect(find.text('Saved'), findsOneWidget);
+    await tester.tap(find.text('Scores').last);
+    await tester.pumpAndSettle();
+    expect(find.textContaining('unsaved changes in Settings'), findsOneWidget);
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(find.text('Mat 3 · Referee'), findsOneWidget);
+
+    await tester.tap(find.text('Scores').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Leave without saving'));
+    await tester.pumpAndSettle();
+    expect(find.text('Mat 3 · Referee'), findsNothing);
+    expect(repository.savedMatReferees, isEmpty);
+
+    // Nothing to save: no question.
+    await tester.tap(find.text('Settings').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Scores').last);
+    await tester.pumpAndSettle();
+    expect(find.text('Leave without saving'), findsNothing);
   });
 
   testWidgets('the club names the person behind each account', (tester) async {
@@ -979,6 +1067,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(FilledButton, 'Remove the last mat'));
     await tester.pumpAndSettle();
+    await tapSave(tester);
     expect(repository.savedMatReferees, [
       ['r1'],
     ]);
@@ -998,15 +1087,18 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(FilledButton, 'Remove the last mat'));
     await tester.pumpAndSettle();
+    await tapSave(tester);
 
     expect(
       find.textContaining('use "Disable mat" in the mats tab'),
       findsOneWidget,
     );
+    await tester.tap(find.text('Discard'));
+    await tester.pumpAndSettle();
     expect(find.text('Mat 2 · Referee', skipOffstage: false), findsOneWidget);
   });
 
-  testWidgets('a refused change explains why and shows the saved value', (
+  testWidgets('a refused change explains why and keeps it to fix or discard', (
     tester,
   ) async {
     final repository = FakeClubRepository(settings)..refuseWith = 409;
@@ -1016,11 +1108,15 @@ void main() {
 
     await tester.tap(await scrolledTo(tester, 'Add mat'));
     await tester.pumpAndSettle();
+    await tapSave(tester);
 
     expect(
       find.text('Not possible: there are groups that depend on it.'),
       findsOneWidget,
     );
+    expect(find.text('Mat 3 · Referee'), findsOneWidget);
+    await tester.tap(find.text('Discard'));
+    await tester.pumpAndSettle();
     expect(find.text('Mat 3 · Referee'), findsNothing);
   });
 
@@ -1043,14 +1139,15 @@ void main() {
     expect(find.text('3:00'), findsOneWidget);
 
     await tester.enterText(length, '25:00');
-    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    await tapSave(tester);
     expect(find.textContaining('between 0:30 and 20:00'), findsOneWidget);
     expect(repository.savedRules, isEmpty);
 
     await tester.enterText(length, '2:30');
     await tester.enterText(limit, '10');
-    await tester.pump(const Duration(seconds: 1));
     await tester.pumpAndSettle();
+    await tapSave(tester);
     expect(repository.savedRules.last, (
       const Duration(minutes: 2, seconds: 30),
       10,
@@ -1076,13 +1173,14 @@ void main() {
     );
     await tester.enterText(limit, '');
     await tester.enterText(gap, '101');
-    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    await tapSave(tester);
     expect(find.textContaining('Between 0 and 100'), findsOneWidget);
     expect(repository.savedGaps, isEmpty);
 
     await tester.enterText(gap, '15');
-    await tester.pump(const Duration(seconds: 1));
     await tester.pumpAndSettle();
+    await tapSave(tester);
     expect(repository.savedRules.last.$2, 0);
     expect(repository.savedGaps.last, 15);
   });
@@ -1123,13 +1221,14 @@ void main() {
           .first,
     );
     await tester.enterText(attendance, '101');
-    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    await tapSave(tester);
     expect(find.text('Between 0 and 100'), findsOneWidget);
     expect(repository.savedAttendance, isEmpty);
 
     await tester.enterText(attendance, '5');
-    await tester.pump(const Duration(seconds: 1));
     await tester.pumpAndSettle();
+    await tapSave(tester);
     expect(repository.savedAttendance.last, 5);
   });
 
@@ -1145,13 +1244,15 @@ void main() {
       find.widgetWithText(TextFormField, 'Individual: match length (min:s)'),
       '4:00',
     );
-    await tester.pump(const Duration(seconds: 1));
     await tester.pumpAndSettle();
+    await tapSave(tester);
 
     expect(
       find.text('It cannot change now: a match is in progress or has started.'),
       findsOneWidget,
     );
+    await tester.tap(find.text('Discard'));
+    await tester.pumpAndSettle();
     expect(find.text('3:00'), findsOneWidget);
   });
 
