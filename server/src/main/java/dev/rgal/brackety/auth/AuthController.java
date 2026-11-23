@@ -224,7 +224,10 @@ class AuthController {
         return ResponseCookie.from(REFRESH_COOKIE, value)
                 .httpOnly(true)
                 .secure(secureCookie)
-                .sameSite("Strict")
+                // Lax, not Strict: Safari may hold back a Strict cookie in a page opened from another site (a
+                // QR read by the camera), and the referee was sent to the sign-in (GR-2). The refresh only takes
+                // POST, which Lax does not send cross-site, so CSRF stays out.
+                .sameSite("Lax")
                 .path(BASE_PATH)
                 .maxAge(maxAge)
                 .build()

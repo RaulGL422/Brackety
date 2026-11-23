@@ -87,7 +87,7 @@ class GoogleSignInControllerTest extends AuthIntegrationTest {
 
         assertThat(cookie)
                 .startsWith(AuthController.REFRESH_COOKIE + "=")
-                .contains("Path=/api/v1/auth", "Secure", "HttpOnly", "SameSite=Strict");
+                .contains("Path=/api/v1/auth", "Secure", "HttpOnly", "SameSite=Lax");
     }
 
     @Test

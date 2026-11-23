@@ -166,7 +166,7 @@ class AuthControllerTest extends AuthIntegrationTest {
     }
 
     @Test
-    void webGetsTheRefreshTokenOnlyInAStrictHttpOnlyCookie() throws Exception {
+    void webGetsTheRefreshTokenOnlyInALaxHttpOnlyCookie() throws Exception {
         registerAna();
 
         var response = login("web", "ana@example.test")
@@ -179,7 +179,7 @@ class AuthControllerTest extends AuthIntegrationTest {
 
         assertThat(response.getHeader(HttpHeaders.SET_COOKIE))
                 .startsWith(AuthController.REFRESH_COOKIE + "=")
-                .contains("Path=/api/v1/auth", "Max-Age=2592000", "Secure", "HttpOnly", "SameSite=Strict");
+                .contains("Path=/api/v1/auth", "Max-Age=2592000", "Secure", "HttpOnly", "SameSite=Lax");
     }
 
     @Test

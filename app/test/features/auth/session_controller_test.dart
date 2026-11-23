@@ -31,6 +31,58 @@ void main() {
     return container.read(sessionProvider);
   }
 
+  group('QR sign-in', () {
+    ProviderContainer qrContainer(
+      FakeAuthApi api,
+      FakeRefreshTokenStore store,
+    ) {
+      final container = ProviderContainer(
+        overrides: sessionOverrides(
+          api,
+          store: store,
+          account: FakeAccountApi(
+            account: testAccount(email: 'qr-k3f9a2', temporary: true),
+          ),
+        ),
+      );
+      addTearDown(container.dispose);
+      return container;
+    }
+
+    test('is kept on this device until logout', () async {
+      final store = FakeRefreshTokenStore(inCookie: true);
+      final container = qrContainer(FakeAuthApi(), store);
+      await restore(container);
+
+      await container.read(sessionProvider.notifier).signInWithQr('abc');
+      expect(store.qrSignIn, 'qr-k3f9a2');
+      expect(await container.read(qrSignInProvider.future), 'qr-k3f9a2');
+
+      await container.read(sessionProvider.notifier).logout();
+      expect(store.qrSignIn, isNull);
+    });
+
+    test('is forgotten when another account signs in here', () async {
+      final store = FakeRefreshTokenStore(inCookie: true)
+        ..qrSignIn = 'qr-k3f9a2';
+      final api = FakeAuthApi()
+        ..accounts['ana@example.com'] = 'secret-pass'
+        ..accounts['QR-K3F9A2'] = 'secret-pass';
+      final container = qrContainer(api, store);
+      await restore(container);
+
+      await container
+          .read(sessionProvider.notifier)
+          .login('QR-K3F9A2 ', 'secret-pass');
+      expect(store.qrSignIn, 'qr-k3f9a2');
+
+      await container
+          .read(sessionProvider.notifier)
+          .login('ana@example.com', 'secret-pass');
+      expect(store.qrSignIn, isNull);
+    });
+  });
+
   group('startup restore', () {
     test('the web tries its cookie', () async {
       final api = FakeAuthApi(signedIn: true);

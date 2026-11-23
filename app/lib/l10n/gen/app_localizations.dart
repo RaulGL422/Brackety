@@ -2941,6 +2941,18 @@ abstract class AppLocalizations {
   /// **'Tu cuenta se borrará el {date}. Inicia sesión antes para recuperarla.'**
   String loginAccountDeleted(String date);
 
+  /// No description provided for @loginUserLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Email o usuario'**
+  String get loginUserLabel;
+
+  /// No description provided for @loginQrSessionLost.
+  ///
+  /// In es, this message translates to:
+  /// **'Se ha cerrado tu sesión. Entra con tu usuario {signIn} y la contraseña que te dio el club, sin pedir otro QR.'**
+  String loginQrSessionLost(String signIn);
+
   /// No description provided for @loginPasswordRemoved.
   ///
   /// In es, this message translates to:

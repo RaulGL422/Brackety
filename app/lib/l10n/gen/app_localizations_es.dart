@@ -1751,6 +1751,14 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get loginUserLabel => 'Email o usuario';
+
+  @override
+  String loginQrSessionLost(String signIn) {
+    return 'Se ha cerrado tu sesión. Entra con tu usuario $signIn y la contraseña que te dio el club, sin pedir otro QR.';
+  }
+
+  @override
   String get loginPasswordRemoved =>
       'Contraseña quitada y sesiones cerradas. Ya solo puedes entrar con Google.';
 

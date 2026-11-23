@@ -27,9 +27,9 @@ competición del 2026-12-20 (`competicion-2026-12-20.md`); objetivo de prueba in
      no viaja tras abrir el QR desde fuera. Raul: iPhone con Safari; él lo abría desde una web lectora de QR (con una
      captura) y otro árbitro con la cámara: en los dos casos, navegación desde otro sitio. Reproducir en debug con
      `ACCESS_TTL=1m` y el iPhone de Raul antes de arreglar.
-  - Arreglo: cookie `SameSite=Lax` si se confirma; tras entrar por QR, recarga completa dentro de Brackety (la página
-    deja de venir de fuera); usuario y contraseña temporales; ante un 401 de renovación
-    sin token, la app avisa y ofrece volver a entrar con ellos en vez de un login vacío.
+  - Hecho (PR B, sin esperar la prueba): cookie `SameSite=Lax` (solo la leen POST: CSRF igual de cerrado); el
+    dispositivo recuerda el usuario `qr-…` y, si se cae la sesión, el login lo trae escrito y dice que entre con la
+    contraseña del club. Si la prueba del iPhone sigue fallando: recarga completa tras entrar por QR.
 - Arreglo pedido por Raul: la cuenta temporal tiene además **usuario y contraseña reales temporales** (el club los
   ve junto al QR). Si se cae la sesión, se vuelve a entrar con ellos sin un QR nuevo.
 - El acceso pasa a la fase siguiente con su tapiz; un QR nuevo para un tapiz ocupado avisa de a quién sustituye;

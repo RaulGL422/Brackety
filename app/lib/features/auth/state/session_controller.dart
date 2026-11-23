@@ -92,6 +92,11 @@ final refreshTokenStoreProvider = Provider<RefreshTokenStore>(
       : const SecureRefreshTokenStore(),
 );
 
+/// The QR account last used on this device, for the sign-in screen after a lost session.
+final qrSignInProvider = FutureProvider<String?>(
+  (ref) => ref.watch(refreshTokenStoreProvider).readQrSignIn(),
+);
+
 final sessionProvider = NotifierProvider<SessionController, SessionState>(
   SessionController.new,
 );
@@ -147,8 +152,14 @@ class SessionController extends Notifier<SessionState> {
     }
   }
 
-  Future<void> login(String email, String password) async =>
-      _signIn(await _api.login(email.trim(), password));
+  Future<void> login(String email, String password) async {
+    await _signIn(await _api.login(email.trim(), password));
+    // Another account on this device: the QR one is no longer the one to offer.
+    final qr = await _store.readQrSignIn();
+    if (qr != null && qr != email.trim().toLowerCase()) {
+      await _rememberQrSignIn(null);
+    }
+  }
 
   /// Registers and signs straight in; returns whether it did. A failed registration throws.
   /// A failed sign-in (the email already had an account with another password, a lock, no
@@ -164,9 +175,22 @@ class SessionController extends Notifier<SessionState> {
     }
   }
 
-  /// Signs in with the code of a QR the club showed (a temporary account for one event).
-  Future<void> signInWithQr(String code) async =>
-      _signIn(await _api.temporary(code));
+  /// Signs in with the code of a QR the club showed (a temporary account for one event), and
+  /// keeps its sign-in in case the session drops.
+  Future<void> signInWithQr(String code) async {
+    await _signIn(await _api.temporary(code));
+    try {
+      final me = await ref.read(accountApiProvider).me();
+      if (me.temporary) await _rememberQrSignIn(me.email);
+    } on DioException {
+      // Signed in all the same; only the sign-in screen's hint is missing.
+    }
+  }
+
+  Future<void> _rememberQrSignIn(String? signIn) async {
+    await _store.writeQrSignIn(signIn);
+    ref.invalidate(qrSignInProvider);
+  }
 
   /// Cancels a pending account deletion with the token from the 403 of the login.
   Future<void> restoreAccount(String restoreToken) async =>
@@ -177,6 +201,7 @@ class SessionController extends Notifier<SessionState> {
     await _refreshing;
     final stored = await _store.read();
     await _signOutLocally();
+    await _rememberQrSignIn(null);
     try {
       await _api.logout(stored);
     } on DioException {

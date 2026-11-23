@@ -868,6 +868,15 @@
       }
     }
   },
+  "loginUserLabel": "Email o usuario",
+  "loginQrSessionLost": "Se ha cerrado tu sesión. Entra con tu usuario {signIn} y la contraseña que te dio el club, sin pedir otro QR.",
+  "@loginQrSessionLost": {
+    "placeholders": {
+      "signIn": {
+        "type": "String"
+      }
+    }
+  },
   "loginPasswordRemoved": "Contraseña quitada y sesiones cerradas. Ya solo puedes entrar con Google.",
   "reauthTitle": "Confirma que eres tú",
   "reauthBody": "Escribe tu contraseña para continuar.",
