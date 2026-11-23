@@ -1,8 +1,10 @@
 /// The group a helper is putting together before sending it to a mat (docs/modulos/prototipo-f1.md):
-/// 4 participants, up to 3 of them wildcards.
+/// [size] participants (the helper picks it within the category's range, GR-5), up to size − 1 of
+/// them wildcards.
 ///
-/// In a team category (docs/modulos/prototipo-f1-equipos.md) the members are teams and up to 3
-/// wildcard teams fill the group in: each one 2 or 3 participants picked from the category's list.
+/// In a team category (docs/modulos/prototipo-f1-equipos.md) the members are teams and up to
+/// size − 1 wildcard teams fill the group in: each one 2 or 3 participants picked from the category's
+/// list.
 class DraftGroup {
   const DraftGroup({
     this.members = const [],
@@ -11,9 +13,14 @@ class DraftGroup {
     this.ghostTeams = const [],
     this.ofTeams = false,
     this.pickGhost = false,
-  });
+    int? size,
+  }) : _size = size; // ignore: prefer_initializing_formals, the public name is size, the field is null until set
 
-  static const size = 4;
+  /// Null until the helper or the category sets it.
+  final int? _size;
+
+  /// Members it takes, wildcards included.
+  int get size => _size ?? 4;
 
   /// Teams are of 2 or 3, always (Raul, 2026-11-13).
   static const minTeam = 2;
@@ -78,6 +85,7 @@ class DraftGroup {
     List<List<String>>? ghostTeams,
     bool? pickGhost,
   }) => DraftGroup(
+    size: _size,
     members: members ?? this.members,
     ghostMode: ghostMode ?? this.ghostMode,
     ghosts: ghosts ?? this.ghosts,
@@ -87,6 +95,35 @@ class DraftGroup {
   );
 
   DraftGroup withPickGhost(bool on) => copyWith(pickGhost: on);
+
+  int get _picked => members.length + ghosts.length + ghostTeams.length;
+
+  /// A smaller size never drops someone already picked: they come out first. One member at least
+  /// stays real.
+  bool canResize(int to) =>
+      to >= _picked && ghosts.length < to && ghostTeams.length < to;
+
+  DraftGroup withSize(int to) => canResize(to)
+      ? DraftGroup(
+          size: to,
+          members: members,
+          ghostMode: ghostMode,
+          ghosts: ghosts,
+          ghostTeams: ghostTeams,
+          ofTeams: ofTeams,
+          pickGhost: pickGhost,
+        )
+      : this;
+
+  /// The category allows [min] to [max]: a fresh draft, or a size outside it (the range changed
+  /// meanwhile), becomes the largest that still fits who is picked.
+  DraftGroup fitTo(int min, int max) {
+    if (_size != null && size >= min && size <= max) return this;
+    for (var to = max; to >= min; to--) {
+      if (canResize(to)) return withSize(to);
+    }
+    return this;
+  }
 
   /// Where [id] stands; [grouped] = already in a group on the server.
   PickState stateOf(String id, {required bool grouped}) {
@@ -158,6 +195,7 @@ class DraftGroup {
       kept = kept.sublist(0, size - 1);
     }
     return DraftGroup(
+      size: _size,
       members: kept,
       ghostMode: on,
       ghosts: newGhosts,

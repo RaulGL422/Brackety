@@ -48,7 +48,12 @@ class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
 
   /// Only matters when the category mixes ages (F2-2).
   var _byAge = true;
-  var _group = const DraftGroup();
+  var _draft = const DraftGroup();
+  var _sizes = (4, 4);
+
+  // Always within the category's sizes: a fresh draft takes the largest.
+  DraftGroup get _group => _draft.fitTo(_sizes.$1, _sizes.$2);
+  set _group(DraftGroup group) => _draft = group;
   String? _matId;
   var _sort = ParticipantSort.name;
   var _busy = false;
@@ -80,7 +85,8 @@ class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
     setState(() {
       _busy = false;
       if (created) {
-        _group = const DraftGroup();
+        // The next group keeps the size: a helper usually makes several alike.
+        _group = DraftGroup(size: _group.size);
         _matId = null;
       }
     });
@@ -95,6 +101,7 @@ class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     listenHelperQueue(context, ref);
+    _sizes = watchGroupSizes(ref, widget.eventId, widget.categoryId);
     // Another helper (or the superadmin) changed the groups: whoever got a group meanwhile leaves the
     // draft now, not with a refusal on "Create". Not while this helper's own group is being sent.
     ref.listen(categoryParticipantsProvider(_key), (_, next) {
@@ -123,6 +130,8 @@ class _GroupBuilderScreenState extends ConsumerState<GroupBuilderScreen> {
             onChanged: (change) => setState(() => _group = change(_group)),
             onMatChanged: (id) => setState(() => _matId = id),
             onCreate: _create,
+            minSize: _sizes.$1,
+            maxSize: _sizes.$2,
             labelOf: (id) {
               final all = participants.value ?? const <CategoryParticipant>[];
               final p = all.where((p) => p.id == id).firstOrNull;
@@ -320,7 +329,7 @@ class _ParticipantTile extends StatelessWidget {
             )
           : onTap == null
           ? null
-          : PickMark(state: state, onTap: onTap!),
+          : PickMark(state: state, onTap: onTap!, label: p.fullName),
       title: Text(p.fullName),
       subtitle: Text(
         [

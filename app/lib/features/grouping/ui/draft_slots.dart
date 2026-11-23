@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../state/group_draft.dart';
 
-/// The group as 4 slots that fill as the helper picks: what is missing at a glance.
+/// The group as one slot per member that fill as the helper picks: what is missing at a glance.
+/// More than 4 go in two even rows, so names stay readable on a phone.
 /// [labelOf] names a member (first name, "Team N"). Tapping a filled slot takes it out.
 class DraftSlots extends StatelessWidget {
   const DraftSlots({
@@ -25,17 +26,25 @@ class DraftSlots extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return Row(
+    final size = group.size;
+    final perRow = size <= 4 ? size : (size + 1) ~/ 2;
+    return Column(
       spacing: AppSpacing.s,
       children: [
-        for (var i = 0; i < DraftGroup.size; i++)
-          Expanded(child: _slot(l10n, i)),
+        for (var start = 0; start < size; start += perRow)
+          Row(
+            spacing: AppSpacing.s,
+            children: [
+              for (var i = start; i < start + perRow; i++)
+                Expanded(child: i < size ? _slot(l10n, i) : const SizedBox()),
+            ],
+          ),
       ],
     );
   }
 
   Widget _slot(AppLocalizations l10n, int i) {
-    final ghostSlot = group.ghostMode && i == DraftGroup.size - 1;
+    final ghostSlot = group.ghostMode && i == group.size - 1;
     if (i < group.members.length) {
       final id = group.members[i];
       return _Slot(

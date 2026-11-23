@@ -3942,6 +3942,18 @@ abstract class AppLocalizations {
   /// **'Se quita el Tapiz {number}; su árbitro deja de estar asignado.'**
   String settingsRemoveMatConfirm(int number);
 
+  /// No description provided for @draftSize.
+  ///
+  /// In es, this message translates to:
+  /// **'Tamaño'**
+  String get draftSize;
+
+  /// No description provided for @draftSizeOf.
+  ///
+  /// In es, this message translates to:
+  /// **'Grupo de {size}'**
+  String draftSizeOf(int size);
+
   /// No description provided for @draftTitle.
   ///
   /// In es, this message translates to:
