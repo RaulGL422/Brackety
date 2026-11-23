@@ -1401,6 +1401,90 @@ void main() {
     expect(repository.savedCategories, isEmpty);
   });
 
+  // GR-5: from-to steppers that push each other, the return leg and how many matches come out.
+  for (final MapEntry(key: device, value: size) in sizes.entries) {
+    testWidgets('the club sets the groups of a category on $device', (
+      tester,
+    ) async {
+      final repository = FakeClubRepository(settings);
+      await pumpPanel(tester, size, repository: repository);
+      await openCategories(tester);
+      await tester.tap(find.text('Add category'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.widgetWithText(TextFormField, 'Name'), 'U9');
+      await tester.enterText(find.widgetWithText(TextFormField, 'From'), '12');
+      await tester.enterText(find.widgetWithText(TextFormField, 'To'), '13');
+      expect(find.text('Group of 4: 6 matches'), findsOneWidget);
+
+      Future<void> tap(String tooltip) async {
+        await tester.ensureVisible(find.byTooltip(tooltip));
+        await tester.tap(find.byTooltip(tooltip));
+        await tester.pumpAndSettle();
+      }
+
+      await tap('To: one less');
+      await tap('To: one less');
+      // "To" went below "From": both are 2 now.
+      expect(find.bySemanticsLabel('From 2'), findsOneWidget);
+      expect(find.text('Group of 2: 1 match'), findsOneWidget);
+      await tap('From: one more');
+      for (var i = 0; i < 2; i++) {
+        await tap('To: one more');
+      }
+      await tester.ensureVisible(find.text('Home and away'));
+      await tester.tap(find.text('Home and away'));
+      await tester.pumpAndSettle();
+      expect(find.text('Group of 5: 20 matches'), findsOneWidget);
+      await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+      await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
+      final json = repository.savedCategories.single.last.toJson();
+      expect(json['minGroupSize'], 3);
+      expect(json['maxGroupSize'], 5);
+      expect(json['returnLeg'], true);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets('the groups block fits a phone with text at 200 %', (
+    tester,
+  ) async {
+    await pumpPanel(tester, const Size(360, 800));
+    await openCategories(tester);
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.tap(find.text('Add category'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byTooltip('To: one more'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Group of 4: 6 matches'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('a return leg that cannot change says why', (tester) async {
+    final repository = FakeClubRepository(settings)
+      ..refuseWith = 409
+      ..refuseCode = 'RETURN_LEG_IN_USE';
+    await pumpPanel(tester, const Size(800, 1280), repository: repository);
+    await openCategories(tester);
+    await tester.tap(find.textContaining('4-7'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Home and away'));
+    await tester.tap(find.text('Home and away'));
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text(
+        'This category already has groups: its home and away cannot change.',
+      ),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('removing a category in use explains why', (tester) async {
     final repository = FakeClubRepository(settings)..refuseWith = 409;
     await pumpPanel(tester, const Size(800, 1280), repository: repository);

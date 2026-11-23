@@ -57,8 +57,8 @@ competición del 2026-12-20 (`competicion-2026-12-20.md`); objetivo de prueba in
 - Decidido el 2026-11-21 (`decisiones.md`, grupos nórdicos de tamaño libre): rango por categoría, ida y vuelta
   opcional, hasta tamaño − 1 comodines.
 - Hecho en el servidor: calendario de 2 a 8, vuelta con colores cambiados, desempate sumando los dos combates,
-  paquete del evento y descargas. Falta: elegir rango y vuelta en Categorías y la pantalla de crear grupos
-  (hoy fija 4: `grouping/state/group_draft.dart`), con Raul.
+  paquete del evento y descargas. En Categorías: «De» y «A» con − / +, «Ida y vuelta» y cuántos combates salen
+  (Raul, 2026-11-23). Falta la pantalla de crear grupos (hoy fija 4: `grouping/state/group_draft.dart`), con Raul.
 
 ## GR-6 · Configuración pedida que no se aplicó
 - Raul (2026-11-23): grupos no solo de 4 (es GR-5) y fin a 15 puntos de diferencia.

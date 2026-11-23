@@ -910,6 +910,37 @@
     }
   },
   "categoryReturnLeg": "Ida y vuelta",
+  "categoryGroups": "Grupos",
+  "categoryGroupFrom": "De",
+  "categoryGroupTo": "A",
+  "categoryGroupLess": "{label}: uno menos",
+  "@categoryGroupLess": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "categoryGroupMore": "{label}: uno más",
+  "@categoryGroupMore": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "categoryGroupMatches": "Grupo de {size}: {count, plural, =1{1 combate} other{{count} combates}}",
+  "@categoryGroupMatches": {
+    "placeholders": {
+      "size": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "categoryReturnLegInUse": "Esta categoría ya tiene grupos: no puede cambiar la ida y vuelta.",
   "categoryGroupSize": "Grupos de {size}",
   "@categoryGroupSize": {
     "placeholders": {

@@ -1832,6 +1832,40 @@ class AppLocalizationsEs extends AppLocalizations {
   String get categoryReturnLeg => 'Ida y vuelta';
 
   @override
+  String get categoryGroups => 'Grupos';
+
+  @override
+  String get categoryGroupFrom => 'De';
+
+  @override
+  String get categoryGroupTo => 'A';
+
+  @override
+  String categoryGroupLess(String label) {
+    return '$label: uno menos';
+  }
+
+  @override
+  String categoryGroupMore(String label) {
+    return '$label: uno más';
+  }
+
+  @override
+  String categoryGroupMatches(int size, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count combates',
+      one: '1 combate',
+    );
+    return 'Grupo de $size: $_temp0';
+  }
+
+  @override
+  String get categoryReturnLegInUse =>
+      'Esta categoría ya tiene grupos: no puede cambiar la ida y vuelta.';
+
+  @override
   String categoryGroupSize(int size) {
     return 'Grupos de $size';
   }

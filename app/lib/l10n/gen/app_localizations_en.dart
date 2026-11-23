@@ -1822,6 +1822,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String get categoryReturnLeg => 'Home and away';
 
   @override
+  String get categoryGroups => 'Groups';
+
+  @override
+  String get categoryGroupFrom => 'From';
+
+  @override
+  String get categoryGroupTo => 'To';
+
+  @override
+  String categoryGroupLess(String label) {
+    return '$label: one less';
+  }
+
+  @override
+  String categoryGroupMore(String label) {
+    return '$label: one more';
+  }
+
+  @override
+  String categoryGroupMatches(int size, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count matches',
+      one: '1 match',
+    );
+    return 'Group of $size: $_temp0';
+  }
+
+  @override
+  String get categoryReturnLegInUse =>
+      'This category already has groups: its home and away cannot change.';
+
+  @override
   String categoryGroupSize(int size) {
     return 'Groups of $size';
   }
