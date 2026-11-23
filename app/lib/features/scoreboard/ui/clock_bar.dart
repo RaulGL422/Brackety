@@ -120,8 +120,10 @@ class _ClockBarState extends ConsumerState<ClockBar> {
             if (widget.clockHeight case final height?) ...[
               SizedBox(height: height, child: clock),
               ?adjust,
-              // Portrait: both buttons on one row, under the thumb, the same height.
-              IntrinsicHeight(
+              // Portrait: both buttons on one row, under the thumb, the same height. Fixed, so
+              // large text shrinks in them instead of taking the corners' height (GR-1).
+              SizedBox(
+                height: AppSizes.scoreTouchTarget,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   spacing: AppSpacing.s,
@@ -368,21 +370,24 @@ class _UndoButton extends StatelessWidget {
         minimumSize: const Size(0, AppSizes.scoreTouchTarget),
       ),
       icon: const Icon(Icons.undo),
-      label: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(l10n.undo, style: text.titleMedium, maxLines: 1),
-          if (target != null)
-            Text(
-              l10n.undoDetail(
-                undoTarget(l10n, target),
-                clockText(target.clock),
+      label: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(l10n.undo, style: text.titleMedium, maxLines: 1),
+            if (target != null)
+              Text(
+                l10n.undoDetail(
+                  undoTarget(l10n, target),
+                  clockText(target.clock),
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-            ),
-        ],
+          ],
+        ),
       ),
       onPressed: target == null ? null : () => onAction(MatchAction.undo),
     );

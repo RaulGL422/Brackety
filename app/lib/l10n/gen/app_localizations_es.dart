@@ -887,14 +887,19 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String removePointsValue(int points) {
+  String removePointsFor(int points, String corner) {
     String _temp0 = intl.Intl.pluralLogic(
       points,
       locale: localeName,
-      other: 'Quitar $points puntos',
-      one: 'Quitar 1 punto',
+      other: 'Quitar $points puntos a $corner',
+      one: 'Quitar 1 punto a $corner',
     );
     return '$_temp0';
+  }
+
+  @override
+  String finishFor(String finish, String corner) {
+    return '$finish: $corner';
   }
 
   @override
@@ -1027,14 +1032,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get tlRivalPoint => 'punto al rival';
-
-  @override
-  String get removePoint => '−1';
-
-  @override
-  String removePointFor(String corner) {
-    return 'Quitar un punto a $corner';
-  }
 
   @override
   String whatPointRemoved(int points, String corner) {

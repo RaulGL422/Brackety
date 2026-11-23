@@ -76,7 +76,32 @@ class CornerPanel extends StatelessWidget {
                           flex: 3,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [...details, const Spacer(), tally],
+                            children: [
+                              // With large text on a phone the name shrinks rather than overflow.
+                              Expanded(
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: AlignmentDirectional.topStart,
+                                  child: SizedBox(
+                                    width:
+                                        (area.maxWidth - AppSpacing.s) * 3 / 5,
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: details,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              // One line that shrinks with the name, not over it.
+                              ConstrainedBox(
+                                constraints: const BoxConstraints(
+                                  maxHeight: 32,
+                                ),
+                                child: tally,
+                              ),
+                            ],
                           ),
                         ),
                         Expanded(flex: 2, child: score),

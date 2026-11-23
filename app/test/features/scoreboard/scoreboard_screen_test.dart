@@ -758,16 +758,14 @@ void main() {
   }
 
   testWidgets(
-    'a submission is picked from the menu, confirmed, and ends the match',
+    'a submission has its own button, is confirmed, and ends the match',
     (tester) async {
       final (repository, _) = await open(
         tester,
         matchView(status: MatchStatus.inProgress, scoring: grappling),
       );
 
-      await tester.tap(find.byTooltip('Warnings: Red'));
-      await settle(tester);
-      await tester.tap(find.text('Sumisión'));
+      await tester.tap(find.bySemanticsLabel('Sumisión: Red'));
       await settle(tester);
       expect(find.text('Sumisión?'), findsOneWidget);
       await tester.tap(find.text('Give the win'));
@@ -781,7 +779,45 @@ void main() {
     },
   );
 
-  testWidgets('a value is taken back from its own menu', (tester) async {
+  // GR-1: each +N with its −N in sight; the flag holds only warnings and the disqualification.
+  for (final MapEntry(key: device, value: size) in layouts.entries) {
+    for (final scale in [1.0, 2.0]) {
+      testWidgets('every value has its pair and the flag only warns on $device '
+          'with text at ${scale * 100}%', (tester) async {
+        setSize(tester, size, scale: scale);
+        await open(
+          tester,
+          matchView(status: MatchStatus.inProgress, scoring: grappling),
+        );
+
+        for (final value in ['+1', '+2', '+3', '+4', '−1', '−2', '−3', '−4']) {
+          expect(find.text(value), findsNWidgets(2));
+        }
+        // Short corners (phones) show only its trophy; it still says its name.
+        expect(find.bySemanticsLabel('Sumisión: Red'), findsOneWidget);
+        expect(find.bySemanticsLabel('Sumisión: Blue'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+        await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+        await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+
+        await tester.tap(find.byTooltip('Warnings: Red'));
+        await settle(tester);
+        expect(find.text('Warning'), findsOneWidget);
+        expect(find.text('Disqualification'), findsOneWidget);
+        final items = find.byType(PopupMenuItem<CornerChoice>);
+        for (final gone in ['Sumisión', 'Take']) {
+          expect(
+            find.descendant(of: items, matching: find.textContaining(gone)),
+            findsNothing,
+          );
+        }
+
+        await tester.pumpWidget(const SizedBox());
+      });
+    }
+  }
+
+  testWidgets('a value is taken back with its own −N', (tester) async {
     final (repository, _) = await open(
       tester,
       matchView(status: MatchStatus.inProgress, scoring: grappling),
@@ -789,24 +825,23 @@ void main() {
     await tester.tap(find.text('+3').first);
     await settle(tester);
 
-    await tester.tap(find.byTooltip('Warnings: Red'));
-    await settle(tester);
     // Only what Red has can be taken back.
+    Finder minus(String label) => find.ancestor(
+      of: find.bySemanticsLabel(label),
+      matching: find.byType(OutlinedButton),
+    );
     expect(
-      tester
-          .widget<PopupMenuItem<CornerChoice>>(
-            find.ancestor(
-              of: find.text('Take back 4 points'),
-              matching: find.byType(PopupMenuItem<CornerChoice>),
-            ),
-          )
-          .enabled,
+      tester.widget<OutlinedButton>(minus('Take 4 points from Red')).enabled,
       isFalse,
     );
-    await tester.tap(find.text('Take back 3 points'));
+    expect(
+      tester.widget<OutlinedButton>(minus('Take 3 points from Blue')).enabled,
+      isFalse,
+    );
+    await tester.tap(minus('Take 3 points from Red'));
     await settle(tester);
 
-    expect(repository.sent.last.$1, MatchAction.pointRemoved);
+    expect(repository.sent.last, (MatchAction.pointRemoved, Side.red, null));
     expect(repository.sentPoints.last, 3);
   });
 }
