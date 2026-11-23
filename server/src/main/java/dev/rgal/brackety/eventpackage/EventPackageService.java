@@ -198,7 +198,10 @@ public class EventPackageService {
                                 c.getMaxAge(),
                                 c.getFormat(),
                                 c.getTeamSize(),
-                                c.getMatchSeconds()))
+                                c.getMatchSeconds(),
+                                c.getMinGroupSize(),
+                                c.getMaxGroupSize(),
+                                c.isReturnLeg()))
                         .toList(),
                 eventOrganizations.stream()
                         .map(o -> new OrganizationEntry(o.getName(), o.getShortName()))

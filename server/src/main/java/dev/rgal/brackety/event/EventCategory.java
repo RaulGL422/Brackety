@@ -8,7 +8,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.util.UUID;
 
-/** {@code teamSize} is null in an individual category; {@code groupSize} counts participants or teams. */
+/**
+ * {@code teamSize} is null in an individual category. A group has {@code minGroupSize} to {@code maxGroupSize}
+ * participants or teams; with {@code returnLeg} everyone fights everyone twice.
+ */
 @Entity
 public class EventCategory {
 
@@ -17,6 +20,7 @@ public class EventCategory {
         TEAM
     }
 
+    /** A new category's groups: of 4, one leg, as before sizes could be chosen. */
     public static final int GROUP_SIZE = 4;
 
     @Id
@@ -32,7 +36,9 @@ public class EventCategory {
     private Format format;
 
     private Integer teamSize;
-    private int groupSize;
+    private int minGroupSize = GROUP_SIZE;
+    private int maxGroupSize = GROUP_SIZE;
+    private boolean returnLeg;
 
     /** Its own match length; null follows its modality. */
     private Integer matchSeconds;
@@ -55,13 +61,19 @@ public class EventCategory {
         this.maxAge = maxAge;
         this.format = teamSize == null ? Format.INDIVIDUAL : Format.TEAM;
         this.teamSize = teamSize;
-        this.groupSize = GROUP_SIZE;
+    }
+
+    public void setGroups(int minSize, int maxSize, boolean returnLeg) {
+        this.minGroupSize = minSize;
+        this.maxGroupSize = maxSize;
+        this.returnLeg = returnLeg;
     }
 
     /** The same category in another phase of the league. */
     public EventCategory copyFor(UUID otherEventId) {
         var copy = new EventCategory(otherEventId, name, minAge, maxAge, teamSize);
         copy.matchSeconds = matchSeconds;
+        copy.setGroups(minGroupSize, maxGroupSize, returnLeg);
         return copy;
     }
 
@@ -105,8 +117,16 @@ public class EventCategory {
         return teamSize;
     }
 
-    public int getGroupSize() {
-        return groupSize;
+    public int getMinGroupSize() {
+        return minGroupSize;
+    }
+
+    public int getMaxGroupSize() {
+        return maxGroupSize;
+    }
+
+    public boolean isReturnLeg() {
+        return returnLeg;
     }
 
     public boolean contains(int age) {

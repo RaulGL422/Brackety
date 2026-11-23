@@ -78,7 +78,9 @@ public record EventSettingsResponse(
             int maxAge,
             Format format,
             Integer teamSize,
-            int groupSize,
+            int minGroupSize,
+            int maxGroupSize,
+            boolean returnLeg,
             Integer matchSeconds) {
 
         public static CategoryResponse of(EventCategory c) {
@@ -89,7 +91,9 @@ public record EventSettingsResponse(
                     c.getMaxAge(),
                     c.getFormat(),
                     c.getTeamSize(),
-                    c.getGroupSize(),
+                    c.getMinGroupSize(),
+                    c.getMaxGroupSize(),
+                    c.isReturnLeg(),
                     c.getMatchSeconds());
         }
     }

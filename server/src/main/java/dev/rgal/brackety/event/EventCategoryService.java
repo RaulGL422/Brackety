@@ -57,6 +57,7 @@ class EventCategoryService {
             if (c.id() == null) {
                 var created = new EventCategory(eventId, c.name().strip(), c.minAge(), c.maxAge(), teamSize);
                 created.setMatchSeconds(c.matchSeconds());
+                setGroups(created, c);
                 categories.save(created);
                 continue;
             }
@@ -64,8 +65,14 @@ class EventCategoryService {
             if (inUse.contains(c.id()) && changesWhoFights(category, c, teamSize)) {
                 throw EventException.conflict("A category with groups or teams only changes its name.");
             }
+            // Its groups would be scored over one or two legs at once.
+            if (inUse.contains(c.id()) && c.returnLeg() != null && c.returnLeg() != category.isReturnLeg()) {
+                throw EventException.conflict(
+                        "RETURN_LEG_IN_USE", "A category with groups keeps whether it has a return leg.");
+            }
             category.update(c.name().strip(), c.minAge(), c.maxAge(), teamSize);
             category.setMatchSeconds(c.matchSeconds());
+            setGroups(category, c);
         }
         return categories.findByEventIdOrderByMinAge(eventId).stream()
                 .map(CategoryResponse::of)
@@ -79,10 +86,16 @@ class EventCategoryService {
         if (c.format() == Format.TEAM && c.teamSize() == null) {
             throw EventException.invalid("A team category needs a team size.");
         }
-        // The round robin and the ghost rules only exist for groups of 4.
-        if (c.groupSize() != EventCategory.GROUP_SIZE) {
-            throw EventException.invalid("Groups are of " + EventCategory.GROUP_SIZE + " for now.");
+    }
+
+    // A new range only applies to the groups made after it: those already made keep their matches.
+    private static void setGroups(EventCategory category, CategoryRequest c) {
+        var min = c.minGroupSize() == null ? category.getMinGroupSize() : c.minGroupSize();
+        var max = c.maxGroupSize() == null ? category.getMaxGroupSize() : c.maxGroupSize();
+        if (min > max) {
+            throw EventException.invalid("The smallest group is above the largest.");
         }
+        category.setGroups(min, max, c.returnLeg() == null ? category.isReturnLeg() : c.returnLeg());
     }
 
     // Each participant's age must fall in one category only.

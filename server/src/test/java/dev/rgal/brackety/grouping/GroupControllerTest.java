@@ -139,6 +139,28 @@ class GroupControllerTest extends EventApiTest {
         createGroups(ghostsGroup(ids(0, 0), 5, 6)).andExpect(status().isBadRequest());
     }
 
+    // GR-5: the club sets 3 to 5 with a return leg; wildcards count in the size.
+    @Test
+    void aCategoryWithARangeTakesGroupsOfAnySizeInItWithTheirReturnLeg() throws Exception {
+        jdbc.sql("update event_category set min_group_size = 3, max_group_size = 5, return_leg = true"
+                        + " where name = '7-8'")
+                .update();
+
+        createGroups(group(0, 1, 2)).andExpect(status().isCreated());
+        call(get("/api/v1/mats/" + matId(1) + "/board"), "arbitro1")
+                .andExpect(jsonPath("$.matches", hasSize(6)))
+                .andExpect(jsonPath("$.matches[*].red.participantId", contains(ids(0, 0, 1, 1, 2, 2))))
+                .andExpect(jsonPath("$.matches[*].blue.participantId", contains(ids(1, 2, 2, 0, 0, 1))));
+
+        createGroups(group(3, 4, 5, 6, 7)).andExpect(status().isCreated());
+        createGroups(ghostsGroup(ids(0, 1), 8)).andExpect(status().isCreated());
+        assertThat(count("fight_match")).isEqualTo(6 + 20 + 6);
+
+        createGroups(ghostsGroup(ids(0, 1, 2, 3, 4), 9)).andExpect(status().isBadRequest());
+        createGroups(ghostsGroup(ids(0), 9)).andExpect(status().isBadRequest());
+        assertThat(count("fight_group")).isEqualTo(3);
+    }
+
     @Test
     void rejectsWrongSizesParticipantsAlreadyInAGroupAndReferees() throws Exception {
         createGroups(group(0, 1, 2, 3)).andExpect(status().isCreated());

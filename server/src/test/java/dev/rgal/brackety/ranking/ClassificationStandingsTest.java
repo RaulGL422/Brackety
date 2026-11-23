@@ -48,6 +48,21 @@ class ClassificationStandingsTest {
         assertThat(ranked).extracting(ClassificationStandings.Placed::position).containsExactly(1, 2);
     }
 
+    // GR-5: with a return leg each won once; the points they scored against each other decide.
+    @Test
+    void twoTiedAfterBothLegsGoByThePointsScoredBetweenThem() {
+        standings.add(Side.RED, "TIME", 2, 1, Set.of(ana), Set.of(bea));
+        standings.add(Side.RED, "TIME", 3, 1, Set.of(bea), Set.of(ana));
+        standings.add(Side.RED, "TIME", 4, 2, Set.of(carla), Set.of(ana));
+        standings.add(Side.RED, "TIME", 4, 1, Set.of(carla), Set.of(bea));
+        // Ana and Bea: 1 win, 5 classification points and 5 technical each. Between them: Ana 3, Bea 4.
+
+        var ranked = standings.rank(List.of(ana, bea), id -> id);
+
+        assertThat(ranked).extracting(ClassificationStandings.Placed::item).containsExactly(bea, ana);
+        assertThat(ranked).extracting(ClassificationStandings.Placed::position).containsExactly(1, 2);
+    }
+
     @Test
     void anEqualRecordWithoutAMatchBetweenThemSharesThePosition() {
         standings.add(Side.RED, "SUBMISSION", 0, 0, Set.of(ana), Set.of(carla));

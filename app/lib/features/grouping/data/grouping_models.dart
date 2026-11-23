@@ -6,6 +6,9 @@ class CategorySummary {
     required this.grouped,
     this.teamSize,
     this.teams = 0,
+    this.minGroupSize = 4,
+    this.maxGroupSize = 4,
+    this.returnLeg = false,
   });
 
   factory CategorySummary.fromJson(Map<String, dynamic> json) =>
@@ -16,6 +19,9 @@ class CategorySummary {
         grouped: json['grouped'] as int,
         teamSize: json['format'] == 'TEAM' ? json['teamSize'] as int : null,
         teams: json['teams'] as int? ?? 0,
+        minGroupSize: json['minGroupSize'] as int? ?? 4,
+        maxGroupSize: json['maxGroupSize'] as int? ?? 4,
+        returnLeg: json['returnLeg'] as bool? ?? false,
       );
 
   final String id;
@@ -28,6 +34,13 @@ class CategorySummary {
   /// Null in an individual category.
   final int? teamSize;
   final int teams;
+
+  /// A new group's size, wildcards included.
+  final int minGroupSize;
+  final int maxGroupSize;
+
+  /// Everyone in a group fights everyone twice.
+  final bool returnLeg;
 
   bool get isTeam => teamSize != null;
 }

@@ -37,6 +37,8 @@ class StaffMember {
 
 /// An age band of the event; [teamSize] is null when it competes individually. [matchLength]:
 /// null when its matches last as the event says (grappling: U13, U15 and veterans fight 4 min).
+/// Group sizes and return leg: null in a category not saved yet (the server makes groups of 4, one
+/// leg) and sent back as they came, so editing a category keeps them.
 class EventCategory {
   const EventCategory({
     this.id,
@@ -44,7 +46,9 @@ class EventCategory {
     required this.minAge,
     required this.maxAge,
     this.teamSize,
-    this.groupSize = 4,
+    this.minGroupSize,
+    this.maxGroupSize,
+    this.returnLeg,
     this.matchLength,
   });
 
@@ -54,7 +58,9 @@ class EventCategory {
     minAge: json['minAge'] as int,
     maxAge: json['maxAge'] as int,
     teamSize: json['format'] == 'TEAM' ? json['teamSize'] as int? : null,
-    groupSize: json['groupSize'] as int? ?? 4,
+    minGroupSize: json['minGroupSize'] as int?,
+    maxGroupSize: json['maxGroupSize'] as int?,
+    returnLeg: json['returnLeg'] as bool?,
     matchLength: switch (json['matchSeconds']) {
       final int seconds => Duration(seconds: seconds),
       _ => null,
@@ -68,8 +74,12 @@ class EventCategory {
   final int maxAge;
   final int? teamSize;
 
-  /// Participants or teams per group; only 4 for now.
-  final int groupSize;
+  /// Participants or teams per group, wildcards included.
+  final int? minGroupSize;
+  final int? maxGroupSize;
+
+  /// Everyone in a group fights everyone twice.
+  final bool? returnLeg;
   final Duration? matchLength;
 
   bool get isTeam => teamSize != null;
@@ -81,7 +91,9 @@ class EventCategory {
     'maxAge': maxAge,
     'format': isTeam ? 'TEAM' : 'INDIVIDUAL',
     'teamSize': teamSize,
-    'groupSize': groupSize,
+    'minGroupSize': minGroupSize,
+    'maxGroupSize': maxGroupSize,
+    'returnLeg': returnLeg,
     'matchSeconds': matchLength?.inSeconds,
   };
 }

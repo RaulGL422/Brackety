@@ -81,6 +81,9 @@ class EventPackageServiceTest extends EventApiTest {
                 .params(eventId, accountId("arbitro1"))
                 .update();
         rulebooks.put(eventId, "Reglamento F1.pdf", "%PDF-1.7 tambo".getBytes(StandardCharsets.US_ASCII));
+        jdbc.sql("update event_category set min_group_size = 3, max_group_size = 5, return_leg = true"
+                        + " where name = '7-8'")
+                .update();
         var exported = packages.export(eventId, accountId("club1"));
         var file = json.writeValueAsBytes(exported);
         emptyDatabase();
@@ -93,6 +96,12 @@ class EventPackageServiceTest extends EventApiTest {
         assertThat(loaded.staffNames()).containsExactly(new EventPackage.StaffName("arbitro1", "Juan Pérez"));
         assertThat(loaded.categories()).isEqualTo(exported.categories()).hasSize(9);
         assertThat(loaded.categories()).filteredOn(c -> c.teamSize() != null).hasSize(4);
+        assertThat(loaded.categories())
+                .filteredOn(c -> c.name().equals("7-8"))
+                .singleElement()
+                .satisfies(c ->
+                        assertThat(List.of(c.minGroupSize(), c.maxGroupSize())).containsExactly(3, 5))
+                .satisfies(c -> assertThat(c.returnLeg()).isTrue());
         assertThat(loaded.mats()).isEqualTo(exported.mats()).hasSize(5);
         assertThat(loaded.mats().get(4).refereeUsername()).isNull();
         assertThat(loaded.participants()).isEqualTo(exported.participants()).hasSize(PARTICIPANTS);
@@ -315,7 +324,8 @@ class EventPackageServiceTest extends EventApiTest {
                 new Case(r -> chosen(r, "club1"), "staffPermissions[0].username"),
                 new Case(r -> r.withObject("owner").put("username", "arbitro1"), "owner: must be in staff"),
                 new Case(r -> r.withObject("event").put("matchSeconds", 0), "event.matchSeconds"),
-                new Case(r -> ((ObjectNode) r.get("categories").get(0)).put("teamSize", 3), "categories[0]"));
+                new Case(r -> ((ObjectNode) r.get("categories").get(0)).put("teamSize", 3), "categories[0]"),
+                new Case(r -> ((ObjectNode) r.get("categories").get(1)).put("minGroupSize", 6), "categories[1]"));
         var files = cases.stream().map(c -> edit(c.change())).toList();
         emptyDatabase();
 

@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/count_stepper.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../events/state/events_providers.dart';
 import '../data/league_models.dart';
@@ -183,6 +184,22 @@ class _PodiumPicker extends StatefulWidget {
 class _PodiumPickerState extends State<_PodiumPicker> {
   late var _other = !_presets.any((p) => _same(p, widget.podium));
 
+  // 0 to 10 of one metal; [podium] builds the podium with the new count.
+  Widget _medal(
+    AppLocalizations l10n,
+    String metal,
+    int value,
+    Podium Function(int) podium,
+  ) => CountStepper(
+    label: metal,
+    value: value,
+    min: 0,
+    max: 10,
+    lessTooltip: l10n.podiumLess(metal),
+    moreTooltip: l10n.podiumMore(metal),
+    onChanged: (v) => widget.onChanged(podium(v)),
+  );
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -218,27 +235,27 @@ class _PodiumPickerState extends State<_PodiumPicker> {
         ),
         if (_other) ...[
           const SizedBox(height: AppSpacing.s),
-          _Counter(
-            label: l10n.medalGold,
-            value: podium.firsts,
-            onChanged: (v) => widget.onChanged(
-              Podium(firsts: v, seconds: podium.seconds, thirds: podium.thirds),
-            ),
-          ),
-          _Counter(
-            label: l10n.medalSilver,
-            value: podium.seconds,
-            onChanged: (v) => widget.onChanged(
-              Podium(firsts: podium.firsts, seconds: v, thirds: podium.thirds),
-            ),
-          ),
-          _Counter(
-            label: l10n.medalBronze,
-            value: podium.thirds,
-            onChanged: (v) => widget.onChanged(
-              Podium(firsts: podium.firsts, seconds: podium.seconds, thirds: v),
-            ),
-          ),
+          _medal(l10n, l10n.medalGold, podium.firsts, (v) {
+            return Podium(
+              firsts: v,
+              seconds: podium.seconds,
+              thirds: podium.thirds,
+            );
+          }),
+          _medal(l10n, l10n.medalSilver, podium.seconds, (v) {
+            return Podium(
+              firsts: podium.firsts,
+              seconds: v,
+              thirds: podium.thirds,
+            );
+          }),
+          _medal(l10n, l10n.medalBronze, podium.thirds, (v) {
+            return Podium(
+              firsts: podium.firsts,
+              seconds: podium.seconds,
+              thirds: v,
+            );
+          }),
         ],
       ],
     );
@@ -295,47 +312,6 @@ class _CategoryPodium extends StatelessWidget {
               onChanged: onChanged,
             ),
           ),
-      ],
-    );
-  }
-}
-
-/// − value + for one metal, 0 to 10.
-class _Counter extends StatelessWidget {
-  const _Counter({
-    required this.label,
-    required this.value,
-    required this.onChanged,
-  });
-
-  final String label;
-  final int value;
-  final ValueChanged<int> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return Row(
-      children: [
-        Expanded(child: Text(label)),
-        IconButton(
-          tooltip: l10n.podiumLess(label),
-          icon: const Icon(Icons.remove_circle_outline),
-          onPressed: value > 0 ? () => onChanged(value - 1) : null,
-        ),
-        SizedBox(
-          width: 32,
-          child: Text(
-            '$value',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-        ),
-        IconButton(
-          tooltip: l10n.podiumMore(label),
-          icon: const Icon(Icons.add_circle_outline),
-          onPressed: value < 10 ? () => onChanged(value + 1) : null,
-        ),
       ],
     );
   }

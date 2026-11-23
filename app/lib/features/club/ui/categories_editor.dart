@@ -5,10 +5,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
+import '../../auth/data/api_error.dart';
 import '../../grouping/state/grouping_providers.dart';
 import '../data/club_models.dart';
 import '../data/club_repository.dart';
 import '../state/club_providers.dart';
+import 'category_groups_field.dart';
 import 'settings_tab.dart';
 
 /// The event's categories (docs/modulos/prototipo-f1-equipos.md): age band and whether they
@@ -53,6 +55,8 @@ class _CategoriesEditorState extends ConsumerState<CategoriesEditor> {
       toasts.show(l10n.saved, duration: const Duration(seconds: 1));
     } on DioException catch (e) {
       toasts.show(switch (e.response?.statusCode) {
+        409 when ApiError.from(e).code == 'RETURN_LEG_IN_USE' =>
+          l10n.categoryReturnLegInUse,
         409 => l10n.categoriesInUse,
         400 => l10n.categoriesInvalid,
         _ => l10n.saveError,
@@ -76,6 +80,16 @@ class _CategoriesEditorState extends ConsumerState<CategoriesEditor> {
     );
   }
 
+  // A new category has no sizes yet: the server makes it of 4, one leg.
+  static String _groups(AppLocalizations l10n, EventCategory c) {
+    final min = c.minGroupSize ?? 4;
+    final max = c.maxGroupSize ?? 4;
+    final sizes = min == max
+        ? l10n.categoryGroupSize(max)
+        : l10n.categoryGroupSizes(min, max);
+    return c.returnLeg ?? false ? '$sizes · ${l10n.categoryReturnLeg}' : sizes;
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -88,7 +102,7 @@ class _CategoriesEditorState extends ConsumerState<CategoriesEditor> {
             title: Text(l10n.categoryRange(c.name, c.minAge, c.maxAge)),
             subtitle: Text(
               '${c.isTeam ? l10n.categoryTeams : l10n.categoryIndividual}'
-              ' · ${l10n.categoryGroupSize(c.groupSize)}'
+              ' · ${_groups(l10n, c)}'
               '${c.matchLength == null ? '' : ' · ${l10n.categoryOwnLength(formatMatchLength(c.matchLength!))}'}',
             ),
             onTap: _saving ? null : () => _edit(i),
@@ -129,6 +143,9 @@ class _CategoryDialogState extends State<_CategoryDialog> {
     text: widget.initial?.maxAge.toString(),
   );
   late var _teamSize = widget.initial?.teamSize;
+  late var _minGroup = widget.initial?.minGroupSize ?? 4;
+  late var _maxGroup = widget.initial?.maxGroupSize ?? 4;
+  late var _returnLeg = widget.initial?.returnLeg ?? false;
   late final _length = TextEditingController(
     text: switch (widget.initial?.matchLength) {
       final Duration length => formatMatchLength(length),
@@ -154,6 +171,9 @@ class _CategoryDialogState extends State<_CategoryDialog> {
         minAge: int.parse(_min.text),
         maxAge: int.parse(_max.text),
         teamSize: _teamSize,
+        minGroupSize: _minGroup,
+        maxGroupSize: _maxGroup,
+        returnLeg: _returnLeg,
         matchLength: _length.text.trim().isEmpty
             ? null
             : parseMatchLength(_length.text),
@@ -260,6 +280,16 @@ class _CategoryDialogState extends State<_CategoryDialog> {
                   onChanged: (on) => setState(() => _teamSize = on ? 3 : null),
                 ),
                 // Teams are always of 2 or 3 (Raul, 2026-11-13): nothing to choose.
+                CategoryGroupsField(
+                  min: _minGroup,
+                  max: _maxGroup,
+                  returnLeg: _returnLeg,
+                  onChanged: (min, max, returnLeg) => setState(() {
+                    _minGroup = min;
+                    _maxGroup = max;
+                    _returnLeg = returnLeg;
+                  }),
+                ),
               ],
             ),
           ),

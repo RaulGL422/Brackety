@@ -237,7 +237,7 @@ class MatchRecommenderSimulationTest {
 
         private SimGroup add(SimMat mat, int number, boolean teams, List<UUID> fighters, Instant at) {
             var group = new SimGroup(UUID.randomUUID(), number, teams, fighters, new HashMap<>());
-            var pairs = RoundRobin.pairs();
+            var pairs = RoundRobin.pairs(4, false);
             var matches = new ArrayList<Candidate>();
             for (int i = 0; i < pairs.size(); i++) {
                 var pair = pairs.get(i);

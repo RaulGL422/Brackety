@@ -3073,6 +3073,60 @@ abstract class AppLocalizations {
   /// **'Por equipos'**
   String get categoryByTeams;
 
+  /// No description provided for @categoryGroupSizes.
+  ///
+  /// In es, this message translates to:
+  /// **'Grupos de {min} a {max}'**
+  String categoryGroupSizes(int min, int max);
+
+  /// No description provided for @categoryReturnLeg.
+  ///
+  /// In es, this message translates to:
+  /// **'Ida y vuelta'**
+  String get categoryReturnLeg;
+
+  /// No description provided for @categoryGroups.
+  ///
+  /// In es, this message translates to:
+  /// **'Grupos'**
+  String get categoryGroups;
+
+  /// No description provided for @categoryGroupFrom.
+  ///
+  /// In es, this message translates to:
+  /// **'De'**
+  String get categoryGroupFrom;
+
+  /// No description provided for @categoryGroupTo.
+  ///
+  /// In es, this message translates to:
+  /// **'A'**
+  String get categoryGroupTo;
+
+  /// No description provided for @categoryGroupLess.
+  ///
+  /// In es, this message translates to:
+  /// **'{label}: uno menos'**
+  String categoryGroupLess(String label);
+
+  /// No description provided for @categoryGroupMore.
+  ///
+  /// In es, this message translates to:
+  /// **'{label}: uno más'**
+  String categoryGroupMore(String label);
+
+  /// No description provided for @categoryGroupMatches.
+  ///
+  /// In es, this message translates to:
+  /// **'Grupo de {size}: {count, plural, =1{1 combate} other{{count} combates}}'**
+  String categoryGroupMatches(int size, int count);
+
+  /// No description provided for @categoryReturnLegInUse.
+  ///
+  /// In es, this message translates to:
+  /// **'Esta categoría ya tiene grupos: no puede cambiar la ida y vuelta.'**
+  String get categoryReturnLegInUse;
+
   /// No description provided for @categoryGroupSize.
   ///
   /// In es, this message translates to:
