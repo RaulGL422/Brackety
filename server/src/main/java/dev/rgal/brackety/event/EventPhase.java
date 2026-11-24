@@ -57,6 +57,14 @@ public class EventPhase {
         }
     }
 
+    /**
+     * Locks the event row and checks the phase as it is now, not as this transaction first read it: an action that
+     * checked the phase and then waited for the row while a finish held it must not go on (GR-8, concurrency).
+     */
+    public void lockInProgress(UUID eventId) {
+        requireInProgress(PhaseState.valueOf(events.lockPhase(eventId).orElseThrow(EventException::notFound)));
+    }
+
     /** Teams, measures and mats can be prepared before the start, never once it is finished. */
     public void requireNotFinished(UUID eventId) {
         if (state(eventId) == PhaseState.FINISHED) {
