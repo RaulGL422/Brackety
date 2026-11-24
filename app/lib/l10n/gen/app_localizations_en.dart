@@ -74,7 +74,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String matGroupsProgress(int played, int matches) {
-    return '$played of $matches';
+    return '$played of $matches fought';
   }
 
   @override

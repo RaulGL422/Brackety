@@ -197,7 +197,7 @@ abstract class AppLocalizations {
   /// No description provided for @matGroupsProgress.
   ///
   /// In es, this message translates to:
-  /// **'{played} de {matches}'**
+  /// **'{played} de {matches} disputados'**
   String matGroupsProgress(int played, int matches);
 
   /// No description provided for @matGroupsDisabled.

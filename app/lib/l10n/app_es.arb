@@ -31,7 +31,7 @@
     }
   },
   "matGroupsInProgress": "En combate: no se puede mover",
-  "matGroupsProgress": "{played} de {matches}",
+  "matGroupsProgress": "{played} de {matches} disputados",
   "@matGroupsProgress": {
     "placeholders": {
       "played": {
