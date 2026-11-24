@@ -1,7 +1,7 @@
 package dev.rgal.brackety.scoreboard;
 
 import dev.rgal.brackety.event.Event;
-import dev.rgal.brackety.event.EventService;
+import dev.rgal.brackety.event.EventPhase;
 import dev.rgal.brackety.grouping.Competitor;
 import dev.rgal.brackety.grouping.CompetitorDirectory;
 import dev.rgal.brackety.grouping.Match;
@@ -37,7 +37,7 @@ class MatchWriter {
     private final MatchEventRepository matchEvents;
     private final ParticipantRepository participants;
     private final CompetitorDirectory directory;
-    private final EventService events;
+    private final EventPhase phase;
     private final MatchRulesService rules;
 
     MatchWriter(
@@ -45,13 +45,13 @@ class MatchWriter {
             MatchEventRepository matchEvents,
             ParticipantRepository participants,
             CompetitorDirectory directory,
-            EventService events,
+            EventPhase phase,
             MatchRulesService rules) {
         this.matches = matches;
         this.matchEvents = matchEvents;
         this.participants = participants;
         this.directory = directory;
-        this.events = events;
+        this.phase = phase;
         this.rules = rules;
     }
 
@@ -160,9 +160,10 @@ class MatchWriter {
     }
 
     // Two mats starting at once with a shared fighter would each see the other still pending: the event lock
-    // (held until commit) makes the second wait and see the first in progress. Always match, then event.
+    // (held until commit) makes the second wait and see the first in progress. Always match, then event. The
+    // phase is read again under the lock: a finish that held the row may have closed it meanwhile.
     private Optional<Refusal> startRefusal(Match match, boolean checkOtherMats) {
-        events.lock(match.getEventId());
+        phase.lockInProgress(match.getEventId());
         var inProgress = matches.findByEventId(match.getEventId()).stream()
                 .filter(m ->
                         m.getStatus() == Match.Status.IN_PROGRESS && !m.getId().equals(match.getId()))
