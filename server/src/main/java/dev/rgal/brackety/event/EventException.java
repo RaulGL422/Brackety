@@ -23,6 +23,12 @@ public class EventException extends ErrorResponseException {
         return new EventException(HttpStatus.BAD_REQUEST, detail);
     }
 
+    public static EventException invalid(String code, String detail) {
+        var exception = invalid(detail);
+        exception.getBody().setProperty("code", code);
+        return exception;
+    }
+
     public static EventException conflict(String detail) {
         return new EventException(HttpStatus.CONFLICT, detail);
     }

@@ -33,9 +33,9 @@ Pedido de Raul (2026-11-19): una pantalla de exportación donde se eligen los ca
 
 ## Cómo se hace por dentro
 - **Servidor, un registro de datos**: cada conjunto (Inscritos, Combates…) declara sus campos una sola vez: clave, título ES/EN, tipo (texto, número, fecha, duración, puesto), sensibilidad y cómo se obtiene. Las 6 funciones de CSV a mano se convierten en estas declaraciones.
-- **Un endpoint**: `POST /api/v1/events/{id}/exports` con la configuración (`dataset`, `columns`, `filters`, `sort`, `splitBy`, `format`, `locale`). El servidor valida todo contra el registro: campos desconocidos o sin permiso → 400 con `code`.
-- `GET .../exports/fields?dataset=…` devuelve los campos disponibles para quien pregunta; la pantalla se construye con eso, sin listas repetidas en la app.
-- Vista previa: el mismo endpoint con `preview=true` devuelve JSON con 20 filas.
+- **Un endpoint**: `POST /api/v1/events/{id}/exports` con la configuración (`sheet`, `columns`, `sort`, `locale`; después `filters`, `splitBy`, `format`). El servidor valida todo contra el registro: hoja o columna desconocida o repetida → 400 con `code` (`EXPORT_UNKNOWN_SHEET`, `EXPORT_UNKNOWN_COLUMN`, `EXPORT_REPEATED_COLUMN`).
+- `GET .../exports/sheets?locale=es|en` devuelve cada hoja con sus campos (título, tipo, sensibilidad); la pantalla se construye con eso, sin listas repetidas en la app.
+- Vista previa: `POST .../exports/preview`, la misma configuración; JSON con 20 filas y el total.
 - Formatos: `Csv` y `StandingsPdf` de hoy, generalizados, y `.xlsx` (aprobado por Raul; librería ligera a elegir al programarlo, con versión exacta).
 - Plantillas guardadas: tabla `export_preset` (dueño, alcance, nombre, configuración en JSON con `schemaVersion`).
 - Funciona igual en el portátil del pabellón (todo ocurre en el servidor) y la configuración viaja en el paquete.
@@ -53,4 +53,6 @@ Pedido de Raul (2026-11-19): una pantalla de exportación donde se eligen los ca
 5. Usar las plantillas en los correos de resultados.
 
 ## Estado
-Aprobada en lo básico (2026-11-19): permiso propio para datos personales, `.xlsx` sí, plantillas sin compartir entre clubes. Pendiente de programar (paso 1 con L5 de `plan-limpieza.md`).
+Aprobada en lo básico (2026-11-19): permiso propio para datos personales, `.xlsx` sí, plantillas sin compartir entre clubes.
+- Paso 1a hecho: registro (`ranking/*Sheet`, `ExportField`, `Exports`) con las 6 hojas de la exportación completa (inscritos, categorías, tapices, grupos, combates, línea de tiempo); salen igual que antes (comprobación de oro). Fuera `EventSheets`. Ordenar por varias columnas, nombres en orden español, vacíos al final.
+- Falta 1b: clasificación de fase y de liga como hojas. Hoy solo el club exporta y ve todo: el permiso «Descargar datos personales» llega con la pantalla (paso 2).
