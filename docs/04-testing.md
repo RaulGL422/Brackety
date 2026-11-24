@@ -42,6 +42,11 @@ Obligatoria en cada release y cierre de módulo; cada punto, con su test en `ser
 - **Ataques**: ids de otro evento (IDOR), cuenta temporal fuera de su evento, entradas límite y mal formadas, tokens caducados o reutilizados, límites de peticiones.
 - **Paquete del pabellón**: ida y vuelta completa (Pi → portátil → Pi) sin perder ni duplicar nada.
 - **Migraciones**: Flyway desde cero y desde el esquema de la última release con el escenario `yoseikan-f1`.
+  `MigrationFromReleaseTest`: carga los datos de la release (`test/resources/migration/release/`), migra y sigue
+  el día (marcador, tablero, clasificación, descargas, cerrar fase). Desde cero: todos los demás tests.
+  Tras etiquetar una release, en la PR `chore/sync-main`: servidor de esa etiqueta con `yoseikan-f1` en 8093/15434
+  y `java -cp postgresql.jar tools/MigrationSnapshot.java http://localhost:8093`
+  `jdbc:postgresql://localhost:15434/postgres server/src/test/resources/migration/release vX.Y.Z`.
 
 ## Determinismo
 Sorteos con semilla guardada: test que repite la semilla y obtiene el mismo resultado. Tiempo por reloj inyectable.
