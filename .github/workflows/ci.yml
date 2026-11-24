@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       server: ${{ steps.pick.outputs.server }}
+      server-tests: ${{ steps.pick.outputs.server-tests }}
       flutter: ${{ steps.pick.outputs.flutter }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -43,6 +44,10 @@ jobs:
           touched "^(app|packages|spec)/|$all" && flutter+=('"app"')
           touched "^(admin|packages)/|$all" && flutter+=('"admin"')
           echo "server=$server" >> "$GITHUB_OUTPUT"
+          # Empty: every server test. Else only those of the touched modules (tools/server_tests.py).
+          if [ "$files" != everything ]; then
+            echo "server-tests=$(echo "$files" | python3 tools/server_tests.py)" >> "$GITHUB_OUTPUT"
+          fi
           echo "flutter=[$(IFS=,; echo "${flutter[*]}")]" >> "$GITHUB_OUTPUT"
 
   server:
@@ -60,8 +65,18 @@ jobs:
           java-version: '25'
           cache: maven
       - name: Build, format check and tests
-        # A release runs the whole day of the server battery with five seeds per sport (docs/04-testing.md).
-        run: ./mvnw -B verify ${{ github.base_ref == 'main' && '-Dbattery.seeds=5' || '' }}
+        # A pull request to development tests the modules it touches; a release runs every test, and the
+        # whole day of the server battery with five seeds per sport (docs/04-testing.md).
+        env:
+          TESTS: ${{ needs.changes.outputs.server-tests }}
+          SEEDS: ${{ github.base_ref == 'main' && '-Dbattery.seeds=5' || '' }}
+        run: |
+          if [ -n "$TESTS" ]; then
+            echo "Tests: $TESTS"
+            ./mvnw -B verify "-Dtest=$TESTS" -Dsurefire.failIfNoSpecifiedTests=false
+          else
+            ./mvnw -B verify $SEEDS
+          fi
 
   flutter:
     needs: changes
