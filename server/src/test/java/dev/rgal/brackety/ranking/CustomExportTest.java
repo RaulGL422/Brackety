@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipFile;
 import org.junit.jupiter.api.Test;
+import org.openpdf.text.pdf.PdfReader;
+import org.openpdf.text.pdf.parser.PdfTextExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
 
 // Custom exports (docs/producto/exportaciones.md, step 1): the club picks the sheet, its columns and the row order.
@@ -223,6 +225,43 @@ class CustomExportTest extends EventApiTest {
         var first = files.get("xl/worksheets/sheet1.xml");
         // 25.5 as a number, 1 March 2019 as Excel's day 43525, and the name that looks like a formula, as a text.
         assertThat(first).contains("<v>25.5</v>", "<v>43525").doesNotContain("<f>");
+    }
+
+    @Test
+    void aPdfHasAPagePerValueWithItsTitleTheEventAndTheVersionAndTurnsWhenWide() throws Exception {
+        participant("Ana", new BigDecimal("25.5"));
+        participant("Carla", null, 2017);
+
+        var split = call(post("/api/v1/events/" + eventId + "/exports").content("""
+                                {"sheet":"participants","columns":["firstName","weightKg"],"splitBy":"category",
+                                 "format":"pdf","title":"Lista para la mesa"}"""), "club1")
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse();
+
+        assertThat(split.getContentType()).isEqualTo("application/pdf");
+        assertThat(split.getHeader("Content-Disposition")).contains("participantes.pdf");
+        var reader = new PdfReader(split.getContentAsByteArray());
+        var text = new PdfTextExtractor(reader);
+        assertThat(reader.getNumberOfPages()).isEqualTo(2);
+        assertThat(text.getTextFromPage(1))
+                .contains("7-8", "Lista para la mesa", "Nombre", "Peso (kg)", "Ana", "25,5", "Brackety local")
+                .doesNotContain("Carla");
+        assertThat(text.getTextFromPage(2)).contains("9-10", "Carla");
+        assertThat(reader.getPageSizeWithRotation(1).getWidth())
+                .isLessThan(reader.getPageSizeWithRotation(1).getHeight());
+
+        var wide = new PdfReader(
+                call(post("/api/v1/events/" + eventId + "/exports").content("""
+                                {"sheet":"participants","format":"pdf","columns":["firstName","lastName","age",
+                                 "sex","club","category","team"]}"""), "club1")
+                        .andExpect(status().isOk())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsByteArray());
+        assertThat(new PdfTextExtractor(wide).getTextFromPage(1)).contains("Inscritos");
+        assertThat(wide.getPageSizeWithRotation(1).getWidth())
+                .isGreaterThan(wide.getPageSizeWithRotation(1).getHeight());
     }
 
     private void participant(String firstName, BigDecimal weight) {

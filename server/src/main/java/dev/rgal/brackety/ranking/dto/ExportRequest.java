@@ -16,7 +16,8 @@ import java.util.Map;
  * its own if wanted), which rows ({@code filters}: all of them must match), how they sort ({@code sort}: by priority;
  * empty, the sheet's own order), one file per value of a column ({@code splitBy}: CSVs in a .zip, or worksheets of
  * one workbook), the language of the headers (es by default) and the format ({@code csv} by default, or
- * {@code xlsx}).
+ * {@code xlsx} or {@code pdf}). A PDF takes a {@code title} (the sheet's by default) and goes {@code landscape} when
+ * asked, or by itself when it has many columns.
  */
 public record ExportRequest(
         @NotBlank @Size(max = 40) String sheet,
@@ -26,7 +27,9 @@ public record ExportRequest(
         @Size(max = 5) List<@Valid SortKey> sort,
         @Size(max = 40) String splitBy,
         @Pattern(regexp = "es|en") String locale,
-        @Pattern(regexp = "csv|xlsx") String format) {
+        @Pattern(regexp = "csv|xlsx|pdf") String format,
+        @Size(max = 120) String title,
+        Boolean landscape) {
 
     public record SortKey(@NotBlank @Size(max = 40) String column, boolean descending) {}
 

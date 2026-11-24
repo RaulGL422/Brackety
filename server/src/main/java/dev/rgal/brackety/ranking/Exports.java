@@ -3,10 +3,13 @@ package dev.rgal.brackety.ranking;
 import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventException;
 import dev.rgal.brackety.event.EventRole;
+import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.ranking.dto.ExportPreview;
 import dev.rgal.brackety.ranking.dto.ExportRequest;
 import dev.rgal.brackety.ranking.dto.ExportSheet;
 import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -14,6 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +36,7 @@ class Exports {
 
     static final String CSV = "text/csv;charset=UTF-8";
     static final String ZIP = "application/zip";
+    private static final DateTimeFormatter TIME = DateTimeFormatter.ofPattern("HH:mm");
 
     /**
      * A file to hand over: one CSV, a .zip with one CSV per value of the «Separar por» column, or a workbook with one
@@ -45,6 +50,9 @@ class Exports {
     private final EventAccess access;
     private final DownloadNames names;
     private final ExportTable tables;
+    private final EventService events;
+    private final Clock clock;
+    private final String version;
 
     Exports(
             List<Sheet<?>> sheets,
@@ -52,13 +60,18 @@ class Exports {
             SheetSource source,
             EventAccess access,
             DownloadNames names,
-            Clock clock) {
+            EventService events,
+            Clock clock,
+            @Value("${brackety.version}") String version) {
         this.sheets = sheets.stream().collect(Collectors.toMap(Sheet::key, Function.identity()));
         this.league = league;
         this.source = source;
         this.access = access;
         this.names = names;
         this.tables = new ExportTable(clock.getZone());
+        this.events = events;
+        this.clock = clock;
+        this.version = version;
     }
 
     /** In the order of the full export. */
@@ -84,7 +97,13 @@ class Exports {
     @Transactional(readOnly = true)
     Download export(UUID eventId, UUID accountId, ExportRequest request) {
         var tables = custom(eventId, accountId, request, true);
-        var file = sheets.get(request.sheet()).fileName();
+        var sheet = sheets.get(request.sheet());
+        var file = sheet.fileName();
+        if ("pdf".equals(request.format())) {
+            var title = request.title() == null ? sheet.title(request.headersLocale()) : request.title();
+            var pdf = TablePdf.of(tables, title, heading(eventId), footer(), request.landscape());
+            return new Download(names.of(eventId, file + ".pdf"), pdf, TablePdf.CONTENT_TYPE);
+        }
         if ("xlsx".equals(request.format())) {
             return new Download(names.of(eventId, file + ".xlsx"), Xlsx.of(tables), Xlsx.CONTENT_TYPE);
         }
@@ -95,6 +114,17 @@ class Exports {
         var files = new LinkedHashMap<String, byte[]>();
         tables.forEach(table -> files.put(names.of(eventId, table.fileName()), Zip.text(table.csv())));
         return new Download(names.of(eventId, file + ".zip"), Zip.of(files), ZIP);
+    }
+
+    private String heading(UUID eventId) {
+        var event = events.get(eventId);
+        return event.getName() + " · " + SheetText.date(event.getEventDate());
+    }
+
+    private String footer() {
+        var now = LocalDateTime.now(clock);
+        return "Generado el " + SheetText.date(now.toLocalDate()) + " a las " + TIME.format(now) + " · Brackety "
+                + version;
     }
 
     /** The rows of the whole export, without splitting it. */
