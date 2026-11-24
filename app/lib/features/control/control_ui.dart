@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../l10n/gen/app_localizations.dart';
 import '../auth/data/api_error.dart';
-import '../club/data/club_models.dart';
+import '../club/data/mat_overview.dart';
 import '../club/state/club_providers.dart';
 import '../mat/data/mat_board.dart';
 import '../mat/ui/fighter_text.dart';

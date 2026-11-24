@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
 import '../../auth/ui/widgets/confirm_dialog.dart';
-import '../../club/data/club_models.dart';
+import '../../club/data/staff_member.dart';
 import '../../club/state/club_providers.dart';
 import '../../events/data/my_event.dart';
 import '../data/staff_repository.dart';

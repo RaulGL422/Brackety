@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
-import '../data/club_models.dart';
 import '../data/club_repository.dart';
+import '../data/event_settings.dart';
 import '../state/club_providers.dart';
 
 /// The warning reasons the referee picks with one tap (F1-4): the sport's until the club changes them. Saved at

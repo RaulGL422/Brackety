@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
-import '../data/club_models.dart';
 import '../data/club_repository.dart';
+import '../data/participant.dart';
 import '../state/club_providers.dart';
 
 /// The clubs taking part, added by hand; each participant may belong to one. Every change is

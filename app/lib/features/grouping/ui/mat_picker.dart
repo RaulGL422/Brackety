@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
-import '../../club/data/club_models.dart';
+import '../../club/data/mat_overview.dart';
 import '../../club/state/club_providers.dart';
 
 /// Where the next group goes: "Automatic" (the mat free first, chosen by the server) or any mat

@@ -1,5 +1,5 @@
 {
-  "Dart files over 400 lines": 13,
+  "Dart files over 400 lines": 12,
   "Java files over 300 lines": 6,
   "Methods of 60 lines or more": 64,
   "Features in an import cycle (app, admin)": 14,

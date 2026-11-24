@@ -6,8 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../events/data/measure_rules.dart';
 import '../../events/state/events_providers.dart';
-import '../data/club_models.dart';
 import '../data/club_repository.dart';
+import '../data/event_settings.dart';
 import '../state/club_providers.dart';
 
 /// Whether the event asks for weight and height (F2-1): as its sport, off, optional or required. Saved at once,

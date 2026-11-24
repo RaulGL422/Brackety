@@ -4,8 +4,14 @@ import 'package:intl/intl.dart';
 
 import '../../auth/state/session_controller.dart';
 import '../../events/data/measure_rules.dart';
-import 'club_models.dart';
+import 'event_category.dart';
+import 'event_settings.dart';
+import 'mat_overview.dart';
+import 'participant.dart';
+import 'participant_record.dart';
+import 'results_import.dart';
 import 'sex.dart';
+import 'standing_row.dart';
 
 final clubRepositoryProvider = Provider<ClubRepository>(
   (ref) => ClubRepository(ref.watch(apiProvider)),

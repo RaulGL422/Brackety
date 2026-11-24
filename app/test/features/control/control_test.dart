@@ -1,4 +1,4 @@
-import 'package:brackety/features/club/data/club_models.dart';
+import 'package:brackety/features/club/data/mat_overview.dart';
 import 'package:brackety/features/club/state/club_providers.dart';
 import 'package:brackety/features/club/ui/mats_tab.dart';
 import 'package:brackety/features/control/control_repository.dart';

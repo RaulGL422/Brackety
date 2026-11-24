@@ -1,9 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/polling.dart';
-
-import '../data/club_models.dart';
 import '../data/club_repository.dart';
+import '../data/event_settings.dart';
+import '../data/mat_overview.dart';
+import '../data/participant.dart';
+import '../data/participant_record.dart';
+import '../data/standing_row.dart';
 
 /// Scores and mats change while the club watches: they follow the event on the live socket.
 Set<String> eventTopics(String eventId) => {'event:$eventId'};

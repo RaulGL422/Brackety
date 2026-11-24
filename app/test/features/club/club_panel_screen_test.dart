@@ -2,9 +2,15 @@ import 'dart:typed_data';
 
 import 'package:brackety/core/download/file_download.dart';
 import 'package:brackety/core/upload/file_upload.dart';
-import 'package:brackety/features/club/data/club_models.dart';
 import 'package:brackety/features/club/data/club_repository.dart';
+import 'package:brackety/features/club/data/event_category.dart';
+import 'package:brackety/features/club/data/event_settings.dart';
+import 'package:brackety/features/club/data/mat_overview.dart';
+import 'package:brackety/features/club/data/participant.dart';
+import 'package:brackety/features/club/data/participant_record.dart';
 import 'package:brackety/features/club/data/sex.dart';
+import 'package:brackety/features/club/data/staff_member.dart';
+import 'package:brackety/features/club/data/standing_row.dart';
 import 'package:brackety/features/club/state/club_providers.dart';
 import 'package:brackety/features/club/ui/club_panel_screen.dart';
 import 'package:brackety/features/club/ui/participant_form.dart';
