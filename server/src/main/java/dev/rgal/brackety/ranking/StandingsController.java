@@ -32,7 +32,7 @@ class StandingsController {
 
     private final StandingsService standings;
     private final LeagueStandingsService leagueStandings;
-    private final EventSheets sheets;
+    private final Exports exports;
     private final FullExportService fullExport;
     private final ParticipantRecordService records;
     private final DownloadNames names;
@@ -40,7 +40,7 @@ class StandingsController {
     StandingsController(
             StandingsService standings,
             LeagueStandingsService leagueStandings,
-            EventSheets sheets,
+            Exports exports,
             FullExportService fullExport,
             ParticipantRecordService records,
             DownloadNames names) {
@@ -48,7 +48,7 @@ class StandingsController {
         this.names = names;
         this.standings = standings;
         this.leagueStandings = leagueStandings;
-        this.sheets = sheets;
+        this.exports = exports;
         this.fullExport = fullExport;
     }
 
@@ -104,17 +104,29 @@ class StandingsController {
 
     @GetMapping("/export/matches.csv")
     ResponseEntity<byte[]> matchesCsv(@PathVariable UUID eventId, @AuthenticationPrincipal Jwt jwt) {
-        return file(eventId, "combates.csv", CSV, sheets.matchesCsv(eventId, CurrentAccount.id(jwt)));
+        return file(
+                eventId,
+                "combates.csv",
+                CSV,
+                exports.builtIn(eventId, CurrentAccount.id(jwt), "matches").csv());
     }
 
     @GetMapping("/export/timeline.csv")
     ResponseEntity<byte[]> timelineCsv(@PathVariable UUID eventId, @AuthenticationPrincipal Jwt jwt) {
-        return file(eventId, "linea-de-tiempo.csv", CSV, sheets.timelineCsv(eventId, CurrentAccount.id(jwt)));
+        return file(
+                eventId,
+                "linea-de-tiempo.csv",
+                CSV,
+                exports.builtIn(eventId, CurrentAccount.id(jwt), "timeline").csv());
     }
 
     @GetMapping("/export/participants.csv")
     ResponseEntity<byte[]> participantsCsv(@PathVariable UUID eventId, @AuthenticationPrincipal Jwt jwt) {
-        return file(eventId, "participantes.csv", CSV, sheets.participantsCsv(eventId, CurrentAccount.id(jwt)));
+        return file(
+                eventId,
+                "participantes.csv",
+                CSV,
+                exports.builtIn(eventId, CurrentAccount.id(jwt), "participants").csv());
     }
 
     /** Every sheet, the event package and a LEEME.txt in one .zip. */

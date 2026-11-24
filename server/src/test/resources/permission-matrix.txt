@@ -34,6 +34,7 @@ GET /api/v1/events/{eventId}/export/package | club
 GET /api/v1/events/{eventId}/export/participants.csv | club
 GET /api/v1/events/{eventId}/export/standings.csv | club
 GET /api/v1/events/{eventId}/export/timeline.csv | club
+GET /api/v1/events/{eventId}/exports/sheets | club
 GET /api/v1/events/{eventId}/invitations | club
 GET /api/v1/events/{eventId}/league | club
 GET /api/v1/events/{eventId}/league/candidates | club
@@ -91,6 +92,8 @@ POST /api/v1/events/{eventId}/control/matches/{matchId}/waive-rest | club
 POST /api/v1/events/{eventId}/control/mats/{matId}/disable | club | {"groupMats":{}}
 POST /api/v1/events/{eventId}/control/mats/{matId}/enable | club
 POST /api/v1/events/{eventId}/control/team-members | club | {"participantId":"{teamMember}","fromTeamId":"{teamId}","toTeamId":"{team2Id}"}
+POST /api/v1/events/{eventId}/exports | club | {"sheet":"participants","columns":["firstName"]}
+POST /api/v1/events/{eventId}/exports/preview | club | {"sheet":"participants","columns":["firstName"]}
 POST /api/v1/events/{eventId}/groups | grouper club | {"categoryId":"{categoryId}","groups":[{"participantIds":["{free1}","{free2}","{free3}","{free4}"]}]}
 POST /api/v1/events/{eventId}/import/results | club | bytes
 POST /api/v1/events/{eventId}/invitations | club | {"email":"nuevo@example.test","role":"GROUPER"}
