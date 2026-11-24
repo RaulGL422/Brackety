@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import dev.rgal.brackety.live.LiveHub;
 import dev.rgal.brackety.live.LiveTopics;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -119,7 +120,8 @@ class ScoreboardLiveTest extends ScoreboardApiTest {
 
     private class Connection {
         final WebSocketSession session = mock(WebSocketSession.class);
-        final List<String> received = new ArrayList<>();
+        // The hub's heartbeat writes from its own thread.
+        final List<String> received = Collections.synchronizedList(new ArrayList<>());
 
         Connection() throws Exception {
             when(session.getId()).thenReturn("live-" + IDS.incrementAndGet());
@@ -135,8 +137,14 @@ class ScoreboardLiveTest extends ScoreboardApiTest {
             hub.handleMessage(session, new TextMessage(text));
         }
 
+        /** The last message but the heartbeat, which may come at any moment and says nothing. */
         String last() {
-            return received.isEmpty() ? "" : received.getLast();
+            synchronized (received) {
+                return received.stream()
+                        .filter(m -> !m.equals("{\"type\":\"ping\"}"))
+                        .reduce((first, second) -> second)
+                        .orElse("");
+            }
         }
     }
 }

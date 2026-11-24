@@ -1,0 +1,135 @@
+# Server battery, «Matriz de permisos» (docs/04-testing.md): every endpoint, who may use it, and a valid
+# body when a role is refused only after the body is checked. Roles: club grouper referee temporary
+# outsider anonymous superadmin. Rewrite the roles from what happens: -Dmatrix.update=true, then review.
+DELETE /api/v1/admin/auth/locks/{lockId} | -
+DELETE /api/v1/events/{eventId}/groups/{groupId} | grouper club
+DELETE /api/v1/events/{eventId}/invitations/{invitationId} | club
+DELETE /api/v1/events/{eventId}/participants/{participantId} | club
+DELETE /api/v1/events/{eventId}/rulebook | club
+DELETE /api/v1/events/{eventId}/staff/{accountId} | club | ?role=GROUPER
+DELETE /api/v1/events/{eventId}/teams/{teamId} | grouper club
+DELETE /api/v1/me | -
+DELETE /api/v1/me/identities/google | -
+DELETE /api/v1/me/password | -
+DELETE /api/v1/me/profiles/{type} | outsider referee grouper club
+GET /api/v1/admin/auth/locks | superadmin
+GET /api/v1/admin/event-reset | superadmin
+GET /api/v1/admin/events | superadmin
+GET /api/v1/admin/events/{eventId} | superadmin
+GET /api/v1/admin/metrics | superadmin
+GET /api/v1/admin/organizers | superadmin
+GET /api/v1/admin/users | superadmin
+GET /api/v1/admin/users/{accountId} | superadmin
+GET /api/v1/events | outsider temporary referee grouper club
+GET /api/v1/events/disciplines | outsider temporary referee grouper club
+GET /api/v1/events/{eventId}/categories | grouper club
+GET /api/v1/events/{eventId}/categories/{categoryId}/participants | grouper club
+GET /api/v1/events/{eventId}/categories/{categoryId}/teams | grouper club
+GET /api/v1/events/{eventId}/export/full | club
+GET /api/v1/events/{eventId}/export/league-standings-by-category.zip | club
+GET /api/v1/events/{eventId}/export/league-standings.csv | club
+GET /api/v1/events/{eventId}/export/league-standings.pdf | club
+GET /api/v1/events/{eventId}/export/matches.csv | club
+GET /api/v1/events/{eventId}/export/package | club
+GET /api/v1/events/{eventId}/export/participants.csv | club
+GET /api/v1/events/{eventId}/export/standings.csv | club
+GET /api/v1/events/{eventId}/export/timeline.csv | club
+GET /api/v1/events/{eventId}/invitations | club
+GET /api/v1/events/{eventId}/league | club
+GET /api/v1/events/{eventId}/league/candidates | club
+GET /api/v1/events/{eventId}/league/people/{personId}/record | club
+GET /api/v1/events/{eventId}/league/standings | club
+GET /api/v1/events/{eventId}/mat-groups | grouper club
+GET /api/v1/events/{eventId}/mats | grouper club
+GET /api/v1/events/{eventId}/participants | club
+GET /api/v1/events/{eventId}/participants/import/available | club
+GET /api/v1/events/{eventId}/participants/{participantId}/record | club
+GET /api/v1/events/{eventId}/phase | temporary referee grouper club
+GET /api/v1/events/{eventId}/rulebook | temporary referee grouper club
+GET /api/v1/events/{eventId}/rulebook/info | temporary referee grouper club
+GET /api/v1/events/{eventId}/settings | club
+GET /api/v1/events/{eventId}/standings | club
+GET /api/v1/events/{eventId}/temporary-access | club
+GET /api/v1/info | anonymous outsider temporary referee grouper club
+GET /api/v1/legal | anonymous outsider temporary referee grouper club
+GET /api/v1/legal/{type} | anonymous outsider temporary referee grouper club
+GET /api/v1/matches/{matchId} | referee club
+GET /api/v1/mats/{matId}/board | referee club
+GET /api/v1/me | outsider temporary referee grouper club
+GET /api/v1/me/export | -
+GET /api/v1/me/identities | outsider referee grouper club
+PATCH /api/v1/me | outsider referee grouper club
+POST /api/v1/admin/auth/login | superadmin
+POST /api/v1/admin/event-reset | superadmin
+POST /api/v1/admin/events/{eventId}/clear-competition | superadmin
+POST /api/v1/admin/events/{eventId}/control/matches/{matchId}/waive-rest | superadmin
+POST /api/v1/admin/events/{eventId}/control/mats/{matId}/disable | superadmin
+POST /api/v1/admin/events/{eventId}/control/mats/{matId}/enable | superadmin
+POST /api/v1/admin/events/{eventId}/control/team-members | superadmin
+POST /api/v1/admin/groups/{groupId}/dissolve | superadmin
+POST /api/v1/admin/matches/{matchId}/reset | superadmin
+POST /api/v1/admin/organizers/{accountId}/validate | -
+POST /api/v1/admin/users/{accountId}/delete | superadmin
+POST /api/v1/admin/users/{accountId}/suspend | superadmin
+POST /api/v1/admin/users/{accountId}/unsuspend | superadmin
+POST /api/v1/auth/email/change/confirm | anonymous outsider temporary referee grouper club
+POST /api/v1/auth/email/resend | anonymous outsider temporary referee grouper club
+POST /api/v1/auth/email/verify | anonymous outsider temporary referee grouper club
+POST /api/v1/auth/google | anonymous outsider temporary referee grouper club
+POST /api/v1/auth/login | anonymous outsider temporary referee grouper club
+POST /api/v1/auth/logout | anonymous outsider temporary referee grouper club
+POST /api/v1/auth/password/forgot | anonymous outsider temporary referee grouper club
+POST /api/v1/auth/password/reset | anonymous outsider temporary referee grouper club
+POST /api/v1/auth/password/reset/check | anonymous outsider temporary referee grouper club
+POST /api/v1/auth/refresh | -
+POST /api/v1/auth/register | anonymous outsider temporary referee grouper club
+POST /api/v1/auth/restore | anonymous outsider temporary referee grouper club
+POST /api/v1/auth/temporary | anonymous outsider temporary referee grouper club
+POST /api/v1/events | outsider referee grouper club | {"name":"Otro","date":"2027-05-08","discipline":"TAMBO","mats":1}
+POST /api/v1/events/{eventId}/categories/{categoryId}/teams | grouper club | {"participantIds":["{participantId}","{participant2}"]}
+POST /api/v1/events/{eventId}/control/matches/{matchId}/waive-rest | club
+POST /api/v1/events/{eventId}/control/mats/{matId}/disable | club | {"groupMats":{}}
+POST /api/v1/events/{eventId}/control/mats/{matId}/enable | club
+POST /api/v1/events/{eventId}/control/team-members | club | {"participantId":"{teamMember}","fromTeamId":"{teamId}","toTeamId":"{team2Id}"}
+POST /api/v1/events/{eventId}/groups | grouper club | {"categoryId":"{categoryId}","groups":[{"participantIds":["{free1}","{free2}","{free3}","{free4}"]}]}
+POST /api/v1/events/{eventId}/import/results | club | bytes
+POST /api/v1/events/{eventId}/invitations | club | {"email":"nuevo@example.test","role":"GROUPER"}
+POST /api/v1/events/{eventId}/league/phases | club | {"name":"Fase 2","date":"2027-04-10","discipline":"TAMBO","attendancePoints":10}
+POST /api/v1/events/{eventId}/league/reenrol | club | {"personIds":["{personId}"],"guardianConsent":false}
+POST /api/v1/events/{eventId}/offline-ops/import | club | csv
+POST /api/v1/events/{eventId}/participants | club | {"firstName":"Nuevo","lastName":"Prueba","birthDate":"2021-03-01","sex":"MALE","guardianConsent":true,"categoryId":"{categoryId}"}
+POST /api/v1/events/{eventId}/participants/import | club | {"rows":[{"firstName":"Nuevo","lastName":"Prueba","birthDate":"2021-03-01","sex":"MALE","categoryId":"{categoryId}"}],"consentVersion":null}
+POST /api/v1/events/{eventId}/participants/import/check | club | {"rows":[{"firstName":"Nuevo","lastName":"Prueba","birthDate":"2021-03-01","sex":"MALE","categoryId":"{categoryId}"}],"consentVersion":null}
+POST /api/v1/events/{eventId}/participants/import/read | club | multipart text
+POST /api/v1/events/{eventId}/phase/finish | club
+POST /api/v1/events/{eventId}/phase/reopen | club | {"reason":"Corrección"}
+POST /api/v1/events/{eventId}/phase/start | club
+POST /api/v1/events/{eventId}/temporary-access | club | {"name":"Lucía","role":"GROUPER"}
+POST /api/v1/events/{eventId}/temporary-access/{accessId}/end | club
+POST /api/v1/events/{eventId}/temporary-access/{accessId}/renew | club
+POST /api/v1/invitations/accept | outsider referee grouper club
+POST /api/v1/invitations/view | outsider referee grouper club
+POST /api/v1/matches/{matchId}/events | referee | {"type":"START","side":null,"reason":null,"knownEvents":0}
+POST /api/v1/matches/{matchId}/move | referee | {"matId":"{mat2Id}"}
+POST /api/v1/matches/{matchId}/review | club | {"action":"DISCARD"}
+POST /api/v1/me/email | outsider referee grouper club
+POST /api/v1/me/identities/google | outsider referee grouper club
+POST /api/v1/me/profiles | outsider referee grouper club
+POST /api/v1/me/reauth | outsider referee grouper club
+PUT /api/v1/admin/events/{eventId}/control/groups/{groupId}/mat | superadmin
+PUT /api/v1/admin/events/{eventId}/control/groups/{groupId}/order | superadmin
+PUT /api/v1/admin/events/{eventId}/control/matches/{matchId}/mat | superadmin
+PUT /api/v1/events/{eventId}/categories | club | {"categories":[{"id":"{categoryId}","name":"4-6","minAge":4,"maxAge":6,"format":"INDIVIDUAL"}]}
+PUT /api/v1/events/{eventId}/control/groups/{groupId}/mat | club | {"matId":"{mat2Id}"}
+PUT /api/v1/events/{eventId}/control/groups/{groupId}/order | club | {"matchIds":["{matchId}"]}
+PUT /api/v1/events/{eventId}/control/matches/{matchId}/mat | club | {"matId":"{mat2Id}"}
+PUT /api/v1/events/{eventId}/league | club | {"name":"Liga","podium":{"firsts":2,"seconds":2,"thirds":3},"categoryPodiums":[]}
+PUT /api/v1/events/{eventId}/measures | club | {"weight":"OPTIONAL","height":null}
+PUT /api/v1/events/{eventId}/organizations | club | {"organizations":[]}
+PUT /api/v1/events/{eventId}/participants/{participantId} | club | {"firstName":"Ana","lastName":"Prueba","birthDate":"2021-03-01","sex":"FEMALE","guardianConsent":true,"categoryId":"{categoryId}"}
+PUT /api/v1/events/{eventId}/participants/{participantId}/measures | grouper club | {"heightCm":120,"weightKg":25.5}
+PUT /api/v1/events/{eventId}/rulebook | club | multipart file
+PUT /api/v1/events/{eventId}/settings | club | {"name":"Fase 1","date":"2027-03-10","matReferees":{matReferees}}
+PUT /api/v1/events/{eventId}/staff/{accountId}/name | club | {"name":"Juan"}
+PUT /api/v1/events/{eventId}/staff/{accountId}/permissions | club | {"permissions":["OWN_MAT"]}
+PUT /api/v1/events/{eventId}/warning-reasons | club | {"reasons":["Agarre"]}
