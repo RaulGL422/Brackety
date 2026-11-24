@@ -8,12 +8,18 @@ import dev.rgal.brackety.ranking.dto.LeagueStandings.PhasePoints;
 import dev.rgal.brackety.ranking.dto.LeagueStandings.Row;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import org.springframework.stereotype.Component;
 
 /** Clasificación de la liga: one row per person, ranked inside their category, with three columns per phase. */
 @Component
 class LeagueSheet implements Sheet<Row> {
+
+    static final Map<String, String> BY_CATEGORY_TITLES =
+            Map.of("warnings", "Advertencias", "disqualifications", "Descalificaciones");
+    private static final Pattern PHASE = Pattern.compile("phase\\d+");
 
     private final LeagueStandingsService leagueStandings;
     private final EventRepository events;
@@ -73,6 +79,11 @@ class LeagueSheet implements Sheet<Row> {
                     "Fase " + n + ": total",
                     "Phase " + n + ": total",
                     r -> phase.apply(r) == null ? null : phase.apply(r).total()));
+            fields.add(text(
+                    "phase" + n,
+                    "Fase " + n,
+                    "Phase " + n,
+                    r -> phase.apply(r) == null ? "No inscrito" : phase.apply(r).total()));
         }
         fields.add(number("leagueTotal", "Total liga", "League total", Row::total));
         fields.add(number("warnings", "Advertencias en la liga", "Warnings in the league", Row::warnings));
@@ -87,5 +98,25 @@ class LeagueSheet implements Sheet<Row> {
     @Override
     public List<Row> rows(SheetData data) {
         return leagueStandings.of(data.event()).rows();
+    }
+
+    /** The full league file has the three columns of each phase, not the short one of the files by category. */
+    @Override
+    public List<String> builtInColumns(SheetData data, List<Row> rows) {
+        return fields(data).stream()
+                .map(ExportField::key)
+                .filter(key -> !PHASE.matcher(key).matches())
+                .toList();
+    }
+
+    /** The files by category (one per category in a .zip): each phase in one column, with short titles. */
+    List<String> byCategoryColumns(SheetData data) {
+        var columns = new ArrayList<>(List.of("position", "medal", "firstName", "lastName", "club"));
+        fields(data).stream()
+                .map(ExportField::key)
+                .filter(key -> PHASE.matcher(key).matches())
+                .forEach(columns::add);
+        columns.addAll(List.of("leagueTotal", "warnings", "disqualifications"));
+        return columns;
     }
 }

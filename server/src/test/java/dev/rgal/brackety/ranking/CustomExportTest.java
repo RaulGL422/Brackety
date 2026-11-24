@@ -9,11 +9,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import dev.rgal.brackety.event.EventApiTest;
 import dev.rgal.brackety.participant.Participant;
 import dev.rgal.brackety.participant.ParticipantRepository;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.zip.ZipInputStream;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -153,9 +158,56 @@ class CustomExportTest extends EventApiTest {
         }
     }
 
+    @Test
+    void filtersKeepTheRowsWithOneOfTheValuesAndInsideTheRange() throws Exception {
+        participant("Ana", new BigDecimal("25.0"));
+        participant("Bea", new BigDecimal("30.5"));
+        participant("Carla", new BigDecimal("40.0"), 2017);
+
+        var csv = export("""
+                {"sheet":"participants","columns":["firstName","category"],
+                 "filters":[{"column":"category","anyOf":["7-8"]},{"column":"weightKg","min":26}]}""");
+
+        assertThat(lines(csv)).containsExactly(Csv.BOM + "Nombre;Categoría", "Bea;7-8");
+        refused("""
+                {"sheet":"participants","columns":["firstName"],"filters":[{"column":"firstName","min":1}]}""", "EXPORT_FILTER_NOT_A_NUMBER");
+    }
+
+    @Test
+    void splitByGivesOneFilePerValueInAZipWithTheColumnsOwnTitles() throws Exception {
+        participant("Bea", null);
+        participant("Ana", null);
+        participant("Carla", null, 2017);
+
+        var answer = call(post("/api/v1/events/" + eventId + "/exports").content("""
+                                {"sheet":"participants","columns":["firstName"],"titles":{"firstName":"Alumno"},
+                                 "splitBy":"category"}"""), "club1")
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse();
+
+        assertThat(answer.getContentType()).isEqualTo("application/zip");
+        assertThat(answer.getHeader("Content-Disposition")).contains(".zip");
+        var files = unzip(answer.getContentAsByteArray());
+        assertThat(files.keySet())
+                .satisfiesExactly(
+                        name -> assertThat(name).endsWith("participantes_7-8.csv"),
+                        name -> assertThat(name).endsWith("participantes_9-10.csv"));
+        assertThat(files.values().stream().map(CustomExportTest::lines))
+                .containsExactly(List.of(Csv.BOM + "Alumno", "Ana", "Bea"), List.of(Csv.BOM + "Alumno", "Carla"));
+        refused("""
+                {"sheet":"participants","columns":["firstName"],"titles":{"club":"Escuela"}}""", "EXPORT_UNKNOWN_COLUMN");
+        refused("""
+                {"sheet":"participants","columns":["firstName"],"splitBy":"belt"}""", "EXPORT_UNKNOWN_COLUMN");
+    }
+
     private void participant(String firstName, BigDecimal weight) {
+        participant(firstName, weight, 2019);
+    }
+
+    private void participant(String firstName, BigDecimal weight, int bornIn) {
         var participant = new Participant(eventId, clock.instant());
-        participant.update(firstName, "Prueba", LocalDate.of(2019, 3, 1), 110, true);
+        participant.update(firstName, "Prueba", LocalDate.of(bornIn, 3, 1), 110, true);
         participant.measure(null, weight);
         participants.save(participant);
     }
@@ -172,6 +224,16 @@ class CustomExportTest extends EventApiTest {
         call(post("/api/v1/events/" + eventId + "/exports").content(body), "club1")
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(code));
+    }
+
+    private static Map<String, String> unzip(byte[] zip) throws IOException {
+        var files = new LinkedHashMap<String, String>();
+        try (var in = new ZipInputStream(new ByteArrayInputStream(zip), StandardCharsets.UTF_8)) {
+            for (var entry = in.getNextEntry(); entry != null; entry = in.getNextEntry()) {
+                files.put(entry.getName(), new String(in.readAllBytes(), StandardCharsets.UTF_8));
+            }
+        }
+        return files;
     }
 
     private static List<String> lines(String csv) {

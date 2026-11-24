@@ -31,13 +31,12 @@ import org.springframework.web.bind.annotation.RestController;
 class ExportController {
 
     private static final MediaType CSV = new MediaType("text", "csv", StandardCharsets.UTF_8);
+    private static final MediaType ZIP = new MediaType("application", "zip");
 
     private final Exports exports;
-    private final DownloadNames names;
 
-    ExportController(Exports exports, DownloadNames names) {
+    ExportController(Exports exports) {
         this.exports = exports;
-        this.names = names;
     }
 
     @GetMapping("/sheets")
@@ -58,16 +57,15 @@ class ExportController {
     @PostMapping
     ResponseEntity<byte[]> export(
             @PathVariable UUID eventId, @Valid @RequestBody ExportRequest request, @AuthenticationPrincipal Jwt jwt) {
-        // The table first: it checks the account may download it before the name reads the event.
-        var table = exports.export(eventId, CurrentAccount.id(jwt), request);
+        var download = exports.export(eventId, CurrentAccount.id(jwt), request);
         return ResponseEntity.ok()
-                .contentType(CSV)
+                .contentType(download.zip() ? ZIP : CSV)
                 .header(
                         HttpHeaders.CONTENT_DISPOSITION,
                         ContentDisposition.attachment()
-                                .filename(names.of(eventId, table.fileName()))
+                                .filename(download.fileName())
                                 .build()
                                 .toString())
-                .body(table.csv().getBytes(StandardCharsets.UTF_8));
+                .body(download.body());
     }
 }
