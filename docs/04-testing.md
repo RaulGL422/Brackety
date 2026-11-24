@@ -35,7 +35,7 @@ Objetivo: calidad sin horas de QA manual. Los tests se escriben con la tarea, en
 ## Batería del servidor (reglas duras, Raul 2026-11-22)
 Obligatoria en cada release y cierre de módulo; cada punto, con su test en `server/src/test` (lo que falte, en `producto/feedback-grappling.md`, GR-8).
 - **Día completo por formato** (liga por fases, torneo suelto, grappling, equipos), al menos 5 semillas: de inscribir a descargas, con incidentes a mitad (tapiz inhabilitado, árbitro sin sesión, combate reabierto, revisión, fase reabierta). Al final: todos los combates disputados, clasificación y descargas de oro coherentes.
-  Torneo y liga de dos fases: `TournamentDayTest`, una semilla en cada PR y 5 en las de release (`-Dbattery.seeds=5`).
+  Torneo, liga de dos fases y día con equipos: `TournamentDayTest`, una semilla en cada PR y 5 en las de release (`-Dbattery.seeds=5`).
 - **Concurrencia**: dos dispositivos a la vez sobre el mismo combate, grupo o alumno; renovaciones de sesión simultáneas. Nunca dos estados ni datos perdidos.
 - **Sesiones**: con reloj simulado, una sesión (normal y temporal por QR) aguanta la fase entera con red perdida y reintentos fuera de tiempo; solo se cierra por fin de fase, «Quitar acceso» o robo real.
 - **Matriz de permisos**: cada endpoint × cada rol y permiso (club, ayudante, árbitro, temporal, ajeno al evento, sin sesión). Un endpoint sin fila en la matriz hace fallar el test.

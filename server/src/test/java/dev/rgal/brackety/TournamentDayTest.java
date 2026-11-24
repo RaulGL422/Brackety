@@ -46,6 +46,8 @@ class TournamentDayTest extends EventApiTest {
     private static final int MATCH_TICKS = 3;
     private static final String CHILDREN = "9-10";
     private static final String TEENS = "13-14";
+    // By teams of 3 in the demo event.
+    private static final String TEAMS = "15-16";
     private static final List<Integer> MATS = List.of(1, 2, 3);
     private static final int QR_MAT = 2;
     private static final int DISABLED_MAT = 3;
@@ -63,7 +65,17 @@ class TournamentDayTest extends EventApiTest {
     @ParameterizedTest(name = "{0}, seed {1}")
     @MethodSource("days")
     void aWholeTournamentWithIncidentsEndsCoherent(String sport, long seed) throws Exception {
-        new Day(sport.equals("GRAPPLING"), new Random(seed), eventId, null).run();
+        new Day(sport.equals("GRAPPLING"), new Random(seed), eventId, null, false).run();
+    }
+
+    /**
+     * A day with a category by teams of 3 beside the individual one: the club makes the teams, groups of 3 to 5
+     * teams, and their matches go to the pool, where any free mat takes them, through the same incidents.
+     */
+    @ParameterizedTest(name = "seed {0}")
+    @MethodSource("leagueSeeds")
+    void aDayWithTeamsEndsCoherent(long seed) throws Exception {
+        new Day(false, new Random(seed), eventId, null, true).run();
     }
 
     static LongStream leagueSeeds() {
@@ -79,7 +91,7 @@ class TournamentDayTest extends EventApiTest {
     @MethodSource("leagueSeeds")
     void aLeagueOfTwoPhasesAddsUpBothDays(long seed) throws Exception {
         var random = new Random(seed);
-        new Day(false, random, eventId, null).run();
+        new Day(false, random, eventId, null, false).run();
         var date = jdbc.sql("select event_date from event where id = ?")
                 .param(eventId)
                 .query(LocalDate.class)
@@ -92,7 +104,7 @@ class TournamentDayTest extends EventApiTest {
                 .getContentAsString();
         var second = UUID.fromString(JsonPath.read(created, "$.eventId"));
         clock.set(date.atTime(9, 0).atZone(clock.getZone()).toInstant());
-        new Day(false, random, second, eventId).run();
+        new Day(false, random, second, eventId, false).run();
 
         checkTheLeague(List.of(eventId, second));
     }
@@ -168,6 +180,8 @@ class TournamentDayTest extends EventApiTest {
         private final Map<String, Integer> seen = new LinkedHashMap<>();
         private final List<String> log = new ArrayList<>();
         private final UUID event;
+        // The second category is by teams instead of the teens'.
+        private final boolean teams;
         // The phase before, in a league: its people enter this one again.
         private final UUID previous;
         private final List<Planned> laterGroups = new ArrayList<>();
@@ -178,8 +192,9 @@ class TournamentDayTest extends EventApiTest {
         private int tick;
         private int idleTicks;
 
-        Day(boolean grappling, Random random, UUID event, UUID previous) {
+        Day(boolean grappling, Random random, UUID event, UUID previous, boolean teams) {
             this.grappling = grappling;
+            this.teams = teams;
             this.random = random;
             this.event = event;
             this.previous = previous;
@@ -232,8 +247,8 @@ class TournamentDayTest extends EventApiTest {
             }
             // GR-5: groups of 3 to 5; the teens fight each other twice, with the colours changed.
             jdbc.sql("update event_category set min_group_size = 3, max_group_size = 5, return_leg = (name = ?)"
-                            + " where name in (?, ?) and event_id = ?")
-                    .params(TEENS, CHILDREN, TEENS, event)
+                            + " where name in (?, ?, ?) and event_id = ?")
+                    .params(TEENS, CHILDREN, TEENS, TEAMS, event)
                     .update();
         }
 
@@ -257,9 +272,10 @@ class TournamentDayTest extends EventApiTest {
                     .query(LocalDate.class)
                     .single();
             var rows = new ArrayList<String>();
-            for (var category : List.of(CHILDREN, TEENS)) {
-                int age = category.equals(CHILDREN) ? 10 : 14;
-                int people = 9 + random.nextInt(6);
+            for (var category : categories()) {
+                int age = Map.of(CHILDREN, 10, TEENS, 14, TEAMS, 16).get(category);
+                // Teams: 4 or 5 teams of 3.
+                int people = category.equals(TEAMS) ? 3 * (4 + random.nextInt(2)) : 9 + random.nextInt(6);
                 for (int i = 0; i < people; i++) {
                     rows.add("""
                             {"firstName":"%s%d","lastName":"Prueba","birthDate":"%s","sex":"%s","categoryId":"%s"}""".formatted(
@@ -292,9 +308,9 @@ class TournamentDayTest extends EventApiTest {
             keepQrSession(signedIn);
         }
 
-        // Each category split into groups of 3 to 5; one of each comes later in the morning.
+        // Each category split into groups of 3 to 5 (people, or teams of 3 people); one of each comes later.
         private void makeGroups() throws Exception {
-            for (var category : List.of(CHILDREN, TEENS)) {
+            for (var category : categories()) {
                 // As the screen lists them: by age, also those entered again without a category of their own.
                 List<String> listed = JsonPath.read(
                         call("club1", get(events("/categories/" + categoryId(category) + "/participants")))
@@ -303,6 +319,9 @@ class TournamentDayTest extends EventApiTest {
                         "$[*].id");
                 var people = new ArrayList<>(listed);
                 Collections.shuffle(people, random);
+                if (category.equals(TEAMS)) {
+                    people = makeTeams(people);
+                }
                 var groups = new ArrayList<List<String>>();
                 while (!people.isEmpty()) {
                     int size = people.size() <= 5 ? people.size() : 3 + random.nextInt(3);
@@ -317,7 +336,28 @@ class TournamentDayTest extends EventApiTest {
             }
         }
 
+        private ArrayList<String> makeTeams(List<String> people) throws Exception {
+            var teamIds = new ArrayList<String>();
+            for (int i = 0; i + 3 <= people.size(); i += 3) {
+                var team = call(
+                                "club1",
+                                post(events("/categories/" + categoryId(TEAMS) + "/teams"))
+                                        .content("{\"participantIds\":[" + quoted(people.subList(i, i + 3)) + "]}"))
+                        .expect(201)
+                        .body();
+                teamIds.add(JsonPath.read(team, "$.id"));
+            }
+            log(teamIds.size() + " teams");
+            return teamIds;
+        }
+
+        private List<String> categories() {
+            return List.of(CHILDREN, teams ? TEAMS : TEENS);
+        }
+
+        // People, or the teams of a team category; team matches go to the pool, so no mat is chosen.
         private void createGroup(UUID category, List<String> people) {
+            var ofTeams = teams && category.equals(categoryId(TEAMS));
             var mat = matId(MATS.get(random.nextInt(MATS.size())));
             var disabled = jdbc.sql("select disabled_at is not null from mat where id = ?")
                     .param(mat)
@@ -328,15 +368,18 @@ class TournamentDayTest extends EventApiTest {
                 call(
                                 random.nextBoolean() ? "ayudante1" : "club1",
                                 post(events("/groups")).content("""
-                                {"categoryId":"%s","groups":[{"participantIds":[%s]}],"matId":%s}""".formatted(
-                                                category, quoted(people), disabled ? "null" : "\"" + mat + "\"")))
+                                {"categoryId":"%s","groups":[{"%s":[%s]}],"matId":%s}""".formatted(
+                                                category,
+                                                ofTeams ? "teamIds" : "participantIds",
+                                                quoted(people),
+                                                disabled || ofTeams ? "null" : "\"" + mat + "\"")))
                         .expect(201);
             } catch (Exception e) {
                 throw new IllegalStateException(e);
             }
             int pairs = people.size() * (people.size() - 1) / 2;
             expectedMatches += category.equals(categoryId(TEENS)) ? 2 * pairs : pairs;
-            log("group of " + people.size());
+            log("group of " + people.size() + (ofTeams ? " teams" : ""));
         }
 
         private void incidents() throws Exception {
@@ -532,6 +575,12 @@ class TournamentDayTest extends EventApiTest {
                     .as("matches not played: %s", log)
                     .isZero();
             assertThat(pressed).hasSize(expectedMatches);
+            if (teams) {
+                assertThat(countOf("select count(*) from fight_match where red_team_id is not null and event_id = '"
+                                + event + "'"))
+                        .as("team matches played")
+                        .isPositive();
+            }
             // Each score is what the referees pressed.
             jdbc.sql("select id::text, red_score, blue_score from fight_match where event_id = ?")
                     .param(event)
@@ -549,13 +598,9 @@ class TournamentDayTest extends EventApiTest {
             assertThat(rows).hasSize(countOf("select count(*) from participant where event_id = '" + event + "'"));
             for (var row : rows) {
                 var person = (String) row.get("participantId");
-                assertThat(row.get("matches"))
-                        .as("matches of %s", person)
-                        .isEqualTo(countOf(FOUGHT.formatted(person, person)));
+                assertThat(row.get("matches")).as("matches of %s", person).isEqualTo(countOf(FOUGHT.formatted(person)));
                 if (grappling) {
-                    assertThat(row.get("wins"))
-                            .as("wins of %s", person)
-                            .isEqualTo(countOf(WON.formatted(person, person)));
+                    assertThat(row.get("wins")).as("wins of %s", person).isEqualTo(countOf(WON.formatted(person)));
                 }
             }
 
@@ -714,14 +759,17 @@ class TournamentDayTest extends EventApiTest {
     private static final String LAST_WITH_POINTS = "select id::text from fight_match where mat_id = ?"
             + " and status = 'FINISHED' and end_reason = 'TIME' and red_score + blue_score > 0 order by finished_at desc, id limit 1";
 
+    // Alone, or as a member of a team.
     private static final String FOUGHT = """
-            select count(*) from fight_match where status = 'FINISHED'
-              and (red_participant_id = '%s' or blue_participant_id = '%s')""";
+            select count(*) from fight_match f where f.status = 'FINISHED'
+              and ('%1$s' in (f.red_participant_id, f.blue_participant_id)
+                or exists (select 1 from team_member tm where tm.participant_id = '%1$s'
+                  and tm.team_id in (f.red_team_id, f.blue_team_id)))""";
 
     private static final String WON = """
             select count(*) from fight_match where status = 'FINISHED'
-              and ((red_participant_id = '%s' and winner_side = 'RED')
-                or (blue_participant_id = '%s' and winner_side = 'BLUE'))""";
+              and ((red_participant_id = '%1$s' and winner_side = 'RED')
+                or (blue_participant_id = '%1$s' and winner_side = 'BLUE'))""";
 
     private static String side(int side) {
         return side == 0 ? "RED" : "BLUE";
