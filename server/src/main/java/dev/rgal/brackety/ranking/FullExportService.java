@@ -2,7 +2,6 @@ package dev.rgal.brackety.ranking;
 
 import static dev.rgal.brackety.ranking.Zip.text;
 
-import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.eventpackage.EventPackageService;
 import java.util.LinkedHashMap;
 import java.util.UUID;
@@ -60,28 +59,25 @@ class FullExportService {
     private static final DefaultPrettyPrinter PACKAGE_FORMAT =
             new DefaultPrettyPrinter().withObjectIndenter(new DefaultIndenter("  ", "\n"));
 
-    private final EventSheets sheets;
+    private final Exports exports;
     private final StandingsService standings;
     private final LeagueStandingsService leagueStandings;
     private final EventPackageService packages;
-    private final EventService events;
     private final DownloadNames names;
     private final JsonMapper json;
 
     FullExportService(
-            EventSheets sheets,
+            Exports exports,
             StandingsService standings,
             LeagueStandingsService leagueStandings,
             EventPackageService packages,
-            EventService events,
             DownloadNames names,
             JsonMapper json) {
         this.names = names;
-        this.sheets = sheets;
+        this.exports = exports;
         this.standings = standings;
         this.leagueStandings = leagueStandings;
         this.packages = packages;
-        this.events = events;
         this.json = json;
     }
 
@@ -90,17 +86,12 @@ class FullExportService {
     @Transactional(readOnly = true)
     Export export(UUID eventId, UUID accountId) {
         var eventPackage = packages.export(eventId, accountId);
-        var event = events.get(eventId);
         var files = new LinkedHashMap<String, byte[]>();
         files.put("LEEME.txt", text(Csv.BOM + README.replace("\n", "\r\n")));
-        files.put("participantes.csv", text(sheets.participantsCsv(eventId, accountId)));
-        files.put(
-                "categorias.csv",
-                text(sheets.categoriesCsv(eventId, accountId, leagueStandings.podiums(event.getLeagueId()))));
-        files.put("tapices.csv", text(sheets.matsCsv(eventId, accountId)));
-        files.put("grupos.csv", text(sheets.groupsCsv(eventId, accountId)));
-        files.put("combates.csv", text(sheets.matchesCsv(eventId, accountId)));
-        files.put("linea-de-tiempo.csv", text(sheets.timelineCsv(eventId, accountId)));
+        for (var sheet : Exports.FULL_EXPORT) {
+            var table = exports.builtIn(eventId, accountId, sheet);
+            files.put(table.fileName(), text(table.csv()));
+        }
         files.put("clasificacion-fase.csv", text(standings.standingsCsv(eventId, accountId)));
         files.put("clasificacion-liga.csv", text(leagueStandings.csv(eventId, accountId)));
         leagueStandings

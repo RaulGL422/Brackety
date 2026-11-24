@@ -1,7 +1,7 @@
 {
   "Dart files over 400 lines": 13,
-  "Java files over 300 lines": 8,
-  "Methods of 60 lines or more": 66,
+  "Java files over 300 lines": 7,
+  "Methods of 60 lines or more": 64,
   "Features in an import cycle (app, admin)": 14,
   "Duplicated 8-line windows": 73,
   "Docs over 12000 characters": 0
