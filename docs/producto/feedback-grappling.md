@@ -86,6 +86,9 @@ competición del 2026-12-20 (`competicion-2026-12-20.md`); objetivo de prueba in
   `CONTROL`, `REVIEWS`…), hoy solo los de cada rol por defecto.
 - Sesiones hecho (`PhaseSessionsTest`): normal y por QR, 10 h con respuestas perdidas y 3 h sin red. Encontró un
   fallo: un reintento pasados 10 s cerraba la sesión como robo; ahora vale 12 h mientras el par nuevo no se use.
+- Día completo de torneo hecho (`TournamentDayTest`), tambo y grappling: inscripción, grupos de 3 a 5 (uno con
+  vuelta), tapiz inhabilitado y de vuelta, árbitro QR que vuelve a entrar con usuario y contraseña, revisión,
+  combate reabierto, fase cerrada, reabierta y cerrada. Faltan liga de varias fases y equipos.
 - Carrera encontrada (`PhaseRaceTest`): empezar o reabrir un combate mientras el club cerraba la fase lo dejaba en
   curso con la fase cerrada; ahora se vuelve a leer la fase con el evento bloqueado.
 
