@@ -60,7 +60,6 @@ class FullExportService {
             new DefaultPrettyPrinter().withObjectIndenter(new DefaultIndenter("  ", "\n"));
 
     private final Exports exports;
-    private final StandingsService standings;
     private final LeagueStandingsService leagueStandings;
     private final EventPackageService packages;
     private final DownloadNames names;
@@ -68,14 +67,12 @@ class FullExportService {
 
     FullExportService(
             Exports exports,
-            StandingsService standings,
             LeagueStandingsService leagueStandings,
             EventPackageService packages,
             DownloadNames names,
             JsonMapper json) {
         this.names = names;
         this.exports = exports;
-        this.standings = standings;
         this.leagueStandings = leagueStandings;
         this.packages = packages;
         this.json = json;
@@ -92,8 +89,6 @@ class FullExportService {
             var table = exports.builtIn(eventId, accountId, sheet);
             files.put(table.fileName(), text(table.csv()));
         }
-        files.put("clasificacion-fase.csv", text(standings.standingsCsv(eventId, accountId)));
-        files.put("clasificacion-liga.csv", text(leagueStandings.csv(eventId, accountId)));
         leagueStandings
                 .categoryCsvs(eventId, accountId)
                 .forEach((name, csv) -> files.put(CATEGORY_FOLDER + names.of(eventId, name), text(csv)));

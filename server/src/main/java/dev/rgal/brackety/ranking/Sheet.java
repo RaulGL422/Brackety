@@ -20,9 +20,15 @@ interface Sheet<R> {
 
     String en();
 
-    List<ExportField<R>> fields();
+    /** Most sheets offer the same fields in every event; the league's has some for each of its phases. */
+    List<ExportField<R>> fields(SheetData data);
 
     List<R> rows(SheetData data);
+
+    /** The columns of the sheet in the full export: all of them, unless the sheet leaves out what the event lacks. */
+    default List<String> builtInColumns(SheetData data, List<R> rows) {
+        return fields(data).stream().map(ExportField::key).toList();
+    }
 
     default String title(Locale locale) {
         return locale.getLanguage().equals("en") ? en() : es();

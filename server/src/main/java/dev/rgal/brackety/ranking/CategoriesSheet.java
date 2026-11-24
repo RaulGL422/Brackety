@@ -84,7 +84,7 @@ class CategoriesSheet implements Sheet<CategoriesSheet.Row> {
     }
 
     @Override
-    public List<ExportField<Row>> fields() {
+    public List<ExportField<Row>> fields(SheetData data) {
         return FIELDS;
     }
 
