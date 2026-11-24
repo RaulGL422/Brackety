@@ -39,6 +39,7 @@ Obligatoria en cada release y cierre de módulo; cada punto, con su test en `ser
 - **Concurrencia**: dos dispositivos a la vez sobre el mismo combate, grupo o alumno; renovaciones de sesión simultáneas. Nunca dos estados ni datos perdidos.
 - **Sesiones**: con reloj simulado, una sesión (normal y temporal por QR) aguanta la fase entera con red perdida y reintentos fuera de tiempo; solo se cierra por fin de fase, «Quitar acceso» o robo real.
 - **Matriz de permisos**: cada endpoint × cada rol y permiso (club, ayudante, árbitro, temporal, ajeno al evento, sin sesión). Un endpoint sin fila en la matriz hace fallar el test.
+  Cada permiso suelto, dado solo a un ayudante: `permission-grants.txt` (mismo `-Dmatrix.update=true`).
 - **Ataques**: ids de otro evento (IDOR), cuenta temporal fuera de su evento, entradas límite y mal formadas, tokens caducados o reutilizados, límites de peticiones.
 - **Paquete del pabellón**: ida y vuelta completa (Pi → portátil → Pi) sin perder ni duplicar nada.
 - **Migraciones**: Flyway desde cero y desde el esquema de la última release con el escenario `yoseikan-f1`.

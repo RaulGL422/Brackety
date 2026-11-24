@@ -81,8 +81,8 @@ competición del 2026-12-20 (`competicion-2026-12-20.md`); objetivo de prueba in
 - Reglas en `04-testing.md`, «Batería del servidor».
 - Matriz de permisos hecha (`PermissionMatrixTest`, `permission-matrix.txt`): 134 endpoints × 7 papeles con ids
   reales y cuerpos válidos; cambiarla: `-Dmatrix.update=true` y revisar el diff. Los de `/me` que piden
-  reautenticación salen cerrados para todos (no se prueba ese paso). Falta: cada permiso suelto (ayudante con
-  `CONTROL`, `REVIEWS`…), hoy solo los de cada rol por defecto.
+  reautenticación salen cerrados para todos (no se prueba ese paso). Cada permiso suelto, dado solo a un
+  ayudante, abre lo de `permission-grants.txt` (revisado contra `ayudantes-permisos.md`).
 - Concurrencia hecha (`ConcurrencyTest`): mismo combate desde dos dispositivos (en línea y cola), mismo `opId` a la
   vez, alumno en dos grupos, grupo movido a dos tapices, movido mientras se deshace o empieza su combate, dos
   renovaciones con un token. Encontró un fallo: un QR escaneado dos veces a la vez abría dos sesiones.
