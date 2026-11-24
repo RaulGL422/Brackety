@@ -30,11 +30,33 @@ final class ExportTable {
     static final Locale SPANISH = Locale.forLanguageTag("es");
     private static final Collator TEXT = Collator.getInstance(SPANISH);
 
-    /** A table to write: titles and cells as they go in the file. */
-    record Table(String fileName, List<String> headers, List<List<Object>> rows) {
+    /**
+     * A table to write: its CSV file, its name as a worksheet, the titles, the kind of each column and the real
+     * values. The CSV writes them as text ({@link #rows}); Excel, numbers and dates as such ({@link Xlsx}).
+     */
+    record Table(
+            String fileName,
+            String name,
+            List<String> headers,
+            List<Kind> kinds,
+            List<List<Object>> values,
+            ZoneId zone) {
+
+        /** The cells as the CSV writes them. */
+        List<List<Object>> rows() {
+            return values.stream()
+                    .map(row -> {
+                        var cells = new ArrayList<Object>(row.size());
+                        for (int i = 0; i < row.size(); i++) {
+                            cells.add(ExportField.write(kinds.get(i), row.get(i), zone));
+                        }
+                        return (List<Object>) cells;
+                    })
+                    .toList();
+        }
 
         String csv() {
-            return Csv.of(headers, rows);
+            return Csv.of(headers, rows());
         }
     }
 
@@ -85,8 +107,10 @@ final class ExportTable {
                     .reduce(Comparator::thenComparing)
                     .orElseThrow());
         }
+        var kinds = chosen.stream().map(ExportField::kind).toList();
         if (spec.splitBy() == null) {
-            return List.of(new Table(spec.file() + ".csv", headers, cells(chosen, rows)));
+            return List.of(new Table(
+                    spec.file() + ".csv", sheet.title(spec.locale()), headers, kinds, values(chosen, rows), zone));
         }
         var split = field(byKey, spec.splitBy());
         var parts = new LinkedHashMap<String, List<R>>();
@@ -94,8 +118,13 @@ final class ExportTable {
                 .add(row));
         var used = new HashSet<String>();
         return parts.entrySet().stream()
-                .map(part ->
-                        new Table(fileFor(spec.file(), part.getKey(), used), headers, cells(chosen, part.getValue())))
+                .map(part -> new Table(
+                        fileFor(spec.file(), part.getKey(), used),
+                        part.getKey().isEmpty() ? "Sin valor" : part.getKey(),
+                        headers,
+                        kinds,
+                        values(chosen, part.getValue()),
+                        zone))
                 .toList();
     }
 
@@ -109,9 +138,9 @@ final class ExportTable {
         return name + ".csv";
     }
 
-    private <R> List<List<Object>> cells(List<ExportField<R>> chosen, List<R> rows) {
+    private static <R> List<List<Object>> values(List<ExportField<R>> chosen, List<R> rows) {
         return rows.stream()
-                .map(row -> chosen.stream().map(f -> f.write(f.read(row), zone)).toList())
+                .map(row -> chosen.stream().map(f -> (Object) f.read(row)).toList())
                 .toList();
     }
 

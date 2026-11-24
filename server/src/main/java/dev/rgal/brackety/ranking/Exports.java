@@ -30,8 +30,14 @@ class Exports {
     static final List<String> FULL_EXPORT =
             List.of("participants", "categories", "mats", "groups", "matches", "timeline", "standings", "league");
 
-    /** A file to hand over: one CSV, or a .zip with one CSV per value of the «Separar por» column. */
-    record Download(String fileName, byte[] body, boolean zip) {}
+    static final String CSV = "text/csv;charset=UTF-8";
+    static final String ZIP = "application/zip";
+
+    /**
+     * A file to hand over: one CSV, a .zip with one CSV per value of the «Separar por» column, or a workbook with one
+     * worksheet per value.
+     */
+    record Download(String fileName, byte[] body, String contentType) {}
 
     private final Map<String, Sheet<?>> sheets;
     private final LeagueSheet league;
@@ -78,13 +84,17 @@ class Exports {
     @Transactional(readOnly = true)
     Download export(UUID eventId, UUID accountId, ExportRequest request) {
         var tables = custom(eventId, accountId, request, true);
+        var file = sheets.get(request.sheet()).fileName();
+        if ("xlsx".equals(request.format())) {
+            return new Download(names.of(eventId, file + ".xlsx"), Xlsx.of(tables), Xlsx.CONTENT_TYPE);
+        }
         if (request.splitBy() == null) {
             var table = tables.getFirst();
-            return new Download(names.of(eventId, table.fileName()), Zip.text(table.csv()), false);
+            return new Download(names.of(eventId, table.fileName()), Zip.text(table.csv()), CSV);
         }
         var files = new LinkedHashMap<String, byte[]>();
         tables.forEach(table -> files.put(names.of(eventId, table.fileName()), Zip.text(table.csv())));
-        return new Download(names.of(eventId, sheets.get(request.sheet()).fileName() + ".zip"), Zip.of(files), true);
+        return new Download(names.of(eventId, file + ".zip"), Zip.of(files), ZIP);
     }
 
     /** The rows of the whole export, without splitting it. */

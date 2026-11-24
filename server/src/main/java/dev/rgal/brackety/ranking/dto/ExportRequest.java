@@ -14,8 +14,9 @@ import java.util.Map;
 /**
  * A custom export (docs/producto/exportaciones.md): which sheet, which of its columns in which order (with a title of
  * its own if wanted), which rows ({@code filters}: all of them must match), how they sort ({@code sort}: by priority;
- * empty, the sheet's own order), one file per value of a column ({@code splitBy}, in a .zip) and the language of the
- * headers (es by default).
+ * empty, the sheet's own order), one file per value of a column ({@code splitBy}: CSVs in a .zip, or worksheets of
+ * one workbook), the language of the headers (es by default) and the format ({@code csv} by default, or
+ * {@code xlsx}).
  */
 public record ExportRequest(
         @NotBlank @Size(max = 40) String sheet,
@@ -24,7 +25,8 @@ public record ExportRequest(
         @Size(max = 10) List<@Valid Filter> filters,
         @Size(max = 5) List<@Valid SortKey> sort,
         @Size(max = 40) String splitBy,
-        @Pattern(regexp = "es|en") String locale) {
+        @Pattern(regexp = "es|en") String locale,
+        @Pattern(regexp = "csv|xlsx") String format) {
 
     public record SortKey(@NotBlank @Size(max = 40) String column, boolean descending) {}
 

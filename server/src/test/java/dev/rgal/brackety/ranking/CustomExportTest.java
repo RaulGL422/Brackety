@@ -9,16 +9,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import dev.rgal.brackety.event.EventApiTest;
 import dev.rgal.brackety.participant.Participant;
 import dev.rgal.brackety.participant.ParticipantRepository;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.ZipInputStream;
+import java.util.zip.ZipFile;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -201,6 +202,29 @@ class CustomExportTest extends EventApiTest {
                 {"sheet":"participants","columns":["firstName"],"splitBy":"belt"}""", "EXPORT_UNKNOWN_COLUMN");
     }
 
+    @Test
+    void anExcelWorkbookHasAWorksheetPerValueWithRealNumbersAndDatesAndNoFormulas() throws Exception {
+        participant("Ana", new BigDecimal("25.5"));
+        participant("=1+1", null);
+        participant("Carla", new BigDecimal("40.0"), 2017);
+
+        var answer = call(post("/api/v1/events/" + eventId + "/exports").content("""
+                                {"sheet":"participants","columns":["firstName","weightKg","birthDate"],
+                                 "splitBy":"category","format":"xlsx"}"""), "club1")
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse();
+
+        assertThat(answer.getContentType()).isEqualTo(Xlsx.CONTENT_TYPE);
+        assertThat(answer.getHeader("Content-Disposition")).contains("participantes.xlsx");
+        var files = unzip(answer.getContentAsByteArray());
+        assertThat(files.get("xl/workbook.xml")).contains("name=\"7-8\"", "name=\"9-10\"");
+        assertThat(files.get("xl/sharedStrings.xml")).contains("Nombre", "Peso (kg)", "Ana", "=1+1", "Carla");
+        var first = files.get("xl/worksheets/sheet1.xml");
+        // 25.5 as a number, 1 March 2019 as Excel's day 43525, and the name that looks like a formula, as a text.
+        assertThat(first).contains("<v>25.5</v>", "<v>43525").doesNotContain("<f>");
+    }
+
     private void participant(String firstName, BigDecimal weight) {
         participant(firstName, weight, 2019);
     }
@@ -226,14 +250,23 @@ class CustomExportTest extends EventApiTest {
                 .andExpect(jsonPath("$.code").value(code));
     }
 
+    // Through the zip's index, as Excel reads it: the .xlsx is written as a stream.
     private static Map<String, String> unzip(byte[] zip) throws IOException {
-        var files = new LinkedHashMap<String, String>();
-        try (var in = new ZipInputStream(new ByteArrayInputStream(zip), StandardCharsets.UTF_8)) {
-            for (var entry = in.getNextEntry(); entry != null; entry = in.getNextEntry()) {
-                files.put(entry.getName(), new String(in.readAllBytes(), StandardCharsets.UTF_8));
+        var file = Files.createTempFile("export", ".zip");
+        try {
+            Files.write(file, zip);
+            var files = new LinkedHashMap<String, String>();
+            try (var archive = new ZipFile(file.toFile(), StandardCharsets.UTF_8)) {
+                for (var entry : Collections.list(archive.entries())) {
+                    try (var in = archive.getInputStream(entry)) {
+                        files.put(entry.getName(), new String(in.readAllBytes(), StandardCharsets.UTF_8));
+                    }
+                }
             }
+            return files;
+        } finally {
+            Files.delete(file);
         }
-        return files;
     }
 
     private static List<String> lines(String csv) {

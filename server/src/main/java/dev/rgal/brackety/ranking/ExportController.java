@@ -6,7 +6,6 @@ import dev.rgal.brackety.ranking.dto.ExportPreview;
 import dev.rgal.brackety.ranking.dto.ExportRequest;
 import dev.rgal.brackety.ranking.dto.ExportSheet;
 import jakarta.validation.Valid;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -29,9 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/events/{eventId}/exports")
 @RequiresVerifiedEmail
 class ExportController {
-
-    private static final MediaType CSV = new MediaType("text", "csv", StandardCharsets.UTF_8);
-    private static final MediaType ZIP = new MediaType("application", "zip");
 
     private final Exports exports;
 
@@ -59,7 +55,7 @@ class ExportController {
             @PathVariable UUID eventId, @Valid @RequestBody ExportRequest request, @AuthenticationPrincipal Jwt jwt) {
         var download = exports.export(eventId, CurrentAccount.id(jwt), request);
         return ResponseEntity.ok()
-                .contentType(download.zip() ? ZIP : CSV)
+                .contentType(MediaType.parseMediaType(download.contentType()))
                 .header(
                         HttpHeaders.CONTENT_DISPOSITION,
                         ContentDisposition.attachment()
