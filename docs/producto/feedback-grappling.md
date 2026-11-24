@@ -86,6 +86,8 @@ competición del 2026-12-20 (`competicion-2026-12-20.md`); objetivo de prueba in
   `CONTROL`, `REVIEWS`…), hoy solo los de cada rol por defecto.
 - Sesiones hecho (`PhaseSessionsTest`): normal y por QR, 10 h con respuestas perdidas y 3 h sin red. Encontró un
   fallo: un reintento pasados 10 s cerraba la sesión como robo; ahora vale 12 h mientras el par nuevo no se use.
+- Carrera encontrada (`PhaseRaceTest`): empezar o reabrir un combate mientras el club cerraba la fase lo dejaba en
+  curso con la fase cerrada; ahora se vuelve a leer la fase con el evento bloqueado.
 
 ## GR-9 · Accesibilidad y organización en lo que ya existe
 - Reglas duras en `07-diseno.md`. Se aplican a cada pantalla al tocarla (GR-1, GR-4) y en el repaso de Raul (GR-7).
