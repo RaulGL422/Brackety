@@ -3,7 +3,7 @@ package dev.rgal.brackety.participant.importing;
 import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventCategoryRepository;
 import dev.rgal.brackety.event.EventException;
-import dev.rgal.brackety.event.EventRole;
+import dev.rgal.brackety.event.EventPermission;
 import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.participant.Participant;
 import dev.rgal.brackety.participant.ParticipantRepository;
@@ -72,7 +72,7 @@ class ParticipantImportService {
     }
 
     boolean isAvailable(UUID eventId, UUID accountId) {
-        access.require(eventId, accountId, EventRole.CLUB);
+        access.require(eventId, accountId, EventPermission.PARTICIPANTS);
         return reader.isAvailable();
     }
 
@@ -81,7 +81,7 @@ class ParticipantImportService {
      * transaction: reading takes up to 90 s and must not hold a database connection.
      */
     List<CheckedRow> read(UUID eventId, UUID accountId, List<ListFile> files, String consentVersion) {
-        access.require(eventId, accountId, EventRole.CLUB);
+        access.require(eventId, accountId, EventPermission.PARTICIPANTS);
         requireConsent(consentVersion);
         if (!reader.isAvailable()) {
             throw ImportException.unavailable();
@@ -107,7 +107,7 @@ class ParticipantImportService {
 
     @Transactional(readOnly = true)
     public List<CheckedRow> check(UUID eventId, UUID accountId, List<ImportRow> rows) {
-        access.require(eventId, accountId, EventRole.CLUB);
+        access.require(eventId, accountId, EventPermission.PARTICIPANTS);
         if (rows.size() > MAX_ROWS) {
             throw EventException.invalid("At most " + MAX_ROWS + " participants per import.");
         }
@@ -122,7 +122,7 @@ class ParticipantImportService {
     /** All or none: one row with an error and nothing is registered. */
     @Transactional
     public ImportResult register(UUID eventId, UUID accountId, ImportRequest request) {
-        access.require(eventId, accountId, EventRole.CLUB);
+        access.require(eventId, accountId, EventPermission.PARTICIPANTS);
         requireConsent(request.consentVersion());
         // Same lock as group creation, so nobody registers the same participant meanwhile.
         events.lock(eventId);

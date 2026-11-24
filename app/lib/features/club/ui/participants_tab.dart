@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/async_view.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../events/data/my_event.dart';
 import '../../events/state/events_providers.dart';
 import '../../importing/data/import_repository.dart';
 import '../../league/ui/reenrol_dialog.dart';
@@ -27,7 +28,10 @@ class ParticipantsTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final provider = participantsProvider(eventId);
-    final isClub = ref.watch(myEventProvider(eventId)).value?.isClub ?? false;
+    final me = ref.watch(myEventProvider(eventId)).value;
+    final isClub = me?.isClub ?? false;
+    // Who enters people may also import a list (Raul, 2026-11-24).
+    final entersPeople = me?.can(EventPermission.participants) ?? false;
     return AsyncView(
       value: ref.watch(provider),
       onRetry: () => ref.invalidate(provider),
@@ -62,7 +66,7 @@ class ParticipantsTab extends ConsumerWidget {
                       onPressed: () => showReenrolDialog(context, eventId),
                     ),
                   // Only when this server can read lists (it has an Anthropic key).
-                  if (isClub &&
+                  if (entersPeople &&
                       (ref.watch(importAvailableProvider(eventId)).value ??
                           false))
                     OutlinedButton.icon(
