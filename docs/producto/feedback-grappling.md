@@ -78,8 +78,8 @@ competición del 2026-12-20 (`competicion-2026-12-20.md`); objetivo de prueba in
 - Rediseño pantalla a pantalla: después, con Raul, cuando GR-1 a GR-6 estén bien.
 
 ## GR-8 · Batería del servidor endurecida
-- Reglas en `04-testing.md`, «Batería del servidor». Faltan: día completo por formato con incidentes, ataques y
-  migración desde la última release. Antes de la release del 20-12, al menos día completo de torneo.
+- Reglas en `04-testing.md`, «Batería del servidor». Faltan: día completo por formato con incidentes, tokens
+  falsificados y migración desde la última release. Antes de la release del 20-12, al menos día completo.
 - Matriz de permisos hecha (`PermissionMatrixTest`, `permission-matrix.txt`): 134 endpoints × 7 papeles con ids
   reales y cuerpos válidos; cambiarla: `-Dmatrix.update=true` y revisar el diff. Los de `/me` que piden
   reautenticación salen cerrados para todos (no se prueba ese paso). Falta: cada permiso suelto (ayudante con
@@ -87,6 +87,9 @@ competición del 2026-12-20 (`competicion-2026-12-20.md`); objetivo de prueba in
 - Concurrencia hecha (`ConcurrencyTest`): mismo combate desde dos dispositivos (en línea y cola), mismo `opId` a la
   vez, alumno en dos grupos, grupo movido a dos tapices, movido mientras se deshace o empieza su combate, dos
   renovaciones con un token. Encontró un fallo: un QR escaneado dos veces a la vez abría dos sesiones.
+- Ataques por endpoint hechos (`PermissionMatrixTest`): el club de otro evento con su `eventId` y los ids de este
+  (rechazado, nada cambia) y entradas rotas (ids no válidos, JSON roto, textos de 5.000, números fuera de rango):
+  ningún 500. Falta: tokens de acceso falsificados (`alg none`, otra clave, `sub` cambiado, caducado).
 - Sesiones hecho (`PhaseSessionsTest`): normal y por QR, 10 h con respuestas perdidas y 3 h sin red. Encontró un
   fallo: un reintento pasados 10 s cerraba la sesión como robo; ahora vale 12 h mientras el par nuevo no se use.
 - Día completo de torneo hecho (`TournamentDayTest`), tambo y grappling: inscripción, grupos de 3 a 5 (uno con

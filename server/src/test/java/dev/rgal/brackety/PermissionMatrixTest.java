@@ -44,12 +44,19 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
  * {@code permission-matrix.txt} says. An endpoint without a row, or a row without an endpoint, fails. A role the row
  * lists must not be refused (401, 403, 404); one it does not list must be. Each call uses the real ids of the demo
  * event with a group, so a missing check shows; a call that changes something gets a fresh event first. With
- * {@code -Dmatrix.update=true} the roles are rewritten from what happens: review the diff in the PR.
+ * {@code -Dmatrix.update=true} the roles are rewritten from what happens: review the diff in the PR. The same rows
+ * serve the «Ataques» that go endpoint by endpoint.
  */
 class PermissionMatrixTest extends EventApiTest {
 
     private static final Path MATRIX = Path.of("src/test/resources/permission-matrix.txt");
     private static final Pattern VARIABLE = Pattern.compile("\\{(\\w+)}");
+    // A JSON text that is not an id to fill in, and a JSON whole number.
+    private static final Pattern TEXT_VALUE = Pattern.compile(":\"[^\"{]*\"");
+    private static final Pattern NUMBER_VALUE = Pattern.compile(":-?\\d+(?=[,}\\]])");
+    // A check that always answers 200, with what is wrong in each row: the other event's category is unknown.
+    private static final Map<String, String> REFUSED_IN_BODY =
+            Map.of("POST /api/v1/events/{eventId}/participants/import/check", "UNKNOWN_CATEGORY");
     private static final byte[] PDF = "%PDF-1.4\n%%EOF\n".getBytes(StandardCharsets.US_ASCII);
 
     /** In the order they call: the weakest first, so the club's changes come last. */
@@ -174,6 +181,138 @@ class PermissionMatrixTest extends EventApiTest {
             write(rows, observed);
         }
         assertThat(failures).isEmpty();
+    }
+
+    /**
+     * «Ataques», IDOR (GR-8): the club of another event calls every endpoint with its own event in the path and this
+     * event's ids everywhere else. Each call is refused and nothing of this event changes.
+     */
+    @Test
+    void anotherClubCannotReachThisEventThroughItsOwn() throws Exception {
+        var ids = new HashMap<>(fixture().ids());
+        var rival = "rival@example.test";
+        auth.register(registration(rival));
+        jdbc.sql("update account set email_verified = true where email = ?")
+                .param(rival)
+                .update();
+        var token = "Bearer " + login(rival, PASSWORD);
+        var created = mvc.perform(post("/api/v1/events")
+                        .header(HttpHeaders.AUTHORIZATION, token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"name":"Rival","date":"2027-05-08","discipline":"TAMBO","mats":2}"""))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        var own = UUID.fromString(JsonPath.read(created, "$.eventId"));
+        startPhase(own);
+        ids.put("eventId", own.toString());
+        var before = snapshot(eventId);
+
+        var failures = new ArrayList<String>();
+        for (var row : rows()) {
+            if (!row.path().contains("{eventId}") || !usesThisEventsIds(row)) {
+                continue;
+            }
+            var answer = mvc.perform(build(row, ids).header(HttpHeaders.AUTHORIZATION, token))
+                    .andReturn()
+                    .getResponse();
+            var status = answer.getStatus();
+            var refusedInBody = REFUSED_IN_BODY.containsKey(row.key())
+                    && status == 200
+                    && answer.getContentAsString().contains(REFUSED_IN_BODY.get(row.key()));
+            if ((status < 400 || status >= 500) && !refusedInBody) {
+                failures.add(row.key() + ": " + status);
+            }
+        }
+
+        assertThat(failures).isEmpty();
+        assertThat(snapshot(eventId)).isEqualTo(before);
+    }
+
+    /**
+     * «Ataques», entradas (GR-8): every endpoint, called by a role it lets in, with ids that are not ids, broken or
+     * mistyped JSON, 5,000-character texts and numbers out of range. A 4xx or a success, never a server error.
+     */
+    @Test
+    void brokenInputIsNeverAServerError() throws Exception {
+        var failures = new ArrayList<String>();
+        Fixture fixture = null;
+        for (var row : rows()) {
+            var role = row.allowed().contains(Role.CLUB)
+                    ? Role.CLUB
+                    : row.allowed().stream().findFirst().orElse(Role.ANONYMOUS);
+            for (var variant : broken(row)) {
+                if (fixture == null) {
+                    fixture = fixture();
+                }
+                var status = call(variant, role, fixture);
+                if (status >= 500) {
+                    failures.add("%s %s: %d".formatted(variant.key(), abbreviate(variant.body()), status));
+                }
+                if (!row.method().equals("GET") && status < 300) {
+                    fixture = null;
+                }
+            }
+        }
+        assertThat(failures).isEmpty();
+    }
+
+    private static boolean usesThisEventsIds(Row row) {
+        return VARIABLE.matcher(row.path() + row.body())
+                .results()
+                .map(m -> m.group(1))
+                .anyMatch(name -> !Set.of("eventId", "type", "matReferees").contains(name));
+    }
+
+    private static List<Row> broken(Row row) {
+        var variants = new ArrayList<Row>();
+        if (VARIABLE.matcher(row.path()).find()) {
+            variants.add(new Row(
+                    row.method(), VARIABLE.matcher(row.path()).replaceAll("not-an-id"), row.allowed(), row.body()));
+        }
+        var body = row.body();
+        if (body.startsWith("{") || body.startsWith("[")) {
+            variants.add(new Row(row.method(), row.path(), row.allowed(), "{\"broken"));
+            variants.add(new Row(row.method(), row.path(), row.allowed(), body.startsWith("{") ? "[]" : "{}"));
+            for (var changed : List.of(
+                    TEXT_VALUE.matcher(body).replaceAll(":\"" + "x".repeat(5000) + "\""),
+                    NUMBER_VALUE.matcher(body).replaceAll(":99999999999"),
+                    NUMBER_VALUE.matcher(body).replaceAll(":-1"))) {
+                if (!changed.equals(body)) {
+                    variants.add(new Row(row.method(), row.path(), row.allowed(), changed));
+                }
+            }
+        }
+        return variants;
+    }
+
+    private static String abbreviate(String body) {
+        return body.length() > 80 ? body.substring(0, 80) + "…" : body;
+    }
+
+    /** Every row of the event, of its groups' members and of its matches' actions: to see that nothing changed. */
+    private String snapshot(UUID event) {
+        var tables = jdbc.sql("""
+                        select table_name from information_schema.columns
+                        where column_name = 'event_id' and table_schema = current_schema()""").query(String.class).list();
+        var rows = new ArrayList<String>();
+        for (var table : tables) {
+            rows.addAll(texts("select t::text from " + table + " t where event_id = ?", event));
+        }
+        rows.addAll(texts("select t::text from event t where id = ?", event));
+        rows.addAll(texts(
+                "select t::text from group_member t join fight_group g on g.id = t.group_id where g.event_id = ?",
+                event));
+        rows.addAll(texts(
+                "select t::text from match_event t join fight_match m on m.id = t.match_id where m.event_id = ?",
+                event));
+        return rows.stream().sorted().collect(Collectors.joining("\n"));
+    }
+
+    private List<String> texts(String sql, UUID event) {
+        return jdbc.sql(sql).param(event).query(String.class).list();
     }
 
     private int call(Row row, Role role, Fixture fixture) throws Exception {
