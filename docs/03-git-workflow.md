@@ -5,15 +5,15 @@
 - Release: rama `release/vX.Y.Z` desde `development`, PR a `main` con merge commit y tag en ese merge. Nunca la PR directa desde `development`: el repo borra la rama de origen al fusionar.
 - Tras la etiqueta: PR `chore/sync-main` que fusiona `main` en `development` (merge commit), para que la versión y los arreglos de la release lleguen a las imágenes `dev` de debug.
 - `development`: integración. Siempre compila y pasa tests.
-- Trabajo: `feat/<modulo>-<tarea>`, `fix/…`, `chore/…`, `docs/…`, creadas desde `development`.
+- Trabajo: una rama por módulo, `feat/<modulo>`, con todos sus pasos; `fix/…`, `chore/…`, `docs/…` para lo suelto. Todas desde `development`.
 
 ## Ciclo de una tarea
 1. Elegir tarea pequeña de `docs/estado.md` y su MD de módulo.
-2. Crear rama (y worktree si hay trabajo en paralelo): `git worktree add ../brackety-wt/<rama> -b <rama> development`.
+2. Si la rama del módulo no existe, crearla (y worktree si hay trabajo en paralelo): `git worktree add ../brackety-wt/<rama> -b <rama> development`, y abrir su PR a `development` como borrador.
 3. Implementar + tests (agentes `backend-dev` / `flutter-dev`).
 4. Skill `close-task`: merge de `development`, tests, revisión, estado.
-5. PR a `development`; CI verde; Raul aprueba; merge squash.
-6. Borrar rama y worktree. La siguiente tarea de esa línea empieza aquí, desde `development` ya actualizado: una sola PR abierta por línea de trabajo.
+5. Siguiente tarea del módulo: en la misma rama. Si `development` avanza, fusionarlo en ella.
+6. Módulo (o bloque acordado) terminado: PR lista para revisar; CI verde; Raul aprueba; merge squash. Borrar rama y worktree.
 
 ## Worktrees
 Máximo 3 simultáneos, uno por tarea independiente (p. ej. backend y front del mismo módulo en paralelo solo si el contrato API está fijado). Nunca dos ramas tocando los mismos archivos.
