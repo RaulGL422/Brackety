@@ -60,7 +60,8 @@ jobs:
           java-version: '25'
           cache: maven
       - name: Build, format check and tests
-        run: ./mvnw -B verify
+        # A release runs the whole day of the server battery with five seeds per sport (docs/04-testing.md).
+        run: ./mvnw -B verify ${{ github.base_ref == 'main' && '-Dbattery.seeds=5' || '' }}
 
   flutter:
     needs: changes
