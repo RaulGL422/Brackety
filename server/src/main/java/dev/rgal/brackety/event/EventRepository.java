@@ -22,6 +22,16 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
     @Query("select e from Event e where e.id = :eventId")
     Optional<Event> lockById(UUID eventId);
 
+    /**
+     * Locks the row and reads its phase as committed now, past what this transaction already loaded. Same rule
+     * as {@link Event#phaseState()}.
+     */
+    @Query(
+            value = "select case when finished_at is not null then 'FINISHED' when started_at is null"
+                    + " then 'NOT_STARTED' else 'IN_PROGRESS' end from event where id = :eventId for update",
+            nativeQuery = true)
+    Optional<String> lockPhase(UUID eventId);
+
     // Native so this package does not depend on grouping, which depends on it.
     @Query(
             value = "select exists(select 1 from fight_group where event_id = :eventId)"
