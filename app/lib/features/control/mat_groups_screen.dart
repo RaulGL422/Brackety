@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/async_view.dart';
+import '../../core/group_number.dart';
 import '../../core/up_button.dart';
 import '../../l10n/gen/app_localizations.dart';
 import 'control_repository.dart';
@@ -284,26 +285,7 @@ class _GroupTile extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (group.inProgress)
-              Container(
-                color: colors.band,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.m,
-                  vertical: AppSpacing.xs,
-                ),
-                child: Row(
-                  spacing: AppSpacing.s,
-                  children: [
-                    Icon(Icons.timer_outlined, size: 18, color: colors.onBand),
-                    Flexible(
-                      child: Text(
-                        l10n.matGroupsInProgress,
-                        style: text.labelLarge?.copyWith(color: colors.onBand),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            if (group.inProgress) const _FightingBand(),
             Padding(
               padding: const EdgeInsets.fromLTRB(
                 AppSpacing.m,
@@ -318,7 +300,7 @@ class _GroupTile extends StatelessWidget {
                   Row(
                     spacing: AppSpacing.m,
                     children: [
-                      _NumberSquare(number: group.number),
+                      GroupNumber(number: group.number),
                       Expanded(
                         child: Text(
                           group.categoryName,
@@ -328,24 +310,7 @@ class _GroupTile extends StatelessWidget {
                       if (onMove != null && !group.inProgress) _moveMenu(l10n),
                     ],
                   ),
-                  // The names whole, one per line: who is where is what this screen is for.
-                  Padding(
-                    padding: const EdgeInsets.only(right: AppSpacing.s),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        for (final m in group.members)
-                          Text(m.ghost ? l10n.ghostOf(m.name) : m.name),
-                        const SizedBox(height: AppSpacing.xs),
-                        Text(
-                          l10n.matGroupsProgress(group.played, group.matches),
-                          style: text.bodySmall?.copyWith(
-                            color: scheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  _Members(group: group),
                 ],
               ),
             ),
@@ -372,29 +337,61 @@ class _GroupTile extends StatelessWidget {
   );
 }
 
-/// The group's number on ink, large enough to find from across the table.
-class _NumberSquare extends StatelessWidget {
-  const _NumberSquare({required this.number});
-
-  final int number;
+/// On a group fighting now: the ink band of «En curso», saying it stays where it is.
+class _FightingBand extends StatelessWidget {
+  const _FightingBand();
 
   @override
   Widget build(BuildContext context) {
     final colors = BracketyColors.of(context);
-    return ExcludeSemantics(
-      child: Container(
-        constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: colors.band,
-          borderRadius: BorderRadius.circular(AppRadius.s),
-        ),
-        child: Text(
-          '$number',
-          style: Theme.of(context).textTheme.headlineSmall
-              ?.copyWith(color: colors.onBand),
-        ),
+    return Container(
+      color: colors.band,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.m,
+        vertical: AppSpacing.xs,
+      ),
+      child: Row(
+        spacing: AppSpacing.s,
+        children: [
+          Icon(Icons.timer_outlined, size: 18, color: colors.onBand),
+          Flexible(
+            child: Text(
+              AppLocalizations.of(context).matGroupsInProgress,
+              style: Theme.of(context).textTheme.labelLarge
+                  ?.copyWith(color: colors.onBand),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The names whole, one per line (who is where is what the screen is for), and how far it has gone.
+class _Members extends StatelessWidget {
+  const _Members({required this.group});
+
+  final GroupCard group;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(right: AppSpacing.s),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final m in group.members)
+            Text(m.ghost ? l10n.ghostOf(m.name) : m.name),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            l10n.matGroupsProgress(group.played, group.matches),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
       ),
     );
   }
