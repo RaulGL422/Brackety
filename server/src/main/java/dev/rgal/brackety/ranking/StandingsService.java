@@ -18,7 +18,6 @@ import dev.rgal.brackety.participant.ParticipantService;
 import dev.rgal.brackety.ranking.dto.StandingRow;
 import dev.rgal.brackety.scoreboard.Side;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -159,51 +158,6 @@ class StandingsService {
             ranked.add(placed);
         }
         return ranked;
-    }
-
-    @Transactional(readOnly = true)
-    String standingsCsv(UUID eventId, UUID accountId) {
-        var standings = standings(eventId, accountId);
-        // Grappling ranks by wins and classification points: they come before the rest.
-        var classified = standings.stream().anyMatch(r -> r.wins() != null);
-        var rows = standings.stream()
-                .map(r -> {
-                    var cells = new ArrayList<Object>();
-                    cells.add(r.position());
-                    if (classified) {
-                        cells.add(r.wins());
-                        cells.add(r.classificationPoints());
-                    }
-                    cells.addAll(Arrays.asList(
-                            r.firstName(),
-                            r.lastName(),
-                            r.age(),
-                            r.organizationName(),
-                            r.categoryName(),
-                            r.teamNumber() == null ? null : "Equipo " + r.teamNumber(),
-                            r.attendancePoints(),
-                            r.matchPoints(),
-                            r.total(),
-                            r.matches()));
-                    return cells;
-                })
-                .toList();
-        var header = new ArrayList<>(List.of("Posición"));
-        if (classified) {
-            header.addAll(List.of("Victorias", "Puntos de clasificación"));
-        }
-        header.addAll(List.of(
-                "Nombre",
-                "Apellidos",
-                "Edad el día del evento",
-                "Club",
-                "Categoría",
-                "Equipo",
-                "Puntos de asistencia",
-                "Puntos en combates",
-                "Total",
-                "Combates disputados"));
-        return Csv.of(header, rows);
     }
 
     /** Every member of a team gets the team's points. */

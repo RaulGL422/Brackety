@@ -29,7 +29,14 @@ class CustomExportTest extends EventApiTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[*].key")
                         .value(org.hamcrest.Matchers.contains(
-                                "participants", "categories", "mats", "groups", "matches", "timeline")))
+                                "participants",
+                                "categories",
+                                "mats",
+                                "groups",
+                                "matches",
+                                "timeline",
+                                "standings",
+                                "league")))
                 .andExpect(jsonPath("$[0].title").value("Inscritos"))
                 .andExpect(jsonPath("$[0].fields[0].title").value("Nombre"))
                 .andExpect(jsonPath("$[0].fields[?(@.key=='birthDate')].sensitivity")
@@ -39,11 +46,35 @@ class CustomExportTest extends EventApiTest {
                 .andExpect(jsonPath("$[0].fields[?(@.key=='guardianConsent')].sensitivity")
                         .value(org.hamcrest.Matchers.contains("MINORS")))
                 .andExpect(jsonPath("$[0].fields[?(@.key=='club')].sensitivity")
-                        .value(org.hamcrest.Matchers.contains("NORMAL")));
+                        .value(org.hamcrest.Matchers.contains("NORMAL")))
+                // The league has three columns for each of its phases.
+                .andExpect(jsonPath("$[7].fields[?(@.key=='phase1Attendance')].title")
+                        .value(org.hamcrest.Matchers.contains("Fase 1: asistencia")))
+                .andExpect(jsonPath("$[7].fields[?(@.key=='phase1Total')].title")
+                        .value(org.hamcrest.Matchers.contains("Fase 1: total")));
 
         call(get("/api/v1/events/" + eventId + "/exports/sheets?locale=en"), "club1")
                 .andExpect(jsonPath("$[0].title").value("Participants"))
-                .andExpect(jsonPath("$[0].fields[0].title").value("First name"));
+                .andExpect(jsonPath("$[0].fields[0].title").value("First name"))
+                .andExpect(jsonPath("$[7].fields[?(@.key=='phase1Attendance')].title")
+                        .value(org.hamcrest.Matchers.contains("Phase 1: attendance")));
+    }
+
+    @Test
+    void theStandingsAreSheetsLikeTheRest() throws Exception {
+        participant("Bea", null);
+        participant("Ana", null);
+
+        var phase = export("""
+                {"sheet":"standings","columns":["firstName","category"],
+                 "sort":[{"column":"firstName","descending":true}],"locale":"en"}""");
+        var league = export("""
+                {"sheet":"league","columns":["firstName","phase1Attendance"],
+                 "sort":[{"column":"firstName","descending":false}]}""");
+
+        assertThat(lines(phase)).containsExactly(Csv.BOM + "First name;Category", "Bea;7-8", "Ana;7-8");
+        assertThat(lines(league).getFirst()).isEqualTo(Csv.BOM + "Nombre;Fase 1: asistencia");
+        assertThat(lines(league).subList(1, 3)).allMatch(line -> line.matches("(Ana|Bea);\\d+"));
     }
 
     @Test

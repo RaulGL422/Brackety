@@ -34,7 +34,7 @@ class Exports {
     static final int PREVIEW_ROWS = 20;
     /** The sheets of the full export, in its order. */
     static final List<String> FULL_EXPORT =
-            List.of("participants", "categories", "mats", "groups", "matches", "timeline");
+            List.of("participants", "categories", "mats", "groups", "matches", "timeline", "standings", "league");
 
     private static final Collator TEXT = Collator.getInstance(Locale.forLanguageTag("es"));
 
@@ -62,12 +62,13 @@ class Exports {
     @Transactional(readOnly = true)
     List<ExportSheet> sheets(UUID eventId, UUID accountId, Locale locale) {
         access.require(eventId, accountId, EventRole.CLUB);
+        var data = source.load(eventId);
         return FULL_EXPORT.stream()
                 .map(sheets::get)
                 .map(sheet -> new ExportSheet(
                         sheet.key(),
                         sheet.title(locale),
-                        sheet.fields().stream()
+                        sheet.fields(data).stream()
                                 .map(f -> new ExportSheet.Field(
                                         f.key(),
                                         f.title(locale),
@@ -84,7 +85,11 @@ class Exports {
         if (sheet == null) {
             throw EventException.invalid("EXPORT_UNKNOWN_SHEET", "There is no sheet " + request.sheet() + ".");
         }
-        return table(sheet, source.load(eventId), request.columns(), request.sortOrEmpty(), request.headersLocale());
+        return custom(sheet, source.load(eventId), request);
+    }
+
+    private <R> Table custom(Sheet<R> sheet, SheetData data, ExportRequest request) {
+        return table(sheet, data, sheet.rows(data), request.columns(), request.sortOrEmpty(), request.headersLocale());
     }
 
     @Transactional(readOnly = true)
@@ -101,22 +106,31 @@ class Exports {
                 table.rows().size());
     }
 
-    /** A sheet of the full export: every field in its order, Spanish titles, the sheet's own row order. */
+    /** A sheet of the full export: its built-in columns in their order, Spanish titles, its own row order. */
     @Transactional(readOnly = true)
     Table builtIn(UUID eventId, UUID accountId, String key) {
         access.require(eventId, accountId, EventRole.CLUB);
-        var sheet = sheets.get(key);
-        var columns = sheet.fields().stream().map(ExportField::key).toList();
-        return table(sheet, source.load(eventId), columns, List.of(), Locale.forLanguageTag("es"));
+        return builtIn(sheets.get(key), source.load(eventId));
     }
 
-    private <R> Table table(Sheet<R> sheet, SheetData data, List<String> columns, List<SortKey> sort, Locale locale) {
-        var byKey = sheet.fields().stream().collect(Collectors.toMap(ExportField::key, Function.identity()));
+    private <R> Table builtIn(Sheet<R> sheet, SheetData data) {
+        var rows = sheet.rows(data);
+        return table(sheet, data, rows, sheet.builtInColumns(data, rows), List.of(), Locale.forLanguageTag("es"));
+    }
+
+    private <R> Table table(
+            Sheet<R> sheet,
+            SheetData data,
+            List<R> sheetRows,
+            List<String> columns,
+            List<SortKey> sort,
+            Locale locale) {
+        var byKey = sheet.fields(data).stream().collect(Collectors.toMap(ExportField::key, Function.identity()));
         if (new HashSet<>(columns).size() != columns.size()) {
             throw EventException.invalid("EXPORT_REPEATED_COLUMN", "A column is chosen twice.");
         }
         var chosen = columns.stream().map(key -> field(byKey, key)).toList();
-        var rows = new ArrayList<>(sheet.rows(data));
+        var rows = new ArrayList<>(sheetRows);
         if (!sort.isEmpty()) {
             rows.sort(sort.stream()
                     .map(key -> order(field(byKey, key.column()), key.descending()))
