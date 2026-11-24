@@ -94,7 +94,7 @@ class MatchesSheet implements Sheet<MatchesSheet.Row> {
     }
 
     @Override
-    public List<ExportField<Row>> fields() {
+    public List<ExportField<Row>> fields(SheetData data) {
         return FIELDS;
     }
 

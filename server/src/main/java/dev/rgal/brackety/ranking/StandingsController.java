@@ -78,12 +78,20 @@ class StandingsController {
 
     @GetMapping("/export/standings.csv")
     ResponseEntity<byte[]> standingsCsv(@PathVariable UUID eventId, @AuthenticationPrincipal Jwt jwt) {
-        return file(eventId, "clasificacion-fase.csv", CSV, standings.standingsCsv(eventId, CurrentAccount.id(jwt)));
+        return file(
+                eventId,
+                "clasificacion-fase.csv",
+                CSV,
+                exports.builtIn(eventId, CurrentAccount.id(jwt), "standings").csv());
     }
 
     @GetMapping("/export/league-standings.csv")
     ResponseEntity<byte[]> leagueStandingsCsv(@PathVariable UUID eventId, @AuthenticationPrincipal Jwt jwt) {
-        return file(eventId, "clasificacion-liga.csv", CSV, leagueStandings.csv(eventId, CurrentAccount.id(jwt)));
+        return file(
+                eventId,
+                "clasificacion-liga.csv",
+                CSV,
+                exports.builtIn(eventId, CurrentAccount.id(jwt), "league").csv());
     }
 
     /** One CSV of the league standings per category, in a .zip. */

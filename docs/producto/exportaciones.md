@@ -54,5 +54,6 @@ Pedido de Raul (2026-11-19): una pantalla de exportación donde se eligen los ca
 
 ## Estado
 Aprobada en lo básico (2026-11-19): permiso propio para datos personales, `.xlsx` sí, plantillas sin compartir entre clubes.
-- Paso 1a hecho: registro (`ranking/*Sheet`, `ExportField`, `Exports`) con las 6 hojas de la exportación completa (inscritos, categorías, tapices, grupos, combates, línea de tiempo); salen igual que antes (comprobación de oro). Fuera `EventSheets`. Ordenar por varias columnas, nombres en orden español, vacíos al final.
-- Falta 1b: clasificación de fase y de liga como hojas. Hoy solo el club exporta y ve todo: el permiso «Descargar datos personales» llega con la pantalla (paso 2).
+- Paso 1a hecho: registro (`ranking/*Sheet`, `ExportField`, `Exports`) con las hojas de la exportación completa (inscritos, categorías, tapices, grupos, combates, línea de tiempo); salen igual que antes (comprobación de oro). Fuera `EventSheets`. Ordenar por varias columnas, nombres en orden español, vacíos al final.
+- Paso 1b hecho: clasificación de la fase y de la liga como hojas (`StandingsSheet`, `LeagueSheet`); la de la liga, con tres columnas por fase. Victorias y puntos de clasificación, en la hoja fija solo si el evento los tiene (grappling).
+- El .zip y el PDF por categoría siguen aparte: pasan a «Separar por» (paso 3). Hoy solo el club exporta y ve todo: el permiso «Descargar datos personales» llega con la pantalla (paso 2).

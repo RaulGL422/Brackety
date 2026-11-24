@@ -48,7 +48,7 @@ class MatsSheet implements Sheet<MatsSheet.Row> {
     }
 
     @Override
-    public List<ExportField<Row>> fields() {
+    public List<ExportField<Row>> fields(SheetData data) {
         return FIELDS;
     }
 

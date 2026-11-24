@@ -226,42 +226,6 @@ class LeagueStandingsService {
         return order;
     }
 
-    @Transactional(readOnly = true)
-    String csv(UUID eventId, UUID accountId) {
-        var result = standings(eventId, accountId);
-        var header = new ArrayList<>(List.of("Categoría", "Posición", "Medalla", "Nombre", "Apellidos", "Club"));
-        for (var phase : result.phases()) {
-            header.add("Fase " + phase.number() + ": asistencia");
-            header.add("Fase " + phase.number() + ": puntos en combates");
-            header.add("Fase " + phase.number() + ": total");
-        }
-        header.add("Total liga");
-        header.add("Advertencias en la liga");
-        header.add("Descalificaciones en la liga");
-        var rows = result.rows().stream()
-                .map(r -> {
-                    var cells = new ArrayList<Object>();
-                    cells.add(r.categoryName());
-                    // With 0 points nobody has a place yet (the app shows a dash too).
-                    cells.add(r.total() > 0 ? r.position() : null);
-                    cells.add(SheetText.medal(r.medal()));
-                    cells.add(r.firstName());
-                    cells.add(r.lastName());
-                    cells.add(r.organizationName());
-                    for (var p : r.phases()) {
-                        cells.add(p == null ? "No inscrito" : p.attendancePoints());
-                        cells.add(p == null ? null : p.matchPoints());
-                        cells.add(p == null ? null : p.total());
-                    }
-                    cells.add(r.total());
-                    cells.add(r.warnings());
-                    cells.add(r.disqualifications());
-                    return cells;
-                })
-                .toList();
-        return Csv.of(header, rows);
-    }
-
     /** The league standings to print: each category on its own page. */
     @Transactional(readOnly = true)
     byte[] pdf(UUID eventId, UUID accountId) {
