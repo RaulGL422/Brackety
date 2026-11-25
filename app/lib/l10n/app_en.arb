@@ -1018,6 +1018,7 @@
   "phaseNotStartedError": "The phase has not started: the club has to start it.",
   "phaseFinishedError": "The phase is finished: the club has to reopen it to change anything.",
   "phaseMatchInProgressError": "A match is in progress or waits for review: finish it first.",
+  "legalGateError": "The server has no privacy contact, so no phase can be started or created. Tell whoever runs it (PRIVACY_CONTACT_EMAIL).",
   "permissionsTooltip": "Permissions of {name}",
   "permissionsTitle": "What {name} may do",
   "permissionsHint": "The club may always do everything. Reopening a phase and managing the staff are the club's alone.",

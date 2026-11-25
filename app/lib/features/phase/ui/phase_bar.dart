@@ -127,5 +127,6 @@ String? phaseErrorMessage(AppLocalizations l10n, DioException error) =>
       'PHASE_NOT_STARTED' => l10n.phaseNotStartedError,
       'PHASE_FINISHED' => l10n.phaseFinishedError,
       'MATCH_IN_PROGRESS' => l10n.phaseMatchInProgressError,
+      'LEGAL_GATE' => l10n.legalGateError,
       _ => null,
     };

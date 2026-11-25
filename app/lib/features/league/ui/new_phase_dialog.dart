@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../club/ui/settings_tab.dart';
 import '../../events/state/events_providers.dart';
+import '../../phase/ui/phase_bar.dart';
 import '../data/league_models.dart';
 import '../data/league_repository.dart';
 import '../state/league_providers.dart';
@@ -161,7 +162,8 @@ class _NewPhaseDialogState extends ConsumerState<_NewPhaseDialog> {
     } on DioException catch (e) {
       if (mounted) setState(() => _saving = false);
       toasts.show(
-        e.response?.statusCode == 400 ? l10n.saveInvalid : l10n.saveError,
+        phaseErrorMessage(l10n, e) ??
+            (e.response?.statusCode == 400 ? l10n.saveInvalid : l10n.saveError),
         kind: ToastKind.error,
       );
     }

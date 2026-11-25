@@ -54,6 +54,16 @@ public class LegalService {
         return privacyContactConfigured;
     }
 
+    /**
+     * The legal gate (docs/modulos/legal-paginas.md): starting a phase or creating the next one puts people's
+     * data to work, so without a privacy contact it is a 403 {@code LEGAL_GATE}.
+     */
+    public void requirePrivacyContact() {
+        if (!privacyContactConfigured) {
+            throw new LegalGateException();
+        }
+    }
+
     /** Empty for an unknown type; an unknown or missing language falls back to Spanish. */
     public Optional<LegalTextResponse> text(String slug, String lang) {
         var language = lang != null && LANGS.contains(lang) ? lang : DEFAULT_LANG;

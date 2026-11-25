@@ -3149,6 +3149,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'A match is in progress or waits for review: finish it first.';
 
   @override
+  String get legalGateError =>
+      'The server has no privacy contact, so no phase can be started or created. Tell whoever runs it (PRIVACY_CONTACT_EMAIL).';
+
+  @override
   String permissionsTooltip(String name) {
     return 'Permissions of $name';
   }
