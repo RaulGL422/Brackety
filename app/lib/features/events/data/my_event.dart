@@ -14,7 +14,8 @@ enum EventPermission {
   reviews('REVIEWS'),
   deviceImport('DEVICE_IMPORT'),
   participants('PARTICIPANTS'),
-  moveGroups('MOVE_GROUPS');
+  moveGroups('MOVE_GROUPS'),
+  personalData('PERSONAL_DATA');
 
   const EventPermission(this.wire);
 

@@ -19,7 +19,7 @@ GET /api/v1/events/{eventId}/export/package | -
 GET /api/v1/events/{eventId}/export/participants.csv | -
 GET /api/v1/events/{eventId}/export/standings.csv | -
 GET /api/v1/events/{eventId}/export/timeline.csv | -
-GET /api/v1/events/{eventId}/exports/sheets | -
+GET /api/v1/events/{eventId}/exports/sheets | participants
 GET /api/v1/events/{eventId}/invitations | -
 GET /api/v1/events/{eventId}/league | -
 GET /api/v1/events/{eventId}/league/candidates | -
@@ -30,9 +30,9 @@ GET /api/v1/events/{eventId}/mats | control groups reviews view
 GET /api/v1/events/{eventId}/participants | participants
 GET /api/v1/events/{eventId}/participants/import/available | participants
 GET /api/v1/events/{eventId}/participants/{participantId}/record | participants
-GET /api/v1/events/{eventId}/phase | control device_import groups measures move_groups own_mat participants phase reviews teams view
-GET /api/v1/events/{eventId}/rulebook | control device_import groups measures move_groups own_mat participants phase reviews teams view
-GET /api/v1/events/{eventId}/rulebook/info | control device_import groups measures move_groups own_mat participants phase reviews teams view
+GET /api/v1/events/{eventId}/phase | control device_import groups measures move_groups own_mat participants personal_data phase reviews teams view
+GET /api/v1/events/{eventId}/rulebook | control device_import groups measures move_groups own_mat participants personal_data phase reviews teams view
+GET /api/v1/events/{eventId}/rulebook/info | control device_import groups measures move_groups own_mat participants personal_data phase reviews teams view
 GET /api/v1/events/{eventId}/settings | participants
 GET /api/v1/events/{eventId}/standings | -
 GET /api/v1/events/{eventId}/temporary-access | -
@@ -43,8 +43,8 @@ POST /api/v1/events/{eventId}/control/matches/{matchId}/waive-rest | control
 POST /api/v1/events/{eventId}/control/mats/{matId}/disable | control
 POST /api/v1/events/{eventId}/control/mats/{matId}/enable | control
 POST /api/v1/events/{eventId}/control/team-members | control
-POST /api/v1/events/{eventId}/exports | -
-POST /api/v1/events/{eventId}/exports/preview | -
+POST /api/v1/events/{eventId}/exports | participants
+POST /api/v1/events/{eventId}/exports/preview | participants
 POST /api/v1/events/{eventId}/groups | groups
 POST /api/v1/events/{eventId}/import/results | -
 POST /api/v1/events/{eventId}/invitations | -

@@ -39,7 +39,7 @@ class RowsEditor extends ConsumerWidget {
         ExportAddButton(
           icon: Icons.filter_alt_outlined,
           label: l10n.exportAddFilter,
-          fields: edit.sheet.fields,
+          fields: edit.fields,
           onPicked: controller.addFilter,
         ),
       ],
@@ -68,7 +68,7 @@ class RowsEditor extends ConsumerWidget {
             icon: Icons.sort,
             label: l10n.exportAddSort,
             fields: [
-              for (final f in edit.sheet.fields)
+              for (final f in edit.fields)
                 if (!sorted.contains(f.key)) f,
             ],
             onPicked: controller.addSort,

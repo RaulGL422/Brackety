@@ -3,6 +3,7 @@ package dev.rgal.brackety.ranking;
 import dev.rgal.brackety.event.EventException;
 import dev.rgal.brackety.eventpackage.EventPackageService;
 import dev.rgal.brackety.ranking.ExportField.Kind;
+import dev.rgal.brackety.ranking.ExportField.Sensitivity;
 import dev.rgal.brackety.ranking.dto.ExportRequest.Filter;
 import dev.rgal.brackety.ranking.dto.ExportRequest.SortKey;
 import java.math.BigDecimal;
@@ -60,7 +61,11 @@ final class ExportTable {
         }
     }
 
-    /** What to write of a sheet; {@code file}: the name of its files, without the extension. */
+    /**
+     * What to write of a sheet; {@code file}: the name of its files, without the extension. Without
+     * {@code personalData} (the permission) or when {@code publish}ing, the personal and minors' columns are not
+     * there; publishing also shortens the names ({@link PublicNames}).
+     */
     record Spec(
             String file,
             List<String> columns,
@@ -68,10 +73,12 @@ final class ExportTable {
             List<Filter> filters,
             List<SortKey> sort,
             String splitBy,
-            Locale locale) {
+            Locale locale,
+            boolean personalData,
+            boolean publish) {
 
         static Spec builtIn(String file, List<String> columns) {
-            return new Spec(file, columns, Map.of(), List.of(), List.of(), null, SPANISH);
+            return new Spec(file, columns, Map.of(), List.of(), List.of(), null, SPANISH, true, false);
         }
     }
 
@@ -82,7 +89,11 @@ final class ExportTable {
     }
 
     <R> List<Table> of(Sheet<R> sheet, SheetData data, List<R> sheetRows, Spec spec) {
-        var byKey = sheet.fields(data).stream().collect(Collectors.toMap(ExportField::key, Function.identity()));
+        var names = spec.publish() ? new PublicNames(data.participants()) : null;
+        var byKey = sheet.fields(data).stream()
+                .filter(f -> f.sensitivity() == Sensitivity.NORMAL || (spec.personalData() && !spec.publish()))
+                .map(f -> names == null ? f : f.mapped(value -> names.apply(f.key(), value)))
+                .collect(Collectors.toMap(ExportField::key, Function.identity()));
         if (new HashSet<>(spec.columns()).size() != spec.columns().size()) {
             throw EventException.invalid("EXPORT_REPEATED_COLUMN", "A column is chosen twice.");
         }

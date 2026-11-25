@@ -18,7 +18,7 @@ class ColumnsEditor extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final controller = ref.read(exportDraftProvider(edit.eventId).notifier);
     final unchosen = [
-      for (final f in edit.sheet.fields)
+      for (final f in edit.fields)
         if (!edit.draft.columns.contains(f.key)) f,
     ];
     return ExportSection(

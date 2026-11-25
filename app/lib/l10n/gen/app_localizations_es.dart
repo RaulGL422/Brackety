@@ -48,6 +48,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get permissionMoveGroups => 'Mover grupos entre tapices';
 
   @override
+  String get permissionPersonalData => 'Descargar datos personales';
+
+  @override
   String get matGroupsTitle => 'Grupos por tapiz';
 
   @override
@@ -3368,6 +3371,13 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get exportCustom => 'Exportar a medida';
+
+  @override
+  String get exportForPublishing => 'Para publicar';
+
+  @override
+  String get exportForPublishingHelp =>
+      'Nombre e inicial del apellido, sin datos personales. Para la web o las redes del club.';
 
   @override
   String get exportStepData => 'Qué datos';

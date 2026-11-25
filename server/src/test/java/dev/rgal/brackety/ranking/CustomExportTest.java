@@ -3,6 +3,7 @@ package dev.rgal.brackety.ranking;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -150,15 +151,48 @@ class CustomExportTest extends EventApiTest {
         assertThat(lines(csv)).containsExactly(Csv.BOM + "Nombre", "\"'=HYPERLINK(\"\"x\"\")\"");
     }
 
+    // The club and whoever enters people export; the personal columns need their own permission (exportaciones.md).
     @Test
-    void onlyTheClubExports() throws Exception {
-        var body = """
+    void aHelperExportsWithParticipantsAndSeesPersonalColumnsOnlyWithPersonalData() throws Exception {
+        participant("Ana", new BigDecimal("25.0"));
+        var names = """
                 {"sheet":"participants","columns":["firstName"]}""";
-        for (var user : List.of("ayudante1", "arbitro1")) {
-            call(post("/api/v1/events/" + eventId + "/exports").content(body), user)
-                    .andExpect(status().is4xxClientError());
-            call(get("/api/v1/events/" + eventId + "/exports/sheets"), user).andExpect(status().is4xxClientError());
-        }
+        var weights = """
+                {"sheet":"participants","columns":["firstName","weightKg"]}""";
+        call(post("/api/v1/events/" + eventId + "/exports").content(names), "ayudante1")
+                .andExpect(status().isForbidden());
+        call(get("/api/v1/events/" + eventId + "/exports/sheets"), "ayudante1").andExpect(status().isForbidden());
+
+        grant("ayudante1", "PARTICIPANTS");
+        call(get("/api/v1/events/" + eventId + "/exports/sheets"), "ayudante1")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].fields[?(@.key=='weightKg')]").isEmpty())
+                .andExpect(jsonPath("$[0].fields[?(@.key=='guardianConsent')]").isEmpty())
+                .andExpect(jsonPath("$[0].fields[?(@.key=='club')]").isNotEmpty());
+        assertThat(lines(export(names, "ayudante1"))).containsExactly(Csv.BOM + "Nombre", "Ana");
+        call(post("/api/v1/events/" + eventId + "/exports").content(weights), "ayudante1")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("EXPORT_UNKNOWN_COLUMN"));
+
+        grant("ayudante1", "PARTICIPANTS", "PERSONAL_DATA");
+        assertThat(lines(export(weights, "ayudante1"))).containsExactly(Csv.BOM + "Nombre;Peso (kg)", "Ana;25,0");
+        call(post("/api/v1/events/" + eventId + "/exports").content(names), "arbitro1")
+                .andExpect(status().isForbidden());
+    }
+
+    // «Para publicar»: first name and the initial, never a personal column, also in the preview.
+    @Test
+    void forPublishingShortensTheNamesAndLeavesOutThePersonalColumns() throws Exception {
+        participant("Ana", new BigDecimal("25.0"));
+
+        var csv = export("""
+                {"sheet":"participants","columns":["firstName","lastName","club"],"forPublishing":true}""");
+        assertThat(lines(csv).get(1)).startsWith("Ana;P.;");
+        call(post("/api/v1/events/" + eventId + "/exports/preview").content("""
+                                {"sheet":"standings","columns":["firstName","lastName"],"forPublishing":true}"""), "club1")
+                .andExpect(jsonPath("$.rows[0]").value(org.hamcrest.Matchers.contains("Ana", "P.")));
+        refused("""
+                {"sheet":"participants","columns":["firstName","weightKg"],"forPublishing":true}""", "EXPORT_UNKNOWN_COLUMN");
     }
 
     @Test
@@ -276,11 +310,23 @@ class CustomExportTest extends EventApiTest {
     }
 
     private String export(String body) throws Exception {
-        return call(post("/api/v1/events/" + eventId + "/exports").content(body), "club1")
+        return export(body, "club1");
+    }
+
+    private String export(String body, String user) throws Exception {
+        return call(post("/api/v1/events/" + eventId + "/exports").content(body), user)
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
                 .getContentAsString(StandardCharsets.UTF_8);
+    }
+
+    private void grant(String user, String... permissions) throws Exception {
+        call(
+                        put("/api/v1/events/" + eventId + "/staff/" + accountId(user) + "/permissions")
+                                .content("{\"permissions\":[\"" + String.join("\",\"", permissions) + "\"]}"),
+                        "club1")
+                .andExpect(status().is2xxSuccessful());
     }
 
     private void refused(String body, String code) throws Exception {

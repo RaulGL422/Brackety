@@ -89,7 +89,16 @@ class _ClubPanelScreenState extends ConsumerState<ClubPanelScreen> {
       if (kIsWeb) ...[
         if (me?.can(EventPermission.deviceImport) ?? false)
           ImportOpsButton(eventId: widget.eventId),
-        if (isClub) ClubExportMenu(eventId: widget.eventId),
+        if (isClub)
+          ClubExportMenu(eventId: widget.eventId)
+        // Who enters people exports too, without the club's fixed downloads.
+        else if (me?.can(EventPermission.participants) ?? false)
+          IconButton(
+            tooltip: l10n.exportCustom,
+            icon: const Icon(Icons.tune),
+            onPressed: () =>
+                context.push('/events/${widget.eventId}/club/export'),
+          ),
       ],
     ];
     final body = Column(

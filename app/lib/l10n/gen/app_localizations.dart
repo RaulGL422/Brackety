@@ -164,6 +164,12 @@ abstract class AppLocalizations {
   /// **'Mover grupos entre tapices'**
   String get permissionMoveGroups;
 
+  /// No description provided for @permissionPersonalData.
+  ///
+  /// In es, this message translates to:
+  /// **'Descargar datos personales'**
+  String get permissionPersonalData;
+
   /// No description provided for @matGroupsTitle.
   ///
   /// In es, this message translates to:
@@ -5363,6 +5369,18 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Exportar a medida'**
   String get exportCustom;
+
+  /// No description provided for @exportForPublishing.
+  ///
+  /// In es, this message translates to:
+  /// **'Para publicar'**
+  String get exportForPublishing;
+
+  /// No description provided for @exportForPublishingHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre e inicial del apellido, sin datos personales. Para la web o las redes del club.'**
+  String get exportForPublishingHelp;
 
   /// No description provided for @exportStepData.
   ///

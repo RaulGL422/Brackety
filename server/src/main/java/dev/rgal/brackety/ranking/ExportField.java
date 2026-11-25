@@ -50,6 +50,11 @@ record ExportField<R>(String key, String es, String en, Kind kind, Sensitivity s
         return new ExportField<>(key, es, en, kind, level, value);
     }
 
+    /** The same column, its value passed through {@code after}. */
+    ExportField<R> mapped(Function<Object, Object> after) {
+        return new ExportField<>(key, es, en, kind, sensitivity, value.andThen(after));
+    }
+
     String title(Locale locale) {
         return locale.getLanguage().equals("en") ? en : es;
     }

@@ -56,6 +56,12 @@ class ExportEdit {
   final String eventId;
   final ExportSheet sheet;
   final ExportDraft draft;
+
+  /// The columns there are to choose: no personal ones when publishing.
+  List<ExportField> get fields => [
+    for (final f in sheet.fields)
+      if (!(draft.forPublishing && f.isPersonal)) f,
+  ];
 }
 
 /// Which data: one of the event's sheets.
@@ -110,11 +116,26 @@ class FileOptions extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        _publish(context, controller),
         _format(context, controller),
         _split(context, controller),
         _headers(context, controller),
         if (edit.draft.format == ExportFormat.pdf) ..._pdf(context, controller),
       ],
+    );
+  }
+
+  Widget _publish(BuildContext context, ExportDraftController controller) {
+    final l10n = AppLocalizations.of(context);
+    return SwitchListTile(
+      contentPadding: EdgeInsets.zero,
+      title: Text(l10n.exportForPublishing),
+      subtitle: Text(l10n.exportForPublishingHelp),
+      value: edit.draft.forPublishing,
+      onChanged: (on) => controller.publish(on, [
+        for (final f in edit.sheet.fields)
+          if (f.isPersonal) f.key,
+      ]),
     );
   }
 
@@ -154,7 +175,7 @@ class FileOptions extends ConsumerWidget {
           decoration: InputDecoration(labelText: l10n.exportSplit),
           items: [
             DropdownMenuItem(child: Text(l10n.exportNoSplit)),
-            for (final f in edit.sheet.fields)
+            for (final f in edit.fields)
               DropdownMenuItem(value: f.key, child: Text(f.title)),
           ],
           onChanged: controller.splitBy,

@@ -2,6 +2,7 @@ package dev.rgal.brackety.ranking;
 
 import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventException;
+import dev.rgal.brackety.event.EventPermission;
 import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.ranking.dto.ExportPreview;
@@ -24,7 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * The event's sheets, as the full export writes them or as the club asks (docs/producto/exportaciones.md): the
  * columns it picks, in its order and with its titles, the rows it filters, sorted by what it says, in one file or one
- * per value of a column. Only the club of the event.
+ * per value of a column. The club and whoever has the Participants permission; the personal columns, only with
+ * Personal data.
  */
 @Service
 class Exports {
@@ -77,7 +79,8 @@ class Exports {
     /** In the order of the full export. */
     @Transactional(readOnly = true)
     List<ExportSheet> sheets(UUID eventId, UUID accountId, Locale locale) {
-        access.require(eventId, accountId, EventRole.CLUB);
+        access.require(eventId, accountId, EventPermission.PARTICIPANTS);
+        var personal = access.has(eventId, accountId, EventPermission.PERSONAL_DATA);
         var data = source.load(eventId);
         return FULL_EXPORT.stream()
                 .map(sheets::get)
@@ -85,6 +88,7 @@ class Exports {
                         sheet.key(),
                         sheet.title(locale),
                         sheet.fields(data).stream()
+                                .filter(f -> personal || f.sensitivity() == ExportField.Sensitivity.NORMAL)
                                 .map(f -> new ExportSheet.Field(
                                         f.key(),
                                         f.title(locale),
@@ -143,7 +147,7 @@ class Exports {
     }
 
     private List<ExportTable.Table> custom(UUID eventId, UUID accountId, ExportRequest request, boolean split) {
-        access.require(eventId, accountId, EventRole.CLUB);
+        access.require(eventId, accountId, EventPermission.PARTICIPANTS);
         var sheet = sheets.get(request.sheet());
         if (sheet == null) {
             throw EventException.invalid("EXPORT_UNKNOWN_SHEET", "There is no sheet " + request.sheet() + ".");
@@ -155,7 +159,9 @@ class Exports {
                 request.filtersOrEmpty(),
                 request.sortOrEmpty(),
                 split ? request.splitBy() : null,
-                request.headersLocale());
+                request.headersLocale(),
+                access.has(eventId, accountId, EventPermission.PERSONAL_DATA),
+                request.publish());
         return tables(sheet, source.load(eventId), spec);
     }
 
@@ -189,7 +195,9 @@ class Exports {
                 List.of(),
                 List.of(),
                 "category",
-                ExportTable.SPANISH);
+                ExportTable.SPANISH,
+                true,
+                false);
         var files = new LinkedHashMap<String, String>();
         tables(league, data, spec).forEach(table -> files.put(table.fileName(), table.csv()));
         return files;
