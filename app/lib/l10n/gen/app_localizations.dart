@@ -5393,6 +5393,348 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Entrar'**
   String get qrAccessEnter;
+
+  /// No description provided for @exportCustom.
+  ///
+  /// In es, this message translates to:
+  /// **'Exportar a medida'**
+  String get exportCustom;
+
+  /// No description provided for @exportStepData.
+  ///
+  /// In es, this message translates to:
+  /// **'Qué datos'**
+  String get exportStepData;
+
+  /// No description provided for @exportStepColumns.
+  ///
+  /// In es, this message translates to:
+  /// **'Columnas'**
+  String get exportStepColumns;
+
+  /// No description provided for @exportStepRows.
+  ///
+  /// In es, this message translates to:
+  /// **'Filas'**
+  String get exportStepRows;
+
+  /// No description provided for @exportStepFile.
+  ///
+  /// In es, this message translates to:
+  /// **'Archivo'**
+  String get exportStepFile;
+
+  /// No description provided for @exportStepPreview.
+  ///
+  /// In es, this message translates to:
+  /// **'Vista previa'**
+  String get exportStepPreview;
+
+  /// No description provided for @exportStepOf.
+  ///
+  /// In es, this message translates to:
+  /// **'Paso {step} de {total}'**
+  String exportStepOf(int step, int total);
+
+  /// No description provided for @exportNext.
+  ///
+  /// In es, this message translates to:
+  /// **'Siguiente'**
+  String get exportNext;
+
+  /// No description provided for @exportBack.
+  ///
+  /// In es, this message translates to:
+  /// **'Atrás'**
+  String get exportBack;
+
+  /// No description provided for @exportSheetHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Cada uno trae sus columnas. Al cambiarlo se empieza de nuevo.'**
+  String get exportSheetHelp;
+
+  /// No description provided for @exportColumnsHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Arrastra para cambiar el orden. Toca el título para cambiarlo.'**
+  String get exportColumnsHelp;
+
+  /// No description provided for @exportAddColumn.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir columna'**
+  String get exportAddColumn;
+
+  /// No description provided for @exportNoColumns.
+  ///
+  /// In es, this message translates to:
+  /// **'Elige al menos una columna.'**
+  String get exportNoColumns;
+
+  /// No description provided for @exportPersonal.
+  ///
+  /// In es, this message translates to:
+  /// **'Dato personal'**
+  String get exportPersonal;
+
+  /// No description provided for @exportMinors.
+  ///
+  /// In es, this message translates to:
+  /// **'Dato de menores'**
+  String get exportMinors;
+
+  /// No description provided for @exportMoveUp.
+  ///
+  /// In es, this message translates to:
+  /// **'Subir {column}'**
+  String exportMoveUp(String column);
+
+  /// No description provided for @exportMoveDown.
+  ///
+  /// In es, this message translates to:
+  /// **'Bajar {column}'**
+  String exportMoveDown(String column);
+
+  /// No description provided for @exportRename.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar el título de {column}'**
+  String exportRename(String column);
+
+  /// No description provided for @exportRemove.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar {column}'**
+  String exportRemove(String column);
+
+  /// No description provided for @exportRenameTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Título de la columna'**
+  String get exportRenameTitle;
+
+  /// No description provided for @exportRenameHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Vacío, vuelve a «{original}».'**
+  String exportRenameHelp(String original);
+
+  /// No description provided for @exportFilters.
+  ///
+  /// In es, this message translates to:
+  /// **'Filtrar filas'**
+  String get exportFilters;
+
+  /// No description provided for @exportFiltersHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Solo las filas que cumplan todos los filtros.'**
+  String get exportFiltersHelp;
+
+  /// No description provided for @exportAddFilter.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir filtro'**
+  String get exportAddFilter;
+
+  /// No description provided for @exportFilterValues.
+  ///
+  /// In es, this message translates to:
+  /// **'Es alguno de (separados por comas)'**
+  String get exportFilterValues;
+
+  /// No description provided for @exportFilterMin.
+  ///
+  /// In es, this message translates to:
+  /// **'Desde'**
+  String get exportFilterMin;
+
+  /// No description provided for @exportFilterMax.
+  ///
+  /// In es, this message translates to:
+  /// **'Hasta'**
+  String get exportFilterMax;
+
+  /// No description provided for @exportRemoveFilter.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar el filtro de {column}'**
+  String exportRemoveFilter(String column);
+
+  /// No description provided for @exportSort.
+  ///
+  /// In es, this message translates to:
+  /// **'Ordenar filas'**
+  String get exportSort;
+
+  /// No description provided for @exportSortHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin orden, salen como en la hoja. El primero manda; los demás deshacen empates.'**
+  String get exportSortHelp;
+
+  /// No description provided for @exportAddSort.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir orden'**
+  String get exportAddSort;
+
+  /// No description provided for @exportAscending.
+  ///
+  /// In es, this message translates to:
+  /// **'De menor a mayor'**
+  String get exportAscending;
+
+  /// No description provided for @exportDescending.
+  ///
+  /// In es, this message translates to:
+  /// **'De mayor a menor'**
+  String get exportDescending;
+
+  /// No description provided for @exportRaiseSort.
+  ///
+  /// In es, this message translates to:
+  /// **'Dar más prioridad a {column}'**
+  String exportRaiseSort(String column);
+
+  /// No description provided for @exportRemoveSort.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar el orden por {column}'**
+  String exportRemoveSort(String column);
+
+  /// No description provided for @exportSplit.
+  ///
+  /// In es, this message translates to:
+  /// **'Separar por'**
+  String get exportSplit;
+
+  /// No description provided for @exportNoSplit.
+  ///
+  /// In es, this message translates to:
+  /// **'No separar'**
+  String get exportNoSplit;
+
+  /// No description provided for @exportSplitCsv.
+  ///
+  /// In es, this message translates to:
+  /// **'Un CSV por valor, en un .zip.'**
+  String get exportSplitCsv;
+
+  /// No description provided for @exportSplitExcel.
+  ///
+  /// In es, this message translates to:
+  /// **'Una hoja del libro por valor.'**
+  String get exportSplitExcel;
+
+  /// No description provided for @exportSplitPdf.
+  ///
+  /// In es, this message translates to:
+  /// **'Una página por valor.'**
+  String get exportSplitPdf;
+
+  /// No description provided for @exportFormat.
+  ///
+  /// In es, this message translates to:
+  /// **'Formato'**
+  String get exportFormat;
+
+  /// No description provided for @exportHeaders.
+  ///
+  /// In es, this message translates to:
+  /// **'Idioma de las cabeceras'**
+  String get exportHeaders;
+
+  /// No description provided for @exportSpanish.
+  ///
+  /// In es, this message translates to:
+  /// **'Español'**
+  String get exportSpanish;
+
+  /// No description provided for @exportEnglish.
+  ///
+  /// In es, this message translates to:
+  /// **'Inglés'**
+  String get exportEnglish;
+
+  /// No description provided for @exportPdfTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Título del PDF'**
+  String get exportPdfTitle;
+
+  /// No description provided for @exportPdfTitleHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Vacío, el nombre de los datos.'**
+  String get exportPdfTitleHelp;
+
+  /// No description provided for @exportOrientation.
+  ///
+  /// In es, this message translates to:
+  /// **'Orientación'**
+  String get exportOrientation;
+
+  /// No description provided for @exportAutomatic.
+  ///
+  /// In es, this message translates to:
+  /// **'Automática'**
+  String get exportAutomatic;
+
+  /// No description provided for @exportPortrait.
+  ///
+  /// In es, this message translates to:
+  /// **'Vertical'**
+  String get exportPortrait;
+
+  /// No description provided for @exportLandscape.
+  ///
+  /// In es, this message translates to:
+  /// **'Horizontal'**
+  String get exportLandscape;
+
+  /// No description provided for @exportRowsShown.
+  ///
+  /// In es, this message translates to:
+  /// **'{shown} de {total} filas'**
+  String exportRowsShown(int shown, int total);
+
+  /// No description provided for @exportPreviewEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'Ninguna fila cumple los filtros.'**
+  String get exportPreviewEmpty;
+
+  /// No description provided for @exportPreviewError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se ha podido preparar la vista previa. Revisa los filtros.'**
+  String get exportPreviewError;
+
+  /// No description provided for @exportDownload.
+  ///
+  /// In es, this message translates to:
+  /// **'Descargar'**
+  String get exportDownload;
+
+  /// No description provided for @exportPersonalTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Lleva datos personales'**
+  String get exportPersonalTitle;
+
+  /// No description provided for @exportPersonalBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Incluye {columns}. Guárdala solo donde haga falta y bórrala cuando ya no la necesites.'**
+  String exportPersonalBody(String columns);
+
+  /// No description provided for @exportChooseColumn.
+  ///
+  /// In es, this message translates to:
+  /// **'Elige una columna'**
+  String get exportChooseColumn;
 }
 
 class _AppLocalizationsDelegate

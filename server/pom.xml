@@ -82,6 +82,12 @@
             <artifactId>openpdf</artifactId>
             <version>3.0.5</version>
         </dependency>
+        <!-- Custom exports in .xlsx (Apache 2.0): only writes, its one dependency is opczip. -->
+        <dependency>
+            <groupId>org.dhatim</groupId>
+            <artifactId>fastexcel</artifactId>
+            <version>0.20.3</version>
+        </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-database-postgresql</artifactId>

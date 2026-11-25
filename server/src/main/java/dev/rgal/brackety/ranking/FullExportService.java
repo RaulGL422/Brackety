@@ -89,8 +89,7 @@ class FullExportService {
             var table = exports.builtIn(eventId, accountId, sheet);
             files.put(table.fileName(), text(table.csv()));
         }
-        leagueStandings
-                .categoryCsvs(eventId, accountId)
+        exports.leagueByCategory(eventId, accountId)
                 .forEach((name, csv) -> files.put(CATEGORY_FOLDER + names.of(eventId, name), text(csv)));
         files.put("clasificacion-por-categoria.pdf", leagueStandings.pdf(eventId, accountId));
         files.put(

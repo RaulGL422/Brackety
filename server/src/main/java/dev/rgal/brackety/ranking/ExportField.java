@@ -60,6 +60,10 @@ record ExportField<R>(String key, String es, String en, Kind kind, Sensitivity s
 
     /** The cell as the sheet writes it: dd/mm/aaaa dates, HH:mm:ss times, m:ss durations, decimal commas. */
     Object write(Object raw, ZoneId zone) {
+        return write(kind, raw, zone);
+    }
+
+    static Object write(Kind kind, Object raw, ZoneId zone) {
         if (raw == null) {
             return null;
         }
