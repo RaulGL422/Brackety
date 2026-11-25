@@ -2,7 +2,7 @@
 
 ## Ramas
 - `main`: producción, solo releases etiquetadas (`vX.Y.Z`).
-- Release: rama `release/vX.Y.Z` desde `development`, PR a `main` con merge commit y tag en ese merge. Nunca la PR directa desde `development`: el repo borra la rama de origen al fusionar.
+- Release: rama `release/vX.Y.Z` desde `development` (en `CHANGELOG.md`, «Sin publicar» pasa a «X.Y.Z»), PR a `main` con merge commit y tag en ese merge. Nunca la PR directa desde `development`: el repo borra la rama de origen al fusionar.
 - Tras la etiqueta: PR `chore/sync-main` que fusiona `main` en `development` (merge commit), para que la versión y los arreglos de la release lleguen a las imágenes `dev` de debug.
 - `development`: integración. Siempre compila y pasa tests.
 - Trabajo: una rama por módulo, `feat/<modulo>`, con todos sus pasos; `fix/…`, `chore/…`, `docs/…` para lo suelto. Todas desde `development`.

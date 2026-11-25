@@ -52,6 +52,7 @@ Estados: **pendiente** · **en curso** · **en pruebas** (hecho; falta la prueba
 | CI por componentes | `producto/calidad.md` | cerrado (#124) |
 | Auditoría y plan de limpieza | `producto/auditoria-codigo.md` | L0 en curso |
 | Servidor: banner y estado al arrancar | `09-despliegue.md` | en pruebas (#128) |
+| Debug: compilación numerada y `CHANGELOG.md` | `09-despliegue.md` | en pruebas (#197) |
 | Fuera `maxGroupsPerMat` | `producto/calidad.md` | cerrado (#134) |
 | Plugins `playwright` y `frontend-design` | `08-ejecucion-local.md` | cerrado (#54) |
 | Plantillas de deporte y arbitraje | `producto/plantillas-deporte.md` | paso 1 hecho (deportes como plantillas en BD); sin editor; preguntas en `pendientes.md` |

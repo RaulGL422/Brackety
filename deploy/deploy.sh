@@ -66,7 +66,10 @@ fi
 
 if "${compose[@]}" up -d --wait --wait-timeout 300; then
   docker image prune -f >/dev/null
-  echo "Deploy OK"
+  # Which build runs now, as the apps show it (0.8.2-dev.7 · 8c525af).
+  built=$(docker inspect --format '{{range .Config.Env}}{{println .}}{{end}}' "$("${compose[@]}" ps -q api)" \
+    | sed -n 's/^BRACKETY_\(VERSION\|COMMIT\)=//p' | paste -sd ' ')
+  echo "Deploy OK: ${built:-version unknown}"
   exit 0
 fi
 
