@@ -78,12 +78,11 @@ competición del 2026-12-20 (`competicion-2026-12-20.md`); objetivo de prueba in
 - Rediseño pantalla a pantalla: después, con Raul, cuando GR-1 a GR-6 estén bien.
 
 ## GR-8 · Batería del servidor endurecida
-- Reglas en `04-testing.md`, «Batería del servidor». Faltan: día completo por formato con incidentes y
-  migración desde la última release. Antes de la release del 20-12, al menos día completo.
+- Reglas en `04-testing.md`, «Batería del servidor».
 - Matriz de permisos hecha (`PermissionMatrixTest`, `permission-matrix.txt`): 134 endpoints × 7 papeles con ids
   reales y cuerpos válidos; cambiarla: `-Dmatrix.update=true` y revisar el diff. Los de `/me` que piden
-  reautenticación salen cerrados para todos (no se prueba ese paso). Falta: cada permiso suelto (ayudante con
-  `CONTROL`, `REVIEWS`…), hoy solo los de cada rol por defecto.
+  reautenticación salen cerrados para todos (no se prueba ese paso). Cada permiso suelto, dado solo a un
+  ayudante, abre lo de `permission-grants.txt` (revisado contra `ayudantes-permisos.md`).
 - Concurrencia hecha (`ConcurrencyTest`): mismo combate desde dos dispositivos (en línea y cola), mismo `opId` a la
   vez, alumno en dos grupos, grupo movido a dos tapices, movido mientras se deshace o empieza su combate, dos
   renovaciones con un token. Encontró un fallo: un QR escaneado dos veces a la vez abría dos sesiones.
@@ -99,6 +98,12 @@ competición del 2026-12-20 (`competicion-2026-12-20.md`); objetivo de prueba in
   combate reabierto, fase cerrada, reabierta y cerrada. Faltan liga de varias fases y equipos.
 - Carrera encontrada (`PhaseRaceTest`): empezar o reabrir un combate mientras el club cerraba la fase lo dejaba en
   curso con la fase cerrada; ahora se vuelve a leer la fase con el evento bloqueado.
+- Migración hecha (`MigrationFromReleaseTest`): datos de v0.8.2 con `yoseikan-f1` en uso migrados a hoy; no se pierde
+  ninguna fila y el día sigue. Una migración que borre filas lo hace fallar.
+- Liga de dos fases hecha (`TournamentDayTest`): la fase 2 se abre desde la 1, entra la misma gente y vive otro día
+  completo con incidentes; la clasificación de liga suma las dos fases, igual que su CSV y el historial de cada uno.
+- Día con equipos hecho (`TournamentDayTest`): equipos de 3 hechos por el club, grupos de 3 a 5 equipos al bote y los
+  mismos incidentes; cada miembro cuenta los combates de su equipo en la clasificación.
 
 ## GR-9 · Accesibilidad y organización en lo que ya existe
 - Reglas duras en `07-diseno.md`. Se aplican a cada pantalla al tocarla (GR-1, GR-4) y en el repaso de Raul (GR-7).

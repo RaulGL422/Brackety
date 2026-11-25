@@ -35,13 +35,19 @@ Objetivo: calidad sin horas de QA manual. Los tests se escriben con la tarea, en
 ## Batería del servidor (reglas duras, Raul 2026-11-22)
 Obligatoria en cada release y cierre de módulo; cada punto, con su test en `server/src/test` (lo que falte, en `producto/feedback-grappling.md`, GR-8).
 - **Día completo por formato** (liga por fases, torneo suelto, grappling, equipos), al menos 5 semillas: de inscribir a descargas, con incidentes a mitad (tapiz inhabilitado, árbitro sin sesión, combate reabierto, revisión, fase reabierta). Al final: todos los combates disputados, clasificación y descargas de oro coherentes.
-  Torneo: `TournamentDayTest`, una semilla por deporte en cada PR y 5 en las de release (`-Dbattery.seeds=5`).
+  Torneo, liga de dos fases y día con equipos: `TournamentDayTest`, una semilla en cada PR y 5 en las de release (`-Dbattery.seeds=5`).
 - **Concurrencia**: dos dispositivos a la vez sobre el mismo combate, grupo o alumno; renovaciones de sesión simultáneas. Nunca dos estados ni datos perdidos.
 - **Sesiones**: con reloj simulado, una sesión (normal y temporal por QR) aguanta la fase entera con red perdida y reintentos fuera de tiempo; solo se cierra por fin de fase, «Quitar acceso» o robo real.
 - **Matriz de permisos**: cada endpoint × cada rol y permiso (club, ayudante, árbitro, temporal, ajeno al evento, sin sesión). Un endpoint sin fila en la matriz hace fallar el test.
+  Cada permiso suelto, dado solo a un ayudante: `permission-grants.txt` (mismo `-Dmatrix.update=true`).
 - **Ataques**: ids de otro evento (IDOR), cuenta temporal fuera de su evento, entradas límite y mal formadas, tokens caducados o reutilizados, límites de peticiones.
 - **Paquete del pabellón**: ida y vuelta completa (Pi → portátil → Pi) sin perder ni duplicar nada.
 - **Migraciones**: Flyway desde cero y desde el esquema de la última release con el escenario `yoseikan-f1`.
+  `MigrationFromReleaseTest`: carga los datos de la release (`test/resources/migration/release/`), migra y sigue
+  el día (marcador, tablero, clasificación, descargas, cerrar fase). Desde cero: todos los demás tests.
+  Tras etiquetar una release, en la PR `chore/sync-main`: servidor de esa etiqueta con `yoseikan-f1` en 8093/15434
+  y `java -cp postgresql.jar tools/MigrationSnapshot.java http://localhost:8093`
+  `jdbc:postgresql://localhost:15434/postgres server/src/test/resources/migration/release vX.Y.Z`.
 
 ## Determinismo
 Sorteos con semilla guardada: test que repite la semilla y obtiene el mismo resultado. Tiempo por reloj inyectable.

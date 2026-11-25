@@ -3,6 +3,7 @@ package dev.rgal.brackety;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -10,6 +11,7 @@ import com.jayway.jsonpath.JsonPath;
 import dev.rgal.brackety.auth.admin.CloudflareAccess;
 import dev.rgal.brackety.auth.admin.FakeCloudflareAccess;
 import dev.rgal.brackety.event.EventApiTest;
+import dev.rgal.brackety.event.EventPermission;
 import dev.rgal.brackety.participant.Participant;
 import dev.rgal.brackety.participant.ParticipantRepository;
 import java.io.IOException;
@@ -25,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -50,6 +53,9 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 class PermissionMatrixTest extends EventApiTest {
 
     private static final Path MATRIX = Path.of("src/test/resources/permission-matrix.txt");
+    private static final Path GRANTS = Path.of("src/test/resources/permission-grants.txt");
+    // What a helper's permissions are about: one event, its matches and its mats.
+    private static final Pattern EVENT_SCOPED = Pattern.compile("^/api/v1/(events/\\{eventId}|matches/|mats/)");
     private static final Pattern VARIABLE = Pattern.compile("\\{(\\w+)}");
     // A JSON text that is not an id to fill in, and a JSON whole number.
     private static final Pattern TEXT_VALUE = Pattern.compile(":\"[^\"{]*\"");
@@ -181,6 +187,72 @@ class PermissionMatrixTest extends EventApiTest {
             write(rows, observed);
         }
         assertThat(failures).isEmpty();
+    }
+
+    /**
+     * «Matriz de permisos», each permission alone (GR-8): the club gives a helper only that permission, and the helper
+     * calls every endpoint of the event, its matches and its mats. What each one opens must be what
+     * {@code permission-grants.txt} says (one line per endpoint, the permissions that open it); with
+     * {@code -Dmatrix.update=true} it is rewritten from what happens: review the diff against ayudantes-permisos.md.
+     */
+    @Test
+    void eachPermissionAloneOpensWhatTheGrantsSay() throws Exception {
+        var update = Boolean.getBoolean("matrix.update");
+        var rows = new ArrayList<Row>(rows().stream()
+                .filter(r -> EVENT_SCOPED.matcher(r.path()).find())
+                .toList());
+        rows.sort(
+                (a, b) -> Boolean.compare(!a.method().equals("GET"), !b.method().equals("GET")));
+        var observed = new TreeMap<String, Set<String>>();
+        rows.forEach(row -> observed.put(row.key(), new TreeSet<>()));
+        var failures = new ArrayList<String>();
+        for (var permission : EventPermission.values()) {
+            Fixture fixture = null;
+            String token = null;
+            for (var row : rows) {
+                if (fixture == null) {
+                    fixture = fixture();
+                    token = onlyThis(permission);
+                }
+                var request = build(row, fixture.ids()).header(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+                var status = mvc.perform(request).andReturn().getResponse().getStatus();
+                if (status >= 500) {
+                    failures.add("%s with %s: %d".formatted(row.key(), permission, status));
+                }
+                if (status != 401 && status != 403 && status != 404) {
+                    observed.get(row.key()).add(permission.name().toLowerCase());
+                }
+                // It changed the event: the next row gets a fresh one.
+                if (!row.method().equals("GET") && status < 300) {
+                    fixture = null;
+                }
+            }
+        }
+        var lines = new ArrayList<String>();
+        observed.forEach((key, opened) -> lines.add(key + " | " + (opened.isEmpty() ? "-" : String.join(" ", opened))));
+        if (update) {
+            var header = Files.readAllLines(GRANTS, StandardCharsets.UTF_8).stream()
+                    .filter(l -> l.startsWith("#"))
+                    .toList();
+            var all = new ArrayList<>(header);
+            all.addAll(lines);
+            Files.write(GRANTS, all, StandardCharsets.UTF_8);
+        }
+        assertThat(failures).isEmpty();
+        assertThat(lines)
+                .containsExactlyElementsOf(Files.readAllLines(GRANTS, StandardCharsets.UTF_8).stream()
+                        .filter(l -> !l.isBlank() && !l.startsWith("#"))
+                        .toList());
+    }
+
+    /** The club leaves ayudante2 with this permission and no other; returns ayudante2's token. */
+    private String onlyThis(EventPermission permission) throws Exception {
+        call(
+                        put("/api/v1/events/" + eventId + "/staff/" + accountId("ayudante2") + "/permissions")
+                                .content("{\"permissions\":[\"" + permission + "\"]}"),
+                        "club1")
+                .andExpect(status().is2xxSuccessful());
+        return login("ayudante2", "ayudante2");
     }
 
     /**
