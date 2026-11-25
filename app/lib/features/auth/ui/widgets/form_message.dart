@@ -15,6 +15,11 @@ class FormMessage extends StatelessWidget {
     final color = success
         ? BracketyColors.of(context).success
         : Theme.of(context).colorScheme.error;
+    // A live region: a screen reader reads the result out as it appears, without moving there.
+    return Semantics(container: true, liveRegion: true, child: _row(color));
+  }
+
+  Widget _row(Color color) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

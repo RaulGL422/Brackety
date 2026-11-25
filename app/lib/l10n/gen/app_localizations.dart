@@ -707,7 +707,7 @@ abstract class AppLocalizations {
   /// No description provided for @loginNoAccount.
   ///
   /// In es, this message translates to:
-  /// **'¿No tienes cuenta? Regístrate'**
+  /// **'¿Aún no tienes cuenta?'**
   String get loginNoAccount;
 
   /// No description provided for @loginPasswordChanged.
@@ -5789,6 +5789,24 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Los textos han vuelto a cambiar mientras los leías. Revisa la versión nueva y acéptala.'**
   String get legalUpdateChangedAgain;
+
+  /// No description provided for @loginSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Con tu email o con el usuario que te dio el club.'**
+  String get loginSubtitle;
+
+  /// No description provided for @loginCreateAccount.
+  ///
+  /// In es, this message translates to:
+  /// **'Crear una cuenta'**
+  String get loginCreateAccount;
+
+  /// No description provided for @legalFooterLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Textos legales'**
+  String get legalFooterLabel;
 }
 
 class _AppLocalizationsDelegate
