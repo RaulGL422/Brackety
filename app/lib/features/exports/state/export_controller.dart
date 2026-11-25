@@ -49,7 +49,14 @@ class ExportDraftController extends Notifier<ExportDraft?> {
       columns: sheet.startingColumns,
       format: keep?.format ?? ExportFormat.csv,
       english: keep?.english ?? false,
+      forPublishing: keep?.forPublishing ?? false,
     );
+  }
+
+  /// Publishing takes the [personal] columns out, with whatever used them.
+  void publish(bool on, Iterable<String> personal) {
+    if (on) personal.forEach(removeColumn);
+    state = _draft.copyWith(forPublishing: on);
   }
 
   void addColumn(String key) =>

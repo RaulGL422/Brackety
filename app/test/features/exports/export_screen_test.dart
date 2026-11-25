@@ -203,6 +203,38 @@ void main() {
     expect(saved, ['liga_participantes.csv text/csv']);
   });
 
+  testWidgets('for publishing takes the personal columns out and says so', (
+    tester,
+  ) async {
+    final (:exports, saved: _) = await pump(tester, sizes['desktop']!);
+    await tester.tap(find.text('Add column'));
+    await settle(tester);
+    await tester.tap(find.text('Weight (kg)'));
+    await settle(tester);
+
+    await tester.scrollUntilVisible(
+      find.text('For publishing'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.text('For publishing'));
+    await settle(tester);
+    await tester.tap(find.text('For publishing'));
+    await settle(tester);
+    expect(find.text('Weight (kg)'), findsNothing);
+
+    await tester.tap(find.text('Download'));
+    await settle(tester);
+
+    expect(find.text('It has personal data'), findsNothing);
+    expect(exports.downloads.single, containsPair('forPublishing', true));
+    expect(exports.downloads.single['columns'], [
+      'firstName',
+      'lastName',
+      'category',
+    ]);
+  });
+
   testWidgets('on a phone it goes step by step and downloads at the end', (
     tester,
   ) async {

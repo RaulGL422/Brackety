@@ -12,6 +12,7 @@
   "@matPlannedAt": {"placeholders": {"time": {"type": "String"}}},
   "controlMenu": "Cambiar",
   "permissionMoveGroups": "Mover grupos entre tapices",
+  "permissionPersonalData": "Descargar datos personales",
   "matGroupsTitle": "Grupos por tapiz",
   "matGroupsFinished": "{count, plural, =1{1 terminado} other{{count} terminados}}",
   "@matGroupsFinished": {
@@ -1746,6 +1747,8 @@
   "qrAccessReplaceSession": "Vas a entrar con el QR del club. Se cerrará la sesión que tienes abierta en este dispositivo.",
   "qrAccessEnter": "Entrar",
   "exportCustom": "Exportar a medida",
+  "exportForPublishing": "Para publicar",
+  "exportForPublishingHelp": "Nombre e inicial del apellido, sin datos personales. Para la web o las redes del club.",
   "exportStepData": "Qué datos",
   "exportStepColumns": "Columnas",
   "exportStepRows": "Filas",

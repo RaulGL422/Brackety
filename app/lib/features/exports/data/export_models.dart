@@ -148,6 +148,7 @@ class ExportDraft {
     this.english = false,
     this.pdfTitle = '',
     this.landscape,
+    this.forPublishing = false,
   });
 
   final String sheet;
@@ -163,6 +164,9 @@ class ExportDraft {
   /// Null: the server turns the page when there are many columns.
   final bool? landscape;
 
+  /// «Para publicar»: first name and the initial of the last name, no personal columns.
+  final bool forPublishing;
+
   ExportDraft copyWith({
     String? sheet,
     List<String>? columns,
@@ -174,6 +178,7 @@ class ExportDraft {
     bool? english,
     String? pdfTitle,
     bool? Function()? landscape,
+    bool? forPublishing,
   }) => ExportDraft(
     sheet: sheet ?? this.sheet,
     columns: columns ?? this.columns,
@@ -185,6 +190,7 @@ class ExportDraft {
     english: english ?? this.english,
     pdfTitle: pdfTitle ?? this.pdfTitle,
     landscape: landscape == null ? this.landscape : landscape(),
+    forPublishing: forPublishing ?? this.forPublishing,
   );
 
   /// Filters still being written (no value yet) are left out.
@@ -203,6 +209,7 @@ class ExportDraft {
     if (format == ExportFormat.pdf && pdfTitle.trim().isNotEmpty)
       'title': pdfTitle.trim(),
     if (format == ExportFormat.pdf) 'landscape': ?landscape,
+    if (forPublishing) 'forPublishing': true,
   };
 }
 

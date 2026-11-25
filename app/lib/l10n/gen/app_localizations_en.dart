@@ -48,6 +48,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get permissionMoveGroups => 'Move groups between mats';
 
   @override
+  String get permissionPersonalData => 'Download personal data';
+
+  @override
   String get matGroupsTitle => 'Groups by mat';
 
   @override
@@ -3327,6 +3330,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get exportCustom => 'Custom export';
+
+  @override
+  String get exportForPublishing => 'For publishing';
+
+  @override
+  String get exportForPublishingHelp =>
+      'First name and the initial of the last name, no personal data. For the club\'s website or social media.';
 
   @override
   String get exportStepData => 'Which data';
