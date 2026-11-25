@@ -55,6 +55,7 @@ Estados: **pendiente** · **en curso** · **en pruebas** (hecho; falta la prueba
 | Debug: compilación numerada y `CHANGELOG.md` | `09-despliegue.md` | en pruebas (#197) |
 | Actualización obligatoria (web y admin) | `01-arquitectura.md` | en pruebas (#200) |
 | Pantalla «Cambios» de debug con buscador | `modulos/entornos.md` | en pruebas (#201) |
+| Cuentas de soporte y Conexión solo para ellas | `modulos/superadmin-reportes.md` | en pruebas (#203) |
 | Fuera `maxGroupsPerMat` | `producto/calidad.md` | cerrado (#134) |
 | Plugins `playwright` y `frontend-design` | `08-ejecucion-local.md` | cerrado (#54) |
 | Plantillas de deporte y arbitraje | `producto/plantillas-deporte.md` | paso 1 hecho (deportes como plantillas en BD); sin editor; preguntas en `pendientes.md` |
