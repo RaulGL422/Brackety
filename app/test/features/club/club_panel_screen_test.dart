@@ -17,6 +17,8 @@ import 'package:brackety/features/club/ui/participant_form.dart';
 import 'package:brackety/features/club/ui/settings_tab.dart';
 import 'package:brackety/features/events/data/my_event.dart';
 import 'package:brackety/features/events/state/events_providers.dart';
+import 'package:brackety/features/exports/data/export_models.dart';
+import 'package:brackety/features/exports/state/export_controller.dart';
 import 'package:brackety/features/importing/data/import_repository.dart';
 import 'package:brackety/features/league/data/league_models.dart';
 import 'package:brackety/features/league/state/league_providers.dart';
@@ -305,6 +307,7 @@ void main() {
     FakeStaffRepository? staff,
     MyEvent? me,
     bool importAvailable = false,
+    List<ExportAuditEntry> audit = const [],
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
@@ -322,6 +325,7 @@ void main() {
             (ref, _) async => importAvailable,
           ),
           temporaryAccessesProvider.overrideWith((ref, _) async => []),
+          exportAuditProvider.overrideWith((ref, _) async => audit),
           leagueProvider.overrideWith(
             (ref, _) async => League(
               name: 'Liga',
@@ -1219,6 +1223,30 @@ void main() {
     await scrolledTo(tester, 'Helper by QR');
     expect(find.text('Helper by QR'), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the settings say who downloaded personal data', (tester) async {
+    await pumpPanel(
+      tester,
+      const Size(1440, 900),
+      audit: [
+        ExportAuditEntry(
+          account: 'ayudante1@demo.test',
+          at: DateTime.utc(2026, 11, 25, 10, 30),
+          sheet: 'Inscritos',
+          columns: 'Fecha de nacimiento, Peso (kg)',
+        ),
+      ],
+    );
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+
+    await scrolledTo(tester, 'Downloads with personal data');
+    expect(find.textContaining('ayudante1@demo.test'), findsOneWidget);
+    expect(
+      find.text('Inscritos: Fecha de nacimiento, Peso (kg)'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('the club changes the attendance points of the phase', (

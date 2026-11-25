@@ -50,6 +50,9 @@ class _FakeExports implements ExportRepository {
       sheetList;
 
   @override
+  Future<List<ExportAuditEntry>> audit(String eventId) async => const [];
+
+  @override
   Future<ExportPreview> preview(String eventId, ExportDraft draft) async {
     final sheet = sheetList.firstWhere((s) => s.key == draft.sheet);
     return ExportPreview(

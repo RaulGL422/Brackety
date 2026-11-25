@@ -11,6 +11,7 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../../auth/data/api_error.dart';
 import '../../events/data/my_event.dart';
 import '../../events/state/events_providers.dart';
+import '../../exports/ui/export_audit_section.dart';
 import '../../league/state/league_providers.dart';
 import '../../rulebook/rulebook_ui.dart';
 import '../../staff/data/staff_repository.dart';
@@ -416,6 +417,8 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
             (m) => m.permissions.contains(EventPermission.groups),
           ),
         ),
+        const SizedBox(height: AppSpacing.xl),
+        ExportAuditSection(eventId: widget.eventId),
         const SizedBox(height: AppSpacing.xl),
         Text(l10n.measuresTitle, style: text.titleMedium),
         MeasuresEditor(eventId: widget.eventId, settings: settings),

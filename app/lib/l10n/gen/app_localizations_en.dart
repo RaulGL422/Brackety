@@ -3332,6 +3332,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exportCustom => 'Custom export';
 
   @override
+  String get exportAuditTitle => 'Downloads with personal data';
+
+  @override
+  String get exportAuditHint =>
+      'Who downloaded personal data, when and which. The files are not kept.';
+
+  @override
+  String get exportAuditEmpty => 'Nobody has downloaded personal data.';
+
+  @override
   String get exportForPublishing => 'For publishing';
 
   @override

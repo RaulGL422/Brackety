@@ -5370,6 +5370,24 @@ abstract class AppLocalizations {
   /// **'Exportar a medida'**
   String get exportCustom;
 
+  /// No description provided for @exportAuditTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Descargas con datos personales'**
+  String get exportAuditTitle;
+
+  /// No description provided for @exportAuditHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Quién descargó datos personales, cuándo y cuáles. Los archivos no se guardan.'**
+  String get exportAuditHint;
+
+  /// No description provided for @exportAuditEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'Nadie ha descargado datos personales.'**
+  String get exportAuditEmpty;
+
   /// No description provided for @exportForPublishing.
   ///
   /// In es, this message translates to:
