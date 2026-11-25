@@ -54,7 +54,7 @@ Todo está fusionado; falta comprobarlo en debug o en la Pi.
 
 ## 3. Raul fuera del código (cuentas y servicios)
 - [ ] Cloudflare: túnel y hostnames `brackety`, `brackety-api` y `brackety-admin` (con Access); rate limiting de `/api/v1/auth/*`; comprobar desde datos móviles (`09-despliegue.md`, paso 8).
-- [ ] `privacidad@rgal.dev` (Email Routing) y `PRIVACY_CONTACT_EMAIL`: sin él, la API no deja publicar ni pasar de fase.
+- [ ] **Urgente, antes de desplegar la puerta legal**: `privacidad@rgal.dev` (Email Routing) y `PRIVACY_CONTACT_EMAIL` en `deploy/.env` y `deploy/.env.debug` de la Pi. Sin él no se puede empezar ni crear una fase (`LEGAL_GATE`).
 - [ ] Resend: API key y remitente verificado en `rgal.dev`.
 - [ ] Google Cloud: OAuth client IDs (web y Android, SHA-1 de debug y release) en `GOOGLE_CLIENT_ID`.
 - [ ] Debug en la Pi: segundo túnel, Access, variables `DEBUG_*` en GitHub y `.env.debug` (`09-despliegue.md`).
