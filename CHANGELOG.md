@@ -32,7 +32,7 @@ esa sección pasa a llamarse como la versión. Debug enseña su compilación jun
 - Batería del servidor: matriz de permisos, día completo de torneo, concurrencia, ataques y migración (#180-#184, #187, #190).
 - CI: en PR a `development`, solo los tests de los módulos tocados (#185).
 - Limpieza L1: piezas y textos comunes en `brackety_core`, índices de claves foráneas (#194).
-- Debug numera cada compilación y `deploy.sh` dice cuál ha desplegado; este archivo.
+- Debug numera cada compilación y `deploy.sh` dice cuál ha desplegado; este archivo (#197).
 
 ## 0.8.2 y anteriores
 En las etiquetas de GitHub (`v0.8.2`, `v0.8.1`, `v0.8.0`…) y en `docs/estado.md`.
