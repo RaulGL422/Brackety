@@ -19,3 +19,4 @@ Anteriores:
 - 2026-11-25 · Nueva aceptación de términos y privacidad: solo se pide a quien aceptó una versión anterior · decisión de Claude: las cuentas por QR (árbitros del club) nunca aceptaron; pedírsela el día de competición las dejaría paradas.
 - 2026-11-25 · Actualización obligatoria en web y admin: al salir una versión, solo queda «Actualizar»; con acciones sin enviar, espera a que salgan · petición de Raul; esperar protege lo que un árbitro aún no ha enviado. Android no, hasta que haya de dónde bajar el APK.
 - 2026-11-25 · Pantalla Conexión solo para cuentas de soporte (las activa el superadmin) y en debug; fuera del menú y de la entrada · decisión de Raul: a los clientes no les sirve y confunde.
+- 2026-11-26 · Textos legales con resumen al principio y secciones numeradas, sin subir su versión · aprobado por Raul; el resumen no cambia lo que dicen y lo que vale sigue siendo el texto completo. Subir la versión obligaría a todos a aceptar otra vez.

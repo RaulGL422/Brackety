@@ -1,6 +1,7 @@
 import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
 import '../data/legal_repository.dart';
@@ -22,9 +23,18 @@ String _shortTitle(AppLocalizations l10n, LegalDocumentType type) =>
       LegalDocumentType.legalNotice => l10n.legalNotice,
     };
 
-/// Pushed, so the screen below (a half-filled form) is still there on the way back.
-void openLegalPage(BuildContext context, LegalDocumentType type) =>
-    context.push('/legal/${type.slug}');
+/// «Versión del 4 de noviembre de 2026»: a version is the date its text took effect.
+String legalVersionText(BuildContext context, String version) {
+  final l10n = AppLocalizations.of(context);
+  final date = DateTime.tryParse(version);
+  if (date == null) return l10n.legalVersion(version);
+  final locale = Localizations.localeOf(context).toLanguageTag();
+  return l10n.legalVersionOn(DateFormat.yMMMMd(locale).format(date));
+}
+
+/// Pushed, so the screen below (a half-filled form) is still there on the way back; done then.
+Future<void> openLegalPage(BuildContext context, LegalDocumentType type) =>
+    context.push<void>('/legal/${type.slug}');
 
 /// The foot of the screens before signing in (Raul, 2026-11-25): the legal texts as one group, and
 /// the app's own facts (version, software licenses) apart. On a phone and a tablet the texts share one

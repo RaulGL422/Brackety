@@ -386,9 +386,9 @@ void main() {
     expect(api.registrations, hasLength(1));
   });
 
-  for (final (link, title) in [
-    ('terms of use', 'Terms of use'),
-    ('privacy policy', 'Privacy policy'),
+  for (final (link, slug) in [
+    ('terms of use', 'terms'),
+    ('privacy policy', 'privacy'),
   ]) {
     testWidgets('"$link" opens its page and the form is kept on the way back', (
       tester,
@@ -407,7 +407,8 @@ void main() {
       await tester.tapOnText(text);
       await tester.pumpAndSettle();
 
-      expect(find.widgetWithText(AppBar, title), findsOneWidget);
+      // The page names itself in its heading (the fake text's own title), not in the bar.
+      expect(find.text('$slug (en)'), findsOneWidget);
       expect(legal.texts.last.$2, 'en');
 
       await tester.tap(find.byIcon(Icons.arrow_back));

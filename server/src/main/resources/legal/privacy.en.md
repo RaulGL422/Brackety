@@ -1,6 +1,13 @@
 # Privacy policy
 
-Version {{VERSION}}
+> **In short**
+>
+> - We do not use your data for advertising.
+> - Brackety does not handle payments: it only notes whether an entry is paid.
+> - Students' photos are never public.
+> - You can see, correct or delete your data by writing to {{PRIVACY_EMAIL}}.
+>
+> The full text below is what applies.
 
 This policy explains which personal data Brackety processes, why, for how long and how to exercise your rights. Brackety is a platform to organize sports leagues, leagues in phases and tournaments.
 

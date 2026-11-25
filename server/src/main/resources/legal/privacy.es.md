@@ -1,6 +1,13 @@
 # Política de privacidad
 
-Versión {{VERSION}}
+> **En resumen**
+>
+> - No usamos tus datos para publicidad.
+> - Brackety no gestiona pagos: solo anota si una inscripción está pagada.
+> - Las fotos de los alumnos nunca son públicas.
+> - Puedes ver, corregir o borrar tus datos escribiendo a {{PRIVACY_EMAIL}}.
+>
+> Lo que vale es el texto completo, debajo.
 
 Esta política explica qué datos personales trata Brackety, para qué, durante cuánto tiempo y cómo ejercer tus derechos. Brackety es una plataforma para organizar ligas, ligas por fases y torneos deportivos.
 

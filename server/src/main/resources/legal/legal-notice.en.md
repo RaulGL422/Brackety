@@ -1,15 +1,20 @@
 # Legal notice
 
-Version {{VERSION}}
+> **In short**
+>
+> - Brackety is a free service run by {{OWNER_NAME}}.
+> - For questions, reports of misuse or security flaws: {{PRIVACY_EMAIL}}.
+>
+> The full text below is what applies.
 
-## Owner
+## 1. Owner
 
 - Owner: {{OWNER_NAME}} (individual).
 - Contact: {{PRIVACY_EMAIL}}.
 
 Brackety is a free, non-commercial service to organize sports leagues, leagues in phases and tournaments.
 
-## Contact and reports
+## 2. Contact and reports
 
 Write to {{PRIVACY_EMAIL}} to:
 - Ask about the service or your data (see the privacy policy).
@@ -18,6 +23,6 @@ Write to {{PRIVACY_EMAIL}} to:
 
 If you can, say which event or screen is affected. We answer as soon as possible and, for personal data requests, within one month at most.
 
-## Intellectual property
+## 3. Intellectual property
 
 Brackety's software and design belong to its owner, except for open-source components, which are governed by their own licenses (see "Licenses" in the app). The names and logos of clubs, federations and events belong to their owners.

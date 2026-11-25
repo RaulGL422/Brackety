@@ -5748,35 +5748,107 @@ abstract class AppLocalizations {
   /// **'Elige una columna'**
   String get exportChooseColumn;
 
+  /// No description provided for @legalVersion.
+  ///
+  /// In es, this message translates to:
+  /// **'Versión {version}'**
+  String legalVersion(String version);
+
+  /// No description provided for @legalVersionOn.
+  ///
+  /// In es, this message translates to:
+  /// **'Versión del {date}'**
+  String legalVersionOn(String date);
+
+  /// No description provided for @legalContents.
+  ///
+  /// In es, this message translates to:
+  /// **'En esta página'**
+  String get legalContents;
+
+  /// No description provided for @legalBackToContents.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver al índice'**
+  String get legalBackToContents;
+
+  /// No description provided for @legalOtherTexts.
+  ///
+  /// In es, this message translates to:
+  /// **'Otros textos'**
+  String get legalOtherTexts;
+
   /// No description provided for @legalUpdateTitle.
   ///
   /// In es, this message translates to:
-  /// **'Hemos cambiado los textos legales'**
-  String get legalUpdateTitle;
+  /// **'{count, plural, =1{Ha cambiado un texto legal} other{Han cambiado {count} textos legales}}'**
+  String legalUpdateTitle(int count);
 
   /// No description provided for @legalUpdateBody.
   ///
   /// In es, this message translates to:
-  /// **'Estos textos han cambiado desde que los aceptaste. Léelos y acéptalos para seguir usando Brackety.'**
-  String get legalUpdateBody;
+  /// **'{count, plural, =1{Para seguir usando Brackety, léelo y acéptalo.} other{Para seguir usando Brackety, léelos y acéptalos.}}'**
+  String legalUpdateBody(int count);
 
-  /// No description provided for @legalUpdateVersion.
+  /// No description provided for @legalUpdateRead.
   ///
   /// In es, this message translates to:
-  /// **'Versión {version}'**
-  String legalUpdateVersion(String version);
+  /// **'Leer'**
+  String get legalUpdateRead;
 
-  /// No description provided for @legalUpdateAccept.
+  /// No description provided for @legalUpdateWasRead.
   ///
   /// In es, this message translates to:
-  /// **'He leído y acepto los textos de arriba.'**
-  String get legalUpdateAccept;
+  /// **'Leído'**
+  String get legalUpdateWasRead;
+
+  /// No description provided for @legalUpdateAcceptDocuments.
+  ///
+  /// In es, this message translates to:
+  /// **'He leído y acepto {documents}.'**
+  String legalUpdateAcceptDocuments(String documents);
+
+  /// No description provided for @legalListAnd.
+  ///
+  /// In es, this message translates to:
+  /// **'{first} y {last}'**
+  String legalListAnd(String first, String last);
+
+  /// No description provided for @legalAcceptPrivacy.
+  ///
+  /// In es, this message translates to:
+  /// **'la política de privacidad'**
+  String get legalAcceptPrivacy;
+
+  /// No description provided for @legalAcceptTerms.
+  ///
+  /// In es, this message translates to:
+  /// **'los términos de uso'**
+  String get legalAcceptTerms;
+
+  /// No description provided for @legalAcceptCookies.
+  ///
+  /// In es, this message translates to:
+  /// **'la política de cookies'**
+  String get legalAcceptCookies;
+
+  /// No description provided for @legalAcceptNotice.
+  ///
+  /// In es, this message translates to:
+  /// **'el aviso legal'**
+  String get legalAcceptNotice;
 
   /// No description provided for @legalUpdateSubmit.
   ///
   /// In es, this message translates to:
   /// **'Aceptar y seguir'**
   String get legalUpdateSubmit;
+
+  /// No description provided for @legalUpdateDisagree.
+  ///
+  /// In es, this message translates to:
+  /// **'¿No estás de acuerdo?'**
+  String get legalUpdateDisagree;
 
   /// No description provided for @legalUpdateSignOut.
   ///

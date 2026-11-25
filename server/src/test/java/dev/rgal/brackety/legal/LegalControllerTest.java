@@ -69,7 +69,10 @@ class LegalControllerTest {
                         .andExpect(jsonPath("$.type").value(document.slug()))
                         .andExpect(jsonPath("$.version").value(document.version()))
                         .andExpect(jsonPath("$.lang").value(lang))
-                        .andExpect(jsonPath("$.markdown").value(containsString(document.version())))
+                        // The version travels apart (the app shows it as a date); each text opens
+                        // with its summary, a quote the app shows as a box.
+                        .andExpect(jsonPath("$.markdown").value(not(containsString(document.version()))))
+                        .andExpect(jsonPath("$.markdown").value(containsString("\n> **")))
                         .andExpect(jsonPath("$.markdown").value(not(containsString("{{"))));
             }
         }
