@@ -7,7 +7,6 @@ import dev.rgal.brackety.auth.dto.ConsentRequest;
 import dev.rgal.brackety.auth.dto.PendingConsent;
 import dev.rgal.brackety.legal.LegalDocument;
 import java.time.Clock;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -34,18 +33,23 @@ class ConsentService {
         this.clock = clock;
     }
 
-    /** The texts whose last accepted version is not the current one, terms first. */
+    /**
+     * The texts accepted in some version but never in the current one, terms first. Versions only move forward, so
+     * having accepted the current one once is enough.
+     */
     @Transactional(readOnly = true)
     List<PendingConsent> pending(UUID accountId) {
         var accepted = consents.findByAccountId(accountId);
         return REQUIRED.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
-                .filter(required -> accepted.stream()
-                        .filter(c -> c.getDocument() == required.getKey())
-                        .max(Comparator.comparing(Consent::getAcceptedAt))
-                        .filter(last ->
-                                !last.getVersion().equals(required.getValue().version()))
-                        .isPresent())
+                .filter(required -> {
+                    var versions = accepted.stream()
+                            .filter(c -> c.getDocument() == required.getKey())
+                            .map(Consent::getVersion)
+                            .toList();
+                    return !versions.isEmpty()
+                            && !versions.contains(required.getValue().version());
+                })
                 .map(required -> new PendingConsent(
                         required.getValue().slug(), required.getValue().version()))
                 .toList();
