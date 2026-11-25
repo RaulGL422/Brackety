@@ -29,24 +29,16 @@ class AuthFormPage extends ConsumerWidget {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) => SingleChildScrollView(
-            // At least the screen's height, so the footer rests at the bottom when the form is short.
+            // At least the screen's height: the name at the top, the footer at the bottom and the
+            // form centred in between (Raul, 2026-11-25). A taller form just scrolls.
             child: ConstrainedBox(
               constraints: BoxConstraints(minHeight: constraints.maxHeight),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const _Header(),
-                      _Form(
-                        title: title,
-                        subtitle: subtitle,
-                        children: children,
-                      ),
-                    ],
-                  ),
+                  const _Header(),
+                  _Form(title: title, subtitle: subtitle, children: children),
                   const LegalFooter(),
                 ],
               ),

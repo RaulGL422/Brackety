@@ -27,13 +27,13 @@ void openLegalPage(BuildContext context, LegalDocumentType type) =>
     context.push('/legal/${type.slug}');
 
 /// The foot of the screens before signing in (Raul, 2026-11-25): the legal texts as one group, and
-/// the app's own facts (version, software licenses) apart. On a phone the texts sit two by two, on a
-/// tablet in one row; a desktop keeps them left and the app's facts right, all along the bottom.
+/// the app's own facts (version, software licenses) apart. On a phone and a tablet the texts share one
+/// centred row, wrapping only when they do not fit; a desktop keeps them left and the app's facts
+/// right, all along the bottom.
 class LegalFooter extends StatelessWidget {
   const LegalFooter({super.key});
 
   // The window, not the parent: the footer sits in a scroll view sized by its content.
-  static const _phone = 420.0;
   static const desktop = 840.0;
 
   @override
@@ -62,7 +62,11 @@ class LegalFooter extends StatelessWidget {
         Semantics(container: true, label: l10n.legalFooterLabel, child: child);
     return width >= desktop
         ? _wide(line, group(Wrap(spacing: AppSpacing.l, children: legal)), app)
-        : _narrow(line, group(_grid(legal, width < _phone ? 2 : 4)), app);
+        : _narrow(
+            line,
+            group(Wrap(alignment: WrapAlignment.center, children: legal)),
+            app,
+          );
   }
 
   /// All along the bottom: the legal texts left, the app's facts right.
@@ -89,7 +93,12 @@ class LegalFooter extends StatelessWidget {
   /// The legal texts above, the app's facts on their own line under a rule.
   static Widget _narrow(BorderSide line, Widget legal, List<Widget> app) =>
       Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.l),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.l,
+          AppSpacing.m,
+          AppSpacing.l,
+          AppSpacing.s,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -105,19 +114,6 @@ class LegalFooter extends StatelessWidget {
           ],
         ),
       );
-
-  /// Equal columns, [columns] per row.
-  static Widget _grid(List<Widget> links, int columns) => Column(
-    children: [
-      for (var i = 0; i < links.length; i += columns)
-        Row(
-          children: [
-            for (final link in links.skip(i).take(columns))
-              Expanded(child: link),
-          ],
-        ),
-    ],
-  );
 }
 
 /// A quiet link of the foot: grey, underlined only when pointed at or focused, as tall as a finger.

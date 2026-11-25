@@ -56,6 +56,22 @@ void main() {
     handle.dispose();
   });
 
+  // Raul, 2026-11-25: what failed shows as a notice under the heading, as in the design, not a
+  // line lost below the fields.
+  testWidgets('a failed sign-in shows its notice above the fields', (
+    tester,
+  ) async {
+    final api = FakeAuthApi()..loginError = networkError();
+    await pumpAuthApp(tester, api);
+
+    await signIn(tester, 'ana@example.com', 'whatever123');
+
+    expect(
+      tester.getBottomLeft(find.text('Cannot reach the server.')).dy,
+      lessThan(tester.getTopLeft(find.byType(TextField).first).dy),
+    );
+  });
+
   testWidgets('text at 200 % fits the sign-in on a phone', (tester) async {
     useSize(tester, screenSizes['phone']!);
     tester.platformDispatcher.textScaleFactorTestValue = 2;

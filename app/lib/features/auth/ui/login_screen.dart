@@ -140,6 +140,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           _QrSessionLost(signIn: qrSignIn),
           const SizedBox(height: AppSpacing.l),
         ],
+        // Under the heading, where the eye starts again after the button: what failed comes first.
+        if (error != null) ...[
+          FormMessage.error(error),
+          const SizedBox(height: AppSpacing.l),
+        ],
         const ServerTile(),
         Form(
           key: _formKey,
@@ -181,10 +186,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
           ),
         ),
-        if (error != null) ...[
-          const SizedBox(height: AppSpacing.m),
-          FormMessage.error(error),
-        ],
         const SizedBox(height: AppSpacing.l),
         FilledButton(
           onPressed: _busy ? null : () => _submit(signIn: qrSignIn),
