@@ -1,0 +1,10 @@
+id,event_id,name,min_age,max_age,format,team_size,group_size,match_seconds
+c22a7542-2c66-4db1-9dad-07c9cdf6717f,a4dbbc78-7b4f-4e2a-9681-4bdff8e712f7,4-6,4,6,INDIVIDUAL,,4,
+5150b170-d21a-4db2-ac5f-8726f3169cfe,a4dbbc78-7b4f-4e2a-9681-4bdff8e712f7,7-8,7,8,INDIVIDUAL,,4,
+e54ba2b1-ce3e-4c1d-81a9-b37ade2b9a7a,a4dbbc78-7b4f-4e2a-9681-4bdff8e712f7,9-10,9,10,INDIVIDUAL,,4,
+02008847-0741-4dfe-b11c-608df91108eb,a4dbbc78-7b4f-4e2a-9681-4bdff8e712f7,11-12,11,12,INDIVIDUAL,,4,
+093f1ae6-3522-4827-8b91-c67eb387320f,a4dbbc78-7b4f-4e2a-9681-4bdff8e712f7,13-14,13,14,INDIVIDUAL,,4,
+179b728f-a325-4ed2-a53d-cbdd30605d2c,a4dbbc78-7b4f-4e2a-9681-4bdff8e712f7,15-16,15,16,TEAM,3,4,
+fc8aad06-7eaa-4d20-b819-d29ab7915270,a4dbbc78-7b4f-4e2a-9681-4bdff8e712f7,17-19,17,19,TEAM,3,4,
+9c477b18-d426-44bc-835f-4f3593c37ad2,a4dbbc78-7b4f-4e2a-9681-4bdff8e712f7,20-25,20,25,TEAM,3,4,
+59d28c15-d75a-412e-b919-e7da7bff3840,a4dbbc78-7b4f-4e2a-9681-4bdff8e712f7,26+,26,120,TEAM,3,4,
