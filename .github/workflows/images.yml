@@ -153,6 +153,9 @@ jobs:
             app: admin
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The tags and history, to count the commits since the release (the debug build number).
+          fetch-depth: 0
       - uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
       - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
       - uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
@@ -176,9 +179,16 @@ jobs:
             api=$PROD_API admin=${PROD_ADMIN_API:-$PROD_API} profile=
           fi
           if [ "$APP" = admin ]; then api=$admin; fi
-          # The server logs the release it runs: the apps' version (app/pubspec.yaml) and the commit.
+          # Server and apps show the release they run: the apps' version (app/pubspec.yaml) and the commit.
+          # Debug counts the commits since that release's tag, so each build has its own number
+          # (0.8.2-dev.7): what is being tried is told apart without reading commits.
           version=$(sed -n 's/^version: *//p' app/pubspec.yaml)
-          if [ "$DEBUG" = true ]; then version="$version-dev"; fi
+          if [ "$DEBUG" = true ]; then
+            release=${version%%+*}
+            since=$(git rev-list --count "v$release..HEAD" 2>/dev/null \
+              || git rev-list --count "$(git describe --tags --abbrev=0)..HEAD")
+            version="$release-dev.$since"
+          fi
           { echo "api=$api"; echo "profile=$profile"; echo "version=$version"; echo "commit=${GITHUB_SHA::7}"; } >> "$GITHUB_OUTPUT"
       - id: meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
