@@ -19,5 +19,9 @@
   "saved": "Saved",
   "save": "Save",
   "close": "Close",
-  "loadError": "Could not load. Check the connection."
+  "loadError": "Could not load. Check the connection.",
+  "updateTitle": "A new version of Brackety is out",
+  "updateBody": "Update to keep going. It takes a few seconds.",
+  "updateButton": "Update",
+  "updateWaiting": "A new version is out: you can update as soon as the pending actions are sent."
 }

@@ -2,11 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../l10n/gen/core_localizations.dart';
-
-/// The web images' release and commit (deploy/web.Dockerfile); debug builds number themselves
-/// (0.8.2-dev.7), so what is being tried is told apart. Empty in local and Android builds.
-const _builtVersion = String.fromEnvironment('BRACKETY_VERSION');
-const _builtCommit = String.fromEnvironment('BRACKETY_COMMIT');
+import 'build_info.dart';
 
 /// "Versión 0.6.0 (8)" in small print, so anyone can say which version a device runs (Raul,
 /// 2026-11-14): the image's release and commit when built with them, otherwise the pubspec (on
@@ -26,13 +22,13 @@ class _AppVersionTextState extends State<AppVersionText> {
 
   @override
   Widget build(BuildContext context) {
-    if (_builtVersion.isNotEmpty) {
+    if (builtVersion.isNotEmpty) {
       final l10n = CoreLocalizations.of(context);
       return _small(
         context,
-        _builtCommit.isEmpty
-            ? l10n.appVersion(_builtVersion)
-            : l10n.appVersionBuild(_builtVersion, _builtCommit),
+        builtCommit.isEmpty
+            ? l10n.appVersion(builtVersion)
+            : l10n.appVersionBuild(builtVersion, builtCommit),
       );
     }
     return FutureBuilder(

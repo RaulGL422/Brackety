@@ -13,16 +13,20 @@ class InfoController {
 
     private final Clock clock;
     private final String version;
+    private final String commit;
 
-    InfoController(Clock clock, @Value("${brackety.version}") String version) {
+    InfoController(
+            Clock clock, @Value("${brackety.version}") String version, @Value("${brackety.commit}") String commit) {
         this.clock = clock;
         this.version = version;
+        this.commit = commit;
     }
 
     @GetMapping
     InfoResponse info() {
-        return new InfoResponse("brackety", version, LocalDate.now(clock));
+        return new InfoResponse("brackety", version, commit, LocalDate.now(clock));
     }
 
-    record InfoResponse(String name, String version, LocalDate today) {}
+    /** {@code version} and {@code commit}: what the apps compare with their own build to offer the update. */
+    record InfoResponse(String name, String version, String commit, LocalDate today) {}
 }

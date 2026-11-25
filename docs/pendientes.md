@@ -56,6 +56,7 @@ Todo está fusionado; falta comprobarlo en debug o en la Pi.
 - [ ] Cloudflare: túnel y hostnames `brackety`, `brackety-api` y `brackety-admin` (con Access); rate limiting de `/api/v1/auth/*`; comprobar desde datos móviles (`09-despliegue.md`, paso 8).
 - [ ] **Urgente, antes de desplegar la puerta legal**: `privacidad@rgal.dev` (Email Routing) y `PRIVACY_CONTACT_EMAIL` en `deploy/.env` y `deploy/.env.debug` de la Pi. Sin él no se puede empezar ni crear una fase (`LEGAL_GATE`).
 - [ ] Resend: API key y remitente verificado en `rgal.dev`.
+- [ ] Android: canal para descargar el APK; entonces la actualización obligatoria enlaza a él (`01-arquitectura.md`).
 - [ ] Google Cloud: OAuth client IDs (web y Android, SHA-1 de debug y release) en `GOOGLE_CLIENT_ID`.
 - [ ] Debug en la Pi: segundo túnel, Access, variables `DEBUG_*` en GitHub y `.env.debug` (`09-despliegue.md`).
 - [ ] SSD para la BD (hoy en la SD) y clave age de backups guardada fuera de la Pi; copia en la nube (proveedor barato, `rclone`).
