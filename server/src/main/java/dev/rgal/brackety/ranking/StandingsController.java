@@ -98,8 +98,7 @@ class StandingsController {
     @GetMapping("/export/league-standings-by-category.zip")
     ResponseEntity<byte[]> categoryStandings(@PathVariable UUID eventId, @AuthenticationPrincipal Jwt jwt) {
         var files = new LinkedHashMap<String, byte[]>();
-        leagueStandings
-                .categoryCsvs(eventId, CurrentAccount.id(jwt))
+        exports.leagueByCategory(eventId, CurrentAccount.id(jwt))
                 .forEach((name, csv) -> files.put(names.of(eventId, name), Zip.text(csv)));
         return file(eventId, "clasificacion-por-categoria.zip", ZIP, Zip.of(files));
     }

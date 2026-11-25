@@ -1,5 +1,15 @@
 package dev.rgal.brackety.ranking;
 
+import static dev.rgal.brackety.ranking.PdfStyle.CELL;
+import static dev.rgal.brackety.ranking.PdfStyle.CELL_BOLD;
+import static dev.rgal.brackety.ranking.PdfStyle.STRIPE;
+import static dev.rgal.brackety.ranking.PdfStyle.SUBTITLE;
+import static dev.rgal.brackety.ranking.PdfStyle.TITLE;
+import static dev.rgal.brackety.ranking.PdfStyle.cell;
+import static dev.rgal.brackety.ranking.PdfStyle.center;
+import static dev.rgal.brackety.ranking.PdfStyle.head;
+import static dev.rgal.brackety.ranking.PdfStyle.toArray;
+
 import dev.rgal.brackety.ranking.dto.LeagueStandings;
 import dev.rgal.brackety.ranking.dto.LeagueStandings.Row;
 import java.awt.Color;
@@ -10,16 +20,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.openpdf.text.Document;
 import org.openpdf.text.Element;
-import org.openpdf.text.Font;
-import org.openpdf.text.FontFactory;
 import org.openpdf.text.PageSize;
 import org.openpdf.text.Paragraph;
-import org.openpdf.text.Phrase;
-import org.openpdf.text.pdf.BaseFont;
 import org.openpdf.text.pdf.PdfPCell;
 import org.openpdf.text.pdf.PdfPTable;
-import org.openpdf.text.pdf.PdfPageEventHelper;
-import org.openpdf.text.pdf.PdfTemplate;
 import org.openpdf.text.pdf.PdfWriter;
 
 /**
@@ -28,13 +32,6 @@ import org.openpdf.text.pdf.PdfWriter;
  */
 final class StandingsPdf {
 
-    private static final Font TITLE = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16);
-    private static final Font SUBTITLE = FontFactory.getFont(FontFactory.HELVETICA, 10, Font.NORMAL, Color.DARK_GRAY);
-    private static final Font HEAD = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 9, Font.NORMAL, Color.WHITE);
-    private static final Font CELL = FontFactory.getFont(FontFactory.HELVETICA, 9);
-    private static final Font CELL_BOLD = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 9);
-    private static final Color HEAD_FILL = new Color(0x33, 0x3D, 0x4A);
-    private static final Color STRIPE = new Color(0xF4, 0xF5, 0xF7);
     private static final Color[] MEDAL_FILL = {
         new Color(0xF7, 0xE7, 0xA6), new Color(0xE2, 0xE5, 0xE9), new Color(0xF2, 0xD3, 0xB3)
     };
@@ -47,7 +44,7 @@ final class StandingsPdf {
         var document = new Document(landscape ? PageSize.A4.rotate() : PageSize.A4, 36, 36, 36, 48);
         var out = new ByteArrayOutputStream();
         var writer = PdfWriter.getInstance(document, out);
-        writer.setPageEvent(new Footer(generated));
+        writer.setPageEvent(new PdfStyle.Footer("Generado el " + generated));
         document.addTitle("Clasificación por categoría");
         document.open();
         var byCategory = standings.rows().stream()
@@ -86,9 +83,7 @@ final class StandingsPdf {
         table.setWidths(toArray(widths));
         table.setHeaderRows(1);
         for (var i = 0; i < header.size(); i++) {
-            var cell = cell(header.get(i), HEAD, i == 2 || i == 3 ? Element.ALIGN_LEFT : Element.ALIGN_CENTER);
-            cell.setBackgroundColor(HEAD_FILL);
-            table.addCell(cell);
+            table.addCell(head(header.get(i), i == 2 || i == 3 ? Element.ALIGN_LEFT : Element.ALIGN_CENTER));
         }
         for (var i = 0; i < rows.size(); i++) {
             var r = rows.get(i);
@@ -108,69 +103,5 @@ final class StandingsPdf {
             });
         }
         return table;
-    }
-
-    private static PdfPCell center(String text, Font font) {
-        return cell(text, font, Element.ALIGN_CENTER);
-    }
-
-    private static PdfPCell cell(String text, Font font, int align) {
-        var cell = new PdfPCell(new Phrase(text, font));
-        cell.setHorizontalAlignment(align);
-        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        cell.setPadding(4);
-        cell.setBorderColor(new Color(0xD0, 0xD4, 0xDA));
-        return cell;
-    }
-
-    private static float[] toArray(List<Float> values) {
-        var array = new float[values.size()];
-        for (var i = 0; i < array.length; i++) {
-            array[i] = values.get(i);
-        }
-        return array;
-    }
-
-    /** "Página X de Y": Y is only known at the end, so it goes in a template filled when the document closes. */
-    private static final class Footer extends PdfPageEventHelper {
-
-        private final String generated;
-        private final BaseFont font;
-        private PdfTemplate total;
-
-        Footer(String generated) {
-            this.generated = generated;
-            this.font = FontFactory.getFont(FontFactory.HELVETICA).getBaseFont();
-        }
-
-        @Override
-        public void onOpenDocument(PdfWriter writer, Document document) {
-            total = writer.getDirectContent().createTemplate(30, 12);
-        }
-
-        @Override
-        public void onEndPage(PdfWriter writer, Document document) {
-            var canvas = writer.getDirectContent();
-            var y = document.bottom() - 24;
-            var page = "Página " + writer.getPageNumber() + " de ";
-            canvas.beginText();
-            canvas.setFontAndSize(font, 8);
-            canvas.setColorFill(Color.DARK_GRAY);
-            canvas.showTextAligned(Element.ALIGN_LEFT, "Generado el " + generated, document.left(), y, 0);
-            var x = document.right() - 30 - font.getWidthPoint(page, 8);
-            canvas.showTextAligned(Element.ALIGN_LEFT, page, x, y, 0);
-            canvas.endText();
-            canvas.addTemplate(total, document.right() - 30, y);
-        }
-
-        @Override
-        public void onCloseDocument(PdfWriter writer, Document document) {
-            total.beginText();
-            total.setFontAndSize(font, 8);
-            total.setColorFill(Color.DARK_GRAY);
-            // On close the writer already counts the next, empty page.
-            total.showText(String.valueOf(writer.getPageNumber() - 1));
-            total.endText();
-        }
     }
 }

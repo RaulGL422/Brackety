@@ -13,6 +13,7 @@ Lo que espera a alguien, ordenado por quién tiene que actuar. Lo hecho se borra
 - [ ] Grupo con sobrante: promedio por combate, puntos brutos o caso a caso; será opción del evento.
 - [ ] Equipos en torneos: plantilla, suplentes y entrenadores. Categorías reales por equipos y si hay ranking de equipos (`modulos/prototipo-f1-equipos.md`).
 - [ ] Plantillas de deporte (`producto/plantillas-deporte.md`): ¿dueño la cuenta o el club? ¿galería pública o primero por enlace? ¿moderación previa o denuncias? ¿autor visible?
+- [ ] Exportar a medida (#191): probar la pantalla; «Para publicar» y el permiso de datos personales (`producto/exportaciones.md`).
 - [ ] Permiso «Participantes» (GR-8): ¿incluye importar la hoja y ver las categorías? Hoy no (`permission-grants.txt`).
 - [ ] Grappling: un combate reabierto por un punto olvidado no lo admite (el tiempo acabó); solo quitar puntos o añadir tiempo y volver a empezar. ¿Se permite sumar al corregir, como en tambo?
 - [ ] Grappling: una persona va a una sola categoría por evento. ¿Gi y sin gi como dos eventos, o varias categorías por persona?

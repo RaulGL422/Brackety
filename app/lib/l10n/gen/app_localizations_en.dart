@@ -3324,4 +3324,201 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get qrAccessEnter => 'Sign in';
+
+  @override
+  String get exportCustom => 'Custom export';
+
+  @override
+  String get exportStepData => 'Which data';
+
+  @override
+  String get exportStepColumns => 'Columns';
+
+  @override
+  String get exportStepRows => 'Rows';
+
+  @override
+  String get exportStepFile => 'File';
+
+  @override
+  String get exportStepPreview => 'Preview';
+
+  @override
+  String exportStepOf(int step, int total) {
+    return 'Step $step of $total';
+  }
+
+  @override
+  String get exportNext => 'Next';
+
+  @override
+  String get exportBack => 'Back';
+
+  @override
+  String get exportSheetHelp =>
+      'Each one brings its own columns. Changing it starts again.';
+
+  @override
+  String get exportColumnsHelp =>
+      'Drag to change the order. Tap the title to change it.';
+
+  @override
+  String get exportAddColumn => 'Add column';
+
+  @override
+  String get exportNoColumns => 'Choose at least one column.';
+
+  @override
+  String get exportPersonal => 'Personal data';
+
+  @override
+  String get exportMinors => 'Data about minors';
+
+  @override
+  String exportMoveUp(String column) {
+    return 'Move $column up';
+  }
+
+  @override
+  String exportMoveDown(String column) {
+    return 'Move $column down';
+  }
+
+  @override
+  String exportRename(String column) {
+    return 'Change the title of $column';
+  }
+
+  @override
+  String exportRemove(String column) {
+    return 'Remove $column';
+  }
+
+  @override
+  String get exportRenameTitle => 'Column title';
+
+  @override
+  String exportRenameHelp(String original) {
+    return 'Empty, it goes back to “$original”.';
+  }
+
+  @override
+  String get exportFilters => 'Filter rows';
+
+  @override
+  String get exportFiltersHelp => 'Only the rows that pass every filter.';
+
+  @override
+  String get exportAddFilter => 'Add filter';
+
+  @override
+  String get exportFilterValues => 'Is one of (comma-separated)';
+
+  @override
+  String get exportFilterMin => 'From';
+
+  @override
+  String get exportFilterMax => 'To';
+
+  @override
+  String exportRemoveFilter(String column) {
+    return 'Remove the filter on $column';
+  }
+
+  @override
+  String get exportSort => 'Sort rows';
+
+  @override
+  String get exportSortHelp =>
+      'Without a sort, rows keep the sheet\'s order. The first one leads; the others break ties.';
+
+  @override
+  String get exportAddSort => 'Add sort';
+
+  @override
+  String get exportAscending => 'Lowest first';
+
+  @override
+  String get exportDescending => 'Highest first';
+
+  @override
+  String exportRaiseSort(String column) {
+    return 'Give $column more priority';
+  }
+
+  @override
+  String exportRemoveSort(String column) {
+    return 'Remove the sort by $column';
+  }
+
+  @override
+  String get exportSplit => 'Split by';
+
+  @override
+  String get exportNoSplit => 'Don\'t split';
+
+  @override
+  String get exportSplitCsv => 'One CSV per value, in a .zip.';
+
+  @override
+  String get exportSplitExcel => 'One worksheet per value.';
+
+  @override
+  String get exportSplitPdf => 'One page per value.';
+
+  @override
+  String get exportFormat => 'Format';
+
+  @override
+  String get exportHeaders => 'Header language';
+
+  @override
+  String get exportSpanish => 'Spanish';
+
+  @override
+  String get exportEnglish => 'English';
+
+  @override
+  String get exportPdfTitle => 'PDF title';
+
+  @override
+  String get exportPdfTitleHelp => 'Empty, the name of the data.';
+
+  @override
+  String get exportOrientation => 'Orientation';
+
+  @override
+  String get exportAutomatic => 'Automatic';
+
+  @override
+  String get exportPortrait => 'Portrait';
+
+  @override
+  String get exportLandscape => 'Landscape';
+
+  @override
+  String exportRowsShown(int shown, int total) {
+    return '$shown of $total rows';
+  }
+
+  @override
+  String get exportPreviewEmpty => 'No row passes the filters.';
+
+  @override
+  String get exportPreviewError =>
+      'The preview could not be prepared. Check the filters.';
+
+  @override
+  String get exportDownload => 'Download';
+
+  @override
+  String get exportPersonalTitle => 'It has personal data';
+
+  @override
+  String exportPersonalBody(String columns) {
+    return 'It includes $columns. Keep it only where needed and delete it when you no longer need it.';
+  }
+
+  @override
+  String get exportChooseColumn => 'Choose a column';
 }

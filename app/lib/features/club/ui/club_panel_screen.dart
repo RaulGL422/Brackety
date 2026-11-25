@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/up_button.dart';
 import '../../../core/upload/file_upload.dart';
@@ -181,6 +182,9 @@ class _ClubPanelScreenState extends ConsumerState<ClubPanelScreen> {
 /// Brings the hall's results into this event (the Pi after the phase): counts first, then confirms.
 const importResultsAction = 'import-results';
 
+/// Opens the screen to build an export to measure.
+const customExportAction = 'custom-export';
+
 /// The CSVs and the whole event as downloads, and the import of the hall's results (web only, like
 /// the CSVs).
 class ClubExportMenu extends ConsumerWidget {
@@ -194,9 +198,11 @@ class ClubExportMenu extends ConsumerWidget {
     return PopupMenuButton<Object>(
       tooltip: l10n.exportMenu,
       icon: const Icon(Icons.download_outlined),
-      onSelected: (value) => value is EventExport
-          ? downloadExport(context, ref, eventId, value)
-          : _importResults(context, ref, eventId),
+      onSelected: (value) => switch (value) {
+        EventExport() => downloadExport(context, ref, eventId, value),
+        customExportAction => context.push('/events/$eventId/club/export'),
+        _ => _importResults(context, ref, eventId),
+      },
       itemBuilder: (_) => [
         PopupMenuItem(
           value: EventExport.standings,
@@ -213,6 +219,13 @@ class ClubExportMenu extends ConsumerWidget {
         PopupMenuItem(
           value: EventExport.timeline,
           child: Text(l10n.exportTimeline),
+        ),
+        PopupMenuItem(
+          value: customExportAction,
+          child: ListTile(
+            leading: const Icon(Icons.tune),
+            title: Text(l10n.exportCustom),
+          ),
         ),
         const PopupMenuDivider(),
         PopupMenuItem(

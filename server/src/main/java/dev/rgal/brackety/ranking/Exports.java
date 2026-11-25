@@ -3,30 +3,28 @@ package dev.rgal.brackety.ranking;
 import dev.rgal.brackety.event.EventAccess;
 import dev.rgal.brackety.event.EventException;
 import dev.rgal.brackety.event.EventRole;
+import dev.rgal.brackety.event.EventService;
 import dev.rgal.brackety.ranking.dto.ExportPreview;
 import dev.rgal.brackety.ranking.dto.ExportRequest;
-import dev.rgal.brackety.ranking.dto.ExportRequest.SortKey;
 import dev.rgal.brackety.ranking.dto.ExportSheet;
-import java.math.BigDecimal;
-import java.text.Collator;
 import java.time.Clock;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * The event's sheets, as the full export writes them or as the club asks (docs/producto/exportaciones.md): the
- * columns it picks, in its order, with the rows sorted by what it says. Only the club of the event.
+ * columns it picks, in its order and with its titles, the rows it filters, sorted by what it says, in one file or one
+ * per value of a column. Only the club of the event.
  */
 @Service
 class Exports {
@@ -36,26 +34,44 @@ class Exports {
     static final List<String> FULL_EXPORT =
             List.of("participants", "categories", "mats", "groups", "matches", "timeline", "standings", "league");
 
-    private static final Collator TEXT = Collator.getInstance(Locale.forLanguageTag("es"));
+    static final String CSV = "text/csv;charset=UTF-8";
+    static final String ZIP = "application/zip";
+    private static final DateTimeFormatter TIME = DateTimeFormatter.ofPattern("HH:mm");
 
-    /** The table to write: titles and cells as they go in the file. */
-    record Table(String fileName, List<String> headers, List<List<Object>> rows) {
-
-        String csv() {
-            return Csv.of(headers, rows);
-        }
-    }
+    /**
+     * A file to hand over: one CSV, a .zip with one CSV per value of the «Separar por» column, or a workbook with one
+     * worksheet per value.
+     */
+    record Download(String fileName, byte[] body, String contentType) {}
 
     private final Map<String, Sheet<?>> sheets;
+    private final LeagueSheet league;
     private final SheetSource source;
     private final EventAccess access;
-    private final ZoneId zone;
+    private final DownloadNames names;
+    private final ExportTable tables;
+    private final EventService events;
+    private final Clock clock;
+    private final String version;
 
-    Exports(List<Sheet<?>> sheets, SheetSource source, EventAccess access, Clock clock) {
+    Exports(
+            List<Sheet<?>> sheets,
+            LeagueSheet league,
+            SheetSource source,
+            EventAccess access,
+            DownloadNames names,
+            EventService events,
+            Clock clock,
+            @Value("${brackety.version}") String version) {
         this.sheets = sheets.stream().collect(Collectors.toMap(Sheet::key, Function.identity()));
+        this.league = league;
         this.source = source;
         this.access = access;
-        this.zone = clock.getZone();
+        this.names = names;
+        this.tables = new ExportTable(clock.getZone());
+        this.events = events;
+        this.clock = clock;
+        this.version = version;
     }
 
     /** In the order of the full export. */
@@ -79,22 +95,42 @@ class Exports {
     }
 
     @Transactional(readOnly = true)
-    Table export(UUID eventId, UUID accountId, ExportRequest request) {
-        access.require(eventId, accountId, EventRole.CLUB);
+    Download export(UUID eventId, UUID accountId, ExportRequest request) {
+        var tables = custom(eventId, accountId, request, true);
         var sheet = sheets.get(request.sheet());
-        if (sheet == null) {
-            throw EventException.invalid("EXPORT_UNKNOWN_SHEET", "There is no sheet " + request.sheet() + ".");
+        var file = sheet.fileName();
+        if ("pdf".equals(request.format())) {
+            var title = request.title() == null ? sheet.title(request.headersLocale()) : request.title();
+            var pdf = TablePdf.of(tables, title, heading(eventId), footer(), request.landscape());
+            return new Download(names.of(eventId, file + ".pdf"), pdf, TablePdf.CONTENT_TYPE);
         }
-        return custom(sheet, source.load(eventId), request);
+        if ("xlsx".equals(request.format())) {
+            return new Download(names.of(eventId, file + ".xlsx"), Xlsx.of(tables), Xlsx.CONTENT_TYPE);
+        }
+        if (request.splitBy() == null) {
+            var table = tables.getFirst();
+            return new Download(names.of(eventId, table.fileName()), Zip.text(table.csv()), CSV);
+        }
+        var files = new LinkedHashMap<String, byte[]>();
+        tables.forEach(table -> files.put(names.of(eventId, table.fileName()), Zip.text(table.csv())));
+        return new Download(names.of(eventId, file + ".zip"), Zip.of(files), ZIP);
     }
 
-    private <R> Table custom(Sheet<R> sheet, SheetData data, ExportRequest request) {
-        return table(sheet, data, sheet.rows(data), request.columns(), request.sortOrEmpty(), request.headersLocale());
+    private String heading(UUID eventId) {
+        var event = events.get(eventId);
+        return event.getName() + " · " + SheetText.date(event.getEventDate());
     }
 
+    private String footer() {
+        var now = LocalDateTime.now(clock);
+        return "Generado el " + SheetText.date(now.toLocalDate()) + " a las " + TIME.format(now) + " · Brackety "
+                + version;
+    }
+
+    /** The rows of the whole export, without splitting it. */
     @Transactional(readOnly = true)
     ExportPreview preview(UUID eventId, UUID accountId, ExportRequest request) {
-        var table = export(eventId, accountId, request);
+        var table = custom(eventId, accountId, request, false).getFirst();
         return new ExportPreview(
                 table.headers(),
                 table.rows().stream()
@@ -106,69 +142,56 @@ class Exports {
                 table.rows().size());
     }
 
+    private List<ExportTable.Table> custom(UUID eventId, UUID accountId, ExportRequest request, boolean split) {
+        access.require(eventId, accountId, EventRole.CLUB);
+        var sheet = sheets.get(request.sheet());
+        if (sheet == null) {
+            throw EventException.invalid("EXPORT_UNKNOWN_SHEET", "There is no sheet " + request.sheet() + ".");
+        }
+        var spec = new ExportTable.Spec(
+                sheet.fileName(),
+                request.columns(),
+                request.titlesOrEmpty(),
+                request.filtersOrEmpty(),
+                request.sortOrEmpty(),
+                split ? request.splitBy() : null,
+                request.headersLocale());
+        return tables(sheet, source.load(eventId), spec);
+    }
+
+    private <R> List<ExportTable.Table> tables(Sheet<R> sheet, SheetData data, ExportTable.Spec spec) {
+        return tables.of(sheet, data, sheet.rows(data), spec);
+    }
+
     /** A sheet of the full export: its built-in columns in their order, Spanish titles, its own row order. */
     @Transactional(readOnly = true)
-    Table builtIn(UUID eventId, UUID accountId, String key) {
+    ExportTable.Table builtIn(UUID eventId, UUID accountId, String key) {
         access.require(eventId, accountId, EventRole.CLUB);
         return builtIn(sheets.get(key), source.load(eventId));
     }
 
-    private <R> Table builtIn(Sheet<R> sheet, SheetData data) {
+    private <R> ExportTable.Table builtIn(Sheet<R> sheet, SheetData data) {
         var rows = sheet.rows(data);
-        return table(sheet, data, rows, sheet.builtInColumns(data, rows), List.of(), Locale.forLanguageTag("es"));
+        return tables.of(
+                        sheet, data, rows, ExportTable.Spec.builtIn(sheet.fileName(), sheet.builtInColumns(data, rows)))
+                .getFirst();
     }
 
-    private <R> Table table(
-            Sheet<R> sheet,
-            SheetData data,
-            List<R> sheetRows,
-            List<String> columns,
-            List<SortKey> sort,
-            Locale locale) {
-        var byKey = sheet.fields(data).stream().collect(Collectors.toMap(ExportField::key, Function.identity()));
-        if (new HashSet<>(columns).size() != columns.size()) {
-            throw EventException.invalid("EXPORT_REPEATED_COLUMN", "A column is chosen twice.");
-        }
-        var chosen = columns.stream().map(key -> field(byKey, key)).toList();
-        var rows = new ArrayList<>(sheetRows);
-        if (!sort.isEmpty()) {
-            rows.sort(sort.stream()
-                    .map(key -> order(field(byKey, key.column()), key.descending()))
-                    .reduce(Comparator::thenComparing)
-                    .orElseThrow());
-        }
-        return new Table(
-                sheet.fileName() + ".csv",
-                chosen.stream().map(f -> f.title(locale)).toList(),
-                rows.stream()
-                        .map(row -> chosen.stream()
-                                .map(f -> f.write(f.read(row), zone))
-                                .toList())
-                        .toList());
-    }
-
-    private static <R> ExportField<R> field(Map<String, ExportField<R>> byKey, String key) {
-        var field = byKey.get(key);
-        if (field == null) {
-            throw EventException.invalid("EXPORT_UNKNOWN_COLUMN", "This sheet has no column " + key + ".");
-        }
-        return field;
-    }
-
-    // Empty cells last either way.
-    private static <R> Comparator<R> order(ExportField<R> field, boolean descending) {
-        Comparator<Object> values = Exports::compare;
-        return Comparator.comparing(field::read, Comparator.nullsLast(descending ? values.reversed() : values));
-    }
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private static int compare(Object a, Object b) {
-        if (a instanceof Number x && b instanceof Number y) {
-            return new BigDecimal(x.toString()).compareTo(new BigDecimal(y.toString()));
-        }
-        if (a instanceof Comparable x && !(a instanceof String) && a.getClass() == b.getClass()) {
-            return x.compareTo(b);
-        }
-        return TEXT.compare(Objects.toString(a), Objects.toString(b));
+    /** The league standings split by category (its .zip and the full export's folder): each file's name and CSV. */
+    @Transactional(readOnly = true)
+    Map<String, String> leagueByCategory(UUID eventId, UUID accountId) {
+        access.require(eventId, accountId, EventRole.CLUB);
+        var data = source.load(eventId);
+        var spec = new ExportTable.Spec(
+                "clasificacion",
+                league.byCategoryColumns(data),
+                LeagueSheet.BY_CATEGORY_TITLES,
+                List.of(),
+                List.of(),
+                "category",
+                ExportTable.SPANISH);
+        var files = new LinkedHashMap<String, String>();
+        tables(league, data, spec).forEach(table -> files.put(table.fileName(), table.csv()));
+        return files;
     }
 }
