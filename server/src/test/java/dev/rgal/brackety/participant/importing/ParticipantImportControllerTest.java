@@ -135,6 +135,30 @@ class ParticipantImportControllerTest extends EventApiTest {
                 .andExpect(jsonPath("$.rows[1].errors[*].code", contains("ALREADY_REGISTERED", "DUPLICATE_IN_LIST")));
     }
 
+    // Who enters people may also read and register a list (Raul, 2026-11-24); a helper without it may not.
+    @Test
+    void aHelperWhoEntersPeopleImportsAList() throws Exception {
+        when(reader.read(any())).thenReturn(List.of(row("Ana", "Prueba", LocalDate.of(2018, 1, 1), null)));
+        call(
+                        put("/api/v1/events/" + eventId + "/staff/" + accountId("ayudante1") + "/permissions")
+                                .content("{\"permissions\":[\"PARTICIPANTS\"]}"),
+                        "club1")
+                .andExpect(status().is2xxSuccessful());
+
+        call(get(path("/available")), "ayudante1")
+                .andExpect(jsonPath("$.available").value(true));
+        upload(multipart(path("/read")).file(PHOTO).param("consentVersion", "v1"), "ayudante1")
+                .andExpect(status().isOk());
+        call(
+                        post(path(""))
+                                .content(json(List.of(row("Ana", "Prueba", LocalDate.of(2018, 1, 1), null)), "v1")),
+                        "ayudante1")
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.registered").value(1));
+        assertThat(count("participant")).isEqualTo(1);
+        call(get(path("/available")), "ayudante2").andExpect(status().isForbidden());
+    }
+
     @Test
     void registeringNeedsTheCurrentConsent() throws Exception {
         call(post(path("")).content(json(List.of(row("Ana", "Prueba", LocalDate.of(2018, 1, 1), null)), "v0")), "club1")
