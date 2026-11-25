@@ -24,9 +24,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get eventResetDone => 'Evento reiniciado desde el paquete.';
 
   @override
-  String get controlSave => 'Guardar';
-
-  @override
   String get controlMenu => 'Cambiar';
 
   @override
@@ -226,13 +223,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dsComponents => 'Componentes';
 
   @override
-  String get dsSave => 'Guardar';
-
-  @override
   String get dsTonal => 'Inscribirse';
-
-  @override
-  String get dsCancel => 'Cancelar';
 
   @override
   String get dsMore => 'Ver más';
@@ -318,9 +309,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get navDebug => 'Escenarios';
 
   @override
-  String get saved => 'Guardado';
-
-  @override
   String get debugTitle => 'Escenarios de debug';
 
   @override
@@ -398,9 +386,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get debugCopyNameInvalid => 'Minúsculas, números y _ (hasta 40)';
 
   @override
-  String get debugSave => 'Guardar';
-
-  @override
   String debugCopySaved(String name) {
     return 'Copia «$name» guardada';
   }
@@ -442,16 +427,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get logout => 'Cerrar sesión';
 
   @override
-  String get cancel => 'Cancelar';
-
-  @override
-  String get retry => 'Reintentar';
-
-  @override
   String get refresh => 'Actualizar';
-
-  @override
-  String get loadError => 'No se han podido cargar los datos.';
 
   @override
   String get noServer => 'No se puede conectar con el servidor.';

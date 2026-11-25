@@ -131,7 +131,7 @@ class _ChangeEmailDialogState extends State<_ChangeEmailDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.cancel),
+          child: Text(CoreLocalizations.of(context).cancel),
         ),
         FilledButton(onPressed: _submit, child: Text(l10n.changeEmailSubmit)),
       ],

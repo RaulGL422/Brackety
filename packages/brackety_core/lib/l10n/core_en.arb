@@ -14,5 +14,10 @@
   "@debugSimulatedDate": {"placeholders": {"date": {"type": "String"}}},
   "retry": "Retry",
   "licenses": "Software licenses",
-  "closeNotice": "Close notice"
+  "closeNotice": "Close notice",
+  "cancel": "Cancel",
+  "saved": "Saved",
+  "save": "Save",
+  "close": "Close",
+  "loadError": "Could not load. Check the connection."
 }

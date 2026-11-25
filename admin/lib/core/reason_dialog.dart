@@ -98,7 +98,7 @@ class _ReasonDialogState extends State<ReasonDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.cancel),
+          child: Text(CoreLocalizations.of(context).cancel),
         ),
         FilledButton(
           style: FilledButton.styleFrom(

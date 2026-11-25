@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
-import '../../auth/ui/widgets/confirm_dialog.dart';
 import '../data/staff_repository.dart';
 import '../data/temporary_access.dart';
 import 'qr_access.dart';

@@ -79,7 +79,7 @@ class _InvitationScreenState extends ConsumerState<InvitationScreen> {
                   const SizedBox(height: AppSpacing.l),
                   OutlinedButton(
                     onPressed: () => ref.invalidate(_offerProvider(token)),
-                    child: Text(l10n.retry),
+                    child: Text(CoreLocalizations.of(context).retry),
                   ),
                 ],
               ),

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/async_view.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../events/state/events_providers.dart';
 import '../data/league_models.dart';
@@ -64,7 +63,7 @@ class _NewEventDialogState extends ConsumerState<_NewEventDialog> {
       actions: [
         TextButton(
           onPressed: _saving ? null : () => Navigator.pop(context),
-          child: Text(l10n.cancel),
+          child: Text(CoreLocalizations.of(context).cancel),
         ),
         FilledButton(
           onPressed: _saving ? null : _create,

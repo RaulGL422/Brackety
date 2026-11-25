@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
-import '../../auth/ui/widgets/confirm_dialog.dart';
 import '../../mat/ui/fighter_text.dart';
 import '../data/match_view.dart';
 import '../state/match_review.dart';

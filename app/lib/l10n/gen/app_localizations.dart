@@ -572,18 +572,6 @@ abstract class AppLocalizations {
   /// **'Cargando…'**
   String get loading;
 
-  /// No description provided for @retry.
-  ///
-  /// In es, this message translates to:
-  /// **'Reintentar'**
-  String get retry;
-
-  /// No description provided for @loadError.
-  ///
-  /// In es, this message translates to:
-  /// **'No se ha podido cargar. Comprueba la conexión.'**
-  String get loadError;
-
   /// No description provided for @noServer.
   ///
   /// In es, this message translates to:
@@ -607,12 +595,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Demasiadas peticiones. Espera un momento y vuelve a intentarlo.'**
   String get tooManyRequestsWait;
-
-  /// No description provided for @cancel.
-  ///
-  /// In es, this message translates to:
-  /// **'Cancelar'**
-  String get cancel;
 
   /// No description provided for @continueAction.
   ///
@@ -2282,23 +2264,11 @@ abstract class AppLocalizations {
   /// **'¿Borrar a {name}?'**
   String deleteParticipantTitle(String name);
 
-  /// No description provided for @save.
-  ///
-  /// In es, this message translates to:
-  /// **'Guardar'**
-  String get save;
-
   /// No description provided for @delete.
   ///
   /// In es, this message translates to:
   /// **'Borrar'**
   String get delete;
-
-  /// No description provided for @saved.
-  ///
-  /// In es, this message translates to:
-  /// **'Guardado'**
-  String get saved;
 
   /// No description provided for @saveConflict.
   ///
@@ -3767,12 +3737,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'No se ha podido importar: el fichero no es de acciones pendientes o es de otro evento.'**
   String get importOpsError;
-
-  /// No description provided for @close.
-  ///
-  /// In es, this message translates to:
-  /// **'Cerrar'**
-  String get close;
 
   /// No description provided for @matOfflineBoard.
   ///

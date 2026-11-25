@@ -24,9 +24,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get eventResetDone => 'Event started again from the package.';
 
   @override
-  String get controlSave => 'Save';
-
-  @override
   String get controlMenu => 'Change';
 
   @override
@@ -226,13 +223,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dsComponents => 'Components';
 
   @override
-  String get dsSave => 'Save';
-
-  @override
   String get dsTonal => 'Sign up';
-
-  @override
-  String get dsCancel => 'Cancel';
 
   @override
   String get dsMore => 'See more';
@@ -318,9 +309,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navDebug => 'Scenarios';
 
   @override
-  String get saved => 'Saved';
-
-  @override
   String get debugTitle => 'Debug scenarios';
 
   @override
@@ -399,9 +387,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Lowercase letters, digits and _ (up to 40)';
 
   @override
-  String get debugSave => 'Save';
-
-  @override
   String debugCopySaved(String name) {
     return 'Copy “$name” saved';
   }
@@ -443,16 +428,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get logout => 'Sign out';
 
   @override
-  String get cancel => 'Cancel';
-
-  @override
-  String get retry => 'Retry';
-
-  @override
   String get refresh => 'Refresh';
-
-  @override
-  String get loadError => 'Could not load the data.';
 
   @override
   String get noServer => 'Cannot reach the server.';

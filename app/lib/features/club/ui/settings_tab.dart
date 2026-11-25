@@ -7,10 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../../core/async_view.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../auth/data/api_error.dart';
-import '../../auth/ui/widgets/confirm_dialog.dart';
 import '../../events/data/my_event.dart';
 import '../../events/state/events_providers.dart';
 import '../../league/state/league_providers.dart';
@@ -530,7 +528,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
         ..invalidate(matsOverviewProvider(widget.eventId))
         ..invalidate(participantsProvider(widget.eventId));
       toasts.show(
-        l10n.saved,
+        CoreLocalizations.of(context).saved,
         kind: ToastKind.success,
         duration: const Duration(seconds: 1),
       );
@@ -606,7 +604,7 @@ class _SaveBar extends StatelessWidget {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.save_outlined),
-                label: Text(l10n.save),
+                label: Text(CoreLocalizations.of(context).save),
               ),
             ],
           ),
@@ -654,6 +652,7 @@ class _StaffNameFieldState extends ConsumerState<_StaffNameField> {
     if (name == _saved) return;
     final l10n = AppLocalizations.of(context);
     final toasts = Toasts.of(context);
+    final savedText = CoreLocalizations.of(context).saved;
     try {
       await ref
           .read(clubRepositoryProvider)
@@ -661,7 +660,7 @@ class _StaffNameFieldState extends ConsumerState<_StaffNameField> {
       _saved = name;
       ref.invalidate(matsOverviewProvider(widget.eventId));
       toasts.show(
-        l10n.saved,
+        savedText,
         kind: ToastKind.success,
         duration: const Duration(seconds: 1),
       );

@@ -110,7 +110,7 @@ void main() {
     final api = seeded()..listError = networkError();
     await pumpAdmin(tester, locks: api, location: '/locks');
 
-    expect(find.text('Could not load the data.'), findsOneWidget);
+    expect(find.text('Could not load. Check the connection.'), findsOneWidget);
 
     api.listError = null;
     await tapText(tester, 'Retry');

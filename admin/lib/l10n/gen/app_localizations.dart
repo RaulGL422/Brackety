@@ -122,12 +122,6 @@ abstract class AppLocalizations {
   /// **'Evento reiniciado desde el paquete.'**
   String get eventResetDone;
 
-  /// No description provided for @controlSave.
-  ///
-  /// In es, this message translates to:
-  /// **'Guardar'**
-  String get controlSave;
-
   /// No description provided for @controlMenu.
   ///
   /// In es, this message translates to:
@@ -458,23 +452,11 @@ abstract class AppLocalizations {
   /// **'Componentes'**
   String get dsComponents;
 
-  /// No description provided for @dsSave.
-  ///
-  /// In es, this message translates to:
-  /// **'Guardar'**
-  String get dsSave;
-
   /// No description provided for @dsTonal.
   ///
   /// In es, this message translates to:
   /// **'Inscribirse'**
   String get dsTonal;
-
-  /// No description provided for @dsCancel.
-  ///
-  /// In es, this message translates to:
-  /// **'Cancelar'**
-  String get dsCancel;
 
   /// No description provided for @dsMore.
   ///
@@ -638,12 +620,6 @@ abstract class AppLocalizations {
   /// **'Escenarios'**
   String get navDebug;
 
-  /// No description provided for @saved.
-  ///
-  /// In es, this message translates to:
-  /// **'Guardado'**
-  String get saved;
-
   /// No description provided for @debugTitle.
   ///
   /// In es, this message translates to:
@@ -764,12 +740,6 @@ abstract class AppLocalizations {
   /// **'Minúsculas, números y _ (hasta 40)'**
   String get debugCopyNameInvalid;
 
-  /// No description provided for @debugSave.
-  ///
-  /// In es, this message translates to:
-  /// **'Guardar'**
-  String get debugSave;
-
   /// No description provided for @debugCopySaved.
   ///
   /// In es, this message translates to:
@@ -830,29 +800,11 @@ abstract class AppLocalizations {
   /// **'Cerrar sesión'**
   String get logout;
 
-  /// No description provided for @cancel.
-  ///
-  /// In es, this message translates to:
-  /// **'Cancelar'**
-  String get cancel;
-
-  /// No description provided for @retry.
-  ///
-  /// In es, this message translates to:
-  /// **'Reintentar'**
-  String get retry;
-
   /// No description provided for @refresh.
   ///
   /// In es, this message translates to:
   /// **'Actualizar'**
   String get refresh;
-
-  /// No description provided for @loadError.
-  ///
-  /// In es, this message translates to:
-  /// **'No se han podido cargar los datos.'**
-  String get loadError;
 
   /// No description provided for @noServer.
   ///

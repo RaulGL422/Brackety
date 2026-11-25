@@ -176,11 +176,11 @@ class _ParticipantFormState extends ConsumerState<_ParticipantForm> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.cancel),
+          child: Text(CoreLocalizations.of(context).cancel),
         ),
         FilledButton(
           onPressed: _saving || needsConsent ? null : _save,
-          child: Text(l10n.save),
+          child: Text(CoreLocalizations.of(context).save),
         ),
       ],
     );

@@ -42,6 +42,7 @@ class _WarningReasonsEditorState extends ConsumerState<WarningReasonsEditor> {
   Future<void> _save(List<String>? reasons) async {
     final l10n = AppLocalizations.of(context);
     final toasts = Toasts.of(context);
+    final savedText = CoreLocalizations.of(context).saved;
     final before = _own;
     setState(() {
       _own = reasons;
@@ -52,7 +53,7 @@ class _WarningReasonsEditorState extends ConsumerState<WarningReasonsEditor> {
           .read(clubRepositoryProvider)
           .saveWarningReasons(widget.eventId, reasons);
       ref.invalidate(eventSettingsProvider(widget.eventId));
-      toasts.show(l10n.saved, duration: const Duration(seconds: 1));
+      toasts.show(savedText, duration: const Duration(seconds: 1));
     } on DioException {
       if (mounted) setState(() => _own = before);
       toasts.show(l10n.saveError, kind: ToastKind.error);

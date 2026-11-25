@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/app_bar_action.dart';
-import '../../../core/async_view.dart';
 import '../../../core/up_button.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../auth/data/api_error.dart';
@@ -558,7 +557,7 @@ class _TeamGroupsState extends ConsumerState<_TeamGroups> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.cancel),
+            child: Text(CoreLocalizations.of(context).cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),

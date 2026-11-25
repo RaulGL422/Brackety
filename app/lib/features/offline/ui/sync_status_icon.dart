@@ -124,7 +124,7 @@ class _StatusDialog extends ConsumerWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.close),
+          child: Text(CoreLocalizations.of(context).close),
         ),
         if (rejected > 0)
           TextButton(
@@ -197,7 +197,7 @@ class _RejectedDialog extends ConsumerWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.close),
+          child: Text(CoreLocalizations.of(context).close),
         ),
         FilledButton(
           onPressed: () {

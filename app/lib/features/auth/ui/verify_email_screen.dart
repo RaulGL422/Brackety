@@ -73,7 +73,10 @@ class _NoServer extends StatelessWidget {
       children: [
         FormMessage.error(l10n.noServer),
         const SizedBox(height: AppSpacing.l),
-        OutlinedButton(onPressed: onRetry, child: Text(l10n.retry)),
+        OutlinedButton(
+          onPressed: onRetry,
+          child: Text(CoreLocalizations.of(context).retry),
+        ),
       ],
     );
   }

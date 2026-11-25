@@ -60,7 +60,10 @@ class _Outcome extends StatelessWidget {
         if (error case final error?) FormMessage.error(error),
         const SizedBox(height: AppSpacing.l),
         if (onRetry != null)
-          OutlinedButton(onPressed: onRetry, child: Text(l10n.retry))
+          OutlinedButton(
+            onPressed: onRetry,
+            child: Text(CoreLocalizations.of(context).retry),
+          )
         else
           // Signed out (the confirmation closes every session), "/" leads to the sign-in.
           FilledButton(

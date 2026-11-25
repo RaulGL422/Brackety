@@ -337,12 +337,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get loading => 'Cargando…';
 
   @override
-  String get retry => 'Reintentar';
-
-  @override
-  String get loadError => 'No se ha podido cargar. Comprueba la conexión.';
-
-  @override
   String get noServer => 'No hay conexión con el servidor.';
 
   @override
@@ -356,9 +350,6 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get tooManyRequestsWait =>
       'Demasiadas peticiones. Espera un momento y vuelve a intentarlo.';
-
-  @override
-  String get cancel => 'Cancelar';
 
   @override
   String get continueAction => 'Continuar';
@@ -1382,13 +1373,7 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get save => 'Guardar';
-
-  @override
   String get delete => 'Borrar';
-
-  @override
-  String get saved => 'Guardado';
 
   @override
   String get saveConflict => 'No se puede: ya hay grupos que dependen de esto.';
@@ -2290,9 +2275,6 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get importOpsError =>
       'No se ha podido importar: el fichero no es de acciones pendientes o es de otro evento.';
-
-  @override
-  String get close => 'Cerrar';
 
   @override
   String get matOfflineBoard =>
