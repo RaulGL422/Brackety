@@ -31,7 +31,7 @@
     }
   },
   "matGroupsInProgress": "En combate: no se puede mover",
-  "matGroupsProgress": "{played} de {matches}",
+  "matGroupsProgress": "{played} de {matches} disputados",
   "@matGroupsProgress": {
     "placeholders": {
       "played": {
@@ -920,14 +920,10 @@
     }
   },
   "loginUserLabel": "Email o usuario",
-  "loginQrSessionLost": "Se ha cerrado tu sesión. Entra con tu usuario {signIn} y la contraseña que te dio el club, sin pedir otro QR.",
-  "@loginQrSessionLost": {
-    "placeholders": {
-      "signIn": {
-        "type": "String"
-      }
-    }
-  },
+  "loginQrLostTitle": "Se ha cerrado tu sesión",
+  "loginQrLostBody": "Escribe la contraseña que te dio el club. No hace falta otro QR.",
+  "loginQrUser": "Tu usuario",
+  "loginOtherAccount": "Entrar con otra cuenta",
   "loginPasswordRemoved": "Contraseña quitada y sesiones cerradas. Ya solo puedes entrar con Google.",
   "reauthTitle": "Confirma que eres tú",
   "reauthBody": "Escribe tu contraseña para continuar.",
@@ -1754,5 +1750,145 @@
   "qrAccessInvalid": "Este QR ya no sirve: pide al club uno nuevo.",
   "qrAccessGoToLogin": "Ir a iniciar sesión",
   "qrAccessReplaceSession": "Vas a entrar con el QR del club. Se cerrará la sesión que tienes abierta en este dispositivo.",
-  "qrAccessEnter": "Entrar"
+  "qrAccessEnter": "Entrar",
+  "exportCustom": "Exportar a medida",
+  "exportStepData": "Qué datos",
+  "exportStepColumns": "Columnas",
+  "exportStepRows": "Filas",
+  "exportStepFile": "Archivo",
+  "exportStepPreview": "Vista previa",
+  "exportStepOf": "Paso {step} de {total}",
+  "@exportStepOf": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "exportNext": "Siguiente",
+  "exportBack": "Atrás",
+  "exportSheetHelp": "Cada uno trae sus columnas. Al cambiarlo se empieza de nuevo.",
+  "exportColumnsHelp": "Arrastra para cambiar el orden. Toca el título para cambiarlo.",
+  "exportAddColumn": "Añadir columna",
+  "exportNoColumns": "Elige al menos una columna.",
+  "exportPersonal": "Dato personal",
+  "exportMinors": "Dato de menores",
+  "exportMoveUp": "Subir {column}",
+  "@exportMoveUp": {
+    "placeholders": {
+      "column": {
+        "type": "String"
+      }
+    }
+  },
+  "exportMoveDown": "Bajar {column}",
+  "@exportMoveDown": {
+    "placeholders": {
+      "column": {
+        "type": "String"
+      }
+    }
+  },
+  "exportRename": "Cambiar el título de {column}",
+  "@exportRename": {
+    "placeholders": {
+      "column": {
+        "type": "String"
+      }
+    }
+  },
+  "exportRemove": "Quitar {column}",
+  "@exportRemove": {
+    "placeholders": {
+      "column": {
+        "type": "String"
+      }
+    }
+  },
+  "exportRenameTitle": "Título de la columna",
+  "exportRenameHelp": "Vacío, vuelve a «{original}».",
+  "@exportRenameHelp": {
+    "placeholders": {
+      "original": {
+        "type": "String"
+      }
+    }
+  },
+  "exportFilters": "Filtrar filas",
+  "exportFiltersHelp": "Solo las filas que cumplan todos los filtros.",
+  "exportAddFilter": "Añadir filtro",
+  "exportFilterValues": "Es alguno de (separados por comas)",
+  "exportFilterMin": "Desde",
+  "exportFilterMax": "Hasta",
+  "exportRemoveFilter": "Quitar el filtro de {column}",
+  "@exportRemoveFilter": {
+    "placeholders": {
+      "column": {
+        "type": "String"
+      }
+    }
+  },
+  "exportSort": "Ordenar filas",
+  "exportSortHelp": "Sin orden, salen como en la hoja. El primero manda; los demás deshacen empates.",
+  "exportAddSort": "Añadir orden",
+  "exportAscending": "De menor a mayor",
+  "exportDescending": "De mayor a menor",
+  "exportRaiseSort": "Dar más prioridad a {column}",
+  "@exportRaiseSort": {
+    "placeholders": {
+      "column": {
+        "type": "String"
+      }
+    }
+  },
+  "exportRemoveSort": "Quitar el orden por {column}",
+  "@exportRemoveSort": {
+    "placeholders": {
+      "column": {
+        "type": "String"
+      }
+    }
+  },
+  "exportSplit": "Separar por",
+  "exportNoSplit": "No separar",
+  "exportSplitCsv": "Un CSV por valor, en un .zip.",
+  "exportSplitExcel": "Una hoja del libro por valor.",
+  "exportSplitPdf": "Una página por valor.",
+  "exportFormat": "Formato",
+  "exportHeaders": "Idioma de las cabeceras",
+  "exportSpanish": "Español",
+  "exportEnglish": "Inglés",
+  "exportPdfTitle": "Título del PDF",
+  "exportPdfTitleHelp": "Vacío, el nombre de los datos.",
+  "exportOrientation": "Orientación",
+  "exportAutomatic": "Automática",
+  "exportPortrait": "Vertical",
+  "exportLandscape": "Horizontal",
+  "exportRowsShown": "{shown} de {total} filas",
+  "@exportRowsShown": {
+    "placeholders": {
+      "shown": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "exportPreviewEmpty": "Ninguna fila cumple los filtros.",
+  "exportPreviewError": "No se ha podido preparar la vista previa. Revisa los filtros.",
+  "exportDownload": "Descargar",
+  "exportPersonalTitle": "Lleva datos personales",
+  "exportPersonalBody": "Incluye {columns}. Guárdala solo donde haga falta y bórrala cuando ya no la necesites.",
+  "@exportPersonalBody": {
+    "placeholders": {
+      "columns": {
+        "type": "String"
+      }
+    }
+  },
+  "exportChooseColumn": "Elige una columna"
 }

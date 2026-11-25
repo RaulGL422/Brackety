@@ -18,7 +18,8 @@ Sistema **neutro multideporte**: el color es de quien compite. La app se queda e
 - Color: `ColorScheme` fijo, claro y oscuro (no generado por semilla), sin tinte.
   | Papel | Claro | Oscuro |
   |---|---|---|
-  | Tinta y acción (`primary`, `onSurface`) | `#1A1A1A` | `#EDEDED` |
+  | Tinta (`primary`, `onSurface`) | `#1A1A1A` | `#EDEDED` |
+  | Acción: botón relleno (`BracketyColors.action`) | `#4B2FC9` | `#B7A8FF` |
   | Fondo (`surface`) | `#F2F2F2` | `#141414` |
   | Tarjeta (`surfaceContainerLow`) | `#FFFFFF` | `#1F1F1F` |
   | Secundario (`onSurfaceVariant`) | `#555555` | `#A8A8A8` |

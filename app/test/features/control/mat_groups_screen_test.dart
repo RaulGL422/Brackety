@@ -94,20 +94,31 @@ void main() {
     testWidgets('every mat shows its groups and who is in them on $device', (
       tester,
     ) async {
+      final semantics = tester.ensureSemantics();
       await pump(tester, size);
 
-      expect(find.text('Mat 1 · Juan'), findsOneWidget);
-      expect(find.text('Group 1 · 4-6'), findsOneWidget);
-      expect(
-        find.text('Ana Prueba, Bea Prueba, Carla Prueba (wildcard)'),
-        findsOneWidget,
-      );
-      expect(find.text('2 of 3'), findsOneWidget);
+      expect(find.text('Mat 1'), findsOneWidget);
+      expect(find.text('Juan'), findsOneWidget);
+      // The number on ink and the category beside it; a screen reader hears both.
+      expect(find.bySemanticsLabel('Group 1 · 4-6'), findsOneWidget);
+      // One name per line, whole.
+      expect(find.text('Ana Prueba'), findsOneWidget);
+      expect(find.text('Bea Prueba'), findsOneWidget);
+      expect(find.text('Carla Prueba (wildcard)'), findsOneWidget);
+      expect(find.text('2 of 3 fought'), findsOneWidget);
       expect(find.text('1 finished'), findsOneWidget);
-      expect(find.text('Mat 3 · Disabled'), findsOneWidget);
+      // On a phone the mats go one under another: the last one is further down.
+      await tester.scrollUntilVisible(
+        find.text('Mat 3'),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.text('Mat 3'), findsOneWidget);
+      expect(find.text('Disabled'), findsOneWidget);
       await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
       await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
       expect(tester.takeException(), isNull);
+      semantics.dispose();
     });
   }
 
@@ -115,10 +126,10 @@ void main() {
     final control = await pump(tester, sizes['tablet']!);
 
     final gesture = await tester.startGesture(
-      tester.getCenter(find.text('Group 1 · 4-6')),
+      tester.getCenter(find.text('Ana Prueba')),
     );
     await tester.pump(kLongPressTimeout + const Duration(milliseconds: 100));
-    await gesture.moveTo(tester.getCenter(find.text('Mat 2 · Luis')));
+    await gesture.moveTo(tester.getCenter(find.text('Mat 2')));
     await tester.pump();
     expect(find.text('Drop here to move it to mat 2'), findsOneWidget);
     await gesture.up();
@@ -132,8 +143,9 @@ void main() {
 
     await tester.tap(find.byTooltip('Move group 1'));
     await tester.pumpAndSettle();
+    // Neither the disabled mat nor the one it is already on.
     expect(find.text('Mat 3 · No referee'), findsNothing);
-    expect(find.text('Mat 1 · Juan'), findsOneWidget);
+    expect(find.text('Mat 1 · Juan'), findsNothing);
     await tester.tap(find.text('Mat 2 · Luis').last);
     await tester.pumpAndSettle();
 
@@ -143,13 +155,9 @@ void main() {
   testWidgets('a group fighting now cannot move', (tester) async {
     await pump(tester, sizes['tablet']!);
 
-    final menu = tester.widget<PopupMenuButton<MatGroups>>(
-      find.byWidgetPredicate(
-        (w) => w is PopupMenuButton<MatGroups> && w.tooltip == 'Move group 2',
-      ),
-    );
-    expect(menu.enabled, isFalse);
-    expect(find.textContaining('Fighting: it cannot move'), findsOneWidget);
+    // No "Move to…" to tap, and an ink band that says why.
+    expect(find.byTooltip('Move group 2'), findsNothing);
+    expect(find.text('Fighting: it cannot move'), findsOneWidget);
   });
 
   testWidgets('the board fits a phone with text at 200 %', (tester) async {

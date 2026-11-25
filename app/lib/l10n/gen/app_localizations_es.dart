@@ -74,7 +74,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String matGroupsProgress(int played, int matches) {
-    return '$played de $matches';
+    return '$played de $matches disputados';
   }
 
   @override
@@ -1801,9 +1801,17 @@ class AppLocalizationsEs extends AppLocalizations {
   String get loginUserLabel => 'Email o usuario';
 
   @override
-  String loginQrSessionLost(String signIn) {
-    return 'Se ha cerrado tu sesión. Entra con tu usuario $signIn y la contraseña que te dio el club, sin pedir otro QR.';
-  }
+  String get loginQrLostTitle => 'Se ha cerrado tu sesión';
+
+  @override
+  String get loginQrLostBody =>
+      'Escribe la contraseña que te dio el club. No hace falta otro QR.';
+
+  @override
+  String get loginQrUser => 'Tu usuario';
+
+  @override
+  String get loginOtherAccount => 'Entrar con otra cuenta';
 
   @override
   String get loginPasswordRemoved =>
@@ -3375,4 +3383,202 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get qrAccessEnter => 'Entrar';
+
+  @override
+  String get exportCustom => 'Exportar a medida';
+
+  @override
+  String get exportStepData => 'Qué datos';
+
+  @override
+  String get exportStepColumns => 'Columnas';
+
+  @override
+  String get exportStepRows => 'Filas';
+
+  @override
+  String get exportStepFile => 'Archivo';
+
+  @override
+  String get exportStepPreview => 'Vista previa';
+
+  @override
+  String exportStepOf(int step, int total) {
+    return 'Paso $step de $total';
+  }
+
+  @override
+  String get exportNext => 'Siguiente';
+
+  @override
+  String get exportBack => 'Atrás';
+
+  @override
+  String get exportSheetHelp =>
+      'Cada uno trae sus columnas. Al cambiarlo se empieza de nuevo.';
+
+  @override
+  String get exportColumnsHelp =>
+      'Arrastra para cambiar el orden. Toca el título para cambiarlo.';
+
+  @override
+  String get exportAddColumn => 'Añadir columna';
+
+  @override
+  String get exportNoColumns => 'Elige al menos una columna.';
+
+  @override
+  String get exportPersonal => 'Dato personal';
+
+  @override
+  String get exportMinors => 'Dato de menores';
+
+  @override
+  String exportMoveUp(String column) {
+    return 'Subir $column';
+  }
+
+  @override
+  String exportMoveDown(String column) {
+    return 'Bajar $column';
+  }
+
+  @override
+  String exportRename(String column) {
+    return 'Cambiar el título de $column';
+  }
+
+  @override
+  String exportRemove(String column) {
+    return 'Quitar $column';
+  }
+
+  @override
+  String get exportRenameTitle => 'Título de la columna';
+
+  @override
+  String exportRenameHelp(String original) {
+    return 'Vacío, vuelve a «$original».';
+  }
+
+  @override
+  String get exportFilters => 'Filtrar filas';
+
+  @override
+  String get exportFiltersHelp =>
+      'Solo las filas que cumplan todos los filtros.';
+
+  @override
+  String get exportAddFilter => 'Añadir filtro';
+
+  @override
+  String get exportFilterValues => 'Es alguno de (separados por comas)';
+
+  @override
+  String get exportFilterMin => 'Desde';
+
+  @override
+  String get exportFilterMax => 'Hasta';
+
+  @override
+  String exportRemoveFilter(String column) {
+    return 'Quitar el filtro de $column';
+  }
+
+  @override
+  String get exportSort => 'Ordenar filas';
+
+  @override
+  String get exportSortHelp =>
+      'Sin orden, salen como en la hoja. El primero manda; los demás deshacen empates.';
+
+  @override
+  String get exportAddSort => 'Añadir orden';
+
+  @override
+  String get exportAscending => 'De menor a mayor';
+
+  @override
+  String get exportDescending => 'De mayor a menor';
+
+  @override
+  String exportRaiseSort(String column) {
+    return 'Dar más prioridad a $column';
+  }
+
+  @override
+  String exportRemoveSort(String column) {
+    return 'Quitar el orden por $column';
+  }
+
+  @override
+  String get exportSplit => 'Separar por';
+
+  @override
+  String get exportNoSplit => 'No separar';
+
+  @override
+  String get exportSplitCsv => 'Un CSV por valor, en un .zip.';
+
+  @override
+  String get exportSplitExcel => 'Una hoja del libro por valor.';
+
+  @override
+  String get exportSplitPdf => 'Una página por valor.';
+
+  @override
+  String get exportFormat => 'Formato';
+
+  @override
+  String get exportHeaders => 'Idioma de las cabeceras';
+
+  @override
+  String get exportSpanish => 'Español';
+
+  @override
+  String get exportEnglish => 'Inglés';
+
+  @override
+  String get exportPdfTitle => 'Título del PDF';
+
+  @override
+  String get exportPdfTitleHelp => 'Vacío, el nombre de los datos.';
+
+  @override
+  String get exportOrientation => 'Orientación';
+
+  @override
+  String get exportAutomatic => 'Automática';
+
+  @override
+  String get exportPortrait => 'Vertical';
+
+  @override
+  String get exportLandscape => 'Horizontal';
+
+  @override
+  String exportRowsShown(int shown, int total) {
+    return '$shown de $total filas';
+  }
+
+  @override
+  String get exportPreviewEmpty => 'Ninguna fila cumple los filtros.';
+
+  @override
+  String get exportPreviewError =>
+      'No se ha podido preparar la vista previa. Revisa los filtros.';
+
+  @override
+  String get exportDownload => 'Descargar';
+
+  @override
+  String get exportPersonalTitle => 'Lleva datos personales';
+
+  @override
+  String exportPersonalBody(String columns) {
+    return 'Incluye $columns. Guárdala solo donde haga falta y bórrala cuando ya no la necesites.';
+  }
+
+  @override
+  String get exportChooseColumn => 'Elige una columna';
 }

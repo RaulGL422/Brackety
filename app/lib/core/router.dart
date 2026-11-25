@@ -15,6 +15,7 @@ import '../features/auth/ui/verify_email_screen.dart';
 import '../features/club/ui/club_panel_screen.dart';
 import '../features/control/mat_groups_screen.dart';
 import '../features/events/ui/events_screen.dart';
+import '../features/exports/ui/export_screen.dart';
 import '../features/grouping/ui/categories_screen.dart';
 import '../features/grouping/ui/group_builder_screen.dart';
 import '../features/grouping/ui/team_category_screen.dart';
@@ -184,6 +185,11 @@ final routerProvider = Provider<GoRouter>((ref) {
           categoryName: state.uri.queryParameters['name'] ?? '',
           teamSize: int.tryParse(state.uri.queryParameters['size'] ?? '') ?? 3,
         ),
+      ),
+      GoRoute(
+        path: '/events/:eventId/club/export',
+        builder: (_, state) =>
+            ExportScreen(eventId: state.pathParameters['eventId']!),
       ),
       GoRoute(
         path: '/events/:eventId/club/import',
