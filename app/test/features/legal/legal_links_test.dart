@@ -31,7 +31,7 @@ void main() {
       await pumpAuthApp(tester, FakeAuthApi());
 
       await tapText(tester, 'Cookies');
-      expect(find.widgetWithText(AppBar, 'Cookie policy'), findsOneWidget);
+      expect(find.text('cookies (en)'), findsOneWidget);
 
       await tester.tap(find.byIcon(Icons.arrow_back));
       await tester.pumpAndSettle();

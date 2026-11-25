@@ -11,6 +11,7 @@ import '../../server/ui/server_tile.dart';
 import '../data/api_error.dart';
 import '../state/session_controller.dart';
 import 'auth_texts.dart';
+import 'widgets/auth_alternative.dart';
 import 'widgets/auth_form_page.dart';
 import 'widgets/demo_accounts.dart';
 import 'widgets/form_message.dart';
@@ -282,25 +283,10 @@ class _SignUp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const SizedBox(height: AppSpacing.m),
-        const Divider(),
-        const SizedBox(height: AppSpacing.m),
-        Text(
-          l10n.loginNoAccount,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.s),
-        OutlinedButton(
-          onPressed: () => context.go('/register'),
-          child: Text(l10n.loginCreateAccount),
-        ),
-      ],
+    return AuthAlternative(
+      question: l10n.loginNoAccount,
+      action: l10n.loginCreateAccount,
+      onPressed: () => context.go('/register'),
     );
   }
 }

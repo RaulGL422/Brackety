@@ -30,8 +30,8 @@ void main() {
       final handle = tester.ensureSemantics();
       await pumpPending(tester, at: '/settings');
 
-      expect(find.text('We have changed the legal texts'), findsOneWidget);
-      expect(find.text('Version 2026-12-01'), findsOneWidget);
+      expect(find.text('A legal text has changed'), findsOneWidget);
+      expect(find.text('Version of December 1, 2026'), findsOneWidget);
       expect(find.text('Privacy policy'), findsNothing);
       await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
       await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
@@ -53,7 +53,7 @@ void main() {
     await tapText(tester, 'Accept and continue');
 
     expect(account.acceptedConsents.single.single.version, '2026-12-01');
-    expect(find.text('We have changed the legal texts'), findsNothing);
+    expect(find.text('A legal text has changed'), findsNothing);
   });
 
   testWidgets('the text can be read from there and back', (tester) async {
@@ -61,11 +61,57 @@ void main() {
 
     await tester.tap(find.text('Terms of use'));
     await tester.pumpAndSettle();
-    expect(find.text('We have changed the legal texts'), findsNothing);
+    expect(find.text('A legal text has changed'), findsNothing);
     await tester.pageBack();
     await tester.pumpAndSettle();
 
-    expect(find.text('We have changed the legal texts'), findsOneWidget);
+    expect(find.text('A legal text has changed'), findsOneWidget);
+  });
+
+  // Raul, 2026-11-25: the box names the texts, an opened one says so, and signing out is the
+  // other way out, apart.
+  testWidgets('the box names the texts and an opened one is marked', (
+    tester,
+  ) async {
+    await pumpPending(tester);
+
+    expect(
+      find.text('I have read and accept the terms of use.'),
+      findsOneWidget,
+    );
+    expect(find.text('Already read'), findsNothing);
+    expect(find.text("Don't agree?"), findsOneWidget);
+    expect(find.widgetWithText(OutlinedButton, 'Sign out'), findsOneWidget);
+
+    await tester.tap(find.text('Terms of use'));
+    await tester.pumpAndSettle();
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+
+    expect(find.text('Already read'), findsOneWidget);
+  });
+
+  testWidgets('two changed texts are counted and both named', (tester) async {
+    await pumpAuthApp(
+      tester,
+      FakeAuthApi(signedIn: true),
+      account: FakeAccountApi(
+        account: testAccount(
+          pendingConsents: const [
+            PendingConsent(document: 'privacy', version: '2026-12-01'),
+            terms,
+          ],
+        ),
+      ),
+    );
+
+    expect(find.text('2 legal texts have changed'), findsOneWidget);
+    expect(
+      find.text(
+        'I have read and accept the privacy policy and the terms of use.',
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('a text changed again while reading says so', (tester) async {
@@ -86,7 +132,7 @@ void main() {
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
     await pumpPending(tester);
 
-    expect(find.text('We have changed the legal texts'), findsOneWidget);
+    expect(find.text('A legal text has changed'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -100,6 +146,6 @@ void main() {
       location: '/settings',
     );
 
-    expect(find.text('We have changed the legal texts'), findsNothing);
+    expect(find.text('A legal text has changed'), findsNothing);
   });
 }
