@@ -36,7 +36,7 @@ Tras un reinicio todo vuelve solo: Docker arranca con el sistema y los servicios
 - `cd ~/brackety && git pull && ./deploy/deploy.sh pi`.
 - `git pull` trae los cambios de compose y scripts; las imágenes nuevas las descarga el script.
 - Versión concreta: `IMAGE_TAG=1.2.0` en `.env`. `latest` = último `main`.
-- Qué corre: `docker compose logs api | grep -A10 "is ready"` muestra la versión (la de `app/pubspec.yaml`, con `-dev` en debug), el commit, la BD con su esquema y qué está activo o falta (email, Google, superadmin, contacto de privacidad, importación, cuentas demo). Sin secretos ni emails. `GET /api/v1/info` también da la versión. El portátil del pabellón la lee de `api/version.txt`.
+- Qué corre: `docker compose logs api | grep -A10 "is ready"` muestra la versión (la de `app/pubspec.yaml`; en debug `0.8.2-dev.N`, N sube con cada fusión), el commit, la BD con su esquema y qué está activo o falta (email, Google, superadmin, contacto de privacidad, importación, cuentas demo). Sin secretos ni emails. `GET /api/v1/info` también da la versión. El portátil del pabellón la lee de `api/version.txt`.
 
 ## Qué hace `deploy.sh` / `deploy.ps1`
 1. Etiqueta como `rollback` las imágenes que están corriendo.
@@ -53,7 +53,7 @@ Otro proyecto de compose (`brackety-debug`) con su BD, sus puertos (8090-8092), 
 3. **Pi**: `sudo mkdir -p /mnt/ssd/brackety-debug/pgdata`, `cp .env.debug.example .env.debug`, rellenarlo (BD, `JWT_SECRET` y superadmin **propios**, token del segundo túnel, Access) y `chmod 600 .env.debug`.
 4. `./deploy.sh debug` (mismo pull, espera y rollback que producción; se niega si comparte `JWT_SECRET`).
 - **Días de evento**: `./deploy.sh debug-stop` la víspera; `./deploy.sh debug` al acabar. Parado no arranca solo tras reiniciar.
-- Actualizar: `./deploy.sh debug` tras cada fusión en `development`.
+- Actualizar: `./deploy.sh debug` tras cada fusión en `development`; al acabar dice la versión y el commit. El código llega en las imágenes: `git pull` en la Pi solo trae `deploy/`. Qué trae cada una: `CHANGELOG.md`.
 - Comandos sueltos: `docker compose --env-file .env.debug -f docker-compose.yml -f docker-compose.debug.yml logs api`.
 - Sin backups: lo que importe, en una copia con nombre de la pestaña Escenarios.
 
