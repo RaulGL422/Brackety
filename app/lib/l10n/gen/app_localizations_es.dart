@@ -411,7 +411,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get loginForgot => '¿Has olvidado la contraseña?';
 
   @override
-  String get loginNoAccount => '¿No tienes cuenta? Regístrate';
+  String get loginNoAccount => '¿Aún no tienes cuenta?';
 
   @override
   String get loginPasswordChanged =>
@@ -3616,4 +3616,14 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get legalUpdateChangedAgain =>
       'Los textos han vuelto a cambiar mientras los leías. Revisa la versión nueva y acéptala.';
+
+  @override
+  String get loginSubtitle =>
+      'Con tu email o con el usuario que te dio el club.';
+
+  @override
+  String get loginCreateAccount => 'Crear una cuenta';
+
+  @override
+  String get legalFooterLabel => 'Textos legales';
 }

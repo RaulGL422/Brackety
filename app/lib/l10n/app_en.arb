@@ -117,7 +117,7 @@
     }
   },
   "loginForgot": "Forgot your password?",
-  "loginNoAccount": "No account? Sign up",
+  "loginNoAccount": "No account yet?",
   "loginPasswordChanged": "Password changed. You can sign in with the new one.",
   "loginDemoAccounts": "Test accounts (development only)",
   "restoreTitle": "Account pending deletion",
@@ -1139,5 +1139,8 @@
   "legalUpdateSubmit": "Accept and continue",
   "legalUpdateSignOut": "Sign out",
   "legalUpdateChangedAgain": "The texts changed again while you were reading. Check the new version and accept it.",
-  "@legalUpdateVersion": {"placeholders": {"version": {"type": "String"}}}
+  "@legalUpdateVersion": {"placeholders": {"version": {"type": "String"}}},
+  "loginSubtitle": "With your email or the sign-in your club gave you.",
+  "loginCreateAccount": "Create an account",
+  "legalFooterLabel": "Legal texts"
 }

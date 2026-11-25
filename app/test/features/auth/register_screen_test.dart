@@ -320,17 +320,17 @@ void main() {
     expect(find.text('Email sent.'), findsOneWidget);
 
     await tapText(tester, 'Go to sign in');
-    expect(find.text('No account? Sign up'), findsOneWidget);
+    expect(find.text('Create an account'), findsOneWidget);
   });
 
   testWidgets('the sign-in links to the sign-up and back', (tester) async {
     await pumpAuthApp(tester, FakeAuthApi());
 
-    await tapText(tester, 'No account? Sign up');
+    await tapText(tester, 'Create an account');
     expect(find.text('How will you use Brackety?'), findsOneWidget);
 
     await tapText(tester, 'Already have an account? Sign in');
-    expect(find.text('No account? Sign up'), findsOneWidget);
+    expect(find.text('Create an account'), findsOneWidget);
   });
 
   for (final (name, error) in [

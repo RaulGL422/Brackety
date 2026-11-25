@@ -4,7 +4,13 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../support/fakes.dart';
 import '../auth/auth_app.dart';
 
-const _footer = ['Privacy', 'Terms', 'Cookies', 'Legal notice', 'Licenses'];
+const _footer = [
+  'Privacy',
+  'Terms',
+  'Cookies',
+  'Legal notice',
+  'Software licenses',
+];
 
 void main() {
   for (final location in ['/login', '/register']) {
@@ -29,15 +35,15 @@ void main() {
 
       await tester.tap(find.byIcon(Icons.arrow_back));
       await tester.pumpAndSettle();
-      expect(find.text('No account? Sign up'), findsOneWidget);
+      expect(find.text('Create an account'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   }
 
-  testWidgets('"Licenses" opens the software licenses', (tester) async {
+  testWidgets('"Software licenses" opens the licenses page', (tester) async {
     await pumpAuthApp(tester, FakeAuthApi());
 
-    await tapText(tester, 'Licenses');
+    await tapText(tester, 'Software licenses');
 
     expect(find.byType(LicensePage), findsOneWidget);
   });
