@@ -126,6 +126,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         : null;
     return AuthFormPage(
       title: l10n.loginTitle,
+      subtitle: qrSignIn == null ? l10n.loginSubtitle : null,
       children: [
         if (widget.passwordChanged) ...[
           FormMessage.success(l10n.loginPasswordChanged),
@@ -174,6 +175,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   validator: (value) =>
                       (value ?? '').isEmpty ? l10n.fieldRequired : null,
                 ),
+                // Where it is looked for: right under the password.
+                if (qrSignIn == null) const _ForgotPassword(),
               ],
             ),
           ),
@@ -193,16 +196,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             onPressed: () => setState(() => _otherAccount = true),
             child: Text(l10n.loginOtherAccount),
           )
-        else ...[
-          TextButton(
-            onPressed: () => context.go('/forgot-password'),
-            child: Text(l10n.loginForgot),
-          ),
-          TextButton(
-            onPressed: () => context.go('/register'),
-            child: Text(l10n.loginNoAccount),
-          ),
-        ],
+        else
+          const _SignUp(),
         if (kDebugMode) ...[
           const SizedBox(height: AppSpacing.xl),
           DemoAccounts(
@@ -257,6 +252,54 @@ class _QrSessionLost extends StatelessWidget {
           Text(signIn, style: theme.textTheme.headlineSmall),
         ],
       ),
+    );
+  }
+}
+
+/// Right under the password, where it is looked for; its text ends at the field's edge.
+class _ForgotPassword extends StatelessWidget {
+  const _ForgotPassword();
+
+  @override
+  Widget build(BuildContext context) => Align(
+    alignment: AlignmentDirectional.centerEnd,
+    // Still 48 px tall to tap.
+    child: TextButton(
+      style: TextButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+      ),
+      onPressed: () => context.go('/forgot-password'),
+      child: Text(AppLocalizations.of(context).loginForgot),
+    ),
+  );
+}
+
+/// The way to an account, apart from signing in: a question and its own button.
+class _SignUp extends StatelessWidget {
+  const _SignUp();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const SizedBox(height: AppSpacing.m),
+        const Divider(),
+        const SizedBox(height: AppSpacing.m),
+        Text(
+          l10n.loginNoAccount,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.s),
+        OutlinedButton(
+          onPressed: () => context.go('/register'),
+          child: Text(l10n.loginCreateAccount),
+        ),
+      ],
     );
   }
 }

@@ -585,7 +585,7 @@ void main() {
       expect(sessionStatus(tester), SessionStatus.signedOut);
 
       await tapText(tester, 'Go to sign in');
-      expect(find.text('No account? Sign up'), findsOneWidget);
+      expect(find.text('Create an account'), findsOneWidget);
     });
 
     testWidgets('an invalid link says so', (tester) async {

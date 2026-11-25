@@ -169,7 +169,7 @@
     }
   },
   "loginForgot": "¿Has olvidado la contraseña?",
-  "loginNoAccount": "¿No tienes cuenta? Regístrate",
+  "loginNoAccount": "¿Aún no tienes cuenta?",
   "loginPasswordChanged": "Contraseña cambiada. Ya puedes entrar con la nueva.",
   "loginDemoAccounts": "Cuentas de prueba (solo en desarrollo)",
   "restoreTitle": "Cuenta pendiente de borrado",
@@ -1900,5 +1900,8 @@
   "legalUpdateSubmit": "Aceptar y seguir",
   "legalUpdateSignOut": "Cerrar sesión",
   "legalUpdateChangedAgain": "Los textos han vuelto a cambiar mientras los leías. Revisa la versión nueva y acéptala.",
-  "@legalUpdateVersion": {"placeholders": {"version": {"type": "String"}}}
+  "@legalUpdateVersion": {"placeholders": {"version": {"type": "String"}}},
+  "loginSubtitle": "Con tu email o con el usuario que te dio el club.",
+  "loginCreateAccount": "Crear una cuenta",
+  "legalFooterLabel": "Textos legales"
 }

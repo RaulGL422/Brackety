@@ -409,7 +409,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginForgot => 'Forgot your password?';
 
   @override
-  String get loginNoAccount => 'No account? Sign up';
+  String get loginNoAccount => 'No account yet?';
 
   @override
   String get loginPasswordChanged =>
@@ -3574,4 +3574,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get legalUpdateChangedAgain =>
       'The texts changed again while you were reading. Check the new version and accept it.';
+
+  @override
+  String get loginSubtitle =>
+      'With your email or the sign-in your club gave you.';
+
+  @override
+  String get loginCreateAccount => 'Create an account';
+
+  @override
+  String get legalFooterLabel => 'Legal texts';
 }
