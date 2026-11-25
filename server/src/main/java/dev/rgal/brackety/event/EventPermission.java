@@ -20,7 +20,12 @@ public enum EventPermission {
      * Sees the groups of every mat and moves a whole group to another, without the rest of the control panel (GR-4:
      * a referee the club trusts with it).
      */
-    MOVE_GROUPS;
+    MOVE_GROUPS,
+    /**
+     * Exports the personal columns (birth date, age, measures) and the minors' ones (docs/producto/exportaciones.md);
+     * without it they are not offered.
+     */
+    PERSONAL_DATA;
 
     /** Sees every mat and match: the control panel, the reviews or plain viewing. */
     public static boolean watchesMats(Set<EventPermission> granted) {

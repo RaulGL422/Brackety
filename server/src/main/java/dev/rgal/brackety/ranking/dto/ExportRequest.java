@@ -17,7 +17,7 @@ import java.util.Map;
  * empty, the sheet's own order), one file per value of a column ({@code splitBy}: CSVs in a .zip, or worksheets of
  * one workbook), the language of the headers (es by default) and the format ({@code csv} by default, or
  * {@code xlsx} or {@code pdf}). A PDF takes a {@code title} (the sheet's by default) and goes {@code landscape} when
- * asked, or by itself when it has many columns.
+ * asked, or by itself when it has many columns. {@code forPublishing}: see {@link #publish()}.
  */
 public record ExportRequest(
         @NotBlank @Size(max = 40) String sheet,
@@ -29,7 +29,8 @@ public record ExportRequest(
         @Pattern(regexp = "es|en") String locale,
         @Pattern(regexp = "csv|xlsx|pdf") String format,
         @Size(max = 120) String title,
-        Boolean landscape) {
+        Boolean landscape,
+        Boolean forPublishing) {
 
     public record SortKey(@NotBlank @Size(max = 40) String column, boolean descending) {}
 
@@ -53,6 +54,11 @@ public record ExportRequest(
 
     public List<SortKey> sortOrEmpty() {
         return sort == null ? List.of() : sort;
+    }
+
+    /** «Para publicar»: first name and the initial of the last name, no personal columns. */
+    public boolean publish() {
+        return Boolean.TRUE.equals(forPublishing);
     }
 
     public Locale headersLocale() {
