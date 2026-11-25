@@ -12,6 +12,7 @@ class PasswordField extends StatefulWidget {
     this.validator,
     this.textInputAction,
     this.onSubmitted,
+    this.autofocus = false,
   });
 
   final TextEditingController controller;
@@ -21,6 +22,9 @@ class PasswordField extends StatefulWidget {
   final FormFieldValidator<String>? validator;
   final TextInputAction? textInputAction;
   final ValueChanged<String>? onSubmitted;
+
+  /// Ready to type on arrival: the only field left to fill (GR-2, a QR referee back in).
+  final bool autofocus;
 
   @override
   State<PasswordField> createState() => _PasswordFieldState();
@@ -34,6 +38,7 @@ class _PasswordFieldState extends State<PasswordField> {
     final l10n = AppLocalizations.of(context);
     return TextFormField(
       controller: widget.controller,
+      autofocus: widget.autofocus,
       obscureText: _hidden,
       autocorrect: false,
       enableSuggestions: false,

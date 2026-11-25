@@ -3007,11 +3007,29 @@ abstract class AppLocalizations {
   /// **'Email o usuario'**
   String get loginUserLabel;
 
-  /// No description provided for @loginQrSessionLost.
+  /// No description provided for @loginQrLostTitle.
   ///
   /// In es, this message translates to:
-  /// **'Se ha cerrado tu sesión. Entra con tu usuario {signIn} y la contraseña que te dio el club, sin pedir otro QR.'**
-  String loginQrSessionLost(String signIn);
+  /// **'Se ha cerrado tu sesión'**
+  String get loginQrLostTitle;
+
+  /// No description provided for @loginQrLostBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe la contraseña que te dio el club. No hace falta otro QR.'**
+  String get loginQrLostBody;
+
+  /// No description provided for @loginQrUser.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu usuario'**
+  String get loginQrUser;
+
+  /// No description provided for @loginOtherAccount.
+  ///
+  /// In es, this message translates to:
+  /// **'Entrar con otra cuenta'**
+  String get loginOtherAccount;
 
   /// No description provided for @loginPasswordRemoved.
   ///
