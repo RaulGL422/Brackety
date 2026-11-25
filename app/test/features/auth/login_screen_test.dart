@@ -21,14 +21,54 @@ void main() {
       tester,
     ) async {
       useSize(tester, size);
+      final handle = tester.ensureSemantics();
       await pumpAuthApp(tester, FakeAuthApi());
 
       expect(find.text('Forgot your password?'), findsOneWidget);
-      expect(find.text('No account? Sign up'), findsOneWidget);
+      expect(find.text('Create an account'), findsOneWidget);
       expect(find.text('Test accounts (development only)'), findsOneWidget);
       expect(tester.takeException(), isNull);
+      await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+      await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+      await expectLater(tester, meetsGuideline(textContrastGuideline));
+      handle.dispose();
     });
   }
+
+  // Raul, 2026-11-25: no app bar; the name above, the title as the screen's heading, the legal
+  // texts and the app's version apart at the foot.
+  testWidgets('the sign-in has its heading, the legal texts and the version', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await pumpAuthApp(tester, FakeAuthApi());
+
+    expect(find.byType(AppBar), findsNothing);
+    expect(find.text('BRACKETY'), findsOneWidget);
+    expect(
+      tester.getSemantics(find.text('Sign in').first),
+      matchesSemantics(label: 'Sign in', isHeader: true),
+    );
+    for (final link in ['Privacy', 'Terms', 'Cookies', 'Legal notice']) {
+      expect(find.text(link), findsOneWidget);
+    }
+    expect(find.text('Software licenses'), findsOneWidget);
+    handle.dispose();
+  });
+
+  testWidgets('text at 200 % fits the sign-in on a phone', (tester) async {
+    useSize(tester, screenSizes['phone']!);
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await pumpAuthApp(tester, FakeAuthApi());
+
+    await tester.scrollUntilVisible(
+      find.text('Software licenses'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(tester.takeException(), isNull);
+  });
 
   // GR-2: a referee let in by QR whose session dropped got an empty sign-in screen.
   testWidgets('a lost QR session brings its sign-in back', (tester) async {
@@ -39,7 +79,7 @@ void main() {
     expect(find.text('qr-k3f9a2'), findsOneWidget);
     expect(find.byType(TextField), findsOneWidget);
     expect(find.text('Forgot your password?'), findsNothing);
-    expect(find.text('No account? Sign up'), findsNothing);
+    expect(find.text('Create an account'), findsNothing);
   });
 
   testWidgets('the QR referee signs in with the password alone', (
@@ -183,7 +223,7 @@ void main() {
     await tapText(tester, 'Cancel');
 
     expect(api.restores, isEmpty);
-    expect(find.text('No account? Sign up'), findsOneWidget);
+    expect(find.text('Create an account'), findsOneWidget);
   });
 
   testWidgets('the password can be shown', (tester) async {
@@ -209,6 +249,7 @@ void main() {
     expect(api.logins, ['club1']);
   });
 
+  // The focus follows what the eye sees: password, «Forgot…» right under it, then «Sign in».
   testWidgets('Tab goes from field to field and skips the eye button', (
     tester,
   ) async {
@@ -227,8 +268,13 @@ void main() {
 
     await tester.sendKeyEvent(LogicalKeyboardKey.tab);
     await tester.pump();
-    final focused = FocusManager.instance.primaryFocus!.context!;
+    var focused = FocusManager.instance.primaryFocus!.context!;
     expect(focused.findAncestorWidgetOfExactType<IconButton>(), isNull);
+    expect(focused.findAncestorWidgetOfExactType<TextButton>(), isNotNull);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pump();
+    focused = FocusManager.instance.primaryFocus!.context!;
     expect(focused.findAncestorWidgetOfExactType<FilledButton>(), isNotNull);
   });
 }

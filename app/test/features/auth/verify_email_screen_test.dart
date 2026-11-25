@@ -15,7 +15,7 @@ void main() {
       expect(tester.takeException(), isNull);
 
       await tapText(tester, 'Continue');
-      expect(find.text('No account? Sign up'), findsOneWidget);
+      expect(find.text('Create an account'), findsOneWidget);
     });
   }
 
