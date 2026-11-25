@@ -62,6 +62,36 @@ void main() {
     expect(at, '/settings');
   });
 
+  // Raul, 2026-11-25: reloading the sign-in again and again piled up «/login?from=/login?from=…».
+  testWidgets('reloading the sign-in keeps one "from"', (tester) async {
+    final at = await openAt(
+      tester,
+      '/login?from=${Uri.encodeQueryComponent('/settings')}',
+      FakeAuthApi(),
+    );
+
+    expect(at, '/login?from=${Uri.encodeQueryComponent('/settings')}');
+  });
+
+  testWidgets('an address already piled up comes down to its destination', (
+    tester,
+  ) async {
+    final inner = '/login?from=${Uri.encodeQueryComponent('/settings')}';
+    final at = await openAt(
+      tester,
+      '/login?from=${Uri.encodeQueryComponent(inner)}',
+      FakeAuthApi(),
+    );
+
+    expect(at, '/login?from=${Uri.encodeQueryComponent('/settings')}');
+  });
+
+  testWidgets('reloading the sign-up stays on the sign-up', (tester) async {
+    final at = await openAt(tester, '/register', FakeAuthApi());
+
+    expect(at, '/register');
+  });
+
   testWidgets('a "from" that leaves the app is ignored', (tester) async {
     final at = await openAt(
       tester,

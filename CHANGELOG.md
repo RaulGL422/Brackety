@@ -26,6 +26,7 @@ esa sección pasa a llamarse como la versión. Debug enseña su compilación jun
 - Repaso de diseño de grupos por tapiz, tamaños de grupo y entrada por QR (#193).
 
 ### Arreglos
+- Recargar la pantalla de entrada ya no repite «login?from=» en la dirección; recargar el registro se queda en el registro (#202).
 - Puerta legal: sin `PRIVACY_CONTACT_EMAIL` el servidor no deja empezar ni crear una fase, y la app dice por qué (#198).
 - Un tapiz sin árbitro admite grupos (#169).
 - Ajustes se guardan con un botón y preguntan antes de salir (#170).
