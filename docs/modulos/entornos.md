@@ -33,6 +33,11 @@ Pasos generales en `../09-despliegue.md`; aquí lo propio de esta Pi.
 - Sin SSD aún: `DB_DATA=pgdata` (volumen en la SD). Copia tras cada jornada: en la Pi `docker compose exec -T db sh -c 'pg_dump -U "$POSTGRES_USER" -d brackety -Fc' > ~/brackety-$(date +%F).dump`; en el PC `scp` (no `ssh … >` en PowerShell: estropea el binario).
 - Accesos: clave SSH de despliegue de solo lectura (alias `github-brackety`) y `docker login ghcr.io` con un token classic solo `read:packages`.
 
+## Cambios de la compilación (solo debug)
+- Las imágenes de debug llevan `CHANGELOG.md` como `/changelog.md` (`deploy/web.Dockerfile`); producción no.
+- Pantalla «Cambios» (`ChangelogView` en `brackety_core`): por versión y tipo, con buscador; vale cada palabra escrita, sin mayúsculas ni acentos («arbitro qr»). En la app, menú de la cuenta → «Cambios (debug)» con el servidor de debug; en el admin, pestaña «Cambios».
+- Muestra lo de la compilación desplegada, no lo fusionado después: se ve tras `./deploy.sh debug`.
+
 ## Escenarios en el superadmin de debug
 - Pestaña **Escenarios** (solo en la imagen de debug):
   - Lista del catálogo de `08-ejecucion-local.md` con su descripción.
