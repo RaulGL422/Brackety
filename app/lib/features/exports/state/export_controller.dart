@@ -10,12 +10,6 @@ final exportSheetsProvider = FutureProvider.autoDispose
           ref.watch(exportRepositoryProvider).sheets(key.eventId, key.language),
     );
 
-/// Who downloaded personal data in the event, newest first (the club's Staff settings).
-final exportAuditProvider = FutureProvider.autoDispose
-    .family<List<ExportAuditEntry>, String>(
-      (ref, eventId) => ref.watch(exportRepositoryProvider).audit(eventId),
-    );
-
 /// The export being put together for an event; null until a sheet is chosen.
 final exportDraftProvider = NotifierProvider.autoDispose
     .family<ExportDraftController, ExportDraft?, String>(

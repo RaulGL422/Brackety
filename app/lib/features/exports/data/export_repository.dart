@@ -8,8 +8,7 @@ final exportRepositoryProvider = Provider<ExportRepository>(
   (ref) => ExportRepository(ref.watch(apiProvider)),
 );
 
-/// Custom exports (docs/producto/exportaciones.md): the sheets, a preview, the file and, for the club,
-/// who downloaded personal data.
+/// Custom exports (docs/producto/exportaciones.md): the sheets, a preview and the file. Only the club.
 class ExportRepository {
   ExportRepository(this._dio);
 
@@ -26,14 +25,6 @@ class ExportRepository {
     return [
       for (final s in response.data!)
         ExportSheet.fromJson(s as Map<String, dynamic>),
-    ];
-  }
-
-  Future<List<ExportAuditEntry>> audit(String eventId) async {
-    final response = await _dio.get<List<dynamic>>('${_path(eventId)}/audit');
-    return [
-      for (final a in response.data!)
-        ExportAuditEntry.fromJson(a as Map<String, dynamic>),
     ];
   }
 

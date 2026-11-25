@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
-import '../state/export_controller.dart';
+import '../state/club_providers.dart';
 
 /// Who downloaded personal data, when and which columns (docs/producto/exportaciones.md); the files are not kept.
 class ExportAuditSection extends ConsumerWidget {

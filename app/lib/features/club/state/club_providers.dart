@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/polling.dart';
 import '../data/club_repository.dart';
 import '../data/event_settings.dart';
+import '../data/export_audit_entry.dart';
 import '../data/mat_overview.dart';
 import '../data/participant.dart';
 import '../data/participant_record.dart';
@@ -10,6 +11,12 @@ import '../data/standing_row.dart';
 
 /// Scores and mats change while the club watches: they follow the event on the live socket.
 Set<String> eventTopics(String eventId) => {'event:$eventId'};
+
+/// Who downloaded personal data in the event (Staff settings).
+final exportAuditProvider = FutureProvider.autoDispose
+    .family<List<ExportAuditEntry>, String>(
+      (ref, eventId) => ref.watch(clubRepositoryProvider).exportAudit(eventId),
+    );
 
 final eventSettingsProvider = FutureProvider.autoDispose
     .family<EventSettings, String>(
