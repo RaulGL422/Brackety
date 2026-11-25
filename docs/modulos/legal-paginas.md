@@ -26,6 +26,8 @@ Política de privacidad, términos de uso, política de cookies, aviso legal, co
 - `GET /api/v1/legal` (pública): documentos con versión y `acceptanceRequired`, y `privacyContactConfigured`.
 - `GET /api/v1/legal/{tipo}?lang=es|en` (pública): `{type, version, lang, markdown}`. Idioma desconocido → `es`; tipo desconocido → 404. Caché pública de 5 min.
 - Registro (contraseña y Google) con versión de términos o privacidad distinta de la actual → `409` `LEGAL_VERSION_OUTDATED`.
+- `GET /api/v1/me` trae `pendingConsents` (`{document, version}`): términos o privacidad cuya última aceptación no es la versión actual. Solo de quien aceptó alguna (una cuenta por QR nunca aceptó: no se le pide). `POST /api/v1/me/consents {accepted: [{document, version}]}`; versión vieja → `409` `LEGAL_VERSION_OUTDATED`, documento desconocido → `400`.
+- Pedir de nuevo la aceptación: subir la versión del texto en `LegalDocument` (cambio material).
 
 ## Pantallas
 En `app/lib/features/legal/`:
@@ -36,6 +38,7 @@ En `app/lib/features/legal/`:
 - Aviso "los datos del alumno se tratan según la política de privacidad" (enlazada) en el formulario de alumno del club y en el paso de consentimiento de la importación.
 - Licencias de software (`showLicensePage`): siguen en la pantalla Conexión de `brackety_core` (la usa el admin) y se añaden al pie y a los ajustes de la app.
 - Puerta legal: empezar la fase o crear la siguiente da «El servidor no tiene contacto de privacidad…» (barra de la fase y diálogo de fase nueva).
+- Textos cambiados (`auth/ui/legal_update_screen.dart`, `/legal-update`): con `pendingConsents` el router lleva ahí y solo deja leer los textos. Casilla, «Aceptar y seguir» (vuelve adonde iba) y «Cerrar sesión».
 
 ## Tests
 Puerta legal activa/inactiva, versión de consentimiento, páginas servidas en ambos idiomas.
@@ -45,4 +48,4 @@ Puerta legal activa/inactiva, versión de consentimiento, páginas servidas en a
 2. Front: páginas públicas en la web y la app, casilla del registro con enlaces, pie, ajustes, licencias; aviso de privacidad visible en inscripción e importación (cubre el pendiente de la F1).
 
 ## Estado
-En pruebas: pasos 1-2 hechos (back y front de la app) y la puerta `LEGAL_GATE` en empezar la fase y crear la siguiente (#198; aún no hay «publicar evento»: cuando exista, la lleva también). Falta la prueba manual de Raul y pedir de nuevo la aceptación cuando cambie un texto material.
+En pruebas: pasos 1-2 hechos (back y front de la app) y la puerta `LEGAL_GATE` en empezar la fase y crear la siguiente (#198; aún no hay «publicar evento»: cuando exista, la lleva también). Pedir de nuevo la aceptación al cambiar un texto material (#199). Falta la prueba manual de Raul.
