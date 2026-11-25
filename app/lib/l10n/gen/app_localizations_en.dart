@@ -74,7 +74,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String matGroupsProgress(int played, int matches) {
-    return '$played of $matches';
+    return '$played of $matches fought';
   }
 
   @override
@@ -1791,9 +1791,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginUserLabel => 'Email or sign-in';
 
   @override
-  String loginQrSessionLost(String signIn) {
-    return 'Your session closed. Sign in with $signIn and the password the club gave you, no new QR needed.';
-  }
+  String get loginQrLostTitle => 'Your session closed';
+
+  @override
+  String get loginQrLostBody =>
+      'Type the password the club gave you. No new QR needed.';
+
+  @override
+  String get loginQrUser => 'Your sign-in';
+
+  @override
+  String get loginOtherAccount => 'Sign in with another account';
 
   @override
   String get loginPasswordRemoved =>

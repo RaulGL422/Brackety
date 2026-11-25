@@ -218,24 +218,33 @@ class DraftPanel extends StatelessWidget {
   }
 
   // A size below who is already picked stays off: they come out first, nobody is dropped unseen.
+  // One of a few sizes, as the role above it: the same control, so it reads the same way.
   Widget _sizes(AppLocalizations l10n, TextTheme text) => Row(
     spacing: AppSpacing.s,
     children: [
       Text(l10n.draftSize, style: text.bodyMedium),
       Expanded(
-        child: Wrap(
-          spacing: AppSpacing.s,
-          runSpacing: AppSpacing.xs,
-          children: [
+        child: SegmentedButton<int>(
+          showSelectedIcon: false,
+          segments: [
             for (var n = minSize; n <= maxSize; n++)
-              ChoiceChip(
-                label: Text('$n', semanticsLabel: l10n.draftSizeOf(n)),
-                selected: group.size == n,
-                onSelected: group.canResize(n)
-                    ? (_) => onChanged((g) => g.withSize(n))
-                    : null,
+              ButtonSegment(
+                value: n,
+                enabled: group.canResize(n),
+                // Size and weight only: the colour is the segment's, light on the picked one.
+                label: Text(
+                  '$n',
+                  style: TextStyle(
+                    fontSize: text.titleMedium?.fontSize,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  semanticsLabel: l10n.draftSizeOf(n),
+                ),
               ),
           ],
+          selected: {group.size},
+          onSelectionChanged: (picked) =>
+              onChanged((g) => g.withSize(picked.single)),
         ),
       ),
     ],
