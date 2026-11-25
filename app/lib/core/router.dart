@@ -102,6 +102,10 @@ final routerProvider = Provider<GoRouter>((ref) {
     refreshListenable: sessionChanged,
     redirect: (context, state) {
       final at = state.matchedLocation;
+      // Support and debug only: a customer typing the address goes home.
+      if (at == '/connection' && !ref.read(connectionAllowedProvider)) {
+        return '/';
+      }
       if (_anySession.contains(at) || at.startsWith(_anySessionPrefix)) {
         return null;
       }

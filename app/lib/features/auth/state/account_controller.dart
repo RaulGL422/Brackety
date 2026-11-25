@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:brackety_core/brackety_core.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -18,6 +19,14 @@ final accountProvider = AsyncNotifierProvider<AccountController, Account?>(
   AccountController.new,
   // Settings show the error with a retry button; a silent retry would hide it.
   retry: (_, _) => null,
+);
+
+/// The Connection screen is for support, never for customers (Raul, 2026-11-25): an account the
+/// superadmin enabled for support, or anyone against the debug server.
+final connectionAllowedProvider = Provider<bool>(
+  (ref) =>
+      (ref.watch(accountProvider.select((a) => a.value?.support)) ?? false) ||
+      ref.watch(debugStatusProvider).value != null,
 );
 
 /// The account's language while signed in (the one its emails use too); null = the device's.

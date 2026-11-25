@@ -12,6 +12,7 @@ AdminUserRow user(
   bool deleted = false,
   List<String> profiles = const ['HELPER'],
   String? organization,
+  bool support = false,
 }) => AdminUserRow(
   id: id,
   email: '$id@example.test',
@@ -21,6 +22,7 @@ AdminUserRow user(
   suspended: suspended,
   profiles: profiles,
   organization: organization,
+  support: support,
 );
 
 class FakeUsersApi implements UsersApi {
@@ -61,6 +63,15 @@ class FakeUsersApi implements UsersApi {
 
   void _replace(String id, AdminUserRow Function(AdminUserRow) change) {
     users = [for (final u in users) u.id == id ? change(u) : u];
+  }
+
+  @override
+  Future<void> support(String accountId, bool enabled, String reason) async {
+    calls.add('support $accountId $enabled: $reason');
+    _replace(
+      accountId,
+      (u) => user(u.id, support: enabled, profiles: u.profiles),
+    );
   }
 
   @override
@@ -153,6 +164,34 @@ void main() {
     expect(api.queries.last, 'arbitro');
     expect(find.text('club1@example.test'), findsNothing);
     expect(find.text('arbitro1@example.test'), findsOneWidget);
+  });
+
+  // Raul, 2026-11-25: the Connection screen is for support accounts, enabled here.
+  testWidgets('support is enabled and disabled with a reason', (tester) async {
+    useSize(tester, screenSizes['desktop']!);
+    final api = await open(tester);
+    await tester.tap(find.text('club1@example.test'));
+    await tester.pumpAndSettle();
+
+    await tapText(tester, 'Enable support');
+    await confirmWithReason(tester, 'Enable support');
+    expect(find.text('Support enabled'), findsOneWidget);
+    expect(
+      find.text('Yes: sees the Connection screen in the app'),
+      findsOneWidget,
+    );
+
+    await tapText(tester, 'Disable support');
+    await confirmWithReason(tester, 'Disable support');
+
+    expect(api.calls.where((c) => c.startsWith('support')), [
+      startsWith('support club1 true:'),
+      startsWith('support club1 false:'),
+    ]);
+    expect(
+      find.text('Yes: sees the Connection screen in the app'),
+      findsNothing,
+    );
   });
 
   testWidgets('suspending and lifting it ask a reason and change the state', (

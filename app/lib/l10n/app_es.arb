@@ -133,6 +133,7 @@
   "@@locale": "es",
   "appTitle": "Brackety",
   "navConnection": "Conexión",
+  "connectionSupportHint": "Servidor, versión y día del servidor. Solo soporte.",
   "loading": "Cargando…",
   "noServer": "No hay conexión con el servidor.",
   "unexpectedError": "Algo ha ido mal. Inténtalo de nuevo.",

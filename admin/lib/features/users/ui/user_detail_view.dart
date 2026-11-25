@@ -86,6 +86,7 @@ class _Detail extends ConsumerWidget {
       (l10n.userStaffEvents, '${d.staffEvents}'),
       if (d.suspendedAt case final at?)
         (l10n.userSuspendedSince, l10n.userDate(at.toLocal())),
+      if (d.user.support) (l10n.userSupportLabel, l10n.userSupportYes),
       if (d.deletesOn case final on?) (l10n.userDeletesOn, l10n.userDate(on)),
     ];
     return ListView(
@@ -119,6 +120,15 @@ class _Detail extends ConsumerWidget {
                   label: Text(l10n.userSuspend),
                   onPressed: () => _suspend(context, ref),
                 ),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.support_agent),
+                label: Text(
+                  user.support
+                      ? l10n.userSupportDisable
+                      : l10n.userSupportEnable,
+                ),
+                onPressed: () => _support(context, ref, enable: !user.support),
+              ),
               OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
                   foregroundColor: scheme.error,
@@ -167,6 +177,31 @@ class _Detail extends ConsumerWidget {
       context,
       () => _controller(ref).unsuspend(reason),
       done: (_) => l10n.userUnsuspended,
+      notFound: l10n.userChanged,
+    );
+  }
+
+  /// The Connection screen in the app is for support, never for customers (Raul, 2026-11-25).
+  Future<void> _support(
+    BuildContext context,
+    WidgetRef ref, {
+    required bool enable,
+  }) async {
+    final l10n = AppLocalizations.of(context);
+    final email = d.user.email;
+    final reason = await askReason(
+      context,
+      title: enable
+          ? l10n.userSupportEnableTitle(email)
+          : l10n.userSupportDisableTitle(email),
+      body: enable ? l10n.userSupportEnableBody : l10n.userSupportDisableBody,
+      confirmLabel: enable ? l10n.userSupportEnable : l10n.userSupportDisable,
+    );
+    if (reason == null || !context.mounted) return;
+    await runAction(
+      context,
+      () => _controller(ref).support(enable, reason),
+      done: (_) => enable ? l10n.userSupportEnabled : l10n.userSupportDisabled,
       notFound: l10n.userChanged,
     );
   }

@@ -82,6 +82,9 @@ class UserDetailController extends AsyncNotifier<AdminUserDetail> {
   Future<void> unsuspend(String reason) =>
       _run(() => _api.unsuspend(accountId, reason));
 
+  Future<void> support(bool enabled, String reason) =>
+      _run(() => _api.support(accountId, enabled, reason));
+
   Future<DateTime> delete(String reason) =>
       _run(() => _api.delete(accountId, reason));
 

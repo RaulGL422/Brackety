@@ -572,6 +572,12 @@ abstract class AppLocalizations {
   /// **'Conexión'**
   String get navConnection;
 
+  /// No description provided for @connectionSupportHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Servidor, versión y día del servidor. Solo soporte.'**
+  String get connectionSupportHint;
+
   /// No description provided for @loading.
   ///
   /// In es, this message translates to:

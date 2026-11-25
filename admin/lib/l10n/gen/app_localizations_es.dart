@@ -1149,4 +1149,40 @@ class AppLocalizationsEs extends AppLocalizations {
   String groupCreatedBy(String name) {
     return 'Hecho por $name';
   }
+
+  @override
+  String get userSupportLabel => 'Soporte';
+
+  @override
+  String get userSupportYes => 'Sí: ve la pantalla Conexión en la app';
+
+  @override
+  String get userSupportEnable => 'Activar soporte';
+
+  @override
+  String get userSupportDisable => 'Quitar soporte';
+
+  @override
+  String userSupportEnableTitle(String email) {
+    return 'Activar soporte para $email';
+  }
+
+  @override
+  String get userSupportEnableBody =>
+      'Verá la pantalla Conexión en los ajustes de la app (servidor, versión y día). Solo para quien da soporte: los clientes nunca la ven.';
+
+  @override
+  String userSupportDisableTitle(String email) {
+    return 'Quitar soporte a $email';
+  }
+
+  @override
+  String get userSupportDisableBody =>
+      'Dejará de ver la pantalla Conexión en la app.';
+
+  @override
+  String get userSupportEnabled => 'Soporte activado';
+
+  @override
+  String get userSupportDisabled => 'Soporte quitado';
 }
