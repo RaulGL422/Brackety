@@ -60,6 +60,8 @@ Se comprueban en cada pantalla que se toque; una pantalla que no las cumple no s
 - Todo icono con texto o `tooltip`/`Semantics`; nada se entiende solo por color o solo por icono.
 - Texto al 200 % sin cortes; orden de foco y teclado lógicos en web; lector de pantalla con etiquetas útiles.
 - Arrastrar siempre tiene alternativa de un toque (WCAG 2.5.7).
+- Enlaces: subrayados dentro del texto y de los formularios (su color es el del texto: el subrayado es lo que los distingue). Los de un grupo propio y reconocible (pie legal) van sin subrayar en gris con contraste suficiente, y se subrayan al pasar o con foco (Raul, 2026-11-25).
+
 ### Organización
 - Una acción principal por pantalla, visible. Lo secundario, tras «Más» o un desplegable; lo raro, en otra pantalla.
 - Cada menú agrupa una sola clase de cosa: la bandera del marcador solo avisos y advertencias (GR-1).
