@@ -83,4 +83,28 @@ class CoreLocalizationsEs extends CoreLocalizations {
   @override
   String get updateWaiting =>
       'Hay una versión nueva: podrás actualizar en cuanto se envíen las acciones pendientes.';
+
+  @override
+  String get changelogTitle => 'Cambios';
+
+  @override
+  String get changelogMenu => 'Cambios (debug)';
+
+  @override
+  String get changelogSearch => 'Buscar en los cambios';
+
+  @override
+  String get changelogClear => 'Borrar la búsqueda';
+
+  @override
+  String changelogCount(int shown, int total) {
+    return '$shown de $total cambios';
+  }
+
+  @override
+  String get changelogNoMatch => 'Ningún cambio tiene todas esas palabras.';
+
+  @override
+  String get changelogMissing =>
+      'La lista de cambios solo viene en las compilaciones de debug.';
 }

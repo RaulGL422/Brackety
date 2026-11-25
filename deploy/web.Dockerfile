@@ -17,7 +17,10 @@ ARG BRACKETY_COMMIT=""
 WORKDIR /src
 COPY packages packages
 COPY ${APP} ${APP}
+COPY CHANGELOG.md CHANGELOG.md
 WORKDIR /src/${APP}
+# Debug images carry the list of changes for their «Cambios» screen (brackety_core ChangelogView).
+RUN if [ "$BRACKETY_DEBUG" = true ]; then cp /src/CHANGELOG.md web/changelog.md; fi
 RUN test -n "$API_BASE_URL" || (echo "API_BASE_URL build arg is required" && exit 1)
 RUN flutter build web --release --no-web-resources-cdn --dart-define=API_BASE_URL="$API_BASE_URL" \
     --dart-define=BRACKETY_DEBUG="$BRACKETY_DEBUG" --dart-define=BRACKETY_VERSION="$BRACKETY_VERSION" \

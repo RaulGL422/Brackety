@@ -4,6 +4,7 @@ import 'package:brackety/features/auth/data/refresh_token_store.dart';
 import 'package:brackety/features/auth/state/auth_providers.dart';
 import 'package:brackety/features/events/state/events_providers.dart';
 import 'package:brackety/features/legal/data/legal_repository.dart';
+import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
@@ -36,11 +37,12 @@ Future<GoRouter> pumpAuthApp(
   FakeLegalRepository? legal,
   RefreshTokenStore store = const CookieRefreshTokenStore(),
   List<Override> overrides = const [],
+  DebugStatus? debug,
 }) async {
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        ...sessionOverrides(api, account: account, store: store),
+        ...sessionOverrides(api, account: account, store: store, debug: debug),
         ...overrides,
         todayProvider.overrideWithValue(DateTime(2026, 10, 31)),
         devEnvironmentProvider.overrideWithValue(devEnvironment),

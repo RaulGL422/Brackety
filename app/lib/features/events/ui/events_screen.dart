@@ -158,7 +158,7 @@ class _PhaseRow extends StatelessWidget {
   }
 }
 
-enum _AccountItem { settings, connection, signOut }
+enum _AccountItem { settings, connection, changelog, signOut }
 
 /// One labelled button instead of three bare icons: people did not know what each one did.
 class _AccountMenu extends ConsumerWidget {
@@ -171,11 +171,14 @@ class _AccountMenu extends ConsumerWidget {
     // An account let in by QR has no settings of its own.
     final temporary =
         ref.watch(accountProvider.select((a) => a.value?.temporary)) ?? false;
+    // Only against the debug server: what each build brings, to know what to try.
+    final debug = ref.watch(debugStatusProvider).value != null;
     return PopupMenuButton<_AccountItem>(
       tooltip: l10n.accountMenu,
       onSelected: (item) => switch (item) {
         _AccountItem.settings => context.push('/settings'),
         _AccountItem.connection => context.push('/connection'),
+        _AccountItem.changelog => context.push('/changelog'),
         _AccountItem.signOut => confirmSignOut(context, ref),
       },
       itemBuilder: (_) => [
@@ -196,6 +199,15 @@ class _AccountMenu extends ConsumerWidget {
             title: Text(l10n.navConnection),
           ),
         ),
+        if (debug)
+          PopupMenuItem(
+            value: _AccountItem.changelog,
+            child: ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.history),
+              title: Text(CoreLocalizations.of(context).changelogMenu),
+            ),
+          ),
         const PopupMenuDivider(),
         PopupMenuItem(
           value: _AccountItem.signOut,
