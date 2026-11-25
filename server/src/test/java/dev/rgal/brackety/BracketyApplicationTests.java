@@ -43,6 +43,15 @@ class BracketyApplicationTests {
                 .andExpect(jsonPath("$.status").value("UP"));
     }
 
+    // The apps compare it with their own build to offer the update (UpdateGate in brackety_core).
+    @Test
+    void infoSaysTheReleaseAndCommitItRuns() throws Exception {
+        mvc.perform(get("/api/v1/info"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.version").value("local"))
+                .andExpect(jsonPath("$.commit").value(""));
+    }
+
     @Test
     void runsOnPostgres18() {
         var version = jdbc.sql("show server_version").query(String.class).single();
