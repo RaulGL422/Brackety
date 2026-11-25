@@ -15,7 +15,9 @@ class AdminApp extends ConsumerWidget {
       theme: lightTheme(),
       darkTheme: darkTheme(),
       routerConfig: ref.watch(routerProvider),
-      builder: (_, child) => ToastHost(child: DebugBanner(child: child!)),
+      builder: (_, child) => UpdateGate(
+        child: ToastHost(child: DebugBanner(child: child!)),
+      ),
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: const [
         AppLocalizations.delegate,

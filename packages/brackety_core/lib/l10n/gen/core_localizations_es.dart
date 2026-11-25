@@ -70,4 +70,17 @@ class CoreLocalizationsEs extends CoreLocalizations {
 
   @override
   String get loadError => 'No se ha podido cargar. Comprueba la conexión.';
+
+  @override
+  String get updateTitle => 'Hay una versión nueva de Brackety';
+
+  @override
+  String get updateBody => 'Actualiza para seguir. Tarda unos segundos.';
+
+  @override
+  String get updateButton => 'Actualizar';
+
+  @override
+  String get updateWaiting =>
+      'Hay una versión nueva: podrás actualizar en cuanto se envíen las acciones pendientes.';
 }

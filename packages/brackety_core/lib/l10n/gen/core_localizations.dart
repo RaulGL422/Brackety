@@ -199,6 +199,30 @@ abstract class CoreLocalizations {
   /// In es, this message translates to:
   /// **'No se ha podido cargar. Comprueba la conexión.'**
   String get loadError;
+
+  /// No description provided for @updateTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Hay una versión nueva de Brackety'**
+  String get updateTitle;
+
+  /// No description provided for @updateBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Actualiza para seguir. Tarda unos segundos.'**
+  String get updateBody;
+
+  /// No description provided for @updateButton.
+  ///
+  /// In es, this message translates to:
+  /// **'Actualizar'**
+  String get updateButton;
+
+  /// No description provided for @updateWaiting.
+  ///
+  /// In es, this message translates to:
+  /// **'Hay una versión nueva: podrás actualizar en cuanto se envíen las acciones pendientes.'**
+  String get updateWaiting;
 }
 
 class _CoreLocalizationsDelegate

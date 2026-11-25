@@ -28,8 +28,16 @@ class BracketyApp extends ConsumerWidget {
       themeMode: ref.watch(themeModeProvider),
       routerConfig: ref.watch(routerProvider),
       locale: ref.watch(appLocaleProvider),
-      builder: (_, child) => ToastHost(
-        child: DebugBanner(child: VerificationBanner(child: child!)),
+      // A new release blocks the app until it reloads, but never with actions still unsent.
+      builder: (_, child) => Consumer(
+        builder: (_, ref, _) => UpdateGate(
+          hold: ref.watch(
+            offlineSyncProvider.select((s) => s.pendingCount > 0),
+          ),
+          child: ToastHost(
+            child: DebugBanner(child: VerificationBanner(child: child!)),
+          ),
+        ),
       ),
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: const [

@@ -27,5 +27,9 @@
   "saved": "Guardado",
   "save": "Guardar",
   "close": "Cerrar",
-  "loadError": "No se ha podido cargar. Comprueba la conexión."
+  "loadError": "No se ha podido cargar. Comprueba la conexión.",
+  "updateTitle": "Hay una versión nueva de Brackety",
+  "updateBody": "Actualiza para seguir. Tarda unos segundos.",
+  "updateButton": "Actualizar",
+  "updateWaiting": "Hay una versión nueva: podrás actualizar en cuanto se envíen las acciones pendientes."
 }
