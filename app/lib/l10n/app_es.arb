@@ -31,7 +31,7 @@
     }
   },
   "matGroupsInProgress": "En combate: no se puede mover",
-  "matGroupsProgress": "{played} de {matches}",
+  "matGroupsProgress": "{played} de {matches} disputados",
   "@matGroupsProgress": {
     "placeholders": {
       "played": {
@@ -920,14 +920,10 @@
     }
   },
   "loginUserLabel": "Email o usuario",
-  "loginQrSessionLost": "Se ha cerrado tu sesión. Entra con tu usuario {signIn} y la contraseña que te dio el club, sin pedir otro QR.",
-  "@loginQrSessionLost": {
-    "placeholders": {
-      "signIn": {
-        "type": "String"
-      }
-    }
-  },
+  "loginQrLostTitle": "Se ha cerrado tu sesión",
+  "loginQrLostBody": "Escribe la contraseña que te dio el club. No hace falta otro QR.",
+  "loginQrUser": "Tu usuario",
+  "loginOtherAccount": "Entrar con otra cuenta",
   "loginPasswordRemoved": "Contraseña quitada y sesiones cerradas. Ya solo puedes entrar con Google.",
   "reauthTitle": "Confirma que eres tú",
   "reauthBody": "Escribe tu contraseña para continuar.",

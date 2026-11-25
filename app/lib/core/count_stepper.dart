@@ -1,6 +1,8 @@
+import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 
-/// "label  − value +": one tap per change, no keyboard. The buttons stop at [min] and [max].
+/// "label  [−] value [+]": one tap per change, no keyboard. The buttons stop at [min] and [max].
+/// Square buttons a thumb finds without looking, and the value large, as on the scoreboard.
 class CountStepper extends StatelessWidget {
   const CountStepper({
     super.key,
@@ -22,28 +24,48 @@ class CountStepper extends StatelessWidget {
   final ValueChanged<int> onChanged;
 
   @override
-  Widget build(BuildContext context) => Row(
-    children: [
-      Expanded(child: Text(label)),
-      IconButton(
-        tooltip: lessTooltip,
-        icon: const Icon(Icons.remove_circle_outline),
-        onPressed: value > min ? () => onChanged(value - 1) : null,
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    final square = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(AppRadius.s),
+    );
+    Widget button(String tooltip, IconData icon, VoidCallback? onPressed) =>
+        IconButton.filledTonal(
+          tooltip: tooltip,
+          icon: Icon(icon),
+          style: IconButton.styleFrom(
+            shape: square,
+            minimumSize: const Size.square(AppSizes.touchTarget),
+          ),
+          onPressed: onPressed,
+        );
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+      child: Row(
+        spacing: AppSpacing.s,
+        children: [
+          Expanded(child: Text(label, style: text.bodyLarge)),
+          button(
+            lessTooltip,
+            Icons.remove,
+            value > min ? () => onChanged(value - 1) : null,
+          ),
+          SizedBox(
+            width: 40,
+            child: Text(
+              '$value',
+              textAlign: TextAlign.center,
+              style: text.headlineSmall,
+              semanticsLabel: '$label $value',
+            ),
+          ),
+          button(
+            moreTooltip,
+            Icons.add,
+            value < max ? () => onChanged(value + 1) : null,
+          ),
+        ],
       ),
-      SizedBox(
-        width: 32,
-        child: Text(
-          '$value',
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.titleMedium,
-          semanticsLabel: '$label $value',
-        ),
-      ),
-      IconButton(
-        tooltip: moreTooltip,
-        icon: const Icon(Icons.add_circle_outline),
-        onPressed: value < max ? () => onChanged(value + 1) : null,
-      ),
-    ],
-  );
+    );
+  }
 }

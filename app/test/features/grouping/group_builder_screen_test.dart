@@ -588,8 +588,13 @@ void main() {
         await tester.pump();
       }
       // Four picked: a group of 3 would drop one, so it stays off until one comes out.
-      final three = find.widgetWithText(ChoiceChip, '3');
-      expect(tester.widget<ChoiceChip>(three).onSelected, isNull);
+      final three = find.descendant(
+        of: find.byType(SegmentedButton<int>),
+        matching: find.text('3'),
+      );
+      await tester.tap(three);
+      await tester.pump();
+      expect(find.text('Slot 5'), findsOneWidget);
       await tester.tap(find.text('Diego P.'));
       await tester.pump();
       await tester.tap(three);
