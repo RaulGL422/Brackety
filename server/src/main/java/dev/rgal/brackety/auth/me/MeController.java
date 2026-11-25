@@ -2,6 +2,7 @@ package dev.rgal.brackety.auth.me;
 
 import dev.rgal.brackety.auth.RequiresVerifiedEmail;
 import dev.rgal.brackety.auth.account.ProfileType;
+import dev.rgal.brackety.auth.dto.ConsentRequest;
 import dev.rgal.brackety.auth.dto.DataExport;
 import dev.rgal.brackety.auth.dto.DeletionResponse;
 import dev.rgal.brackety.auth.dto.MeResponse;
@@ -41,6 +42,7 @@ class MeController {
     private final DataExportService export;
     private final EmailChangeService emailChange;
     private final ReauthService reauth;
+    private final ConsentService consents;
 
     MeController(
             MeService me,
@@ -48,13 +50,15 @@ class MeController {
             AccountDeletionService deletion,
             DataExportService export,
             EmailChangeService emailChange,
-            ReauthService reauth) {
+            ReauthService reauth,
+            ConsentService consents) {
         this.me = me;
         this.profiles = profiles;
         this.deletion = deletion;
         this.export = export;
         this.emailChange = emailChange;
         this.reauth = reauth;
+        this.consents = consents;
     }
 
     @GetMapping
@@ -65,6 +69,13 @@ class MeController {
     @PatchMapping
     MeResponse update(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody UpdateMeRequest request) {
         return me.updateLocale(accountId(jwt), request.locale());
+    }
+
+    /** Accepts the current terms or privacy policy after a change; the answer is the account without them pending. */
+    @PostMapping("/consents")
+    MeResponse acceptConsents(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody ConsentRequest request) {
+        consents.accept(accountId(jwt), request);
+        return me.get(accountId(jwt));
     }
 
     // The new profile shows in the access token from the next refresh.
