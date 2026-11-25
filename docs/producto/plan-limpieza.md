@@ -80,4 +80,4 @@ Ver `diseno-revision.md`. Regla al tocar una pantalla: `build` ≤ 60 líneas, a
 
 ## Estado
 Aprobado por Raul (2026-11-18). L0 completa (2026-11-20).
-- L1 en curso (rama `chore/cleanup-l1`): paso 3 hecho (26 claves foráneas con índice; `ForeignKeyIndexesTest` falla si llega una sin él), paso 4 ya estaba (ArchUnit, #138), paso 5 hecho (`club/data`: un archivo por tema). Pasos 1-2, tras fusionar la rama de exportaciones (#191), que toca `AsyncView` y las ARB.
+- L1 hecha (#194): índices de las 26 claves foráneas (`ForeignKeyIndexesTest`), `eventpackage` sin `demo` (ya estaba, #138), `club/data` un archivo por tema; `AsyncView`, `ConfirmDialog` y textos comunes (Cancelar, Guardar, Guardado, Cerrar, Reintentar, error de carga) en `brackety_core`. Los diálogos de motivo y `runAction` siguen en cada app: piden cosas distintas. Siguiente: L2.
