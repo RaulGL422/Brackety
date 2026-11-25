@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import dev.rgal.brackety.event.EventApiTest;
+import dev.rgal.brackety.event.EventPermission;
 import java.util.UUID;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,7 @@ class StaffPermissionsTest extends EventApiTest {
         call(get("/api/v1/events"), "arbitro1")
                 .andExpect(jsonPath("$[0].permissions[0]").value("OWN_MAT"));
         call(get("/api/v1/events"), "club1")
-                .andExpect(jsonPath("$[0].permissions.length()").value(11));
+                .andExpect(jsonPath("$[0].permissions.length()").value(EventPermission.values().length));
 
         call(get(mats()), "ayudante1").andExpect(status().isOk());
         call(get(participants()), "ayudante1").andExpect(status().isForbidden());
