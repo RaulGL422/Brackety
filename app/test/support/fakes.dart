@@ -272,6 +272,10 @@ class FakeAccountApi implements AccountApi {
 
   int meCalls = 0;
   final locales = <String>[];
+
+  /// Each acceptance of changed legal texts, and what the server answers instead.
+  final acceptedConsents = <List<PendingConsent>>[];
+  DioException? consentError;
   final addedProfiles = <ProfileType>[];
   final removedProfiles = <ProfileType>[];
   final reauths = <String>[];
@@ -279,6 +283,13 @@ class FakeAccountApi implements AccountApi {
   /// Sensitive call name → the reauth token it carried.
   final actions = <(String, String)>[];
   int _tokens = 0;
+
+  @override
+  Future<Account> acceptConsents(List<PendingConsent> accepted) async {
+    acceptedConsents.add(accepted);
+    if (consentError case final error?) throw error;
+    return account = testAccount(email: account.email);
+  }
 
   @override
   Future<Account> me() async {
@@ -383,6 +394,7 @@ Account testAccount({
     SignInMethod(method: SignInMethod.password),
   ],
   bool temporary = false,
+  List<PendingConsent> pendingConsents = const [],
 }) => Account(
   email: email,
   emailVerified: emailVerified,
@@ -390,6 +402,7 @@ Account testAccount({
   profiles: profiles,
   signInMethods: signInMethods,
   temporary: temporary,
+  pendingConsents: pendingConsents,
 );
 
 /// The club of event [id]: it may do everything there (F1-7 C).

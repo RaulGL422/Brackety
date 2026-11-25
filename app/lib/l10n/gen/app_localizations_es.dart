@@ -3587,4 +3587,29 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get exportChooseColumn => 'Elige una columna';
+
+  @override
+  String get legalUpdateTitle => 'Hemos cambiado los textos legales';
+
+  @override
+  String get legalUpdateBody =>
+      'Estos textos han cambiado desde que los aceptaste. Léelos y acéptalos para seguir usando Brackety.';
+
+  @override
+  String legalUpdateVersion(String version) {
+    return 'Versión $version';
+  }
+
+  @override
+  String get legalUpdateAccept => 'He leído y acepto los textos de arriba.';
+
+  @override
+  String get legalUpdateSubmit => 'Aceptar y seguir';
+
+  @override
+  String get legalUpdateSignOut => 'Cerrar sesión';
+
+  @override
+  String get legalUpdateChangedAgain =>
+      'Los textos han vuelto a cambiar mientras los leías. Revisa la versión nueva y acéptala.';
 }

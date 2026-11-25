@@ -1891,5 +1891,13 @@
       }
     }
   },
-  "exportChooseColumn": "Elige una columna"
+  "exportChooseColumn": "Elige una columna",
+  "legalUpdateTitle": "Hemos cambiado los textos legales",
+  "legalUpdateBody": "Estos textos han cambiado desde que los aceptaste. Léelos y acéptalos para seguir usando Brackety.",
+  "legalUpdateVersion": "Versión {version}",
+  "legalUpdateAccept": "He leído y acepto los textos de arriba.",
+  "legalUpdateSubmit": "Aceptar y seguir",
+  "legalUpdateSignOut": "Cerrar sesión",
+  "legalUpdateChangedAgain": "Los textos han vuelto a cambiar mientras los leías. Revisa la versión nueva y acéptala.",
+  "@legalUpdateVersion": {"placeholders": {"version": {"type": "String"}}}
 }

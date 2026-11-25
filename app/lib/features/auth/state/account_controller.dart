@@ -53,6 +53,16 @@ class AccountController extends AsyncNotifier<Account?> {
     }
   }
 
+  /// A 409 means a text changed again while reading: the account is asked again for the new ones.
+  Future<void> acceptConsents(List<PendingConsent> accepted) async {
+    try {
+      state = AsyncData(await _api.acceptConsents(accepted));
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 409) ref.invalidateSelf();
+      rethrow;
+    }
+  }
+
   Future<void> addProfile(ProfileType type) async {
     try {
       await _api.addProfile(type);

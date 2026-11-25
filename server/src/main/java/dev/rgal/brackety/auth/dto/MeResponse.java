@@ -11,4 +11,6 @@ public record MeResponse(
         List<ProfileResponse> profiles,
         List<SignInMethodResponse> signInMethods,
         // Let in by QR for one event: the app hides what such an account cannot do.
-        boolean temporary) {}
+        boolean temporary,
+        // Changed legal texts to accept again before going on (docs/modulos/legal-paginas.md).
+        List<PendingConsent> pendingConsents) {}
