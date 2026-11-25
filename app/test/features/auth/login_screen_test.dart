@@ -35,9 +35,35 @@ void main() {
     final store = FakeRefreshTokenStore(inCookie: true)..qrSignIn = 'qr-k3f9a2';
     await pumpAuthApp(tester, FakeAuthApi(), store: store);
 
-    expect(find.textContaining('Sign in with qr-k3f9a2'), findsOneWidget);
-    expect(find.widgetWithText(TextField, 'qr-k3f9a2'), findsOneWidget);
-    expect(find.text('Email or sign-in'), findsOneWidget);
+    expect(find.text('Your session closed'), findsOneWidget);
+    expect(find.text('qr-k3f9a2'), findsOneWidget);
+    expect(find.byType(TextField), findsOneWidget);
+    expect(find.text('Forgot your password?'), findsNothing);
+    expect(find.text('No account? Sign up'), findsNothing);
+  });
+
+  testWidgets('the QR referee signs in with the password alone', (
+    tester,
+  ) async {
+    final api = FakeAuthApi()..accounts['qr-k3f9a2'] = 'club-pass';
+    final store = FakeRefreshTokenStore(inCookie: true)..qrSignIn = 'qr-k3f9a2';
+    await pumpAuthApp(tester, api, store: store);
+
+    await tester.enterText(find.byType(TextField), 'club-pass');
+    await tapText(tester, 'Sign in');
+
+    expect(api.logins, ['qr-k3f9a2']);
+  });
+
+  testWidgets('another account gets the full sign-in back', (tester) async {
+    final store = FakeRefreshTokenStore(inCookie: true)..qrSignIn = 'qr-k3f9a2';
+    await pumpAuthApp(tester, FakeAuthApi(), store: store);
+
+    await tapText(tester, 'Sign in with another account');
+
+    expect(find.text('Your session closed'), findsNothing);
+    expect(find.byType(TextField), findsNWidgets(2));
+    expect(find.text('Forgot your password?'), findsOneWidget);
   });
 
   testWidgets('without a QR account used here nothing is offered', (

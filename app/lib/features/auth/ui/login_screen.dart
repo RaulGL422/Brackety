@@ -34,20 +34,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _busy = false;
   String? _error;
 
-  @override
-  void initState() {
-    super.initState();
-    _offerQrSignIn();
-  }
-
-  // A referee whose session dropped: their sign-in is already typed (GR-2).
-  Future<void> _offerQrSignIn() async {
-    if (!ref.read(sessionProvider).expired) return;
-    final signIn = await ref.read(qrSignInProvider.future);
-    if (signIn != null && mounted && _email.text.isEmpty) {
-      setState(() => _email.text = signIn);
-    }
-  }
+  /// A QR referee's sign-in was offered, but someone else signs in on this device.
+  bool _otherAccount = false;
 
   @override
   void dispose() {
@@ -56,9 +44,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
-  void _submit() {
+  void _submit({String? signIn}) {
     if (_formKey.currentState!.validate()) {
-      _login(_email.text, _password.text);
+      _login(signIn ?? _email.text, _password.text);
     }
   }
 
@@ -131,7 +119,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final error = _error;
     final notice = ref.watch(sessionProvider.select((s) => s.notice));
     final expired = ref.watch(sessionProvider.select((s) => s.expired));
-    final qrSignIn = expired ? ref.watch(qrSignInProvider).value : null;
+    // A QR referee whose session dropped (GR-2): their sign-in shown, only the password to type,
+    // nothing about signing up or a forgotten password, which are not theirs.
+    final qrSignIn = expired && !_otherAccount
+        ? ref.watch(qrSignInProvider).value
+        : null;
     return AuthFormPage(
       title: l10n.loginTitle,
       children: [
@@ -144,7 +136,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           const SizedBox(height: AppSpacing.l),
         ],
         if (qrSignIn != null) ...[
-          FormMessage.error(l10n.loginQrSessionLost(qrSignIn)),
+          _QrSessionLost(signIn: qrSignIn),
           const SizedBox(height: AppSpacing.l),
         ],
         const ServerTile(),
@@ -154,27 +146,31 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                TextFormField(
-                  controller: _email,
-                  keyboardType: TextInputType.emailAddress,
-                  autocorrect: false,
-                  autofillHints: const [
-                    AutofillHints.email,
-                    AutofillHints.username,
-                  ],
-                  textInputAction: TextInputAction.next,
-                  // A QR account signs in with its `qr-…` sign-in, not an email.
-                  decoration: InputDecoration(labelText: l10n.loginUserLabel),
-                  validator: (value) =>
-                      (value ?? '').trim().isEmpty ? l10n.fieldRequired : null,
-                ),
-                const SizedBox(height: AppSpacing.m),
+                if (qrSignIn == null) ...[
+                  TextFormField(
+                    controller: _email,
+                    keyboardType: TextInputType.emailAddress,
+                    autocorrect: false,
+                    autofillHints: const [
+                      AutofillHints.email,
+                      AutofillHints.username,
+                    ],
+                    textInputAction: TextInputAction.next,
+                    // A QR account signs in with its `qr-…` sign-in, not an email.
+                    decoration: InputDecoration(labelText: l10n.loginUserLabel),
+                    validator: (value) => (value ?? '').trim().isEmpty
+                        ? l10n.fieldRequired
+                        : null,
+                  ),
+                  const SizedBox(height: AppSpacing.m),
+                ],
                 PasswordField(
                   controller: _password,
                   label: l10n.passwordLabel,
                   autofillHints: const [AutofillHints.password],
                   textInputAction: TextInputAction.done,
-                  onSubmitted: (_) => _busy ? null : _submit(),
+                  autofocus: qrSignIn != null,
+                  onSubmitted: (_) => _busy ? null : _submit(signIn: qrSignIn),
                   validator: (value) =>
                       (value ?? '').isEmpty ? l10n.fieldRequired : null,
                 ),
@@ -188,18 +184,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ],
         const SizedBox(height: AppSpacing.l),
         FilledButton(
-          onPressed: _busy ? null : _submit,
+          onPressed: _busy ? null : () => _submit(signIn: qrSignIn),
           child: Text(l10n.loginSubmit),
         ),
         const SizedBox(height: AppSpacing.s),
-        TextButton(
-          onPressed: () => context.go('/forgot-password'),
-          child: Text(l10n.loginForgot),
-        ),
-        TextButton(
-          onPressed: () => context.go('/register'),
-          child: Text(l10n.loginNoAccount),
-        ),
+        if (qrSignIn != null)
+          TextButton(
+            onPressed: () => setState(() => _otherAccount = true),
+            child: Text(l10n.loginOtherAccount),
+          )
+        else ...[
+          TextButton(
+            onPressed: () => context.go('/forgot-password'),
+            child: Text(l10n.loginForgot),
+          ),
+          TextButton(
+            onPressed: () => context.go('/register'),
+            child: Text(l10n.loginNoAccount),
+          ),
+        ],
         if (kDebugMode) ...[
           const SizedBox(height: AppSpacing.xl),
           DemoAccounts(
@@ -207,6 +210,53 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
         ],
       ],
+    );
+  }
+}
+
+/// Why the referee is here and who they are: not an error of theirs, so no error colour; their
+/// sign-in large, to read it against the club's paper if they doubt.
+class _QrSessionLost extends StatelessWidget {
+  const _QrSessionLost({required this.signIn});
+
+  final String signIn;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final muted = theme.textTheme.bodyMedium?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+    );
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.m),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(AppRadius.m),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: AppSpacing.s,
+        children: [
+          Row(
+            spacing: AppSpacing.s,
+            children: [
+              const Icon(Icons.qr_code_2),
+              Expanded(
+                child: Text(
+                  l10n.loginQrLostTitle,
+                  style: theme.textTheme.titleMedium,
+                ),
+              ),
+            ],
+          ),
+          Text(l10n.loginQrLostBody),
+          const SizedBox(height: AppSpacing.xs),
+          Text(l10n.loginQrUser, style: muted),
+          Text(signIn, style: theme.textTheme.headlineSmall),
+        ],
+      ),
     );
   }
 }

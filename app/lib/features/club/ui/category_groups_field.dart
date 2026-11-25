@@ -50,22 +50,47 @@ class CategoryGroupsField extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final text = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
     final matches = max * (max - 1) ~/ 2 * (returnLeg ? 2 : 1);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const SizedBox(height: AppSpacing.m),
-        Text(l10n.categoryGroups, style: text.titleSmall),
-        _stepper(l10n.categoryGroupFrom, min, _setMin, l10n),
-        _stepper(l10n.categoryGroupTo, max, _setMax, l10n),
-        SwitchListTile(
-          contentPadding: EdgeInsets.zero,
-          title: Text(l10n.categoryReturnLeg),
-          value: returnLeg,
-          onChanged: (on) => onChanged(min, max, on),
+    // One block: what a group of this category is, and what it costs in matches.
+    // A Material, not a coloured box: the switch's tap ripple paints on it.
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.m),
+      child: Material(
+        type: MaterialType.transparency,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.m),
+          side: BorderSide(color: scheme.outlineVariant),
         ),
-        Text(l10n.categoryGroupMatches(max, matches), style: text.bodySmall),
-      ],
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.m,
+            AppSpacing.s,
+            AppSpacing.m,
+            AppSpacing.m,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(l10n.categoryGroups, style: text.titleMedium),
+              _stepper(l10n.categoryGroupFrom, min, _setMin, l10n),
+              _stepper(l10n.categoryGroupTo, max, _setMax, l10n),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(l10n.categoryReturnLeg),
+                value: returnLeg,
+                onChanged: (on) => onChanged(min, max, on),
+              ),
+              Text(
+                l10n.categoryGroupMatches(max, matches),
+                style: text.bodyMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
