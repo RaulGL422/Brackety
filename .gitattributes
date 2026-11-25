@@ -9,3 +9,5 @@ mvnw text eol=lf
 .githooks/* text eol=lf
 # Golden files are compared byte for byte (CSV with BOM and CRLF for Excel): never converted.
 server/src/test/resources/golden/** -text
+# Release data for the migration test, loaded with COPY as it was dumped: never converted.
+server/src/test/resources/migration/** -text

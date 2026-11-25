@@ -1,0 +1,80 @@
+# Server battery, «Matriz de permisos», each permission alone: the club gives a helper only one permission; each
+# line is an endpoint of the event, its matches or its mats, and the permissions that open it (- none). Rewrite it
+# from what happens with -Dmatrix.update=true, then review against docs/modulos/ayudantes-permisos.md.
+DELETE /api/v1/events/{eventId}/groups/{groupId} | groups
+DELETE /api/v1/events/{eventId}/invitations/{invitationId} | -
+DELETE /api/v1/events/{eventId}/participants/{participantId} | participants
+DELETE /api/v1/events/{eventId}/rulebook | -
+DELETE /api/v1/events/{eventId}/staff/{accountId} | -
+DELETE /api/v1/events/{eventId}/teams/{teamId} | teams
+GET /api/v1/events/{eventId}/categories | groups measures teams view
+GET /api/v1/events/{eventId}/categories/{categoryId}/participants | groups measures teams view
+GET /api/v1/events/{eventId}/categories/{categoryId}/teams | groups measures teams view
+GET /api/v1/events/{eventId}/export/full | -
+GET /api/v1/events/{eventId}/export/league-standings-by-category.zip | -
+GET /api/v1/events/{eventId}/export/league-standings.csv | -
+GET /api/v1/events/{eventId}/export/league-standings.pdf | -
+GET /api/v1/events/{eventId}/export/matches.csv | -
+GET /api/v1/events/{eventId}/export/package | -
+GET /api/v1/events/{eventId}/export/participants.csv | -
+GET /api/v1/events/{eventId}/export/standings.csv | -
+GET /api/v1/events/{eventId}/export/timeline.csv | -
+GET /api/v1/events/{eventId}/exports/sheets | -
+GET /api/v1/events/{eventId}/invitations | -
+GET /api/v1/events/{eventId}/league | -
+GET /api/v1/events/{eventId}/league/candidates | -
+GET /api/v1/events/{eventId}/league/people/{personId}/record | participants
+GET /api/v1/events/{eventId}/league/standings | -
+GET /api/v1/events/{eventId}/mat-groups | control groups move_groups reviews view
+GET /api/v1/events/{eventId}/mats | control groups reviews view
+GET /api/v1/events/{eventId}/participants | participants
+GET /api/v1/events/{eventId}/participants/import/available | -
+GET /api/v1/events/{eventId}/participants/{participantId}/record | participants
+GET /api/v1/events/{eventId}/phase | control device_import groups measures move_groups own_mat participants phase reviews teams view
+GET /api/v1/events/{eventId}/rulebook | control device_import groups measures move_groups own_mat participants phase reviews teams view
+GET /api/v1/events/{eventId}/rulebook/info | control device_import groups measures move_groups own_mat participants phase reviews teams view
+GET /api/v1/events/{eventId}/settings | participants
+GET /api/v1/events/{eventId}/standings | -
+GET /api/v1/events/{eventId}/temporary-access | -
+GET /api/v1/matches/{matchId} | control reviews view
+GET /api/v1/mats/{matId}/board | control reviews view
+POST /api/v1/events/{eventId}/categories/{categoryId}/teams | teams
+POST /api/v1/events/{eventId}/control/matches/{matchId}/waive-rest | control
+POST /api/v1/events/{eventId}/control/mats/{matId}/disable | control
+POST /api/v1/events/{eventId}/control/mats/{matId}/enable | control
+POST /api/v1/events/{eventId}/control/team-members | control
+POST /api/v1/events/{eventId}/exports | -
+POST /api/v1/events/{eventId}/exports/preview | -
+POST /api/v1/events/{eventId}/groups | groups
+POST /api/v1/events/{eventId}/import/results | -
+POST /api/v1/events/{eventId}/invitations | -
+POST /api/v1/events/{eventId}/league/phases | -
+POST /api/v1/events/{eventId}/league/reenrol | -
+POST /api/v1/events/{eventId}/offline-ops/import | device_import
+POST /api/v1/events/{eventId}/participants | participants
+POST /api/v1/events/{eventId}/participants/import | -
+POST /api/v1/events/{eventId}/participants/import/check | -
+POST /api/v1/events/{eventId}/participants/import/read | -
+POST /api/v1/events/{eventId}/phase/finish | phase
+POST /api/v1/events/{eventId}/phase/reopen | -
+POST /api/v1/events/{eventId}/phase/start | phase
+POST /api/v1/events/{eventId}/temporary-access | -
+POST /api/v1/events/{eventId}/temporary-access/{accessId}/end | -
+POST /api/v1/events/{eventId}/temporary-access/{accessId}/renew | -
+POST /api/v1/matches/{matchId}/events | -
+POST /api/v1/matches/{matchId}/move | -
+POST /api/v1/matches/{matchId}/review | reviews
+PUT /api/v1/events/{eventId}/categories | -
+PUT /api/v1/events/{eventId}/control/groups/{groupId}/mat | control move_groups
+PUT /api/v1/events/{eventId}/control/groups/{groupId}/order | control
+PUT /api/v1/events/{eventId}/control/matches/{matchId}/mat | control
+PUT /api/v1/events/{eventId}/league | -
+PUT /api/v1/events/{eventId}/measures | -
+PUT /api/v1/events/{eventId}/organizations | -
+PUT /api/v1/events/{eventId}/participants/{participantId} | participants
+PUT /api/v1/events/{eventId}/participants/{participantId}/measures | measures
+PUT /api/v1/events/{eventId}/rulebook | -
+PUT /api/v1/events/{eventId}/settings | -
+PUT /api/v1/events/{eventId}/staff/{accountId}/name | -
+PUT /api/v1/events/{eventId}/staff/{accountId}/permissions | -
+PUT /api/v1/events/{eventId}/warning-reasons | -

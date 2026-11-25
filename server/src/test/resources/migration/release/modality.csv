@@ -1,0 +1,2 @@
+id,event_id,position,name,min_rest_seconds,changeover_seconds,scoring
+a1009a96-0d15-492d-9104-ffeb639bdf6a,a4dbbc78-7b4f-4e2a-9681-4bdff8e712f7,1,,30,30,"{""actions"": [{""label"": ""Punto"", ""value"": 1}], ""finishes"": [], ""tiebreaks"": [], ""warningPoints"": [0, 1], ""classification"": [], ""superiorityGap"": 0, ""oneHandWarnings"": true, ""pointsAfterTime"": true, ""warningsToDisqualify"": 0, ""disqualificationScores"": true}"

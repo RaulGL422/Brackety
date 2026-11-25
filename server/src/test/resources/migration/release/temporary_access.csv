@@ -1,0 +1,2 @@
+id,event_id,account_id,name,role,token_hash,created_by,created_at,renewed_at,signed_in_at,ended_at
+e12fb67c-a1f5-4fbd-9439-2963a14ca5d1,a4dbbc78-7b4f-4e2a-9681-4bdff8e712f7,f6a4c94f-7018-4d49-bc4d-01e0ca2efe53,Lucía,GROUPER,2e8bb1dec936b51f583c12f55a328ea0a7f50eb010b605cb67609eee71069be6,8d1fa72b-dc78-43a8-ad78-786e0dca3365,2026-11-24 15:49:20.179186+01,2026-11-24 15:49:20.179186+01,,
