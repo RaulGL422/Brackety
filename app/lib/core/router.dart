@@ -179,6 +179,15 @@ final routerProvider = Provider<GoRouter>((ref) {
             QrSignInScreen(code: state.uri.queryParameters['code']),
       ),
       GoRoute(
+        path: '/changelog',
+        builder: (context, _) => Scaffold(
+          appBar: AppBar(
+            title: Text(CoreLocalizations.of(context).changelogTitle),
+          ),
+          body: const ChangelogView(),
+        ),
+      ),
+      GoRoute(
         path: '/connection',
         builder: (context, _) => Scaffold(
           appBar: AppBar(

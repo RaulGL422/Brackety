@@ -31,5 +31,13 @@
   "updateTitle": "Hay una versión nueva de Brackety",
   "updateBody": "Actualiza para seguir. Tarda unos segundos.",
   "updateButton": "Actualizar",
-  "updateWaiting": "Hay una versión nueva: podrás actualizar en cuanto se envíen las acciones pendientes."
+  "updateWaiting": "Hay una versión nueva: podrás actualizar en cuanto se envíen las acciones pendientes.",
+  "changelogTitle": "Cambios",
+  "changelogMenu": "Cambios (debug)",
+  "changelogSearch": "Buscar en los cambios",
+  "changelogClear": "Borrar la búsqueda",
+  "changelogCount": "{shown} de {total} cambios",
+  "changelogNoMatch": "Ningún cambio tiene todas esas palabras.",
+  "changelogMissing": "La lista de cambios solo viene en las compilaciones de debug.",
+  "@changelogCount": {"placeholders": {"shown": {"type": "int"}, "total": {"type": "int"}}}
 }

@@ -78,6 +78,13 @@ final routerProvider = Provider<GoRouter>((ref) {
           label: (context) => AppLocalizations.of(context).navDebug,
           builder: (_) => const DebugScreen(),
         ),
+      if (debugEnvironment)
+        AdaptiveTab(
+          path: '/changelog',
+          icon: Icons.history,
+          label: (context) => CoreLocalizations.of(context).changelogTitle,
+          builder: (_) => const ChangelogView(),
+        ),
       AdaptiveTab(
         path: '/connection',
         icon: Icons.dns_outlined,

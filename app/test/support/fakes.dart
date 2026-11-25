@@ -53,13 +53,14 @@ List<Override> sessionOverrides(
   RefreshTokenStore store = const CookieRefreshTokenStore(),
   FakeAccountApi? account,
   LiveSocketConnect? live,
+  DebugStatus? debug,
 }) => [
   authApiProvider.overrideWithValue(api),
   refreshTokenStoreProvider.overrideWithValue(store),
   accountApiProvider.overrideWithValue(account ?? FakeAccountApi()),
   liveSocketConnectProvider.overrideWithValue(live ?? silentLive),
-  // Not the debug environment: no banner, and no request for it.
-  debugStatusProvider.overrideWith((ref) async => null),
+  // Not the debug environment unless [debug]: no banner, and no request for it.
+  debugStatusProvider.overrideWith((ref) async => debug),
 ];
 
 /// Server auth without a server. Sign-in works for [accounts] and when the password equals the

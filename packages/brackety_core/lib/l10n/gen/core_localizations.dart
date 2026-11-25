@@ -223,6 +223,48 @@ abstract class CoreLocalizations {
   /// In es, this message translates to:
   /// **'Hay una versión nueva: podrás actualizar en cuanto se envíen las acciones pendientes.'**
   String get updateWaiting;
+
+  /// No description provided for @changelogTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambios'**
+  String get changelogTitle;
+
+  /// No description provided for @changelogMenu.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambios (debug)'**
+  String get changelogMenu;
+
+  /// No description provided for @changelogSearch.
+  ///
+  /// In es, this message translates to:
+  /// **'Buscar en los cambios'**
+  String get changelogSearch;
+
+  /// No description provided for @changelogClear.
+  ///
+  /// In es, this message translates to:
+  /// **'Borrar la búsqueda'**
+  String get changelogClear;
+
+  /// No description provided for @changelogCount.
+  ///
+  /// In es, this message translates to:
+  /// **'{shown} de {total} cambios'**
+  String changelogCount(int shown, int total);
+
+  /// No description provided for @changelogNoMatch.
+  ///
+  /// In es, this message translates to:
+  /// **'Ningún cambio tiene todas esas palabras.'**
+  String get changelogNoMatch;
+
+  /// No description provided for @changelogMissing.
+  ///
+  /// In es, this message translates to:
+  /// **'La lista de cambios solo viene en las compilaciones de debug.'**
+  String get changelogMissing;
 }
 
 class _CoreLocalizationsDelegate

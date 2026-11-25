@@ -1,4 +1,7 @@
 export 'l10n/gen/core_localizations.dart';
+export 'src/changelog/changelog.dart';
+export 'src/changelog/changelog_provider.dart';
+export 'src/changelog/changelog_view.dart';
 export 'src/config/api_config.dart';
 export 'src/config/automation.dart';
 export 'src/feedback/toast.dart';
