@@ -19,6 +19,7 @@ GET /api/v1/events/{eventId}/export/package | -
 GET /api/v1/events/{eventId}/export/participants.csv | -
 GET /api/v1/events/{eventId}/export/standings.csv | -
 GET /api/v1/events/{eventId}/export/timeline.csv | -
+GET /api/v1/events/{eventId}/exports/audit | -
 GET /api/v1/events/{eventId}/exports/sheets | participants
 GET /api/v1/events/{eventId}/invitations | -
 GET /api/v1/events/{eventId}/league | -

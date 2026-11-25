@@ -180,6 +180,31 @@ class CustomExportTest extends EventApiTest {
                 .andExpect(status().isForbidden());
     }
 
+    // Each download with personal data leaves who, when, which sheet and which of those columns; only the club reads
+    // it.
+    @Test
+    void aDownloadWithPersonalDataIsAuditedForTheClub() throws Exception {
+        participant("Ana", new BigDecimal("25.0"));
+        grant("ayudante1", "PARTICIPANTS", "PERSONAL_DATA");
+
+        export("""
+                {"sheet":"participants","columns":["firstName","club"]}""");
+        call(post("/api/v1/events/" + eventId + "/exports/preview").content("""
+                                {"sheet":"participants","columns":["firstName","weightKg"]}"""), "club1")
+                .andExpect(status().isOk());
+        export("""
+                {"sheet":"participants","columns":["firstName","weightKg","birthDate"]}""", "ayudante1");
+
+        call(get("/api/v1/events/" + eventId + "/exports/audit"), "club1")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].account").value(org.hamcrest.Matchers.startsWith("ayudante1")))
+                .andExpect(jsonPath("$[0].sheet").value("Inscritos"))
+                .andExpect(jsonPath("$[0].columns").value("Fecha de nacimiento, Peso (kg)"))
+                .andExpect(jsonPath("$[0].at").isNotEmpty());
+        call(get("/api/v1/events/" + eventId + "/exports/audit"), "ayudante1").andExpect(status().isForbidden());
+    }
+
     // «Para publicar»: first name and the initial, never a personal column, also in the preview.
     @Test
     void forPublishingShortensTheNamesAndLeavesOutThePersonalColumns() throws Exception {
