@@ -53,7 +53,7 @@ public class AuthException extends ErrorResponseException {
         return withCode(HttpStatus.BAD_REQUEST, "INVALID_TAX_ID", "The CIF is not valid.");
     }
 
-    static AuthException legalVersionOutdated() {
+    public static AuthException legalVersionOutdated() {
         return withCode(
                 HttpStatus.CONFLICT,
                 "LEGAL_VERSION_OUTDATED",

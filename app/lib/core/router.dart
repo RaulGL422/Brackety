@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/auth/state/account_controller.dart';
 import '../features/auth/state/session_controller.dart';
 import '../features/auth/ui/check_email_screen.dart';
 import '../features/auth/ui/confirm_email_change_screen.dart';
 import '../features/auth/ui/forgot_password_screen.dart';
+import '../features/auth/ui/legal_update_screen.dart';
 import '../features/auth/ui/login_screen.dart';
 import '../features/auth/ui/register_screen.dart';
 import '../features/auth/ui/reset_password_screen.dart';
@@ -59,7 +61,27 @@ String _via(String detour, Uri location) {
   return at == '/' ? detour : '$detour?from=${Uri.encodeQueryComponent(at)}';
 }
 
+const _legalUpdate = '/legal-update';
+
 final routerProvider = Provider<GoRouter>((ref) {
+  String? signedIn(String at, Uri uri) {
+    final pending =
+        ref.read(accountProvider).value?.pendingConsents.isNotEmpty ?? false;
+    final arriving = _signedOutOnly.contains(at) || at == '/loading';
+    if (pending) {
+      if (at == _legalUpdate) return null;
+      // Back afterwards to where the person was going, not to the sign-in on the way.
+      return _via(
+        _legalUpdate,
+        arriving ? Uri.parse(_target(uri) ?? '/') : uri,
+      );
+    }
+    if (arriving || at == _legalUpdate) {
+      return _target(uri) ?? '/';
+    }
+    return null;
+  }
+
   // On the web the address follows every screen, also those opened with push: a reload comes
   // back to the same screen (a referee to the scoreboard), not to the start.
   GoRouter.optionURLReflectsImperativeAPIs = true;
@@ -68,6 +90,11 @@ final routerProvider = Provider<GoRouter>((ref) {
   final sessionChanged = ValueNotifier(0);
   ref.listen(
     sessionProvider.select((s) => s.status),
+    (_, _) => sessionChanged.value++,
+  );
+  // Changed legal texts to accept again keep the account on their screen until it does.
+  ref.listen(
+    accountProvider.select((a) => a.value?.pendingConsents.isNotEmpty ?? false),
     (_, _) => sessionChanged.value++,
   );
 
@@ -87,10 +114,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               : at == '/loading'
               ? _via('/login', Uri.parse(_target(state.uri) ?? '/'))
               : _via('/login', state.uri),
-        SessionStatus.signedIn =>
-          _signedOutOnly.contains(at) || at == '/loading'
-              ? _target(state.uri) ?? '/'
-              : null,
+        SessionStatus.signedIn => signedIn(at, state.uri),
       };
     },
     routes: [
@@ -99,6 +123,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, _) =>
             const Scaffold(body: Center(child: CircularProgressIndicator())),
       ),
+      GoRoute(path: _legalUpdate, builder: (_, _) => const LegalUpdateScreen()),
       GoRoute(
         path: '/login',
         builder: (_, state) => LoginScreen(

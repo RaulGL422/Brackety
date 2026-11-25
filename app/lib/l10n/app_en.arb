@@ -1130,5 +1130,13 @@
   "exportDownload": "Download",
   "exportPersonalTitle": "It has personal data",
   "exportPersonalBody": "It includes {columns}. Keep it only where needed and delete it when you no longer need it.",
-  "exportChooseColumn": "Choose a column"
+  "exportChooseColumn": "Choose a column",
+  "legalUpdateTitle": "We have changed the legal texts",
+  "legalUpdateBody": "These texts changed since you accepted them. Read and accept them to keep using Brackety.",
+  "legalUpdateVersion": "Version {version}",
+  "legalUpdateAccept": "I have read and accept the texts above.",
+  "legalUpdateSubmit": "Accept and continue",
+  "legalUpdateSignOut": "Sign out",
+  "legalUpdateChangedAgain": "The texts changed again while you were reading. Check the new version and accept it.",
+  "@legalUpdateVersion": {"placeholders": {"version": {"type": "String"}}}
 }

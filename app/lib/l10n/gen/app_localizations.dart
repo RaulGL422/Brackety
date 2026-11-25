@@ -5741,6 +5741,48 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Elige una columna'**
   String get exportChooseColumn;
+
+  /// No description provided for @legalUpdateTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Hemos cambiado los textos legales'**
+  String get legalUpdateTitle;
+
+  /// No description provided for @legalUpdateBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Estos textos han cambiado desde que los aceptaste. Léelos y acéptalos para seguir usando Brackety.'**
+  String get legalUpdateBody;
+
+  /// No description provided for @legalUpdateVersion.
+  ///
+  /// In es, this message translates to:
+  /// **'Versión {version}'**
+  String legalUpdateVersion(String version);
+
+  /// No description provided for @legalUpdateAccept.
+  ///
+  /// In es, this message translates to:
+  /// **'He leído y acepto los textos de arriba.'**
+  String get legalUpdateAccept;
+
+  /// No description provided for @legalUpdateSubmit.
+  ///
+  /// In es, this message translates to:
+  /// **'Aceptar y seguir'**
+  String get legalUpdateSubmit;
+
+  /// No description provided for @legalUpdateSignOut.
+  ///
+  /// In es, this message translates to:
+  /// **'Cerrar sesión'**
+  String get legalUpdateSignOut;
+
+  /// No description provided for @legalUpdateChangedAgain.
+  ///
+  /// In es, this message translates to:
+  /// **'Los textos han vuelto a cambiar mientras los leías. Revisa la versión nueva y acéptala.'**
+  String get legalUpdateChangedAgain;
 }
 
 class _AppLocalizationsDelegate

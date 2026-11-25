@@ -18,12 +18,19 @@ class MeService {
     private final AccountRepository accounts;
     private final ProfileRepository profiles;
     private final IdentityService identities;
+    private final ConsentService consents;
     private final Clock clock;
 
-    MeService(AccountRepository accounts, ProfileRepository profiles, IdentityService identities, Clock clock) {
+    MeService(
+            AccountRepository accounts,
+            ProfileRepository profiles,
+            IdentityService identities,
+            ConsentService consents,
+            Clock clock) {
         this.accounts = accounts;
         this.profiles = profiles;
         this.identities = identities;
+        this.consents = consents;
         this.clock = clock;
     }
 
@@ -51,6 +58,7 @@ class MeService {
                 account.getLocale(),
                 accountProfiles,
                 identities.methods(account),
-                account.isTemporary());
+                account.isTemporary(),
+                consents.pending(account.getId()));
     }
 }
