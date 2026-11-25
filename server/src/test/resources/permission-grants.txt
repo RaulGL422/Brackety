@@ -7,9 +7,9 @@ DELETE /api/v1/events/{eventId}/participants/{participantId} | participants
 DELETE /api/v1/events/{eventId}/rulebook | -
 DELETE /api/v1/events/{eventId}/staff/{accountId} | -
 DELETE /api/v1/events/{eventId}/teams/{teamId} | teams
-GET /api/v1/events/{eventId}/categories | groups measures teams view
-GET /api/v1/events/{eventId}/categories/{categoryId}/participants | groups measures teams view
-GET /api/v1/events/{eventId}/categories/{categoryId}/teams | groups measures teams view
+GET /api/v1/events/{eventId}/categories | groups measures participants teams view
+GET /api/v1/events/{eventId}/categories/{categoryId}/participants | groups measures participants teams view
+GET /api/v1/events/{eventId}/categories/{categoryId}/teams | groups measures participants teams view
 GET /api/v1/events/{eventId}/export/full | -
 GET /api/v1/events/{eventId}/export/league-standings-by-category.zip | -
 GET /api/v1/events/{eventId}/export/league-standings.csv | -
@@ -28,7 +28,7 @@ GET /api/v1/events/{eventId}/league/standings | -
 GET /api/v1/events/{eventId}/mat-groups | control groups move_groups reviews view
 GET /api/v1/events/{eventId}/mats | control groups reviews view
 GET /api/v1/events/{eventId}/participants | participants
-GET /api/v1/events/{eventId}/participants/import/available | -
+GET /api/v1/events/{eventId}/participants/import/available | participants
 GET /api/v1/events/{eventId}/participants/{participantId}/record | participants
 GET /api/v1/events/{eventId}/phase | control device_import groups measures move_groups own_mat participants phase reviews teams view
 GET /api/v1/events/{eventId}/rulebook | control device_import groups measures move_groups own_mat participants phase reviews teams view
@@ -52,9 +52,9 @@ POST /api/v1/events/{eventId}/league/phases | -
 POST /api/v1/events/{eventId}/league/reenrol | -
 POST /api/v1/events/{eventId}/offline-ops/import | device_import
 POST /api/v1/events/{eventId}/participants | participants
-POST /api/v1/events/{eventId}/participants/import | -
-POST /api/v1/events/{eventId}/participants/import/check | -
-POST /api/v1/events/{eventId}/participants/import/read | -
+POST /api/v1/events/{eventId}/participants/import | participants
+POST /api/v1/events/{eventId}/participants/import/check | participants
+POST /api/v1/events/{eventId}/participants/import/read | participants
 POST /api/v1/events/{eventId}/phase/finish | phase
 POST /api/v1/events/{eventId}/phase/reopen | -
 POST /api/v1/events/{eventId}/phase/start | phase
