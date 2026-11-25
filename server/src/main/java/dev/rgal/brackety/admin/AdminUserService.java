@@ -35,6 +35,7 @@ class AdminUserService {
     // The profiles come joined, sorted, in one column.
     private static final String SELECT = """
             select a.id, a.email, a.created_at, a.email_verified, a.status, a.suspended_at is not null as suspended,
+                   a.support,
                    (select string_agg(p.type, ',' order by p.type) from profile p where p.account_id = a.id)
                        as profiles,
                    (select max(p.organization_name) from profile p where p.account_id = a.id) as organization
@@ -140,6 +141,18 @@ class AdminUserService {
         log.info("Superadmin lifted the suspension of account {}", accountId);
     }
 
+    /** Enables or disables the Connection screen for this account (support); idempotent, audited with its reason. */
+    @Transactional
+    public void changeSupport(UUID accountId, boolean enabled, String reason) {
+        var account = activeLocked(accountId);
+        if (account.isSupport() == enabled) {
+            return;
+        }
+        account.changeSupport(enabled, clock.instant());
+        audit.supportChanged(accountId, enabled, reason.strip());
+        log.info("Superadmin {} support for account {}", enabled ? "enabled" : "disabled", accountId);
+    }
+
     /**
      * The same deletion as the owner's own (docs/modulos/auth.md): signed out, purged for good after the grace, and
      * the owner is emailed and can still restore it. An owner of events is refused (409 OWNS_EVENTS).
@@ -189,6 +202,7 @@ class AdminUserService {
                 rs.getString("status"),
                 rs.getBoolean("suspended"),
                 profiles == null ? List.of() : Arrays.asList(profiles.split(",")),
-                rs.getString("organization"));
+                rs.getString("organization"),
+                rs.getBoolean("support"));
     }
 }

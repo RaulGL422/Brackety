@@ -7,6 +7,7 @@ esa sección pasa a llamarse como la versión. Debug enseña su compilación jun
 ## Sin publicar (en debug)
 
 ### Nuevo
+- Cuentas de soporte: el superadmin las activa en la ficha del usuario; solo ellas (y debug) ven Conexión, ahora al final de Ajustes (#203).
 - Debug: pantalla «Cambios» con esta lista y un buscador por palabras (app: menú de la cuenta; admin: pestaña) (#201).
 - Si cambian los términos o la privacidad, quien los aceptó debe aceptarlos de nuevo al entrar (#199).
 - Al salir una versión nueva, la web y el admin avisan y obligan a actualizar (esperan si hay acciones sin enviar) (#200).

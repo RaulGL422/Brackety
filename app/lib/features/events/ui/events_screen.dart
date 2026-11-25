@@ -158,7 +158,7 @@ class _PhaseRow extends StatelessWidget {
   }
 }
 
-enum _AccountItem { settings, connection, changelog, signOut }
+enum _AccountItem { settings, changelog, signOut }
 
 /// One labelled button instead of three bare icons: people did not know what each one did.
 class _AccountMenu extends ConsumerWidget {
@@ -177,7 +177,6 @@ class _AccountMenu extends ConsumerWidget {
       tooltip: l10n.accountMenu,
       onSelected: (item) => switch (item) {
         _AccountItem.settings => context.push('/settings'),
-        _AccountItem.connection => context.push('/connection'),
         _AccountItem.changelog => context.push('/changelog'),
         _AccountItem.signOut => confirmSignOut(context, ref),
       },
@@ -191,14 +190,6 @@ class _AccountMenu extends ConsumerWidget {
               title: Text(l10n.settingsTitle),
             ),
           ),
-        PopupMenuItem(
-          value: _AccountItem.connection,
-          child: ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.dns_outlined),
-            title: Text(l10n.navConnection),
-          ),
-        ),
         if (debug)
           PopupMenuItem(
             value: _AccountItem.changelog,

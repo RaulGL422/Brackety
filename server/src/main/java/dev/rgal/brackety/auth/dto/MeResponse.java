@@ -13,4 +13,6 @@ public record MeResponse(
         // Let in by QR for one event: the app hides what such an account cannot do.
         boolean temporary,
         // Changed legal texts to accept again before going on (docs/modulos/legal-paginas.md).
-        List<PendingConsent> pendingConsents) {}
+        List<PendingConsent> pendingConsents,
+        // Enabled by the superadmin for support: the app shows it the Connection screen.
+        boolean support) {}

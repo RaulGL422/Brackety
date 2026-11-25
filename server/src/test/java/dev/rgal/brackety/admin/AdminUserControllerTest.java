@@ -97,6 +97,33 @@ class AdminUserControllerTest extends AdminApiTestBase {
         assertThat(audit()).isEmpty();
     }
 
+    // Only an account the superadmin enables for support sees the Connection screen (Raul, 2026-11-25).
+    @Test
+    void supportIsEnabledAndDisabledWithAReasonAndTheAccountSeesIt() throws Exception {
+        var club = accountId("club1");
+        call(get("/api/v1/me"), "club1").andExpect(jsonPath("$.support").value(false));
+
+        admin(post("/api/v1/admin/users/" + club + "/support").content("""
+                        {"enabled":true,"reason":"Soporte del club en la F2"}""")).andExpect(status().isNoContent());
+
+        call(get("/api/v1/me"), "club1").andExpect(jsonPath("$.support").value(true));
+        admin(get("/api/v1/admin/users/" + club))
+                .andExpect(jsonPath("$.user.support").value(true));
+        admin(post("/api/v1/admin/users/" + club + "/support").content("""
+                        {"enabled":false,"reason":"Fin del soporte"}""")).andExpect(status().isNoContent());
+        call(get("/api/v1/me"), "club1").andExpect(jsonPath("$.support").value(false));
+        assertThat(jdbc.sql("select reason from admin_audit where action = 'SUPPORT_CHANGED' order by at")
+                        .query(String.class)
+                        .list())
+                .containsExactly("on: Soporte del club en la F2", "off: Fin del soporte");
+        admin(post("/api/v1/admin/users/" + club + "/support").content("{\"enabled\":true}"))
+                .andExpect(status().isBadRequest());
+        call(post("/api/v1/admin/users/" + club + "/support").content("""
+                        {"enabled":true,"reason":"Yo mismo"}"""), "club1")
+                .andExpect(status().is4xxClientError());
+        call(get("/api/v1/me"), "club1").andExpect(jsonPath("$.support").value(false));
+    }
+
     private List<String> audit() {
         return jdbc.sql("select action from admin_audit where action like 'USER_%' order by at")
                 .query(String.class)

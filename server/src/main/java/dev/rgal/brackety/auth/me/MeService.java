@@ -59,6 +59,7 @@ class MeService {
                 accountProfiles,
                 identities.methods(account),
                 account.isTemporary(),
-                consents.pending(account.getId()));
+                consents.pending(account.getId()),
+                account.isSupport());
     }
 }

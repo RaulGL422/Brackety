@@ -318,5 +318,15 @@
   "planEmpty": "Nothing pending",
   "planSummary": "{count, plural, =1{1 pending match, starting at {time}} other{{count} pending matches, the first at {time}}}",
   "planHint": "Expected order of the recommended matches if everything goes to plan (each match at its full time plus the changeover). Times are estimates.",
-  "groupCreatedBy": "Made by {name}"
+  "groupCreatedBy": "Made by {name}",
+  "userSupportLabel": "Support",
+  "userSupportYes": "Yes: sees the Connection screen in the app",
+  "userSupportEnable": "Enable support",
+  "userSupportDisable": "Disable support",
+  "userSupportEnableTitle": "Enable support for {email}",
+  "userSupportEnableBody": "They will see the Connection screen in the app's settings (server, version and day). Only for whoever gives support: customers never see it.",
+  "userSupportDisableTitle": "Disable support for {email}",
+  "userSupportDisableBody": "They will no longer see the Connection screen in the app.",
+  "userSupportEnabled": "Support enabled",
+  "userSupportDisabled": "Support disabled"
 }

@@ -13,11 +13,13 @@ void main() {
     WidgetTester tester, {
     String? saved,
     bool selectable = true,
+    DebugStatus? debug,
   }) async {
     final store = FakeServerStore()..url = saved;
     await pumpAuthApp(
       tester,
       FakeAuthApi(),
+      debug: debug,
       overrides: [
         serverStoreProvider.overrideWithValue(store),
         serverSelectableProvider.overrideWithValue(selectable),
@@ -84,13 +86,26 @@ void main() {
     expect(find.text('Server: Sports hall'), findsOneWidget);
   });
 
+  // Before signing in, Connection is only offered against the debug server (support, not customers).
   testWidgets('the connection screen shows the chosen server', (tester) async {
-    await pumpLogin(tester, saved: hallServerUrl);
+    await pumpLogin(
+      tester,
+      saved: hallServerUrl,
+      debug: DebugStatus(today: DateTime(2026, 10, 31), simulated: false),
+    );
 
     await tester.tap(find.byTooltip('Connection'));
     await tester.pumpAndSettle();
 
     expect(find.text(hallServerUrl), findsOneWidget);
+  });
+
+  testWidgets('a customer signing in is not offered Connection', (
+    tester,
+  ) async {
+    await pumpLogin(tester, saved: hallServerUrl);
+
+    expect(find.byTooltip('Connection'), findsNothing);
   });
 
   testWidgets('the web has no server choice', (tester) async {

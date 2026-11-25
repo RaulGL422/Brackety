@@ -25,7 +25,9 @@ class AdminAudit {
         /** A change from the control panel (MatchControlService); the reason says which. */
         CONTROL_CHANGE,
         /** Debug environment only: a scenario loaded or the clock moved (docs/modulos/entornos.md). */
-        DEBUG_CHANGE
+        DEBUG_CHANGE,
+        /** Support enabled or disabled for an account; the reason says which. */
+        SUPPORT_CHANGED
     }
 
     @Id

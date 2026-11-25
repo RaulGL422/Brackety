@@ -1927,6 +1927,66 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Hecho por {name}'**
   String groupCreatedBy(String name);
+
+  /// No description provided for @userSupportLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Soporte'**
+  String get userSupportLabel;
+
+  /// No description provided for @userSupportYes.
+  ///
+  /// In es, this message translates to:
+  /// **'Sí: ve la pantalla Conexión en la app'**
+  String get userSupportYes;
+
+  /// No description provided for @userSupportEnable.
+  ///
+  /// In es, this message translates to:
+  /// **'Activar soporte'**
+  String get userSupportEnable;
+
+  /// No description provided for @userSupportDisable.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar soporte'**
+  String get userSupportDisable;
+
+  /// No description provided for @userSupportEnableTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Activar soporte para {email}'**
+  String userSupportEnableTitle(String email);
+
+  /// No description provided for @userSupportEnableBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Verá la pantalla Conexión en los ajustes de la app (servidor, versión y día). Solo para quien da soporte: los clientes nunca la ven.'**
+  String get userSupportEnableBody;
+
+  /// No description provided for @userSupportDisableTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar soporte a {email}'**
+  String userSupportDisableTitle(String email);
+
+  /// No description provided for @userSupportDisableBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Dejará de ver la pantalla Conexión en la app.'**
+  String get userSupportDisableBody;
+
+  /// No description provided for @userSupportEnabled.
+  ///
+  /// In es, this message translates to:
+  /// **'Soporte activado'**
+  String get userSupportEnabled;
+
+  /// No description provided for @userSupportDisabled.
+  ///
+  /// In es, this message translates to:
+  /// **'Soporte quitado'**
+  String get userSupportDisabled;
 }
 
 class _AppLocalizationsDelegate

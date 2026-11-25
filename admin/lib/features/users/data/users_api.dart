@@ -10,6 +10,7 @@ class AdminUserRow {
     required this.suspended,
     required this.profiles,
     this.organization,
+    this.support = false,
   });
 
   factory AdminUserRow.fromJson(Map<String, dynamic> json) => AdminUserRow(
@@ -21,6 +22,7 @@ class AdminUserRow {
     suspended: json['suspended'] as bool,
     profiles: [for (final p in json['profiles'] as List) p as String],
     organization: json['organization'] as String?,
+    support: json['support'] as bool? ?? false,
   );
 
   final String id;
@@ -35,6 +37,9 @@ class AdminUserRow {
   /// CLUB, EXTERNAL_ENTITY, HELPER, STUDENT, EXTERNAL.
   final List<String> profiles;
   final String? organization;
+
+  /// Enabled for support: sees the Connection screen in the app.
+  final bool support;
 }
 
 class AdminUserPage {
@@ -129,6 +134,12 @@ class UsersApi {
 
   Future<void> suspend(String accountId, String reason) =>
       _dio.post<void>('$_base/$accountId/suspend', data: {'reason': reason});
+
+  Future<void> support(String accountId, bool enabled, String reason) =>
+      _dio.post<void>(
+        '$_base/$accountId/support',
+        data: {'enabled': enabled, 'reason': reason},
+      );
 
   Future<void> unsuspend(String accountId, String reason) =>
       _dio.post<void>('$_base/$accountId/unsuspend', data: {'reason': reason});

@@ -1,6 +1,7 @@
 package dev.rgal.brackety.admin;
 
 import dev.rgal.brackety.admin.dto.AdminEventDtos.ReasonRequest;
+import dev.rgal.brackety.admin.dto.AdminUserDtos.SupportRequest;
 import dev.rgal.brackety.admin.dto.AdminUserDtos.UserDetail;
 import dev.rgal.brackety.admin.dto.AdminUserDtos.UserPage;
 import dev.rgal.brackety.auth.dto.DeletionResponse;
@@ -50,6 +51,12 @@ class AdminUserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void unsuspend(@PathVariable UUID accountId, @Valid @RequestBody ReasonRequest request) {
         users.unsuspend(accountId, request.reason());
+    }
+
+    @PostMapping("/{accountId}/support")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void support(@PathVariable UUID accountId, @Valid @RequestBody SupportRequest request) {
+        users.changeSupport(accountId, request.enabled(), request.reason());
     }
 
     @PostMapping("/{accountId}/delete")
