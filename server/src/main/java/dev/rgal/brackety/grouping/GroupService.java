@@ -32,8 +32,13 @@ import org.springframework.transaction.annotation.Transactional;
 class GroupService {
 
     /** Whoever groups, forms teams, measures or only looks reads the categories and who is in them. */
+    // Also who enters people: they choose each one's category (Raul, 2026-11-24).
     static final EventPermission[] READ_CATEGORIES = {
-        EventPermission.GROUPS, EventPermission.TEAMS, EventPermission.MEASURES, EventPermission.VIEW
+        EventPermission.GROUPS,
+        EventPermission.TEAMS,
+        EventPermission.MEASURES,
+        EventPermission.VIEW,
+        EventPermission.PARTICIPANTS
     };
 
     private final FightGroupRepository groups;

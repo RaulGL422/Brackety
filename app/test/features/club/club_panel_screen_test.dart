@@ -17,6 +17,7 @@ import 'package:brackety/features/club/ui/participant_form.dart';
 import 'package:brackety/features/club/ui/settings_tab.dart';
 import 'package:brackety/features/events/data/my_event.dart';
 import 'package:brackety/features/events/state/events_providers.dart';
+import 'package:brackety/features/importing/data/import_repository.dart';
 import 'package:brackety/features/league/data/league_models.dart';
 import 'package:brackety/features/league/state/league_providers.dart';
 import 'package:brackety/features/mat/data/mat_board.dart';
@@ -303,6 +304,7 @@ void main() {
     bool globalStandings = true,
     FakeStaffRepository? staff,
     MyEvent? me,
+    bool importAvailable = false,
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
@@ -316,6 +318,9 @@ void main() {
             staff ?? FakeStaffRepository(),
           ),
           myEventsProvider.overrideWith((ref) async => [me ?? event]),
+          importAvailableProvider.overrideWith(
+            (ref, _) async => importAvailable,
+          ),
           temporaryAccessesProvider.overrideWith((ref, _) async => []),
           leagueProvider.overrideWith(
             (ref, _) async => League(
@@ -811,6 +816,7 @@ void main() {
           size,
           repository: FakeClubRepository(settings),
           me: helperEvent({EventPermission.view, EventPermission.participants}),
+          importAvailable: true,
         );
 
         expect(find.text('Mats'), findsWidgets);
@@ -821,8 +827,9 @@ void main() {
         await tester.tap(find.text('Entries').last);
         await tester.pumpAndSettle();
         expect(find.text('Add student'), findsOneWidget);
-        // Re-enrolling from another phase and reading lists stay the club's.
-        expect(find.text('Import participants'), findsNothing);
+        // Who enters people also reads lists (Raul, 2026-11-24); re-enrolling stays the club's.
+        expect(find.text('Import participants'), findsOneWidget);
+        expect(find.text('Enter from other phases'), findsNothing);
         expect(tester.takeException(), isNull);
       },
     );
