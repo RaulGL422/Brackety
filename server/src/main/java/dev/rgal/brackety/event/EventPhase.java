@@ -3,6 +3,7 @@ package dev.rgal.brackety.event;
 import dev.rgal.brackety.event.Event.PhaseState;
 import dev.rgal.brackety.event.EventPhaseChange.Action;
 import dev.rgal.brackety.event.dto.PhaseView;
+import dev.rgal.brackety.legal.LegalService;
 import java.time.Clock;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -28,6 +29,7 @@ public class EventPhase {
     private final EventPhaseChangeRepository changes;
     private final EventAccess access;
     private final ApplicationEventPublisher publisher;
+    private final LegalService legal;
     private final Clock clock;
 
     EventPhase(
@@ -35,11 +37,13 @@ public class EventPhase {
             EventPhaseChangeRepository changes,
             EventAccess access,
             ApplicationEventPublisher publisher,
+            LegalService legal,
             Clock clock) {
         this.events = events;
         this.changes = changes;
         this.access = access;
         this.publisher = publisher;
+        this.legal = legal;
         this.clock = clock;
     }
 
@@ -83,6 +87,7 @@ public class EventPhase {
     @Transactional
     public PhaseView start(UUID eventId, UUID accountId) {
         access.require(eventId, accountId, EventPermission.PHASE);
+        legal.requirePrivacyContact();
         var event = lock(eventId);
         if (event.phaseState() != PhaseState.NOT_STARTED) {
             throw EventException.conflict("PHASE_ALREADY_STARTED", "The phase has already started.");

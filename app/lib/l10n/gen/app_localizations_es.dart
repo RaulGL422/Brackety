@@ -3188,6 +3188,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Hay un combate en curso o pendiente de revisión: termínalo antes.';
 
   @override
+  String get legalGateError =>
+      'El servidor no tiene contacto de privacidad, así que no se puede empezar ni crear una fase. Avisa a quien lo administra (PRIVACY_CONTACT_EMAIL).';
+
+  @override
   String permissionsTooltip(String name) {
     return 'Permisos de $name';
   }

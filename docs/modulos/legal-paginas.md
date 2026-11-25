@@ -35,7 +35,7 @@ En `app/lib/features/legal/`:
 - Ajustes: sección "Legal" con los 4 documentos y las licencias.
 - Aviso "los datos del alumno se tratan según la política de privacidad" (enlazada) en el formulario de alumno del club y en el paso de consentimiento de la importación.
 - Licencias de software (`showLicensePage`): siguen en la pantalla Conexión de `brackety_core` (la usa el admin) y se añaden al pie y a los ajustes de la app.
-- Pendiente: aviso de puerta legal para organizadores (cuando exista publicar eventos).
+- Puerta legal: empezar la fase o crear la siguiente da «El servidor no tiene contacto de privacidad…» (barra de la fase y diálogo de fase nueva).
 
 ## Tests
 Puerta legal activa/inactiva, versión de consentimiento, páginas servidas en ambos idiomas.
@@ -45,4 +45,4 @@ Puerta legal activa/inactiva, versión de consentimiento, páginas servidas en a
 2. Front: páginas públicas en la web y la app, casilla del registro con enlaces, pie, ajustes, licencias; aviso de privacidad visible en inscripción e importación (cubre el pendiente de la F1).
 
 ## Estado
-En pruebas: pasos 1-2 hechos (back y front de la app). Falta la prueba manual de Raul y la puerta `LEGAL_GATE` cuando existan publicar eventos y pasar de fase (2026-11-04).
+En pruebas: pasos 1-2 hechos (back y front de la app) y la puerta `LEGAL_GATE` en empezar la fase y crear la siguiente (#198; aún no hay «publicar evento»: cuando exista, la lleva también). Falta la prueba manual de Raul y pedir de nuevo la aceptación cuando cambie un texto material.

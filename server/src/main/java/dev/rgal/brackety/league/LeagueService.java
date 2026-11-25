@@ -11,10 +11,6 @@ import dev.rgal.brackety.event.EventOrganizationRepository;
 import dev.rgal.brackety.event.EventRepository;
 import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventService;
-import dev.rgal.brackety.event.EventStaff;
-import dev.rgal.brackety.event.EventStaffRepository;
-import dev.rgal.brackety.event.Mat;
-import dev.rgal.brackety.event.MatRepository;
 import dev.rgal.brackety.event.PhaseCreated;
 import dev.rgal.brackety.event.sport.SportCatalog;
 import dev.rgal.brackety.league.dto.LeagueDtos.Candidate;
@@ -26,6 +22,7 @@ import dev.rgal.brackety.league.dto.LeagueDtos.NewPhaseRequest;
 import dev.rgal.brackety.league.dto.LeagueDtos.PhaseResponse;
 import dev.rgal.brackety.league.dto.LeagueDtos.ReenrolRequest;
 import dev.rgal.brackety.league.dto.LeagueDtos.ReenrolResponse;
+import dev.rgal.brackety.legal.LegalService;
 import dev.rgal.brackety.participant.Participant;
 import dev.rgal.brackety.participant.ParticipantRepository;
 import dev.rgal.brackety.participant.ParticipantService;
@@ -54,14 +51,14 @@ public class LeagueService {
     private final CategoryPodiumRepository podiums;
     private final EventRepository events;
     private final EventService eventService;
-    private final EventStaffRepository staff;
-    private final MatRepository mats;
+    private final PhaseCarryOver carryOver;
     private final EventCategoryRepository categories;
     private final EventOrganizationRepository organizations;
     private final ParticipantRepository participants;
     private final EventAccess access;
     private final SportCatalog sports;
     private final ApplicationEventPublisher publisher;
+    private final LegalService legal;
     private final Clock clock;
 
     LeagueService(
@@ -69,27 +66,27 @@ public class LeagueService {
             CategoryPodiumRepository podiums,
             EventRepository events,
             EventService eventService,
-            EventStaffRepository staff,
-            MatRepository mats,
+            PhaseCarryOver carryOver,
             EventCategoryRepository categories,
             EventOrganizationRepository organizations,
             ParticipantRepository participants,
             EventAccess access,
             SportCatalog sports,
             ApplicationEventPublisher publisher,
+            LegalService legal,
             Clock clock) {
         this.leagues = leagues;
         this.podiums = podiums;
         this.events = events;
         this.eventService = eventService;
-        this.staff = staff;
-        this.mats = mats;
+        this.carryOver = carryOver;
         this.categories = categories;
         this.organizations = organizations;
         this.participants = participants;
         this.access = access;
         this.sports = sports;
         this.publisher = publisher;
+        this.legal = legal;
         this.clock = clock;
     }
 
@@ -124,29 +121,14 @@ public class LeagueService {
     @Transactional
     public PhaseResponse createPhase(UUID eventId, UUID accountId, NewPhaseRequest request) {
         access.require(eventId, accountId, EventRole.CLUB);
+        legal.requirePrivacyContact();
         var sport = sports.playable(request.discipline());
         var source = eventService.get(eventId);
         var phases = events.findByLeagueIdOrderByPhaseNumber(source.getLeagueId());
         var number = phases.getLast().getPhaseNumber() + 1;
         var phase = events.save(source.nextPhase(
                 number, sport, request.name().strip(), request.date(), request.attendancePoints(), clock.instant()));
-        var lasting = staff.findLastingByEventId(eventId);
-        for (var member : lasting) {
-            staff.save(new EventStaff(phase.getId(), member.getAccountId(), member.getRole()));
-        }
-        staff.flush();
-        access.copyPermissions(eventId, phase.getId());
-        var kept = lasting.stream().map(EventStaff::getAccountId).collect(Collectors.toSet());
-        for (var mat : mats.findByEventIdOrderByNumber(eventId)) {
-            var referee = kept.contains(mat.getRefereeAccountId()) ? mat.getRefereeAccountId() : null;
-            mats.save(new Mat(phase.getId(), mat.getNumber(), referee));
-        }
-        for (var c : categories.findByEventIdOrderByMinAge(eventId)) {
-            categories.save(c.copyFor(phase.getId()));
-        }
-        for (var o : organizations.findByEventIdOrderByName(eventId)) {
-            organizations.save(new EventOrganization(phase.getId(), o.getOrganization()));
-        }
+        carryOver.copy(eventId, phase.getId());
         publisher.publishEvent(new PhaseCreated(eventId, phase.getId()));
         return new PhaseResponse(
                 phase.getId(),

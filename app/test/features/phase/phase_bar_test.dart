@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/fakes.dart';
+
 import '../auth/auth_app.dart';
 
 /// The server's phase as it changes with each action.
@@ -18,12 +20,16 @@ class FakePhaseRepository extends PhaseRepository {
   Phase current;
   final calls = <String>[];
 
+  /// What the server answers to a start instead of starting.
+  DioException? startError;
+
   @override
   Future<Phase> phase(String eventId) async => current;
 
   @override
   Future<Phase> start(String eventId) async {
     calls.add('start');
+    if (startError case final error?) throw error;
     // A group was created meanwhile: three matches would stay unplayed.
     return current = const Phase(
       state: PhaseState.inProgress,
@@ -113,6 +119,20 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  // Without a privacy contact the server refuses to start (LEGAL_GATE): the club is told why.
+  testWidgets('a start refused by the legal gate says why', (tester) async {
+    final phases = FakePhaseRepository(
+      const Phase(state: PhaseState.notStarted),
+    )..startError = httpError(403, body: {'code': 'LEGAL_GATE'});
+    await pumpBar(tester, phases);
+
+    await tester.tap(find.text('Start phase'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('no privacy contact'), findsOneWidget);
+    expect(find.textContaining('has not started yet'), findsOneWidget);
+  });
 
   testWidgets('a helper sees the state but cannot change it', (tester) async {
     await pumpBar(
