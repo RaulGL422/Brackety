@@ -55,10 +55,40 @@ String? _target(Uri uri) {
   return from;
 }
 
-/// [location] as the `from` of a detour, unless it is the app's home: nothing to come back to.
+/// Where [uri] leads in the end: the sign-in and the loading screen only pass on their own `from`
+/// (also when an old address piled them up), so a reload never wraps one in another (Raul,
+/// 2026-11-25: «/login?from=/login?from=…»).
+Uri _destination(Uri uri) {
+  var at = uri;
+  while (at.path == '/login' || at.path == '/loading') {
+    at = Uri.parse(_target(at) ?? '/');
+  }
+  return at;
+}
+
+/// Where [location] leads as the `from` of a detour, unless it is the app's home: nothing to come
+/// back to.
 String _via(String detour, Uri location) {
-  final at = location.toString();
+  final at = _destination(location).toString();
   return at == '/' ? detour : '$detour?from=${Uri.encodeQueryComponent(at)}';
+}
+
+/// Without a session the sign-in and sign-up pages stay (a piled-up sign-in comes down to one
+/// `from`); the loading screen goes on to the page it was going to if it is one of them, and
+/// anything else asks to sign in first.
+String? _signedOut(String at, Uri uri) {
+  if (at == '/login') {
+    final from = _target(uri);
+    final piled =
+        from != null && {'/login', '/loading'}.contains(Uri.parse(from).path);
+    return piled ? _via('/login', uri) : null;
+  }
+  if (_signedOutOnly.contains(at)) return null;
+  final to = _destination(uri);
+  if (at == '/loading' && _signedOutOnly.contains(to.path)) {
+    return to.toString();
+  }
+  return _via('/login', uri);
 }
 
 const _legalUpdate = '/legal-update';
@@ -67,17 +97,15 @@ final routerProvider = Provider<GoRouter>((ref) {
   String? signedIn(String at, Uri uri) {
     final pending =
         ref.read(accountProvider).value?.pendingConsents.isNotEmpty ?? false;
-    final arriving = _signedOutOnly.contains(at) || at == '/loading';
     if (pending) {
-      if (at == _legalUpdate) return null;
       // Back afterwards to where the person was going, not to the sign-in on the way.
-      return _via(
-        _legalUpdate,
-        arriving ? Uri.parse(_target(uri) ?? '/') : uri,
-      );
+      return at == _legalUpdate ? null : _via(_legalUpdate, uri);
     }
-    if (arriving || at == _legalUpdate) {
-      return _target(uri) ?? '/';
+    if (at == _legalUpdate) return _target(uri) ?? '/';
+    if (_signedOutOnly.contains(at) || at == '/loading') {
+      // A sign-up left behind is no place for a signed-in account: home instead.
+      final to = _destination(uri);
+      return _signedOutOnly.contains(to.path) ? '/' : to.toString();
     }
     return null;
   }
@@ -108,12 +136,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       return switch (ref.read(sessionProvider).status) {
         SessionStatus.restoring =>
           at == '/loading' ? null : _via('/loading', state.uri),
-        SessionStatus.signedOut =>
-          _signedOutOnly.contains(at)
-              ? null
-              : at == '/loading'
-              ? _via('/login', Uri.parse(_target(state.uri) ?? '/'))
-              : _via('/login', state.uri),
+        SessionStatus.signedOut => _signedOut(at, state.uri),
         SessionStatus.signedIn => signedIn(at, state.uri),
       };
     },
