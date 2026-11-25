@@ -5064,6 +5064,12 @@ abstract class AppLocalizations {
   /// **'Hay un combate en curso o pendiente de revisión: termínalo antes.'**
   String get phaseMatchInProgressError;
 
+  /// No description provided for @legalGateError.
+  ///
+  /// In es, this message translates to:
+  /// **'El servidor no tiene contacto de privacidad, así que no se puede empezar ni crear una fase. Avisa a quien lo administra (PRIVACY_CONTACT_EMAIL).'**
+  String get legalGateError;
+
   /// No description provided for @permissionsTooltip.
   ///
   /// In es, this message translates to:
