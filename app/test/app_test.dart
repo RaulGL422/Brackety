@@ -16,9 +16,9 @@ void main() {
     'desktop': Size(1440, 900),
   };
 
-  Widget app(FakeAuthApi api) => ProviderScope(
+  Widget app(FakeAuthApi api, {FakeAccountApi? account}) => ProviderScope(
     overrides: [
-      ...sessionOverrides(api),
+      ...sessionOverrides(api, account: account),
       serverInfoProvider.overrideWith(
         (ref) async =>
             ServerInfo(name: 'brackety', today: DateTime(2027, 3, 10)),
@@ -66,9 +66,12 @@ void main() {
   }
 
   testWidgets(
-    'a saved session skips the sign-in and the connection screen is reachable',
+    'a saved session skips the sign-in; a support account finds Connection in the settings',
     (tester) async {
-      await tester.pumpWidget(app(FakeAuthApi(signedIn: true)));
+      final support = FakeAccountApi(account: testAccount(support: true));
+      await tester.pumpWidget(
+        app(FakeAuthApi(signedIn: true), account: support),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('My events'), findsOneWidget);
@@ -79,12 +82,37 @@ void main() {
 
       await tester.tap(find.byTooltip('My account'));
       await tester.pumpAndSettle();
+      expect(find.text('Connection'), findsNothing);
+      await tester.tap(find.text('Account settings'));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(find.text('Connection'), 300);
       await tester.tap(find.text('Connection'));
       await tester.pumpAndSettle();
       expect(find.text(apiBaseUrl), findsOneWidget);
       expect(find.text('Server date: March 10, 2027'), findsOneWidget);
     },
   );
+
+  // Raul, 2026-11-25: the Connection screen is not for customers.
+  testWidgets('a customer finds no Connection, and its address goes home', (
+    tester,
+  ) async {
+    await tester.pumpWidget(app(FakeAuthApi(signedIn: true)));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('My account'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Account settings'));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Sign out'), 300);
+    expect(find.text('Connection'), findsNothing);
+
+    ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
+        .read(routerProvider)
+        .go('/connection');
+    await tester.pumpAndSettle();
+    expect(find.text('My events'), findsOneWidget);
+  });
 
   for (final MapEntry(key: device, value: size) in sizes.entries) {
     testWidgets(

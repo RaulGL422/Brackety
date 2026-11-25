@@ -10,6 +10,7 @@ class Account {
     required this.signInMethods,
     this.temporary = false,
     this.pendingConsents = const [],
+    this.support = false,
   });
 
   factory Account.fromJson(Map<String, dynamic> json) => Account(
@@ -29,6 +30,7 @@ class Account {
       for (final p in json['pendingConsents'] as List<dynamic>? ?? const [])
         PendingConsent.fromJson(p as Map<String, dynamic>),
     ],
+    support: json['support'] as bool? ?? false,
   );
 
   final String email;
@@ -42,6 +44,9 @@ class Account {
 
   /// Legal texts changed since this account accepted them: to accept again before going on.
   final List<PendingConsent> pendingConsents;
+
+  /// Enabled by the superadmin for support: sees the Connection screen, which customers never do.
+  final bool support;
 
   bool get hasPassword =>
       signInMethods.any((m) => m.method == SignInMethod.password);
@@ -61,6 +66,7 @@ class Account {
     signInMethods: signInMethods,
     temporary: temporary,
     pendingConsents: pendingConsents,
+    support: support,
   );
 }
 

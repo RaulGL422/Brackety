@@ -12,6 +12,7 @@ import '../data/api_error.dart';
 import '../state/account_controller.dart';
 import 'settings/account_section.dart';
 import 'settings/appearance_section.dart';
+import 'settings/connection_tile.dart';
 import 'settings/data_sections.dart';
 import 'settings/language_section.dart';
 import 'settings/legal_section.dart';
@@ -100,6 +101,7 @@ class _Sections extends StatelessWidget {
             gap,
             const LegalSection(),
             gap,
+            const ConnectionTile(),
             const DangerZoneSection(),
             gap,
             const LogoutButton(),

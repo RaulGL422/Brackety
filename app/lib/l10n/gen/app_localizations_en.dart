@@ -337,6 +337,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navConnection => 'Connection';
 
   @override
+  String get connectionSupportHint =>
+      'Server, its version and its day. Support only.';
+
+  @override
   String get loading => 'Loading…';
 
   @override

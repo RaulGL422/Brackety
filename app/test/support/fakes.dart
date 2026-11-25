@@ -395,6 +395,7 @@ Account testAccount({
   ],
   bool temporary = false,
   List<PendingConsent> pendingConsents = const [],
+  bool support = false,
 }) => Account(
   email: email,
   emailVerified: emailVerified,
@@ -403,6 +404,7 @@ Account testAccount({
   signInMethods: signInMethods,
   temporary: temporary,
   pendingConsents: pendingConsents,
+  support: support,
 );
 
 /// The club of event [id]: it may do everything there (F1-7 C).

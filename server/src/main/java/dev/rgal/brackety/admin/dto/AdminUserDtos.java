@@ -1,5 +1,7 @@
 package dev.rgal.brackety.admin.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -24,7 +26,9 @@ public final class AdminUserDtos {
             String status,
             boolean suspended,
             List<String> profiles,
-            String organization) {}
+            String organization,
+            // Sees the Connection screen in the app.
+            boolean support) {}
 
     /**
      * {@code signInMethods}: PASSWORD and the linked providers; {@code lastSignIn}: the newest session; {@code
@@ -38,4 +42,8 @@ public final class AdminUserDtos {
             Instant lastSignIn,
             Instant suspendedAt,
             LocalDate deletesOn) {}
+
+    /** Support on or off for an account, with the reason the audit keeps. */
+    public record SupportRequest(
+            boolean enabled, @NotBlank @Size(max = 300) String reason) {}
 }

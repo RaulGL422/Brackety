@@ -612,5 +612,17 @@
   "@planSummary": {"placeholders": {"count": {"type": "int"}, "time": {"type": "String"}}},
   "planHint": "Orden previsto de los combates recomendados si todo va según lo previsto (cada combate con su tiempo entero y el cambio). Las horas son estimadas.",
   "groupCreatedBy": "Hecho por {name}",
-  "@groupCreatedBy": {"placeholders": {"name": {"type": "String"}}}
+  "@groupCreatedBy": {"placeholders": {"name": {"type": "String"}}},
+  "userSupportLabel": "Soporte",
+  "userSupportYes": "Sí: ve la pantalla Conexión en la app",
+  "userSupportEnable": "Activar soporte",
+  "userSupportDisable": "Quitar soporte",
+  "userSupportEnableTitle": "Activar soporte para {email}",
+  "userSupportEnableBody": "Verá la pantalla Conexión en los ajustes de la app (servidor, versión y día). Solo para quien da soporte: los clientes nunca la ven.",
+  "userSupportDisableTitle": "Quitar soporte a {email}",
+  "userSupportDisableBody": "Dejará de ver la pantalla Conexión en la app.",
+  "userSupportEnabled": "Soporte activado",
+  "userSupportDisabled": "Soporte quitado",
+  "@userSupportEnableTitle": {"placeholders": {"email": {"type": "String"}}},
+  "@userSupportDisableTitle": {"placeholders": {"email": {"type": "String"}}}
 }

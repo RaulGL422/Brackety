@@ -74,6 +74,7 @@ POST /api/v1/admin/organizers/{accountId}/validate | -
 POST /api/v1/admin/users/{accountId}/delete | superadmin
 POST /api/v1/admin/users/{accountId}/suspend | superadmin
 POST /api/v1/admin/users/{accountId}/unsuspend | superadmin
+POST /api/v1/admin/users/{accountId}/support | superadmin | {"enabled":true,"reason":"Prueba"}
 POST /api/v1/auth/email/change/confirm | anonymous outsider temporary referee grouper club
 POST /api/v1/auth/email/resend | anonymous outsider temporary referee grouper club
 POST /api/v1/auth/email/verify | anonymous outsider temporary referee grouper club

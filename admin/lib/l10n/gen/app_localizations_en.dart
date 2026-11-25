@@ -1148,4 +1148,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String groupCreatedBy(String name) {
     return 'Made by $name';
   }
+
+  @override
+  String get userSupportLabel => 'Support';
+
+  @override
+  String get userSupportYes => 'Yes: sees the Connection screen in the app';
+
+  @override
+  String get userSupportEnable => 'Enable support';
+
+  @override
+  String get userSupportDisable => 'Disable support';
+
+  @override
+  String userSupportEnableTitle(String email) {
+    return 'Enable support for $email';
+  }
+
+  @override
+  String get userSupportEnableBody =>
+      'They will see the Connection screen in the app\'s settings (server, version and day). Only for whoever gives support: customers never see it.';
+
+  @override
+  String userSupportDisableTitle(String email) {
+    return 'Disable support for $email';
+  }
+
+  @override
+  String get userSupportDisableBody =>
+      'They will no longer see the Connection screen in the app.';
+
+  @override
+  String get userSupportEnabled => 'Support enabled';
+
+  @override
+  String get userSupportDisabled => 'Support disabled';
 }
