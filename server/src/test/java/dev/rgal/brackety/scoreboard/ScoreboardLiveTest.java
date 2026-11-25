@@ -80,6 +80,23 @@ class ScoreboardLiveTest extends ScoreboardApiTest {
     }
 
     @Test
+    void aSuspendedAccountStopsHearingAtTheNextHeartbeat() throws Exception {
+        var match = match(young, 0, 1);
+        var helper = connect("ayudante1", LiveTopics.event(eventId));
+        var club = connect("club1", LiveTopics.event(eventId));
+        var account = accounts.findById(accountId("ayudante1")).orElseThrow();
+        account.suspend(clock.instant());
+        accounts.save(account);
+
+        hub.keepAlive();
+        start(match);
+
+        verify(helper.session).close(LiveHub.UNAUTHORIZED);
+        assertThat(helper.last()).doesNotContain("changed");
+        assertThat(club.last()).contains("changed", LiveTopics.event(eventId));
+    }
+
+    @Test
     void aRejectedWriteSendsNothing() throws Exception {
         var match = match(young, 0, 1);
         var club = connect("club1", LiveTopics.match(match));

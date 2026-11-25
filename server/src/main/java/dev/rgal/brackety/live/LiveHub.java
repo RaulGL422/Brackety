@@ -67,6 +67,8 @@ public class LiveHub extends TextWebSocketHandler {
         final WebSocketSession session;
         final Instant openedAt;
         volatile UUID accountId;
+        // Checked again on every heartbeat: a closed session or a suspended account stops hearing at once.
+        volatile String token;
         volatile Instant expiresAt;
         // Each topic the client follows, by the published topic it hears from (a mat hears from its event).
         volatile Map<String, String> topics = Map.of();
@@ -120,6 +122,7 @@ public class LiveHub extends TextWebSocketHandler {
                 return;
             }
             client.accountId = UUID.fromString(jwt.getSubject());
+            client.token = token;
             client.expiresAt = jwt.getExpiresAt();
             send(client, Map.of("type", "ready"));
         } catch (JwtException | IllegalArgumentException e) {
@@ -161,20 +164,34 @@ public class LiveHub extends TextWebSocketHandler {
     }
 
     // Keeps idle connections open through proxies (Cloudflare closes them after 100 s) and lets the client notice a
-    // dead one. Closes the ones that never signed in and those whose token has expired.
+    // dead one. Closes the ones that never signed in and those whose session is no longer valid: expired, closed by
+    // a password reset or a deletion, or suspended (one account read each, as every API request does).
     @Scheduled(fixedDelayString = "PT25S", initialDelayString = "PT25S")
-    void keepAlive() {
+    public void keepAlive() {
         var now = clock.instant();
         for (var client : clients.values()) {
             if (client.accountId == null) {
                 if (client.openedAt.plus(AUTH_WINDOW).isBefore(now)) {
                     close(client, UNAUTHORIZED);
                 }
-            } else if (client.expiresAt != null && !client.expiresAt.isAfter(now)) {
+            } else if ((client.expiresAt != null && !client.expiresAt.isAfter(now)) || !isValid(client.token)) {
                 close(client, UNAUTHORIZED);
             } else {
                 send(client, Map.of("type", "ping"));
             }
+        }
+    }
+
+    private boolean isValid(String token) {
+        try {
+            jwtDecoder.decode(token);
+            return true;
+        } catch (JwtException e) {
+            return false;
+        } catch (RuntimeException e) {
+            // A database hiccup must not drop every socket: the next heartbeat checks again.
+            log.warn("Could not check a live session: {}", e.toString());
+            return true;
         }
     }
 
