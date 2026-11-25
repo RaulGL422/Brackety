@@ -8,7 +8,6 @@ import '../../data/registration.dart';
 import '../../state/account_controller.dart';
 import '../../state/auth_providers.dart';
 import '../auth_texts.dart';
-import '../widgets/confirm_dialog.dart';
 import 'account_action.dart';
 import 'settings_section.dart';
 

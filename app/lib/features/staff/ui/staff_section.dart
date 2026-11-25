@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
-import '../../auth/ui/widgets/confirm_dialog.dart';
-import '../../club/data/club_models.dart';
+import '../../club/data/staff_member.dart';
 import '../../club/state/club_providers.dart';
 import '../../events/data/my_event.dart';
 import '../data/staff_repository.dart';
@@ -241,11 +240,11 @@ class _PermissionsDialogState extends State<_PermissionsDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.cancel),
+          child: Text(CoreLocalizations.of(context).cancel),
         ),
         FilledButton(
           onPressed: () => Navigator.pop(context, _chosen),
-          child: Text(l10n.save),
+          child: Text(CoreLocalizations.of(context).save),
         ),
       ],
     );
@@ -325,7 +324,7 @@ class _InviteDialogState extends State<_InviteDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.cancel),
+          child: Text(CoreLocalizations.of(context).cancel),
         ),
         FilledButton(
           onPressed: () {

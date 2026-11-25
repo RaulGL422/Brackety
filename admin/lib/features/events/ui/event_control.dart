@@ -133,7 +133,7 @@ class MatchControlMenu extends ConsumerWidget {
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(context, false),
-                    child: Text(l10n.cancel),
+                    child: Text(CoreLocalizations.of(context).cancel),
                   ),
                   FilledButton(
                     onPressed: () => Navigator.pop(context, true),
@@ -343,7 +343,7 @@ class _DisableMatDialogState extends State<_DisableMatDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.cancel),
+          child: Text(CoreLocalizations.of(context).cancel),
         ),
         FilledButton(
           onPressed: mats.isEmpty
@@ -404,12 +404,12 @@ class _ReorderDialogState extends State<_ReorderDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.cancel),
+          child: Text(CoreLocalizations.of(context).cancel),
         ),
         FilledButton(
           onPressed: () =>
               Navigator.pop(context, [for (final m in _order) m.id]),
-          child: Text(l10n.controlSave),
+          child: Text(CoreLocalizations.of(context).save),
         ),
       ],
     );

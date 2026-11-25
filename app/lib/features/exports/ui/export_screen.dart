@@ -3,7 +3,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/async_view.dart';
 import '../../../core/download/file_download.dart';
 import '../../../core/up_button.dart';
 import '../../../l10n/gen/app_localizations.dart';
@@ -73,7 +72,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(l10n.cancel),
+            child: Text(CoreLocalizations.of(context).cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),

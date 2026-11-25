@@ -8,8 +8,8 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../../events/data/measure_rules.dart';
 import '../../events/state/events_providers.dart';
 import '../../legal/ui/legal_links.dart';
-import '../data/club_models.dart';
 import '../data/club_repository.dart';
+import '../data/participant.dart';
 import '../data/sex.dart';
 import '../state/club_providers.dart';
 import 'club_panel_screen.dart';
@@ -176,11 +176,11 @@ class _ParticipantFormState extends ConsumerState<_ParticipantForm> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.cancel),
+          child: Text(CoreLocalizations.of(context).cancel),
         ),
         FilledButton(
           onPressed: _saving || needsConsent ? null : _save,
-          child: Text(l10n.save),
+          child: Text(CoreLocalizations.of(context).save),
         ),
       ],
     );

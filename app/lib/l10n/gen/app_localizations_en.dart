@@ -337,12 +337,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loading => 'Loading…';
 
   @override
-  String get retry => 'Retry';
-
-  @override
-  String get loadError => 'Could not load. Check the connection.';
-
-  @override
   String get noServer => 'Cannot reach the server.';
 
   @override
@@ -356,9 +350,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get tooManyRequestsWait =>
       'Too many requests. Wait a moment and try again.';
-
-  @override
-  String get cancel => 'Cancel';
 
   @override
   String get continueAction => 'Continue';
@@ -1372,13 +1363,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get save => 'Save';
-
-  @override
   String get delete => 'Delete';
-
-  @override
-  String get saved => 'Saved';
 
   @override
   String get saveConflict =>
@@ -2279,9 +2264,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get importOpsError =>
       'Could not import: the file is not one of pending actions or is from another event.';
-
-  @override
-  String get close => 'Close';
 
   @override
   String get matOfflineBoard =>

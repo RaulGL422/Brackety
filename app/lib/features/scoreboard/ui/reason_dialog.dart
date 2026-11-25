@@ -116,7 +116,7 @@ class _ReasonDialogState extends State<_ReasonDialog> {
               child: OutlinedButton(
                 onPressed: () => Navigator.of(context).pop(),
                 child: Text(
-                  widget.dismissLabel ?? l10n.cancel,
+                  widget.dismissLabel ?? CoreLocalizations.of(context).cancel,
                   textAlign: TextAlign.center,
                 ),
               ),

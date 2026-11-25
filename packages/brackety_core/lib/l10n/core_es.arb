@@ -22,5 +22,10 @@
       }
     }
   },
-  "closeNotice": "Cerrar aviso"
+  "closeNotice": "Cerrar aviso",
+  "cancel": "Cancelar",
+  "saved": "Guardado",
+  "save": "Guardar",
+  "close": "Cerrar",
+  "loadError": "No se ha podido cargar. Comprueba la conexión."
 }

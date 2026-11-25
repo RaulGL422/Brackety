@@ -30,13 +30,19 @@ class _ComponentsSectionState extends State<ComponentsSection> {
           spacing: AppSpacing.s,
           runSpacing: AppSpacing.s,
           children: [
-            FilledButton(onPressed: () {}, child: Text(l10n.dsSave)),
+            FilledButton(
+              onPressed: () {},
+              child: Text(CoreLocalizations.of(context).save),
+            ),
             FilledButton.tonalIcon(
               onPressed: () {},
               icon: const Icon(Icons.how_to_reg_outlined),
               label: Text(l10n.dsTonal),
             ),
-            OutlinedButton(onPressed: () {}, child: Text(l10n.dsCancel)),
+            OutlinedButton(
+              onPressed: () {},
+              child: Text(CoreLocalizations.of(context).cancel),
+            ),
             TextButton(onPressed: () {}, child: Text(l10n.dsMore)),
             FilledButton(onPressed: null, child: Text(l10n.dsDisabled)),
           ],

@@ -8,7 +8,6 @@ import 'package:go_router/go_router.dart';
 import '../../../core/up_button.dart';
 import '../../../core/upload/file_upload.dart';
 import '../../../l10n/gen/app_localizations.dart';
-import '../../auth/ui/widgets/confirm_dialog.dart';
 import '../../events/data/my_event.dart';
 import '../../events/state/events_providers.dart';
 import '../../league/ui/phase_switcher.dart';

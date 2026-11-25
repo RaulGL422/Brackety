@@ -95,7 +95,7 @@ class _ReauthDialogState extends ConsumerState<ReauthDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context, false),
-          child: Text(l10n.cancel),
+          child: Text(CoreLocalizations.of(context).cancel),
         ),
         FilledButton(
           onPressed: _busy ? null : _submit,

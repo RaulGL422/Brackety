@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
-import '../data/club_models.dart';
 import '../data/club_repository.dart';
+import '../data/participant.dart';
 import '../state/club_providers.dart';
 
 /// The clubs taking part, added by hand; each participant may belong to one. Every change is
@@ -40,6 +40,7 @@ class _OrganizationsEditorState extends ConsumerState<OrganizationsEditor> {
   Future<void> _save(List<Organization> next) async {
     final l10n = AppLocalizations.of(context);
     final toasts = Toasts.of(context);
+    final savedText = CoreLocalizations.of(context).saved;
     setState(() => _saving = true);
     try {
       final saved = await ref
@@ -49,7 +50,7 @@ class _OrganizationsEditorState extends ConsumerState<OrganizationsEditor> {
       ref
         ..invalidate(eventSettingsProvider(widget.eventId))
         ..invalidate(participantsProvider(widget.eventId));
-      toasts.show(l10n.saved, duration: const Duration(seconds: 1));
+      toasts.show(savedText, duration: const Duration(seconds: 1));
     } on DioException catch (e) {
       toasts.show(switch (e.response?.statusCode) {
         409 => l10n.organizationsConflict,
@@ -187,9 +188,12 @@ class _OrganizationDialogState extends State<_OrganizationDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.cancel),
+          child: Text(CoreLocalizations.of(context).cancel),
         ),
-        FilledButton(onPressed: _done, child: Text(l10n.save)),
+        FilledButton(
+          onPressed: _done,
+          child: Text(CoreLocalizations.of(context).save),
+        ),
       ],
     );
   }

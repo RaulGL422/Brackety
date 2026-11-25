@@ -182,11 +182,11 @@ class _RenameDialogState extends State<_RenameDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.cancel),
+          child: Text(CoreLocalizations.of(context).cancel),
         ),
         FilledButton(
           onPressed: () => Navigator.pop(context, _text.text),
-          child: Text(l10n.save),
+          child: Text(CoreLocalizations.of(context).save),
         ),
       ],
     );

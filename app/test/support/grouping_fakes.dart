@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:brackety/app.dart';
 import 'package:brackety/core/router.dart';
-import 'package:brackety/features/club/data/club_models.dart';
+import 'package:brackety/features/club/data/mat_overview.dart';
 import 'package:brackety/features/club/state/club_providers.dart';
 import 'package:brackety/features/grouping/data/grouping_models.dart';
 import 'package:brackety/features/grouping/data/grouping_repository.dart';

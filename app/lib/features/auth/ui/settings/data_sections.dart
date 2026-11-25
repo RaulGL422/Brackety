@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../l10n/gen/app_localizations.dart';
 import '../../../offline/ui/confirm_sign_out.dart';
 import '../../state/account_controller.dart';
-import '../widgets/confirm_dialog.dart';
 import '../widgets/reauth_dialog.dart';
 import 'account_action.dart';
 import 'settings_section.dart';

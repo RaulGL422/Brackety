@@ -4,7 +4,6 @@ import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/async_view.dart';
 import '../../../core/up_button.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../data/legal_repository.dart';

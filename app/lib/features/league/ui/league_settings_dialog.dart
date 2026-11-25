@@ -114,9 +114,12 @@ class _LeagueSettingsDialogState extends ConsumerState<_LeagueSettingsDialog> {
       actions: [
         TextButton(
           onPressed: _saving ? null : () => Navigator.pop(context),
-          child: Text(l10n.cancel),
+          child: Text(CoreLocalizations.of(context).cancel),
         ),
-        FilledButton(onPressed: _saving ? null : _save, child: Text(l10n.save)),
+        FilledButton(
+          onPressed: _saving ? null : _save,
+          child: Text(CoreLocalizations.of(context).save),
+        ),
       ],
     );
   }

@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../../core/async_view.dart';
-import '../../../core/confirm_dialog.dart';
 import '../../../core/page_header.dart';
 import '../../../core/run_action.dart';
 import '../../../l10n/gen/app_localizations.dart';
@@ -107,7 +105,7 @@ class _Day extends ConsumerWidget {
       await runAction(
         context,
         () => ref.read(debugApiProvider).moveClock(day),
-        done: (_) => l10n.saved,
+        done: (_) => CoreLocalizations.of(context).saved,
         notFound: l10n.debugGone,
       );
       ref.invalidate(debugStatusProvider);
@@ -206,7 +204,10 @@ class _SaveCopyState extends ConsumerState<_SaveCopy> {
           const SizedBox(width: AppSpacing.s),
           Padding(
             padding: const EdgeInsets.only(top: AppSpacing.s),
-            child: FilledButton(onPressed: _save, child: Text(l10n.debugSave)),
+            child: FilledButton(
+              onPressed: _save,
+              child: Text(CoreLocalizations.of(context).save),
+            ),
           ),
         ],
       ),
@@ -360,7 +361,7 @@ class _LoadDialogState extends State<_LoadDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.cancel),
+          child: Text(CoreLocalizations.of(context).cancel),
         ),
         FilledButton(
           onPressed: typed

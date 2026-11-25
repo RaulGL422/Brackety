@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-import '../../../core/async_view.dart';
 import '../../../core/keep_screen_on.dart';
 import '../../../core/up_button.dart';
 import '../../../l10n/gen/app_localizations.dart';

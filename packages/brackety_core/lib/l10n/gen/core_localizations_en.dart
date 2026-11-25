@@ -55,4 +55,19 @@ class CoreLocalizationsEn extends CoreLocalizations {
 
   @override
   String get closeNotice => 'Close notice';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get saved => 'Saved';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get loadError => 'Could not load. Check the connection.';
 }

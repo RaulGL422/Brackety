@@ -86,7 +86,7 @@ class _ServerDialogState extends State<ServerDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text(l10n.cancel),
+          child: Text(CoreLocalizations.of(context).cancel),
         ),
         FilledButton(onPressed: _submit, child: Text(l10n.serverUse)),
       ],

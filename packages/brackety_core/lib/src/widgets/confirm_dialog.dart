@@ -1,42 +1,51 @@
-import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 
-import '../l10n/gen/app_localizations.dart';
+import '../../l10n/gen/core_localizations.dart';
+import '../theme/tokens.dart';
 
-/// True when confirmed.
+/// Pops true when confirmed. A [destructive] action gets the error colour on its button.
 Future<bool> confirmAction(
   BuildContext context, {
-  required String title,
+  String? title,
   required String body,
   required String confirmLabel,
+  bool destructive = false,
 }) async =>
     await showDialog<bool>(
       context: context,
-      builder: (_) =>
-          ConfirmDialog(title: title, body: body, confirmLabel: confirmLabel),
+      builder: (_) => ConfirmDialog(
+        title: title,
+        body: body,
+        confirmLabel: confirmLabel,
+        destructive: destructive,
+      ),
     ) ??
     false;
 
 class ConfirmDialog extends StatelessWidget {
   const ConfirmDialog({
     super.key,
-    required this.title,
+    this.title,
     required this.body,
     required this.confirmLabel,
+    this.destructive = false,
   });
 
-  final String title;
+  final String? title;
   final String body;
   final String confirmLabel;
+  final bool destructive;
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = CoreLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    final title = this.title;
     return AlertDialog(
       scrollable: true,
       actionsOverflowDirection: VerticalDirection.up,
       actionsOverflowButtonSpacing: 8,
-      title: Text(title),
+      title: title == null ? null : Text(title),
       // Long bodies would stretch the dialog across wide windows.
       content: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: AppSizes.formMaxWidth),
@@ -48,6 +57,12 @@ class ConfirmDialog extends StatelessWidget {
           child: Text(l10n.cancel),
         ),
         FilledButton(
+          style: destructive
+              ? FilledButton.styleFrom(
+                  backgroundColor: scheme.error,
+                  foregroundColor: scheme.onError,
+                )
+              : null,
           onPressed: () => Navigator.pop(context, true),
           child: Text(confirmLabel),
         ),

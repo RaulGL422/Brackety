@@ -8,7 +8,6 @@ import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
 import '../../auth/data/api_error.dart';
-import '../../auth/ui/widgets/confirm_dialog.dart';
 import '../../club/state/club_providers.dart';
 import '../data/staff_repository.dart';
 import '../data/temporary_access.dart';
@@ -186,7 +185,7 @@ class _NameDialogState extends State<_NameDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.cancel),
+          child: Text(CoreLocalizations.of(context).cancel),
         ),
         FilledButton.icon(
           icon: const Icon(Icons.qr_code_2),
@@ -296,7 +295,7 @@ class _QrDialogState extends ConsumerState<_QrDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.close),
+          child: Text(CoreLocalizations.of(context).close),
         ),
       ],
     );

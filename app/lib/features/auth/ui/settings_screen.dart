@@ -128,9 +128,16 @@ class _LoadError extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              FormMessage.error(noServer ? l10n.noServer : l10n.loadError),
+              FormMessage.error(
+                noServer
+                    ? l10n.noServer
+                    : CoreLocalizations.of(context).loadError,
+              ),
               const SizedBox(height: AppSpacing.l),
-              OutlinedButton(onPressed: onRetry, child: Text(l10n.retry)),
+              OutlinedButton(
+                onPressed: onRetry,
+                child: Text(CoreLocalizations.of(context).retry),
+              ),
             ],
           ),
         ),

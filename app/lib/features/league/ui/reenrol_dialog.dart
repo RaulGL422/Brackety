@@ -3,9 +3,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/async_view.dart';
 import '../../../l10n/gen/app_localizations.dart';
-import '../../club/data/club_models.dart';
+import '../../club/data/participant.dart';
 import '../../club/state/club_providers.dart';
 import '../data/league_models.dart';
 import '../data/league_repository.dart';
@@ -60,7 +59,7 @@ class _ReenrolDialogState extends ConsumerState<_ReenrolDialog> {
       actions: [
         TextButton(
           onPressed: _saving ? null : () => Navigator.pop(context),
-          child: Text(l10n.cancel),
+          child: Text(CoreLocalizations.of(context).cancel),
         ),
         FilledButton(
           onPressed:

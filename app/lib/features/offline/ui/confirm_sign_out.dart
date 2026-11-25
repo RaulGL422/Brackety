@@ -1,9 +1,9 @@
+import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
 import '../../auth/state/session_controller.dart';
-import '../../auth/ui/widgets/confirm_dialog.dart';
 import '../state/offline_sync.dart';
 
 /// "Sign out" by hand: the account's actions not sent yet are lost, so it asks first.

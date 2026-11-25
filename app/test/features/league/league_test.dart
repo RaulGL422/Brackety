@@ -1,4 +1,6 @@
-import 'package:brackety/features/club/data/club_models.dart';
+import 'package:brackety/features/club/data/participant.dart';
+import 'package:brackety/features/club/data/participant_record.dart';
+import 'package:brackety/features/club/data/standing_row.dart';
 import 'package:brackety/features/club/state/club_providers.dart';
 import 'package:brackety/features/events/data/my_event.dart';
 import 'package:brackety/features/events/state/events_providers.dart';

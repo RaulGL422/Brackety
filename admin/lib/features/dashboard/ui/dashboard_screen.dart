@@ -2,7 +2,6 @@ import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/async_view.dart';
 import '../../../core/page_header.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../data/metrics_api.dart';

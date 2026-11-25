@@ -169,6 +169,36 @@ abstract class CoreLocalizations {
   /// In es, this message translates to:
   /// **'Cerrar aviso'**
   String get closeNotice;
+
+  /// No description provided for @cancel.
+  ///
+  /// In es, this message translates to:
+  /// **'Cancelar'**
+  String get cancel;
+
+  /// No description provided for @saved.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardado'**
+  String get saved;
+
+  /// No description provided for @save.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardar'**
+  String get save;
+
+  /// No description provided for @close.
+  ///
+  /// In es, this message translates to:
+  /// **'Cerrar'**
+  String get close;
+
+  /// No description provided for @loadError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se ha podido cargar. Comprueba la conexión.'**
+  String get loadError;
 }
 
 class _CoreLocalizationsDelegate

@@ -79,4 +79,5 @@ Ver `diseno-revision.md`. Regla al tocar una pantalla: `build` ≤ 60 líneas, a
 | Claves foráneas consultadas sin índice | 8 | 0 |
 
 ## Estado
-Aprobado por Raul (2026-11-18). L0 completa (2026-11-20); siguiente, L1.
+Aprobado por Raul (2026-11-18). L0 completa (2026-11-20).
+- L1 hecha (#194): índices de las 26 claves foráneas (`ForeignKeyIndexesTest`), `eventpackage` sin `demo` (ya estaba, #138), `club/data` un archivo por tema; `AsyncView`, `ConfirmDialog` y textos comunes (Cancelar, Guardar, Guardado, Cerrar, Reintentar, error de carga) en `brackety_core`. Los diálogos de motivo y `runAction` siguen en cada app: piden cosas distintas. Siguiente: L2.

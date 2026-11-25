@@ -3,13 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/async_view.dart';
 import '../../../core/medal.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../mat/data/mat_board.dart';
 import '../../mat/ui/mat_label.dart';
 import '../../scoreboard/ui/undo_text.dart';
-import '../data/club_models.dart';
+import '../data/participant_record.dart';
 import '../state/club_providers.dart';
 
 /// A participant's day for the club: their place and points, their warnings (unfolding to each

@@ -1,8 +1,8 @@
-import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../l10n/gen/app_localizations.dart';
+import '../../l10n/gen/core_localizations.dart';
+import '../theme/tokens.dart';
 
 /// Loading spinner, error with retry, or [data]. On a refresh it keeps showing the last data.
 class AsyncView<T> extends StatelessWidget {
@@ -19,7 +19,7 @@ class AsyncView<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = CoreLocalizations.of(context);
     return switch (value) {
       AsyncValue(:final value?, hasValue: true) => data(value),
       AsyncError() => Center(
@@ -35,7 +35,11 @@ class AsyncView<T> extends StatelessWidget {
           ),
         ),
       ),
-      _ => const Center(child: CircularProgressIndicator()),
+      // Padded so a spinner inside a list does not sit on its neighbours.
+      _ => const Padding(
+        padding: EdgeInsets.all(AppSpacing.xl),
+        child: Center(child: CircularProgressIndicator()),
+      ),
     };
   }
 }

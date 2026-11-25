@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../l10n/gen/app_localizations.dart';
 import '../auth/data/api_error.dart';
-import '../club/data/club_models.dart';
+import '../club/data/mat_overview.dart';
 import '../club/state/club_providers.dart';
 import '../mat/data/mat_board.dart';
 import '../mat/ui/fighter_text.dart';
@@ -374,7 +374,7 @@ class _DisableMatDialogState extends State<_DisableMatDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.cancel),
+          child: Text(CoreLocalizations.of(context).cancel),
         ),
         FilledButton(
           onPressed: mats.isEmpty
@@ -510,12 +510,12 @@ class _ReorderDialogState extends State<_ReorderDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.cancel),
+          child: Text(CoreLocalizations.of(context).cancel),
         ),
         FilledButton(
           onPressed: () =>
               Navigator.pop(context, [for (final m in _order) m.id]),
-          child: Text(l10n.save),
+          child: Text(CoreLocalizations.of(context).save),
         ),
       ],
     );
@@ -533,7 +533,7 @@ Future<bool> _confirm(BuildContext context, String title, String body) async {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: Text(l10n.cancel),
+              child: Text(CoreLocalizations.of(context).cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, true),

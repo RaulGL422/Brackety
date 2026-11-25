@@ -2,11 +2,11 @@ import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/async_view.dart';
 import '../../../core/medal.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../league/state/league_providers.dart';
-import '../data/club_models.dart';
+import '../data/event_category.dart';
+import '../data/standing_row.dart';
 import '../state/club_providers.dart';
 import 'participant_record_sheet.dart';
 

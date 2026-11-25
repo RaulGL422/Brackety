@@ -133,8 +133,6 @@
   "appTitle": "Brackety",
   "navConnection": "Conexión",
   "loading": "Cargando…",
-  "retry": "Reintentar",
-  "loadError": "No se ha podido cargar. Comprueba la conexión.",
   "noServer": "No hay conexión con el servidor.",
   "unexpectedError": "Algo ha ido mal. Inténtalo de nuevo.",
   "tooManyRequests": "Demasiadas peticiones. Espera {seconds} s y vuelve a intentarlo.",
@@ -146,7 +144,6 @@
     }
   },
   "tooManyRequestsWait": "Demasiadas peticiones. Espera un momento y vuelve a intentarlo.",
-  "cancel": "Cancelar",
   "continueAction": "Continuar",
   "fieldRequired": "Campo obligatorio.",
   "emailLabel": "Email",
@@ -676,9 +673,7 @@
       }
     }
   },
-  "save": "Guardar",
   "delete": "Borrar",
-  "saved": "Guardado",
   "saveConflict": "No se puede: ya hay grupos que dependen de esto.",
   "saveInvalid": "Revisa los datos.",
   "saveError": "No se ha podido guardar.",
@@ -1243,7 +1238,6 @@
   "importOpsResult": "Importadas: {applied} nuevas · {duplicates} ya estaban · {inReview} a revisión · {skipped} rechazadas",
   "@importOpsResult": {"placeholders": {"applied": {"type": "int"}, "duplicates": {"type": "int"}, "inReview": {"type": "int"}, "skipped": {"type": "int"}}},
   "importOpsError": "No se ha podido importar: el fichero no es de acciones pendientes o es de otro evento.",
-  "close": "Cerrar",
   "matOfflineBoard": "Sin conexión: tablero guardado en este dispositivo. Sin recomendado; puedes empezar un pendiente si no hay otro en curso.",
   "matSyncingTitle": "Sincronizando combates",
   "matSyncingBody": "{count, plural, =1{Han cambiado los tapices y al tapiz {mats} aún no le ha llegado. Hasta que le llegue, su combate propuesto puede cambiar.} other{Han cambiado los tapices y a los tapices {mats} aún no les ha llegado. Hasta que les llegue, sus combates propuestos pueden cambiar.}}",

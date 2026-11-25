@@ -124,9 +124,12 @@ class _MeasuresDialogState extends ConsumerState<_MeasuresDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context, false),
-          child: Text(l10n.cancel),
+          child: Text(CoreLocalizations.of(context).cancel),
         ),
-        FilledButton(onPressed: _saving ? null : _save, child: Text(l10n.save)),
+        FilledButton(
+          onPressed: _saving ? null : _save,
+          child: Text(CoreLocalizations.of(context).save),
+        ),
       ],
     );
   }

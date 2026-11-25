@@ -7,8 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../auth/data/api_error.dart';
 import '../../grouping/state/grouping_providers.dart';
-import '../data/club_models.dart';
 import '../data/club_repository.dart';
+import '../data/event_category.dart';
 import '../state/club_providers.dart';
 import 'category_groups_field.dart';
 import 'settings_tab.dart';
@@ -42,6 +42,7 @@ class _CategoriesEditorState extends ConsumerState<CategoriesEditor> {
   Future<void> _save(List<EventCategory> next) async {
     final l10n = AppLocalizations.of(context);
     final toasts = Toasts.of(context);
+    final savedText = CoreLocalizations.of(context).saved;
     setState(() => _saving = true);
     try {
       final saved = await ref
@@ -52,7 +53,7 @@ class _CategoriesEditorState extends ConsumerState<CategoriesEditor> {
         ..invalidate(eventSettingsProvider(widget.eventId))
         ..invalidate(participantsProvider(widget.eventId))
         ..invalidate(categoriesProvider(widget.eventId));
-      toasts.show(l10n.saved, duration: const Duration(seconds: 1));
+      toasts.show(savedText, duration: const Duration(seconds: 1));
     } on DioException catch (e) {
       toasts.show(switch (e.response?.statusCode) {
         409 when ApiError.from(e).code == 'RETURN_LEG_IN_USE' =>
@@ -298,7 +299,7 @@ class _CategoryDialogState extends State<_CategoryDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text(l10n.cancel),
+          child: Text(CoreLocalizations.of(context).cancel),
         ),
         FilledButton(onPressed: _submit, child: Text(l10n.ok)),
       ],

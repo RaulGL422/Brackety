@@ -6,8 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../events/data/measure_rules.dart';
 import '../../events/state/events_providers.dart';
-import '../data/club_models.dart';
 import '../data/club_repository.dart';
+import '../data/event_settings.dart';
 import '../state/club_providers.dart';
 
 /// Whether the event asks for weight and height (F2-1): as its sport, off, optional or required. Saved at once,
@@ -37,6 +37,7 @@ class _MeasuresEditorState extends ConsumerState<MeasuresEditor> {
   }) async {
     final l10n = AppLocalizations.of(context);
     final toasts = Toasts.of(context);
+    final savedText = CoreLocalizations.of(context).saved;
     setState(() {
       _weight = weight;
       _height = height;
@@ -49,7 +50,7 @@ class _MeasuresEditorState extends ConsumerState<MeasuresEditor> {
       ref
         ..invalidate(eventSettingsProvider(widget.eventId))
         ..invalidate(myEventProvider(widget.eventId));
-      toasts.show(l10n.saved, duration: const Duration(seconds: 1));
+      toasts.show(savedText, duration: const Duration(seconds: 1));
     } on DioException {
       toasts.show(l10n.saveError, kind: ToastKind.error);
     } finally {

@@ -123,7 +123,7 @@ class _NewPhaseDialogState extends ConsumerState<_NewPhaseDialog> {
       actions: [
         TextButton(
           onPressed: _saving ? null : () => Navigator.pop(context),
-          child: Text(l10n.cancel),
+          child: Text(CoreLocalizations.of(context).cancel),
         ),
         FilledButton(
           onPressed: _saving ? null : _create,
