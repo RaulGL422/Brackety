@@ -47,6 +47,11 @@ public class AdminAuditLog {
         save(AdminAudit.Action.USER_DELETED, accountId, reason);
     }
 
+    @Transactional
+    public void supportChanged(UUID accountId, boolean enabled, String reason) {
+        save(AdminAudit.Action.SUPPORT_CHANGED, accountId, (enabled ? "on: " : "off: ") + reason);
+    }
+
     /** {@code what}: the change, as "group moved to mat 2". */
     @Transactional
     public void control(UUID target, String what) {

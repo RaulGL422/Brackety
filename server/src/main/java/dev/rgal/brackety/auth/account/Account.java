@@ -45,6 +45,10 @@ public class Account {
     private Instant deletedAt;
     private Instant sessionsRevokedAt;
     private Instant suspendedAt;
+
+    /** Enabled by the superadmin for support: sees the Connection screen, which customers never do. */
+    private boolean support;
+
     private boolean temporary;
 
     protected Account() {}
@@ -155,6 +159,15 @@ public class Account {
 
     public void unsuspend(Instant now) {
         suspendedAt = null;
+        updatedAt = now;
+    }
+
+    public boolean isSupport() {
+        return support;
+    }
+
+    public void changeSupport(boolean enabled, Instant now) {
+        support = enabled;
         updatedAt = now;
     }
 
