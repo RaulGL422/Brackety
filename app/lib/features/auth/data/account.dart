@@ -9,6 +9,7 @@ class Account {
     required this.profiles,
     required this.signInMethods,
     this.temporary = false,
+    this.pendingConsents = const [],
   });
 
   factory Account.fromJson(Map<String, dynamic> json) => Account(
@@ -24,6 +25,10 @@ class Account {
         SignInMethod.fromJson(method as Map<String, dynamic>),
     ],
     temporary: json['temporary'] as bool? ?? false,
+    pendingConsents: [
+      for (final p in json['pendingConsents'] as List<dynamic>? ?? const [])
+        PendingConsent.fromJson(p as Map<String, dynamic>),
+    ],
   );
 
   final String email;
@@ -34,6 +39,9 @@ class Account {
 
   /// Let in by a club's QR for one event: no events of its own, no account settings.
   final bool temporary;
+
+  /// Legal texts changed since this account accepted them: to accept again before going on.
+  final List<PendingConsent> pendingConsents;
 
   bool get hasPassword =>
       signInMethods.any((m) => m.method == SignInMethod.password);
@@ -51,7 +59,24 @@ class Account {
     locale: locale,
     profiles: profiles,
     signInMethods: signInMethods,
+    temporary: temporary,
+    pendingConsents: pendingConsents,
   );
+}
+
+/// A legal text to accept again: [document] is its slug (terms, privacy), [version] the current one.
+class PendingConsent {
+  const PendingConsent({required this.document, required this.version});
+
+  factory PendingConsent.fromJson(Map<String, dynamic> json) => PendingConsent(
+    document: json['document'] as String,
+    version: json['version'] as String,
+  );
+
+  final String document;
+  final String version;
+
+  Map<String, dynamic> toJson() => {'document': document, 'version': version};
 }
 
 class AccountProfile {

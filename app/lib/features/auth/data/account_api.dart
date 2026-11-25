@@ -33,6 +33,17 @@ class AccountApi {
     return Account.fromJson(response.data!);
   }
 
+  /// The account as it stands after accepting them: nothing left pending.
+  Future<Account> acceptConsents(List<PendingConsent> accepted) async {
+    final response = await _dio.post<Map<String, dynamic>>(
+      '$_base/consents',
+      data: {
+        'accepted': [for (final a in accepted) a.toJson()],
+      },
+    );
+    return Account.fromJson(response.data!);
+  }
+
   Future<void> addProfile(ProfileType type) =>
       _dio.post<void>('$_base/profiles', data: {'type': type.wireName});
 
