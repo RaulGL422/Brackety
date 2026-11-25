@@ -5,6 +5,7 @@ import dev.rgal.brackety.event.EventException;
 import dev.rgal.brackety.event.EventPermission;
 import dev.rgal.brackety.event.EventRole;
 import dev.rgal.brackety.event.EventService;
+import dev.rgal.brackety.ranking.dto.ExportAuditEntry;
 import dev.rgal.brackety.ranking.dto.ExportPreview;
 import dev.rgal.brackety.ranking.dto.ExportRequest;
 import dev.rgal.brackety.ranking.dto.ExportSheet;
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,6 +55,7 @@ class Exports {
     private final DownloadNames names;
     private final ExportTable tables;
     private final EventService events;
+    private final ExportAuditRepository audits;
     private final Clock clock;
     private final String version;
 
@@ -63,6 +66,7 @@ class Exports {
             EventAccess access,
             DownloadNames names,
             EventService events,
+            ExportAuditRepository audits,
             Clock clock,
             @Value("${brackety.version}") String version) {
         this.sheets = sheets.stream().collect(Collectors.toMap(Sheet::key, Function.identity()));
@@ -72,6 +76,7 @@ class Exports {
         this.names = names;
         this.tables = new ExportTable(clock.getZone());
         this.events = events;
+        this.audits = audits;
         this.clock = clock;
         this.version = version;
     }
@@ -98,7 +103,8 @@ class Exports {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
+    /** A file with personal or minors' columns leaves a line in the club's audit ({@link #audit}). */
+    @Transactional
     Download export(UUID eventId, UUID accountId, ExportRequest request) {
         var tables = custom(eventId, accountId, request, true);
         var sheet = sheets.get(request.sheet());
@@ -152,6 +158,7 @@ class Exports {
         if (sheet == null) {
             throw EventException.invalid("EXPORT_UNKNOWN_SHEET", "There is no sheet " + request.sheet() + ".");
         }
+        var data = source.load(eventId);
         var spec = new ExportTable.Spec(
                 sheet.fileName(),
                 request.columns(),
@@ -162,7 +169,39 @@ class Exports {
                 request.headersLocale(),
                 access.has(eventId, accountId, EventPermission.PERSONAL_DATA),
                 request.publish());
-        return tables(sheet, source.load(eventId), spec);
+        var tables = tables(sheet, data, spec);
+        if (split) {
+            record(eventId, accountId, sheet, data, request);
+        }
+        return tables;
+    }
+
+    private void record(UUID eventId, UUID accountId, Sheet<?> sheet, SheetData data, ExportRequest request) {
+        var personal = sheet.fields(data).stream()
+                .filter(f -> f.sensitivity() != ExportField.Sensitivity.NORMAL
+                        && request.columns().contains(f.key()))
+                .map(f -> f.title(ExportTable.SPANISH))
+                .toList();
+        if (personal.isEmpty()) {
+            return;
+        }
+        var name = source.usernames(Stream.of(accountId)).getOrDefault(accountId, "");
+        audits.save(new ExportAudit(
+                eventId,
+                accountId,
+                name,
+                clock.instant(),
+                sheet.title(ExportTable.SPANISH),
+                String.join(", ", personal)));
+    }
+
+    /** The downloads with personal data, newest first: only the club, which gives the permission. */
+    @Transactional(readOnly = true)
+    List<ExportAuditEntry> audit(UUID eventId, UUID accountId) {
+        access.require(eventId, accountId, EventRole.CLUB);
+        return audits.findTop100ByEventIdOrderByAtDesc(eventId).stream()
+                .map(a -> new ExportAuditEntry(a.getAccountName(), a.getAt(), a.getSheet(), a.getColumns()))
+                .toList();
     }
 
     private <R> List<ExportTable.Table> tables(Sheet<R> sheet, SheetData data, ExportTable.Spec spec) {

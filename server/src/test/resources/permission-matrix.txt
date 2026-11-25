@@ -34,6 +34,7 @@ GET /api/v1/events/{eventId}/export/package | club
 GET /api/v1/events/{eventId}/export/participants.csv | club
 GET /api/v1/events/{eventId}/export/standings.csv | club
 GET /api/v1/events/{eventId}/export/timeline.csv | club
+GET /api/v1/events/{eventId}/exports/audit | club
 GET /api/v1/events/{eventId}/exports/sheets | club
 GET /api/v1/events/{eventId}/invitations | club
 GET /api/v1/events/{eventId}/league | club

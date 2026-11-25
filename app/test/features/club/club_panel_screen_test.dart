@@ -5,6 +5,7 @@ import 'package:brackety/core/upload/file_upload.dart';
 import 'package:brackety/features/club/data/club_repository.dart';
 import 'package:brackety/features/club/data/event_category.dart';
 import 'package:brackety/features/club/data/event_settings.dart';
+import 'package:brackety/features/club/data/export_audit_entry.dart';
 import 'package:brackety/features/club/data/mat_overview.dart';
 import 'package:brackety/features/club/data/participant.dart';
 import 'package:brackety/features/club/data/participant_record.dart';
@@ -305,6 +306,7 @@ void main() {
     FakeStaffRepository? staff,
     MyEvent? me,
     bool importAvailable = false,
+    List<ExportAuditEntry> audit = const [],
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
@@ -322,6 +324,7 @@ void main() {
             (ref, _) async => importAvailable,
           ),
           temporaryAccessesProvider.overrideWith((ref, _) async => []),
+          exportAuditProvider.overrideWith((ref, _) async => audit),
           leagueProvider.overrideWith(
             (ref, _) async => League(
               name: 'Liga',
@@ -1219,6 +1222,30 @@ void main() {
     await scrolledTo(tester, 'Helper by QR');
     expect(find.text('Helper by QR'), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the settings say who downloaded personal data', (tester) async {
+    await pumpPanel(
+      tester,
+      const Size(1440, 900),
+      audit: [
+        ExportAuditEntry(
+          account: 'ayudante1@demo.test',
+          at: DateTime.utc(2026, 11, 25, 10, 30),
+          sheet: 'Inscritos',
+          columns: 'Fecha de nacimiento, Peso (kg)',
+        ),
+      ],
+    );
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+
+    await scrolledTo(tester, 'Downloads with personal data');
+    expect(find.textContaining('ayudante1@demo.test'), findsOneWidget);
+    expect(
+      find.text('Inscritos: Fecha de nacimiento, Peso (kg)'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('the club changes the attendance points of the phase', (

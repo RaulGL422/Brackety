@@ -2,6 +2,7 @@ package dev.rgal.brackety.ranking;
 
 import dev.rgal.brackety.auth.RequiresVerifiedEmail;
 import dev.rgal.brackety.common.CurrentAccount;
+import dev.rgal.brackety.ranking.dto.ExportAuditEntry;
 import dev.rgal.brackety.ranking.dto.ExportPreview;
 import dev.rgal.brackety.ranking.dto.ExportRequest;
 import dev.rgal.brackety.ranking.dto.ExportSheet;
@@ -42,6 +43,11 @@ class ExportController {
             @RequestParam(defaultValue = "es") String locale,
             @AuthenticationPrincipal Jwt jwt) {
         return exports.sheets(eventId, CurrentAccount.id(jwt), Locale.forLanguageTag(locale));
+    }
+
+    @GetMapping("/audit")
+    List<ExportAuditEntry> audit(@PathVariable UUID eventId, @AuthenticationPrincipal Jwt jwt) {
+        return exports.audit(eventId, CurrentAccount.id(jwt));
     }
 
     @PostMapping("/preview")

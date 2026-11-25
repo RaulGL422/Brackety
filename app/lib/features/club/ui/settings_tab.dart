@@ -23,6 +23,7 @@ import '../data/staff_member.dart';
 import '../state/club_providers.dart';
 import 'categories_editor.dart';
 import 'club_panel_screen.dart';
+import 'export_audit_section.dart';
 import 'measures_editor.dart';
 import 'organizations_editor.dart';
 import 'warning_reasons_editor.dart';
@@ -416,6 +417,8 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
             (m) => m.permissions.contains(EventPermission.groups),
           ),
         ),
+        const SizedBox(height: AppSpacing.xl),
+        ExportAuditSection(eventId: widget.eventId),
         const SizedBox(height: AppSpacing.xl),
         Text(l10n.measuresTitle, style: text.titleMedium),
         MeasuresEditor(eventId: widget.eventId, settings: settings),

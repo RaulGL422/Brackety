@@ -6,6 +6,7 @@ import '../../auth/state/session_controller.dart';
 import '../../events/data/measure_rules.dart';
 import 'event_category.dart';
 import 'event_settings.dart';
+import 'export_audit_entry.dart';
 import 'mat_overview.dart';
 import 'participant.dart';
 import 'participant_record.dart';
@@ -56,6 +57,17 @@ class ClubRepository {
   final Dio _dio;
 
   static final _day = DateFormat('yyyy-MM-dd');
+
+  /// Who downloaded personal data in the event, newest first.
+  Future<List<ExportAuditEntry>> exportAudit(String eventId) async {
+    final response = await _dio.get<List<dynamic>>(
+      '/api/v1/events/$eventId/exports/audit',
+    );
+    return [
+      for (final a in response.data!)
+        ExportAuditEntry.fromJson(a as Map<String, dynamic>),
+    ];
+  }
 
   Future<EventSettings> settings(String eventId) async {
     final response = await _dio.get<Map<String, dynamic>>(
