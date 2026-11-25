@@ -70,4 +70,17 @@ class CoreLocalizationsEn extends CoreLocalizations {
 
   @override
   String get loadError => 'Could not load. Check the connection.';
+
+  @override
+  String get updateTitle => 'A new version of Brackety is out';
+
+  @override
+  String get updateBody => 'Update to keep going. It takes a few seconds.';
+
+  @override
+  String get updateButton => 'Update';
+
+  @override
+  String get updateWaiting =>
+      'A new version is out: you can update as soon as the pending actions are sent.';
 }

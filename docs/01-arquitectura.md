@@ -29,6 +29,7 @@ Pool de conexiones DB pequeño (10), una instancia de API, límites de tasa en l
 - DB en SSD (SD solo para desarrollo; requisito de lanzamiento).
 - `pg_dump` diario cifrado a almacenamiento externo con restauración probada (`05-seguridad-infra.md`).
 - Despliegue manual con `deploy/deploy.sh` (descarga imágenes de GitHub Container Registry, reinicia servicios).
+- Actualización obligatoria (`UpdateGate` en `brackety_core`): la web y el admin preguntan a `GET /api/v1/info` cada 5 min y al volver a la app; si la versión o el commit no son los suyos, solo dejan «Actualizar» (recarga la página). Con acciones sin enviar, solo una franja hasta enviarlas. nginx revalida `main.dart.*` en cada carga. Android y local: sin versión de compilación, no preguntan.
 
 ## Decisiones técnicas clave
 Ver `decisiones.md`. Versiones en `02-stack-versiones.md`.

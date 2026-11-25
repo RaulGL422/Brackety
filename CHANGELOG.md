@@ -7,6 +7,7 @@ esa sección pasa a llamarse como la versión. Debug enseña su compilación jun
 ## Sin publicar (en debug)
 
 ### Nuevo
+- Al salir una versión nueva, la web y el admin avisan y obligan a actualizar (esperan si hay acciones sin enviar) (#200).
 - Exportar a medida: elegir datos, columnas, orden, filtros, «Separar por», CSV, Excel o PDF, con vista previa (#186, #188, #191).
 - Exportar: permiso «Descargar datos personales» y opción «Para publicar» (nombre e inicial del apellido) (#195).
 - Exportar: auditoría de cada descarga con datos personales, en Configuración → Personal (#196).
