@@ -10,7 +10,7 @@ Roles de evento, ubicaciones y permisos del staff.
 - **Delegación de un nivel**: quien tenga "gestionar permisos" puede dar o quitar permisos a otros ayudantes, pero no puede dar ese mismo permiso.
 - Toda comprobación en servidor, por permiso y por evento/ubicación.
 - Registro de auditoría de cambios de permisos.
-- Detalle fino de permisos: se define al construir el módulo. Ya decidido: «Descargar datos personales» para las exportaciones a medida (Raul, 2026-11-19, `../producto/exportaciones.md`).
+- Detalle fino de permisos: se define al construir el módulo. «Descargar datos personales» (`PERSONAL_DATA`) hecho: abre las columnas personales y de menores de las exportaciones a medida (`../producto/exportaciones.md`).
 - Los árbitros también son ayudantes: en «Personal» (Configuración del evento) se elige qué puede hacer cada uno (Raul, 2026-11-18). Permiso nuevo: comenzar y finalizar la fase (F1-7). La lista se enseña a Raul antes de la PR C.
 
 ## Datos
