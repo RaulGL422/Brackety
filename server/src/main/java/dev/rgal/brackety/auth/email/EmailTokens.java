@@ -5,6 +5,7 @@ import dev.rgal.brackety.common.crypto.RandomTokens;
 import dev.rgal.brackety.common.crypto.Sha256;
 import java.time.Clock;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
@@ -47,6 +48,11 @@ public class EmailTokens {
             return Optional.empty();
         }
         return Optional.of(issue(accountId, purpose, newEmail));
+    }
+
+    /** An expired link is refused anyway; its row only takes space. */
+    public int deleteExpired(Instant now) {
+        return tokens.deleteExpired(now);
     }
 
     /** Drops every pending link of the account, whatever its purpose. */
