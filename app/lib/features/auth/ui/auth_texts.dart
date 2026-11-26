@@ -20,7 +20,13 @@ String apiErrorMessage(AppLocalizations l10n, ApiError error) {
 String? validateEmail(AppLocalizations l10n, String? value) {
   final email = value?.trim() ?? '';
   if (email.isEmpty) return l10n.fieldRequired;
-  if (!email.contains('@')) return l10n.emailInvalid;
+  final at = email.indexOf('@');
+  if (at < 1) return l10n.emailInvalid;
+  // «ana@ejemplo» passes a plain check but never receives anything: name what is missing.
+  final domain = email.substring(at + 1);
+  if (!domain.contains('.') || domain.endsWith('.')) {
+    return l10n.emailMissingDomain;
+  }
   return null;
 }
 

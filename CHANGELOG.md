@@ -9,6 +9,7 @@ esa sección pasa a llamarse como la versión. Debug enseña su compilación jun
 ### Nuevo
 - Los rechazos del servidor (fecha bloqueada, categoría en uso, reglamento que no es PDF…) dicen el motivo concreto en tu idioma, en vez de «No se pudo guardar» (#207).
 - La pestaña del panel del club va en la dirección (`…/club/mats`): recargar la web o volver de otra pantalla abre la misma pestaña (#207).
+- Registro, «Revisa tu email», contraseña olvidada, nueva contraseña, enlace caducado y entrar con QR rediseñados: tipo de cuenta en desplegable, requisitos de contraseña que se marcan al escribir, aviso de cuántas cosas faltan y textos más claros.
 - Textos legales rediseñados: resumen al principio, índice «En esta página», letra más grande, tablas legibles en el móvil y la versión como fecha. «Han cambiado los textos» marca lo que ya has leído y nombra los textos que aceptas.
 - Pantalla de entrada (y las demás sin sesión) rediseñada: sin barra, título y textos más claros, pie legal ordenado y la versión aparte; mejoras de accesibilidad (#204).
 - Cuentas de soporte: el superadmin las activa en la ficha del usuario; solo ellas (y debug) ven Conexión, ahora al final de Ajustes (#203).
@@ -29,6 +30,7 @@ esa sección pasa a llamarse como la versión. Debug enseña su compilación jun
 - Repaso de diseño de grupos por tapiz, tamaños de grupo y entrada por QR (#193).
 
 ### Arreglos
+- Pantallas sin sesión: «Crear una cuenta», «Entrar» y los demás botones secundarios vuelven a ser compactos junto a su pregunta, como en el diseño; bajan debajo solo si no caben.
 - Entrar: el formulario queda centrado en vertical, el pie legal cabe en una fila en el móvil y los errores salen como aviso bajo el título (también en el resto de formularios).
 - Recargar la pantalla de entrada ya no repite «login?from=» en la dirección; recargar el registro se queda en el registro (#202).
 - Puerta legal: sin `PRIVACY_CONTACT_EMAIL` el servidor no deja empezar ni crear una fase, y la app dice por qué (#198).

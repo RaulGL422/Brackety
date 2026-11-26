@@ -436,10 +436,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Ha pasado demasiado tiempo. Vuelve a entrar para recuperar la cuenta.';
 
   @override
-  String get registerTitle => 'Crear cuenta';
+  String get registerTitle => 'Crear una cuenta';
 
   @override
-  String get registerSubmit => 'Crear cuenta';
+  String get registerSubmit => 'Crear la cuenta';
 
   @override
   String get registerBirthDate => 'Fecha de nacimiento';
@@ -449,10 +449,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Los menores de 14 años no pueden crear su propia cuenta. Su padre, madre o tutor lo da de alta desde su cuenta añadiendo un perfil de menor (disponible próximamente).';
 
   @override
-  String get registerProfile => '¿Cómo vas a usar Brackety?';
+  String get registerProfile => 'Tipo de cuenta';
 
   @override
-  String get registerProfileRequired => 'Elige un perfil.';
+  String get registerProfileRequired => 'Elige el tipo de cuenta.';
 
   @override
   String get profileClub => 'Club';
@@ -507,7 +507,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get registerTaxIdHelper =>
-      'La plataforma lo usa para verificar la organización antes de que pueda publicar eventos.';
+      'Lo revisamos antes de que pueda publicar eventos.';
 
   @override
   String get registerTaxIdInvalid => 'CIF no válido.';
@@ -521,9 +521,6 @@ class AppLocalizationsEs extends AppLocalizations {
       'Debes confirmarlo para registrar la organización.';
 
   @override
-  String get registerHaveAccount => '¿Ya tienes cuenta? Entra';
-
-  @override
   String get checkEmailTitle => 'Revisa tu email';
 
   @override
@@ -531,7 +528,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'Te hemos enviado un email. Abre su enlace para verificar la cuenta; caduca en 24 horas.';
 
   @override
-  String get resendEmail => 'Reenviar email';
+  String get resendEmail => 'Reenviar el email';
 
   @override
   String get resendSent => 'Email enviado.';
@@ -550,36 +547,163 @@ class AppLocalizationsEs extends AppLocalizations {
   String get linkInvalid => 'El enlace no es válido o ha caducado.';
 
   @override
-  String get forgotTitle => 'Recuperar contraseña';
+  String get forgotTitle => '¿Has olvidado la contraseña?';
 
   @override
   String get forgotIntro =>
-      'Escribe tu email y te enviaremos un enlace para elegir una contraseña nueva.';
+      'Escribe el email de tu cuenta y te enviaremos un enlace para elegir otra.';
 
   @override
-  String get forgotSubmit => 'Enviar enlace';
+  String get forgotSubmit => 'Enviar el enlace';
 
   @override
-  String get forgotSent =>
-      'Si hay una cuenta con ese email, te hemos enviado un enlace para cambiar la contraseña.';
+  String get resetTitle => 'Elige otra contraseña';
 
   @override
-  String get resetTitle => 'Nueva contraseña';
+  String get resetNewPassword => 'Contraseña nueva';
 
   @override
-  String get resetNewPassword => 'Nueva contraseña';
-
-  @override
-  String get resetConfirmPassword => 'Repite la contraseña';
+  String get resetConfirmPassword => 'Repítela';
 
   @override
   String get resetMismatch => 'Las contraseñas no coinciden.';
 
   @override
-  String get resetSubmit => 'Cambiar contraseña';
+  String get resetSubmit => 'Guardar la contraseña';
 
   @override
   String get resetRequestNew => 'Pedir otro enlace';
+
+  @override
+  String get registerSubtitle =>
+      'Brackety es gratuito. Lo que pidamos depende de cómo lo vayas a usar.';
+
+  @override
+  String get registerHaveAccountQuestion => '¿Ya tienes cuenta?';
+
+  @override
+  String get registerProfileHint => 'Elige uno';
+
+  @override
+  String get registerSectionClub => 'Tu club';
+
+  @override
+  String get registerSectionOrganization => 'Tu entidad';
+
+  @override
+  String get registerSectionYou => 'Tus datos';
+
+  @override
+  String get registerSectionAccount => 'Tu cuenta';
+
+  @override
+  String get registerClubName => 'Nombre del club';
+
+  @override
+  String get registerRepresentativeClub =>
+      'Soy mayor de edad y represento a este club.';
+
+  @override
+  String registerFormErrors(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Faltan $count cosas por revisar. Te llevamos a la primera.',
+      one: 'Falta una cosa por revisar. Te llevamos a ella.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get registerAcceptTick => 'Marca la casilla para crear la cuenta.';
+
+  @override
+  String get emailMissingDomain =>
+      'Falta el final del email, como «.es» o «.com».';
+
+  @override
+  String passwordRuleLength(int min) {
+    return 'Al menos $min caracteres';
+  }
+
+  @override
+  String passwordRuleProgress(int min, int count) {
+    return 'Al menos $min caracteres (llevas $count)';
+  }
+
+  @override
+  String get passwordRuleMatch => 'Coinciden';
+
+  @override
+  String checkEmailSentTo(String email) {
+    return 'Te hemos enviado un enlace a $email. Ábrelo para activar la cuenta: caduca en 24 horas.';
+  }
+
+  @override
+  String get checkEmailSpam => 'Si no lo ves, mira en spam o en promociones.';
+
+  @override
+  String get checkEmailThenSignIn =>
+      'Después entra con tu email y tu contraseña.';
+
+  @override
+  String get forgotQrHint =>
+      '¿Entras con el usuario que te dio el club? Pide al club un QR nuevo.';
+
+  @override
+  String get forgotRemembered => '¿Ya la recuerdas?';
+
+  @override
+  String forgotSentTo(String email) {
+    return 'Si hay una cuenta con $email, ya tiene un email con el enlace. Caduca en 1 hora.';
+  }
+
+  @override
+  String get forgotCloseHint =>
+      'Puedes cerrar esta pantalla: el enlace te trae de vuelta.';
+
+  @override
+  String get forgotBackToLogin => 'Volver a entrar';
+
+  @override
+  String get forgotOtherEmail => 'Probar con otro email';
+
+  @override
+  String get resetSubtitle =>
+      'Al guardarla se cierran todas las sesiones abiertas con la contraseña anterior; después entras con la nueva.';
+
+  @override
+  String get resetLinkExpiredTitle => 'Este enlace ya no sirve';
+
+  @override
+  String get resetLinkExpired =>
+      'Los enlaces para cambiar la contraseña caducan en 1 hora y sirven una sola vez.';
+
+  @override
+  String get resetLinkExpiredNext =>
+      'Pide otro y ábrelo desde el último email que te llegue.';
+
+  @override
+  String qrAccessOpenSession(String email) {
+    return 'Este dispositivo ya tiene una sesión abierta con $email.';
+  }
+
+  @override
+  String get qrAccessOpenSessionUnnamed =>
+      'Este dispositivo ya tiene una sesión abierta.';
+
+  @override
+  String get qrAccessIfYouEnter => 'Si entras con el QR:';
+
+  @override
+  String get qrAccessEndsSession => 'Se cierra esa sesión en este dispositivo.';
+
+  @override
+  String get qrAccessOnlyEvent =>
+      'Entras solo en el evento del club y mientras dure la fase.';
+
+  @override
+  String get qrAccessKeepSession => 'Seguir con mi cuenta';
 
   @override
   String get logout => 'Salir';
@@ -3362,7 +3486,7 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get qrAccessSignInTitle => 'Entrar con QR';
+  String get qrAccessSignInTitle => 'Entrar con el QR del club';
 
   @override
   String get qrAccessInvalid => 'Este QR ya no sirve: pide al club uno nuevo.';
@@ -3371,11 +3495,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get qrAccessGoToLogin => 'Ir a iniciar sesión';
 
   @override
-  String get qrAccessReplaceSession =>
-      'Vas a entrar con el QR del club. Se cerrará la sesión que tienes abierta en este dispositivo.';
-
-  @override
-  String get qrAccessEnter => 'Entrar';
+  String get qrAccessEnter => 'Entrar con el QR';
 
   @override
   String get exportCustom => 'Exportar a medida';

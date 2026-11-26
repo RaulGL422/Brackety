@@ -8,7 +8,9 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../data/api_error.dart';
 import '../state/session_controller.dart';
 import 'auth_texts.dart';
+import 'widgets/auth_alternative.dart';
 import 'widgets/auth_form_page.dart';
+import 'widgets/auth_note.dart';
 import 'widgets/form_message.dart';
 
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
@@ -55,46 +57,72 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final error = _error;
+  void _tryAnotherEmail() {
+    _email.clear();
+    setState(() => _sent = false);
+  }
+
+  Widget _sentPage(AppLocalizations l10n) {
     return AuthFormPage(
       title: l10n.forgotTitle,
       children: [
         // The same message whether or not the account exists.
-        if (_sent)
-          FormMessage.success(l10n.forgotSent)
-        else ...[
-          Text(l10n.forgotIntro),
-          const SizedBox(height: AppSpacing.l),
-          Form(
-            key: _formKey,
-            child: TextFormField(
-              controller: _email,
-              keyboardType: TextInputType.emailAddress,
-              autocorrect: false,
-              autofillHints: const [AutofillHints.email],
-              textInputAction: TextInputAction.done,
-              onFieldSubmitted: (_) => _submit(),
-              decoration: InputDecoration(labelText: l10n.emailLabel),
-              validator: (value) => validateEmail(l10n, value),
-            ),
-          ),
-          if (error != null) ...[
-            const SizedBox(height: AppSpacing.m),
-            FormMessage.error(error),
-          ],
-          const SizedBox(height: AppSpacing.l),
-          FilledButton(
-            onPressed: _busy ? null : _submit,
-            child: Text(l10n.forgotSubmit),
-          ),
-        ],
-        const SizedBox(height: AppSpacing.s),
-        TextButton(
+        FormMessage.success(l10n.forgotSentTo(_email.text.trim())),
+        const SizedBox(height: AppSpacing.l),
+        AuthNote(items: [l10n.checkEmailSpam, l10n.forgotCloseHint]),
+        const SizedBox(height: AppSpacing.xl),
+        FilledButton(
           onPressed: () => context.go('/login'),
-          child: Text(l10n.goToLogin),
+          child: Text(l10n.forgotBackToLogin),
+        ),
+        const SizedBox(height: AppSpacing.m),
+        OutlinedButton(
+          onPressed: _tryAnotherEmail,
+          child: Text(l10n.forgotOtherEmail),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final error = _error;
+    if (_sent) return _sentPage(l10n);
+    return AuthFormPage(
+      title: l10n.forgotTitle,
+      subtitle: l10n.forgotIntro,
+      error: error,
+      children: [
+        Form(
+          key: _formKey,
+          child: TextFormField(
+            controller: _email,
+            keyboardType: TextInputType.emailAddress,
+            autocorrect: false,
+            autofillHints: const [AutofillHints.email],
+            textInputAction: TextInputAction.done,
+            onFieldSubmitted: (_) => _submit(),
+            decoration: InputDecoration(labelText: l10n.emailLabel),
+            validator: (value) => validateEmail(l10n, value),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.l),
+        FilledButton(
+          onPressed: _busy ? null : _submit,
+          child: Text(l10n.forgotSubmit),
+        ),
+        const SizedBox(height: AppSpacing.l),
+        // Recovering by email cannot help a QR account: it has no email.
+        Text(
+          l10n.forgotQrHint,
+          style: Theme.of(context).textTheme.bodyMedium
+              ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+        ),
+        AuthAlternative(
+          question: l10n.forgotRemembered,
+          action: l10n.loginSubmit,
+          onPressed: () => context.go('/login'),
         ),
       ],
     );

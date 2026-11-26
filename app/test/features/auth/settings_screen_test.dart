@@ -122,7 +122,7 @@ void main() {
     await openSettings(tester, account: testAccount(emailVerified: false));
 
     expect(find.text('Not verified'), findsOneWidget);
-    await tapText(tester, 'Resend email');
+    await tapText(tester, 'Resend the email');
 
     expect(auth.resends, ['ana@example.com']);
   });

@@ -749,13 +749,13 @@ abstract class AppLocalizations {
   /// No description provided for @registerTitle.
   ///
   /// In es, this message translates to:
-  /// **'Crear cuenta'**
+  /// **'Crear una cuenta'**
   String get registerTitle;
 
   /// No description provided for @registerSubmit.
   ///
   /// In es, this message translates to:
-  /// **'Crear cuenta'**
+  /// **'Crear la cuenta'**
   String get registerSubmit;
 
   /// No description provided for @registerBirthDate.
@@ -773,13 +773,13 @@ abstract class AppLocalizations {
   /// No description provided for @registerProfile.
   ///
   /// In es, this message translates to:
-  /// **'¿Cómo vas a usar Brackety?'**
+  /// **'Tipo de cuenta'**
   String get registerProfile;
 
   /// No description provided for @registerProfileRequired.
   ///
   /// In es, this message translates to:
-  /// **'Elige un perfil.'**
+  /// **'Elige el tipo de cuenta.'**
   String get registerProfileRequired;
 
   /// No description provided for @profileClub.
@@ -875,7 +875,7 @@ abstract class AppLocalizations {
   /// No description provided for @registerTaxIdHelper.
   ///
   /// In es, this message translates to:
-  /// **'La plataforma lo usa para verificar la organización antes de que pueda publicar eventos.'**
+  /// **'Lo revisamos antes de que pueda publicar eventos.'**
   String get registerTaxIdHelper;
 
   /// No description provided for @registerTaxIdInvalid.
@@ -896,12 +896,6 @@ abstract class AppLocalizations {
   /// **'Debes confirmarlo para registrar la organización.'**
   String get registerRepresentativeRequired;
 
-  /// No description provided for @registerHaveAccount.
-  ///
-  /// In es, this message translates to:
-  /// **'¿Ya tienes cuenta? Entra'**
-  String get registerHaveAccount;
-
   /// No description provided for @checkEmailTitle.
   ///
   /// In es, this message translates to:
@@ -917,7 +911,7 @@ abstract class AppLocalizations {
   /// No description provided for @resendEmail.
   ///
   /// In es, this message translates to:
-  /// **'Reenviar email'**
+  /// **'Reenviar el email'**
   String get resendEmail;
 
   /// No description provided for @resendSent.
@@ -953,43 +947,37 @@ abstract class AppLocalizations {
   /// No description provided for @forgotTitle.
   ///
   /// In es, this message translates to:
-  /// **'Recuperar contraseña'**
+  /// **'¿Has olvidado la contraseña?'**
   String get forgotTitle;
 
   /// No description provided for @forgotIntro.
   ///
   /// In es, this message translates to:
-  /// **'Escribe tu email y te enviaremos un enlace para elegir una contraseña nueva.'**
+  /// **'Escribe el email de tu cuenta y te enviaremos un enlace para elegir otra.'**
   String get forgotIntro;
 
   /// No description provided for @forgotSubmit.
   ///
   /// In es, this message translates to:
-  /// **'Enviar enlace'**
+  /// **'Enviar el enlace'**
   String get forgotSubmit;
-
-  /// No description provided for @forgotSent.
-  ///
-  /// In es, this message translates to:
-  /// **'Si hay una cuenta con ese email, te hemos enviado un enlace para cambiar la contraseña.'**
-  String get forgotSent;
 
   /// No description provided for @resetTitle.
   ///
   /// In es, this message translates to:
-  /// **'Nueva contraseña'**
+  /// **'Elige otra contraseña'**
   String get resetTitle;
 
   /// No description provided for @resetNewPassword.
   ///
   /// In es, this message translates to:
-  /// **'Nueva contraseña'**
+  /// **'Contraseña nueva'**
   String get resetNewPassword;
 
   /// No description provided for @resetConfirmPassword.
   ///
   /// In es, this message translates to:
-  /// **'Repite la contraseña'**
+  /// **'Repítela'**
   String get resetConfirmPassword;
 
   /// No description provided for @resetMismatch.
@@ -1001,7 +989,7 @@ abstract class AppLocalizations {
   /// No description provided for @resetSubmit.
   ///
   /// In es, this message translates to:
-  /// **'Cambiar contraseña'**
+  /// **'Guardar la contraseña'**
   String get resetSubmit;
 
   /// No description provided for @resetRequestNew.
@@ -1009,6 +997,210 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Pedir otro enlace'**
   String get resetRequestNew;
+
+  /// No description provided for @registerSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Brackety es gratuito. Lo que pidamos depende de cómo lo vayas a usar.'**
+  String get registerSubtitle;
+
+  /// No description provided for @registerHaveAccountQuestion.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Ya tienes cuenta?'**
+  String get registerHaveAccountQuestion;
+
+  /// No description provided for @registerProfileHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Elige uno'**
+  String get registerProfileHint;
+
+  /// No description provided for @registerSectionClub.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu club'**
+  String get registerSectionClub;
+
+  /// No description provided for @registerSectionOrganization.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu entidad'**
+  String get registerSectionOrganization;
+
+  /// No description provided for @registerSectionYou.
+  ///
+  /// In es, this message translates to:
+  /// **'Tus datos'**
+  String get registerSectionYou;
+
+  /// No description provided for @registerSectionAccount.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu cuenta'**
+  String get registerSectionAccount;
+
+  /// No description provided for @registerClubName.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre del club'**
+  String get registerClubName;
+
+  /// No description provided for @registerRepresentativeClub.
+  ///
+  /// In es, this message translates to:
+  /// **'Soy mayor de edad y represento a este club.'**
+  String get registerRepresentativeClub;
+
+  /// No description provided for @registerFormErrors.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{Falta una cosa por revisar. Te llevamos a ella.} other{Faltan {count} cosas por revisar. Te llevamos a la primera.}}'**
+  String registerFormErrors(int count);
+
+  /// No description provided for @registerAcceptTick.
+  ///
+  /// In es, this message translates to:
+  /// **'Marca la casilla para crear la cuenta.'**
+  String get registerAcceptTick;
+
+  /// No description provided for @emailMissingDomain.
+  ///
+  /// In es, this message translates to:
+  /// **'Falta el final del email, como «.es» o «.com».'**
+  String get emailMissingDomain;
+
+  /// No description provided for @passwordRuleLength.
+  ///
+  /// In es, this message translates to:
+  /// **'Al menos {min} caracteres'**
+  String passwordRuleLength(int min);
+
+  /// No description provided for @passwordRuleProgress.
+  ///
+  /// In es, this message translates to:
+  /// **'Al menos {min} caracteres (llevas {count})'**
+  String passwordRuleProgress(int min, int count);
+
+  /// No description provided for @passwordRuleMatch.
+  ///
+  /// In es, this message translates to:
+  /// **'Coinciden'**
+  String get passwordRuleMatch;
+
+  /// No description provided for @checkEmailSentTo.
+  ///
+  /// In es, this message translates to:
+  /// **'Te hemos enviado un enlace a {email}. Ábrelo para activar la cuenta: caduca en 24 horas.'**
+  String checkEmailSentTo(String email);
+
+  /// No description provided for @checkEmailSpam.
+  ///
+  /// In es, this message translates to:
+  /// **'Si no lo ves, mira en spam o en promociones.'**
+  String get checkEmailSpam;
+
+  /// No description provided for @checkEmailThenSignIn.
+  ///
+  /// In es, this message translates to:
+  /// **'Después entra con tu email y tu contraseña.'**
+  String get checkEmailThenSignIn;
+
+  /// No description provided for @forgotQrHint.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Entras con el usuario que te dio el club? Pide al club un QR nuevo.'**
+  String get forgotQrHint;
+
+  /// No description provided for @forgotRemembered.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Ya la recuerdas?'**
+  String get forgotRemembered;
+
+  /// No description provided for @forgotSentTo.
+  ///
+  /// In es, this message translates to:
+  /// **'Si hay una cuenta con {email}, ya tiene un email con el enlace. Caduca en 1 hora.'**
+  String forgotSentTo(String email);
+
+  /// No description provided for @forgotCloseHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Puedes cerrar esta pantalla: el enlace te trae de vuelta.'**
+  String get forgotCloseHint;
+
+  /// No description provided for @forgotBackToLogin.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver a entrar'**
+  String get forgotBackToLogin;
+
+  /// No description provided for @forgotOtherEmail.
+  ///
+  /// In es, this message translates to:
+  /// **'Probar con otro email'**
+  String get forgotOtherEmail;
+
+  /// No description provided for @resetSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Al guardarla se cierran todas las sesiones abiertas con la contraseña anterior; después entras con la nueva.'**
+  String get resetSubtitle;
+
+  /// No description provided for @resetLinkExpiredTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Este enlace ya no sirve'**
+  String get resetLinkExpiredTitle;
+
+  /// No description provided for @resetLinkExpired.
+  ///
+  /// In es, this message translates to:
+  /// **'Los enlaces para cambiar la contraseña caducan en 1 hora y sirven una sola vez.'**
+  String get resetLinkExpired;
+
+  /// No description provided for @resetLinkExpiredNext.
+  ///
+  /// In es, this message translates to:
+  /// **'Pide otro y ábrelo desde el último email que te llegue.'**
+  String get resetLinkExpiredNext;
+
+  /// No description provided for @qrAccessOpenSession.
+  ///
+  /// In es, this message translates to:
+  /// **'Este dispositivo ya tiene una sesión abierta con {email}.'**
+  String qrAccessOpenSession(String email);
+
+  /// No description provided for @qrAccessOpenSessionUnnamed.
+  ///
+  /// In es, this message translates to:
+  /// **'Este dispositivo ya tiene una sesión abierta.'**
+  String get qrAccessOpenSessionUnnamed;
+
+  /// No description provided for @qrAccessIfYouEnter.
+  ///
+  /// In es, this message translates to:
+  /// **'Si entras con el QR:'**
+  String get qrAccessIfYouEnter;
+
+  /// No description provided for @qrAccessEndsSession.
+  ///
+  /// In es, this message translates to:
+  /// **'Se cierra esa sesión en este dispositivo.'**
+  String get qrAccessEndsSession;
+
+  /// No description provided for @qrAccessOnlyEvent.
+  ///
+  /// In es, this message translates to:
+  /// **'Entras solo en el evento del club y mientras dure la fase.'**
+  String get qrAccessOnlyEvent;
+
+  /// No description provided for @qrAccessKeepSession.
+  ///
+  /// In es, this message translates to:
+  /// **'Seguir con mi cuenta'**
+  String get qrAccessKeepSession;
 
   /// No description provided for @logout.
   ///
@@ -5349,7 +5541,7 @@ abstract class AppLocalizations {
   /// No description provided for @qrAccessSignInTitle.
   ///
   /// In es, this message translates to:
-  /// **'Entrar con QR'**
+  /// **'Entrar con el QR del club'**
   String get qrAccessSignInTitle;
 
   /// No description provided for @qrAccessInvalid.
@@ -5364,16 +5556,10 @@ abstract class AppLocalizations {
   /// **'Ir a iniciar sesión'**
   String get qrAccessGoToLogin;
 
-  /// No description provided for @qrAccessReplaceSession.
-  ///
-  /// In es, this message translates to:
-  /// **'Vas a entrar con el QR del club. Se cerrará la sesión que tienes abierta en este dispositivo.'**
-  String get qrAccessReplaceSession;
-
   /// No description provided for @qrAccessEnter.
   ///
   /// In es, this message translates to:
-  /// **'Entrar'**
+  /// **'Entrar con el QR'**
   String get qrAccessEnter;
 
   /// No description provided for @exportCustom.

@@ -16,9 +16,9 @@ import '../state/auth_providers.dart';
 import '../state/session_controller.dart';
 import 'auth_texts.dart';
 import 'widgets/acceptance_checkbox.dart';
+import 'widgets/auth_alternative.dart';
 import 'widgets/auth_form_page.dart';
 import 'widgets/birth_date_field.dart';
-import 'widgets/form_message.dart';
 import 'widgets/organization_fields.dart';
 import 'widgets/password_field.dart';
 import 'widgets/profile_selector.dart';
@@ -76,7 +76,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   Future<void> _submit() async {
     final form = _formKey.currentState!;
-    if (_busy || !form.validate()) return;
+    if (_busy) return;
+    final invalid = form.validateGranularly();
+    if (invalid.isNotEmpty) {
+      _showMissing(invalid);
+      return;
+    }
     setState(() {
       _busy = true;
       _error = null;
@@ -101,6 +106,23 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+  }
+
+  /// A long form fails in several places at once: say how many, and scroll to the first.
+  void _showMissing(Set<FormFieldState<Object?>> invalid) {
+    setState(
+      () =>
+          _error = AppLocalizations.of(context)
+              .registerFormErrors(invalid.length),
+    );
+    final first = invalid.first.context;
+    Scrollable.ensureVisible(
+      first,
+      alignment: 0.2,
+      duration: MediaQuery.disableAnimationsOf(context)
+          ? Duration.zero
+          : const Duration(milliseconds: 300),
+    );
   }
 
   void _showError(ApiError error) {
@@ -140,6 +162,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         },
         declared: _declared,
         onDeclaredChanged: (value) => _declared = value,
+        club: profile == ProfileType.club,
       );
     }
     return BirthDateField(
@@ -156,75 +179,116 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final l10n = AppLocalizations.of(context);
     final error = _error;
     final profile = _profile;
+    final organizer = profile?.isOrganizer ?? false;
     // Loaded on open, so the submit rarely waits for it.
     ref.watch(legalVersionsProvider);
     return AuthFormPage(
       title: l10n.registerTitle,
+      subtitle: l10n.registerSubtitle,
+      error: error,
       children: [
-        Form(
-          key: _formKey,
-          child: AutofillGroup(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                ProfileSelector(
-                  profiles: registrationProfiles(
-                    devEnvironment: ref.watch(devEnvironmentProvider),
-                  ),
-                  initialValue: profile,
-                  onChanged: (value) => setState(() => _profile = value),
-                  validator: (value) =>
-                      value == null ? l10n.registerProfileRequired : null,
-                ),
-                if (profile != null) ...[
-                  const SizedBox(height: AppSpacing.m),
-                  _profileFields(l10n, profile),
-                ],
-                const SizedBox(height: AppSpacing.l),
-                TextFormField(
-                  controller: _email,
-                  keyboardType: TextInputType.emailAddress,
-                  autocorrect: false,
-                  autofillHints: const [AutofillHints.email],
-                  textInputAction: TextInputAction.next,
-                  decoration: InputDecoration(labelText: l10n.emailLabel),
-                  validator: (value) => validateEmail(l10n, value),
-                ),
-                const SizedBox(height: AppSpacing.m),
-                PasswordField(
-                  controller: _password,
-                  label: l10n.passwordLabel,
-                  helperText: l10n.passwordHint,
-                  autofillHints: const [AutofillHints.newPassword],
-                  textInputAction: TextInputAction.done,
-                  onSubmitted: (_) => _submit(),
-                  validator: (value) => validateNewPassword(l10n, value),
-                ),
-                const SizedBox(height: AppSpacing.s),
-                AcceptanceCheckbox(
-                  key: _acceptance,
-                  title: const _AcceptanceText(),
-                  requiredText: l10n.registerAcceptRequired,
-                ),
-              ],
+        AutofillForm(
+          formKey: _formKey,
+          children: [
+            ProfileSelector(
+              profiles: registrationProfiles(
+                devEnvironment: ref.watch(devEnvironmentProvider),
+              ),
+              value: profile,
+              onChanged: (value) => setState(() => _profile = value),
+              validator: (value) =>
+                  value == null ? l10n.registerProfileRequired : null,
             ),
-          ),
+            if (profile != null && organizer)
+              _Section(
+                title: profile == ProfileType.club
+                    ? l10n.registerSectionClub
+                    : l10n.registerSectionOrganization,
+                child: _profileFields(l10n, profile),
+              ),
+            _Section(
+              // Without an organization, the birth date joins the email and password.
+              title: profile == null || organizer
+                  ? l10n.registerSectionAccount
+                  : l10n.registerSectionYou,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (profile != null && !organizer) ...[
+                    _profileFields(l10n, profile),
+                    const SizedBox(height: AppSpacing.l),
+                  ],
+                  TextFormField(
+                    controller: _email,
+                    keyboardType: TextInputType.emailAddress,
+                    autocorrect: false,
+                    autofillHints: const [AutofillHints.email],
+                    textInputAction: TextInputAction.next,
+                    decoration: InputDecoration(labelText: l10n.emailLabel),
+                    validator: (value) => validateEmail(l10n, value),
+                  ),
+                  const SizedBox(height: AppSpacing.l),
+                  NewPasswordField(
+                    controller: _password,
+                    label: l10n.passwordLabel,
+                    textInputAction: TextInputAction.done,
+                    onSubmitted: (_) => _submit(),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xxl),
+            AcceptanceCheckbox(
+              key: _acceptance,
+              boxed: true,
+              title: const _AcceptanceText(),
+              requiredText: l10n.registerAcceptTick,
+            ),
+          ],
         ),
-        if (error != null) ...[
-          const SizedBox(height: AppSpacing.m),
-          FormMessage.error(error),
-        ],
         const SizedBox(height: AppSpacing.l),
         FilledButton(
           onPressed: _busy ? null : _submit,
           child: Text(l10n.registerSubmit),
         ),
-        const SizedBox(height: AppSpacing.s),
-        TextButton(
+        AuthAlternative(
+          question: l10n.registerHaveAccountQuestion,
+          action: l10n.loginSubmit,
           onPressed: () => context.go('/login'),
-          child: Text(l10n.registerHaveAccount),
         ),
       ],
+    );
+  }
+}
+
+/// A titled block of the form: «Tu club», «Tu cuenta».
+class _Section extends StatelessWidget {
+  const _Section({required this.title, required this.child});
+
+  final String title;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.xxl),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Semantics(
+            header: true,
+            child: Text(
+              title,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.m),
+          child,
+        ],
+      ),
     );
   }
 }

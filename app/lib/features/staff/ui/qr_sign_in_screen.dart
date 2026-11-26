@@ -6,8 +6,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
 import '../../auth/data/api_error.dart';
+import '../../auth/state/account_controller.dart';
 import '../../auth/state/session_controller.dart';
 import '../../auth/ui/widgets/auth_form_page.dart';
+import '../../auth/ui/widgets/auth_note.dart';
 import '../../auth/ui/widgets/form_message.dart';
 
 /// Where a club's QR leads: signs in to the temporary account at once, with no account of one's
@@ -75,9 +77,22 @@ class _QrSignInScreenState extends ConsumerState<QrSignInScreen> {
             child: Text(l10n.qrAccessGoToLogin),
           ),
         ] else if (status == SessionStatus.signedIn && !_signingIn) ...[
-          Text(l10n.qrAccessReplaceSession),
+          Text(switch (ref.watch(accountProvider).value?.email) {
+            final email? => l10n.qrAccessOpenSession(email),
+            null => l10n.qrAccessOpenSessionUnnamed,
+          }),
           const SizedBox(height: AppSpacing.l),
+          AuthNote(
+            title: l10n.qrAccessIfYouEnter,
+            items: [l10n.qrAccessEndsSession, l10n.qrAccessOnlyEvent],
+          ),
+          const SizedBox(height: AppSpacing.xl),
           FilledButton(onPressed: _signIn, child: Text(l10n.qrAccessEnter)),
+          const SizedBox(height: AppSpacing.s),
+          TextButton(
+            onPressed: () => context.go('/'),
+            child: Text(l10n.qrAccessKeepSession),
+          ),
         ] else
           const Center(child: CircularProgressIndicator()),
       ],

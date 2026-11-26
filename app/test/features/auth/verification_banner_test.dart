@@ -43,7 +43,7 @@ void main() {
 
     expect(DefaultTextStyle.of(context).style.color, onWarning);
     final button = tester.widget<OutlinedButton>(
-      find.widgetWithText(OutlinedButton, 'Resend email'),
+      find.widgetWithText(OutlinedButton, 'Resend the email'),
     );
     final style = OutlinedButtonTheme.of(tester.element(find.byWidget(button)))
         .style!;
