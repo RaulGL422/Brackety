@@ -4,6 +4,7 @@ import 'package:brackety/features/appearance/state/theme_mode_provider.dart';
 import 'package:brackety/features/auth/data/account.dart';
 import 'package:brackety/features/auth/data/registration.dart';
 import 'package:brackety/features/auth/state/session_controller.dart';
+import 'package:brackety/features/auth/ui/app_settings_screen.dart';
 import 'package:brackety/features/auth/ui/settings_screen.dart';
 import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
@@ -25,13 +26,14 @@ void main() {
     List<(String, List<int>)>? saved,
     ThemeStore? themes,
     ThemeMode savedTheme = ThemeMode.system,
+    String location = '/settings',
   }) async {
     final api = FakeAccountApi(account: account);
     await pumpAuthApp(
       tester,
       auth,
       account: api,
-      location: '/settings',
+      location: location,
       devEnvironment: devEnvironment,
       overrides: [
         saveFileProvider.overrideWithValue(
@@ -72,14 +74,16 @@ void main() {
       useSize(tester, size);
       await openSettings(tester);
 
-      expect(find.text('Account settings'), findsOneWidget);
+      expect(find.text('My account'), findsOneWidget);
+      expect(find.text('Sign-in'), findsOneWidget);
       expect(find.text('ana@example.com'), findsOneWidget);
       expect(find.text('Verified'), findsOneWidget);
-      expect(find.text('Language'), findsOneWidget);
+      // The device's own choices live in «Ajustes de la app».
+      expect(find.text('Language'), findsNothing);
       for (final text in [
         'Helper',
         'Email and password',
-        'Appearance',
+        'Privacy and data',
         'Export my data',
         'Danger zone',
         'Delete account',
@@ -92,19 +96,63 @@ void main() {
     });
   }
 
-  testWidgets('the account icon in my events opens the settings', (
+  for (final (title, location, last) in [
+    ('My account', '/settings', 'Sign out'),
+    ('App settings', '/app-settings', 'About Brackety'),
+  ]) {
+    testWidgets('text at 200 % fits $title on a phone', (tester) async {
+      useSize(tester, screenSizes['phone']!);
+      tester.platformDispatcher.textScaleFactorTestValue = 2;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await openSettings(tester, location: location);
+
+      await scrollTo(tester, last);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets('the account menu says who is in and opens my account', (
     tester,
   ) async {
     await pumpAuthApp(tester, auth);
 
-    await tester.tap(find.byTooltip('My account'));
+    await tester.tap(find.byTooltip('Account'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Account settings'));
+    // Who is signed in heads the menu.
+    expect(find.text('ana@example.com'), findsWidgets);
+    await tester.tap(find.text('My account'));
     await tester.pumpAndSettle();
-
     expect(find.byType(SettingsScreen), findsOneWidget);
-    expect(find.text('ana@example.com'), findsOneWidget);
   });
+
+  testWidgets('the account menu opens the app settings', (tester) async {
+    await pumpAuthApp(tester, auth);
+
+    await tester.tap(find.byTooltip('Account'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('App settings'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AppSettingsScreen), findsOneWidget);
+    expect(find.text('Language'), findsOneWidget);
+  });
+
+  for (final MapEntry(key: device, value: size) in screenSizes.entries) {
+    testWidgets('app settings show and fit on $device', (tester) async {
+      useSize(tester, size);
+      final handle = tester.ensureSemantics();
+      await openSettings(tester, location: '/app-settings');
+
+      expect(find.text('App settings'), findsOneWidget);
+      expect(find.text('Language'), findsOneWidget);
+      await scrollTo(tester, 'About Brackety');
+      expect(find.text('Appearance'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+      await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+      await expectLater(tester, meetsGuideline(textContrastGuideline));
+      handle.dispose();
+    });
+  }
 
   testWidgets('without the server it says so and retries', (tester) async {
     final api = FakeAccountApi()..meError = networkError();
@@ -269,6 +317,8 @@ void main() {
       );
       api.removeProfileError = httpError(409, body: {'code': 'LAST_PROFILE'});
 
+      await tester.ensureVisible(find.byTooltip('Remove profile').first);
+      await tester.pumpAndSettle();
       await tester.tap(find.byTooltip('Remove profile').first);
       await tester.pumpAndSettle();
       expect(find.text('Remove the Helper profile?'), findsOneWidget);
@@ -367,7 +417,7 @@ void main() {
       tester,
     ) async {
       final store = _FakeThemeStore();
-      await openSettings(tester, themes: store);
+      await openSettings(tester, themes: store, location: '/app-settings');
       expect(appMode(tester), ThemeMode.system);
 
       await scrollTo(tester, 'Dark');
@@ -382,7 +432,11 @@ void main() {
     });
 
     testWidgets('the app starts with the saved choice', (tester) async {
-      await openSettings(tester, savedTheme: ThemeMode.light);
+      await openSettings(
+        tester,
+        savedTheme: ThemeMode.light,
+        location: '/app-settings',
+      );
 
       expect(appMode(tester), ThemeMode.light);
       await scrollTo(tester, 'Light');
@@ -395,22 +449,22 @@ void main() {
 
   group('language', () {
     testWidgets('switching changes the app and the account', (tester) async {
-      final api = await openSettings(tester);
+      final api = await openSettings(tester, location: '/app-settings');
 
       await tapText(tester, 'Español');
 
       expect(api.locales, ['es']);
-      expect(find.text('Ajustes de la cuenta'), findsOneWidget);
+      expect(find.text('Ajustes de la app'), findsOneWidget);
       expect(find.text('Idioma'), findsOneWidget);
     });
 
     testWidgets('a failure puts the language back', (tester) async {
-      final api = await openSettings(tester);
+      final api = await openSettings(tester, location: '/app-settings');
       api.localeError = networkError();
 
       await tapText(tester, 'Español');
 
-      expect(find.text('Account settings'), findsOneWidget);
+      expect(find.text('App settings'), findsOneWidget);
       expect(find.text('The language could not be changed.'), findsOneWidget);
     });
   });

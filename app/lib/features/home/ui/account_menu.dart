@@ -4,12 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
+import '../../auth/data/account.dart';
 import '../../auth/state/account_controller.dart';
 import '../../auth/ui/confirm_sign_out.dart';
 
-enum _AccountItem { settings, changelog, signOut }
+enum _AccountItem { account, appSettings, changelog, signOut }
 
 /// One labelled button instead of three bare icons: people did not know what each one did.
+/// Inside, who is signed in, then «Mi cuenta» apart from «Ajustes de la app» (Raul, 2026-11-26).
 class AccountMenu extends ConsumerWidget {
   const AccountMenu({super.key});
 
@@ -25,28 +27,34 @@ class AccountMenu extends ConsumerWidget {
     return PopupMenuButton<_AccountItem>(
       tooltip: l10n.accountMenu,
       onSelected: (item) => switch (item) {
-        _AccountItem.settings => context.push('/settings'),
+        _AccountItem.account => context.push('/settings'),
+        _AccountItem.appSettings => context.push('/app-settings'),
         _AccountItem.changelog => context.push('/changelog'),
         _AccountItem.signOut => confirmSignOut(context, ref),
       },
       itemBuilder: (_) => [
-        if (!temporary)
-          PopupMenuItem(
-            value: _AccountItem.settings,
-            child: ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.settings_outlined),
-              title: Text(l10n.settingsTitle),
-            ),
+        const PopupMenuItem(enabled: false, child: _Identity()),
+        const PopupMenuDivider(),
+        if (!temporary) ...[
+          _item(
+            _AccountItem.account,
+            Icons.person_outline,
+            l10n.settingsTitle,
+            l10n.menuAccountHint,
           ),
+          _item(
+            _AccountItem.appSettings,
+            Icons.tune,
+            l10n.appSettingsTitle,
+            l10n.menuAppSettingsHint,
+          ),
+        ],
         if (debug)
-          PopupMenuItem(
-            value: _AccountItem.changelog,
-            child: ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.history),
-              title: Text(CoreLocalizations.of(context).changelogMenu),
-            ),
+          _item(
+            _AccountItem.changelog,
+            Icons.history,
+            CoreLocalizations.of(context).changelogMenu,
+            null,
           ),
         const PopupMenuDivider(),
         PopupMenuItem(
@@ -131,3 +139,65 @@ String initialsOf(String name) {
       .toList();
   return words.take(2).map((w) => w.characters.first.toUpperCase()).join();
 }
+
+PopupMenuItem<_AccountItem> _item(
+  _AccountItem value,
+  IconData icon,
+  String title,
+  String? hint,
+) => PopupMenuItem(
+  value: value,
+  child: ListTile(
+    contentPadding: EdgeInsets.zero,
+    leading: Icon(icon),
+    title: Text(title),
+    subtitle: hint == null ? null : Text(hint),
+  ),
+);
+
+/// Who is signed in: the organization (or the email) and the email under it.
+class _Identity extends ConsumerWidget {
+  const _Identity();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final account = ref.watch(accountProvider).value;
+    final email = account?.email ?? '';
+    final name = _nameOf(account) ?? email;
+    // A disabled item greys its text: these colours keep it readable.
+    return Row(
+      children: [
+        const _Initials(),
+        const SizedBox(width: AppSpacing.m),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+              if (name != email)
+                Text(
+                  email,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+String? _nameOf(Account? account) =>
+    account?.profiles.map((p) => p.organizationName).nonNulls.firstOrNull;

@@ -48,16 +48,14 @@ void main() {
     expect(find.byType(LicensePage), findsOneWidget);
   });
 
-  testWidgets('the settings list the legal documents and the licenses', (
-    tester,
-  ) async {
+  testWidgets('my account lists the legal documents', (tester) async {
     await pumpAuthApp(
       tester,
       FakeAuthApi(signedIn: true),
       location: '/settings',
     );
     await tester.scrollUntilVisible(
-      find.widgetWithText(ListTile, 'Software licenses'),
+      find.widgetWithText(ListTile, 'Legal notice'),
       200,
       scrollable: find.byType(Scrollable).first,
     );
@@ -67,12 +65,28 @@ void main() {
       'Terms of use',
       'Cookie policy',
       'Legal notice',
-      'Software licenses',
     ]) {
       expect(find.widgetWithText(ListTile, title), findsOneWidget);
     }
 
     await tapText(tester, 'Terms of use');
     expect(find.text('terms (en)'), findsOneWidget);
+  });
+
+  // The licenses are the app's, not the account's: they moved to «Ajustes de la app».
+  testWidgets('app settings list the software licenses', (tester) async {
+    await pumpAuthApp(
+      tester,
+      FakeAuthApi(signedIn: true),
+      location: '/app-settings',
+    );
+    await tester.scrollUntilVisible(
+      find.widgetWithText(ListTile, 'Software licenses'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+
+    expect(find.widgetWithText(ListTile, 'Software licenses'), findsOneWidget);
+    expect(find.widgetWithText(ListTile, 'Privacy policy'), findsNothing);
   });
 }

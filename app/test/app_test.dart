@@ -80,12 +80,14 @@ void main() {
         findsNothing,
       );
 
-      await tester.tap(find.byTooltip('My account'));
+      await tester.tap(find.byTooltip('Account'));
       await tester.pumpAndSettle();
       expect(find.text('Connection'), findsNothing);
-      await tester.tap(find.text('Account settings'));
+      await tester.tap(find.text('App settings'));
       await tester.pumpAndSettle();
       await tester.scrollUntilVisible(find.text('Connection'), 300);
+      await tester.ensureVisible(find.text('Connection'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Connection'));
       await tester.pumpAndSettle();
       expect(find.text(apiBaseUrl), findsOneWidget);
@@ -100,11 +102,11 @@ void main() {
     await tester.pumpWidget(app(FakeAuthApi(signedIn: true)));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byTooltip('My account'));
+    await tester.tap(find.byTooltip('Account'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Account settings'));
+    await tester.tap(find.text('App settings'));
     await tester.pumpAndSettle();
-    await tester.scrollUntilVisible(find.text('Sign out'), 300);
+    await tester.scrollUntilVisible(find.text('Software licenses'), 300);
     expect(find.text('Connection'), findsNothing);
 
     ProviderScope.containerOf(tester.element(find.byType(BracketyApp)))
@@ -159,7 +161,7 @@ void main() {
     await tester.pumpWidget(app(api));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byTooltip('My account'));
+    await tester.tap(find.byTooltip('Account'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Sign out'));
     await tester.pumpAndSettle();

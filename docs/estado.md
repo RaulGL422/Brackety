@@ -21,7 +21,7 @@ Estados: **pendiente** · **en curso** · **en pruebas** (hecho; falta la prueba
 |---|---|---|
 | `infra-deploy` | cerrado (2026-10-30) | |
 | `entornos` | en curso | Producción y debug en la Pi; falta pasar los datos de la F1 a producción |
-| `auth` | en pruebas | Tareas 1-9 de 9; registro, contraseña y QR rediseñados |
+| `auth` | en pruebas | Tareas 1-9 de 9; registro, contraseña y QR rediseñados; Mi cuenta y Ajustes de la app |
 | `perfiles-menores` | pendiente | |
 | `legal-paginas` | en pruebas | Pasos 1-2, puerta legal (#198) y nueva aceptación si cambia un texto (#199), páginas rediseñadas |
 | `eventos` | pendiente | Adelantado: comenzar, finalizar y reabrir la fase (#129); rediseño en `producto/eventos-ux.md` |

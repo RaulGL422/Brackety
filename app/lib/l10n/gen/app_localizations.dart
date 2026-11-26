@@ -3118,13 +3118,55 @@ abstract class AppLocalizations {
   /// No description provided for @settingsTitle.
   ///
   /// In es, this message translates to:
-  /// **'Ajustes de la cuenta'**
+  /// **'Mi cuenta'**
   String get settingsTitle;
+
+  /// No description provided for @appSettingsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Ajustes de la app'**
+  String get appSettingsTitle;
+
+  /// No description provided for @menuAccountHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Email, perfiles, acceso y tus datos'**
+  String get menuAccountHint;
+
+  /// No description provided for @menuAppSettingsHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Idioma, apariencia y versión'**
+  String get menuAppSettingsHint;
+
+  /// No description provided for @accountGroupAccess.
+  ///
+  /// In es, this message translates to:
+  /// **'Acceso'**
+  String get accountGroupAccess;
+
+  /// No description provided for @accountGroupWho.
+  ///
+  /// In es, this message translates to:
+  /// **'Quién eres en Brackety'**
+  String get accountGroupWho;
+
+  /// No description provided for @accountGroupPrivacy.
+  ///
+  /// In es, this message translates to:
+  /// **'Privacidad y datos'**
+  String get accountGroupPrivacy;
+
+  /// No description provided for @appGroupAbout.
+  ///
+  /// In es, this message translates to:
+  /// **'Acerca de Brackety'**
+  String get appGroupAbout;
 
   /// No description provided for @settingsAccount.
   ///
   /// In es, this message translates to:
-  /// **'Cuenta'**
+  /// **'Email'**
   String get settingsAccount;
 
   /// No description provided for @settingsEmailVerified.
@@ -4455,13 +4497,13 @@ abstract class AppLocalizations {
   /// No description provided for @settingsAppearanceHint.
   ///
   /// In es, this message translates to:
-  /// **'Automático sigue al modo claro u oscuro del dispositivo. Se guarda solo en este dispositivo.'**
+  /// **'Sistema sigue al modo claro u oscuro del dispositivo. Se guarda solo en este dispositivo.'**
   String get settingsAppearanceHint;
 
   /// No description provided for @themeSystem.
   ///
   /// In es, this message translates to:
-  /// **'Automático'**
+  /// **'Sistema'**
   String get themeSystem;
 
   /// No description provided for @themeLight.
@@ -4503,7 +4545,7 @@ abstract class AppLocalizations {
   /// No description provided for @accountMenu.
   ///
   /// In es, this message translates to:
-  /// **'Mi cuenta'**
+  /// **'Cuenta'**
   String get accountMenu;
 
   /// No description provided for @back.

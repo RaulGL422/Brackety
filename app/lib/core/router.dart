@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../features/auth/state/account_controller.dart';
 import '../features/auth/state/session_controller.dart';
+import '../features/auth/ui/app_settings_screen.dart';
 import '../features/auth/ui/check_email_screen.dart';
 import '../features/auth/ui/confirm_email_change_screen.dart';
 import '../features/auth/ui/forgot_password_screen.dart';
@@ -194,6 +195,10 @@ final routerProvider = Provider<GoRouter>((ref) {
             LegalPageScreen(slug: state.pathParameters['type']!),
       ),
       GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
+      GoRoute(
+        path: '/app-settings',
+        builder: (_, _) => const AppSettingsScreen(),
+      ),
       // From the invitation email; signed out, the sign-in comes back here.
       GoRoute(
         path: '/invitation',
