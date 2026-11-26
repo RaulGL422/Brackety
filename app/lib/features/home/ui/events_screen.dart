@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
+import '../../appearance/data/device_prefs.dart';
+import '../../appearance/state/device_prefs_provider.dart';
 import '../../auth/data/registration.dart';
 import '../../auth/state/account_controller.dart';
 import '../../events/data/my_event.dart';
@@ -107,13 +109,14 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _Sections extends StatelessWidget {
+class _Sections extends ConsumerWidget {
   const _Sections({required this.events});
 
   final List<MyEvent> events;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final finished = ref.watch(devicePrefsProvider.select((p) => p.finished));
     final l10n = AppLocalizations.of(context);
     final sections = overviewOf(events);
     final wide = WindowSize.of(context) != WindowSize.compact;
@@ -142,11 +145,17 @@ class _Sections extends StatelessWidget {
                     UpcomingCard(league: league),
                 ],
               ),
-            if (sections.finished.isNotEmpty)
+            // This device may hide them («Ajustes de la app»).
+            if (sections.finished.isNotEmpty && finished != FinishedShown.none)
               _Section(
                 title: l10n.homeFinished,
                 count: sections.finished.length,
-                children: [FinishedList(leagues: sections.finished)],
+                children: [
+                  FinishedList(
+                    leagues: sections.finished,
+                    all: finished == FinishedShown.all,
+                  ),
+                ],
               ),
           ],
         ),

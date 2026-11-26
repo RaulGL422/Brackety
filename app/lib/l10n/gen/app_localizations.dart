@@ -3163,6 +3163,120 @@ abstract class AppLocalizations {
   /// **'Acerca de Brackety'**
   String get appGroupAbout;
 
+  /// No description provided for @prefsText.
+  ///
+  /// In es, this message translates to:
+  /// **'Texto y contraste'**
+  String get prefsText;
+
+  /// No description provided for @prefsTextSize.
+  ///
+  /// In es, this message translates to:
+  /// **'Tamaño del texto'**
+  String get prefsTextSize;
+
+  /// No description provided for @prefsTextSizeDevice.
+  ///
+  /// In es, this message translates to:
+  /// **'Como en el dispositivo'**
+  String get prefsTextSizeDevice;
+
+  /// No description provided for @prefsTextSizePercent.
+  ///
+  /// In es, this message translates to:
+  /// **'{percent} %'**
+  String prefsTextSizePercent(int percent);
+
+  /// No description provided for @prefsTextPreview.
+  ///
+  /// In es, this message translates to:
+  /// **'Así se verá el texto en Brackety.'**
+  String get prefsTextPreview;
+
+  /// No description provided for @prefsMoreContrast.
+  ///
+  /// In es, this message translates to:
+  /// **'Más contraste'**
+  String get prefsMoreContrast;
+
+  /// No description provided for @prefsMoreContrastHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Los textos grises pasan a negro y los bordes se marcan más. Útil al sol o con poca vista.'**
+  String get prefsMoreContrastHint;
+
+  /// No description provided for @prefsFinished.
+  ///
+  /// In es, this message translates to:
+  /// **'Finalizados que se muestran'**
+  String get prefsFinished;
+
+  /// No description provided for @prefsFinishedLatest.
+  ///
+  /// In es, this message translates to:
+  /// **'Los 3 últimos'**
+  String get prefsFinishedLatest;
+
+  /// No description provided for @prefsFinishedAll.
+  ///
+  /// In es, this message translates to:
+  /// **'Todos'**
+  String get prefsFinishedAll;
+
+  /// No description provided for @prefsFinishedNone.
+  ///
+  /// In es, this message translates to:
+  /// **'Ninguno'**
+  String get prefsFinishedNone;
+
+  /// No description provided for @prefsScoreboard.
+  ///
+  /// In es, this message translates to:
+  /// **'Marcador y tapiz'**
+  String get prefsScoreboard;
+
+  /// No description provided for @prefsScoreboardHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Para quien arbitra o lleva la mesa. Cada dispositivo puede tenerlo distinto.'**
+  String get prefsScoreboardHint;
+
+  /// No description provided for @prefsBell.
+  ///
+  /// In es, this message translates to:
+  /// **'Campana'**
+  String get prefsBell;
+
+  /// No description provided for @prefsBellHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Al empezar, a falta de 10 segundos y al acabar.'**
+  String get prefsBellHint;
+
+  /// No description provided for @prefsVibrate.
+  ///
+  /// In es, this message translates to:
+  /// **'Vibrar al acabar'**
+  String get prefsVibrate;
+
+  /// No description provided for @prefsVibrateHint.
+  ///
+  /// In es, this message translates to:
+  /// **'En los móviles que lo permiten.'**
+  String get prefsVibrateHint;
+
+  /// No description provided for @prefsScreenOn.
+  ///
+  /// In es, this message translates to:
+  /// **'Mantener la pantalla encendida'**
+  String get prefsScreenOn;
+
+  /// No description provided for @prefsScreenOnHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Mientras están abiertos el marcador o el tapiz.'**
+  String get prefsScreenOnHint;
+
   /// No description provided for @settingsAccount.
   ///
   /// In es, this message translates to:

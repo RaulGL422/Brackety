@@ -1923,6 +1923,68 @@ class AppLocalizationsEs extends AppLocalizations {
   String get appGroupAbout => 'Acerca de Brackety';
 
   @override
+  String get prefsText => 'Texto y contraste';
+
+  @override
+  String get prefsTextSize => 'Tamaño del texto';
+
+  @override
+  String get prefsTextSizeDevice => 'Como en el dispositivo';
+
+  @override
+  String prefsTextSizePercent(int percent) {
+    return '$percent %';
+  }
+
+  @override
+  String get prefsTextPreview => 'Así se verá el texto en Brackety.';
+
+  @override
+  String get prefsMoreContrast => 'Más contraste';
+
+  @override
+  String get prefsMoreContrastHint =>
+      'Los textos grises pasan a negro y los bordes se marcan más. Útil al sol o con poca vista.';
+
+  @override
+  String get prefsFinished => 'Finalizados que se muestran';
+
+  @override
+  String get prefsFinishedLatest => 'Los 3 últimos';
+
+  @override
+  String get prefsFinishedAll => 'Todos';
+
+  @override
+  String get prefsFinishedNone => 'Ninguno';
+
+  @override
+  String get prefsScoreboard => 'Marcador y tapiz';
+
+  @override
+  String get prefsScoreboardHint =>
+      'Para quien arbitra o lleva la mesa. Cada dispositivo puede tenerlo distinto.';
+
+  @override
+  String get prefsBell => 'Campana';
+
+  @override
+  String get prefsBellHint => 'Al empezar, a falta de 10 segundos y al acabar.';
+
+  @override
+  String get prefsVibrate => 'Vibrar al acabar';
+
+  @override
+  String get prefsVibrateHint => 'En los móviles que lo permiten.';
+
+  @override
+  String get prefsScreenOn => 'Mantener la pantalla encendida';
+
+  @override
+  String get prefsScreenOnHint =>
+      'Mientras están abiertos el marcador o el tapiz.';
+
+  @override
   String get settingsAccount => 'Email';
 
   @override

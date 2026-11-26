@@ -8,11 +8,12 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../state/account_controller.dart';
 import 'settings/appearance_section.dart';
 import 'settings/connection_tile.dart';
+import 'settings/device_sections.dart';
 import 'settings/language_section.dart';
 import 'settings/settings_section.dart';
 
-/// «Ajustes de la app» (Raul, 2026-11-26): how Brackety looks and speaks on this device, and
-/// what version it runs. The account's own matters are in «Mi cuenta».
+/// «Ajustes de la app» (Raul, 2026-11-26): how Brackety looks, speaks and rings on this device,
+/// and what version it runs. The account's own matters are in «Mi cuenta».
 class AppSettingsScreen extends ConsumerWidget {
   const AppSettingsScreen({super.key});
 
@@ -32,6 +33,12 @@ class AppSettingsScreen extends ConsumerWidget {
           if (locale != null) LanguageSection(locale: locale),
           const SizedBox(height: AppSpacing.m),
           const AppearanceSection(),
+          const SizedBox(height: AppSpacing.m),
+          const TextContrastSection(),
+          const SizedBox(height: AppSpacing.m),
+          const MyEventsPrefsSection(),
+          const SizedBox(height: AppSpacing.m),
+          const ScoreboardPrefsSection(),
           const SizedBox(height: AppSpacing.xl),
           SettingsGroup(title: l10n.appGroupAbout, children: const [_About()]),
         ],

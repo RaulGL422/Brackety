@@ -1,4 +1,10 @@
+import 'dart:async';
+
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../appearance/data/device_prefs.dart';
+import '../../appearance/state/device_prefs_provider.dart';
 
 import 'bell_audio.dart'
     if (dart.library.js_interop) 'bell_web.dart'
@@ -33,9 +39,31 @@ abstract interface class PlatformBell implements Bell {
   void dispose();
 }
 
-/// One for the whole app: the sounds are loaded once, before the first match.
+/// One for the whole app: the sounds are loaded once, before the first match. It rings and
+/// buzzes only as this device's settings say («Marcador y tapiz»).
 final bellProvider = Provider<Bell>((ref) {
   final bell = platform.createBell();
   ref.onDispose(bell.dispose);
-  return bell;
+  return PreferredBell(bell, () => ref.read(devicePrefsProvider));
 });
+
+/// A [Bell] that rings and buzzes only as this device's settings say.
+class PreferredBell implements Bell {
+  PreferredBell(this._bell, this._prefs);
+
+  final Bell _bell;
+  final DevicePrefs Function() _prefs;
+
+  @override
+  void play(BellSound sound) {
+    final prefs = _prefs();
+    if (prefs.bell) _bell.play(sound);
+    // The end is what a referee must not miss: it buzzes too, where the device can.
+    if (prefs.vibrate && sound == BellSound.end) {
+      unawaited(HapticFeedback.vibrate());
+    }
+  }
+
+  @override
+  void unlock() => _bell.unlock();
+}

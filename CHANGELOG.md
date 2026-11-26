@@ -7,6 +7,7 @@ esa sección pasa a llamarse como la versión. Debug enseña su compilación jun
 ## Sin publicar (en debug)
 
 ### Nuevo
+- Ajustes de la app: tamaño del texto y «Más contraste», cuántos finalizados ver en Mis eventos, y en marcador y tapiz campana, vibrar al acabar y pantalla encendida. Se guardan en cada dispositivo.
 - El menú de la cuenta dice quién está dentro y separa «Mi cuenta» (email, acceso, perfiles, tus datos, textos legales) de «Ajustes de la app» (idioma, apariencia, licencias y versión). «Automático» pasa a llamarse «Sistema».
 - Mis eventos rediseñado: «En curso», «Próximos» y «Finalizados»; fases de la liga en una fila deslizable que abre cada una; un botón según lo que haces en el evento (o «Entrar al evento» si haces varias cosas); «Nuevo evento» solo para clubes y entidades.
 - Los rechazos del servidor (fecha bloqueada, categoría en uso, reglamento que no es PDF…) dicen el motivo concreto en tu idioma, en vez de «No se pudo guardar» (#207).

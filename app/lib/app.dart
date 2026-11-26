@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/router.dart';
+import 'features/appearance/state/device_prefs_provider.dart';
 import 'features/appearance/state/theme_mode_provider.dart';
 import 'features/auth/state/account_controller.dart';
 import 'features/auth/ui/verification_banner.dart';
@@ -21,10 +22,13 @@ class BracketyApp extends ConsumerWidget {
       offlineSyncProvider.select((s) => s.pendingCount > 0),
       (_, unsent) => guardLeaving(unsent),
     );
+    final moreContrast = ref.watch(
+      devicePrefsProvider.select((p) => p.moreContrast),
+    );
     return MaterialApp.router(
       onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
-      theme: lightTheme(),
-      darkTheme: darkTheme(),
+      theme: lightTheme(moreContrast: moreContrast),
+      darkTheme: darkTheme(moreContrast: moreContrast),
       themeMode: ref.watch(themeModeProvider),
       routerConfig: ref.watch(routerProvider),
       locale: ref.watch(appLocaleProvider),
@@ -34,8 +38,10 @@ class BracketyApp extends ConsumerWidget {
           hold: ref.watch(
             offlineSyncProvider.select((s) => s.pendingCount > 0),
           ),
-          child: ToastHost(
-            child: DebugBanner(child: VerificationBanner(child: child!)),
+          child: _TextSize(
+            child: ToastHost(
+              child: DebugBanner(child: VerificationBanner(child: child!)),
+            ),
           ),
         ),
       ),
@@ -44,6 +50,24 @@ class BracketyApp extends ConsumerWidget {
         AppLocalizations.delegate,
         ...coreLocalizationsDelegates,
       ],
+    );
+  }
+}
+
+/// The size chosen in «Ajustes de la app» over the device's own; none chosen, the device's.
+class _TextSize extends ConsumerWidget {
+  const _TextSize({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final scale = ref.watch(devicePrefsProvider.select((p) => p.textScale));
+    if (scale == null) return child;
+    return MediaQuery(
+      data: MediaQuery.of(context)
+          .copyWith(textScaler: TextScaler.linear(scale)),
+      child: child,
     );
   }
 }

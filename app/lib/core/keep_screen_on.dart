@@ -2,11 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
+import '../features/appearance/state/device_prefs_provider.dart';
+
 /// The screen stays on while at least one of these is mounted (the mat board and the
-/// scoreboard, one over the other); the web does nothing.
-class KeepScreenOn extends StatefulWidget {
+/// scoreboard, one over the other), unless this device turned it off; the web does nothing.
+class KeepScreenOn extends ConsumerStatefulWidget {
   const KeepScreenOn({super.key, required this.child});
 
   final Widget child;
@@ -24,19 +27,22 @@ class KeepScreenOn extends StatefulWidget {
   }
 
   @override
-  State<KeepScreenOn> createState() => _KeepScreenOnState();
+  ConsumerState<KeepScreenOn> createState() => _KeepScreenOnState();
 }
 
-class _KeepScreenOnState extends State<KeepScreenOn> {
+class _KeepScreenOnState extends ConsumerState<KeepScreenOn> {
+  /// Read once: switching the setting takes effect the next time a board opens.
+  late final bool _wanted = ref.read(devicePrefsProvider).keepScreenOn;
+
   @override
   void initState() {
     super.initState();
-    if (KeepScreenOn._mounted++ == 0) KeepScreenOn.toggle(true);
+    if (_wanted && KeepScreenOn._mounted++ == 0) KeepScreenOn.toggle(true);
   }
 
   @override
   void dispose() {
-    if (--KeepScreenOn._mounted == 0) KeepScreenOn.toggle(false);
+    if (_wanted && --KeepScreenOn._mounted == 0) KeepScreenOn.toggle(false);
     super.dispose();
   }
 

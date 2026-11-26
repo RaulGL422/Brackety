@@ -1914,6 +1914,68 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appGroupAbout => 'About Brackety';
 
   @override
+  String get prefsText => 'Text and contrast';
+
+  @override
+  String get prefsTextSize => 'Text size';
+
+  @override
+  String get prefsTextSizeDevice => 'As on the device';
+
+  @override
+  String prefsTextSizePercent(int percent) {
+    return '$percent %';
+  }
+
+  @override
+  String get prefsTextPreview => 'This is how text will look in Brackety.';
+
+  @override
+  String get prefsMoreContrast => 'More contrast';
+
+  @override
+  String get prefsMoreContrastHint =>
+      'Grey text turns black and outlines get stronger. Useful in the sun or with poor sight.';
+
+  @override
+  String get prefsFinished => 'Finished events shown';
+
+  @override
+  String get prefsFinishedLatest => 'The latest 3';
+
+  @override
+  String get prefsFinishedAll => 'All';
+
+  @override
+  String get prefsFinishedNone => 'None';
+
+  @override
+  String get prefsScoreboard => 'Scoreboard and mat';
+
+  @override
+  String get prefsScoreboardHint =>
+      'For whoever referees or keeps the table. Each device can have its own.';
+
+  @override
+  String get prefsBell => 'Bell';
+
+  @override
+  String get prefsBellHint =>
+      'At the start, with 10 seconds left and at the end.';
+
+  @override
+  String get prefsVibrate => 'Vibrate at the end';
+
+  @override
+  String get prefsVibrateHint => 'On phones that allow it.';
+
+  @override
+  String get prefsScreenOn => 'Keep the screen on';
+
+  @override
+  String get prefsScreenOnHint => 'While the scoreboard or the mat is open.';
+
+  @override
   String get settingsAccount => 'Email';
 
   @override

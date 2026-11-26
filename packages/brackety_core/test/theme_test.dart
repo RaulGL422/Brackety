@@ -59,6 +59,18 @@ void main() {
     });
   }
 
+  // «Más contraste» (an app setting): grey text and outlines take the ink, in both themes.
+  for (final brightness in Brightness.values) {
+    test('more contrast inks the secondary text in $brightness', () {
+      final scheme = buildTheme(brightness, moreContrast: true).colorScheme;
+      final plain = buildTheme(brightness).colorScheme;
+
+      expect(scheme.onSurfaceVariant, plain.onSurface);
+      expect(scheme.outline, plain.onSurface);
+      expect(plain.onSurfaceVariant, isNot(plain.onSurface));
+    });
+  }
+
   test('contrast ratio goes from 1 to 21', () {
     expect(contrastRatio(Colors.white, Colors.white), closeTo(1, 0.01));
     expect(contrastRatio(Colors.black, Colors.white), closeTo(21, 0.01));

@@ -32,6 +32,7 @@ Sistema **neutro multideporte**: el color es de quien compite. La app se queda e
 - Tipografía: Atkinson Hyperlegible Next (texto: distingue I, l, 1 y O, 0 con poca vista o al sol) y Saira Condensed (display, headline, reloj, puntos, número de ubicación), empaquetadas en assets sin modificar (offline), licencia OFL.
 - Espaciado `AppSpacing` 4·8·12·16·24·32·48. Radios `AppRadius` 4·6·8·full: rectángulos con esquina corta, nunca cápsulas. Táctil `AppSizes` 48 (general) y 72 (marcador); iconos del marcador 40. Anchos: formulario 480, lectura 720, columna de tabla en móvil 200 (la tabla se desplaza en horizontal).
 - Marcador: siempre con el tema oscuro, también en modo claro.
+- Preferencias del dispositivo (Ajustes de la app, 2026-11-26; se guardan en cada dispositivo como el tema): tamaño del texto (el del dispositivo o 100-200 %), «Más contraste» (`buildTheme(moreContrast:)`: grises y bordes en tinta), finalizados en Mis eventos (3, todos, ninguno), campana, vibrar al acabar y pantalla encendida en marcador y tapiz.
 - Componentes: estilo vía `ThemeData` (botones, tarjetas, campos, chips, diálogos, barras). Widgets propios solo al repetirse.
 - Diálogos (2026-11-14): todo `AlertDialog` con `scrollable: true`, para que en móvil y con el teclado abierto el título y el contenido se desplacen y los botones sigan a la vista. Las listas dentro de un diálogo, con altura fija.
 - Regla: ningún widget de producto usa colores, tamaños o espaciados fijos; todo sale del tema o de los tokens (la página Diseño fija anchos solo para maquetar la muestra).

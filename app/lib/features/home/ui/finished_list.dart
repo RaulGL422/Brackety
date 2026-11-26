@@ -8,9 +8,12 @@ import 'event_entry.dart';
 
 /// What is over, in short: the latest three, the rest on demand.
 class FinishedList extends StatefulWidget {
-  const FinishedList({super.key, required this.leagues});
+  const FinishedList({super.key, required this.leagues, this.all = false});
 
   final List<LeagueOverview> leagues;
+
+  /// Every one at once, as this device prefers, with no «Ver los N».
+  final bool all;
 
   @override
   State<FinishedList> createState() => _FinishedListState();
@@ -24,7 +27,8 @@ class _FinishedListState extends State<FinishedList> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final leagues = widget.leagues;
-    final visible = _all ? leagues : leagues.take(shown).toList();
+    final all = _all || widget.all;
+    final visible = all ? leagues : leagues.take(shown).toList();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -39,7 +43,7 @@ class _FinishedListState extends State<FinishedList> {
             ],
           ),
         ),
-        if (leagues.length > shown)
+        if (leagues.length > shown && !widget.all)
           TextButton(
             onPressed: () => setState(() => _all = !_all),
             child: Text(
