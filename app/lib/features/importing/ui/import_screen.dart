@@ -7,11 +7,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/download/file_download.dart';
+import '../../../core/error_codes.dart';
 import '../../../core/up_button.dart';
 import '../../../core/upload/file_upload.dart';
 import '../../../l10n/gen/app_localizations.dart';
-import '../../club/state/club_providers.dart';
-import '../../club/ui/measure_fields.dart';
+import '../../events/state/club_providers.dart';
+import '../../events/ui/measure_fields.dart';
 import '../../legal/ui/legal_links.dart';
 import '../data/import_models.dart';
 import '../data/import_repository.dart';
@@ -114,11 +115,14 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
     try {
       await action();
     } on DioException catch (e) {
-      toasts.show(switch (e.response?.statusCode) {
-        400 => l10n.importInvalidFiles(_maxFiles),
-        429 => l10n.importTooMany,
-        _ => l10n.importReadError,
-      }, kind: ToastKind.error);
+      toasts.show(
+        errorMessage(l10n, e, switch (e.response?.statusCode) {
+          400 => l10n.importInvalidFiles(_maxFiles),
+          429 => l10n.importTooMany,
+          _ => l10n.importReadError,
+        }),
+        kind: ToastKind.error,
+      );
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -132,7 +136,7 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
       appBar: AppBar(
         leading: UpButton(
           label: l10n.clubParticipants,
-          fallback: '/events/${widget.eventId}/club',
+          fallback: '/events/${widget.eventId}/club/participants',
         ),
         leadingWidth: UpButton.leadingWidth(context),
         title: Text(l10n.importButton),

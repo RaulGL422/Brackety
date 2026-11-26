@@ -1,6 +1,6 @@
-import 'package:brackety/features/mat/data/mat_board.dart';
+import 'package:brackety/features/match/data/mat_board.dart';
+import 'package:brackety/features/match/data/match_view.dart';
 import 'package:brackety/features/offline/state/offline_sync.dart';
-import 'package:brackety/features/scoreboard/data/match_view.dart';
 import 'package:brackety/features/scoreboard/state/match_review.dart';
 import 'package:brackety/features/scoreboard/ui/match_watch_screen.dart';
 import 'package:brackety/l10n/gen/app_localizations.dart';

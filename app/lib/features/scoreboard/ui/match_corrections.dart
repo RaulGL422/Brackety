@@ -2,11 +2,11 @@ import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/reason_dialog.dart';
 import '../../../l10n/gen/app_localizations.dart';
-import '../data/match_state.dart';
-import '../data/match_view.dart';
+import '../../match/data/match_state.dart';
+import '../../match/data/match_view.dart';
 import '../state/match_controller.dart';
-import 'reason_dialog.dart';
 
 /// A match started by mistake goes back to pending, all at 0; asks why first. The reason and who did it
 /// stay in its timeline.

@@ -8,5 +8,7 @@ public interface MatRepository extends JpaRepository<Mat, UUID> {
 
     List<Mat> findByEventIdOrderByNumber(UUID eventId);
 
+    List<Mat> findByRefereeAccountIdOrderByNumber(UUID refereeAccountId);
+
     List<Mat> findByEventIdAndRefereeAccountIdOrderByNumber(UUID eventId, UUID refereeAccountId);
 }

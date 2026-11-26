@@ -9,7 +9,12 @@ import 'package:intl/intl.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
 import '../../auth/data/api_error.dart';
+import '../../events/data/club_repository.dart';
+import '../../events/data/event_settings.dart';
 import '../../events/data/my_event.dart';
+import '../../events/data/settings_input.dart';
+import '../../events/data/staff_member.dart';
+import '../../events/state/club_providers.dart';
 import '../../events/state/events_providers.dart';
 import '../../league/state/league_providers.dart';
 import '../../rulebook/rulebook_ui.dart';
@@ -17,55 +22,12 @@ import '../../staff/data/staff_repository.dart';
 import '../../staff/ui/qr_access.dart';
 import '../../staff/ui/qr_access_section.dart';
 import '../../staff/ui/staff_section.dart';
-import '../data/club_repository.dart';
-import '../data/event_settings.dart';
-import '../data/staff_member.dart';
-import '../state/club_providers.dart';
 import 'categories_editor.dart';
 import 'club_panel_screen.dart';
 import 'export_audit_section.dart';
 import 'measures_editor.dart';
 import 'organizations_editor.dart';
 import 'warning_reasons_editor.dart';
-
-const maxMats = 20;
-
-/// "3:00" for 3 minutes.
-String formatMatchLength(Duration length) =>
-    '${length.inMinutes}:${(length.inSeconds % 60).toString().padLeft(2, '0')}';
-
-/// "3:00", "3" (minutes) or "2:30" between 0:30 and 20:00 (the server's range), else null.
-Duration? parseMatchLength(String text) {
-  final match = RegExp(r'^\s*(\d{1,2})(?::(\d{2}))?\s*$').firstMatch(text);
-  if (match == null) return null;
-  final seconds = int.parse(match[2] ?? '0');
-  if (seconds > 59) return null;
-  final length = Duration(minutes: int.parse(match[1]!), seconds: seconds);
-  return length < const Duration(seconds: 30) ||
-          length > const Duration(minutes: 20)
-      ? null
-      : length;
-}
-
-/// Empty or 0: no limit (returns 0); else up to [max], or null if invalid.
-int? parsePointsLimit(String text, {int max = 99}) {
-  if (text.trim().isEmpty) return 0;
-  final value = int.tryParse(text.trim());
-  return value == null || value < 0 || value > max ? null : value;
-}
-
-/// Seconds, 0 to 600.
-Duration? parseMinRest(String text) {
-  final value = int.tryParse(text.trim());
-  return value == null || value < 0 || value > 600
-      ? null
-      : Duration(seconds: value);
-}
-
-int? parseAttendancePoints(String text) {
-  final value = int.tryParse(text.trim());
-  return value == null || value < 0 || value > 100 ? null : value;
-}
 
 /// Event name and date, match length, points limit, superiority gap and attendance points, mats with their referee, and the
 /// categories.

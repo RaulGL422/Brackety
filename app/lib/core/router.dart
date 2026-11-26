@@ -16,11 +16,11 @@ import '../features/auth/ui/settings_screen.dart';
 import '../features/auth/ui/verify_email_screen.dart';
 import '../features/club/ui/club_panel_screen.dart';
 import '../features/control/mat_groups_screen.dart';
-import '../features/events/ui/events_screen.dart';
 import '../features/exports/ui/export_screen.dart';
 import '../features/grouping/ui/categories_screen.dart';
 import '../features/grouping/ui/group_builder_screen.dart';
 import '../features/grouping/ui/team_category_screen.dart';
+import '../features/home/ui/events_screen.dart';
 import '../features/importing/ui/import_screen.dart';
 import '../features/league/ui/league_screen.dart';
 import '../features/legal/ui/legal_page_screen.dart';
@@ -264,14 +264,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           eventId: state.pathParameters['eventId']!,
         ),
       ),
-      GoRoute(
-        path: '/events/:eventId/club',
-        // Keyed by event so moving to another phase starts the panel afresh.
-        builder: (_, state) => ClubPanelScreen(
-          key: ValueKey(state.pathParameters['eventId']),
-          eventId: state.pathParameters['eventId']!,
-        ),
-      ),
+      ...clubPanelRoutes(),
       GoRoute(
         path: '/events/:eventId/mat-groups',
         builder: (_, state) =>

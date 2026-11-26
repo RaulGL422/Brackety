@@ -2,26 +2,26 @@ import 'dart:typed_data';
 
 import 'package:brackety/core/download/file_download.dart';
 import 'package:brackety/core/upload/file_upload.dart';
-import 'package:brackety/features/club/data/club_repository.dart';
-import 'package:brackety/features/club/data/event_category.dart';
-import 'package:brackety/features/club/data/event_settings.dart';
-import 'package:brackety/features/club/data/export_audit_entry.dart';
-import 'package:brackety/features/club/data/mat_overview.dart';
-import 'package:brackety/features/club/data/participant.dart';
-import 'package:brackety/features/club/data/participant_record.dart';
-import 'package:brackety/features/club/data/sex.dart';
-import 'package:brackety/features/club/data/staff_member.dart';
-import 'package:brackety/features/club/data/standing_row.dart';
-import 'package:brackety/features/club/state/club_providers.dart';
 import 'package:brackety/features/club/ui/club_panel_screen.dart';
 import 'package:brackety/features/club/ui/participant_form.dart';
-import 'package:brackety/features/club/ui/settings_tab.dart';
+import 'package:brackety/features/events/data/club_repository.dart';
+import 'package:brackety/features/events/data/event_category.dart';
+import 'package:brackety/features/events/data/event_settings.dart';
+import 'package:brackety/features/events/data/export_audit_entry.dart';
+import 'package:brackety/features/events/data/mat_overview.dart';
 import 'package:brackety/features/events/data/my_event.dart';
+import 'package:brackety/features/events/data/participant.dart';
+import 'package:brackety/features/events/data/participant_record.dart';
+import 'package:brackety/features/events/data/settings_input.dart';
+import 'package:brackety/features/events/data/sex.dart';
+import 'package:brackety/features/events/data/staff_member.dart';
+import 'package:brackety/features/events/data/standing_row.dart';
+import 'package:brackety/features/events/state/club_providers.dart';
 import 'package:brackety/features/events/state/events_providers.dart';
 import 'package:brackety/features/importing/data/import_repository.dart';
 import 'package:brackety/features/league/data/league_models.dart';
 import 'package:brackety/features/league/state/league_providers.dart';
-import 'package:brackety/features/mat/data/mat_board.dart';
+import 'package:brackety/features/match/data/mat_board.dart';
 import 'package:brackety/features/staff/data/staff_repository.dart';
 import 'package:brackety/features/staff/data/temporary_access.dart';
 import 'package:brackety/l10n/gen/app_localizations.dart';
@@ -30,6 +30,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../support/fakes.dart';
 import '../../support/staff_fakes.dart';
@@ -297,6 +298,9 @@ void main() {
     categoryName: '4-7',
   );
 
+  late GoRouter router;
+  String location() => router.routerDelegate.currentConfiguration.uri.path;
+
   Future<void> pumpPanel(
     WidgetTester tester,
     Size size, {
@@ -307,6 +311,7 @@ void main() {
     MyEvent? me,
     bool importAvailable = false,
     List<ExportAuditEntry> audit = const [],
+    String at = '/events/e1/club',
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
@@ -426,7 +431,7 @@ void main() {
             ],
           ),
         ],
-        child: MaterialApp(
+        child: MaterialApp.router(
           builder: (_, child) => ToastHost(child: child!),
           theme: lightTheme(),
           localizationsDelegates: const [
@@ -434,7 +439,10 @@ void main() {
             ...coreLocalizationsDelegates,
           ],
           supportedLocales: AppLocalizations.supportedLocales,
-          home: const ClubPanelScreen(eventId: 'e1'),
+          routerConfig: router = GoRouter(
+            initialLocation: at,
+            routes: clubPanelRoutes(),
+          ),
         ),
       ),
     );
@@ -1031,6 +1039,25 @@ void main() {
     await tester.tap(find.text('Scores').last);
     await tester.pumpAndSettle();
     expect(find.text('Leave without saving'), findsNothing);
+  });
+
+  testWidgets('the tab is in the address: a reload opens it again', (
+    tester,
+  ) async {
+    await pumpPanel(tester, const Size(1440, 900));
+    await tester.tap(find.text('Mats').last);
+    await tester.pumpAndSettle();
+    expect(location(), '/events/e1/club/mats');
+    expect(find.text('Mat 1 · arbitro1'), findsOneWidget);
+    // Back leaves the panel instead of walking through its tabs.
+    expect(router.canPop(), isFalse);
+
+    await pumpPanel(tester, const Size(1440, 900), at: '/events/e1/club/mats');
+    expect(find.text('Mat 1 · arbitro1'), findsOneWidget);
+
+    // A tab that does not exist opens the first one.
+    await pumpPanel(tester, const Size(1440, 900), at: '/events/e1/club/nope');
+    expect(find.text('Zoe Test'), findsOneWidget);
   });
 
   testWidgets('the club names the person behind each account', (tester) async {

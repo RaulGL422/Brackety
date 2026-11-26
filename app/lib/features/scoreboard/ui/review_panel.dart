@@ -4,10 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
-import '../../mat/ui/fighter_text.dart';
-import '../data/match_view.dart';
+import '../../match/data/match_view.dart';
+import '../../match/ui/fighter_text.dart';
+import '../../match/ui/timeline_list.dart';
 import '../state/match_review.dart';
-import 'timeline_list.dart';
 
 /// For the club: why a match is in review and what the phone sent.
 class ReviewPanel extends StatelessWidget {

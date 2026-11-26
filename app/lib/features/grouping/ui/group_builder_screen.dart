@@ -9,7 +9,7 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../../events/data/measure_rules.dart';
 import '../../events/data/my_event.dart';
 import '../../events/state/events_providers.dart';
-import '../../mat/ui/mat_label.dart';
+import '../../match/ui/mat_label.dart';
 import '../data/grouping_models.dart';
 import '../state/group_draft.dart';
 import '../state/grouping_providers.dart';

@@ -119,6 +119,20 @@ class OfflineImportControllerTest extends ScoreboardApiTest {
         mvc.perform(post(importPath()).contentType("text/csv").content(csv)).andExpect(status().isUnauthorized());
     }
 
+    @Test
+    void aHugeBodyIsRefusedBeforeItIsRead() throws Exception {
+        var huge =
+                HEADER + row(UUID.randomUUID(), "START", "", "", "09:00:00", 0).repeat(120_000);
+
+        importAs(outsider(), PASSWORD, huge)
+                .andExpect(status().isContentTooLarge())
+                .andExpect(jsonPath("$.status").value(413));
+        importAs("club1", huge).andExpect(status().isContentTooLarge());
+
+        call(get(path(match)), "club1")
+                .andExpect(jsonPath("$.timeline.length()").value(0));
+    }
+
     // A version 1 row with the deltaMs cell of version 2 at the end.
     private static String v2Row(String v1Row, String deltaMs) {
         return v1Row.replace("\r\n", ";" + deltaMs + "\r\n");

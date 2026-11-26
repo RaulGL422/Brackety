@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/upload/file_upload.dart';
 import '../../../l10n/gen/app_localizations.dart';
-import '../../scoreboard/data/scoreboard_repository.dart';
+import '../../match/data/scoreboard_repository.dart';
 
 /// The club imports the CSV of a referee's device that could not send its actions. The server
 /// takes each action once, so importing a file twice changes nothing.

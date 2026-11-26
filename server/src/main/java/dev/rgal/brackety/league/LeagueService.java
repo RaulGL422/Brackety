@@ -103,7 +103,7 @@ public class LeagueService {
         var names = new HashSet<String>();
         for (var c : request.categoryPodiums()) {
             if (!names.add(c.categoryName().strip())) {
-                throw EventException.invalid("A category has two podiums.");
+                throw EventException.invalid("PODIUM_TWICE", "A category has two podiums.");
             }
         }
         league.update(
@@ -196,11 +196,12 @@ public class LeagueService {
         for (var personId : new HashSet<>(request.personIds())) {
             var previous = latest.get(personId);
             if (previous == null) {
-                throw EventException.invalid("Someone is not in another phase of the league, or already entered.");
+                throw EventException.invalid(
+                        "REENROL_INVALID", "Someone is not in another phase of the league, or already entered.");
             }
             var minor = event.ageOf(previous.getBirthDate()) < ParticipantService.ADULT_AGE;
             if (minor && !request.guardianConsent()) {
-                throw EventException.invalid("A minor needs the guardian's consent.");
+                throw EventException.invalid("GUARDIAN_CONSENT_REQUIRED", "A minor needs the guardian's consent.");
             }
             var participant = new Participant(eventId, previous.getPerson(), clock.instant());
             participant.setGuardianConsent(minor ? request.guardianConsent() : previous.hasGuardianConsent());

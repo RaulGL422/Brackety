@@ -30,6 +30,7 @@ Lo que espera a alguien, ordenado por quién tiene que actuar. Lo hecho se borra
 - [ ] ¿Textos de error también en el servidor, o solo la app traduce por `code`?
 - [ ] Aviso "tu email ha cambiado": sin canal de soporte no hay recuperación si lo cambió un atacante. Definir con el email de privacidad.
 - [ ] Exportación de datos sin el `sub` de Google: confirmarlo en la revisión legal.
+- [ ] Endpoints E1-E3 y CSP completa: `producto/auditoria-endpoints.md` y `auditoria-seguridad.md`.
 
 ## 2. Pruebas a mano (Raul)
 Todo está fusionado; falta comprobarlo en debug o en la Pi.

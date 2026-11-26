@@ -49,7 +49,7 @@ class EventCategoryService {
         }
         var removed = current.keySet().stream().filter(id -> !kept.contains(id)).toList();
         if (removed.stream().anyMatch(inUse::contains)) {
-            throw EventException.conflict("A category with groups or teams cannot be removed.");
+            throw EventException.conflict("CATEGORY_IN_USE", "A category with groups or teams cannot be removed.");
         }
         categories.deleteAllById(removed);
         for (var c : requested) {
@@ -63,7 +63,8 @@ class EventCategoryService {
             }
             var category = current.get(c.id());
             if (inUse.contains(c.id()) && changesWhoFights(category, c, teamSize)) {
-                throw EventException.conflict("A category with groups or teams only changes its name.");
+                throw EventException.conflict(
+                        "CATEGORY_ONLY_NAME", "A category with groups or teams only changes its name.");
             }
             // Its groups would be scored over one or two legs at once.
             if (inUse.contains(c.id()) && c.returnLeg() != null && c.returnLeg() != category.isReturnLeg()) {
@@ -81,7 +82,7 @@ class EventCategoryService {
 
     private static void check(CategoryRequest c) {
         if (c.minAge() > c.maxAge()) {
-            throw EventException.invalid("The minimum age is above the maximum.");
+            throw EventException.invalid("CATEGORY_AGES_INVERTED", "The minimum age is above the maximum.");
         }
         if (c.format() == Format.TEAM && c.teamSize() == null) {
             throw EventException.invalid("A team category needs a team size.");
@@ -93,7 +94,7 @@ class EventCategoryService {
         var min = c.minGroupSize() == null ? category.getMinGroupSize() : c.minGroupSize();
         var max = c.maxGroupSize() == null ? category.getMaxGroupSize() : c.maxGroupSize();
         if (min > max) {
-            throw EventException.invalid("The smallest group is above the largest.");
+            throw EventException.invalid("GROUP_SIZE_INVERTED", "The smallest group is above the largest.");
         }
         category.setGroups(min, max, c.returnLeg() == null ? category.isReturnLeg() : c.returnLeg());
     }
@@ -105,7 +106,7 @@ class EventCategoryService {
                 .toList();
         for (int i = 1; i < sorted.size(); i++) {
             if (sorted.get(i).minAge() <= sorted.get(i - 1).maxAge()) {
-                throw EventException.invalid("Two categories share ages.");
+                throw EventException.invalid("CATEGORY_AGES_OVERLAP", "Two categories share ages.");
             }
         }
     }

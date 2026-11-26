@@ -5,6 +5,7 @@ paths: ["app/**", "admin/**", "packages/**"]
 
 ## Estructura
 - `app/lib/features/<feature>/` y `admin/lib/features/<feature>/` con `data/` (repositorio, DTO), `state/` (providers) y `ui/` (pantallas y widgets).
+- Sin ciclos entre features (el CI falla con uno, `tools/code_metrics.py`). Capas de la app, de abajo arriba: `legal`, `appearance` → `auth` → `match`, `events` (datos del evento) → `offline` → `scoreboard`, `phase`, `league`… → `mat`, `club` (panel), `home`. Lo que usan dos features baja a la de debajo; si la de abajo necesita algo de la de arriba, expone un provider y `main.dart` registra el de arriba (`offlineRegistrations`).
 - `app/lib/core/` y `admin/lib/core/`: solo lo propio de cada app (router, arranque).
 - `packages/brackety_core/`: todo lo que usan las dos apps (config de API, red, layout responsive, tema, i18n común, pantalla Conexión). Antes de crear algo en una app, buscar aquí; si lo necesitan ambas, va aquí. Exporta solo por `lib/brackety_core.dart`.
 

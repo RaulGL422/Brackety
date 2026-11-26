@@ -3,10 +3,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/error_codes.dart';
 import '../../../l10n/gen/app_localizations.dart';
-import '../data/club_repository.dart';
-import '../data/participant.dart';
-import '../state/club_providers.dart';
+import '../../events/data/club_repository.dart';
+import '../../events/data/participant.dart';
+import '../../events/state/club_providers.dart';
 
 /// The clubs taking part, added by hand; each participant may belong to one. Every change is
 /// saved at once, as the rest of the settings.
@@ -52,10 +53,13 @@ class _OrganizationsEditorState extends ConsumerState<OrganizationsEditor> {
         ..invalidate(participantsProvider(widget.eventId));
       toasts.show(savedText, duration: const Duration(seconds: 1));
     } on DioException catch (e) {
-      toasts.show(switch (e.response?.statusCode) {
-        409 => l10n.organizationsConflict,
-        _ => l10n.saveError,
-      }, kind: ToastKind.error);
+      toasts.show(
+        errorMessage(l10n, e, switch (e.response?.statusCode) {
+          409 => l10n.organizationsConflict,
+          _ => l10n.saveError,
+        }),
+        kind: ToastKind.error,
+      );
     } finally {
       if (mounted) setState(() => _saving = false);
     }

@@ -6065,6 +6065,246 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Textos legales'**
   String get legalFooterLabel;
+
+  /// No description provided for @errorAlreadyGrouped.
+  ///
+  /// In es, this message translates to:
+  /// **'Alguien ya está en un grupo o equipo: quítalo de ahí antes.'**
+  String get errorAlreadyGrouped;
+
+  /// No description provided for @errorCategoryAgesInverted.
+  ///
+  /// In es, this message translates to:
+  /// **'La edad mínima de una categoría es mayor que la máxima.'**
+  String get errorCategoryAgesInverted;
+
+  /// No description provided for @errorCategoryAgesOverlap.
+  ///
+  /// In es, this message translates to:
+  /// **'Dos categorías comparten edades: cada edad va a una sola.'**
+  String get errorCategoryAgesOverlap;
+
+  /// No description provided for @errorCategoryInUse.
+  ///
+  /// In es, this message translates to:
+  /// **'Esa categoría ya tiene grupos o equipos: no se puede quitar.'**
+  String get errorCategoryInUse;
+
+  /// No description provided for @errorCategoryOnlyName.
+  ///
+  /// In es, this message translates to:
+  /// **'Esa categoría ya tiene grupos o equipos: solo se puede cambiar su nombre.'**
+  String get errorCategoryOnlyName;
+
+  /// No description provided for @errorConsentRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'Acepta las condiciones actuales de la importación para seguir.'**
+  String get errorConsentRequired;
+
+  /// No description provided for @errorDateLocked.
+  ///
+  /// In es, this message translates to:
+  /// **'Ya hay grupos o equipos: la fecha no puede cambiar, porque fija la edad y la categoría de cada uno.'**
+  String get errorDateLocked;
+
+  /// No description provided for @errorExportFilterNotANumber.
+  ///
+  /// In es, this message translates to:
+  /// **'Un filtro de números tiene algo que no es un número.'**
+  String get errorExportFilterNotANumber;
+
+  /// No description provided for @errorExportRepeatedColumn.
+  ///
+  /// In es, this message translates to:
+  /// **'Hay una columna repetida.'**
+  String get errorExportRepeatedColumn;
+
+  /// No description provided for @errorExportUnknownColumn.
+  ///
+  /// In es, this message translates to:
+  /// **'Una columna ya no existe: vuelve a elegir las columnas.'**
+  String get errorExportUnknownColumn;
+
+  /// No description provided for @errorExportUnknownSheet.
+  ///
+  /// In es, this message translates to:
+  /// **'Esa hoja ya no existe: elige otra.'**
+  String get errorExportUnknownSheet;
+
+  /// No description provided for @errorGroupSize.
+  ///
+  /// In es, this message translates to:
+  /// **'El grupo no tiene el tamaño de su categoría (comodines incluidos) o no tiene a nadie que no sea comodín.'**
+  String get errorGroupSize;
+
+  /// No description provided for @errorGroupSizeInverted.
+  ///
+  /// In es, this message translates to:
+  /// **'El grupo más pequeño de una categoría es mayor que el más grande.'**
+  String get errorGroupSizeInverted;
+
+  /// No description provided for @errorGuardianConsentRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'Falta el consentimiento del tutor legal de un menor.'**
+  String get errorGuardianConsentRequired;
+
+  /// No description provided for @errorImportFileCount.
+  ///
+  /// In es, this message translates to:
+  /// **'Envía entre 1 y 10 archivos.'**
+  String get errorImportFileCount;
+
+  /// No description provided for @errorImportFileSize.
+  ///
+  /// In es, this message translates to:
+  /// **'Cada archivo puede tener hasta 10 MB.'**
+  String get errorImportFileSize;
+
+  /// No description provided for @errorImportFileType.
+  ///
+  /// In es, this message translates to:
+  /// **'Solo fotos (JPG, PNG, WebP), CSV, TXT o Excel.'**
+  String get errorImportFileType;
+
+  /// No description provided for @errorImportTooManyRows.
+  ///
+  /// In es, this message translates to:
+  /// **'Como mucho 200 personas por importación: divide la lista.'**
+  String get errorImportTooManyRows;
+
+  /// No description provided for @errorInvitationOtherEmail.
+  ///
+  /// In es, this message translates to:
+  /// **'Esta invitación es para otro email: entra con la cuenta que la recibió.'**
+  String get errorInvitationOtherEmail;
+
+  /// No description provided for @errorLengthLocked.
+  ///
+  /// In es, this message translates to:
+  /// **'Hay un combate en curso: la duración no puede cambiar hasta que acabe.'**
+  String get errorLengthLocked;
+
+  /// No description provided for @errorMatchNotInReview.
+  ///
+  /// In es, this message translates to:
+  /// **'Ese combate ya no espera revisión: alguien la ha resuelto.'**
+  String get errorMatchNotInReview;
+
+  /// No description provided for @errorMatchStale.
+  ///
+  /// In es, this message translates to:
+  /// **'El combate ha cambiado en otro dispositivo: revisa el marcador y vuelve a intentarlo.'**
+  String get errorMatchStale;
+
+  /// No description provided for @errorMatHasIndividual.
+  ///
+  /// In es, this message translates to:
+  /// **'Este tapiz tiene antes combates individuales por jugar.'**
+  String get errorMatHasIndividual;
+
+  /// No description provided for @errorNoRefereeOnMats.
+  ///
+  /// In es, this message translates to:
+  /// **'Ningún tapiz tiene árbitro todavía: asigna uno en Configuración.'**
+  String get errorNoRefereeOnMats;
+
+  /// No description provided for @errorOrganizationDuplicate.
+  ///
+  /// In es, this message translates to:
+  /// **'Dos clubes tienen el mismo nombre.'**
+  String get errorOrganizationDuplicate;
+
+  /// No description provided for @errorOrganizationInUse.
+  ///
+  /// In es, this message translates to:
+  /// **'Ese club tiene inscritos: no se puede quitar.'**
+  String get errorOrganizationInUse;
+
+  /// No description provided for @errorParticipantInGroup.
+  ///
+  /// In es, this message translates to:
+  /// **'Está en un grupo o equipo: no se puede quitar.'**
+  String get errorParticipantInGroup;
+
+  /// No description provided for @errorParticipantLocked.
+  ///
+  /// In es, this message translates to:
+  /// **'Ya está en un grupo o equipo: su fecha de nacimiento y su categoría no pueden cambiar.'**
+  String get errorParticipantLocked;
+
+  /// No description provided for @errorPhaseAlreadyStarted.
+  ///
+  /// In es, this message translates to:
+  /// **'La fase ya ha comenzado.'**
+  String get errorPhaseAlreadyStarted;
+
+  /// No description provided for @errorPhaseNotFinished.
+  ///
+  /// In es, this message translates to:
+  /// **'La fase aún no está finalizada.'**
+  String get errorPhaseNotFinished;
+
+  /// No description provided for @errorPodiumTwice.
+  ///
+  /// In es, this message translates to:
+  /// **'Una categoría tiene dos podios.'**
+  String get errorPodiumTwice;
+
+  /// No description provided for @errorPointsLimitLocked.
+  ///
+  /// In es, this message translates to:
+  /// **'Ya hay combates empezados: el límite de puntos y la superioridad no pueden cambiar.'**
+  String get errorPointsLimitLocked;
+
+  /// No description provided for @errorReenrolInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'Alguien no está en otra fase de la liga o ya está inscrito.'**
+  String get errorReenrolInvalid;
+
+  /// No description provided for @errorRefereeGone.
+  ///
+  /// In es, this message translates to:
+  /// **'Ese árbitro ya no está en el evento.'**
+  String get errorRefereeGone;
+
+  /// No description provided for @errorRefereeWithoutMat.
+  ///
+  /// In es, this message translates to:
+  /// **'Ese árbitro ya no tiene tapiz.'**
+  String get errorRefereeWithoutMat;
+
+  /// No description provided for @errorRulebookNotPdf.
+  ///
+  /// In es, this message translates to:
+  /// **'El reglamento tiene que ser un PDF.'**
+  String get errorRulebookNotPdf;
+
+  /// No description provided for @errorRulebookTooLarge.
+  ///
+  /// In es, this message translates to:
+  /// **'El reglamento puede tener hasta 10 MB.'**
+  String get errorRulebookTooLarge;
+
+  /// No description provided for @errorTeamAlreadyGrouped.
+  ///
+  /// In es, this message translates to:
+  /// **'Ese equipo ya está en un grupo.'**
+  String get errorTeamAlreadyGrouped;
+
+  /// No description provided for @errorTeamInGroup.
+  ///
+  /// In es, this message translates to:
+  /// **'Ese equipo está en un grupo: no se puede deshacer.'**
+  String get errorTeamInGroup;
+
+  /// No description provided for @errorFighterResting.
+  ///
+  /// In es, this message translates to:
+  /// **'Alguien de este combate aún está descansando.'**
+  String get errorFighterResting;
 }
 
 class _AppLocalizationsDelegate

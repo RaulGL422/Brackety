@@ -5,12 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/polling.dart';
 import '../../auth/data/api_error.dart';
-import '../../mat/data/mat_board.dart';
+import '../../match/data/mat_board.dart';
+import '../../match/data/match_state.dart';
+import '../../match/data/match_view.dart';
+import '../../match/data/scoreboard_repository.dart';
 import '../../offline/data/local_match.dart';
 import '../../offline/state/offline_sync.dart';
-import '../data/match_state.dart';
-import '../data/match_view.dart';
-import '../data/scoreboard_repository.dart';
 import 'bell.dart';
 import 'match_review.dart';
 

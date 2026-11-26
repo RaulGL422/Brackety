@@ -3,12 +3,13 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/error_codes.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../auth/data/api_error.dart';
-import '../club/data/mat_overview.dart';
-import '../club/state/club_providers.dart';
-import '../mat/data/mat_board.dart';
-import '../mat/ui/fighter_text.dart';
+import '../events/data/mat_overview.dart';
+import '../events/state/club_providers.dart';
+import '../match/data/mat_board.dart';
+import '../match/ui/fighter_text.dart';
 import 'control_repository.dart';
 
 /// Runs one change of the control panel; says how it went. True if it was made.
@@ -41,7 +42,7 @@ String controlErrorText(AppLocalizations l10n, DioException e) =>
       'NO_OTHER_MAT' => l10n.controlNoOtherMat,
       'MAT_NOT_DISABLED' => l10n.controlMatNotDisabled,
       'REFEREE_GONE' || 'REFEREE_ON_OTHER_MAT' => l10n.controlMatRefereeTaken,
-      _ => l10n.controlError,
+      _ => errorMessage(l10n, e, l10n.controlError),
     };
 
 /// A mat with a referee other than [current]; null if cancelled.

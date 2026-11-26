@@ -46,7 +46,7 @@ class MatGroupsScreen extends ConsumerWidget {
         leading: UpButton(
           label: l10n.back,
           isPlace: false,
-          fallback: '/events/$eventId/club',
+          fallback: '/events/$eventId/club/mats',
         ),
         leadingWidth: UpButton.leadingWidth(context),
         title: Text(l10n.matGroupsTitle),

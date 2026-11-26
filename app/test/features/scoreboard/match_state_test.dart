@@ -1,5 +1,5 @@
-import 'package:brackety/features/scoreboard/data/match_state.dart';
-import 'package:brackety/features/scoreboard/data/match_view.dart';
+import 'package:brackety/features/match/data/match_state.dart';
+import 'package:brackety/features/match/data/match_view.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 // The same cases as the server's MatchStateTest: both must agree on every rule.

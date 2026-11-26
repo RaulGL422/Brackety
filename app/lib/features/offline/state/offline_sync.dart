@@ -6,13 +6,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../auth/data/api_error.dart';
+import '../../auth/state/server_providers.dart';
 import '../../auth/state/session_controller.dart';
-import '../../mat/data/mat_board.dart';
-import '../../scoreboard/data/match_view.dart';
-import '../../scoreboard/data/scoreboard_repository.dart';
-import '../../server/state/server_providers.dart';
+import '../../match/data/mat_board.dart';
+import '../../match/data/match_view.dart';
+import '../../match/data/offline_op.dart';
+import '../../match/data/scoreboard_repository.dart';
 import '../data/local_match.dart';
-import '../data/offline_op.dart';
 import '../data/offline_store.dart';
 
 /// The device's clock, so tests can fix it.

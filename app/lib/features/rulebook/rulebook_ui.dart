@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/download/file_download.dart';
+import '../../core/error_codes.dart';
 import '../../core/upload/file_upload.dart';
 import '../../l10n/gen/app_localizations.dart';
 import 'rulebook.dart';
@@ -131,7 +132,7 @@ class _RulebookSectionState extends ConsumerState<RulebookSection> {
       done: () => toasts.show(l10n.rulebookUploaded, kind: ToastKind.success),
       failed: (e) => toasts.show(
         e is DioException && e.response?.statusCode == 400
-            ? l10n.rulebookUploadError
+            ? errorMessage(l10n, e, l10n.rulebookUploadError)
             : l10n.rulebookUploadFailed,
         kind: ToastKind.error,
       ),

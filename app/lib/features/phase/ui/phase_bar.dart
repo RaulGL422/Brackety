@@ -3,11 +3,12 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/error_codes.dart';
+import '../../../core/reason_dialog.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../auth/data/api_error.dart';
 import '../../events/data/my_event.dart';
 import '../../events/state/events_providers.dart';
-import '../../scoreboard/ui/reason_dialog.dart';
 import '../data/phase_repository.dart';
 
 /// The phase's state on top of the club panel, the helper's categories and the referee's mat (F1-7).
@@ -113,7 +114,7 @@ class PhaseBar extends ConsumerWidget {
       await action(ref.read(phaseRepositoryProvider));
     } on DioException catch (e) {
       toasts.show(
-        phaseErrorMessage(l10n, e) ?? l10n.saveError,
+        phaseErrorMessage(l10n, e) ?? errorMessage(l10n, e, l10n.saveError),
         kind: ToastKind.error,
       );
     }
