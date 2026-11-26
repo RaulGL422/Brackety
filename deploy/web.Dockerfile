@@ -26,7 +26,7 @@ RUN flutter build web --release --no-web-resources-cdn --dart-define=API_BASE_UR
     --dart-define=BRACKETY_DEBUG="$BRACKETY_DEBUG" --dart-define=BRACKETY_VERSION="$BRACKETY_VERSION" \
     --dart-define=BRACKETY_COMMIT="$BRACKETY_COMMIT"
 
-FROM nginx:1.31.8-alpine
+FROM nginx:1.31.9-alpine
 ARG APP
 COPY deploy/nginx/security-headers.conf /etc/nginx/security-headers.conf
 COPY deploy/nginx/web.conf /etc/nginx/conf.d/default.conf
