@@ -25,5 +25,5 @@ Mapa de qué vive dónde. Un hecho está en un solo documento; los demás lo enl
 ## Reglas de escritura
 - Español, frases cortas, listas. Sin relleno ni historia: la historia está en git y en las PR.
 - `estado.md`: una línea por cosa, con su estado y su doc; el detalle, en el doc.
-- `pendientes.md`: solo lo que espera a alguien; lo hecho se borra.
+- `pendientes.md`: solo lo que espera a alguien; lo hecho se borra. Lo técnico, en `pendientes-tecnico.md`.
 - Límite duro: 150 líneas y 12.000 caracteres por documento (el CI falla). Si crece, se divide por temas o lo cerrado pasa a `historico/`.

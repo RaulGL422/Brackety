@@ -40,11 +40,25 @@ void main() {
     await pumpAuthApp(tester, api, location: '/qr?code=c1');
 
     expect(api.qrCodes, isEmpty);
-    expect(find.textContaining('will end'), findsOneWidget);
-    await tester.tap(find.widgetWithText(FilledButton, 'Sign in'));
+    expect(find.text('That session ends on this device.'), findsOneWidget);
+    expect(find.text('Keep my account'), findsOneWidget);
+    await tester.tap(find.widgetWithText(FilledButton, 'Sign in with the QR'));
     await tester.pumpAndSettle();
 
     expect(api.qrCodes, ['c1']);
     expect(api.logouts, hasLength(1));
+  });
+
+  testWidgets('signed in, keeping the account leaves it as it was', (
+    tester,
+  ) async {
+    final api = FakeAuthApi(signedIn: true);
+    final router = await pumpAuthApp(tester, api, location: '/qr?code=c1');
+
+    await tapText(tester, 'Keep my account');
+
+    expect(router.routeInformationProvider.value.uri.path, '/');
+    expect(api.qrCodes, isEmpty);
+    expect(api.logouts, isEmpty);
   });
 }

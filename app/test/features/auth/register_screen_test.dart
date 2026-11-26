@@ -10,10 +10,10 @@ import 'auth_app.dart';
 
 const _accept = 'I accept the terms of use and the privacy policy.';
 const _orgName = 'Organization name';
+const _clubName = 'Club name';
 const _taxId = 'CIF (Spanish tax ID)';
-const _declaration = 'I am of legal age and represent this organization.';
-const _taxIdHelper =
-    'The platform uses it to verify the organization before it can publish events.';
+const _declaration = 'I am of legal age and represent this club.';
+const _taxIdHelper = 'We check it before it can publish events.';
 
 void main() {
   Future<void> enterField(
@@ -42,6 +42,15 @@ void main() {
       .widget<CheckboxListTile>(find.widgetWithText(CheckboxListTile, _accept))
       .value!;
 
+  Future<void> chooseProfile(WidgetTester tester, String name) async {
+    final dropdown = find.byType(DropdownButtonFormField<ProfileType>);
+    await tester.ensureVisible(dropdown);
+    await tester.tap(dropdown);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(name).last);
+    await tester.pumpAndSettle();
+  }
+
   Future<void> fillAccount(WidgetTester tester) async {
     await enterField(tester, 'Email', 'ana@example.com');
     await enterField(tester, 'Password', 'long enough pw');
@@ -52,7 +61,7 @@ void main() {
     WidgetTester tester, {
     required String birthDate,
   }) async {
-    await tapText(tester, 'Helper');
+    await chooseProfile(tester, 'Helper');
     await tester.tap(find.byIcon(Icons.calendar_today_outlined));
     await tester.pumpAndSettle();
     await tester.enterText(
@@ -71,8 +80,8 @@ void main() {
     String taxId = 'b-1234567 4',
     bool declare = true,
   }) async {
-    await tapText(tester, 'Club');
-    await enterField(tester, _orgName, '  Club Yoseikan Sevilla ');
+    await chooseProfile(tester, 'Club');
+    await enterField(tester, _clubName, '  Club Yoseikan Sevilla ');
     await enterField(tester, _taxId, taxId);
     if (declare) await tapText(tester, _declaration);
     await fillAccount(tester);
@@ -82,8 +91,10 @@ void main() {
     testWidgets('the sign-up fits on $device', (tester) async {
       useSize(tester, size);
       await pumpAuthApp(tester, FakeAuthApi(), location: '/register');
+      await chooseProfile(tester, 'Helper');
 
-      expect(find.text('How will you use Brackety?'), findsOneWidget);
+      expect(find.text('Account type'), findsOneWidget);
+      expect(find.text('About you'), findsOneWidget);
       expect(
         find.text('Helps at events: groups, table or refereeing.'),
         findsOneWidget,
@@ -95,9 +106,10 @@ void main() {
       useSize(tester, size);
       await pumpAuthApp(tester, FakeAuthApi(), location: '/register');
 
-      await tapText(tester, 'Club');
+      await chooseProfile(tester, 'Club');
 
-      expect(find.widgetWithText(TextFormField, _orgName), findsOneWidget);
+      expect(find.text('Your club'), findsOneWidget);
+      expect(find.widgetWithText(TextFormField, _clubName), findsOneWidget);
       expect(find.widgetWithText(TextFormField, _taxId), findsOneWidget);
       expect(find.text(_taxIdHelper), findsOneWidget);
       expect(find.text(_declaration), findsOneWidget);
@@ -109,9 +121,11 @@ void main() {
   testWidgets('only Club and Helper are offered outside dev', (tester) async {
     await pumpAuthApp(tester, FakeAuthApi(), location: '/register');
 
-    expect(find.byType(RadioListTile<ProfileType>), findsNWidgets(2));
-    expect(find.text('Club'), findsOneWidget);
-    expect(find.text('Helper'), findsOneWidget);
+    await tester.tap(find.byType(DropdownButtonFormField<ProfileType>));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Club'), findsWidgets);
+    expect(find.text('Helper'), findsWidgets);
     expect(find.text('Student'), findsNothing);
     expect(find.text('External'), findsNothing);
     expect(find.text('External entity'), findsNothing);
@@ -126,11 +140,15 @@ void main() {
       devEnvironment: true,
     );
 
-    expect(find.byType(RadioListTile<ProfileType>), findsNWidgets(5));
-    expect(find.text('Student'), findsOneWidget);
-    expect(find.text('External'), findsOneWidget);
+    await tester.tap(find.byType(DropdownButtonFormField<ProfileType>));
+    await tester.pumpAndSettle();
+    expect(find.text('Student'), findsWidgets);
+    expect(find.text('External'), findsWidgets);
+    await tester.tap(find.text('External entity').last);
+    await tester.pumpAndSettle();
 
-    await tapText(tester, 'External entity');
+    expect(find.text('Your organization'), findsOneWidget);
+    expect(find.widgetWithText(TextFormField, _orgName), findsOneWidget);
     expect(find.widgetWithText(TextFormField, _taxId), findsOneWidget);
     expect(find.text('Date of birth'), findsNothing);
   });
@@ -141,11 +159,11 @@ void main() {
     expect(find.text('Date of birth'), findsNothing);
     expect(find.widgetWithText(TextFormField, _taxId), findsNothing);
     expect(
-      tester.getTopLeft(find.text('How will you use Brackety?')).dy,
+      tester.getTopLeft(find.text('Account type')).dy,
       lessThan(tester.getTopLeft(find.text('Email')).dy),
     );
 
-    await tapText(tester, 'Helper');
+    await chooseProfile(tester, 'Helper');
     expect(find.text('Date of birth'), findsOneWidget);
     expect(find.widgetWithText(TextFormField, _taxId), findsNothing);
   });
@@ -153,12 +171,12 @@ void main() {
   testWidgets('switching profile keeps what was typed', (tester) async {
     await pumpAuthApp(tester, FakeAuthApi(), location: '/register');
 
-    await tapText(tester, 'Club');
-    await enterField(tester, _orgName, 'Club Yoseikan Sevilla');
+    await chooseProfile(tester, 'Club');
+    await enterField(tester, _clubName, 'Club Yoseikan Sevilla');
     await tapText(tester, _declaration);
     await enterField(tester, 'Email', 'ana@example.com');
-    await tapText(tester, 'Helper');
-    await tapText(tester, 'Club');
+    await chooseProfile(tester, 'Helper');
+    await chooseProfile(tester, 'Club');
 
     expect(find.text('Club Yoseikan Sevilla'), findsOneWidget);
     expect(find.text('ana@example.com'), findsOneWidget);
@@ -172,19 +190,44 @@ void main() {
     final api = FakeAuthApi();
     await pumpAuthApp(tester, api, location: '/register');
 
-    await tapText(tester, 'Create account');
+    await tapText(tester, 'Create the account');
 
+    expect(
+      find.text('4 things left to check. We took you to the first.'),
+      findsOneWidget,
+    );
     expect(find.text('Required.'), findsOneWidget);
     expect(
       find.text('The password needs at least 10 characters.'),
       findsOneWidget,
     );
-    expect(find.text('Choose a profile.'), findsOneWidget);
+    expect(find.text('Choose the account type.'), findsOneWidget);
+    expect(find.text('Tick the box to create the account.'), findsOneWidget);
+    expect(api.registrations, isEmpty);
+  });
+
+  testWidgets('an email without its ending says what is missing', (
+    tester,
+  ) async {
+    await pumpAuthApp(tester, FakeAuthApi(), location: '/register');
+
+    await enterField(tester, 'Email', 'ana@example');
+    await tapText(tester, 'Create the account');
+
     expect(
-      find.text('You must accept them to create the account.'),
+      find.text('The end of the email is missing, like “.com”.'),
       findsOneWidget,
     );
-    expect(api.registrations, isEmpty);
+  });
+
+  testWidgets('the password says how far it is from long enough', (
+    tester,
+  ) async {
+    await pumpAuthApp(tester, FakeAuthApi(), location: '/register');
+
+    expect(find.text('At least 10 characters'), findsOneWidget);
+    await enterField(tester, 'Password', 'short');
+    expect(find.text('At least 10 characters (5 so far)'), findsOneWidget);
   });
 
   testWidgets('under 14 cannot sign up alone', (tester) async {
@@ -192,7 +235,7 @@ void main() {
     await pumpAuthApp(tester, api, location: '/register');
 
     await fillHelper(tester, birthDate: '11/01/2012');
-    await tapText(tester, 'Create account');
+    await tapText(tester, 'Create the account');
 
     expect(find.textContaining('adding a minor profile'), findsOneWidget);
     expect(api.registrations, isEmpty);
@@ -204,7 +247,7 @@ void main() {
     await pumpAuthApp(tester, api, location: '/register');
 
     await fillClub(tester);
-    await tapText(tester, 'Create account');
+    await tapText(tester, 'Create the account');
 
     final registration = api.registrations.single;
     expect(registration.profile, ProfileType.club);
@@ -224,7 +267,7 @@ void main() {
     await pumpAuthApp(tester, api, location: '/register');
 
     await fillHelper(tester, birthDate: '05/07/1990');
-    await tapText(tester, 'Create account');
+    await tapText(tester, 'Create the account');
 
     final json = api.registrations.single.toJson();
     expect(json['birthDate'], '1990-05-07');
@@ -237,7 +280,7 @@ void main() {
     await pumpAuthApp(tester, api, location: '/register');
 
     await fillClub(tester, declare: false);
-    await tapText(tester, 'Create account');
+    await tapText(tester, 'Create the account');
 
     expect(
       find.text('You must confirm it to register the organization.'),
@@ -251,7 +294,7 @@ void main() {
     await pumpAuthApp(tester, api, location: '/register');
 
     await fillClub(tester, taxId: 'B12345675');
-    await tapText(tester, 'Create account');
+    await tapText(tester, 'Create the account');
 
     expect(find.text('Invalid CIF.'), findsOneWidget);
     expect(api.registrations, isEmpty);
@@ -265,7 +308,7 @@ void main() {
     await pumpAuthApp(tester, api, location: '/register');
 
     await fillClub(tester);
-    await tapText(tester, 'Create account');
+    await tapText(tester, 'Create the account');
 
     expect(
       find.descendant(
@@ -287,7 +330,7 @@ void main() {
     await pumpAuthApp(tester, api, location: '/register');
 
     await fillHelper(tester, birthDate: '05/07/1990');
-    await tapText(tester, 'Create account');
+    await tapText(tester, 'Create the account');
 
     expect(api.logins, ['ana@example.com']);
     expect(find.text('My events'), findsOneWidget);
@@ -304,7 +347,7 @@ void main() {
     await pumpAuthApp(tester, api, location: '/register');
 
     await fillHelper(tester, birthDate: '05/07/1990');
-    await tapText(tester, 'Create account');
+    await tapText(tester, 'Create the account');
 
     final registration = api.registrations.single;
     expect(registration.email, 'ana@example.com');
@@ -315,11 +358,11 @@ void main() {
     expect(find.text('Check your email'), findsOneWidget);
     expect(find.byType(FormMessage), findsNothing);
 
-    await tapText(tester, 'Resend email');
+    await tapText(tester, 'Resend the email');
     expect(api.resends, ['ana@example.com']);
     expect(find.text('Email sent.'), findsOneWidget);
 
-    await tapText(tester, 'Go to sign in');
+    await tapText(tester, 'Sign in');
     expect(find.text('Create an account'), findsOneWidget);
   });
 
@@ -327,9 +370,9 @@ void main() {
     await pumpAuthApp(tester, FakeAuthApi());
 
     await tapText(tester, 'Create an account');
-    expect(find.text('How will you use Brackety?'), findsOneWidget);
+    expect(find.text('Account type'), findsOneWidget);
 
-    await tapText(tester, 'Already have an account? Sign in');
+    await tapText(tester, 'Sign in');
     expect(find.text('Create an account'), findsOneWidget);
   });
 
@@ -343,7 +386,7 @@ void main() {
       await pumpAuthApp(tester, api, location: '/register');
 
       await fillHelper(tester, birthDate: '05/07/1990');
-      await tapText(tester, 'Create account');
+      await tapText(tester, 'Create the account');
 
       expect(api.registrations, hasLength(1));
       expect(find.text('Check your email'), findsOneWidget);
@@ -363,7 +406,7 @@ void main() {
     expect(legal.versionsCalls, 1);
 
     await fillHelper(tester, birthDate: '05/07/1990');
-    await tapText(tester, 'Create account');
+    await tapText(tester, 'Create the account');
 
     final json = api.registrations.single.toJson();
     expect(json['acceptedTermsVersion'], 't-7');
@@ -377,12 +420,12 @@ void main() {
     await pumpAuthApp(tester, api, location: '/register', legal: legal);
 
     await fillHelper(tester, birthDate: '05/07/1990');
-    await tapText(tester, 'Create account');
+    await tapText(tester, 'Create the account');
     expect(find.byType(FormMessage), findsOneWidget);
     expect(api.registrations, isEmpty);
 
     legal.versionsError = null;
-    await tapText(tester, 'Create account');
+    await tapText(tester, 'Create the account');
     expect(api.registrations, hasLength(1));
   });
 
@@ -433,7 +476,7 @@ void main() {
       terms: '2026-12-01',
       privacy: '2026-12-01',
     );
-    await tapText(tester, 'Create account');
+    await tapText(tester, 'Create the account');
 
     expect(
       find.text(
@@ -447,7 +490,7 @@ void main() {
 
     api.registerError = null;
     await tapAcceptance(tester);
-    await tapText(tester, 'Create account');
+    await tapText(tester, 'Create the account');
 
     final json = api.registrations.single.toJson();
     expect(json['acceptedTermsVersion'], '2026-12-01');

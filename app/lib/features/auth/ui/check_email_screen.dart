@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../state/session_controller.dart';
 import 'widgets/auth_form_page.dart';
+import 'widgets/auth_note.dart';
 import 'widgets/resend_button.dart';
 
 /// After signing up. The same answer whether or not the email already had an account.
@@ -21,22 +22,23 @@ class CheckEmailScreen extends ConsumerWidget {
     final email = this.email;
     return AuthFormPage(
       title: l10n.checkEmailTitle,
+      subtitle: email == null
+          ? l10n.checkEmailBody
+          : l10n.checkEmailSentTo(email),
       children: [
-        Text(l10n.checkEmailBody),
-        if (email != null) ...[
-          const SizedBox(height: AppSpacing.l),
-          Align(
-            alignment: AlignmentDirectional.centerStart,
-            child: ResendButton(
-              send: () => ref.read(authApiProvider).resendVerification(email),
-            ),
-          ),
-        ],
-        const SizedBox(height: AppSpacing.l),
+        AuthNote(items: [l10n.checkEmailSpam, l10n.checkEmailThenSignIn]),
+        const SizedBox(height: AppSpacing.xl),
         FilledButton(
           onPressed: () => context.go('/login'),
-          child: Text(l10n.goToLogin),
+          child: Text(l10n.loginSubmit),
         ),
+        if (email != null) ...[
+          const SizedBox(height: AppSpacing.m),
+          ResendButton(
+            stretch: true,
+            send: () => ref.read(authApiProvider).resendVerification(email),
+          ),
+        ],
       ],
     );
   }

@@ -151,7 +151,7 @@ void main() {
 
     router.go('/forgot-password');
     await tester.pumpAndSettle();
-    expect(find.text('Recover password'), findsOneWidget);
+    expect(find.text('Forgot your password?'), findsOneWidget);
   });
 
   testWidgets('signing out goes back to the sign-in', (tester) async {

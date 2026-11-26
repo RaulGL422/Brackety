@@ -14,6 +14,7 @@ class OrganizationFields extends StatelessWidget {
     required this.declared,
     required this.onDeclaredChanged,
     required this.onTaxIdChanged,
+    required this.club,
     this.taxIdError,
   });
 
@@ -22,6 +23,9 @@ class OrganizationFields extends StatelessWidget {
   final bool declared;
   final ValueChanged<bool> onDeclaredChanged;
   final ValueChanged<String> onTaxIdChanged;
+
+  /// A club, or another organizer (a federation, a town hall): the labels name which.
+  final bool club;
 
   /// The server's verdict on the CIF, shown until the user edits it.
   final String? taxIdError;
@@ -37,7 +41,11 @@ class OrganizationFields extends StatelessWidget {
           textCapitalization: TextCapitalization.words,
           autofillHints: const [AutofillHints.organizationName],
           textInputAction: TextInputAction.next,
-          decoration: InputDecoration(labelText: l10n.registerOrganizationName),
+          decoration: InputDecoration(
+            labelText: club
+                ? l10n.registerClubName
+                : l10n.registerOrganizationName,
+          ),
           validator: (value) => validateOrganizationName(l10n, value),
         ),
         const SizedBox(height: AppSpacing.m),
@@ -58,7 +66,11 @@ class OrganizationFields extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.s),
         AcceptanceCheckbox(
-          title: Text(l10n.registerRepresentative),
+          title: Text(
+            club
+                ? l10n.registerRepresentativeClub
+                : l10n.registerRepresentative,
+          ),
           requiredText: l10n.registerRepresentativeRequired,
           initialValue: declared,
           onChanged: onDeclaredChanged,
