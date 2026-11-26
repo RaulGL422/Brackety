@@ -1,9 +1,7 @@
 name: Images
 
 on:
-  pull_request:
-    # Docs never change an image; releases always touch code, so they still build.
-    paths-ignore: ['docs/**', '**/*.md']
+  # Images are built only for main, development and release tags: PRs skip them to keep CI short.
   push:
     # development publishes the debug images (tag dev, docs/modulos/entornos.md); main and v* production's.
     branches: [main, development]
@@ -15,7 +13,6 @@ permissions:
 
 jobs:
   compose-smoke:
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -92,7 +89,6 @@ jobs:
         run: docker compose down -v
 
   debug-smoke:
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -130,7 +126,9 @@ jobs:
         run: $DEBUG_COMPOSE down -v
 
   publish:
-    if: github.event_name != 'pull_request'
+    # A manual run from another branch only runs the smoke tests; broken deploys never publish.
+    needs: [compose-smoke, debug-smoke]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/development' || startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions:
       contents: read
