@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/error_codes.dart';
 import '../../../l10n/gen/app_localizations.dart';
-import '../../club/ui/settings_tab.dart';
+import '../../events/data/settings_input.dart';
 import '../../events/state/events_providers.dart';
 import '../../phase/ui/phase_bar.dart';
 import '../data/league_models.dart';

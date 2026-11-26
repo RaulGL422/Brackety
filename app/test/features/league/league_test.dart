@@ -1,10 +1,10 @@
-import 'package:brackety/features/club/data/participant.dart';
-import 'package:brackety/features/club/data/participant_record.dart';
-import 'package:brackety/features/club/data/standing_row.dart';
-import 'package:brackety/features/club/state/club_providers.dart';
 import 'package:brackety/features/events/data/my_event.dart';
+import 'package:brackety/features/events/data/participant.dart';
+import 'package:brackety/features/events/data/participant_record.dart';
+import 'package:brackety/features/events/data/standing_row.dart';
+import 'package:brackety/features/events/state/club_providers.dart';
 import 'package:brackety/features/events/state/events_providers.dart';
-import 'package:brackety/features/events/ui/events_screen.dart';
+import 'package:brackety/features/home/ui/events_screen.dart';
 import 'package:brackety/features/league/data/league_models.dart';
 import 'package:brackety/features/league/data/league_repository.dart';
 import 'package:brackety/features/league/state/league_providers.dart';

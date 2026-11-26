@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
-import '../../club/ui/measure_fields.dart';
 import '../../events/data/measure_rules.dart';
 import '../../events/state/events_providers.dart';
+import '../../events/ui/measure_fields.dart';
 import '../data/grouping_models.dart';
 import '../data/grouping_repository.dart';
 

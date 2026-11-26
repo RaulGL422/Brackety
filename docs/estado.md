@@ -9,7 +9,7 @@
 Estados: **pendiente** · **en curso** · **en pruebas** (hecho; falta la prueba a mano de Raul, lista en `pendientes.md`) · **cerrado**.
 
 ## Ahora
-- Calidad (`producto/plan-limpieza.md`): L0 completa (2026-11-20): métricas en el CI (#137), ArchUnit (#138), lints estrictos (#139), casos de reglas compartidos (#142) y comprobación de oro (#143, #149). Destapó el orden de nombres con acento en Linux (#144). L1 hecha (#194). L3 hecha (#207, borrador). Siguiente: L2.
+- Calidad (`producto/plan-limpieza.md`): L0 completa (2026-11-20): métricas en el CI (#137), ArchUnit (#138), lints estrictos (#139), casos de reglas compartidos (#142) y comprobación de oro (#143, #149). Destapó el orden de nombres con acento en Linux (#144). L1 hecha (#194). L2 y L3 hechas (#207). Siguiente: L4.
 - Grappling FELODA (`producto/grappling.md`): G1-G5 fusionadas (#151, #153-#159); release v0.8.0 (#160).
 - Acceso por QR para ayudantes y árbitros sin cuenta (`modulos/ayudantes-permisos.md`): fusionado (#162), release v0.8.1.
 - Tras el grappling del 2026-11-21: superioridad en Ajustes (#165). Arreglos GR-1 a GR-12 para el 20-12 (`producto/feedback-grappling.md`): GR-3 (#169), GR-11 (#170), GR-10 (#171) y GR-2 (#172, #173) hechos; GR-5 (#174, #175), GR-4 (grupos por tapiz), GR-1 (marcador del árbitro), GR-8 sesiones (#179), matriz de permisos (#180), día completo de torneo (#181), concurrencia (#182, #183), ataques (#184, #187), migración, liga de dos fases y equipos (#190): GR-8 completo; repaso de diseño de GR-2, GR-4 y GR-5 (#193); resto pendiente. GR-1, GR-7 y GR-12, pantalla a pantalla con Raul.

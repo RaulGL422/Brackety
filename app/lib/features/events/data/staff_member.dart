@@ -1,4 +1,4 @@
-import '../../events/data/my_event.dart';
+import 'my_event.dart';
 
 /// A helper or referee account of the event; [personName]: who is behind it, set by the club.
 class StaffMember {

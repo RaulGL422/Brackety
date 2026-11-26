@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/polling.dart';
-import '../club/state/club_providers.dart';
+import '../events/state/club_providers.dart';
 import 'control_repository.dart';
 
 /// One mat and its groups still to finish (GR-4). [disabled]: it takes no groups.

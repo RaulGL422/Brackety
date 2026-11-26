@@ -7,9 +7,9 @@ import 'package:intl/intl.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../auth/state/account_controller.dart';
 import '../../auth/ui/confirm_sign_out.dart';
+import '../../events/data/my_event.dart';
+import '../../events/state/events_providers.dart';
 import '../../league/ui/new_event_dialog.dart';
-import '../data/my_event.dart';
-import '../state/events_providers.dart';
 
 class EventsScreen extends ConsumerWidget {
   const EventsScreen({super.key});

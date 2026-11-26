@@ -1,6 +1,6 @@
 import 'package:intl/intl.dart';
 
-import '../../club/data/sex.dart';
+import '../../events/data/sex.dart';
 
 final _day = DateFormat('yyyy-MM-dd');
 

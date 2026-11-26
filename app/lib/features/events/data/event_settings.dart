@@ -1,5 +1,5 @@
-import '../../events/data/measure_rules.dart';
 import 'event_category.dart';
+import 'measure_rules.dart';
 import 'participant.dart';
 import 'staff_member.dart';
 

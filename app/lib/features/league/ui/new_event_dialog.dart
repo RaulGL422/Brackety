@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/error_codes.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../events/data/settings_input.dart';
 import '../../events/state/events_providers.dart';
 import '../data/league_models.dart';
 import '../data/league_repository.dart';
@@ -35,8 +36,6 @@ class _NewEventDialogState extends ConsumerState<_NewEventDialog> {
   var _date = DateUtils.dateOnly(DateTime.now());
   String? _sport;
   var _saving = false;
-
-  static const maxMats = 20;
 
   @override
   void dispose() {

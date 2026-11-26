@@ -5,8 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/error_codes.dart';
 import '../../../l10n/gen/app_localizations.dart';
-import '../../club/data/participant.dart';
-import '../../club/state/club_providers.dart';
+import '../../events/data/participant.dart';
+import '../../events/state/club_providers.dart';
 import '../data/league_models.dart';
 import '../data/league_repository.dart';
 import '../state/league_providers.dart';

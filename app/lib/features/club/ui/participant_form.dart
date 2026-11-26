@@ -5,15 +5,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
+import '../../events/data/club_repository.dart';
 import '../../events/data/measure_rules.dart';
+import '../../events/data/participant.dart';
+import '../../events/data/sex.dart';
+import '../../events/state/club_providers.dart';
 import '../../events/state/events_providers.dart';
+import '../../events/ui/measure_fields.dart';
 import '../../legal/ui/legal_links.dart';
-import '../data/club_repository.dart';
-import '../data/participant.dart';
-import '../data/sex.dart';
-import '../state/club_providers.dart';
 import 'club_panel_screen.dart';
-import 'measure_fields.dart';
 import 'organizations_editor.dart';
 
 /// Age on [day], as the server counts it for categories.

@@ -1,8 +1,8 @@
-import 'package:brackety/features/club/data/mat_overview.dart';
-import 'package:brackety/features/club/state/club_providers.dart';
 import 'package:brackety/features/club/ui/mats_tab.dart';
 import 'package:brackety/features/control/control_repository.dart';
+import 'package:brackety/features/events/data/mat_overview.dart';
 import 'package:brackety/features/events/data/my_event.dart';
+import 'package:brackety/features/events/state/club_providers.dart';
 import 'package:brackety/features/events/state/events_providers.dart';
 import 'package:brackety/features/mat/ui/mat_board_screen.dart';
 import 'package:brackety/features/match/data/mat_board.dart';

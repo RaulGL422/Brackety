@@ -5,9 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/error_codes.dart';
 import '../../../l10n/gen/app_localizations.dart';
-import '../../club/data/staff_member.dart';
-import '../../club/state/club_providers.dart';
 import '../../events/data/my_event.dart';
+import '../../events/data/staff_member.dart';
+import '../../events/state/club_providers.dart';
 import '../data/staff_repository.dart';
 
 String staffRoleName(AppLocalizations l10n, StaffRole role) => switch (role) {

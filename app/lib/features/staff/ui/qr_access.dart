@@ -9,7 +9,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../../../core/error_codes.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../auth/data/api_error.dart';
-import '../../club/state/club_providers.dart';
+import '../../events/state/club_providers.dart';
 import '../data/staff_repository.dart';
 import '../data/temporary_access.dart';
 

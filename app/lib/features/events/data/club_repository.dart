@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../auth/state/session_controller.dart';
-import '../../events/data/measure_rules.dart';
 import 'event_category.dart';
 import 'event_settings.dart';
 import 'export_audit_entry.dart';
 import 'mat_overview.dart';
+import 'measure_rules.dart';
 import 'participant.dart';
 import 'participant_record.dart';
 import 'results_import.dart';

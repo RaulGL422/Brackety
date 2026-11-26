@@ -6,12 +6,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/error_codes.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../events/data/club_repository.dart';
+import '../../events/data/event_category.dart';
+import '../../events/data/settings_input.dart';
+import '../../events/state/club_providers.dart';
 import '../../grouping/state/grouping_providers.dart';
-import '../data/club_repository.dart';
-import '../data/event_category.dart';
-import '../state/club_providers.dart';
 import 'category_groups_field.dart';
-import 'settings_tab.dart';
 
 /// The event's categories (docs/modulos/prototipo-f1-equipos.md): age band and whether they
 /// compete individually or as teams. Every change is saved at once, as the rest of the settings.
