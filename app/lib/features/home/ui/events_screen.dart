@@ -1,156 +1,256 @@
 import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
+import '../../auth/data/registration.dart';
 import '../../auth/state/account_controller.dart';
-import '../../auth/ui/confirm_sign_out.dart';
 import '../../events/data/my_event.dart';
 import '../../events/state/events_providers.dart';
 import '../../league/ui/new_event_dialog.dart';
+import '../data/league_overview.dart';
+import 'account_menu.dart';
+import 'finished_list.dart';
+import 'league_cards.dart';
 
+/// «Mis eventos» (Raul, 2026-11-26): what is on now first, then what comes, then what is over.
+/// Each league once, at its phase that matters now; what opens it depends on the account's role.
 class EventsScreen extends ConsumerWidget {
   const EventsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
-    final temporary =
-        ref.watch(accountProvider.select((a) => a.value?.temporary)) ?? false;
+    final organizer = ref.watch(_organizerProvider);
+    final wide = WindowSize.of(context) == WindowSize.expanded;
+    final events = ref.watch(myEventsProvider);
+    final hasEvents = events.value?.isNotEmpty ?? false;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.eventsTitle),
-        actions: const [
-          _AccountMenu(),
-          SizedBox(width: AppSpacing.s),
-        ],
-      ),
-      // An account let in by QR only helps in its event.
-      floatingActionButton: temporary
-          ? null
-          : FloatingActionButton.extended(
-              icon: const Icon(Icons.add),
-              label: Text(l10n.newEventButton),
-              onPressed: () => showNewEventDialog(context),
-            ),
-      body: AsyncView(
-        value: ref.watch(myEventsProvider),
-        onRetry: () => ref.invalidate(myEventsProvider),
-        data: (events) {
-          final leagues = byLeague(events);
-          return events.isEmpty
-              ? Center(child: Text(l10n.eventsEmpty))
-              : ListView.builder(
-                  padding: const EdgeInsets.all(AppSpacing.l),
-                  itemCount: leagues.length,
-                  itemBuilder: (context, i) => _LeagueCard(phases: leagues[i]),
-                );
-        },
+      // On a phone the way to create stays at hand; on a desktop it sits in the header.
+      floatingActionButton: organizer && !wide && hasEvents
+          ? const _NewEventButton(floating: true)
+          : null,
+      body: SafeArea(
+        child: AsyncView(
+          value: events,
+          onRetry: () => ref.invalidate(myEventsProvider),
+          data: (events) => CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: _Header(showNewEvent: organizer && wide && hasEvents),
+              ),
+              if (events.isEmpty)
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: _Empty(organizer: organizer),
+                )
+              else
+                SliverToBoxAdapter(child: _Sections(events: events)),
+            ],
+          ),
+        ),
       ),
     );
   }
 }
 
-/// A league with its phases: each phase is an event with its own entries, mats and scores.
-class _LeagueCard extends StatelessWidget {
-  const _LeagueCard({required this.phases});
+/// Only clubs and other organizers create events; an account let in by QR helps in one.
+final _organizerProvider = Provider.autoDispose<bool>((ref) {
+  final account = ref.watch(accountProvider).value;
+  return account != null &&
+      !account.temporary &&
+      account.profiles.any((p) => p.type.isOrganizer);
+});
 
-  final List<MyEvent> phases;
+class _Header extends StatelessWidget {
+  const _Header({required this.showNewEvent});
+
+  final bool showNewEvent;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final text = Theme.of(context).textTheme;
-    final single = phases.length == 1;
-    final clubPhase = phases
-        .where((p) => p.roles.contains(EventRole.club))
-        .lastOrNull;
-    return Card(
+    return _Column(
       child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.l),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // The club sees the league first, so its name leads; a lone event is just its name.
-            Text(
-              clubPhase != null || !single
-                  ? phases.first.leagueName
-                  : phases.single.name,
-              style: text.titleLarge,
-            ),
-            for (final (i, phase) in phases.indexed) ...[
-              if (i > 0) const Divider(height: AppSpacing.xl),
-              const SizedBox(height: AppSpacing.xs),
-              _PhaseRow(
-                event: phase,
-                showName: !single || phase.name != phase.leagueName,
-              ),
-            ],
-            // The club enters the league and opens its phases from there.
-            if (clubPhase != null) ...[
-              const SizedBox(height: AppSpacing.m),
-              FilledButton.icon(
-                icon: const Icon(Icons.emoji_events_outlined),
-                label: Text(l10n.openLeague),
-                onPressed: () => context.push('/leagues/${clubPhase.id}'),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _PhaseRow extends StatelessWidget {
-  const _PhaseRow({required this.event, required this.showName});
-
-  final MyEvent event;
-  final bool showName;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final locale = Localizations.localeOf(context).toLanguageTag();
-    final text = Theme.of(context).textTheme;
-    final buttons = [
-      // The club has its panel; it sees this only if it is a helper too.
-      if (event.buildsGroups &&
-          (event.roles.contains(EventRole.grouper) ||
-              !event.roles.contains(EventRole.club)))
-        FilledButton.icon(
-          icon: const Icon(Icons.group_add_outlined),
-          label: Text(l10n.eventMakeGroups),
-          onPressed: () => context.push('/events/${event.id}/categories'),
-        ),
-      if (event.opensPanel && !event.isClub)
-        FilledButton.tonalIcon(
-          icon: const Icon(Icons.dashboard_outlined),
-          label: Text(l10n.eventStaffPanel),
-          onPressed: () => context.push('/events/${event.id}/club'),
-        ),
-      if (event.can(EventPermission.ownMat) && event.matNumber != null)
-        FilledButton.icon(
-          icon: const Icon(Icons.sports_martial_arts),
-          label: Text(l10n.eventMyMat(event.matNumber!)),
-          onPressed: () =>
-              context.push('/mats/${event.matId}?number=${event.matNumber}'),
-        ),
-    ];
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (showName) Text(event.name, style: text.titleMedium),
-        Text(DateFormat.yMMMMd(locale).format(event.date)),
-        // The club's way in is the league's button: a phase of theirs alone has none here.
-        if (buttons.isNotEmpty) ...[
-          const SizedBox(height: AppSpacing.m),
-          Wrap(
+        padding: const EdgeInsets.only(top: AppSpacing.l),
+        // With large text the buttons go under the title instead of squeezing it; as wide as the
+        // column, so the title stays left and the buttons right.
+        child: SizedBox(
+          width: double.infinity,
+          child: Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
             spacing: AppSpacing.s,
             runSpacing: AppSpacing.s,
-            children: buttons,
+            children: [
+              Semantics(
+                header: true,
+                child: Text(
+                  l10n.eventsTitle,
+                  style: Theme.of(context).textTheme.displaySmall,
+                ),
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (showNewEvent) ...[
+                    const _NewEventButton(floating: false),
+                    const SizedBox(width: AppSpacing.s),
+                  ],
+                  const Flexible(child: AccountMenu()),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _Sections extends StatelessWidget {
+  const _Sections({required this.events});
+
+  final List<MyEvent> events;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final sections = overviewOf(events);
+    final wide = WindowSize.of(context) != WindowSize.compact;
+    return _Column(
+      child: Padding(
+        // Room under the floating button on a phone.
+        padding: const EdgeInsets.only(top: AppSpacing.l, bottom: 96),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (sections.live.isNotEmpty)
+              _Section(
+                title: l10n.homeLive,
+                count: sections.live.length,
+                children: [
+                  for (final league in sections.live) LiveCard(league: league),
+                ],
+              ),
+            if (sections.upcoming.isNotEmpty)
+              _Section(
+                title: l10n.homeUpcoming,
+                count: sections.upcoming.length,
+                columns: wide ? 2 : 1,
+                children: [
+                  for (final league in sections.upcoming)
+                    UpcomingCard(league: league),
+                ],
+              ),
+            if (sections.finished.isNotEmpty)
+              _Section(
+                title: l10n.homeFinished,
+                count: sections.finished.length,
+                children: [FinishedList(leagues: sections.finished)],
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A section's title with how many events it holds, in a square like a group's number.
+class _Section extends StatelessWidget {
+  const _Section({
+    required this.title,
+    required this.count,
+    required this.children,
+    this.columns = 1,
+  });
+
+  final String title;
+  final int count;
+  final List<Widget> children;
+  final int columns;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.xxl),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Semantics(
+            header: true,
+            label: '$title, ${l10n.homeCount(count)}',
+            excludeSemantics: true,
+            child: Row(
+              children: [
+                Flexible(
+                  child: Text(title, style: theme.textTheme.headlineMedium),
+                ),
+                const SizedBox(width: AppSpacing.s),
+                Container(
+                  constraints: const BoxConstraints(minWidth: 32),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.xs,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: theme.colorScheme.onSurface,
+                      width: 2,
+                    ),
+                    borderRadius: BorderRadius.circular(AppRadius.s),
+                  ),
+                  child: Text(
+                    '$count',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.m),
+          if (columns == 1)
+            for (final (i, child) in children.indexed) ...[
+              if (i > 0) const SizedBox(height: AppSpacing.m),
+              child,
+            ]
+          else
+            _Grid(columns: columns, children: children),
+        ],
+      ),
+    );
+  }
+}
+
+/// Cards side by side, two to a row.
+class _Grid extends StatelessWidget {
+  const _Grid({required this.columns, required this.children});
+
+  final int columns;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        for (var row = 0; row < children.length; row += columns) ...[
+          if (row > 0) const SizedBox(height: AppSpacing.m),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (var i = row; i < row + columns; i++) ...[
+                if (i > row) const SizedBox(width: AppSpacing.m),
+                Expanded(
+                  child: i < children.length
+                      ? children[i]
+                      : const SizedBox.shrink(),
+                ),
+              ],
+            ],
           ),
         ],
       ],
@@ -158,79 +258,92 @@ class _PhaseRow extends StatelessWidget {
   }
 }
 
-enum _AccountItem { settings, changelog, signOut }
+class _Empty extends StatelessWidget {
+  const _Empty({required this.organizer});
 
-/// One labelled button instead of three bare icons: people did not know what each one did.
-class _AccountMenu extends ConsumerWidget {
-  const _AccountMenu();
+  final bool organizer;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final error = Theme.of(context).colorScheme.error;
-    // An account let in by QR has no settings of its own.
-    final temporary =
-        ref.watch(accountProvider.select((a) => a.value?.temporary)) ?? false;
-    // Only against the debug server: what each build brings, to know what to try.
-    final debug = ref.watch(debugStatusProvider).value != null;
-    return PopupMenuButton<_AccountItem>(
-      tooltip: l10n.accountMenu,
-      onSelected: (item) => switch (item) {
-        _AccountItem.settings => context.push('/settings'),
-        _AccountItem.changelog => context.push('/changelog'),
-        _AccountItem.signOut => confirmSignOut(context, ref),
-      },
-      itemBuilder: (_) => [
-        if (!temporary)
-          PopupMenuItem(
-            value: _AccountItem.settings,
-            child: ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.settings_outlined),
-              title: Text(l10n.settingsTitle),
+    final theme = Theme.of(context);
+    return _Column(
+      maxWidth: AppSizes.formMaxWidth,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(l10n.homeEmptyTitle, style: theme.textTheme.headlineMedium),
+          const SizedBox(height: AppSpacing.s),
+          Text(
+            organizer ? l10n.homeEmptyOrganizer : l10n.homeEmptyHelper,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
-        if (debug)
-          PopupMenuItem(
-            value: _AccountItem.changelog,
-            child: ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.history),
-              title: Text(CoreLocalizations.of(context).changelogMenu),
+          if (organizer) ...[
+            const SizedBox(height: AppSpacing.xl),
+            FilledButton.icon(
+              icon: const Icon(Icons.add),
+              label: Text(l10n.homeCreateFirst),
+              onPressed: () => showNewEventDialog(context),
             ),
-          ),
-        const PopupMenuDivider(),
-        PopupMenuItem(
-          value: _AccountItem.signOut,
-          child: ListTile(
-            contentPadding: EdgeInsets.zero,
-            iconColor: error,
-            textColor: error,
-            leading: const Icon(Icons.logout),
-            title: Text(l10n.logout),
-          ),
-        ),
-        // Which version this device runs, at a glance.
-        const PopupMenuItem(enabled: false, child: AppVersionText()),
-      ],
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.m,
-          vertical: AppSpacing.s,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.account_circle_outlined),
-            const SizedBox(width: AppSpacing.xs),
-            Text(
-              l10n.accountMenu,
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
-            const Icon(Icons.arrow_drop_down),
           ],
-        ),
+          const SizedBox(height: AppSpacing.xxxl),
+        ],
       ),
     );
   }
+}
+
+class _NewEventButton extends StatelessWidget {
+  const _NewEventButton({required this.floating});
+
+  final bool floating;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    if (!floating) {
+      return FilledButton.icon(
+        style: FilledButton.styleFrom(
+          backgroundColor: scheme.onSurface,
+          foregroundColor: scheme.surface,
+        ),
+        icon: const Icon(Icons.add),
+        label: Text(l10n.newEventButton),
+        onPressed: () => showNewEventDialog(context),
+      );
+    }
+    return FloatingActionButton.extended(
+      backgroundColor: scheme.onSurface,
+      foregroundColor: scheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.l),
+      ),
+      icon: const Icon(Icons.add),
+      label: Text(l10n.newEventButton),
+      onPressed: () => showNewEventDialog(context),
+    );
+  }
+}
+
+/// The page's column: full width on a phone, centred and capped on wide windows.
+class _Column extends StatelessWidget {
+  const _Column({required this.child, this.maxWidth = 1200});
+
+  final Widget child;
+  final double maxWidth;
+
+  @override
+  Widget build(BuildContext context) => Center(
+    child: ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: maxWidth),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.l),
+        child: child,
+      ),
+    ),
+  );
 }

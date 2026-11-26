@@ -17,7 +17,7 @@ Liga cuyo cada fase es un minievento (caso real: Liga Yoseikan, 4 fases).
 `phase` (modalidad, estado), `phase_registration`, `group`, `group_assignment`, `phase_points`.
 
 ## Pantallas
-- Mis eventos: una tarjeta por liga. El club entra por **"Abrir la liga"** (pedido de Raul, 2026-11-12: la liga antes que sus fases); ayudantes y árbitros ven cada fase con sus botones (grupos, mi tapiz).
+- Mis eventos (Raul, 2026-11-26): «En curso», «Próximos» y «Finalizados» según el estado de la fase (`phaseState` en `GET /api/v1/events`); cada liga una vez, en su fase de ahora. Fila de fases deslizable con la actual en el centro; cada fase abre la suya. El club abre o prepara la fase y ve la liga; ayudante o árbitro: con una tarea, su botón; con varias, «Entrar al evento»; sin tarea, «Por decidir». El tapiz se abre al empezar la fase. «Nuevo evento» solo para club o entidad.
 - Pantalla de la liga (`/leagues/<fase>`): fases (fecha, modalidad, inscritos; cada una abre su panel), "Nueva fase" (nombre, fecha, modalidad, puntos de asistencia), clasificación acumulada por categoría con puntos por fase y medallas, CSV (web), y editar nombre y podios.
 - Podios: el general con un toque ("1 oro · 1 plata · 1 bronce", "1·1·2" u "Otro" con contadores −/+); cada categoría "Como el general" o "Propio" con el mismo selector.
 - Panel de una fase: la flecha vuelve a la liga; selector de fase arriba (si hay más de una).

@@ -55,6 +55,7 @@ Future<void> pumpBar(
   FakePhaseRepository phases, {
   Set<EventRole> roles = const {EventRole.club},
   Set<EventPermission> permissions = const {...EventPermission.values},
+  void Function()? onEventsLoaded,
 }) async {
   final me = MyEvent(
     id: 'e1',
@@ -67,7 +68,10 @@ Future<void> pumpBar(
     ProviderScope(
       overrides: [
         phaseRepositoryProvider.overrideWithValue(phases),
-        myEventsProvider.overrideWith((ref) async => [me]),
+        myEventsProvider.overrideWith((ref) async {
+          onEventsLoaded?.call();
+          return [me];
+        }),
       ],
       child: MaterialApp(
         builder: (_, child) => ToastHost(child: child!),
@@ -119,6 +123,23 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  testWidgets('starting the phase reloads my events, which sort by it', (
+    tester,
+  ) async {
+    var loads = 0;
+    await pumpBar(
+      tester,
+      FakePhaseRepository(const Phase(state: PhaseState.notStarted)),
+      onEventsLoaded: () => loads++,
+    );
+    final before = loads;
+
+    await tester.tap(find.text('Start phase'));
+    await tester.pumpAndSettle();
+
+    expect(loads, greaterThan(before));
+  });
 
   // Without a privacy contact the server refuses to start (LEGAL_GATE): the club is told why.
   testWidgets('a start refused by the legal gate says why', (tester) async {

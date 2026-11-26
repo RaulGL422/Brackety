@@ -95,7 +95,8 @@ public class EventService {
                             leagueNames.computeIfAbsent(event.getLeagueId(), events::leagueName),
                             event.getPhaseNumber(),
                             event.weightRequirement(),
-                            event.heightRequirement());
+                            event.heightRequirement(),
+                            event.phaseState());
                 })
                 .toList();
     }

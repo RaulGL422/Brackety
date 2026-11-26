@@ -709,6 +709,151 @@ class AppLocalizationsEn extends AppLocalizations {
   String get eventsTitle => 'My events';
 
   @override
+  String get homeLive => 'On now';
+
+  @override
+  String get homeUpcoming => 'Coming up';
+
+  @override
+  String get homeFinished => 'Finished';
+
+  @override
+  String homeCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count events',
+      one: '1 event',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeLiveToday => 'On now';
+
+  @override
+  String homePhase(int number) {
+    return 'Phase $number';
+  }
+
+  @override
+  String homePhaseOf(int number, int total) {
+    return 'Phase $number of $total';
+  }
+
+  @override
+  String get homePhaseDone => 'Finished';
+
+  @override
+  String get homePhaseLive => 'On now';
+
+  @override
+  String get homePhaseRail =>
+      'League phases: swipe for more and tap one to open it';
+
+  @override
+  String homeOpenPhase(int number) {
+    return 'Open phase $number';
+  }
+
+  @override
+  String get homeOpenEvent => 'Open the event';
+
+  @override
+  String homePreparePhase(int number) {
+    return 'Prepare phase $number';
+  }
+
+  @override
+  String get homePrepareEvent => 'Prepare the event';
+
+  @override
+  String get homeSeeLeague => 'See the league and its phases';
+
+  @override
+  String get homeEnterEvent => 'Enter the event';
+
+  @override
+  String homeOpenMyMat(int number) {
+    return 'Open my mat $number';
+  }
+
+  @override
+  String get homeMat => 'Mat';
+
+  @override
+  String get homeRoleClub => 'You organize it';
+
+  @override
+  String get homeRoleReferee => 'Referee';
+
+  @override
+  String homeRoleRefereeMat(int number) {
+    return 'Referee of mat $number';
+  }
+
+  @override
+  String get homeRoleHelper => 'Helper';
+
+  @override
+  String get homeTasks => 'Your tasks';
+
+  @override
+  String homeTasksMore(int count) {
+    return 'and $count more';
+  }
+
+  @override
+  String get homeTask => 'Task';
+
+  @override
+  String get homeTaskPending => 'Not decided yet';
+
+  @override
+  String homeClubNote(String date) {
+    return 'It starts on $date. Until then you can prepare entries, groups and mats.';
+  }
+
+  @override
+  String get homeClubNoteToday =>
+      'It is today. Start it from its panel when you are ready; until then you can prepare entries, groups and mats.';
+
+  @override
+  String homeMatNote(String date) {
+    return 'Your mat opens on $date, when the club starts the phase.';
+  }
+
+  @override
+  String homeSeeAllFinished(int count) {
+    return 'See all $count finished';
+  }
+
+  @override
+  String get homeSeeFewerFinished => 'See fewer';
+
+  @override
+  String homeLeaguePhases(int count) {
+    return 'League of $count phases';
+  }
+
+  @override
+  String get homeEmptyTitle => 'No events yet';
+
+  @override
+  String get homeEmptyOrganizer =>
+      'Leagues and competitions you organize, help at or referee will appear here.';
+
+  @override
+  String get homeEmptyHelper =>
+      'When a club adds you to a league or a competition, it will appear here with what you can do there.';
+
+  @override
+  String get homeCreateFirst => 'Create your first event';
+
+  @override
+  String get homeChooseTask => 'What do you want to open?';
+
+  @override
   String get newEventButton => 'New event';
 
   @override
@@ -734,9 +879,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get newEventDone => 'Event created';
-
-  @override
-  String get eventsEmpty => 'You have no events assigned.';
 
   @override
   String get roleClub => 'Club';
@@ -3049,9 +3191,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recordOpen => 'See matches';
-
-  @override
-  String get openLeague => 'Open the league';
 
   @override
   String podiumPreset(int gold, int silver, int bronze) {

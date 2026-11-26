@@ -7,6 +7,7 @@ esa sección pasa a llamarse como la versión. Debug enseña su compilación jun
 ## Sin publicar (en debug)
 
 ### Nuevo
+- Mis eventos rediseñado: «En curso», «Próximos» y «Finalizados»; fases de la liga en una fila deslizable que abre cada una; un botón según lo que haces en el evento (o «Entrar al evento» si haces varias cosas); «Nuevo evento» solo para clubes y entidades.
 - Los rechazos del servidor (fecha bloqueada, categoría en uso, reglamento que no es PDF…) dicen el motivo concreto en tu idioma, en vez de «No se pudo guardar» (#207).
 - La pestaña del panel del club va en la dirección (`…/club/mats`): recargar la web o volver de otra pantalla abre la misma pestaña (#207).
 - Registro, «Revisa tu email», contraseña olvidada, nueva contraseña, enlace caducado y entrar con QR rediseñados: tipo de cuenta en desplegable, requisitos de contraseña que se marcan al escribir, aviso de cuántas cosas faltan y textos más claros.

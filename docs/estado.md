@@ -29,7 +29,7 @@ Estados: **pendiente** · **en curso** · **en pruebas** (hecho; falta la prueba
 | `ayudantes-permisos` | pendiente | Adelantado: invitaciones (#122) y permisos por persona (#130, #131, #133, #192) |
 | `puntuacion` | pendiente | Tambo y grappling como plantillas de datos (paso 1); plan en `producto/plantillas-deporte.md` |
 | `liga` | pendiente | |
-| `liga-fases` | en pruebas | Fases, reinscripción, puntos por asistir, podios |
+| `liga-fases` | en pruebas | Fases, reinscripción, puntos por asistir, podios; Mis eventos por estado |
 | `torneo` | pendiente | Lo pide la competición del 20-12 |
 | `marcador-tapiz` | pendiente | Adelantado por el prototipo |
 | `tiempo-real` | en pruebas | Avisos por WebSocket con sondeo de respaldo |

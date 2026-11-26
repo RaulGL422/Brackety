@@ -252,16 +252,14 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byType(Card), findsOneWidget);
+      // One card for the league, its phases in a row; the club prepares the next one.
       expect(find.text('Liga Yoseikan'), findsOneWidget);
       expect(
-        tester.getTopLeft(find.text('Liga Yoseikan · Fase 1')).dy,
-        lessThan(tester.getTopLeft(find.text('Liga Yoseikan · Fase 2')).dy),
+        tester.getTopLeft(find.text('Phase 1')).dx,
+        lessThan(tester.getTopLeft(find.text('Phase 2')).dx),
       );
-      // The club enters the league, then its phases; a helper still sees their phase.
-      expect(find.text('Open the league'), findsOneWidget);
-      expect(find.text('Club panel'), findsNothing);
-      expect(find.text('Make groups'), findsOneWidget);
+      expect(find.text('Prepare phase 1'), findsOneWidget);
+      expect(find.text('Make groups'), findsNothing);
       expect(tester.takeException(), isNull);
     });
 

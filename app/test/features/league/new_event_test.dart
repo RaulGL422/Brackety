@@ -9,6 +9,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../support/fakes.dart';
+
 /// Creates a standalone event and says what it was asked.
 class _FakeLeagueRepository extends Fake implements LeagueRepository {
   final created = <(String, String, int)>[];
@@ -78,6 +80,7 @@ void main() {
         overrides: [
           leagueRepositoryProvider.overrideWithValue(repository),
           myEventsProvider.overrideWith((ref) async => []),
+          accountOverride(clubAccount),
         ],
         child: MaterialApp.router(
           routerConfig: router,
@@ -101,7 +104,7 @@ void main() {
       (tester) async {
         final repository = await open(tester, size);
 
-        await tester.tap(find.text('New event'));
+        await tester.tap(find.text('Create your first event'));
         await tester.pumpAndSettle();
         await tester.enterText(
           find.widgetWithText(TextFormField, 'Event name'),
@@ -133,7 +136,7 @@ void main() {
   ) async {
     final repository = await open(tester, sizes['phone']!);
 
-    await tester.tap(find.text('New event'));
+    await tester.tap(find.text('Create your first event'));
     await tester.pumpAndSettle();
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Event name'),

@@ -1214,6 +1214,228 @@ abstract class AppLocalizations {
   /// **'Mis eventos'**
   String get eventsTitle;
 
+  /// No description provided for @homeLive.
+  ///
+  /// In es, this message translates to:
+  /// **'En curso'**
+  String get homeLive;
+
+  /// No description provided for @homeUpcoming.
+  ///
+  /// In es, this message translates to:
+  /// **'Próximos'**
+  String get homeUpcoming;
+
+  /// No description provided for @homeFinished.
+  ///
+  /// In es, this message translates to:
+  /// **'Finalizados'**
+  String get homeFinished;
+
+  /// No description provided for @homeCount.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 evento} other{{count} eventos}}'**
+  String homeCount(int count);
+
+  /// No description provided for @homeLiveToday.
+  ///
+  /// In es, this message translates to:
+  /// **'En curso hoy'**
+  String get homeLiveToday;
+
+  /// No description provided for @homePhase.
+  ///
+  /// In es, this message translates to:
+  /// **'Fase {number}'**
+  String homePhase(int number);
+
+  /// No description provided for @homePhaseOf.
+  ///
+  /// In es, this message translates to:
+  /// **'Fase {number} de {total}'**
+  String homePhaseOf(int number, int total);
+
+  /// No description provided for @homePhaseDone.
+  ///
+  /// In es, this message translates to:
+  /// **'Terminada'**
+  String get homePhaseDone;
+
+  /// No description provided for @homePhaseLive.
+  ///
+  /// In es, this message translates to:
+  /// **'En curso'**
+  String get homePhaseLive;
+
+  /// No description provided for @homePhaseRail.
+  ///
+  /// In es, this message translates to:
+  /// **'Fases de la liga: desliza para ver más y toca una para abrirla'**
+  String get homePhaseRail;
+
+  /// No description provided for @homeOpenPhase.
+  ///
+  /// In es, this message translates to:
+  /// **'Abrir la fase {number}'**
+  String homeOpenPhase(int number);
+
+  /// No description provided for @homeOpenEvent.
+  ///
+  /// In es, this message translates to:
+  /// **'Abrir el evento'**
+  String get homeOpenEvent;
+
+  /// No description provided for @homePreparePhase.
+  ///
+  /// In es, this message translates to:
+  /// **'Preparar la fase {number}'**
+  String homePreparePhase(int number);
+
+  /// No description provided for @homePrepareEvent.
+  ///
+  /// In es, this message translates to:
+  /// **'Preparar el evento'**
+  String get homePrepareEvent;
+
+  /// No description provided for @homeSeeLeague.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver la liga y sus fases'**
+  String get homeSeeLeague;
+
+  /// No description provided for @homeEnterEvent.
+  ///
+  /// In es, this message translates to:
+  /// **'Entrar al evento'**
+  String get homeEnterEvent;
+
+  /// No description provided for @homeOpenMyMat.
+  ///
+  /// In es, this message translates to:
+  /// **'Abrir mi tapiz {number}'**
+  String homeOpenMyMat(int number);
+
+  /// No description provided for @homeMat.
+  ///
+  /// In es, this message translates to:
+  /// **'Tapiz'**
+  String get homeMat;
+
+  /// No description provided for @homeRoleClub.
+  ///
+  /// In es, this message translates to:
+  /// **'Lo organizas tú'**
+  String get homeRoleClub;
+
+  /// No description provided for @homeRoleReferee.
+  ///
+  /// In es, this message translates to:
+  /// **'Árbitro'**
+  String get homeRoleReferee;
+
+  /// No description provided for @homeRoleRefereeMat.
+  ///
+  /// In es, this message translates to:
+  /// **'Árbitro del tapiz {number}'**
+  String homeRoleRefereeMat(int number);
+
+  /// No description provided for @homeRoleHelper.
+  ///
+  /// In es, this message translates to:
+  /// **'Ayudante'**
+  String get homeRoleHelper;
+
+  /// No description provided for @homeTasks.
+  ///
+  /// In es, this message translates to:
+  /// **'Tus tareas'**
+  String get homeTasks;
+
+  /// No description provided for @homeTasksMore.
+  ///
+  /// In es, this message translates to:
+  /// **'y {count} más'**
+  String homeTasksMore(int count);
+
+  /// No description provided for @homeTask.
+  ///
+  /// In es, this message translates to:
+  /// **'Tarea'**
+  String get homeTask;
+
+  /// No description provided for @homeTaskPending.
+  ///
+  /// In es, this message translates to:
+  /// **'Por decidir'**
+  String get homeTaskPending;
+
+  /// No description provided for @homeClubNote.
+  ///
+  /// In es, this message translates to:
+  /// **'Empieza el {date}. Hasta entonces puedes preparar inscripciones, grupos y tapices.'**
+  String homeClubNote(String date);
+
+  /// No description provided for @homeClubNoteToday.
+  ///
+  /// In es, this message translates to:
+  /// **'Es hoy. Empiézalo desde su panel cuando estéis listos; hasta entonces puedes preparar inscripciones, grupos y tapices.'**
+  String get homeClubNoteToday;
+
+  /// No description provided for @homeMatNote.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu tapiz se abre el {date}, cuando el club empiece la fase.'**
+  String homeMatNote(String date);
+
+  /// No description provided for @homeSeeAllFinished.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver los {count} finalizados'**
+  String homeSeeAllFinished(int count);
+
+  /// No description provided for @homeSeeFewerFinished.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver menos'**
+  String get homeSeeFewerFinished;
+
+  /// No description provided for @homeLeaguePhases.
+  ///
+  /// In es, this message translates to:
+  /// **'Liga de {count} fases'**
+  String homeLeaguePhases(int count);
+
+  /// No description provided for @homeEmptyTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Aún no tienes eventos'**
+  String get homeEmptyTitle;
+
+  /// No description provided for @homeEmptyOrganizer.
+  ///
+  /// In es, this message translates to:
+  /// **'Aquí aparecerán las ligas y competiciones que organices y aquellas en las que ayudes o arbitres.'**
+  String get homeEmptyOrganizer;
+
+  /// No description provided for @homeEmptyHelper.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuando un club te añada a una liga o una competición, aparecerá aquí con lo que puedes hacer en ella.'**
+  String get homeEmptyHelper;
+
+  /// No description provided for @homeCreateFirst.
+  ///
+  /// In es, this message translates to:
+  /// **'Crear el primer evento'**
+  String get homeCreateFirst;
+
+  /// No description provided for @homeChooseTask.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Qué quieres abrir?'**
+  String get homeChooseTask;
+
   /// No description provided for @newEventButton.
   ///
   /// In es, this message translates to:
@@ -1261,12 +1483,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Evento creado'**
   String get newEventDone;
-
-  /// No description provided for @eventsEmpty.
-  ///
-  /// In es, this message translates to:
-  /// **'No tienes eventos asignados.'**
-  String get eventsEmpty;
 
   /// No description provided for @roleClub.
   ///
@@ -4889,12 +5105,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Ver combates'**
   String get recordOpen;
-
-  /// No description provided for @openLeague.
-  ///
-  /// In es, this message translates to:
-  /// **'Abrir la liga'**
-  String get openLeague;
 
   /// No description provided for @podiumPreset.
   ///
