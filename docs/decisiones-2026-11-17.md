@@ -45,3 +45,4 @@
 - 2026-11-23 · GR-4: tablero «Grupos por tapiz» (columnas; móvil, en lista con «Mover»), solo grupos por acabar; permiso nuevo `MOVE_GROUPS` que abre ese tablero y mover grupos, sin el resto del panel · Raul.
 - 2026-11-23 · GR-1: marcador con parejas [+N|−N] a la vista, sumisión como botón propio (confirma), bandera solo avisos y descalificación; en esquina baja (móvil) 🏆 cuadrado junto a las parejas · Raul.
 - 2026-11-24 · Plantillas paso 1: oficiales en BD (sin dueño hasta decidirlo), mismos códigos que el enum; la fase siguiente del mismo deporte sigue en su versión · Claude.
+- 2026-11-26 · Imágenes Docker solo en `main`, `development` y tags `v*`; las PR ya no construyen imágenes y el compose completo pasa a correr antes de publicar · Raul (CI de las PR más corto).

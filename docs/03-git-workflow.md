@@ -22,8 +22,8 @@ Máximo 3 simultáneos, uno por tarea independiente (p. ej. backend y front del 
 `tipo(modulo): resumen` en inglés; tipos: feat, fix, refactor, perf, test, docs, build, ci, chore. Cuerpo solo si explica un porqué.
 
 ## CI (GitHub Actions)
-- En cada PR: build + tests backend (Maven), análisis y tests Flutter, tamaño de los MDs de `docs/`, y compose completo (despliegue, backup/restauración, rollback).
-- En `main`: imágenes multi-arch a GHCR con tag `latest`; en tags `vX.Y.Z`, con su versión.
+- En cada PR: build + tests backend (Maven), análisis y tests Flutter y tamaño de los MDs de `docs/`. Sin imágenes Docker.
+- Imágenes solo en push a `development` (tag `dev`), `main` (`latest`) y tags `vX.Y.Z` (su versión): antes de publicar, compose completo (despliegue, backup/restauración, rollback) y debug; si falla, no se publica.
 - Dependabot abre PRs semanales a `development` con actualizaciones (Maven, pub, Docker, Actions).
 - Secretos de CI en GitHub Secrets; nunca en el repo.
 
