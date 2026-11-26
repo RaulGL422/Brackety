@@ -328,7 +328,9 @@ class ScoreboardService {
                 now,
                 match.isInReview() ? review(match, pending, actors) : null,
                 match.getStatus() == Match.Status.PENDING
-                        ? writer.restedAt(match, event).filter(now::isBefore).orElse(null)
+                        ? writer.restedAt(match, event, competitors)
+                                .filter(now::isBefore)
+                                .orElse(null)
                         : null,
                 event.warningReasons(),
                 rules.scoring(),
