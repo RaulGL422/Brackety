@@ -8,8 +8,8 @@ import '../../l10n/gen/app_localizations.dart';
 import '../auth/data/api_error.dart';
 import '../club/data/mat_overview.dart';
 import '../club/state/club_providers.dart';
-import '../mat/data/mat_board.dart';
-import '../mat/ui/fighter_text.dart';
+import '../match/data/mat_board.dart';
+import '../match/ui/fighter_text.dart';
 import 'control_repository.dart';
 
 /// Runs one change of the control panel; says how it went. True if it was made.

@@ -21,7 +21,7 @@ import 'package:brackety/features/events/state/events_providers.dart';
 import 'package:brackety/features/importing/data/import_repository.dart';
 import 'package:brackety/features/league/data/league_models.dart';
 import 'package:brackety/features/league/state/league_providers.dart';
-import 'package:brackety/features/mat/data/mat_board.dart';
+import 'package:brackety/features/match/data/mat_board.dart';
 import 'package:brackety/features/staff/data/staff_repository.dart';
 import 'package:brackety/features/staff/data/temporary_access.dart';
 import 'package:brackety/l10n/gen/app_localizations.dart';

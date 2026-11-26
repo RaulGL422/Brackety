@@ -2,9 +2,9 @@ import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
-import '../data/match_view.dart';
-import '../data/scoring.dart';
-import 'corner_panel.dart';
+import '../../match/data/match_view.dart';
+import '../../match/data/scoring.dart';
+import '../../match/ui/corner.dart';
 
 /// What a corner's warnings menu or win button does: a warning, a disqualification or a [finish]
 /// (a sport's action that wins at once, by name).

@@ -1,7 +1,7 @@
 import 'package:brackety/features/auth/state/session_controller.dart';
 import 'package:brackety/features/mat/ui/mat_board_screen.dart';
-import 'package:brackety/features/offline/data/offline_op.dart';
-import 'package:brackety/features/scoreboard/data/match_view.dart';
+import 'package:brackety/features/match/data/match_view.dart';
+import 'package:brackety/features/match/data/offline_op.dart';
 import 'package:brackety/features/scoreboard/state/bell.dart';
 import 'package:brackety/features/scoreboard/ui/match_watch_screen.dart';
 import 'package:brackety/features/scoreboard/ui/scoreboard_screen.dart';

@@ -1,4 +1,4 @@
-import '../../mat/data/mat_board.dart';
+import 'mat_board.dart';
 import 'scoring.dart';
 
 enum Side { red, blue }

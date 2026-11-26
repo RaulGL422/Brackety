@@ -4,8 +4,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../auth/state/session_controller.dart';
-import '../../offline/data/offline_op.dart';
 import 'match_view.dart';
+import 'offline_op.dart';
 
 final scoreboardRepositoryProvider = Provider<ScoreboardRepository>(
   (ref) => ScoreboardRepository(ref.watch(apiProvider)),

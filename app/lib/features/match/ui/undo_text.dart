@@ -1,6 +1,6 @@
 import '../../../l10n/gen/app_localizations.dart';
 import '../data/match_view.dart';
-import 'corner_panel.dart';
+import 'corner.dart';
 
 /// What an undo of [entry] takes back, for its button and the message after it: "+2 Rojo".
 String undoTarget(AppLocalizations l10n, TimelineEntry entry) {

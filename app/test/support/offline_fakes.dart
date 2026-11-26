@@ -1,11 +1,11 @@
-import 'package:brackety/features/mat/data/mat_board.dart';
+import 'package:brackety/features/match/data/mat_board.dart';
+import 'package:brackety/features/match/data/match_view.dart';
+import 'package:brackety/features/match/data/offline_op.dart';
+import 'package:brackety/features/match/data/scoreboard_repository.dart';
+import 'package:brackety/features/match/data/scoring.dart';
 import 'package:brackety/features/offline/data/local_match.dart';
-import 'package:brackety/features/offline/data/offline_op.dart';
 import 'package:brackety/features/offline/data/offline_store.dart';
 import 'package:brackety/features/offline/state/offline_sync.dart';
-import 'package:brackety/features/scoreboard/data/match_view.dart';
-import 'package:brackety/features/scoreboard/data/scoreboard_repository.dart';
-import 'package:brackety/features/scoreboard/data/scoring.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/misc.dart';
 

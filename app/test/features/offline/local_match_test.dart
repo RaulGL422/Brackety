@@ -1,9 +1,9 @@
-import 'package:brackety/features/mat/data/mat_board.dart';
+import 'package:brackety/features/match/data/mat_board.dart';
+import 'package:brackety/features/match/data/match_state.dart';
+import 'package:brackety/features/match/data/match_view.dart';
+import 'package:brackety/features/match/data/offline_op.dart';
 import 'package:brackety/features/offline/data/local_board.dart';
 import 'package:brackety/features/offline/data/local_match.dart';
-import 'package:brackety/features/offline/data/offline_op.dart';
-import 'package:brackety/features/scoreboard/data/match_state.dart';
-import 'package:brackety/features/scoreboard/data/match_view.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/offline_fakes.dart';

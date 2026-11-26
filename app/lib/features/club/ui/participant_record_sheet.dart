@@ -5,9 +5,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/medal.dart';
 import '../../../l10n/gen/app_localizations.dart';
-import '../../mat/data/mat_board.dart';
-import '../../mat/ui/mat_label.dart';
-import '../../scoreboard/ui/undo_text.dart';
+import '../../match/data/mat_board.dart';
+import '../../match/ui/mat_label.dart';
+import '../../match/ui/undo_text.dart';
 import '../data/participant_record.dart';
 import '../state/club_providers.dart';
 

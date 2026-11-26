@@ -6,10 +6,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/polling.dart';
 import '../../auth/data/api_error.dart';
 import '../../auth/state/session_controller.dart';
-import '../../offline/data/local_board.dart';
-import '../../offline/state/offline_sync.dart';
-import '../../scoreboard/data/match_view.dart';
-import '../data/mat_board.dart';
+import '../../match/data/mat_board.dart';
+import '../../match/data/match_view.dart';
+import '../data/local_board.dart';
+import 'offline_sync.dart';
 
 /// The board follows its mat on the live socket: matches on other mats change what is
 /// available here too, so the server signals it for any change in the event.

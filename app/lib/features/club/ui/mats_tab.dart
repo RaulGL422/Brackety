@@ -8,7 +8,7 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../../control/control_ui.dart';
 import '../../events/data/my_event.dart';
 import '../../events/state/events_providers.dart';
-import '../../mat/state/mat_providers.dart';
+import '../../offline/state/board_providers.dart';
 import '../data/mat_overview.dart';
 import '../state/club_providers.dart';
 

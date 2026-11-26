@@ -1,4 +1,4 @@
-import 'package:brackety/features/server/data/server_store.dart';
+import 'package:brackety/features/auth/data/server_store.dart';
 
 class FakeServerStore implements ServerStore {
   String? url;

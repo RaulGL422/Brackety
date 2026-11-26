@@ -1,11 +1,11 @@
-import 'package:brackety/features/server/data/server_choice.dart';
-import 'package:brackety/features/server/state/server_providers.dart';
+import 'package:brackety/features/auth/data/server_choice.dart';
+import 'package:brackety/features/auth/state/server_providers.dart';
 import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/fakes.dart';
-import '../auth/auth_app.dart';
+import 'auth_app.dart';
 import 'server_fakes.dart';
 
 void main() {

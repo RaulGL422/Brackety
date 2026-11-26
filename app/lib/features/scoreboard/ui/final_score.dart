@@ -2,9 +2,9 @@ import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
-import '../../mat/ui/fighter_text.dart';
-import '../data/match_view.dart';
-import 'corner_panel.dart';
+import '../../match/data/match_view.dart';
+import '../../match/ui/corner.dart';
+import '../../match/ui/fighter_text.dart';
 
 /// Both fighters, one row each in their corner's colour; with [showWinner] the winner is
 /// marked (or the draw said).

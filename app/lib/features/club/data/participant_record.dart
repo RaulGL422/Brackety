@@ -1,4 +1,4 @@
-import '../../mat/data/mat_board.dart';
+import '../../match/data/mat_board.dart';
 import 'standing_row.dart';
 
 /// One participant's day: their standing row and every match they fight (with their team or as a

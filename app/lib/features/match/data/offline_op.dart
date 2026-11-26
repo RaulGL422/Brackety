@@ -1,4 +1,4 @@
-import '../../scoreboard/data/match_view.dart';
+import 'match_view.dart';
 
 /// A referee action waiting in the device's queue (docs/modulos/offline.md, "App (APK)").
 /// [knownEvents]: the non-automatic actions the device knew of this match before it.

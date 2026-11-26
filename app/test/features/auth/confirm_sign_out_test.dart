@@ -1,8 +1,10 @@
 import 'package:brackety/features/auth/state/session_controller.dart';
-import 'package:brackety/features/offline/data/offline_op.dart';
+import 'package:brackety/features/auth/ui/confirm_sign_out.dart';
+import 'package:brackety/features/match/data/match_view.dart';
+import 'package:brackety/features/match/data/offline_op.dart';
+import 'package:brackety/features/offline/data/offline_get_cache.dart';
+import 'package:brackety/features/offline/offline_registrations.dart';
 import 'package:brackety/features/offline/state/offline_sync.dart';
-import 'package:brackety/features/offline/ui/confirm_sign_out.dart';
-import 'package:brackety/features/scoreboard/data/match_view.dart';
 import 'package:brackety/l10n/gen/app_localizations.dart';
 import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
@@ -49,12 +51,16 @@ void main() {
     final server = FakeMatchServer([serverMatch('m1')], clock)..down = true;
     await tester.pumpWidget(
       ProviderScope(
-        overrides: offlineOverrides(
-          store: store,
-          clock: clock,
-          repository: server,
-          auth: auth,
-        ),
+        overrides: [
+          ...offlineOverrides(
+            store: store,
+            clock: clock,
+            repository: server,
+            auth: auth,
+          ),
+          // As `main` does: the queue's count reaches auth only through them.
+          ...offlineRegistrations(),
+        ],
         child: MaterialApp(
           builder: (_, child) => ToastHost(child: child!),
           theme: lightTheme(),
@@ -114,6 +120,17 @@ void main() {
       expect(store.docs, isEmpty);
     });
   }
+
+  testWidgets('the offline copy of the lists is on every API call', (
+    tester,
+  ) async {
+    final container = await pump(tester, sizes['phone']!);
+
+    expect(
+      container.read(apiProvider).interceptors.whereType<OfflineGetCache>(),
+      hasLength(1),
+    );
+  });
 
   testWidgets('signing out with nothing waiting does not ask', (tester) async {
     final container = await pump(tester, sizes['phone']!);

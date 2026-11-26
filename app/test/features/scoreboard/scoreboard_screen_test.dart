@@ -1,10 +1,10 @@
 import 'package:brackety/core/keep_screen_on.dart';
-import 'package:brackety/features/mat/data/mat_board.dart';
+import 'package:brackety/features/match/data/mat_board.dart';
+import 'package:brackety/features/match/data/match_view.dart';
+import 'package:brackety/features/match/data/offline_op.dart';
+import 'package:brackety/features/match/data/scoreboard_repository.dart';
+import 'package:brackety/features/match/data/scoring.dart';
 import 'package:brackety/features/offline/data/local_match.dart';
-import 'package:brackety/features/offline/data/offline_op.dart';
-import 'package:brackety/features/scoreboard/data/match_view.dart';
-import 'package:brackety/features/scoreboard/data/scoreboard_repository.dart';
-import 'package:brackety/features/scoreboard/data/scoring.dart';
 import 'package:brackety/features/scoreboard/state/bell.dart';
 import 'package:brackety/features/scoreboard/ui/corner_buttons.dart';
 import 'package:brackety/features/scoreboard/ui/scoreboard_screen.dart';

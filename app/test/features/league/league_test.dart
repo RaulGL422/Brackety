@@ -12,7 +12,7 @@ import 'package:brackety/features/league/ui/league_settings_dialog.dart';
 import 'package:brackety/features/league/ui/league_tab.dart';
 import 'package:brackety/features/league/ui/phase_switcher.dart';
 import 'package:brackety/features/league/ui/reenrol_dialog.dart';
-import 'package:brackety/features/mat/data/mat_board.dart';
+import 'package:brackety/features/match/data/mat_board.dart';
 import 'package:brackety/l10n/gen/app_localizations.dart';
 import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';

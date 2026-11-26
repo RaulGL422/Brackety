@@ -1,4 +1,4 @@
-import 'package:brackety/features/server/data/server_choice.dart';
+import 'package:brackety/features/auth/data/server_choice.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

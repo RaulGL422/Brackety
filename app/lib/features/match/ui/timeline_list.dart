@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
-import '../../mat/ui/fighter_text.dart';
 import '../data/match_view.dart';
+import 'fighter_text.dart';
 import 'undo_text.dart';
 
 /// Every action of a match, oldest first: who, what, when and at which match time. For the

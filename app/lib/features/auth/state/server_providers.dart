@@ -3,8 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 
-import '../../auth/state/session_controller.dart';
 import '../data/server_store.dart';
+import 'session_controller.dart';
 
 /// Only the Android app picks its server; the web talks to the one it was built for (or came from).
 final serverSelectableProvider = Provider<bool>((ref) => !kIsWeb);

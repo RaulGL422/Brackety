@@ -1,7 +1,7 @@
 import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 
-import '../../../l10n/gen/app_localizations.dart';
+import '../l10n/gen/app_localizations.dart';
 
 /// Asks for confirmation and a reason before a warning or disqualification; null if cancelled.
 /// [suggestions]: the event's warning reasons (F1-4). One tap on one gives it at once; a destructive action

@@ -2,8 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/polling.dart';
-import '../data/match_view.dart';
-import '../data/scoreboard_repository.dart';
+import '../../match/data/match_view.dart';
+import '../../match/data/scoreboard_repository.dart';
 
 /// The live topic of one match's scoreboard.
 Set<String> matchTopics(String matchId) => {'match:$matchId'};

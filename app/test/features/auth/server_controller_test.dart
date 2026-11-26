@@ -1,6 +1,6 @@
+import 'package:brackety/features/auth/data/server_choice.dart';
+import 'package:brackety/features/auth/state/server_providers.dart';
 import 'package:brackety/features/auth/state/session_controller.dart';
-import 'package:brackety/features/server/data/server_choice.dart';
-import 'package:brackety/features/server/state/server_providers.dart';
 import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';

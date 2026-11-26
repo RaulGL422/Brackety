@@ -4,14 +4,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/keep_screen_on.dart';
+import '../../../core/reason_dialog.dart';
 import '../../../core/up_button.dart';
 import '../../../l10n/gen/app_localizations.dart';
-import '../../mat/state/mat_providers.dart';
-import '../../mat/ui/fighter_text.dart';
-import '../../mat/ui/mat_label.dart';
+import '../../match/data/match_state.dart';
+import '../../match/data/match_view.dart';
+import '../../match/ui/fighter_text.dart';
+import '../../match/ui/mat_label.dart';
+import '../../match/ui/timeline_list.dart';
+import '../../match/ui/undo_text.dart';
+import '../../offline/state/board_providers.dart';
 import '../../offline/ui/sync_status_icon.dart';
-import '../data/match_state.dart';
-import '../data/match_view.dart';
 import '../state/bell.dart';
 import '../state/match_controller.dart';
 import 'clock_bar.dart';
@@ -19,9 +22,6 @@ import 'corner_buttons.dart';
 import 'corner_panel.dart';
 import 'final_score.dart';
 import 'match_corrections.dart';
-import 'reason_dialog.dart';
-import 'timeline_list.dart';
-import 'undo_text.dart';
 
 /// How long the "undone" message stays.
 const undoneNotice = Duration(seconds: 3);

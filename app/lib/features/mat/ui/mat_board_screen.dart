@@ -13,14 +13,14 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../../control/control_ui.dart';
 import '../../events/data/my_event.dart';
 import '../../events/state/events_providers.dart';
+import '../../match/data/mat_board.dart';
+import '../../match/data/match_view.dart';
+import '../../match/ui/fighter_text.dart';
+import '../../offline/state/board_providers.dart';
 import '../../offline/ui/sync_status_icon.dart';
 import '../../phase/ui/phase_bar.dart';
 import '../../rulebook/rulebook_ui.dart';
-import '../../scoreboard/data/match_view.dart';
 import '../../scoreboard/ui/match_corrections.dart';
-import '../data/mat_board.dart';
-import '../state/mat_providers.dart';
-import 'fighter_text.dart';
 
 /// The referee's mat: what to do now first (the match in progress, the next one), then
 /// what comes later, what is finished and the groups on it.
