@@ -7,6 +7,7 @@ import 'package:brackety/features/auth/data/account_api.dart';
 import 'package:brackety/features/auth/data/auth_api.dart';
 import 'package:brackety/features/auth/data/refresh_token_store.dart';
 import 'package:brackety/features/auth/data/registration.dart';
+import 'package:brackety/features/auth/state/account_controller.dart';
 import 'package:brackety/features/auth/state/session_controller.dart';
 import 'package:brackety/features/events/data/my_event.dart';
 import 'package:brackety/features/events/state/events_providers.dart';
@@ -428,4 +429,27 @@ MyEvent helperEvent(Set<EventPermission> permissions) => MyEvent(
   date: DateTime(2026, 11, 14),
   roles: const {EventRole.grouper},
   permissions: permissions,
+);
+
+/// The signed-in account is [account], without asking the server.
+Override accountOverride(Account account) =>
+    accountProvider.overrideWith(() => _FixedAccount(account));
+
+class _FixedAccount extends AccountController {
+  _FixedAccount(this.account);
+
+  final Account account;
+
+  @override
+  Future<Account?> build() async => account;
+}
+
+/// A club's account: it organizes, so it may create events.
+final clubAccount = testAccount(
+  profiles: const [
+    AccountProfile(
+      type: ProfileType.club,
+      organizationName: 'Club Yoseikan Sevilla',
+    ),
+  ],
 );

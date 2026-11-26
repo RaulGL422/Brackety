@@ -22,11 +22,27 @@ class EventControllerTest extends EventApiTest {
                 .andExpect(jsonPath("$[0].roles", contains("CLUB")))
                 .andExpect(jsonPath("$[0].matId").doesNotExist())
                 .andExpect(jsonPath("$[0].leagueName").isNotEmpty())
-                .andExpect(jsonPath("$[0].phaseNumber").value(1));
+                .andExpect(jsonPath("$[0].phaseNumber").value(1))
+                .andExpect(jsonPath("$[0].phaseState").value("IN_PROGRESS"));
         call(get("/api/v1/events"), "arbitro3")
                 .andExpect(jsonPath("$[0].roles", contains("REFEREE")))
                 .andExpect(jsonPath("$[0].matNumber").value(3));
         call(get("/api/v1/events"), "ayudante1").andExpect(jsonPath("$[0].roles", contains("GROUPER")));
+    }
+
+    @Test
+    void myEventsSaysWhetherEachPhaseHasStartedOrFinished() throws Exception {
+        jdbc.sql("update event set started_at = null where id = ?")
+                .param(eventId)
+                .update();
+        call(get("/api/v1/events"), "arbitro3")
+                .andExpect(jsonPath("$[0].phaseState").value("NOT_STARTED"));
+
+        jdbc.sql("update event set started_at = now(), finished_at = now() where id = ?")
+                .param(eventId)
+                .update();
+        call(get("/api/v1/events"), "ayudante1")
+                .andExpect(jsonPath("$[0].phaseState").value("FINISHED"));
     }
 
     @Test

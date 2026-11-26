@@ -2,6 +2,20 @@ import 'measure_rules.dart';
 
 enum EventRole { club, grouper, referee }
 
+/// Whether the club has started or finished a phase; an older server's events have not started.
+enum PhaseState {
+  notStarted('NOT_STARTED'),
+  inProgress('IN_PROGRESS'),
+  finished('FINISHED');
+
+  const PhaseState(this.wire);
+
+  final String wire;
+
+  static PhaseState fromWire(Object? wire) =>
+      values.where((s) => s.wire == wire).firstOrNull ?? notStarted;
+}
+
 /// What a helper or referee may do in an event, as the club chose (F1-7 C); the club may do all.
 enum EventPermission {
   view('VIEW'),
@@ -44,6 +58,7 @@ class MyEvent {
     String? leagueName,
     this.phaseNumber = 1,
     this.measures = const MeasureRules(),
+    this.phaseState = PhaseState.notStarted,
   }) : leagueId = leagueId ?? id,
        leagueName = leagueName ?? name;
 
@@ -69,6 +84,7 @@ class MyEvent {
           MeasureRequirement.fromJson(json['heightRequirement']) ??
           MeasureRequirement.optional,
     ),
+    phaseState: PhaseState.fromWire(json['phaseState']),
   );
 
   final String id;
@@ -111,4 +127,6 @@ class MyEvent {
 
   /// Whether weight and height are asked (its own choice or its sport's).
   final MeasureRules measures;
+
+  final PhaseState phaseState;
 }

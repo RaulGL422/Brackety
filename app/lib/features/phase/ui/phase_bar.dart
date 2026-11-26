@@ -119,6 +119,8 @@ class PhaseBar extends ConsumerWidget {
       );
     }
     ref.invalidate(phaseProvider(eventId));
+    // «Mis eventos» sorts by the phase's state: on the way back it shows where it moved.
+    ref.invalidate(myEventsProvider);
   }
 }
 

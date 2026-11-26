@@ -2,19 +2,16 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../auth/state/session_controller.dart';
+import '../../events/data/my_event.dart';
 
-enum PhaseState { notStarted, inProgress, finished }
+export '../../events/data/my_event.dart' show PhaseState;
 
 /// A phase is started, played and finished (F1-7); finished, nobody changes it until the club reopens it.
 class Phase {
   const Phase({required this.state, this.pendingMatches = 0});
 
   factory Phase.fromJson(Map<String, dynamic> json) => Phase(
-    state: switch (json['state']) {
-      'IN_PROGRESS' => PhaseState.inProgress,
-      'FINISHED' => PhaseState.finished,
-      _ => PhaseState.notStarted,
-    },
+    state: PhaseState.fromWire(json['state']),
     pendingMatches: json['pendingMatches'] as int? ?? 0,
   );
 
