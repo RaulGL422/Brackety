@@ -102,13 +102,14 @@ class GroupService {
         access.require(eventId, accountId, READ_CATEGORIES);
         var event = events.get(eventId);
         var grouped = roster.groupedIds(eventId);
+        var byCategory = roster.byCategory(event);
         var teamNumbers = directory.teamNumbers(eventId);
         var realTeams = teams.findByEventId(eventId).stream()
                 .filter(t -> !t.isGhost())
                 .collect(Collectors.groupingBy(Team::getCategoryId, Collectors.counting()));
         return categories.findByEventIdOrderByMinAge(eventId).stream()
                 .map(c -> {
-                    var ids = roster.inCategory(event, c).stream()
+                    var ids = byCategory.getOrDefault(c.getId(), List.<Participant>of()).stream()
                             .map(Participant::getId)
                             .toList();
                     return new CategorySummary(

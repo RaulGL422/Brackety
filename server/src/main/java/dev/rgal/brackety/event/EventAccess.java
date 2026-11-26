@@ -58,12 +58,21 @@ public class EventAccess {
         if (roles.isEmpty() || roles.contains(EventRole.CLUB)) {
             return EventPermission.defaults(roles);
         }
-        return jdbc.sql("select permissions from event_staff_permissions where event_id = ? and account_id = ?")
-                .params(eventId, accountId)
-                .query(String.class)
-                .optional()
-                .map(EventAccess::parse)
-                .orElseGet(() -> EventPermission.defaults(roles));
+        return permissions(
+                roles,
+                jdbc.sql("select permissions from event_staff_permissions where event_id = ? and account_id = ?")
+                        .params(eventId, accountId)
+                        .query(String.class)
+                        .optional()
+                        .map(EventAccess::parse)
+                        .orElse(null));
+    }
+
+    /** The same rule with the club's choice already read: {@code saved} is null while it has not chosen. */
+    public static Set<EventPermission> permissions(Set<EventRole> roles, Set<EventPermission> saved) {
+        return roles.isEmpty() || roles.contains(EventRole.CLUB) || saved == null
+                ? EventPermission.defaults(roles)
+                : saved;
     }
 
     public void setPermissions(UUID eventId, UUID accountId, Set<EventPermission> permissions) {
@@ -78,6 +87,17 @@ public class EventAccess {
         return jdbc
                 .sql("select account_id, permissions from event_staff_permissions where event_id = ?")
                 .params(eventId)
+                .query((rs, row) -> Map.entry(rs.getObject(1, UUID.class), parse(rs.getString(2))))
+                .list()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    /** The choices the clubs made for this account, by event. */
+    public Map<UUID, Set<EventPermission>> savedPermissionsOf(UUID accountId) {
+        return jdbc
+                .sql("select event_id, permissions from event_staff_permissions where account_id = ?")
+                .params(accountId)
                 .query((rs, row) -> Map.entry(rs.getObject(1, UUID.class), parse(rs.getString(2))))
                 .list()
                 .stream()

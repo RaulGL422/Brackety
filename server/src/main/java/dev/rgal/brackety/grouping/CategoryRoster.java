@@ -7,6 +7,7 @@ import dev.rgal.brackety.event.EventException;
 import dev.rgal.brackety.event.MeasureRequirement;
 import dev.rgal.brackety.participant.Participant;
 import dev.rgal.brackety.participant.ParticipantRepository;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,10 +49,20 @@ class CategoryRoster {
     }
 
     List<Participant> inCategory(Event event, EventCategory category) {
+        return byCategory(event).getOrDefault(category.getId(), List.of());
+    }
+
+    /** Every participant by the id of their category, by name: one read whatever the number of categories. */
+    Map<UUID, List<Participant>> byCategory(Event event) {
         var all = categories.findByEventIdOrderByMinAge(event.getId());
-        return participants.findByEventIdOrderByFirstNameAscLastNameAsc(event.getId()).stream()
-                .filter(p -> isIn(event, category, all, p))
-                .toList();
+        var result = new HashMap<UUID, List<Participant>>();
+        for (var participant : participants.findByEventIdOrderByFirstNameAscLastNameAsc(event.getId())) {
+            participant
+                    .categoryIn(event, all)
+                    .ifPresent(c -> result.computeIfAbsent(c.getId(), k -> new ArrayList<>())
+                            .add(participant));
+        }
+        return result;
     }
 
     void requireAllIn(Event event, EventCategory category, Collection<UUID> ids) {

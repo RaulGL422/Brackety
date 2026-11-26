@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -74,18 +75,20 @@ public class EventService {
                         Collectors.mapping(
                                 EventStaff::getRole, Collectors.toCollection(() -> EnumSet.noneOf(EventRole.class)))));
         var leagueNames = new HashMap<UUID, String>();
+        var saved = access.savedPermissionsOf(accountId);
+        // Their first mat in each event, by number.
+        var matByEvent = new HashMap<UUID, Mat>();
+        mats.findByRefereeAccountIdOrderByNumber(accountId).forEach(m -> matByEvent.putIfAbsent(m.getEventId(), m));
         return events.findAllById(rolesByEvent.keySet()).stream()
                 .sorted(Comparator.comparing(Event::getEventDate).reversed())
                 .map(event -> {
-                    var mat = mats.findByEventIdOrderByNumber(event.getId()).stream()
-                            .filter(m -> accountId.equals(m.getRefereeAccountId()))
-                            .findFirst();
+                    var mat = Optional.ofNullable(matByEvent.get(event.getId()));
                     return new MyEventResponse(
                             event.getId(),
                             event.getName(),
                             event.getEventDate(),
                             rolesByEvent.get(event.getId()),
-                            access.permissions(event.getId(), accountId, rolesByEvent.get(event.getId())),
+                            EventAccess.permissions(rolesByEvent.get(event.getId()), saved.get(event.getId())),
                             mat.map(Mat::getId).orElse(null),
                             mat.map(Mat::getNumber).orElse(null),
                             event.getLeagueId(),
@@ -226,6 +229,7 @@ public class EventService {
 
     private EventSettingsResponse settings(Event event) {
         var names = staffNames.names(event.getId());
+        var saved = access.savedPermissions(event.getId());
         var rolesByAccount = staff.findByEventId(event.getId()).stream()
                 .collect(Collectors.groupingBy(
                         EventStaff::getAccountId, Collectors.mapping(EventStaff::getRole, Collectors.toList())));
@@ -238,7 +242,7 @@ public class EventService {
                         a.getEmail(),
                         names.get(a.getId()),
                         rolesByAccount.get(a.getId()).stream().sorted().toList(),
-                        access.permissions(event.getId(), a.getId(), EnumSet.copyOf(rolesByAccount.get(a.getId())))))
+                        EventAccess.permissions(EnumSet.copyOf(rolesByAccount.get(a.getId())), saved.get(a.getId()))))
                 .toList();
         var referees = people.stream()
                 .filter(p -> p.permissions().contains(EventPermission.OWN_MAT))

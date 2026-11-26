@@ -51,6 +51,8 @@ Estados: **pendiente** · **en curso** · **en pruebas** (hecho; falta la prueba
 | Modelo de datos | `producto/modelo-datos.md` | M1 y M2a-c hechos; falta M2d; M3-M6 en la etapa 3 |
 | CI por componentes | `producto/calidad.md` | cerrado (#124) |
 | Auditoría y plan de limpieza | `producto/auditoria-codigo.md` | L0 en curso |
+| Seguridad, rendimiento, BD y endpoints | `producto/auditoria-seguridad.md` | en curso (`chore/hardening`) |
+| M3: individual = entrada de 1 | `producto/m3-entradas.md` | diseño; migración tras el 20-12 |
 | Servidor: banner y estado al arrancar | `09-despliegue.md` | en pruebas (#128) |
 | Debug: compilación numerada y `CHANGELOG.md` | `09-despliegue.md` | en pruebas (#197) |
 | Actualización obligatoria (web y admin) | `01-arquitectura.md` | en pruebas (#200) |
