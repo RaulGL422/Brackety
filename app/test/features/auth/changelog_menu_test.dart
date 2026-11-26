@@ -22,7 +22,7 @@ void main() {
       ],
     );
 
-    await tester.tap(find.byTooltip('My account'));
+    await tester.tap(find.byTooltip('Account'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Changes (debug)'));
     await tester.pumpAndSettle();
@@ -33,7 +33,7 @@ void main() {
   testWidgets('elsewhere the menu does not offer it', (tester) async {
     await pumpAuthApp(tester, FakeAuthApi(signedIn: true));
 
-    await tester.tap(find.byTooltip('My account'));
+    await tester.tap(find.byTooltip('Account'));
     await tester.pumpAndSettle();
 
     expect(find.text('Changes (debug)'), findsNothing);

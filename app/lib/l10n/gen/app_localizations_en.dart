@@ -1890,10 +1890,31 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get settingsTitle => 'Account settings';
+  String get settingsTitle => 'My account';
 
   @override
-  String get settingsAccount => 'Account';
+  String get appSettingsTitle => 'App settings';
+
+  @override
+  String get menuAccountHint => 'Email, profiles, sign-in and your data';
+
+  @override
+  String get menuAppSettingsHint => 'Language, appearance and version';
+
+  @override
+  String get accountGroupAccess => 'Sign-in';
+
+  @override
+  String get accountGroupWho => 'Who you are in Brackety';
+
+  @override
+  String get accountGroupPrivacy => 'Privacy and data';
+
+  @override
+  String get appGroupAbout => 'About Brackety';
+
+  @override
+  String get settingsAccount => 'Email';
 
   @override
   String get settingsEmailVerified => 'Verified';
@@ -2746,10 +2767,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsAppearanceHint =>
-      'Automatic follows the device\'s light or dark mode. It is saved on this device only.';
+      'System follows the device\'s light or dark mode. It is saved on this device only.';
 
   @override
-  String get themeSystem => 'Automatic';
+  String get themeSystem => 'System';
 
   @override
   String get themeLight => 'Light';
@@ -2773,7 +2794,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reasonApplyDisqualify => 'Disqualify';
 
   @override
-  String get accountMenu => 'My account';
+  String get accountMenu => 'Account';
 
   @override
   String get back => 'Back';

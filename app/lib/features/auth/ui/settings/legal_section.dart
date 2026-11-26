@@ -1,4 +1,3 @@
-import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/gen/app_localizations.dart';
@@ -20,10 +19,6 @@ class LegalSection extends StatelessWidget {
             title: legalTitle(l10n, type),
             onTap: () => openLegalPage(context, type),
           ),
-        _LinkTile(
-          title: CoreLocalizations.of(context).licenses,
-          onTap: () => showLicensePage(context: context),
-        ),
       ],
     );
   }

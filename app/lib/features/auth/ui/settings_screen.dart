@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:brackety_core/brackety_core.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -11,16 +9,14 @@ import '../data/account.dart';
 import '../data/api_error.dart';
 import '../state/account_controller.dart';
 import 'settings/account_section.dart';
-import 'settings/appearance_section.dart';
-import 'settings/connection_tile.dart';
 import 'settings/data_sections.dart';
-import 'settings/language_section.dart';
 import 'settings/legal_section.dart';
 import 'settings/profiles_section.dart';
+import 'settings/settings_section.dart';
 import 'settings/sign_in_methods_section.dart';
 import 'widgets/form_message.dart';
 
-/// Account settings. They need the server (Offline rule): without it, an error and a retry.
+/// «Mi cuenta»: what belongs to the account. It needs the server (Offline rule): without it, an error and a retry.
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
@@ -66,6 +62,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 }
 
+/// What belongs to the account wherever it signs in; the device's own choices are in
+/// «Ajustes de la app» (Raul, 2026-11-26).
 class _Sections extends StatelessWidget {
   const _Sections({required this.account});
 
@@ -73,41 +71,30 @@ class _Sections extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const gap = SizedBox(height: AppSpacing.l);
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // One column, as wide as a form, centred on large windows.
-        final side = max(
-          AppSpacing.l,
-          (constraints.maxWidth - AppSizes.formMaxWidth) / 2,
-        );
-        return ListView(
-          padding: EdgeInsets.symmetric(
-            horizontal: side,
-            vertical: AppSpacing.l,
-          ),
+    final l10n = AppLocalizations.of(context);
+    return SettingsList(
+      children: [
+        SettingsGroup(
+          title: l10n.accountGroupAccess,
           children: [
             AccountSection(account: account),
-            gap,
-            LanguageSection(locale: account.locale),
-            gap,
-            ProfilesSection(account: account),
-            gap,
             SignInMethodsSection(account: account),
-            gap,
-            const AppearanceSection(),
-            gap,
-            const ExportSection(),
-            gap,
-            const LegalSection(),
-            gap,
-            const ConnectionTile(),
-            const DangerZoneSection(),
-            gap,
-            const LogoutButton(),
           ],
-        );
-      },
+        ),
+        SettingsGroup(
+          title: l10n.accountGroupWho,
+          children: [ProfilesSection(account: account)],
+        ),
+        SettingsGroup(
+          title: l10n.accountGroupPrivacy,
+          children: const [
+            ExportSection(),
+            LegalSection(),
+            DangerZoneSection(),
+          ],
+        ),
+        const LogoutButton(),
+      ],
     );
   }
 }
