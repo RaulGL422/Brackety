@@ -24,6 +24,11 @@ services:
     image: ghcr.io/raulgl422/brackety-api:${IMAGE_TAG:-latest}
     build: ../server
     restart: unless-stopped
+    # The JVM takes 75 % of what it sees (Dockerfile): without a limit that is the whole Pi (16 GB), and under load
+    # the kernel would kill PostgreSQL first. db has no limit on purpose: it is what this protects.
+    deploy:
+      resources:
+        limits: { memory: 4G }
     depends_on:
       db:
         condition: service_healthy
