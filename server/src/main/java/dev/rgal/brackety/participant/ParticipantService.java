@@ -85,6 +85,7 @@ public class ParticipantService {
         if ((changesCategory && participants.isInAGroupOrTeam(participantId))
                 || (changesBirthDate && participants.isPersonInAGroupOrTeam(participant.getPersonId()))) {
             throw EventException.conflict(
+                    "PARTICIPANT_LOCKED",
                     "The birth date and category cannot change once the participant is in a group or team.");
         }
         return save(participant, request);
@@ -102,7 +103,8 @@ public class ParticipantService {
         access.require(eventId, accountId, EventPermission.PARTICIPANTS);
         var participant = find(eventId, participantId);
         if (participants.isInAGroupOrTeam(participantId)) {
-            throw EventException.conflict("A participant in a group or team cannot be removed.");
+            throw EventException.conflict(
+                    "PARTICIPANT_IN_GROUP", "A participant in a group or team cannot be removed.");
         }
         participants.delete(participant);
         // Their only entry: nothing of the student stays behind.
@@ -121,7 +123,7 @@ public class ParticipantService {
     private ParticipantResponse save(Participant participant, ParticipantRequest request) {
         var event = events.get(participant.getEventId());
         if (event.ageOf(request.birthDate()) < ADULT_AGE && !request.guardianConsent()) {
-            throw EventException.invalid("A minor needs the guardian's consent.");
+            throw EventException.invalid("GUARDIAN_CONSENT_REQUIRED", "A minor needs the guardian's consent.");
         }
         var eventCategories = categories.findByEventIdOrderByMinAge(event.getId());
         if (request.categoryId() != null

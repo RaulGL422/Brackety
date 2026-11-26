@@ -5,17 +5,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
+import '../../events/data/club_repository.dart';
 import '../../events/data/my_event.dart';
+import '../../events/data/participant.dart';
+import '../../events/state/club_providers.dart';
 import '../../events/state/events_providers.dart';
+import '../../events/ui/measure_fields.dart';
+import '../../events/ui/participant_record_sheet.dart';
 import '../../importing/data/import_repository.dart';
 import '../../league/ui/reenrol_dialog.dart';
-import '../data/club_repository.dart';
-import '../data/participant.dart';
-import '../state/club_providers.dart';
 import 'club_panel_screen.dart';
-import 'measure_fields.dart';
 import 'participant_form.dart';
-import 'participant_record_sheet.dart';
 
 /// The students entered in the event, by name; add, edit or delete them.
 class ParticipantsTab extends ConsumerWidget {

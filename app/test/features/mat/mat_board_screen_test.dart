@@ -1,6 +1,6 @@
-import 'package:brackety/features/mat/data/mat_board.dart';
-import 'package:brackety/features/mat/state/mat_providers.dart';
 import 'package:brackety/features/mat/ui/mat_board_screen.dart';
+import 'package:brackety/features/match/data/mat_board.dart';
+import 'package:brackety/features/offline/state/board_providers.dart';
 import 'package:brackety/l10n/gen/app_localizations.dart';
 import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';

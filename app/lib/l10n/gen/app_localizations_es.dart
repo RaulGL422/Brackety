@@ -3803,4 +3803,151 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get legalFooterLabel => 'Textos legales';
+
+  @override
+  String get errorAlreadyGrouped =>
+      'Alguien ya está en un grupo o equipo: quítalo de ahí antes.';
+
+  @override
+  String get errorCategoryAgesInverted =>
+      'La edad mínima de una categoría es mayor que la máxima.';
+
+  @override
+  String get errorCategoryAgesOverlap =>
+      'Dos categorías comparten edades: cada edad va a una sola.';
+
+  @override
+  String get errorCategoryInUse =>
+      'Esa categoría ya tiene grupos o equipos: no se puede quitar.';
+
+  @override
+  String get errorCategoryOnlyName =>
+      'Esa categoría ya tiene grupos o equipos: solo se puede cambiar su nombre.';
+
+  @override
+  String get errorConsentRequired =>
+      'Acepta las condiciones actuales de la importación para seguir.';
+
+  @override
+  String get errorDateLocked =>
+      'Ya hay grupos o equipos: la fecha no puede cambiar, porque fija la edad y la categoría de cada uno.';
+
+  @override
+  String get errorExportFilterNotANumber =>
+      'Un filtro de números tiene algo que no es un número.';
+
+  @override
+  String get errorExportRepeatedColumn => 'Hay una columna repetida.';
+
+  @override
+  String get errorExportUnknownColumn =>
+      'Una columna ya no existe: vuelve a elegir las columnas.';
+
+  @override
+  String get errorExportUnknownSheet => 'Esa hoja ya no existe: elige otra.';
+
+  @override
+  String get errorGroupSize =>
+      'El grupo no tiene el tamaño de su categoría (comodines incluidos) o no tiene a nadie que no sea comodín.';
+
+  @override
+  String get errorGroupSizeInverted =>
+      'El grupo más pequeño de una categoría es mayor que el más grande.';
+
+  @override
+  String get errorGuardianConsentRequired =>
+      'Falta el consentimiento del tutor legal de un menor.';
+
+  @override
+  String get errorImportFileCount => 'Envía entre 1 y 10 archivos.';
+
+  @override
+  String get errorImportFileSize => 'Cada archivo puede tener hasta 10 MB.';
+
+  @override
+  String get errorImportFileType =>
+      'Solo fotos (JPG, PNG, WebP), CSV, TXT o Excel.';
+
+  @override
+  String get errorImportTooManyRows =>
+      'Como mucho 200 personas por importación: divide la lista.';
+
+  @override
+  String get errorInvitationOtherEmail =>
+      'Esta invitación es para otro email: entra con la cuenta que la recibió.';
+
+  @override
+  String get errorLengthLocked =>
+      'Hay un combate en curso: la duración no puede cambiar hasta que acabe.';
+
+  @override
+  String get errorMatchNotInReview =>
+      'Ese combate ya no espera revisión: alguien la ha resuelto.';
+
+  @override
+  String get errorMatchStale =>
+      'El combate ha cambiado en otro dispositivo: revisa el marcador y vuelve a intentarlo.';
+
+  @override
+  String get errorMatHasIndividual =>
+      'Este tapiz tiene antes combates individuales por jugar.';
+
+  @override
+  String get errorNoRefereeOnMats =>
+      'Ningún tapiz tiene árbitro todavía: asigna uno en Configuración.';
+
+  @override
+  String get errorOrganizationDuplicate => 'Dos clubes tienen el mismo nombre.';
+
+  @override
+  String get errorOrganizationInUse =>
+      'Ese club tiene inscritos: no se puede quitar.';
+
+  @override
+  String get errorParticipantInGroup =>
+      'Está en un grupo o equipo: no se puede quitar.';
+
+  @override
+  String get errorParticipantLocked =>
+      'Ya está en un grupo o equipo: su fecha de nacimiento y su categoría no pueden cambiar.';
+
+  @override
+  String get errorPhaseAlreadyStarted => 'La fase ya ha comenzado.';
+
+  @override
+  String get errorPhaseNotFinished => 'La fase aún no está finalizada.';
+
+  @override
+  String get errorPodiumTwice => 'Una categoría tiene dos podios.';
+
+  @override
+  String get errorPointsLimitLocked =>
+      'Ya hay combates empezados: el límite de puntos y la superioridad no pueden cambiar.';
+
+  @override
+  String get errorReenrolInvalid =>
+      'Alguien no está en otra fase de la liga o ya está inscrito.';
+
+  @override
+  String get errorRefereeGone => 'Ese árbitro ya no está en el evento.';
+
+  @override
+  String get errorRefereeWithoutMat => 'Ese árbitro ya no tiene tapiz.';
+
+  @override
+  String get errorRulebookNotPdf => 'El reglamento tiene que ser un PDF.';
+
+  @override
+  String get errorRulebookTooLarge => 'El reglamento puede tener hasta 10 MB.';
+
+  @override
+  String get errorTeamAlreadyGrouped => 'Ese equipo ya está en un grupo.';
+
+  @override
+  String get errorTeamInGroup =>
+      'Ese equipo está en un grupo: no se puede deshacer.';
+
+  @override
+  String get errorFighterResting =>
+      'Alguien de este combate aún está descansando.';
 }

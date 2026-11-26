@@ -8,15 +8,15 @@ import '../../../core/up_button.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../events/data/my_event.dart';
 import '../../events/state/events_providers.dart';
-import '../../mat/data/mat_board.dart';
-import '../../mat/ui/mat_label.dart';
+import '../../match/data/mat_board.dart';
+import '../../match/data/match_view.dart';
+import '../../match/ui/mat_label.dart';
+import '../../match/ui/timeline_list.dart';
 import '../../offline/state/offline_sync.dart';
-import '../data/match_view.dart';
 import '../state/match_review.dart';
 import 'clock_bar.dart';
 import 'final_score.dart';
 import 'review_panel.dart';
-import 'timeline_list.dart';
 
 /// A match seen by the club or a helper: score and timeline, without controls. In review, what the
 /// phone sent and, for whoever resolves reviews, the buttons to apply or discard it.

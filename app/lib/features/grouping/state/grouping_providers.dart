@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/polling.dart';
-import '../../club/state/club_providers.dart';
+import '../../events/state/club_providers.dart';
 import '../data/grouping_models.dart';
 import '../data/grouping_repository.dart';
 import 'helper_queue.dart';

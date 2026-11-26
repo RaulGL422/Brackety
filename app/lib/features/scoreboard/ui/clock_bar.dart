@@ -5,12 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
-import '../../mat/data/mat_board.dart';
-import '../data/match_view.dart';
+import '../../match/data/mat_board.dart';
+import '../../match/data/match_view.dart';
+import '../../match/ui/timeline_list.dart';
+import '../../match/ui/undo_text.dart';
 import '../state/bell.dart';
 import '../state/match_controller.dart';
-import 'timeline_list.dart';
-import 'undo_text.dart';
 
 /// The last seconds show in the warning colour, and the clapper knocks once when they start.
 const clockWarningFrom = Duration(seconds: 10);

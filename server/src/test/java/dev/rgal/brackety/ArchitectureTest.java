@@ -56,6 +56,16 @@ class ArchitectureTest {
             .dependOnClassesThat()
             .resideInAPackage("dev.rgal.brackety.demo..");
 
+    // Without a locale, a server in Turkish lower-cases "I" to a dotless "ı": names stop matching (duplicates in an
+    // import, warning reasons) and "MULTIPART" stops being multipart.
+    @ArchTest
+    static final ArchRule caseChangesNameTheirLocale = noClasses()
+            .should()
+            .callMethod(String.class, "toLowerCase")
+            .orShould()
+            .callMethod(String.class, "toUpperCase")
+            .because("String.toLowerCase(Locale.ROOT) gives the same result on every server");
+
     // Also inside ResponseEntity, Optional or List.
     private static ArchCondition<JavaMethod> notReturnAnEntity() {
         return new ArchCondition<>("not return a JPA entity") {

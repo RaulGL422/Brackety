@@ -7,6 +7,8 @@ esa sección pasa a llamarse como la versión. Debug enseña su compilación jun
 ## Sin publicar (en debug)
 
 ### Nuevo
+- Los rechazos del servidor (fecha bloqueada, categoría en uso, reglamento que no es PDF…) dicen el motivo concreto en tu idioma, en vez de «No se pudo guardar» (#207).
+- La pestaña del panel del club va en la dirección (`…/club/mats`): recargar la web o volver de otra pantalla abre la misma pestaña (#207).
 - Registro, «Revisa tu email», contraseña olvidada, nueva contraseña, enlace caducado y entrar con QR rediseñados: tipo de cuenta en desplegable, requisitos de contraseña que se marcan al escribir, aviso de cuántas cosas faltan y textos más claros.
 - Textos legales rediseñados: resumen al principio, índice «En esta página», letra más grande, tablas legibles en el móvil y la versión como fecha. «Han cambiado los textos» marca lo que ya has leído y nombra los textos que aceptas.
 - Pantalla de entrada (y las demás sin sesión) rediseñada: sin barra, título y textos más claros, pie legal ordenado y la versión aparte; mejoras de accesibilidad (#204).

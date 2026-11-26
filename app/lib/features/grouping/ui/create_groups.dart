@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
 import '../../auth/data/api_error.dart';
-import '../../mat/ui/mat_label.dart';
+import '../../match/ui/mat_label.dart';
 import '../../phase/ui/phase_bar.dart';
 import '../data/grouping_repository.dart';
 import '../state/group_draft.dart';

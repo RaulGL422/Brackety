@@ -1,5 +1,5 @@
-import 'package:brackety/features/scoreboard/data/match_view.dart';
-import 'package:brackety/features/scoreboard/data/scoring.dart';
+import 'package:brackety/features/match/data/match_view.dart';
+import 'package:brackety/features/match/data/scoring.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/match_fakes.dart';

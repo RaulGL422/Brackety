@@ -25,7 +25,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * The rules an imported row must pass, the same as registering by hand plus what a list adds
@@ -55,7 +59,7 @@ final class ImportValidator {
             LocalDate today) {
         var existing = registered.stream()
                 .map(p -> key(p.getFirstName(), p.getLastName(), p.getBirthDate()))
-                .toList();
+                .collect(Collectors.toSet());
         var firstRowOf = new HashMap<String, Integer>();
         var result = new ArrayList<CheckedRow>();
         for (int i = 0; i < rows.size(); i++) {
@@ -64,34 +68,14 @@ final class ImportValidator {
             name(row.firstName(), "firstName", MAX_FIRST_NAME, errors);
             name(row.lastName(), "lastName", MAX_LAST_NAME, errors);
             var date = birthDate(row, today, errors);
-            if (row.heightCm() != null && (row.heightCm() < MIN_HEIGHT || row.heightCm() > MAX_HEIGHT)) {
-                errors.add(new RowIssue(
-                        "heightCm", HEIGHT_OUT_OF_RANGE, row.heightCm().toString()));
-            }
-            if (row.sex() == null) {
-                errors.add(RowIssue.of("sex", MISSING));
-            }
-            if (row.weightKg() != null
-                    && (row.weightKg().compareTo(MIN_WEIGHT) < 0
-                            || row.weightKg().compareTo(MAX_WEIGHT) > 0
-                            || row.weightKg().scale() > 1)) {
-                errors.add(new RowIssue(
-                        "weightKg", WEIGHT_OUT_OF_RANGE, row.weightKg().toPlainString()));
-            }
+            sexAndMeasures(row, errors);
             Integer age = date == null ? null : event.ageOf(date);
             var byAge = age == null ? Optional.<EventCategory>empty() : byAge(categories, age);
             var indicated = indicated(categories, row.categoryText());
             var category = category(row, categories, byAge, indicated, age, errors);
 
             if (date != null && row.firstName() != null && row.lastName() != null) {
-                var key = key(row.firstName(), row.lastName(), date);
-                if (existing.contains(key)) {
-                    errors.add(RowIssue.of("firstName", ALREADY_REGISTERED));
-                }
-                var first = firstRowOf.putIfAbsent(key, i);
-                if (first != null) {
-                    errors.add(new RowIssue("firstName", DUPLICATE_IN_LIST, String.valueOf(first + 1)));
-                }
+                duplicates(key(row.firstName(), row.lastName(), date), i, existing, firstRowOf, errors);
             }
             var warnings = row.unsure().stream()
                     .map(field -> RowIssue.of(field, UNSURE))
@@ -116,6 +100,35 @@ final class ImportValidator {
             errors.add(RowIssue.of(field, MISSING));
         } else if (value.strip().length() > max) {
             errors.add(RowIssue.of(field, TOO_LONG));
+        }
+    }
+
+    private static void sexAndMeasures(ImportRow row, List<RowIssue> errors) {
+        if (row.heightCm() != null && (row.heightCm() < MIN_HEIGHT || row.heightCm() > MAX_HEIGHT)) {
+            errors.add(
+                    new RowIssue("heightCm", HEIGHT_OUT_OF_RANGE, row.heightCm().toString()));
+        }
+        if (row.sex() == null) {
+            errors.add(RowIssue.of("sex", MISSING));
+        }
+        if (row.weightKg() != null
+                && (row.weightKg().compareTo(MIN_WEIGHT) < 0
+                        || row.weightKg().compareTo(MAX_WEIGHT) > 0
+                        || row.weightKg().scale() > 1)) {
+            errors.add(
+                    new RowIssue("weightKg", WEIGHT_OUT_OF_RANGE, row.weightKg().toPlainString()));
+        }
+    }
+
+    // Already in the event, or earlier in this same list (the club sees which line).
+    private static void duplicates(
+            String key, int index, Set<String> existing, Map<String, Integer> firstRowOf, List<RowIssue> errors) {
+        if (existing.contains(key)) {
+            errors.add(RowIssue.of("firstName", ALREADY_REGISTERED));
+        }
+        var first = firstRowOf.putIfAbsent(key, index);
+        if (first != null) {
+            errors.add(new RowIssue("firstName", DUPLICATE_IN_LIST, String.valueOf(first + 1)));
         }
     }
 
@@ -197,7 +210,7 @@ final class ImportValidator {
     private static String plain(String text) {
         return Normalizer.normalize(text.strip(), Normalizer.Form.NFD)
                 .replaceAll("\\p{M}", "")
-                .toLowerCase()
+                .toLowerCase(Locale.ROOT)
                 .replaceAll("\\s+", " ");
     }
 }

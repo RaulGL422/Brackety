@@ -44,7 +44,7 @@ class EventOrganizationService {
         var names = new HashSet<String>();
         for (var o : requested) {
             if (!names.add(o.name().strip().toLowerCase(Locale.ROOT))) {
-                throw EventException.invalid("Two organizations have the same name.");
+                throw EventException.invalid("ORGANIZATION_DUPLICATE", "Two organizations have the same name.");
             }
         }
         var current = organizations.findByEventIdOrderByName(eventId).stream()
@@ -58,7 +58,8 @@ class EventOrganizationService {
         }
         var removed = current.keySet().stream().filter(id -> !kept.contains(id)).toList();
         if (removed.stream().anyMatch(new HashSet<>(organizations.findInUse(eventId))::contains)) {
-            throw EventException.conflict("An organization with participants cannot be removed.");
+            throw EventException.conflict(
+                    "ORGANIZATION_IN_USE", "An organization with participants cannot be removed.");
         }
         organizations.deleteAllById(removed);
         organizations.flush();

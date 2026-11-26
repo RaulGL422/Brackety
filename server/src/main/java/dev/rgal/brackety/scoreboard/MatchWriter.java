@@ -4,6 +4,7 @@ import dev.rgal.brackety.event.Event;
 import dev.rgal.brackety.event.EventPhase;
 import dev.rgal.brackety.grouping.Competitor;
 import dev.rgal.brackety.grouping.CompetitorDirectory;
+import dev.rgal.brackety.grouping.Competitors;
 import dev.rgal.brackety.grouping.Match;
 import dev.rgal.brackety.grouping.MatchRepository;
 import dev.rgal.brackety.participant.ParticipantRepository;
@@ -193,10 +194,14 @@ class MatchWriter {
 
     /** When every fighter of {@code match} has had the least rest since their last other match; empty if none. */
     Optional<Instant> restedAt(Match match, Event event) {
+        return match.isRestWaived() ? Optional.empty() : restedAt(match, event, directory.of(match.getEventId()));
+    }
+
+    /** The same, with the event's competitors already read. */
+    Optional<Instant> restedAt(Match match, Event event, Competitors competitors) {
         if (match.isRestWaived()) {
             return Optional.empty();
         }
-        var competitors = directory.of(match.getEventId());
         var fighters = competitors.participants(match.getRedId(), match.getBlueId());
         var minRest = Duration.ofSeconds(event.modality().getMinRestSeconds());
         return matches.findByEventId(match.getEventId()).stream()

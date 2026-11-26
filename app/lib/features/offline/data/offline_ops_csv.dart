@@ -1,5 +1,5 @@
-import '../../scoreboard/data/match_view.dart';
-import 'offline_op.dart';
+import '../../match/data/match_view.dart';
+import '../../match/data/offline_op.dart';
 
 /// The actions a device could not send, as a file the club imports (docs/modulos/offline.md,
 /// "Rescate"). Read by the server's `OfflineOpsCsv`: same header, version and columns.

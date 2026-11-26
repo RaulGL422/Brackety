@@ -7,11 +7,11 @@ import 'package:intl/intl.dart';
 
 import '../../../core/medal.dart';
 import '../../../l10n/gen/app_localizations.dart';
-import '../../club/data/club_repository.dart';
-import '../../club/ui/export_download.dart';
-import '../../club/ui/participant_record_sheet.dart';
+import '../../events/data/club_repository.dart';
 import '../../events/data/my_event.dart';
 import '../../events/state/events_providers.dart';
+import '../../events/ui/export_download.dart';
+import '../../events/ui/participant_record_sheet.dart';
 import '../data/league_models.dart';
 import '../state/league_providers.dart';
 import 'league_settings_dialog.dart';

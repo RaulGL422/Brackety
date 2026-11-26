@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
 import '../../auth/ui/widgets/birth_date_field.dart';
-import '../../club/data/sex.dart';
-import '../../club/ui/measure_fields.dart';
+import '../../events/data/sex.dart';
+import '../../events/ui/measure_fields.dart';
 import '../data/import_models.dart';
 
 /// Edits a row of the list, or adds one when [row] is null. Returns the row, or null if cancelled.

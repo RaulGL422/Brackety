@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/error_codes.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../events/data/settings_input.dart';
 import '../../events/state/events_providers.dart';
 import '../data/league_models.dart';
 import '../data/league_repository.dart';
@@ -34,8 +36,6 @@ class _NewEventDialogState extends ConsumerState<_NewEventDialog> {
   var _date = DateUtils.dateOnly(DateTime.now());
   String? _sport;
   var _saving = false;
-
-  static const maxMats = 20;
 
   @override
   void dispose() {
@@ -139,7 +139,11 @@ class _NewEventDialogState extends ConsumerState<_NewEventDialog> {
     } on DioException catch (e) {
       if (mounted) setState(() => _saving = false);
       toasts.show(
-        e.response?.statusCode == 400 ? l10n.saveInvalid : l10n.saveError,
+        errorMessage(
+          l10n,
+          e,
+          e.response?.statusCode == 400 ? l10n.saveInvalid : l10n.saveError,
+        ),
         kind: ToastKind.error,
       );
     }

@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/download/file_download.dart';
 import '../../../l10n/gen/app_localizations.dart';
-import '../../scoreboard/ui/timeline_list.dart';
+import '../../match/ui/timeline_list.dart';
 import '../data/offline_ops_csv.dart';
 import '../state/offline_sync.dart';
 

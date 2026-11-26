@@ -81,7 +81,8 @@ public class DebugSnapshots {
                 .query(String.class)
                 .single();
         if (!saved.split(";", -1)[0].equals(version())) {
-            throw EventException.conflict("Saved with another version of the database: its tables do not match.");
+            throw EventException.conflict(
+                    "SNAPSHOT_OTHER_VERSION", "Saved with another version of the database: its tables do not match.");
         }
         transactions.executeWithoutResult(status -> {
             var tables = DebugData.appTables(jdbc);

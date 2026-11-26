@@ -29,13 +29,10 @@ public class EventException extends ErrorResponseException {
         return exception;
     }
 
-    public static EventException conflict(String detail) {
-        return new EventException(HttpStatus.CONFLICT, detail);
-    }
-
-    // The code lets the app react without parsing the detail.
+    // The code lets the app react without parsing the detail, and say it in the user's language. Every conflict
+    // has one: the user can always cause it (ErrorCodesTranslatedTest keeps the app's texts in step).
     public static EventException conflict(String code, String detail) {
-        var exception = conflict(detail);
+        var exception = new EventException(HttpStatus.CONFLICT, detail);
         exception.getBody().setProperty("code", code);
         return exception;
     }

@@ -6,7 +6,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/storage/browser_storage.dart';
-import '../../offline/data/offline_get_cache.dart';
 import '../data/account_api.dart';
 import '../data/auth_api.dart';
 import '../data/refresh_token_store.dart';
@@ -257,6 +256,10 @@ class SessionController extends Notifier<SessionState> {
   }
 }
 
+/// What other features add to every API call: `main` registers the offline copy of the lists
+/// (`offlineRegistrations`), so auth does not depend on them.
+final apiInterceptorsProvider = Provider<List<Interceptor>>((ref) => const []);
+
 /// Dio for the API with the access token; on a 401 it refreshes once and repeats the request.
 final apiProvider = Provider<Dio>((ref) {
   final base = ref.watch(dioProvider);
@@ -296,6 +299,6 @@ final apiProvider = Provider<Dio>((ref) {
       },
     ),
   );
-  dio.interceptors.add(OfflineGetCache(ref));
+  dio.interceptors.addAll(ref.watch(apiInterceptorsProvider));
   return dio;
 });

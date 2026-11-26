@@ -1,5 +1,5 @@
 import 'package:brackety/features/events/state/events_providers.dart';
-import 'package:brackety/features/events/ui/events_screen.dart';
+import 'package:brackety/features/home/ui/events_screen.dart';
 import 'package:brackety/features/league/data/league_models.dart';
 import 'package:brackety/features/league/data/league_repository.dart';
 import 'package:brackety/l10n/gen/app_localizations.dart';

@@ -7,8 +7,9 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import 'app.dart';
 import 'features/appearance/data/theme_store.dart';
 import 'features/appearance/state/theme_mode_provider.dart';
-import 'features/server/data/server_store.dart';
-import 'features/server/state/server_providers.dart';
+import 'features/auth/data/server_store.dart';
+import 'features/auth/state/server_providers.dart';
+import 'features/offline/offline_registrations.dart';
 
 Future<void> main() async {
   ensureApiConfigured();
@@ -24,6 +25,7 @@ Future<void> main() async {
     ProviderScope(
       overrides: [
         ...serverOverrides(savedServer),
+        ...offlineRegistrations(),
         savedThemeModeProvider.overrideWithValue(savedTheme),
       ],
       child: const BracketyApp(),

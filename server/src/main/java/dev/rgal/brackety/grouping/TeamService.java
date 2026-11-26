@@ -155,7 +155,7 @@ class TeamService {
                 .filter(t -> t.getEventId().equals(eventId) && !t.isGhost())
                 .orElseThrow(EventException::notFound);
         if (!groupMembers.findByTeamIdIn(List.of(teamId)).isEmpty()) {
-            throw EventException.conflict("A team in a group cannot be removed.");
+            throw EventException.conflict("TEAM_IN_GROUP", "A team in a group cannot be removed.");
         }
         teams.delete(team);
     }

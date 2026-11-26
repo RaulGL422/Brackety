@@ -1,5 +1,5 @@
-import '../../mat/data/mat_board.dart';
-import '../../scoreboard/data/match_view.dart';
+import '../../match/data/mat_board.dart';
+import '../../match/data/match_view.dart';
 
 /// [board] (from the server, or from the cache when [MatBoard.offline]) with what the device
 /// knows on top: [local] are the matches as the device shows them, [inReview] the ones waiting

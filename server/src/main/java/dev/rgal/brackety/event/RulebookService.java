@@ -58,10 +58,10 @@ public class RulebookService {
     @Transactional
     public void put(UUID eventId, String fileName, byte[] content) {
         if (content.length > MAX_BYTES) {
-            throw EventException.invalid("The rulebook can be up to 10 MB.");
+            throw EventException.invalid("RULEBOOK_TOO_LARGE", "The rulebook can be up to 10 MB.");
         }
         if (content.length < PDF_MAGIC.length || !Arrays.equals(Arrays.copyOf(content, PDF_MAGIC.length), PDF_MAGIC)) {
-            throw EventException.invalid("The rulebook must be a PDF.");
+            throw EventException.invalid("RULEBOOK_NOT_PDF", "The rulebook must be a PDF.");
         }
         rulebooks.save(new Rulebook(eventId, name(fileName), content, clock.instant()));
     }

@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -74,18 +75,20 @@ public class EventService {
                         Collectors.mapping(
                                 EventStaff::getRole, Collectors.toCollection(() -> EnumSet.noneOf(EventRole.class)))));
         var leagueNames = new HashMap<UUID, String>();
+        var saved = access.savedPermissionsOf(accountId);
+        // Their first mat in each event, by number.
+        var matByEvent = new HashMap<UUID, Mat>();
+        mats.findByRefereeAccountIdOrderByNumber(accountId).forEach(m -> matByEvent.putIfAbsent(m.getEventId(), m));
         return events.findAllById(rolesByEvent.keySet()).stream()
                 .sorted(Comparator.comparing(Event::getEventDate).reversed())
                 .map(event -> {
-                    var mat = mats.findByEventIdOrderByNumber(event.getId()).stream()
-                            .filter(m -> accountId.equals(m.getRefereeAccountId()))
-                            .findFirst();
+                    var mat = Optional.ofNullable(matByEvent.get(event.getId()));
                     return new MyEventResponse(
                             event.getId(),
                             event.getName(),
                             event.getEventDate(),
                             rolesByEvent.get(event.getId()),
-                            access.permissions(event.getId(), accountId, rolesByEvent.get(event.getId())),
+                            EventAccess.permissions(rolesByEvent.get(event.getId()), saved.get(event.getId())),
                             mat.map(Mat::getId).orElse(null),
                             mat.map(Mat::getNumber).orElse(null),
                             event.getLeagueId(),
@@ -130,51 +133,52 @@ public class EventService {
         access.require(eventId, accountId, EventRole.CLUB);
         // Locked like a match's first start: no match starts while the rules change.
         var event = lock(eventId);
-        var referees = refereeIds(eventId);
-        var assigned = request.matReferees().stream().filter(Objects::nonNull).toList();
-        if (!referees.containsAll(assigned)) {
+        var referees = request.matReferees();
+        requireEventReferees(eventId, referees);
+        // The date sets every participant's age, and so the category their group was made for.
+        if (!request.date().equals(event.getEventDate()) && events.hasGroupsOrTeams(eventId)) {
+            throw EventException.conflict("DATE_LOCKED", "The date cannot change once there are groups or teams.");
+        }
+        var rules = NewRules.of(event.modality(), request);
+        requireRulesCanChange(eventId, event.modality(), rules);
+        var current = mats.findByEventIdOrderByNumber(eventId);
+        requireMatsCanChange(current, referees);
+        event.update(
+                request.name().strip(),
+                request.date(),
+                Objects.requireNonNullElse(request.attendancePoints(), event.getAttendancePoints()),
+                rules.individual(),
+                rules.team(),
+                rules.minRestSeconds(),
+                rules.superiorityGap());
+        updateMats(eventId, current, referees);
+        return settings(event);
+    }
+
+    private void requireEventReferees(UUID eventId, List<UUID> matReferees) {
+        var assigned = matReferees.stream().filter(Objects::nonNull).toList();
+        if (!refereeIds(eventId).containsAll(assigned)) {
             throw EventException.invalid("Only the event's referees can be assigned to a mat.");
         }
         if (new HashSet<>(assigned).size() != assigned.size()) {
             throw EventException.invalid("A referee can only be on one mat.");
         }
-        // The date sets every participant's age, and so the category their group was made for.
-        if (!request.date().equals(event.getEventDate()) && events.hasGroupsOrTeams(eventId)) {
-            throw EventException.conflict("The date cannot change once there are groups or teams.");
-        }
-        var modality = event.modality();
-        var individual = new Modality.FormatRules(
-                Objects.requireNonNullElse(
-                        request.matchSeconds(), modality.individual().matchSeconds()),
-                Objects.requireNonNullElse(
-                        request.pointsLimit(), modality.individual().pointsLimit()));
-        var team = new Modality.FormatRules(
-                Objects.requireNonNullElse(
-                        request.teamMatchSeconds(), modality.team().matchSeconds()),
-                Objects.requireNonNullElse(
-                        request.teamPointsLimit(), modality.team().pointsLimit()));
-        var minRestSeconds = Objects.requireNonNullElse(request.minRestSeconds(), modality.getMinRestSeconds());
-        var superiorityGap = Objects.requireNonNullElse(
-                request.superiorityGap(), modality.scoring().superiorityGap());
-        if ((individual.matchSeconds() != modality.individual().matchSeconds()
-                        || team.matchSeconds() != modality.team().matchSeconds())
-                && events.hasMatchIn(eventId, "IN_PROGRESS")) {
-            throw EventException.conflict("The match length cannot change while a match is in progress.");
+    }
+
+    private void requireRulesCanChange(UUID eventId, Modality modality, NewRules rules) {
+        if (rules.changeLength(modality) && events.hasMatchIn(eventId, "IN_PROGRESS")) {
+            throw EventException.conflict(
+                    "LENGTH_LOCKED", "The match length cannot change while a match is in progress.");
         }
         // A disqualification scores the limit for the rival: started matches keep the one they had.
-        if ((individual.pointsLimit() != modality.individual().pointsLimit()
-                        || team.pointsLimit() != modality.team().pointsLimit()
-                        || superiorityGap != modality.scoring().superiorityGap())
-                && events.hasStartedMatches(eventId)) {
-            throw EventException.conflict("The points limit cannot change once a match has started.");
+        if (rules.changeHowAMatchEnds(modality) && events.hasStartedMatches(eventId)) {
+            throw EventException.conflict(
+                    "POINTS_LIMIT_LOCKED", "The points limit cannot change once a match has started.");
         }
-        var current = mats.findByEventIdOrderByNumber(eventId);
-        if (!current.stream().map(Mat::getRefereeAccountId).toList().equals(request.matReferees())) {
-            matSync.changed(eventId);
-        }
-        var removed = current.size() > request.matReferees().size()
-                ? current.subList(request.matReferees().size(), current.size())
-                : List.<Mat>of();
+    }
+
+    private void requireMatsCanChange(List<Mat> current, List<UUID> matReferees) {
+        var removed = removed(current, matReferees);
         if (!removed.isEmpty()
                 && events.hasGroupsOnMats(removed.stream().map(Mat::getId).toList())) {
             // Its groups say where they were played: a mat that is done goes out of use instead (Raul, 2026-11-18).
@@ -182,35 +186,34 @@ public class EventService {
                     "MAT_HAS_GROUPS", "A mat with groups cannot be removed: disable it in the control panel.");
         }
         // Nobody would ever play the matches of a mat left without its referee (Raul, 2026-11-13).
-        for (int i = 0; i < Math.min(current.size(), request.matReferees().size()); i++) {
+        for (int i = 0; i < Math.min(current.size(), matReferees.size()); i++) {
             var mat = current.get(i);
-            if (request.matReferees().get(i) == null
+            if (matReferees.get(i) == null
                     && mat.getRefereeAccountId() != null
                     && events.hasMatchesToPlayOn(mat.getId())) {
                 throw EventException.conflict(
                         "MAT_HAS_MATCHES", "Mat " + mat.getNumber() + " has matches to play: it needs its referee.");
             }
         }
-        var attendancePoints =
-                request.attendancePoints() != null ? request.attendancePoints() : event.getAttendancePoints();
-        event.update(
-                request.name().strip(),
-                request.date(),
-                attendancePoints,
-                individual,
-                team,
-                minRestSeconds,
-                superiorityGap);
-        for (int i = 0; i < request.matReferees().size(); i++) {
-            var referee = request.matReferees().get(i);
+    }
+
+    // Mat i + 1 gets referee i: new mats at the end, the last ones go when the list is shorter.
+    private void updateMats(UUID eventId, List<Mat> current, List<UUID> matReferees) {
+        if (!current.stream().map(Mat::getRefereeAccountId).toList().equals(matReferees)) {
+            matSync.changed(eventId);
+        }
+        for (int i = 0; i < matReferees.size(); i++) {
             if (i < current.size()) {
-                current.get(i).assignReferee(referee);
+                current.get(i).assignReferee(matReferees.get(i));
             } else {
-                mats.save(new Mat(eventId, i + 1, referee));
+                mats.save(new Mat(eventId, i + 1, matReferees.get(i)));
             }
         }
-        mats.deleteAll(removed);
-        return settings(event);
+        mats.deleteAll(removed(current, matReferees));
+    }
+
+    private static List<Mat> removed(List<Mat> current, List<UUID> matReferees) {
+        return current.size() > matReferees.size() ? current.subList(matReferees.size(), current.size()) : List.of();
     }
 
     /** Puts someone who may referee their mat on mat {@code number}, as the settings do (staff QR access). */
@@ -226,6 +229,7 @@ public class EventService {
 
     private EventSettingsResponse settings(Event event) {
         var names = staffNames.names(event.getId());
+        var saved = access.savedPermissions(event.getId());
         var rolesByAccount = staff.findByEventId(event.getId()).stream()
                 .collect(Collectors.groupingBy(
                         EventStaff::getAccountId, Collectors.mapping(EventStaff::getRole, Collectors.toList())));
@@ -238,7 +242,7 @@ public class EventService {
                         a.getEmail(),
                         names.get(a.getId()),
                         rolesByAccount.get(a.getId()).stream().sorted().toList(),
-                        access.permissions(event.getId(), a.getId(), EnumSet.copyOf(rolesByAccount.get(a.getId())))))
+                        EventAccess.permissions(EnumSet.copyOf(rolesByAccount.get(a.getId())), saved.get(a.getId()))))
                 .toList();
         var referees = people.stream()
                 .filter(p -> p.permissions().contains(EventPermission.OWN_MAT))

@@ -4,11 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/medal.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../events/data/event_category.dart';
+import '../../events/data/standing_row.dart';
+import '../../events/state/club_providers.dart';
+import '../../events/ui/participant_record_sheet.dart';
 import '../../league/state/league_providers.dart';
-import '../data/event_category.dart';
-import '../data/standing_row.dart';
-import '../state/club_providers.dart';
-import 'participant_record_sheet.dart';
 
 enum StandingsOrder { points, name }
 

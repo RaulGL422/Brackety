@@ -2,14 +2,9 @@ import 'package:brackety_core/brackety_core.dart';
 import 'package:flutter/material.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
-import '../../mat/ui/fighter_text.dart';
-import '../data/match_view.dart';
-
-CompetitorColor cornerColor(Side side) =>
-    side == Side.red ? CompetitorColor.red : CompetitorColor.blue;
-
-String cornerName(AppLocalizations l10n, Side side) =>
-    side == Side.red ? l10n.cornerRed : l10n.cornerBlue;
+import '../../match/data/match_view.dart';
+import '../../match/ui/corner.dart';
+import '../../match/ui/fighter_text.dart';
 
 /// One fighter: big score and the [buttons] below. Red and blue are fixed for this event.
 /// Every line but the score keeps to one line, so it fits with the text at 200 %.
