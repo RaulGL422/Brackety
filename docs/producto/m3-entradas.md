@@ -34,6 +34,7 @@ Hoy lo vigilan `group_member_real_uk` y `team_member_real_uk`. Con M3 una person
 - Crear grupo: un solo flujo. Para individuales crea (o reutiliza) sus entradas y sigue el camino de equipos. `POST …/groups` acepta `entryIds` + `ghostEntryIds`; durante una versión sigue aceptando `participantIds`/`teamIds` (móviles con caché vieja).
 - Marcador, tablero, control, planificador, hojas y paquete: `getRedId()`/`getBlueId()` ya devuelven el id del competidor; pasan a `entry`. Desaparecen las ramas por tipo.
 - App: `participantId`/`teamId` en los DTO del combate y del grupo → `entryId`; nombre y miembros vienen del servidor.
+- Se dividen con M3 (no antes, sería trabajo doble): `AdminEventService` (SQL sobre `team_member`/`group_member`), `EventPackageService`, `EventResultsTransfer`, `MatPlanner.simulate`, `MatBoardService.board`, `MatFloor.load`: los métodos largos del servidor que quedan.
 
 ## Migración (Flyway, una sola, con test)
 1. Crear `entry` por cada `team` (mismo id: no cambian enlaces ni paquetes) y por cada inscrito que esté en algún `group_member` o combate.
