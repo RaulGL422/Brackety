@@ -65,6 +65,47 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
     }
   }
 
+  /// The link expired or was already used: why, and how to get another.
+  Widget _expiredPage(AppLocalizations l10n) => AuthFormPage(
+    title: l10n.resetLinkExpiredTitle,
+    children: [
+      FormMessage.error(l10n.resetLinkExpired),
+      const SizedBox(height: AppSpacing.l),
+      Text(l10n.resetLinkExpiredNext),
+      const SizedBox(height: AppSpacing.xl),
+      FilledButton(
+        onPressed: () => context.go('/forgot-password'),
+        child: Text(l10n.resetRequestNew),
+      ),
+      const SizedBox(height: AppSpacing.s),
+      TextButton(
+        onPressed: () => context.go('/login'),
+        child: Text(l10n.forgotBackToLogin),
+      ),
+    ],
+  );
+
+  Widget _confirmationField(AppLocalizations l10n) => PasswordField(
+    controller: _confirmation,
+    label: l10n.resetConfirmPassword,
+    helper: ListenableBuilder(
+      listenable: Listenable.merge([_password, _confirmation]),
+      builder: (context, _) {
+        // Only once there is something to compare: an empty field does not «match».
+        final matches =
+            _confirmation.text.isNotEmpty &&
+            _confirmation.text == _password.text;
+        return matches
+            ? PasswordRule(met: true, text: l10n.passwordRuleMatch)
+            : const SizedBox.shrink();
+      },
+    ),
+    autofillHints: const [AutofillHints.newPassword],
+    textInputAction: TextInputAction.done,
+    onSubmitted: (_) => _submit(),
+    validator: (value) => value == _password.text ? null : l10n.resetMismatch,
+  );
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -72,19 +113,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
     final linkValid = _invalidLink
         ? const AsyncData(false)
         : ref.watch(resetLinkValidProvider(widget.token!));
-    if (linkValid case AsyncData(value: false)) {
-      return AuthFormPage(
-        title: l10n.resetTitle,
-        children: [
-          FormMessage.error(l10n.linkInvalid),
-          const SizedBox(height: AppSpacing.l),
-          FilledButton(
-            onPressed: () => context.go('/forgot-password'),
-            child: Text(l10n.resetRequestNew),
-          ),
-        ],
-      );
-    }
+    if (linkValid case AsyncData(value: false)) return _expiredPage(l10n);
     if (linkValid.isLoading) {
       return AuthFormPage(
         title: l10n.resetTitle,
@@ -93,40 +122,22 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
     }
     return AuthFormPage(
       title: l10n.resetTitle,
+      subtitle: l10n.resetSubtitle,
+      error: error,
       children: [
-        Form(
-          key: _formKey,
-          child: AutofillGroup(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                PasswordField(
-                  controller: _password,
-                  label: l10n.resetNewPassword,
-                  helperText: l10n.passwordHint,
-                  autofillHints: const [AutofillHints.newPassword],
-                  textInputAction: TextInputAction.next,
-                  validator: (value) => validateNewPassword(l10n, value),
-                ),
-                const SizedBox(height: AppSpacing.m),
-                PasswordField(
-                  controller: _confirmation,
-                  label: l10n.resetConfirmPassword,
-                  autofillHints: const [AutofillHints.newPassword],
-                  textInputAction: TextInputAction.done,
-                  onSubmitted: (_) => _submit(),
-                  validator: (value) =>
-                      value == _password.text ? null : l10n.resetMismatch,
-                ),
-              ],
+        AutofillForm(
+          formKey: _formKey,
+          children: [
+            NewPasswordField(
+              controller: _password,
+              label: l10n.resetNewPassword,
+              textInputAction: TextInputAction.next,
             ),
-          ),
+            const SizedBox(height: AppSpacing.l),
+            _confirmationField(l10n),
+          ],
         ),
-        if (error != null) ...[
-          const SizedBox(height: AppSpacing.m),
-          FormMessage.error(error),
-        ],
-        const SizedBox(height: AppSpacing.l),
+        const SizedBox(height: AppSpacing.xl),
         FilledButton(
           onPressed: _busy ? null : _submit,
           child: Text(l10n.resetSubmit),

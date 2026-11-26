@@ -42,7 +42,7 @@ void main() {
 
     expect(find.text('The link is invalid or has expired.'), findsOneWidget);
     expect(find.text('Go to sign in'), findsOneWidget);
-    expect(find.text('Resend email'), findsNothing);
+    expect(find.text('Resend the email'), findsNothing);
   });
 
   testWidgets('an invalid link signed in offers to resend', (tester) async {
@@ -53,7 +53,7 @@ void main() {
 
     expect(find.text('The link is invalid or has expired.'), findsOneWidget);
     // One in the banner, one on the page.
-    expect(find.text('Resend email'), findsNWidgets(2));
+    expect(find.text('Resend the email'), findsNWidgets(2));
   });
 
   testWidgets('without network it offers to retry', (tester) async {

@@ -8,9 +8,12 @@ import '../auth_texts.dart';
 
 /// "Resend email" with its own busy, sent and error states.
 class ResendButton extends StatefulWidget {
-  const ResendButton({super.key, required this.send});
+  const ResendButton({super.key, required this.send, this.stretch = false});
 
   final Future<void> Function() send;
+
+  /// As wide as the column, under a full-width button.
+  final bool stretch;
 
   @override
   State<ResendButton> createState() => _ResendButtonState();
@@ -44,9 +47,12 @@ class _ResendButtonState extends State<ResendButton> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final stretch = widget.stretch;
     return Column(
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: stretch
+          ? CrossAxisAlignment.stretch
+          : CrossAxisAlignment.start,
       children: [
         OutlinedButton(
           onPressed: _busy ? null : _send,

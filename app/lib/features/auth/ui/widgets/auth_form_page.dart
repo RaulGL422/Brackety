@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../l10n/gen/app_localizations.dart';
 import '../../../legal/ui/legal_links.dart';
+import 'form_message.dart';
 
 /// The frame of the screens before signing in (Raul, 2026-11-25): the product's name instead of an
 /// app bar, the screen's title as its heading, the form in one centred column, and at the foot the
@@ -15,12 +16,16 @@ class AuthFormPage extends ConsumerWidget {
     required this.title,
     required this.children,
     this.subtitle,
+    this.error,
   });
 
   final String title;
 
   /// One line under the title saying what this screen asks for.
   final String? subtitle;
+
+  /// What went wrong, as a notice under the heading: where the eye is after pressing the button.
+  final String? error;
   final List<Widget> children;
 
   @override
@@ -38,7 +43,17 @@ class AuthFormPage extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const _Header(),
-                  _Form(title: title, subtitle: subtitle, children: children),
+                  _Form(
+                    title: title,
+                    subtitle: subtitle,
+                    children: [
+                      if (error case final error?) ...[
+                        FormMessage.error(error),
+                        const SizedBox(height: AppSpacing.l),
+                      ],
+                      ...children,
+                    ],
+                  ),
                   const LegalFooter(),
                 ],
               ),
@@ -70,6 +85,9 @@ class _Form extends StatelessWidget {
     final fields = theme.copyWith(
       inputDecorationTheme: theme.inputDecorationTheme.copyWith(
         floatingLabelBehavior: FloatingLabelBehavior.always,
+        // An error cut at «caracte…» says nothing: let it wrap.
+        errorMaxLines: 3,
+        helperMaxLines: 3,
       ),
     );
     return Center(
@@ -154,6 +172,32 @@ class _Header extends ConsumerWidget {
               onPressed: () => context.push('/connection'),
             ),
         ],
+      ),
+    );
+  }
+}
+
+/// The fields of a form, one under the other, that the browser and the password manager fill
+/// together.
+class AutofillForm extends StatelessWidget {
+  const AutofillForm({
+    super.key,
+    required this.formKey,
+    required this.children,
+  });
+
+  final GlobalKey<FormState> formKey;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: formKey,
+      child: AutofillGroup(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: children,
+        ),
       ),
     );
   }
