@@ -109,7 +109,7 @@ class ParticipantImportService {
     public List<CheckedRow> check(UUID eventId, UUID accountId, List<ImportRow> rows) {
         access.require(eventId, accountId, EventPermission.PARTICIPANTS);
         if (rows.size() > MAX_ROWS) {
-            throw EventException.invalid("At most " + MAX_ROWS + " participants per import.");
+            throw EventException.invalid("IMPORT_TOO_MANY_ROWS", "At most " + MAX_ROWS + " participants per import.");
         }
         return ImportValidator.check(
                 events.get(eventId),
@@ -151,23 +151,23 @@ class ParticipantImportService {
 
     private static void requireConsent(String version) {
         if (!CONSENT_VERSION.equals(version)) {
-            throw EventException.invalid("The current consent must be accepted.");
+            throw EventException.invalid("CONSENT_REQUIRED", "The current consent must be accepted.");
         }
     }
 
     private static void checkFiles(List<ListFile> files) {
         if (files.isEmpty() || files.size() > MAX_FILES) {
-            throw EventException.invalid("Send between 1 and " + MAX_FILES + " files.");
+            throw EventException.invalid("IMPORT_FILE_COUNT", "Send between 1 and " + MAX_FILES + " files.");
         }
         for (var file : files) {
             var known = IMAGE_TYPES.contains(file.mediaType())
                     || file.mediaType().equals(XLSX)
                     || file.mediaType().startsWith("text/");
             if (!known) {
-                throw EventException.invalid("Photos (JPG, PNG, WebP), CSV, TXT or Excel only.");
+                throw EventException.invalid("IMPORT_FILE_TYPE", "Photos (JPG, PNG, WebP), CSV, TXT or Excel only.");
             }
             if (file.content().length == 0 || file.content().length > MAX_FILE_BYTES) {
-                throw EventException.invalid("Each file must be up to 10 MB.");
+                throw EventException.invalid("IMPORT_FILE_SIZE", "Each file must be up to 10 MB.");
             }
         }
     }

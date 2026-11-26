@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/error_codes.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../auth/data/api_error.dart';
 import '../club/data/mat_overview.dart';
@@ -41,7 +42,7 @@ String controlErrorText(AppLocalizations l10n, DioException e) =>
       'NO_OTHER_MAT' => l10n.controlNoOtherMat,
       'MAT_NOT_DISABLED' => l10n.controlMatNotDisabled,
       'REFEREE_GONE' || 'REFEREE_ON_OTHER_MAT' => l10n.controlMatRefereeTaken,
-      _ => l10n.controlError,
+      _ => errorMessage(l10n, e, l10n.controlError),
     };
 
 /// A mat with a referee other than [current]; null if cancelled.

@@ -180,7 +180,8 @@ class GroupService {
                 ? null
                 : request.matId() == null
                         ? schedule.soonestFree(event, clock.instant())
-                                .orElseThrow(() -> EventException.conflict("No mat has a referee yet."))
+                                .orElseThrow(() ->
+                                        EventException.conflict("NO_REFEREE_ON_MATS", "No mat has a referee yet."))
                         : chosenMat(event, request.matId());
         var number = groups.maxNumber(eventId);
         var numbers = new ArrayList<Integer>();
@@ -288,7 +289,7 @@ class GroupService {
             throw EventException.invalid("Every team must be from this category.");
         }
         if (!members.findByTeamIdIn(allTeams).isEmpty()) {
-            throw EventException.conflict("A team is already in a group.");
+            throw EventException.conflict("TEAM_ALREADY_GROUPED", "A team is already in a group.");
         }
     }
 
@@ -306,8 +307,10 @@ class GroupService {
     private static void checkSize(EventCategory category, int real, int wildcards) {
         var size = real + wildcards;
         if (real == 0 || size < category.getMinGroupSize() || size > category.getMaxGroupSize()) {
-            throw EventException.invalid("A group of this category is of " + category.getMinGroupSize() + " to "
-                    + category.getMaxGroupSize() + ", wildcards included, with one non-wildcard at least.");
+            throw EventException.invalid(
+                    "GROUP_SIZE",
+                    "A group of this category is of " + category.getMinGroupSize() + " to " + category.getMaxGroupSize()
+                            + ", wildcards included, with one non-wildcard at least.");
         }
     }
 

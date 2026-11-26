@@ -48,7 +48,6 @@ class ScoreboardService {
     static final String MATCH_CONFLICT = "MATCH_CONFLICT";
     static final String MATCH_IN_REVIEW = "MATCH_IN_REVIEW";
     static final String MATCH_STALE = "MATCH_STALE";
-    static final String FIGHTER_RESTING = "FIGHTER_RESTING";
     static final String MAT_HAS_INDIVIDUAL = "MAT_HAS_INDIVIDUAL";
 
     private static final Logger log = LoggerFactory.getLogger(ScoreboardService.class);
@@ -177,7 +176,8 @@ class ScoreboardService {
         phase.requireInProgress(match.getEventId());
         var mat = match.getMatId() == null
                 ? refereeMatOf(match, actorId)
-                        .orElseThrow(() -> EventException.conflict("The referee of this action has no mat now."))
+                        .orElseThrow(() -> EventException.conflict(
+                                "REFEREE_WITHOUT_MAT", "The referee of this action has no mat now."))
                 : mat(match);
         return apply(match, mat, actorId, request);
     }
@@ -249,8 +249,8 @@ class ScoreboardService {
         writer.append(match, event, history, action, now, true, true).ifPresent(refusal -> {
             throw switch (refusal.cause()) {
                 case AGE -> EventException.invalid(refusal.detail());
-                case FIGHTER_RESTING -> EventException.conflict(FIGHTER_RESTING, refusal.detail());
-                default -> EventException.conflict(refusal.detail());
+                // MAT_BUSY, FIGHTER_BUSY, FIGHTER_RESTING…: the same names the review shows.
+                default -> EventException.conflict(refusal.cause().name(), refusal.detail());
             };
         });
         return null;

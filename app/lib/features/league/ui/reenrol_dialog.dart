@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/error_codes.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../club/data/participant.dart';
 import '../../club/state/club_providers.dart';
@@ -178,9 +179,9 @@ class _ReenrolDialogState extends ConsumerState<_ReenrolDialog> {
         ..invalidate(standingsProvider(widget.eventId));
       if (mounted) Navigator.pop(context);
       toasts.show(l10n.reenrolDone(added), kind: ToastKind.success);
-    } on DioException {
+    } on DioException catch (e) {
       if (mounted) setState(() => _saving = false);
-      toasts.show(l10n.saveError, kind: ToastKind.error);
+      toasts.show(errorMessage(l10n, e, l10n.saveError), kind: ToastKind.error);
     }
   }
 }

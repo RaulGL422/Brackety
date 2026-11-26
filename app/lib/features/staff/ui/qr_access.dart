@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
+import '../../../core/error_codes.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../auth/data/api_error.dart';
 import '../../club/state/club_providers.dart';
@@ -108,7 +109,7 @@ String qrAccessError(AppLocalizations l10n, DioException e) =>
     switch (ApiError.from(e).code) {
       'PHASE_FINISHED' => l10n.qrAccessPhaseFinished,
       'TOO_MANY_QR_ACCESSES' => l10n.qrAccessTooMany,
-      _ => l10n.saveError,
+      _ => errorMessage(l10n, e, l10n.saveError),
     };
 
 /// The QR and the sign-in and password to come back in. Once scanned the club hears who came in; it

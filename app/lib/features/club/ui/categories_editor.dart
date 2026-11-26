@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/error_codes.dart';
 import '../../../l10n/gen/app_localizations.dart';
-import '../../auth/data/api_error.dart';
 import '../../grouping/state/grouping_providers.dart';
 import '../data/club_repository.dart';
 import '../data/event_category.dart';
@@ -55,13 +55,14 @@ class _CategoriesEditorState extends ConsumerState<CategoriesEditor> {
         ..invalidate(categoriesProvider(widget.eventId));
       toasts.show(savedText, duration: const Duration(seconds: 1));
     } on DioException catch (e) {
-      toasts.show(switch (e.response?.statusCode) {
-        409 when ApiError.from(e).code == 'RETURN_LEG_IN_USE' =>
-          l10n.categoryReturnLegInUse,
-        409 => l10n.categoriesInUse,
-        400 => l10n.categoriesInvalid,
-        _ => l10n.saveError,
-      }, kind: ToastKind.error);
+      toasts.show(
+        errorMessage(l10n, e, switch (e.response?.statusCode) {
+          409 => l10n.categoriesInUse,
+          400 => l10n.categoriesInvalid,
+          _ => l10n.saveError,
+        }),
+        kind: ToastKind.error,
+      );
     } finally {
       if (mounted) setState(() => _saving = false);
     }

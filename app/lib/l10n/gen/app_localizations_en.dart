@@ -3641,4 +3641,151 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get legalFooterLabel => 'Legal texts';
+
+  @override
+  String get errorAlreadyGrouped =>
+      'Someone is already in a group or team: take them out first.';
+
+  @override
+  String get errorCategoryAgesInverted =>
+      'A category\'s minimum age is above its maximum.';
+
+  @override
+  String get errorCategoryAgesOverlap =>
+      'Two categories share ages: each age goes to one only.';
+
+  @override
+  String get errorCategoryInUse =>
+      'That category already has groups or teams: it cannot be removed.';
+
+  @override
+  String get errorCategoryOnlyName =>
+      'That category already has groups or teams: only its name can change.';
+
+  @override
+  String get errorConsentRequired =>
+      'Accept the current import terms to go on.';
+
+  @override
+  String get errorDateLocked =>
+      'There are groups or teams already: the date cannot change, as it sets everyone\'s age and category.';
+
+  @override
+  String get errorExportFilterNotANumber =>
+      'A number filter has something that is not a number.';
+
+  @override
+  String get errorExportRepeatedColumn => 'A column is repeated.';
+
+  @override
+  String get errorExportUnknownColumn =>
+      'A column no longer exists: choose the columns again.';
+
+  @override
+  String get errorExportUnknownSheet =>
+      'That sheet no longer exists: choose another.';
+
+  @override
+  String get errorGroupSize =>
+      'The group is not the size of its category (wildcards included) or has nobody but wildcards.';
+
+  @override
+  String get errorGroupSizeInverted =>
+      'A category\'s smallest group is above its largest.';
+
+  @override
+  String get errorGuardianConsentRequired =>
+      'A minor\'s guardian consent is missing.';
+
+  @override
+  String get errorImportFileCount => 'Send between 1 and 10 files.';
+
+  @override
+  String get errorImportFileSize => 'Each file can be up to 10 MB.';
+
+  @override
+  String get errorImportFileType =>
+      'Photos (JPG, PNG, WebP), CSV, TXT or Excel only.';
+
+  @override
+  String get errorImportTooManyRows =>
+      'At most 200 people per import: split the list.';
+
+  @override
+  String get errorInvitationOtherEmail =>
+      'This invitation is for another email: sign in with the account that got it.';
+
+  @override
+  String get errorLengthLocked =>
+      'A match is in progress: the length cannot change until it ends.';
+
+  @override
+  String get errorMatchNotInReview =>
+      'That match is no longer waiting for review: someone has resolved it.';
+
+  @override
+  String get errorMatchStale =>
+      'The match changed on another device: check the scoreboard and try again.';
+
+  @override
+  String get errorMatHasIndividual =>
+      'This mat has individual matches to play first.';
+
+  @override
+  String get errorNoRefereeOnMats =>
+      'No mat has a referee yet: assign one in Settings.';
+
+  @override
+  String get errorOrganizationDuplicate => 'Two clubs have the same name.';
+
+  @override
+  String get errorOrganizationInUse =>
+      'That club has participants: it cannot be removed.';
+
+  @override
+  String get errorParticipantInGroup =>
+      'They are in a group or team: they cannot be removed.';
+
+  @override
+  String get errorParticipantLocked =>
+      'They are in a group or team: their birth date and category cannot change.';
+
+  @override
+  String get errorPhaseAlreadyStarted => 'The phase has already started.';
+
+  @override
+  String get errorPhaseNotFinished => 'The phase is not finished yet.';
+
+  @override
+  String get errorPodiumTwice => 'A category has two podiums.';
+
+  @override
+  String get errorPointsLimitLocked =>
+      'Matches have started: the points limit and superiority cannot change.';
+
+  @override
+  String get errorReenrolInvalid =>
+      'Someone is not in another phase of the league or is already entered.';
+
+  @override
+  String get errorRefereeGone => 'That referee is no longer in the event.';
+
+  @override
+  String get errorRefereeWithoutMat => 'That referee no longer has a mat.';
+
+  @override
+  String get errorRulebookNotPdf => 'The rulebook must be a PDF.';
+
+  @override
+  String get errorRulebookTooLarge => 'The rulebook can be up to 10 MB.';
+
+  @override
+  String get errorTeamAlreadyGrouped => 'That team is already in a group.';
+
+  @override
+  String get errorTeamInGroup =>
+      'That team is in a group: it cannot be undone.';
+
+  @override
+  String get errorFighterResting => 'Someone in this match is still resting.';
 }

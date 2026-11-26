@@ -98,7 +98,7 @@ class CategoryRoster {
     void requireFree(Collection<UUID> ids) {
         if (!groupMembers.findByParticipantIdInAndGhostFalse(ids).isEmpty()
                 || !teamMembers.findByParticipantIdInAndGhostFalse(ids).isEmpty()) {
-            throw EventException.conflict("A participant is already in a group or team.");
+            throw EventException.conflict("ALREADY_GROUPED", "A participant is already in a group or team.");
         }
     }
 

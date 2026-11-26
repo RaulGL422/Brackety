@@ -137,7 +137,7 @@ public class EventService {
         requireEventReferees(eventId, referees);
         // The date sets every participant's age, and so the category their group was made for.
         if (!request.date().equals(event.getEventDate()) && events.hasGroupsOrTeams(eventId)) {
-            throw EventException.conflict("The date cannot change once there are groups or teams.");
+            throw EventException.conflict("DATE_LOCKED", "The date cannot change once there are groups or teams.");
         }
         var rules = NewRules.of(event.modality(), request);
         requireRulesCanChange(eventId, event.modality(), rules);
@@ -165,47 +165,15 @@ public class EventService {
         }
     }
 
-    /** The rules the request asks for: what it leaves out stays as it is. */
-    private record NewRules(
-            Modality.FormatRules individual, Modality.FormatRules team, int minRestSeconds, int superiorityGap) {
-
-        static NewRules of(Modality modality, EventSettingsRequest request) {
-            return new NewRules(
-                    new Modality.FormatRules(
-                            Objects.requireNonNullElse(
-                                    request.matchSeconds(),
-                                    modality.individual().matchSeconds()),
-                            Objects.requireNonNullElse(
-                                    request.pointsLimit(), modality.individual().pointsLimit())),
-                    new Modality.FormatRules(
-                            Objects.requireNonNullElse(
-                                    request.teamMatchSeconds(), modality.team().matchSeconds()),
-                            Objects.requireNonNullElse(
-                                    request.teamPointsLimit(), modality.team().pointsLimit())),
-                    Objects.requireNonNullElse(request.minRestSeconds(), modality.getMinRestSeconds()),
-                    Objects.requireNonNullElse(
-                            request.superiorityGap(), modality.scoring().superiorityGap()));
-        }
-
-        boolean changeLength(Modality modality) {
-            return individual.matchSeconds() != modality.individual().matchSeconds()
-                    || team.matchSeconds() != modality.team().matchSeconds();
-        }
-
-        boolean changeHowAMatchEnds(Modality modality) {
-            return individual.pointsLimit() != modality.individual().pointsLimit()
-                    || team.pointsLimit() != modality.team().pointsLimit()
-                    || superiorityGap != modality.scoring().superiorityGap();
-        }
-    }
-
     private void requireRulesCanChange(UUID eventId, Modality modality, NewRules rules) {
         if (rules.changeLength(modality) && events.hasMatchIn(eventId, "IN_PROGRESS")) {
-            throw EventException.conflict("The match length cannot change while a match is in progress.");
+            throw EventException.conflict(
+                    "LENGTH_LOCKED", "The match length cannot change while a match is in progress.");
         }
         // A disqualification scores the limit for the rival: started matches keep the one they had.
         if (rules.changeHowAMatchEnds(modality) && events.hasStartedMatches(eventId)) {
-            throw EventException.conflict("The points limit cannot change once a match has started.");
+            throw EventException.conflict(
+                    "POINTS_LIMIT_LOCKED", "The points limit cannot change once a match has started.");
         }
     }
 

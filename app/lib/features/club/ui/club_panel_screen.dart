@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/error_codes.dart';
 import '../../../core/up_button.dart';
 import '../../../core/upload/file_upload.dart';
 import '../../../l10n/gen/app_localizations.dart';
@@ -314,8 +315,8 @@ Future<void> _importResults(
 /// The message for a failed save: 409 means groups depend on what changed.
 String saveErrorMessage(AppLocalizations l10n, DioException error) =>
     phaseErrorMessage(l10n, error) ??
-    switch (error.response?.statusCode) {
+    errorMessage(l10n, error, switch (error.response?.statusCode) {
       409 => l10n.saveConflict,
       400 => l10n.saveInvalid,
       _ => l10n.saveError,
-    };
+    });

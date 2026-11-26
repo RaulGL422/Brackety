@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/error_codes.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../club/data/staff_member.dart';
 import '../../club/state/club_providers.dart';
@@ -258,7 +259,7 @@ String staffErrorMessage(AppLocalizations l10n, DioException error) =>
       {'code': 'INVITATION_TOO_SOON'} => l10n.staffErrorTooSoon,
       {'code': 'TOO_MANY_INVITATIONS'} => l10n.staffErrorTooMany,
       {'code': 'REFEREE_ON_MAT'} => l10n.staffErrorOnMat,
-      _ => l10n.saveError,
+      _ => errorMessage(l10n, error, l10n.saveError),
     };
 
 class _InviteDialog extends StatefulWidget {
