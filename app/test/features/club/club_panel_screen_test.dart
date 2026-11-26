@@ -30,6 +30,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../support/fakes.dart';
 import '../../support/staff_fakes.dart';
@@ -297,6 +298,9 @@ void main() {
     categoryName: '4-7',
   );
 
+  late GoRouter router;
+  String location() => router.routerDelegate.currentConfiguration.uri.path;
+
   Future<void> pumpPanel(
     WidgetTester tester,
     Size size, {
@@ -307,6 +311,7 @@ void main() {
     MyEvent? me,
     bool importAvailable = false,
     List<ExportAuditEntry> audit = const [],
+    String at = '/events/e1/club',
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
@@ -426,7 +431,7 @@ void main() {
             ],
           ),
         ],
-        child: MaterialApp(
+        child: MaterialApp.router(
           builder: (_, child) => ToastHost(child: child!),
           theme: lightTheme(),
           localizationsDelegates: const [
@@ -434,7 +439,10 @@ void main() {
             ...coreLocalizationsDelegates,
           ],
           supportedLocales: AppLocalizations.supportedLocales,
-          home: const ClubPanelScreen(eventId: 'e1'),
+          routerConfig: router = GoRouter(
+            initialLocation: at,
+            routes: clubPanelRoutes(),
+          ),
         ),
       ),
     );
@@ -1031,6 +1039,25 @@ void main() {
     await tester.tap(find.text('Scores').last);
     await tester.pumpAndSettle();
     expect(find.text('Leave without saving'), findsNothing);
+  });
+
+  testWidgets('the tab is in the address: a reload opens it again', (
+    tester,
+  ) async {
+    await pumpPanel(tester, const Size(1440, 900));
+    await tester.tap(find.text('Mats').last);
+    await tester.pumpAndSettle();
+    expect(location(), '/events/e1/club/mats');
+    expect(find.text('Mat 1 · arbitro1'), findsOneWidget);
+    // Back leaves the panel instead of walking through its tabs.
+    expect(router.canPop(), isFalse);
+
+    await pumpPanel(tester, const Size(1440, 900), at: '/events/e1/club/mats');
+    expect(find.text('Mat 1 · arbitro1'), findsOneWidget);
+
+    // A tab that does not exist opens the first one.
+    await pumpPanel(tester, const Size(1440, 900), at: '/events/e1/club/nope');
+    expect(find.text('Zoe Test'), findsOneWidget);
   });
 
   testWidgets('the club names the person behind each account', (tester) async {

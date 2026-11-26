@@ -136,7 +136,7 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
       appBar: AppBar(
         leading: UpButton(
           label: l10n.clubParticipants,
-          fallback: '/events/${widget.eventId}/club',
+          fallback: '/events/${widget.eventId}/club/participants',
         ),
         leadingWidth: UpButton.leadingWidth(context),
         title: Text(l10n.importButton),

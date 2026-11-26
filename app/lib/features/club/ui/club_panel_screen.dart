@@ -22,13 +22,34 @@ import 'participants_tab.dart';
 import 'settings_tab.dart';
 import 'standings_tab.dart';
 
+/// The panel's addresses: the tab goes in the path, so a reload or a shared link opens it again
+/// (`/events/:eventId/club/mats`). Without one, the first tab the user has.
+List<GoRoute> clubPanelRoutes() {
+  Widget panel(GoRouterState state) => ClubPanelScreen(
+    // Keyed by event so moving to another phase starts the panel afresh.
+    key: ValueKey(state.pathParameters['eventId']),
+    eventId: state.pathParameters['eventId']!,
+    tab: state.pathParameters['tab'],
+  );
+  return [
+    GoRoute(path: '/events/:eventId/club', builder: (_, state) => panel(state)),
+    GoRoute(
+      path: '/events/:eventId/club/:tab',
+      builder: (_, state) => panel(state),
+    ),
+  ];
+}
+
 /// What the club sees of a phase: live scores, mats, entries and settings; and its league. A helper
 /// sees the tabs their permissions open (F1-7 C): the mats to watch, control or review, and the
 /// participants.
 class ClubPanelScreen extends ConsumerStatefulWidget {
-  const ClubPanelScreen({super.key, required this.eventId});
+  const ClubPanelScreen({super.key, required this.eventId, this.tab});
 
   final String eventId;
+
+  /// The tab's name in the address; one the user does not have (or none) opens the first.
+  final String? tab;
 
   @override
   ConsumerState<ClubPanelScreen> createState() => _ClubPanelScreenState();
@@ -37,7 +58,6 @@ class ClubPanelScreen extends ConsumerStatefulWidget {
 enum _PanelTab { standings, mats, participants, settings }
 
 class _ClubPanelScreenState extends ConsumerState<ClubPanelScreen> {
-  var _tab = _PanelTab.standings;
   final _settingsUnsaved = ValueNotifier(false);
 
   @override
@@ -76,7 +96,8 @@ class _ClubPanelScreenState extends ConsumerState<ClubPanelScreen> {
         _PanelTab.participants,
       if (isClub) _PanelTab.settings,
     ];
-    final tab = tabs.contains(_tab) ? _tab : tabs.firstOrNull;
+    final asked = _PanelTab.values.asNameMap()[widget.tab];
+    final tab = tabs.contains(asked) ? asked : tabs.firstOrNull;
     final title = me?.name ?? l10n.eventClubPanel;
     // A phase is entered from its league: back goes there; a helper's, to their events.
     final fallback = isClub ? '/leagues/${widget.eventId}' : '/';
@@ -167,9 +188,15 @@ class _ClubPanelScreenState extends ConsumerState<ClubPanelScreen> {
             },
         ],
         selectedIndex: tabs.indexOf(tab!),
+        // Replace, not push: the same page stays (its unsaved warning too) and back leaves the
+        // panel instead of walking through its tabs.
         onSelected: (i) => tabs[i] == tab
             ? null
-            : _leave(() => setState(() => _tab = tabs[i])),
+            : _leave(
+                () => context.replace(
+                  '/events/${widget.eventId}/club/${tabs[i].name}',
+                ),
+              ),
         body: body,
       ),
     );
