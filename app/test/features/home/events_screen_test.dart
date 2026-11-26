@@ -1,3 +1,5 @@
+import 'package:brackety/features/appearance/data/device_prefs.dart';
+import 'package:brackety/features/appearance/state/device_prefs_provider.dart';
 import 'package:brackety/features/auth/state/auth_providers.dart';
 import 'package:brackety/features/events/data/my_event.dart';
 import 'package:brackety/features/events/state/events_providers.dart';
@@ -84,6 +86,7 @@ void main() {
     Size size = const Size(360, 800),
     bool organizer = true,
     DateTime? today,
+    DevicePrefs prefs = const DevicePrefs(),
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
@@ -115,6 +118,7 @@ void main() {
         overrides: [
           myEventsProvider.overrideWith((ref) async => events),
           accountOverride(organizer ? clubAccount : testAccount()),
+          savedDevicePrefsProvider.overrideWithValue(prefs),
           todayProvider.overrideWithValue(today ?? DateTime(2026, 11, 26)),
         ],
         child: MaterialApp.router(
@@ -370,5 +374,37 @@ void main() {
 
     expect(find.textContaining('It is today.'), findsOneWidget);
     expect(find.textContaining('It starts on'), findsNothing);
+  });
+
+  testWidgets('a device can show every finished event or none', (tester) async {
+    await pump(
+      tester,
+      _clubEvents,
+      prefs: const DevicePrefs(finished: FinishedShown.all),
+    );
+    await tester.scrollUntilVisible(
+      find.text('Copa 1'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.textContaining('See all'), findsNothing);
+  });
+
+  testWidgets('a device that hides the finished events has no such section', (
+    tester,
+  ) async {
+    await pump(
+      tester,
+      _clubEvents,
+      prefs: const DevicePrefs(finished: FinishedShown.none),
+    );
+
+    await tester.scrollUntilVisible(
+      find.text('Open de Grappling'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.text('Copa 4'), findsNothing);
+    expect(find.textContaining('See all'), findsNothing);
   });
 }

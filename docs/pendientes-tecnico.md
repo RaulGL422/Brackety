@@ -9,6 +9,7 @@ Lo técnico que espera, sin fecha. Parte de `pendientes.md` (sección 5). Lo hec
 - [ ] Reparto no reproducible: con la misma entrada, los empates del reparto (tapiz libre para el bote, combate propuesto) se deciden por el orden de `HashMap<UUID, …>` (`MatFloor`, `MatPlanner`, `CategoryRoster`), que cambia con los ids. Desempatar por número de tapiz, grupo y orden del combate; cambia comportamiento, PR aparte. Hasta entonces una semilla de `EventDaySimulationTest` no repite el mismo día.
 - [ ] Mis eventos con texto al 200 % en un móvil: la barra superior desborda 45 px (la vio el test de accesibilidad de las pantallas sin sesión, 2026-11-26).
 - [ ] Tapiz: al acabar un descanso la lista no se refresca sola; hay que salir y volver a entrar.
+- [ ] Marcador: «Botones grandes para una mano» (propuesto en Ajustes de la app, 2026-11-26): rediseño del marcador, tarea aparte.
 - [ ] Marcador en móvil (360 px): el texto de «Deshacer» corta el tiempo («+1 Rojo · 0…»).
 - [ ] Refresh idempotente: caché en memoria, supone una sola instancia de la API.
 - [ ] Register y forgot: pequeña diferencia de tiempo según exista la cuenta (aceptado por ahora).

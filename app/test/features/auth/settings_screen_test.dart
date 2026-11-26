@@ -1,5 +1,7 @@
 import 'package:brackety/core/download/file_download.dart';
+import 'package:brackety/features/appearance/data/device_prefs.dart';
 import 'package:brackety/features/appearance/data/theme_store.dart';
+import 'package:brackety/features/appearance/state/device_prefs_provider.dart';
 import 'package:brackety/features/appearance/state/theme_mode_provider.dart';
 import 'package:brackety/features/auth/data/account.dart';
 import 'package:brackety/features/auth/data/registration.dart';
@@ -27,6 +29,7 @@ void main() {
     ThemeStore? themes,
     ThemeMode savedTheme = ThemeMode.system,
     String location = '/settings',
+    _FakePrefsStore? prefs,
   }) async {
     final api = FakeAccountApi(account: account);
     await pumpAuthApp(
@@ -41,6 +44,7 @@ void main() {
         ),
         if (themes != null) themeStoreProvider.overrideWithValue(themes),
         savedThemeModeProvider.overrideWithValue(savedTheme),
+        devicePrefsStoreProvider.overrideWithValue(prefs ?? _FakePrefsStore()),
       ],
     );
     return api;
@@ -144,8 +148,9 @@ void main() {
 
       expect(find.text('App settings'), findsOneWidget);
       expect(find.text('Language'), findsOneWidget);
+      await scrollTo(tester, 'Appearance');
+      await scrollTo(tester, 'Scoreboard and mat');
       await scrollTo(tester, 'About Brackety');
-      expect(find.text('Appearance'), findsOneWidget);
       expect(tester.takeException(), isNull);
       await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
       await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
@@ -447,6 +452,75 @@ void main() {
     });
   });
 
+  group('device preferences', () {
+    testWidgets('a text size of its own replaces the device\'s', (
+      tester,
+    ) async {
+      final prefs = _FakePrefsStore();
+      await openSettings(tester, location: '/app-settings', prefs: prefs);
+
+      await scrollTo(tester, 'Text size');
+      await tester.tap(find.text('As on the device'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('150 %').last);
+      await tester.pumpAndSettle();
+
+      final scaler = MediaQuery.textScalerOf(
+        tester.element(find.text('Text and contrast')),
+      );
+      expect(scaler.scale(10), 15);
+      expect(prefs.saved?.textScale, 1.5);
+    });
+
+    testWidgets('more contrast turns the grey text to ink', (tester) async {
+      final prefs = _FakePrefsStore();
+      await openSettings(tester, location: '/app-settings', prefs: prefs);
+
+      await scrollTo(tester, 'More contrast');
+      await tapText(tester, 'More contrast');
+
+      final scheme = Theme.of(tester.element(find.text('More contrast')))
+          .colorScheme;
+      expect(scheme.onSurfaceVariant, scheme.onSurface);
+      expect(prefs.saved?.moreContrast, isTrue);
+    });
+
+    testWidgets('the scoreboard\'s bell, buzz and screen are saved', (
+      tester,
+    ) async {
+      final prefs = _FakePrefsStore();
+      await openSettings(tester, location: '/app-settings', prefs: prefs);
+
+      for (final title in [
+        'Bell',
+        'Vibrate at the end',
+        'Keep the screen on',
+      ]) {
+        await scrollTo(tester, title);
+        await tapText(tester, title);
+      }
+
+      final saved = prefs.saved!;
+      expect(
+        (saved.bell, saved.vibrate, saved.keepScreenOn),
+        (false, false, false),
+      );
+    });
+
+    testWidgets('how many finished events show is saved', (tester) async {
+      final prefs = _FakePrefsStore();
+      await openSettings(tester, location: '/app-settings', prefs: prefs);
+
+      await scrollTo(tester, 'Finished events shown');
+      await tester.tap(find.text('The latest 3'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('None').last);
+      await tester.pumpAndSettle();
+
+      expect(prefs.saved?.finished, FinishedShown.none);
+    });
+  });
+
   group('language', () {
     testWidgets('switching changes the app and the account', (tester) async {
       final api = await openSettings(tester, location: '/app-settings');
@@ -696,4 +770,14 @@ class _FakeThemeStore implements ThemeStore {
 
   @override
   Future<void> write(ThemeMode mode) async => saved = mode;
+}
+
+class _FakePrefsStore implements DevicePrefsStore {
+  DevicePrefs? saved;
+
+  @override
+  Future<DevicePrefs> read() async => saved ?? const DevicePrefs();
+
+  @override
+  Future<void> write(DevicePrefs prefs) async => saved = prefs;
 }

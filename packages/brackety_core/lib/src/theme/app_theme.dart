@@ -23,12 +23,23 @@ void registerFontLicenses() {
   }
 }
 
-ThemeData lightTheme() => buildTheme(Brightness.light);
+ThemeData lightTheme({bool moreContrast = false}) =>
+    buildTheme(Brightness.light, moreContrast: moreContrast);
 
-ThemeData darkTheme() => buildTheme(Brightness.dark);
+ThemeData darkTheme({bool moreContrast = false}) =>
+    buildTheme(Brightness.dark, moreContrast: moreContrast);
 
-ThemeData buildTheme(Brightness brightness) {
-  final scheme = brightness == Brightness.light ? _light : _dark;
+/// [moreContrast]: the secondary text and the outlines take the ink colour, for strong sun or
+/// poor sight (an app setting, Raul 2026-11-26).
+ThemeData buildTheme(Brightness brightness, {bool moreContrast = false}) {
+  final plain = brightness == Brightness.light ? _light : _dark;
+  final scheme = moreContrast
+      ? plain.copyWith(
+          onSurfaceVariant: plain.onSurface,
+          outline: plain.onSurface,
+          outlineVariant: plain.outline,
+        )
+      : plain;
   final base = ThemeData(
     colorScheme: scheme,
     fontFamily: _bodyFont,

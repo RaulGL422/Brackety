@@ -5,7 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 
 import 'app.dart';
+import 'features/appearance/data/device_prefs.dart';
 import 'features/appearance/data/theme_store.dart';
+import 'features/appearance/state/device_prefs_provider.dart';
 import 'features/appearance/state/theme_mode_provider.dart';
 import 'features/auth/data/server_store.dart';
 import 'features/auth/state/server_providers.dart';
@@ -21,12 +23,14 @@ Future<void> main() async {
   // Before the first request: the saved session belongs to the saved server.
   final savedServer = kIsWeb ? null : await const SecureServerStore().read();
   final savedTheme = await const SecureThemeStore().read();
+  final savedPrefs = await const SecureDevicePrefsStore().read();
   runApp(
     ProviderScope(
       overrides: [
         ...serverOverrides(savedServer),
         ...offlineRegistrations(),
         savedThemeModeProvider.overrideWithValue(savedTheme),
+        savedDevicePrefsProvider.overrideWithValue(savedPrefs),
       ],
       child: const BracketyApp(),
     ),
