@@ -242,6 +242,33 @@ void main() {
     expect(find.text('Create an account'), findsOneWidget);
   });
 
+  // Raul, 2026-11-26: as in the design, the way to sign up is a compact button beside its question,
+  // not a second full-width button competing with «Sign in».
+  testWidgets('«Create an account» is a compact button beside its question', (
+    tester,
+  ) async {
+    useSize(tester, screenSizes['desktop']!);
+    await pumpAuthApp(tester, FakeAuthApi());
+
+    final button = find.widgetWithText(OutlinedButton, 'Create an account');
+    final question = find.text('No account yet?');
+    final signIn = find.widgetWithText(FilledButton, 'Sign in');
+    // The test font is wide: here the two do not fit on one row, so the button goes under.
+    final sameRow =
+        (tester.getCenter(button).dy - tester.getCenter(question).dy).abs() < 1;
+    expect(
+      sameRow
+          ? tester.getTopLeft(button).dx > tester.getTopRight(question).dx
+          : tester.getTopLeft(button).dy >= tester.getBottomLeft(question).dy,
+      isTrue,
+    );
+    expect(
+      tester.getSize(button).width,
+      lessThan(tester.getSize(signIn).width * 0.8),
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('the password can be shown', (tester) async {
     await pumpAuthApp(tester, FakeAuthApi());
     TextField password() =>
