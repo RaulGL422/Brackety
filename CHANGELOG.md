@@ -7,6 +7,7 @@ esa sección pasa a llamarse como la versión. Debug enseña su compilación jun
 ## Sin publicar (en debug)
 
 ### Nuevo
+- Textos legales rediseñados: resumen al principio, índice «En esta página», letra más grande, tablas legibles en el móvil y la versión como fecha. «Han cambiado los textos» marca lo que ya has leído y nombra los textos que aceptas.
 - Pantalla de entrada (y las demás sin sesión) rediseñada: sin barra, título y textos más claros, pie legal ordenado y la versión aparte; mejoras de accesibilidad (#204).
 - Cuentas de soporte: el superadmin las activa en la ficha del usuario; solo ellas (y debug) ven Conexión, ahora al final de Ajustes (#203).
 - Debug: pantalla «Cambios» con esta lista y un buscador por palabras (app: menú de la cuenta; admin: pestaña) (#201).

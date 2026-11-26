@@ -1,6 +1,13 @@
 # Terms of use
 
-Version {{VERSION}}
+> **In short**
+>
+> - Brackety is free.
+> - Accounts are personal. Children under 14 cannot have their own account.
+> - Whoever organizes an event answers for their students' data and the results.
+> - Brackety does not handle payments: the organizer collects them, outside the app.
+>
+> The full text below is what applies.
 
 By creating an account or using Brackety you accept these terms. If you do not agree, do not use the service.
 

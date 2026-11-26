@@ -23,7 +23,7 @@ Estados: **pendiente** · **en curso** · **en pruebas** (hecho; falta la prueba
 | `entornos` | en curso | Producción y debug en la Pi; falta pasar los datos de la F1 a producción |
 | `auth` | en pruebas | Tareas 1-9 de 9 |
 | `perfiles-menores` | pendiente | |
-| `legal-paginas` | en pruebas | Pasos 1-2, puerta legal (#198) y nueva aceptación si cambia un texto (#199) |
+| `legal-paginas` | en pruebas | Pasos 1-2, puerta legal (#198) y nueva aceptación si cambia un texto (#199), páginas rediseñadas |
 | `eventos` | pendiente | Adelantado: comenzar, finalizar y reabrir la fase (#129); rediseño en `producto/eventos-ux.md` |
 | `inscripciones` | pendiente | Adelantado por el prototipo y la importación |
 | `ayudantes-permisos` | pendiente | Adelantado: invitaciones (#122) y permisos por persona (#130, #131, #133, #192) |

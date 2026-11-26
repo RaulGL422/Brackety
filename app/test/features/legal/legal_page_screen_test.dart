@@ -13,6 +13,28 @@ const _wideTable = '''
 | Organising events: entries, groups, scoreboard and standings | Contract with the organizer; guardian consent for minors | Web and Android app | Until the account is deleted |
 ''';
 
+// As the server sends them (Raul, 2026-11-25): a summary, then numbered sections.
+const _structured =
+    '''
+> **In short**
+>
+> - We do not use your data for advertising.
+
+This policy explains which data Brackety processes.
+
+## 1. Controller
+
+The owner.
+
+## 2. Purposes
+
+$_wideTable
+
+## 3. Your rights
+
+You can ask to see your data.
+''';
+
 bool _scrollsSideways(Widget widget) =>
     widget is SingleChildScrollView &&
     widget.scrollDirection == Axis.horizontal;
@@ -35,24 +57,63 @@ void main() {
   }
 
   for (final MapEntry(key: device, value: size) in screenSizes.entries) {
-    testWidgets('a legal page renders its markdown and a wide table fits on '
-        '$device', (tester) async {
+    testWidgets('a legal page reads well and its table fits on $device', (
+      tester,
+    ) async {
       useSize(tester, size);
-      final legal = FakeLegalRepository()..markdown = _wideTable;
+      final handle = tester.ensureSemantics();
+      final legal = FakeLegalRepository()..markdown = _structured;
       await openPage(tester, 'privacy', legal: legal);
 
-      expect(find.widgetWithText(AppBar, 'Privacy policy'), findsOneWidget);
-      expect(find.text('privacy (en)'), findsOneWidget);
-      expect(find.byType(Table), findsOneWidget);
-      expect(legal.texts.single, (LegalDocumentType.privacy, 'en'));
+      // The title once, as the heading: not again in the bar.
       expect(
-        find.ancestor(
-          of: find.byType(Table),
-          matching: find.byWidgetPredicate(_scrollsSideways),
-        ),
-        size.width < 600 ? findsOneWidget : findsNothing,
+        find.descendant(of: find.byType(AppBar), matching: find.byType(Text)),
+        findsNothing,
       );
+      expect(
+        tester.getSemantics(find.text('privacy (en)')),
+        matchesSemantics(label: 'privacy (en)', isHeader: true),
+      );
+      expect(find.text('Version of November 4, 2026'), findsOneWidget);
+      expect(find.text('On this page'), findsOneWidget);
+      expect(find.text('Controller'), findsOneWidget);
+      expect(legal.texts.single, (LegalDocumentType.privacy, 'en'));
+      // On a phone each row is a block; wider, a table. Nothing scrolls sideways.
+      expect(
+        find.byType(Table),
+        size.width < 600 ? findsNothing : findsOneWidget,
+      );
+      expect(find.byWidgetPredicate(_scrollsSideways), findsNothing);
+      await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+      await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+      await expectLater(tester, meetsGuideline(textContrastGuideline));
       expect(tester.takeException(), isNull);
+      handle.dispose();
+    });
+
+    testWidgets('the contents take you to a section on $device', (
+      tester,
+    ) async {
+      useSize(tester, size);
+      // Long enough to scroll on any window.
+      final legal = FakeLegalRepository()
+        ..markdown = _structured
+            .replaceFirst(
+              'The owner.',
+              List.filled(60, 'The owner.').join('\n\n'),
+            )
+            .replaceFirst(
+              'You can ask to see your data.',
+              List.filled(60, 'You can ask to see your data.').join('\n\n'),
+            );
+      await openPage(tester, 'privacy', legal: legal);
+      final heading = find.text('3. Your rights');
+      expect(tester.getTopLeft(heading).dy, greaterThan(size.height));
+
+      await tester.tap(find.text('Your rights'));
+      await tester.pumpAndSettle();
+
+      expect(tester.getTopLeft(heading).dy, lessThan(size.height / 2));
     });
 
     testWidgets('a failed load offers a retry on $device', (tester) async {
@@ -80,21 +141,35 @@ void main() {
       final legal = await openPage(tester, 'cookies');
 
       for (final title in ['Privacy policy', 'Terms of use', 'Legal notice']) {
-        expect(find.widgetWithText(OutlinedButton, title), findsOneWidget);
+        expect(find.widgetWithText(ListTile, title), findsOneWidget);
       }
-      expect(
-        find.widgetWithText(OutlinedButton, 'Cookie policy'),
-        findsNothing,
-      );
+      expect(find.widgetWithText(ListTile, 'Cookie policy'), findsNothing);
 
-      await tapText(tester, 'Legal notice');
+      await tester.ensureVisible(find.widgetWithText(ListTile, 'Legal notice'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(ListTile, 'Legal notice'));
+      await tester.pumpAndSettle();
 
-      expect(find.widgetWithText(AppBar, 'Legal notice'), findsOneWidget);
       expect(find.text('legal-notice (en)'), findsOneWidget);
       expect(legal.texts.last, (LegalDocumentType.legalNotice, 'en'));
       expect(tester.takeException(), isNull);
     });
   }
+
+  testWidgets('text at 200 % fits a legal page on a phone', (tester) async {
+    useSize(tester, screenSizes['phone']!);
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    final legal = FakeLegalRepository()..markdown = _structured;
+    await openPage(tester, 'privacy', legal: legal);
+
+    await tester.scrollUntilVisible(
+      find.text('Back to contents'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('an unknown page says it does not exist', (tester) async {
     final legal = await openPage(tester, 'secrets');

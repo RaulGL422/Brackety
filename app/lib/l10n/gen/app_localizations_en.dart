@@ -3551,22 +3551,79 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exportChooseColumn => 'Choose a column';
 
   @override
-  String get legalUpdateTitle => 'We have changed the legal texts';
-
-  @override
-  String get legalUpdateBody =>
-      'These texts changed since you accepted them. Read and accept them to keep using Brackety.';
-
-  @override
-  String legalUpdateVersion(String version) {
+  String legalVersion(String version) {
     return 'Version $version';
   }
 
   @override
-  String get legalUpdateAccept => 'I have read and accept the texts above.';
+  String legalVersionOn(String date) {
+    return 'Version of $date';
+  }
+
+  @override
+  String get legalContents => 'On this page';
+
+  @override
+  String get legalBackToContents => 'Back to contents';
+
+  @override
+  String get legalOtherTexts => 'Other texts';
+
+  @override
+  String legalUpdateTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count legal texts have changed',
+      one: 'A legal text has changed',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String legalUpdateBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'To keep using Brackety, read and accept them.',
+      one: 'To keep using Brackety, read and accept it.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get legalUpdateRead => 'Read';
+
+  @override
+  String get legalUpdateWasRead => 'Already read';
+
+  @override
+  String legalUpdateAcceptDocuments(String documents) {
+    return 'I have read and accept $documents.';
+  }
+
+  @override
+  String legalListAnd(String first, String last) {
+    return '$first and $last';
+  }
+
+  @override
+  String get legalAcceptPrivacy => 'the privacy policy';
+
+  @override
+  String get legalAcceptTerms => 'the terms of use';
+
+  @override
+  String get legalAcceptCookies => 'the cookie policy';
+
+  @override
+  String get legalAcceptNotice => 'the legal notice';
 
   @override
   String get legalUpdateSubmit => 'Accept and continue';
+
+  @override
+  String get legalUpdateDisagree => 'Don\'t agree?';
 
   @override
   String get legalUpdateSignOut => 'Sign out';
