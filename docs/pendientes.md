@@ -20,6 +20,7 @@ Lo que espera a alguien, ordenado por quién tiene que actuar. Lo hecho se borra
 - [ ] Torneo ≠ liga (Raul, 2026-11-21, **muy importante**): un torneo (evento suelto, p. ej. grappling) hoy se ve con fases, podio de liga, puntos por asistir y demás conceptos de liga. No tiene nada que ver con una liga: cada tipo debe mostrar solo lo suyo, en Mis eventos, panel, ajustes y clasificaciones. Revisar todas las pantallas con esa diferencia.
 - [ ] Configuración del evento (Raul, 2026-11-21): da pereza configurar. Jugar con tamaños, subsecciones (desplegables) y mostrar según importancia; lo secundario, oculto tras interruptores. Rediseño en `producto/eventos-ux.md`.
 - [ ] Invitaciones (Raul, 2026-11-26): revisar el flujo entero; sobra la pantalla de aceptar (`/invitation`).
+- [ ] Foto de perfil (Raul, 2026-11-26): poder ponerla en la cuenta (hoy, iniciales). Las fotos nunca son públicas (`06-legal-rgpd.md`): ¿quién la ve? ¿y en perfiles de menores?
 - [ ] Gestión del club (`producto/gestion-club.md`): ¿se amplía el alcance? Si se cobra o factura: forma jurídica, asesor y contratos.
 
 ### Técnicas y diseño
