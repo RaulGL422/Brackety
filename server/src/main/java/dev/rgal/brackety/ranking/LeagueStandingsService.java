@@ -114,62 +114,65 @@ class LeagueStandingsService {
         var rows = new ArrayList<Row>();
         byCategory.entrySet().stream()
                 .sorted(Comparator.comparingInt(e -> order.getOrDefault(e.getKey(), Integer.MAX_VALUE)))
-                .forEach(e -> {
-                    var categoryPodium = podium.of(e.getKey());
-                    var people = e.getValue().stream()
-                            .map(r -> {
-                                var phasePoints = Arrays.asList(points.get(r.personId()));
-                                var total = phasePoints.stream()
-                                        .filter(p -> p != null)
-                                        .mapToInt(PhasePoints::total)
-                                        .sum();
-                                return new Row(
+                .forEach(e -> rows.addAll(ranked(
+                        e.getKey(),
+                        e.getValue().stream()
+                                .map(r -> unranked(
                                         e.getKey(),
-                                        0,
-                                        null,
-                                        r.personId(),
-                                        r.firstName(),
-                                        r.lastName(),
-                                        r.organizationName(),
-                                        phasePoints,
-                                        total,
-                                        discipline.warnings().getOrDefault(r.personId(), 0),
-                                        discipline.disqualifications().getOrDefault(r.personId(), 0),
-                                        latestPhase.get(r.personId()),
-                                        r.participantId());
-                            })
-                            .sorted(Comparator.comparingInt(Row::total)
-                                    .reversed()
-                                    .thenComparing(Row::firstName, Names.ORDER)
-                                    .thenComparing(Row::lastName, Names.ORDER))
-                            .toList();
-                    for (int i = 0; i < people.size(); i++) {
-                        var r = people.get(i);
-                        var position = i > 0 && people.get(i - 1).total() == r.total()
-                                ? rows.getLast().position()
-                                : i + 1;
-                        var medal = NO_CATEGORY.equals(e.getKey()) ? null : categoryPodium.medal(position, r.total());
-                        rows.add(new Row(
-                                r.categoryName(),
-                                position,
-                                medal,
-                                r.personId(),
-                                r.firstName(),
-                                r.lastName(),
-                                r.organizationName(),
-                                r.phases(),
-                                r.total(),
-                                r.warnings(),
-                                r.disqualifications(),
-                                r.eventId(),
-                                r.participantId()));
-                    }
-                });
+                                        r,
+                                        Arrays.asList(points.get(r.personId())),
+                                        discipline,
+                                        latestPhase.get(r.personId())))
+                                .toList(),
+                        podium.of(e.getKey()))));
         return new LeagueStandings(
                 phases.stream()
                         .map(p -> new LeagueStandings.Phase(p.getId(), p.getPhaseNumber(), p.getName()))
                         .toList(),
                 rows);
+    }
+
+    // A person with their points phase by phase (null where they did not take part), not yet placed.
+    private static Row unranked(
+            String category, StandingRow r, List<PhasePoints> phasePoints, Discipline discipline, UUID latestPhase) {
+        var total = phasePoints.stream()
+                .filter(p -> p != null)
+                .mapToInt(PhasePoints::total)
+                .sum();
+        return new Row(
+                category,
+                0,
+                null,
+                r.personId(),
+                r.firstName(),
+                r.lastName(),
+                r.organizationName(),
+                phasePoints,
+                total,
+                discipline.warnings().getOrDefault(r.personId(), 0),
+                discipline.disqualifications().getOrDefault(r.personId(), 0),
+                latestPhase,
+                r.participantId());
+    }
+
+    // Most points first, then by name; the same total shares the position and the medal.
+    private static List<Row> ranked(String category, List<Row> people, Podium podium) {
+        var sorted = people.stream()
+                .sorted(Comparator.comparingInt(Row::total)
+                        .reversed()
+                        .thenComparing(Row::firstName, Names.ORDER)
+                        .thenComparing(Row::lastName, Names.ORDER))
+                .toList();
+        var placed = new ArrayList<Row>();
+        for (int i = 0; i < sorted.size(); i++) {
+            var r = sorted.get(i);
+            var position = i > 0 && sorted.get(i - 1).total() == r.total()
+                    ? placed.getLast().position()
+                    : i + 1;
+            var medal = NO_CATEGORY.equals(category) ? null : podium.medal(position, r.total());
+            placed.add(r.placed(position, medal));
+        }
+        return placed;
     }
 
     private record Discipline(Map<UUID, Integer> warnings, Map<UUID, Integer> disqualifications) {}

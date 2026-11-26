@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.zip.ZipInputStream;
@@ -140,7 +141,7 @@ final class XlsxText {
             return false;
         }
         var unquoted =
-                code.replaceAll("\"[^\"]*\"", "").replaceAll("\\[[^]]*]", "").toLowerCase();
+                code.replaceAll("\"[^\"]*\"", "").replaceAll("\\[[^]]*]", "").toLowerCase(Locale.ROOT);
         return unquoted.matches(".*[dy].*");
     }
 

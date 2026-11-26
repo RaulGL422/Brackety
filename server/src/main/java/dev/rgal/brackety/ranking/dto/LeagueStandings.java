@@ -34,5 +34,23 @@ public record LeagueStandings(List<Phase> phases, List<Row> rows) {
             int warnings,
             int disqualifications,
             UUID eventId,
-            UUID participantId) {}
+            UUID participantId) {
+
+        public Row placed(int position, Integer medal) {
+            return new Row(
+                    categoryName,
+                    position,
+                    medal,
+                    personId,
+                    firstName,
+                    lastName,
+                    organizationName,
+                    phases,
+                    total,
+                    warnings,
+                    disqualifications,
+                    eventId,
+                    participantId);
+        }
+    }
 }

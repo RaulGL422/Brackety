@@ -13,6 +13,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -257,7 +258,7 @@ class ClaudeListReader implements ListReader {
 
     // Java does not escape quotes inside Windows arguments; claude would get a broken schema.
     private static String argument(String value) {
-        var windows = System.getProperty("os.name", "").toLowerCase().contains("win");
+        var windows = System.getProperty("os.name", "").toLowerCase(Locale.ROOT).contains("win");
         return windows ? value.replace("\"", "\\\"") : value;
     }
 
