@@ -19,6 +19,7 @@ Lo que espera a alguien, ordenado por quién tiene que actuar. Lo hecho se borra
 - [ ] Botón de acceso en Mis eventos (Raul, 2026-11-21): hoy pone siempre «Abrir la liga». El texto depende de lo que se abre: liga, competición (evento suelto) o, para árbitros y ayudantes, la fase o competición. Un evento suelto lleva además podio de liga: ¿botón directo a su panel?
 - [ ] Torneo ≠ liga (Raul, 2026-11-21, **muy importante**): un torneo (evento suelto, p. ej. grappling) hoy se ve con fases, podio de liga, puntos por asistir y demás conceptos de liga. No tiene nada que ver con una liga: cada tipo debe mostrar solo lo suyo, en Mis eventos, panel, ajustes y clasificaciones. Revisar todas las pantallas con esa diferencia.
 - [ ] Configuración del evento (Raul, 2026-11-21): da pereza configurar. Jugar con tamaños, subsecciones (desplegables) y mostrar según importancia; lo secundario, oculto tras interruptores. Rediseño en `producto/eventos-ux.md`.
+- [ ] Invitaciones (Raul, 2026-11-26): revisar el flujo entero; sobra la pantalla de aceptar (`/invitation`).
 - [ ] Gestión del club (`producto/gestion-club.md`): ¿se amplía el alcance? Si se cobra o factura: forma jurídica, asesor y contratos.
 
 ### Técnicas y diseño
