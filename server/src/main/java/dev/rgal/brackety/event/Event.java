@@ -19,6 +19,7 @@ import java.time.Period;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -212,7 +213,7 @@ public class Event {
         reasons.stream()
                 .map(String::strip)
                 .filter(r -> !r.isEmpty())
-                .forEach(r -> unique.putIfAbsent(r.toLowerCase(), r));
+                .forEach(r -> unique.putIfAbsent(r.toLowerCase(Locale.ROOT), r));
         warningReasons = new ArrayList<>(unique.values());
     }
 
